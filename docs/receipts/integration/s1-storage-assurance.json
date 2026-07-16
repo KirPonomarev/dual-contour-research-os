@@ -1,0 +1,47 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s1-storage-assurance-20260716",
+  "issued_at": "2026-07-16T22:22:20Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "bridge",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s1-storage-assurance",
+    "agent_id": "agent-5",
+    "ownership_lease_ref": "stages/s1-storage-assurance/ownership-lease.json",
+    "base_sha": "e87bf042a1ffa6f3bc8e042ab1650dd13e336ca4",
+    "head_sha": "647de92b9b3069f5d553eca24c08c004be3aaa48",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "tests/test_stage1_storage_assurance.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "focused_tests": 13,
+      "composed_storage_tests": 40,
+      "connected_tests": 157,
+      "diff_check": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "dependency_adoption": false,
+      "skipped_tests": 0,
+      "implementation_files_changed": 0,
+      "concurrency_retry_corruption": "green",
+      "path_quota_durability_fencing": "green",
+      "manifest_last_and_d2_d3_denial": "green",
+      "branch_ci": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29539244969"
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29539308666",
+    "integration_commit_sha": "21ee64fd2f303f8faff52ba86279248dec96524d"
+  },
+  "integrity": {
+    "payload_sha256": "e0164035e9aca242c6a0f1a5596aea37016b924a1e2815157ee7bc52bfd36226",
+    "parent_refs": [
+      "git:647de92b9b3069f5d553eca24c08c004be3aaa48",
+      "git:21ee64fd2f303f8faff52ba86279248dec96524d",
+      "ci:29539244969",
+      "ci:29539308666"
+    ]
+  }
+}
