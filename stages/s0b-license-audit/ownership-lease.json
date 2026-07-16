@@ -1,0 +1,13 @@
+{
+  "lease_id": "lease-s0b-license-audit-agent-5-20260716",
+  "stage_id": "s0b-license-audit",
+  "agent_id": "agent-5",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-16T19:23:36Z",
+  "expires_at": "2026-07-17T01:23:36Z",
+  "base_sha": "f135fba7e152b3044caa4093f6632c2d8a801c03",
+  "branch": "codex/bridge-a5-s0b-license-audit",
+  "write_set": ["inventory/dependencies/**", "docs/drafts/stage0b/license-security-shortlist.md", "tests/stage0b/test_dependency_shortlist.py"],
+  "delegation_allowed": false,
+  "state": "active"
+}
