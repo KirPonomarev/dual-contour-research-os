@@ -1,0 +1,14 @@
+{
+  "lease_id": "lease-s1-execution-assurance-agent-5-20260716",
+  "stage_id": "s1-execution-assurance",
+  "agent_id": "agent-5",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-16T22:33:42Z",
+  "expires_at": "2026-07-17T04:33:42Z",
+  "base_sha": "c53d59545b81009a378b9f1213cd2cb3b5b805c3",
+  "branch": "codex/bridge-a5-s1-execution-assurance",
+  "worktree": "ephemeral-worktree:s1-execution-assurance",
+  "write_set": ["tests/test_stage1_execution_assurance.py"],
+  "delegation_allowed": false,
+  "state": "active"
+}

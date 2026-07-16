@@ -1,0 +1,65 @@
+{
+  "stage_id": "s1-execution-assurance",
+  "agent_id": "agent-5",
+  "objective": "Create independent adversarial and conformance tests for the composed frozen L0 and researchd execution-receipt-last gate without implementation edits.",
+  "executable_blocker": "The offline execution gate lacks independently owned proof for authority-before-run, deterministic outputs, stale fencing, crash-window false success and receipt-last ordering.",
+  "base_sha": "c53d59545b81009a378b9f1213cd2cb3b5b805c3",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a5-s1-execution-assurance",
+  "worktree": "ephemeral-worktree:s1-execution-assurance",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "docs/receipts/reuse/s1-offline-execution.json",
+    "contracts/v1/JobSpec.schema.json",
+    "contracts/v1/CheckpointManifest.schema.json",
+    "contracts/v1/StagingEnvelope.schema.json",
+    "contracts/v1/ExecutionReceipt.schema.json"
+  ],
+  "write_set": ["tests/test_stage1_execution_assurance.py"],
+  "forbidden_scope": [
+    "implementation-edit",
+    "existing-test-contract-or-root-config-edit",
+    "external-dependency",
+    "domain-or-live-fixture",
+    "scientific-outcome-or-registry-write",
+    "deployment"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "reuse_decision": "a02cddf62d5568d5d0dbee73c8ef3d2e61c359e67e581c9583c1aa1928609e51",
+    "authority_receipt": "9d7b5b817f3ac86fafbb8ce490d72f5aa8aceed26c2d107f931aa1d9ca0a1d6a",
+    "external_dependencies": "none"
+  },
+  "interface_contract": {
+    "l0_exports": ["L0Error", "L0Checkpoint", "L0RunResult", "DeterministicL0Runner"],
+    "execution_exports": ["ExecutionError", "ExecutionRecord", "OfflineExecutionCoordinator", "canonical_json_sha256"],
+    "composed_candidate_test_owner": "agent-0"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m py_compile tests/test_stage1_execution_assurance.py",
+    "python3 -m unittest discover -s tests -p test_stage1_authority.py",
+    "Agent 0 composed acceptance: python3 -m unittest discover -s tests -p test_stage1_execution_assurance.py",
+    "git diff --check",
+    "public privacy, secret and exact write-set scan"
+  ],
+  "risk_class": "independent-offline-execution-adversarial-assurance",
+  "stop_conditions": [
+    "test-skips-without-implementation",
+    "runner-write-before-valid-claim",
+    "unknown-template-network-or-dynamic-code-path",
+    "nondeterministic-output-not-detected",
+    "stale-fence-reaches-checkpoint-or-staging",
+    "receipt-issued-before-checkpoint-artifact-and-completion",
+    "receipt-issued-on-injected-failure",
+    "d2-or-d3-or-domain-outcome-accepted",
+    "domain-or-live-fixture-needed",
+    "private-data-detected"
+  ],
+  "expected_receipt": "docs/receipts/integration/s1-execution-assurance.json",
+  "rollback": "Agent 0 reverts the test-only commit; execution implementation and runtime state remain unchanged.",
+  "commit_authority": "one-scoped-worker-commit",
+  "push_authority": false,
+  "expected_handoff_status": ["ready_for_agent0_audit", "blocked_validation_failed"]
+}
