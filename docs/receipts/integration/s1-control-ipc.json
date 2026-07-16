@@ -1,0 +1,47 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s1-control-ipc-20260716",
+  "issued_at": "2026-07-16T21:31:58Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "bridge",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s1-control-ipc",
+    "agent_id": "agent-1",
+    "ownership_lease_ref": "stages/s1-control-ipc/ownership-lease.json",
+    "base_sha": "1f6f9c0ad874d16bad2b045b02bc1fdb31fdd6c3",
+    "head_sha": "769cd4ac9c2a4f058988856ecbf40f9ef8a4f6a7",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "src/research_bridge/control.py",
+      "src/research_bridge/ipc.py",
+      "tests/test_stage1_control.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "focused_tests": 11,
+      "connected_tests": 102,
+      "diff_check": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "dependency_adoption": false,
+      "peer_authentication": "os-verified-uid-allowlist",
+      "socket_family": "AF_UNIX",
+      "socket_mode": "0660",
+      "max_request_bytes": 65536,
+      "deadline_seconds_max": 5,
+      "invalid_or_unauthorized_backend_calls": 0,
+      "public_network_surface": false
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29536359223",
+    "integration_commit_sha": "769cd4ac9c2a4f058988856ecbf40f9ef8a4f6a7"
+  },
+  "integrity": {
+    "payload_sha256": "3fd32b4d3d2eee6177300923f75f0fe4e7adf5e9c6d9e59a1250e1734122a668",
+    "parent_refs": [
+      "git:769cd4ac9c2a4f058988856ecbf40f9ef8a4f6a7",
+      "ci:29536359223"
+    ]
+  }
+}

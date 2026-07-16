@@ -1,0 +1,32 @@
+{
+  "stage_id": "s1-pause-ledger",
+  "agent_id": "agent-2",
+  "objective": "Extend the existing canonical bridge_job_ledger with append-only persistent global pause/resume events and atomically block claim while paused.",
+  "executable_blocker": "Global pause does not survive restart and claim is not transactionally fenced by persistent safety state.",
+  "base_sha": "1f6f9c0ad874d16bad2b045b02bc1fdb31fdd6c3",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a2-s1-pause-ledger",
+  "worktree": "ephemeral-worktree:s1-pause-ledger",
+  "read_set": ["AGENTS.md", "docs/DEVELOPMENT_AGENT_CONTRACT.md", "docs/receipts/reuse/s1-control-ipc-pause.json", "src/research_bridge/ledger.py", "tests/test_stage1_ledger.py"],
+  "write_set": ["src/research_bridge/ledger.py", "tests/test_stage1_ledger.py"],
+  "forbidden_scope": ["second-ledger-or-table", "runtime-migration", "ipc-edit", "runner", "domain-feature", "external-dependency", "live-execution", "deployment", "contract-or-root-config-edit"],
+  "dependency_hashes": {"contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50", "reuse_decision": "f5bc5676d00384639bff67df911fd0e18b16d67aa357f6965a4d56342fbb0487", "authority_receipt": "32c1323e9bb2e7f10cc997ab413e21d56e6af972cce5e893d62af8c26e91d13b", "external_dependencies": "none"},
+  "interface_contract": {
+    "class": "JobLedger",
+    "new_methods": ["pause_global", "resume_global", "is_globally_paused", "pause_snapshot"],
+    "pause_keywords": ["actor", "reason", "authority_ref", "idempotency_key", "event_at"],
+    "resume_keywords": ["actor", "approval_ref", "idempotency_key", "event_at"],
+    "new_event_types": ["pause", "resume"],
+    "claim_rule": "global pause checked after BEGIN IMMEDIATE and before claim append",
+    "idempotency_rule": "control idempotency keys are unique and duplicate attempts add zero events",
+    "state_rule": "pause state derives from the latest valid pause/resume event and survives reopen"
+  },
+  "acceptance_commands": ["make contracts", "python3 -m unittest discover -s tests -p test_stage1_ledger.py", "make test", "git diff --check", "public privacy and secret scan over exact write-set"],
+  "risk_class": "persistent-kill-switch-state",
+  "stop_conditions": ["claim-succeeds-while-paused", "pause-lost-after-reopen", "resume-without-approval", "duplicate-idempotency-writes", "existing-ledger-tests-regress", "second-ledger-created", "private-data-detected", "write-set-collision"],
+  "expected_receipt": "docs/receipts/integration/s1-pause-ledger.json",
+  "rollback": "Agent 0 reverts the scoped ledger extension. No deployed database or migration exists; synthetic databases are discarded.",
+  "commit_authority": "one-scoped-worker-commit",
+  "push_authority": false,
+  "expected_handoff_status": ["ready_for_agent0_audit", "blocked_validation_failed"]
+}
