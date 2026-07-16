@@ -1,0 +1,46 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s1-execution-authority-20260716",
+  "issued_at": "2026-07-16T22:31:33Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "bridge",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s1-execution-authority",
+    "agent_id": "agent-0",
+    "ownership_lease_ref": "stages/s1-execution-authority/ownership-lease.json",
+    "base_sha": "abf1595e33d8b04a08ae11412da9f120bd19d24e",
+    "head_sha": "b98033ef25d4e8277b82005df0fa1fdfe4bd62bd",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "docs/receipts/reuse/s1-offline-execution.json",
+      "stages/s1-execution-authority/stage-envelope.json",
+      "stages/s1-execution-authority/ownership-lease.json",
+      "tests/test_stage1_authority.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "focused_tests": 7,
+      "connected_tests": 158,
+      "diff_check": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "dependency_adoption": false,
+      "private_source_code_copied": false,
+      "d2_d3_payload_storage_authorized": false,
+      "subprocess_network_dynamic_code_authorized": false,
+      "scientific_outcome_authority": false,
+      "execution_scope": "offline-one-shot-mechanical-only"
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29539789972",
+    "integration_commit_sha": "b98033ef25d4e8277b82005df0fa1fdfe4bd62bd"
+  },
+  "integrity": {
+    "payload_sha256": "3adfaec604647a339202410c0e0cf2b53d47f171cc4fcf68fcb42220add23fbd",
+    "parent_refs": [
+      "git:b98033ef25d4e8277b82005df0fa1fdfe4bd62bd",
+      "ci:29539789972"
+    ]
+  }
+}
