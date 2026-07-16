@@ -1,0 +1,16 @@
+{
+  "lease_id": "lease-s1-reference-vertical-agent-5-20260716",
+  "stage_id": "s1-reference-vertical",
+  "agent_id": "agent-5",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-16T23:46:03Z",
+  "expires_at": "2026-07-17T05:46:03Z",
+  "base_sha": "9fcfde7b2a9d8b150434bd0908691e711ae95899",
+  "branch": "codex/bridge-a5-s1-reference-vertical",
+  "worktree": "ephemeral-worktree:s1-reference-vertical",
+  "write_set": [
+    "tests/test_stage1_reference_vertical.py"
+  ],
+  "delegation_allowed": false,
+  "state": "active"
+}

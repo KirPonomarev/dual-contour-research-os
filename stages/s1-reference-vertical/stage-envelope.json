@@ -1,0 +1,103 @@
+{
+  "stage_id": "s1-reference-vertical",
+  "agent_id": "agent-5",
+  "objective": "Prove one actual synthetic D0/D1 Bridge reference vertical using only accepted components: fail-closed authority, real L0 execution, durable checkpoint/artifact/ledger state, receipt-last mechanical result, then read-only verification of synthetic external validation/domain-link receipts into a reference-only projection.",
+  "executable_blocker": "All Stage 1 Bridge primitives are individually green, but no single exact-head test yet proves that their real composition ends at a reference-only domain handoff without granting validator, registry writer or scientific outcome authority.",
+  "base_sha": "9fcfde7b2a9d8b150434bd0908691e711ae95899",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a5-s1-reference-vertical",
+  "worktree": "ephemeral-worktree:s1-reference-vertical",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "docs/ARCHITECTURE.md",
+    "docs/TRUST_BOUNDARIES.md",
+    "docs/receipts/reuse/s1-offline-execution.json",
+    "docs/receipts/reuse/s1-validation-boundary.json",
+    "docs/receipts/integration/s1-execution-assurance.json",
+    "docs/receipts/integration/s1-validation-assurance.json",
+    "src/research_bridge/admission.py",
+    "src/research_bridge/kernel.py",
+    "src/research_bridge/ledger.py",
+    "src/research_bridge/l0.py",
+    "src/research_bridge/cas.py",
+    "src/research_bridge/ingestion.py",
+    "src/research_bridge/execution.py",
+    "src/research_bridge/validation.py",
+    "tests/test_stage1_execution_assurance.py",
+    "tests/test_stage1_validation_assurance.py"
+  ],
+  "write_set": [
+    "tests/test_stage1_reference_vertical.py"
+  ],
+  "forbidden_scope": [
+    "runtime-implementation-contract-config-ci-or-existing-test-edit",
+    "market-or-security-domain-feature-or-scientific-semantics",
+    "validator-or-domain-registry-writer-implementation-or-call",
+    "scientific-outcome-interpretation-or-application",
+    "d2-or-d3-payload-fixture-storage-or-projection",
+    "network-process-dynamic-code-external-callback-or-deployment",
+    "live-trading-live-target-publication-or-ui",
+    "external-dependency",
+    "skip-conditional-skip-or-expected-failure",
+    "global-SKELETON_GREEN-declaration"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "offline_execution_reuse": "a02cddf62d5568d5d0dbee73c8ef3d2e61c359e67e581c9583c1aa1928609e51",
+    "validation_boundary_reuse": "ab26cac74aa719ba511b52949daf8c631f71c801cb79c417b962cbbc2769bc8b",
+    "execution_assurance_receipt": "0ffc990ac136d36c3358c8f668a8eca17c76b9ce31313c7b3f5ce966bb0b6f69",
+    "validation_assurance_receipt": "fbcb20541d5e02a639f1bf24b1ebbdf996394475796b903f5598d73c2258adf8",
+    "external_dependencies": "none"
+  },
+  "vertical_contract": {
+    "real_components": [
+      "admission validation through BridgeKernel",
+      "single canonical JobLedger",
+      "DeterministicL0Runner",
+      "checkpoint ContentAddressedStore",
+      "TrustedIngestor plus artifact ContentAddressedStore",
+      "OfflineExecutionCoordinator",
+      "ValidationBoundary"
+    ],
+    "success_flow": "synthetic D0/D1 JobSpec Permit AttemptLease -> claim -> L0 -> checkpoint CAS -> ledger checkpoint -> artifact CAS -> ledger complete -> ExecutionReceipt -> synthetic external ValidationReceipt -> synthetic external DomainTrialLinkReceipt -> immutable reference-only projection",
+    "required_evidence": [
+      "real ledger chain and both CAS stores verify after success",
+      "ExecutionReceipt is mechanical-success and issued after durable prerequisites",
+      "validation and domain-link inputs are synthetic receipts only and no validator or writer is called",
+      "projection contains only portable refs identity revision contour and classification",
+      "invalid validation or domain link produces no projection and does not mutate ledger or CAS counts",
+      "execution prerequisite failure produces no ExecutionReceipt validation call or domain projection",
+      "no fencing token host path input bytes scientific payload or domain outcome value enters the mechanical receipt"
+    ],
+    "exit_rule": "This receipt proves only the public Bridge reference vertical. Domain-owned frozen data hypothesis protocol validator and registry writer remain required before global SKELETON_GREEN."
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest discover -s tests -p test_stage1_reference_vertical.py",
+    "make test",
+    "git diff --check",
+    "public privacy, secret, skip, forbidden-capability and exact write-set scan"
+  ],
+  "risk_class": "synthetic-bridge-reference-vertical-assurance",
+  "stop_conditions": [
+    "new-runtime-component-or-domain-code-needed",
+    "validation-or-domain-writer-callback-needed",
+    "invalid-domain-chain-mutates-bridge-state",
+    "execution-failure-can-produce-validation-projection",
+    "scientific-payload-enters-receipt-or-projection",
+    "d2-or-d3-bytes-needed",
+    "skip-or-external-dependency-needed",
+    "global-green-would-be-overclaimed",
+    "private-data-detected",
+    "write-set-collision"
+  ],
+  "expected_receipt": "docs/receipts/integration/s1-reference-vertical.json",
+  "rollback": "Agent 0 reverts the assurance-only commit and discards synthetic temporary ledgers, CAS objects and staging files. No runtime implementation, validator, domain registry, deployment or external state is mutated.",
+  "commit_authority": "one-scoped-worker-commit",
+  "push_authority": false,
+  "expected_handoff_status": [
+    "ready_for_agent0_audit",
+    "blocked_validation_failed"
+  ]
+}
