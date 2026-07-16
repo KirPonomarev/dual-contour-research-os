@@ -6,3 +6,4 @@ contracts:
 
 test: contracts
 	python3 -m unittest discover -s tests -p 'test_*.py'
+	@if [ -d tests/stage0b ]; then python3 -m unittest discover -s tests/stage0b -p 'test_*.py'; fi
