@@ -1,0 +1,152 @@
+{
+  "$id": "https://github.com/KirPonomarev/dual-contour-research-os/contracts/v1/JobSpec.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "classification": {
+      "enum": [
+        "D0_PUBLIC",
+        "D1_INTERNAL_SANITIZED",
+        "D2_DOMAIN_CONFIDENTIAL",
+        "D3_RESTRICTED"
+      ]
+    },
+    "contour": {
+      "enum": [
+        "bridge",
+        "market",
+        "security",
+        "governance"
+      ]
+    },
+    "integrity": {
+      "additionalProperties": false,
+      "properties": {
+        "parent_refs": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "payload_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "payload_sha256",
+        "parent_refs"
+      ],
+      "type": "object"
+    },
+    "issued_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "issuer": {
+      "additionalProperties": false,
+      "properties": {
+        "authority_class": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "id": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "authority_class"
+      ],
+      "type": "object"
+    },
+    "object_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "payload": {
+      "additionalProperties": false,
+      "properties": {
+        "checkpoint_strategy": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "code_ref": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "expected_output_contract": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "idempotency_key": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "image_digest": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "input_refs": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "network_policy": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "protocol_ref": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "resource_limits": {
+          "type": "object"
+        },
+        "runner_profile": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "protocol_ref",
+        "code_ref",
+        "input_refs",
+        "image_digest",
+        "runner_profile",
+        "network_policy",
+        "resource_limits",
+        "checkpoint_strategy",
+        "expected_output_contract",
+        "idempotency_key"
+      ],
+      "type": "object"
+    },
+    "schema_id": {
+      "const": "JobSpec"
+    },
+    "schema_version": {
+      "const": "1.0.0"
+    }
+  },
+  "required": [
+    "schema_id",
+    "schema_version",
+    "object_id",
+    "issued_at",
+    "issuer",
+    "contour",
+    "classification",
+    "payload",
+    "integrity"
+  ],
+  "title": "JobSpec",
+  "type": "object",
+  "x-authority": "execution-description",
+  "x-owner": "bridge",
+  "x-writer": "admission-controller"
+}

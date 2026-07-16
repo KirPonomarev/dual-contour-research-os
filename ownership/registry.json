@@ -1,0 +1,33 @@
+{
+  "schema_version": "1.0.0",
+  "frozen": true,
+  "canonical_owners": {
+    "contracts/**": "agent-0",
+    "docs/*.md": "agent-0",
+    "docs/ADR/**": "agent-0",
+    "docs/drafts/assurance/**": "agent-5",
+    "src/research_bridge/control/**": "agent-1",
+    "src/research_bridge/registry/**": "agent-1",
+    "src/research_bridge/budgets/**": "agent-1",
+    "src/research_bridge/ipc/**": "agent-1",
+    "src/research_bridge/runner/**": "agent-2",
+    "src/research_bridge/artifacts/**": "agent-2",
+    "src/research_bridge/checkpoint/**": "agent-2",
+    "adapters/market/**": "agent-3",
+    "validator_adapters/market/**": "agent-3",
+    "adapters/security/**": "agent-4",
+    "validator_adapters/security/**": "agent-4",
+    "ops/**": "agent-5",
+    "tests/adversarial/**": "agent-5",
+    "tests/acceptance/**": "agent-5"
+  },
+  "root_only": [
+    "AGENTS.md",
+    "Makefile",
+    "pyproject.toml",
+    ".github/**",
+    "ownership/registry.json"
+  ],
+  "branch_pattern": "codex/bridge-a<agent-id>-<stage-id>",
+  "max_active_children": 3
+}

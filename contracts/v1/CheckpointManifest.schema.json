@@ -1,0 +1,148 @@
+{
+  "$id": "https://github.com/KirPonomarev/dual-contour-research-os/contracts/v1/CheckpointManifest.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "classification": {
+      "enum": [
+        "D0_PUBLIC",
+        "D1_INTERNAL_SANITIZED",
+        "D2_DOMAIN_CONFIDENTIAL",
+        "D3_RESTRICTED"
+      ]
+    },
+    "contour": {
+      "enum": [
+        "bridge",
+        "market",
+        "security",
+        "governance"
+      ]
+    },
+    "integrity": {
+      "additionalProperties": false,
+      "properties": {
+        "parent_refs": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "payload_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "payload_sha256",
+        "parent_refs"
+      ],
+      "type": "object"
+    },
+    "issued_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "issuer": {
+      "additionalProperties": false,
+      "properties": {
+        "authority_class": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "id": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "authority_class"
+      ],
+      "type": "object"
+    },
+    "object_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "payload": {
+      "additionalProperties": false,
+      "properties": {
+        "attempt_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "code_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "completed_ranges": {
+          "type": "array"
+        },
+        "environment_digest": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "fencing_token": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "payload_ref": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "payload_stored_in_domain_vault": {
+          "type": "boolean"
+        },
+        "run_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "sequence": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "state_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "run_id",
+        "attempt_id",
+        "fencing_token",
+        "completed_ranges",
+        "state_sha256",
+        "code_sha256",
+        "environment_digest",
+        "sequence",
+        "payload_ref",
+        "payload_stored_in_domain_vault"
+      ],
+      "type": "object"
+    },
+    "schema_id": {
+      "const": "CheckpointManifest"
+    },
+    "schema_version": {
+      "const": "1.0.0"
+    }
+  },
+  "required": [
+    "schema_id",
+    "schema_version",
+    "object_id",
+    "issued_at",
+    "issuer",
+    "contour",
+    "classification",
+    "payload",
+    "integrity"
+  ],
+  "title": "CheckpointManifest",
+  "type": "object",
+  "x-authority": "durability-reference",
+  "x-owner": "bridge",
+  "x-writer": "trusted-ingestor"
+}

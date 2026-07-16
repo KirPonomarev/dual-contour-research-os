@@ -1,0 +1,138 @@
+{
+  "$id": "https://github.com/KirPonomarev/dual-contour-research-os/contracts/v1/LearningDecision.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "classification": {
+      "enum": [
+        "D0_PUBLIC",
+        "D1_INTERNAL_SANITIZED",
+        "D2_DOMAIN_CONFIDENTIAL",
+        "D3_RESTRICTED"
+      ]
+    },
+    "contour": {
+      "enum": [
+        "bridge",
+        "market",
+        "security",
+        "governance"
+      ]
+    },
+    "integrity": {
+      "additionalProperties": false,
+      "properties": {
+        "parent_refs": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "payload_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "payload_sha256",
+        "parent_refs"
+      ],
+      "type": "object"
+    },
+    "issued_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "issuer": {
+      "additionalProperties": false,
+      "properties": {
+        "authority_class": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "id": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "authority_class"
+      ],
+      "type": "object"
+    },
+    "object_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "payload": {
+      "additionalProperties": false,
+      "properties": {
+        "affected_scope": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "decision": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "evidence_strength": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "mutation_ref": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "outcome_refs": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "rationale": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "reviewer": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "outcome_refs",
+        "evidence_strength",
+        "decision",
+        "affected_scope",
+        "rationale",
+        "reviewer",
+        "mutation_ref"
+      ],
+      "type": "object"
+    },
+    "schema_id": {
+      "const": "LearningDecision"
+    },
+    "schema_version": {
+      "const": "1.0.0"
+    }
+  },
+  "required": [
+    "schema_id",
+    "schema_version",
+    "object_id",
+    "issued_at",
+    "issuer",
+    "contour",
+    "classification",
+    "payload",
+    "integrity"
+  ],
+  "title": "LearningDecision",
+  "type": "object",
+  "x-authority": "learning-proposal",
+  "x-owner": "domain",
+  "x-writer": "learning-decision-writer"
+}

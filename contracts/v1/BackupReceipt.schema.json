@@ -1,0 +1,134 @@
+{
+  "$id": "https://github.com/KirPonomarev/dual-contour-research-os/contracts/v1/BackupReceipt.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "classification": {
+      "enum": [
+        "D0_PUBLIC",
+        "D1_INTERNAL_SANITIZED",
+        "D2_DOMAIN_CONFIDENTIAL",
+        "D3_RESTRICTED"
+      ]
+    },
+    "contour": {
+      "enum": [
+        "bridge",
+        "market",
+        "security",
+        "governance"
+      ]
+    },
+    "integrity": {
+      "additionalProperties": false,
+      "properties": {
+        "parent_refs": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "payload_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "payload_sha256",
+        "parent_refs"
+      ],
+      "type": "object"
+    },
+    "issued_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "issuer": {
+      "additionalProperties": false,
+      "properties": {
+        "authority_class": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "id": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "authority_class"
+      ],
+      "type": "object"
+    },
+    "object_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "payload": {
+      "additionalProperties": false,
+      "properties": {
+        "destination_ref": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "encrypted": {
+          "type": "boolean"
+        },
+        "ended_at": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "snapshot_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "source_manifest_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "started_at": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "verification_result": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "snapshot_id",
+        "source_manifest_sha256",
+        "destination_ref",
+        "encrypted",
+        "started_at",
+        "ended_at",
+        "verification_result"
+      ],
+      "type": "object"
+    },
+    "schema_id": {
+      "const": "BackupReceipt"
+    },
+    "schema_version": {
+      "const": "1.0.0"
+    }
+  },
+  "required": [
+    "schema_id",
+    "schema_version",
+    "object_id",
+    "issued_at",
+    "issuer",
+    "contour",
+    "classification",
+    "payload",
+    "integrity"
+  ],
+  "title": "BackupReceipt",
+  "type": "object",
+  "x-authority": "backup-proof",
+  "x-owner": "governance",
+  "x-writer": "backup-controller"
+}

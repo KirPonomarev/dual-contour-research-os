@@ -1,0 +1,135 @@
+{
+  "$id": "https://github.com/KirPonomarev/dual-contour-research-os/contracts/v1/SourceEnvelope.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "classification": {
+      "enum": [
+        "D0_PUBLIC",
+        "D1_INTERNAL_SANITIZED",
+        "D2_DOMAIN_CONFIDENTIAL",
+        "D3_RESTRICTED"
+      ]
+    },
+    "contour": {
+      "enum": [
+        "bridge",
+        "market",
+        "security",
+        "governance"
+      ]
+    },
+    "integrity": {
+      "additionalProperties": false,
+      "properties": {
+        "parent_refs": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "payload_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "payload_sha256",
+        "parent_refs"
+      ],
+      "type": "object"
+    },
+    "issued_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "issuer": {
+      "additionalProperties": false,
+      "properties": {
+        "authority_class": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "id": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "authority_class"
+      ],
+      "type": "object"
+    },
+    "object_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "payload": {
+      "additionalProperties": false,
+      "properties": {
+        "available_at": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "byte_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "license_terms_note": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "policy_snapshot_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "published_at": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "sanitized_uri_ref": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "source_id": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_id",
+        "sanitized_uri_ref",
+        "published_at",
+        "available_at",
+        "byte_sha256",
+        "policy_snapshot_sha256",
+        "license_terms_note"
+      ],
+      "type": "object"
+    },
+    "schema_id": {
+      "const": "SourceEnvelope"
+    },
+    "schema_version": {
+      "const": "1.0.0"
+    }
+  },
+  "required": [
+    "schema_id",
+    "schema_version",
+    "object_id",
+    "issued_at",
+    "issuer",
+    "contour",
+    "classification",
+    "payload",
+    "integrity"
+  ],
+  "title": "SourceEnvelope",
+  "type": "object",
+  "x-authority": "reference-only",
+  "x-owner": "domain",
+  "x-writer": "domain-adapter"
+}

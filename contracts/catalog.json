@@ -1,0 +1,485 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "catalog_id": "dual-contour-contract-catalog",
+  "schema_version": "1.0.0",
+  "status": "frozen",
+  "common_required": [
+    "schema_id",
+    "schema_version",
+    "object_id",
+    "issued_at",
+    "issuer",
+    "contour",
+    "classification",
+    "payload",
+    "integrity"
+  ],
+  "contracts": {
+    "SourceEnvelope": {
+      "owner": "domain",
+      "writer": "domain-adapter",
+      "authority": "reference-only",
+      "required_payload": {
+        "source_id": "string",
+        "sanitized_uri_ref": "string",
+        "published_at": "string",
+        "available_at": "string",
+        "byte_sha256": "sha256",
+        "policy_snapshot_sha256": "sha256",
+        "license_terms_note": "string"
+      }
+    },
+    "ModelCallEnvelope": {
+      "owner": "bridge",
+      "writer": "model-broker",
+      "authority": "budgeted-request",
+      "required_payload": {
+        "role": "string",
+        "protocol_ref": "string",
+        "prompt_template_sha256": "sha256",
+        "sanitized_input_refs": "string_array",
+        "redaction_receipt_ref": "string",
+        "provider_model_class": "string",
+        "max_tokens": "integer",
+        "max_cost": "number",
+        "idempotency_key": "string"
+      }
+    },
+    "HypothesisCard": {
+      "owner": "domain",
+      "writer": "domain-adapter",
+      "authority": "proposal",
+      "required_payload": {
+        "hypothesis_id": "string",
+        "thesis": "string",
+        "null_hypothesis": "string",
+        "mechanism": "string",
+        "falsification_rule": "string",
+        "scope_boundary": "string",
+        "source_refs": "string_array"
+      }
+    },
+    "ProtocolSnapshot": {
+      "owner": "domain",
+      "writer": "domain-registry-writer",
+      "authority": "scientific-protocol",
+      "required_payload": {
+        "hypothesis_sha256": "sha256",
+        "primary_outcome": "string",
+        "input_manifest_sha256": "sha256",
+        "code_sha256": "sha256",
+        "environment_digest": "string",
+        "seed_set": "integer_array",
+        "stopping_rule": "string",
+        "validator_sha256": "sha256",
+        "trial_family_id": "string",
+        "holdout_policy_ref": "string"
+      }
+    },
+    "JobSpec": {
+      "owner": "bridge",
+      "writer": "admission-controller",
+      "authority": "execution-description",
+      "required_payload": {
+        "protocol_ref": "string",
+        "code_ref": "string",
+        "input_refs": "string_array",
+        "image_digest": "string",
+        "runner_profile": "string",
+        "network_policy": "string",
+        "resource_limits": "object",
+        "checkpoint_strategy": "string",
+        "expected_output_contract": "string",
+        "idempotency_key": "string"
+      }
+    },
+    "PolicySnapshot": {
+      "owner": "governance",
+      "writer": "policy-authority",
+      "authority": "policy",
+      "required_payload": {
+        "source_repo": "string",
+        "commit_sha": "string",
+        "aggregate_sha256": "sha256",
+        "covered_action_classes": "string_array",
+        "allow_rules": "array",
+        "deny_rules": "array",
+        "valid_from": "string",
+        "valid_until": "string"
+      }
+    },
+    "Permit": {
+      "owner": "governance",
+      "writer": "permit-authority",
+      "authority": "execution-authority",
+      "required_payload": {
+        "subject": "string",
+        "job_spec_sha256": "sha256",
+        "policy_snapshot_sha256": "sha256",
+        "code_sha256": "sha256",
+        "input_sha256": "sha256",
+        "image_digest": "string",
+        "quotas": "object",
+        "network_class": "string",
+        "not_before": "string",
+        "expires_at": "string",
+        "max_uses": "integer",
+        "nonce": "string"
+      }
+    },
+    "ApprovalReceipt": {
+      "owner": "governance",
+      "writer": "operator-authority",
+      "authority": "human-approval",
+      "required_payload": {
+        "action_class": "string",
+        "job_spec_sha256": "sha256",
+        "protocol_sha256": "sha256",
+        "policy_sha256": "sha256",
+        "quotas": "object",
+        "stop_conditions": "array",
+        "expires_at": "string",
+        "nonce": "string",
+        "revoked": "boolean"
+      }
+    },
+    "AttemptLease": {
+      "owner": "bridge",
+      "writer": "researchd",
+      "authority": "single-attempt-lease",
+      "required_payload": {
+        "attempt_id": "string",
+        "permit_ref": "string",
+        "job_ref": "string",
+        "runner_identity": "string",
+        "fencing_epoch": "integer",
+        "fencing_token": "string",
+        "issued_at": "string",
+        "expires_at": "string",
+        "checkpoint_parent_ref": "string"
+      }
+    },
+    "CheckpointManifest": {
+      "owner": "bridge",
+      "writer": "trusted-ingestor",
+      "authority": "durability-reference",
+      "required_payload": {
+        "run_id": "string",
+        "attempt_id": "string",
+        "fencing_token": "string",
+        "completed_ranges": "array",
+        "state_sha256": "sha256",
+        "code_sha256": "sha256",
+        "environment_digest": "string",
+        "sequence": "integer",
+        "payload_ref": "string",
+        "payload_stored_in_domain_vault": "boolean"
+      }
+    },
+    "StagingEnvelope": {
+      "owner": "bridge",
+      "writer": "untrusted-runner",
+      "authority": "untrusted-claim",
+      "required_payload": {
+        "producer_identity": "string",
+        "run_id": "string",
+        "attempt_id": "string",
+        "fencing_token": "string",
+        "relative_file_manifest": "array",
+        "claimed_metrics": "object",
+        "completion_reason": "string"
+      }
+    },
+    "ArtifactManifest": {
+      "owner": "domain",
+      "writer": "trusted-ingestor",
+      "authority": "artifact-reference",
+      "required_payload": {
+        "artifact_sha256": "sha256",
+        "size_bytes": "integer",
+        "producer": "string",
+        "claim_class": "string",
+        "source_refs": "string_array",
+        "redaction_status": "string",
+        "retention_class": "string",
+        "validator_ref": "string"
+      }
+    },
+    "ExecutionReceipt": {
+      "owner": "bridge",
+      "writer": "researchd",
+      "authority": "mechanical-result",
+      "required_payload": {
+        "permit_ref": "string",
+        "lease_ref": "string",
+        "job_spec_ref": "string",
+        "code_sha256": "sha256",
+        "input_sha256": "sha256",
+        "environment_digest": "string",
+        "started_at": "string",
+        "ended_at": "string",
+        "exit_classification": "string",
+        "artifact_refs": "string_array",
+        "resource_usage": "object",
+        "event_chain_head": "sha256"
+      }
+    },
+    "ValidationReceipt": {
+      "owner": "domain",
+      "writer": "pinned-validator",
+      "authority": "proposed-outcome-only",
+      "required_payload": {
+        "protocol_ref": "string",
+        "execution_ref": "string",
+        "artifact_refs": "string_array",
+        "validator_id": "string",
+        "validator_sha256": "sha256",
+        "holdout_access_ref": "string",
+        "checks_performed": "array",
+        "metrics": "object",
+        "tolerances": "object",
+        "proposed_outcome": "string",
+        "reasons": "array",
+        "reproducibility_class": "string"
+      }
+    },
+    "HoldoutAccessGrant": {
+      "owner": "domain",
+      "writer": "holdout-owner",
+      "authority": "single-use-holdout-access",
+      "required_payload": {
+        "trial_ref": "string",
+        "protocol_sha256": "sha256",
+        "accessor_identity": "string",
+        "allowed_operation": "string",
+        "query_limits": "object",
+        "not_before": "string",
+        "expires_at": "string",
+        "single_use_nonce": "string"
+      }
+    },
+    "HoldoutAccessReceipt": {
+      "owner": "domain",
+      "writer": "holdout-owner",
+      "authority": "holdout-access-proof",
+      "required_payload": {
+        "grant_ref": "string",
+        "accessed_at": "string",
+        "query_sha256": "sha256",
+        "result_ref": "string",
+        "raw_egress": "boolean",
+        "consumed": "boolean"
+      }
+    },
+    "BudgetReservation": {
+      "owner": "bridge",
+      "writer": "budget-ledger",
+      "authority": "hard-budget-reservation",
+      "required_payload": {
+        "trial_ref": "string",
+        "job_ref": "string",
+        "provider": "string",
+        "idempotency_key": "string",
+        "hard_limits": "object",
+        "ledger_version_before": "integer",
+        "expires_at": "string"
+      }
+    },
+    "SettlementReceipt": {
+      "owner": "bridge",
+      "writer": "budget-ledger",
+      "authority": "budget-settlement",
+      "required_payload": {
+        "reservation_ref": "string",
+        "actual_usage": "object",
+        "actual_cost": "number",
+        "provider_receipt_ref": "string",
+        "released_amount": "number",
+        "provider_unknown": "boolean",
+        "ledger_version_after": "integer"
+      }
+    },
+    "DomainTrialLinkReceipt": {
+      "owner": "domain",
+      "writer": "domain-registry-writer",
+      "authority": "canonical-domain-link",
+      "required_payload": {
+        "domain_trial_id": "string",
+        "bridge_execution_ref": "string",
+        "protocol_ref": "string",
+        "registry_identity": "string",
+        "registry_revision": "string",
+        "applied_outcome_ref": "string",
+        "policy_ref": "string"
+      }
+    },
+    "DomainArtifactReceipt": {
+      "owner": "domain",
+      "writer": "domain-vault-acceptor",
+      "authority": "canonical-domain-artifact",
+      "required_payload": {
+        "bridge_manifest_ref": "string",
+        "domain_vault_ref": "string",
+        "artifact_sha256": "sha256",
+        "redaction_status": "string",
+        "retention_class": "string",
+        "bridge_payload_present": "boolean"
+      }
+    },
+    "ReplicationReceipt": {
+      "owner": "domain",
+      "writer": "domain-registry-writer",
+      "authority": "replication-result",
+      "required_payload": {
+        "parent_trial_ref": "string",
+        "child_trial_ref": "string",
+        "independence_declaration": "string",
+        "data_sha256": "sha256",
+        "code_sha256": "sha256",
+        "environment_digest": "string",
+        "original_outcome_ref": "string",
+        "replication_outcome_ref": "string",
+        "metric_comparison": "object",
+        "reproducibility_class": "string"
+      }
+    },
+    "LearningDecision": {
+      "owner": "domain",
+      "writer": "learning-decision-writer",
+      "authority": "learning-proposal",
+      "required_payload": {
+        "outcome_refs": "string_array",
+        "evidence_strength": "string",
+        "decision": "string",
+        "affected_scope": "string",
+        "rationale": "string",
+        "reviewer": "string",
+        "mutation_ref": "string"
+      }
+    },
+    "SourceFreezeReceipt": {
+      "owner": "governance",
+      "writer": "agent-0",
+      "authority": "source-freeze",
+      "required_payload": {
+        "source_repo": "string",
+        "remote": "string",
+        "branch": "string",
+        "head_sha": "string",
+        "upstream_sha": "string",
+        "tracked_diff_sha256": "sha256",
+        "untracked_manifest_sha256": "sha256",
+        "path_dispositions": "array",
+        "selected_source_sha": "string"
+      }
+    },
+    "ReuseDecisionReceipt": {
+      "owner": "governance",
+      "writer": "agent-0",
+      "authority": "reuse-freeze",
+      "required_payload": {
+        "capability": "string",
+        "candidates": "array",
+        "selected_mode": "string",
+        "source_ref": "string",
+        "code_sha256": "sha256",
+        "license_spdx": "string",
+        "license_sha256": "sha256",
+        "tests": "array",
+        "canonical_owner": "string",
+        "rollback": "string"
+      }
+    },
+    "IntegrationReceipt": {
+      "owner": "governance",
+      "writer": "agent-0",
+      "authority": "accepted-stage",
+      "required_payload": {
+        "stage_id": "string",
+        "agent_id": "string",
+        "ownership_lease_ref": "string",
+        "base_sha": "string",
+        "head_sha": "string",
+        "contract_sha256": "sha256",
+        "write_set": "string_array",
+        "audit_results": "object",
+        "remote_ci_ref": "string",
+        "integration_commit_sha": "string"
+      }
+    },
+    "DeploymentApprovalReceipt": {
+      "owner": "governance",
+      "writer": "operator-authority",
+      "authority": "deployment-approval",
+      "required_payload": {
+        "environment": "string",
+        "release_sha": "string",
+        "image_digest": "string",
+        "policy_sha256": "sha256",
+        "config_sha256": "sha256",
+        "schema_sha256": "sha256",
+        "remote_ci_ref": "string",
+        "restore_receipt_ref": "string",
+        "rollback_target": "string",
+        "expires_at": "string",
+        "nonce": "string"
+      }
+    },
+    "ReleaseManifest": {
+      "owner": "governance",
+      "writer": "agent-0",
+      "authority": "immutable-release",
+      "required_payload": {
+        "release_sha": "string",
+        "image_digests": "string_array",
+        "policy_sha256": "sha256",
+        "config_sha256": "sha256",
+        "schema_sha256": "sha256",
+        "dependency_lock_sha256": "sha256",
+        "sbom_ref": "string",
+        "previous_release_ref": "string"
+      }
+    },
+    "BackupReceipt": {
+      "owner": "governance",
+      "writer": "backup-controller",
+      "authority": "backup-proof",
+      "required_payload": {
+        "snapshot_id": "string",
+        "source_manifest_sha256": "sha256",
+        "destination_ref": "string",
+        "encrypted": "boolean",
+        "started_at": "string",
+        "ended_at": "string",
+        "verification_result": "string"
+      }
+    },
+    "RestoreReceipt": {
+      "owner": "governance",
+      "writer": "restore-controller",
+      "authority": "restore-proof",
+      "required_payload": {
+        "backup_ref": "string",
+        "clean_target_ref": "string",
+        "restored_manifest_sha256": "sha256",
+        "integrity_result": "string",
+        "recovery_point_seconds": "integer",
+        "recovery_time_seconds": "integer"
+      }
+    },
+    "IncidentReceipt": {
+      "owner": "governance",
+      "writer": "incident-controller",
+      "authority": "incident-record",
+      "required_payload": {
+        "severity": "string",
+        "detected_at": "string",
+        "affected_refs": "string_array",
+        "containment": "array",
+        "evidence_refs": "string_array",
+        "recovery_ref": "string",
+        "final_state": "string"
+      }
+    }
+  }
+}

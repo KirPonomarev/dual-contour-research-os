@@ -1,0 +1,27 @@
+name: exact-head-ci
+
+on:
+  push:
+    branches: [main, "codex/**"]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: exact-head-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  contracts-and-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Verify contracts and tests
+        run: make test
