@@ -1,0 +1,45 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s1-control-method-compat-20260716",
+  "issued_at": "2026-07-16T21:37:06Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "bridge",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s1-control-method-compat",
+    "agent_id": "agent-0",
+    "ownership_lease_ref": "stages/s1-control-method-compat/ownership-lease.json",
+    "base_sha": "7fc81d090246fa69f1f17a11a276afb6c862122d",
+    "head_sha": "c39c2bb412d485114f092d7b23d250899fec9ae3",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "stages/s1-control-method-compat/stage-envelope.json",
+      "stages/s1-control-method-compat/ownership-lease.json",
+      "tests/test_stage1_assurance.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "focused_tests": 12,
+      "composed_control_tests": 21,
+      "connected_tests": 116,
+      "diff_check": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "dependency_adoption": false,
+      "implementation_files_changed": 0,
+      "legacy_assertions_removed": 0,
+      "authorized_methods_added_to_exact_set": 4,
+      "scoped_head_remote_ci": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29536679907"
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29536625967",
+    "integration_commit_sha": "69a2362fef37362efd6cfe65bb0d9fd7e8d901c1"
+  },
+  "integrity": {
+    "payload_sha256": "532f40c0d7a2eac1deb86d77b094706a1450a438559087ff66315f1cb27db4b6",
+    "parent_refs": [
+      "git:c39c2bb412d485114f092d7b23d250899fec9ae3",
+      "ci:29536625967"
+    ]
+  }
+}
