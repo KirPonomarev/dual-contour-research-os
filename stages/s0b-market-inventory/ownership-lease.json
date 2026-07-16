@@ -1,0 +1,13 @@
+{
+  "lease_id": "lease-s0b-market-inventory-agent-3-20260716",
+  "stage_id": "s0b-market-inventory",
+  "agent_id": "agent-3",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-16T19:23:36Z",
+  "expires_at": "2026-07-17T01:23:36Z",
+  "base_sha": "f135fba7e152b3044caa4093f6632c2d8a801c03",
+  "branch": "codex/bridge-a3-s0b-market-inventory",
+  "write_set": ["inventory/market/**", "docs/drafts/stage0b/market-runtime.md", "tests/stage0b/test_market_inventory.py"],
+  "delegation_allowed": false,
+  "state": "active"
+}
