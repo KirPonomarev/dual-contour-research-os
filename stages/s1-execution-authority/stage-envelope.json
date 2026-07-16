@@ -1,0 +1,75 @@
+{
+  "stage_id": "s1-execution-authority",
+  "agent_id": "agent-0",
+  "objective": "Freeze one bounded Stage 1 gate for a deterministic in-process L0 template, one D0/D1 checkpoint, trusted staging ingestion and ExecutionReceipt publication last.",
+  "executable_blocker": "The admitted Bridge kernel can claim and durably ingest artifacts but cannot yet execute a frozen offline workload, record its checkpoint, complete the canonical ledger or emit a mechanical ExecutionReceipt in fail-closed order.",
+  "base_sha": "abf1595e33d8b04a08ae11412da9f120bd19d24e",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "main",
+  "worktree": "canonical-main-worktree",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "docs/drafts/stage0b/runtime-comparison.md",
+    "docs/receipts/integration/s1-storage-assurance.json",
+    "contracts/v1/JobSpec.schema.json",
+    "contracts/v1/Permit.schema.json",
+    "contracts/v1/AttemptLease.schema.json",
+    "contracts/v1/CheckpointManifest.schema.json",
+    "contracts/v1/StagingEnvelope.schema.json",
+    "contracts/v1/ExecutionReceipt.schema.json"
+  ],
+  "write_set": [
+    "docs/receipts/reuse/s1-offline-execution.json",
+    "stages/s1-execution-authority/stage-envelope.json",
+    "stages/s1-execution-authority/ownership-lease.json",
+    "tests/test_stage1_authority.py"
+  ],
+  "forbidden_scope": [
+    "private-source-code-copy",
+    "market-or-security-domain-feature",
+    "d2-or-d3-payload-storage",
+    "scientific-validation-or-domain-outcome",
+    "subprocess-socket-network-or-dynamic-code",
+    "arbitrary-template-or-argv",
+    "container-root-deployment-or-external-mutation",
+    "external-dependency-adoption",
+    "live-execution",
+    "ui",
+    "contract-or-root-config-edit",
+    "second-ledger-or-runtime-migration",
+    "crash-resume-or-corrupt-checkpoint-stage2-scope"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "runtime_comparison_receipt": "06bd1aa0bc55b4432887d3213c83de3289b0ac857ac288872cea68d7f4f06adb",
+    "security_source_freeze": "be5c339754fbb336f27b5bee6139919009e466095dd21baceb43cc95831fdb12",
+    "market_source_freeze": "6de45dbbfebddb732ab8e166cc1b1ac31a3c1371561f03f348f9c66cb918ab34",
+    "storage_assurance_receipt": "992c47d15614e9667698c5fb3b577508a4ad6491788a55a27adb8a7073324d08",
+    "external_dependencies": "none"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest discover -s tests -p test_stage1_authority.py",
+    "make test",
+    "git diff --check",
+    "public privacy and secret scan over exact write-set"
+  ],
+  "risk_class": "offline-l0-checkpoint-and-receipt-last-authority",
+  "stop_conditions": [
+    "private-source-copy-needed",
+    "subprocess-network-or-dynamic-code-needed",
+    "d2-or-d3-bytes-selected-for-bridge-storage",
+    "runner-can-bypass-kernel-claim",
+    "checkpoint-or-receipt-before-prerequisite-durability",
+    "scientific-outcome-authority-added",
+    "external-dependency-selected",
+    "contract-drift",
+    "private-data-detected",
+    "write-set-collision"
+  ],
+  "expected_receipt": "docs/receipts/integration/s1-execution-authority.json",
+  "rollback": "Revert the scoped authority commit before worker bases are issued; no workload, checkpoint, runtime database, receipt, deployment or external state is created by this authority stage.",
+  "commit_authority": "agent-0-one-scoped-commit",
+  "push_authority": true
+}

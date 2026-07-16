@@ -48,6 +48,7 @@ class Stage1AuthorityTests(unittest.TestCase):
             "s1-control-ipc-pause.json": "internal-adapter-plus-stdlib-minimal-glue",
             "s1-ledger-durability.json": "clean-room-stdlib-adapter-single-ledger",
             "s1-trusted-storage.json": "clean-room-stdlib-owned-cas-ingestor",
+            "s1-offline-execution.json": "clean-room-stdlib-inprocess-frozen-l0-and-researchd-finalizer",
         }
         schema = load(ROOT / "contracts" / "v1" / "ReuseDecisionReceipt.schema.json")
         allowed = set(schema["properties"])
@@ -100,6 +101,32 @@ class Stage1AuthorityTests(unittest.TestCase):
             for item in receipt["payload"]["candidates"]
         }
         self.assertEqual(dispositions["stdlib-os-hashlib-json-pathlib"], "selected")
+        self.assertEqual(
+            dispositions["market-runtime-source"],
+            "rejected-no-license-no-code-copy",
+        )
+        self.assertTrue(envelope["rollback"])
+        self.assertFalse(lease["delegation_allowed"])
+
+    def test_execution_authority_is_pinned_offline_and_receipt_last(self) -> None:
+        envelope = load(ROOT / "stages" / "s1-execution-authority" / "stage-envelope.json")
+        lease = load(ROOT / "stages" / "s1-execution-authority" / "ownership-lease.json")
+        receipt = load(REUSE_RECEIPTS / "s1-offline-execution.json")
+        self.assertEqual(envelope["base_sha"], "abf1595e33d8b04a08ae11412da9f120bd19d24e")
+        self.assertEqual(envelope["write_set"], lease["write_set"])
+        self.assertIn("subprocess-socket-network-or-dynamic-code", envelope["forbidden_scope"])
+        self.assertIn("d2-or-d3-payload-storage", envelope["forbidden_scope"])
+        self.assertIn("checkpoint-or-receipt-before-prerequisite-durability", envelope["stop_conditions"])
+        self.assertEqual(envelope["dependency_hashes"]["external_dependencies"], "none")
+        dispositions = {
+            item["candidate"]: item["disposition"]
+            for item in receipt["payload"]["candidates"]
+        }
+        self.assertEqual(dispositions["stdlib-hashlib-json-os-pathlib"], "selected")
+        self.assertEqual(
+            dispositions["subprocess-or-container-runner"],
+            "parked-until-isolation-proof",
+        )
         self.assertEqual(
             dispositions["market-runtime-source"],
             "rejected-no-license-no-code-copy",

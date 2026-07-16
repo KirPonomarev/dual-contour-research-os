@@ -1,0 +1,48 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-s1-offline-execution-20260716",
+  "issued_at": "2026-07-16T22:27:04Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-freeze-authority"},
+  "contour": "bridge",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "stage1-deterministic-offline-l0-checkpoint-and-execution-receipt-last",
+    "candidates": [
+      {"candidate": "owned-durable-runtime-chunk-checkpoint-pattern", "disposition": "reference-only-no-source-copy"},
+      {"candidate": "security-governed-runner-recovery-pattern", "disposition": "reference-only-no-source-copy"},
+      {"candidate": "market-runtime-source", "disposition": "rejected-no-license-no-code-copy"},
+      {"candidate": "stdlib-hashlib-json-os-pathlib", "disposition": "selected"},
+      {"candidate": "subprocess-or-container-runner", "disposition": "parked-until-isolation-proof"},
+      {"candidate": "external-workflow-or-runner-package", "disposition": "rejected-unnecessary-and-unaudited"}
+    ],
+    "selected_mode": "clean-room-stdlib-inprocess-frozen-l0-and-researchd-finalizer",
+    "source_ref": "git:abf1595e33d8b04a08ae11412da9f120bd19d24e;integration:s0b-runtime-comparison;source-freeze:source-freeze-security-s0b-20260716;source-freeze:source-freeze-market-s0b-20260716",
+    "code_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "license_spdx": "NOASSERTION",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "invalid-or-unclaimed-authority-causes-zero-runner-writes",
+      "only-one-built-in-frozen-template-is-executable",
+      "no-subprocess-socket-network-or-dynamic-code-path",
+      "deterministic-input-chunk-and-output-hashes",
+      "d0-d1-checkpoint-payload-publication-only",
+      "stale-or-mismatched-fence-cannot-checkpoint-stage-or-complete",
+      "checkpoint-manifest-after-durable-payload",
+      "execution-receipt-after-checkpoint-artifacts-and-ledger-completion",
+      "no-scientific-outcome-or-domain-write-authority"
+    ],
+    "canonical_owner": "researchd-offline-execution",
+    "rollback": "Revert the scoped L0 and execution-finalizer commits and discard synthetic D0/D1 staging, CAS and ledger fixtures. No private source bytes, D2/D3 payloads, domain outcomes, live execution, deployment or external mutation are authorized."
+  },
+  "integrity": {
+    "payload_sha256": "00883349419316d9efa455cc233f9a6a05879d59e3b345eb22930765107fafb5",
+    "parent_refs": [
+      "git:abf1595e33d8b04a08ae11412da9f120bd19d24e",
+      "sha256:06bd1aa0bc55b4432887d3213c83de3289b0ac857ac288872cea68d7f4f06adb",
+      "sha256:be5c339754fbb336f27b5bee6139919009e466095dd21baceb43cc95831fdb12",
+      "sha256:6de45dbbfebddb732ab8e166cc1b1ac31a3c1371561f03f348f9c66cb918ab34",
+      "sha256:992c47d15614e9667698c5fb3b577508a4ad6491788a55a27adb8a7073324d08"
+    ]
+  }
+}
