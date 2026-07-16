@@ -1,0 +1,14 @@
+{
+  "lease_id": "lease-s1-trusted-ingestion-agent-1-20260716",
+  "stage_id": "s1-trusted-ingestion",
+  "agent_id": "agent-1",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-16T21:57:52Z",
+  "expires_at": "2026-07-17T03:57:52Z",
+  "base_sha": "e87bf042a1ffa6f3bc8e042ab1650dd13e336ca4",
+  "branch": "codex/bridge-a1-s1-trusted-ingestion",
+  "worktree": "ephemeral-worktree:s1-trusted-ingestion",
+  "write_set": ["src/research_bridge/ingestion.py", "tests/test_stage1_ingestion.py"],
+  "delegation_allowed": false,
+  "state": "active"
+}
