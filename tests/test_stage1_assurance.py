@@ -557,7 +557,18 @@ class Stage1StaticBoundaryTests(unittest.TestCase):
         }
         self.assertEqual(
             ledger_methods,
-            {"claim", "checkpoint", "complete", "event_count", "verify_chain", "close"},
+            {
+                "claim",
+                "checkpoint",
+                "complete",
+                "event_count",
+                "verify_chain",
+                "close",
+                "pause_global",
+                "resume_global",
+                "is_globally_paused",
+                "pause_snapshot",
+            },
         )
 
         identifiers = set()
