@@ -1,0 +1,73 @@
+{
+  "stage_id": "s1-cas-core",
+  "agent_id": "agent-2",
+  "objective": "Implement the Bridge-owned stdlib content-addressed store for immutable, quota-bounded D0/D1 artifact bytes with exclusive durable publication.",
+  "executable_blocker": "Trusted ingestion has no safe publication primitive that rejects path attacks and durability failures while returning only portable content references.",
+  "base_sha": "e87bf042a1ffa6f3bc8e042ab1650dd13e336ca4",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a2-s1-cas-core",
+  "worktree": "ephemeral-worktree:s1-cas-core",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "docs/receipts/reuse/s1-trusted-storage.json",
+    "docs/receipts/integration/s1-storage-authority.json",
+    "contracts/v1/ArtifactManifest.schema.json"
+  ],
+  "write_set": [
+    "src/research_bridge/cas.py",
+    "tests/test_stage1_cas.py"
+  ],
+  "forbidden_scope": [
+    "staging-envelope-or-artifact-manifest-adapter",
+    "ledger-or-admission-edit",
+    "runner-or-receipt",
+    "d2-or-d3-payload",
+    "domain-feature",
+    "external-dependency",
+    "live-execution",
+    "deployment",
+    "contract-or-root-config-edit"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "reuse_decision": "6f45fa8a12bb073c215dc292cf03a0e8c3bc9f132d521a1e91a0e655102aa5f7",
+    "authority_receipt": "392d3778c42cebeba36927bb9ee4b43bd1cb8413d5483f512e9bbe722974d58c",
+    "external_dependencies": "none"
+  },
+  "interface_contract": {
+    "exports": ["CASError", "CASObject", "ContentAddressedStore"],
+    "cas_object_fields": ["ref", "sha256", "size_bytes", "created"],
+    "constructor": "ContentAddressedStore(root, *, quota_bytes, chunk_size=65536)",
+    "methods": ["publish", "inspect", "verify", "used_bytes", "object_count", "reconcile_orphans"],
+    "publish_signature": "publish(source_path, *, expected_sha256, expected_size_bytes)",
+    "portable_ref": "cas:sha256:<lowercase-sha256>",
+    "publication_rule": "fsynced temporary regular file then exclusive immutable adoption and parent-directory durability",
+    "retry_rule": "exact existing object returns created=false after full integrity verification",
+    "quota_rule": "canonical objects plus bounded temporary bytes never exceed quota"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest discover -s tests -p test_stage1_cas.py",
+    "make test",
+    "git diff --check",
+    "public privacy and secret scan over exact write-set"
+  ],
+  "risk_class": "durable-content-addressed-publication",
+  "stop_conditions": [
+    "symlink-or-non-regular-source-accepted",
+    "corrupt-existing-object-accepted",
+    "quota-exceeded",
+    "host-path-returned",
+    "durability-failure-reported-as-success",
+    "d2-or-d3-payload-path-added",
+    "external-dependency-needed",
+    "private-data-detected",
+    "write-set-collision"
+  ],
+  "expected_receipt": "docs/receipts/integration/s1-cas-core.json",
+  "rollback": "Agent 0 reverts the scoped CAS commit and removes only synthetic test stores; no deployment, migration, or domain state exists.",
+  "commit_authority": "one-scoped-worker-commit",
+  "push_authority": false,
+  "expected_handoff_status": ["ready_for_agent0_audit", "blocked_validation_failed"]
+}
