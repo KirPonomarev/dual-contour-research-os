@@ -1,0 +1,75 @@
+{
+  "stage_id": "s1-validation-authority",
+  "agent_id": "agent-0",
+  "objective": "Freeze one bounded Stage 1 gate that read-only verifies an independent ValidationReceipt and a domain-registry-owned DomainTrialLinkReceipt against one mechanical ExecutionReceipt, then exposes only immutable portable references.",
+  "executable_blocker": "The Bridge now emits a receipt-last mechanical ExecutionReceipt, but it cannot yet fail closed when an invalid validator receipt or an unbound domain link is presented; process success could otherwise be confused with a scientifically applied outcome.",
+  "base_sha": "50b04b330fca620814e964a308dfbefb3ba6cd7e",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "main",
+  "worktree": "canonical-main-worktree",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "docs/ARCHITECTURE.md",
+    "docs/TRUST_BOUNDARIES.md",
+    "docs/drafts/stage0b/runtime-comparison.md",
+    "docs/receipts/integration/s1-execution-assurance.json",
+    "contracts/v1/ExecutionReceipt.schema.json",
+    "contracts/v1/ValidationReceipt.schema.json",
+    "contracts/v1/DomainTrialLinkReceipt.schema.json"
+  ],
+  "write_set": [
+    "docs/receipts/reuse/s1-validation-boundary.json",
+    "stages/s1-validation-authority/stage-envelope.json",
+    "stages/s1-validation-authority/ownership-lease.json",
+    "tests/test_stage1_authority.py"
+  ],
+  "forbidden_scope": [
+    "market-or-security-scientific-semantics",
+    "validator-implementation-or-execution",
+    "domain-registry-writer-call-or-mutation",
+    "scientific-outcome-interpretation-or-application",
+    "metrics-reasons-tolerances-or-proposed-outcome-projection",
+    "d2-or-d3-payload-acceptance-or-storage",
+    "subprocess-socket-network-filesystem-or-dynamic-code",
+    "external-callback-or-deployment",
+    "external-dependency-adoption",
+    "contract-root-config-or-existing-runtime-edit",
+    "live-trading-live-target-or-publication-authority",
+    "ui"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "runtime_comparison_receipt": "06bd1aa0bc55b4432887d3213c83de3289b0ac857ac288872cea68d7f4f06adb",
+    "security_source_freeze": "be5c339754fbb336f27b5bee6139919009e466095dd21baceb43cc95831fdb12",
+    "market_source_freeze": "6de45dbbfebddb732ab8e166cc1b1ac31a3c1371561f03f348f9c66cb918ab34",
+    "execution_assurance_receipt": "0ffc990ac136d36c3358c8f668a8eca17c76b9ce31313c7b3f5ce966bb0b6f69",
+    "validation_receipt_schema": "322a3d5f80aeb04fb5e9f77a3f1ef61b467abfeb7663873b362c3523a4676e21",
+    "domain_link_schema": "aeb2e264bf70e1cacd13270237ef582a2f50e993aea13f79376ac1d5a1961b28",
+    "external_dependencies": "none"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest discover -s tests -p test_stage1_authority.py",
+    "make test",
+    "git diff --check",
+    "public privacy, secret, forbidden-capability and exact write-set scan"
+  ],
+  "risk_class": "read-only-validation-and-domain-link-conformance-authority",
+  "stop_conditions": [
+    "domain-validator-or-writer-code-needed",
+    "scientific-field-needs-interpretation-or-projection",
+    "domain-registry-or-external-callback-needed",
+    "d2-or-d3-payload-needed",
+    "execution-validation-domain-link-chain-not-exactly-bound",
+    "invalid-receipt-can-produce-projection",
+    "external-dependency-needed",
+    "contract-drift",
+    "private-data-detected",
+    "write-set-collision"
+  ],
+  "expected_receipt": "docs/receipts/integration/s1-validation-authority.json",
+  "rollback": "Revert the scoped authority commit before worker bases are issued. No validator, domain registry, runtime database, artifact, deployment or external state is touched by this authority stage.",
+  "commit_authority": "agent-0-one-scoped-commit",
+  "push_authority": true
+}

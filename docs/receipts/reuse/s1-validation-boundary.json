@@ -1,0 +1,75 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-s1-validation-boundary-20260716",
+  "issued_at": "2026-07-16T23:14:13Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "reuse-freeze-authority"
+  },
+  "contour": "bridge",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "stage1-pure-validation-receipt-and-domain-link-conformance",
+    "candidates": [
+      {
+        "candidate": "frozen-public-validation-and-domain-link-contracts",
+        "disposition": "selected-interface"
+      },
+      {
+        "candidate": "security-validator-patterns",
+        "disposition": "reference-only-no-source-copy"
+      },
+      {
+        "candidate": "market-validator-and-registry-patterns",
+        "disposition": "reference-only-no-source-copy"
+      },
+      {
+        "candidate": "market-runtime-source",
+        "disposition": "rejected-no-license-no-code-copy"
+      },
+      {
+        "candidate": "stdlib-hashlib-hmac-json-datetime",
+        "disposition": "selected"
+      },
+      {
+        "candidate": "jsonschema-4.26.0",
+        "disposition": "parked-until-canonical-transitive-lock-and-audit"
+      },
+      {
+        "candidate": "domain-validator-or-registry-writer-import",
+        "disposition": "rejected-domain-owned-and-side-effecting"
+      }
+    ],
+    "selected_mode": "clean-room-stdlib-pure-receipt-verifier",
+    "source_ref": "git:50b04b330fca620814e964a308dfbefb3ba6cd7e;integration:s0b-runtime-comparison;source-freeze:source-freeze-security-s0b-20260716;source-freeze:source-freeze-market-s0b-20260716",
+    "code_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "license_spdx": "NOASSERTION",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "exact-contract-shape-and-canonical-payload-integrity",
+      "pinned-validator-id-and-sha-required",
+      "execution-artifact-protocol-contour-and-classification-binding",
+      "validation-and-domain-link-parent-chain-required",
+      "monotonic-execution-validation-link-timestamps",
+      "d2-d3-receipt-payload-denied",
+      "opaque-scientific-fields-never-projected-or-interpreted",
+      "no-validator-call-domain-write-io-or-external-mutation",
+      "deeply-immutable-reference-only-projection"
+    ],
+    "canonical_owner": "bridge-read-only-domain-handoff-verifier",
+    "rollback": "Revert the scoped pure verifier and synthetic tests. No validator is executed, no domain registry is called or mutated, and no scientific outcome or D2/D3 payload is persisted by this gate."
+  },
+  "integrity": {
+    "payload_sha256": "8b69d83d4792d5bc29089e7d3bc9eceadff7658c2c69b95ed67f4cebfa433241",
+    "parent_refs": [
+      "git:50b04b330fca620814e964a308dfbefb3ba6cd7e",
+      "sha256:06bd1aa0bc55b4432887d3213c83de3289b0ac857ac288872cea68d7f4f06adb",
+      "sha256:be5c339754fbb336f27b5bee6139919009e466095dd21baceb43cc95831fdb12",
+      "sha256:6de45dbbfebddb732ab8e166cc1b1ac31a3c1371561f03f348f9c66cb918ab34",
+      "sha256:0ffc990ac136d36c3358c8f668a8eca17c76b9ce31313c7b3f5ce966bb0b6f69",
+      "sha256:322a3d5f80aeb04fb5e9f77a3f1ef61b467abfeb7663873b362c3523a4676e21",
+      "sha256:aeb2e264bf70e1cacd13270237ef582a2f50e993aea13f79376ac1d5a1961b28"
+    ]
+  }
+}

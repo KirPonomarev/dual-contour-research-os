@@ -49,6 +49,7 @@ class Stage1AuthorityTests(unittest.TestCase):
             "s1-ledger-durability.json": "clean-room-stdlib-adapter-single-ledger",
             "s1-trusted-storage.json": "clean-room-stdlib-owned-cas-ingestor",
             "s1-offline-execution.json": "clean-room-stdlib-inprocess-frozen-l0-and-researchd-finalizer",
+            "s1-validation-boundary.json": "clean-room-stdlib-pure-receipt-verifier",
         }
         schema = load(ROOT / "contracts" / "v1" / "ReuseDecisionReceipt.schema.json")
         allowed = set(schema["properties"])
@@ -126,6 +127,35 @@ class Stage1AuthorityTests(unittest.TestCase):
         self.assertEqual(
             dispositions["subprocess-or-container-runner"],
             "parked-until-isolation-proof",
+        )
+        self.assertEqual(
+            dispositions["market-runtime-source"],
+            "rejected-no-license-no-code-copy",
+        )
+        self.assertTrue(envelope["rollback"])
+        self.assertFalse(lease["delegation_allowed"])
+
+    def test_validation_authority_is_read_only_domain_neutral_and_reversible(self) -> None:
+        envelope = load(ROOT / "stages" / "s1-validation-authority" / "stage-envelope.json")
+        lease = load(ROOT / "stages" / "s1-validation-authority" / "ownership-lease.json")
+        receipt = load(REUSE_RECEIPTS / "s1-validation-boundary.json")
+        self.assertEqual(envelope["base_sha"], "50b04b330fca620814e964a308dfbefb3ba6cd7e")
+        self.assertEqual(envelope["write_set"], lease["write_set"])
+        self.assertIn("validator-implementation-or-execution", envelope["forbidden_scope"])
+        self.assertIn("domain-registry-writer-call-or-mutation", envelope["forbidden_scope"])
+        self.assertIn("d2-or-d3-payload-acceptance-or-storage", envelope["forbidden_scope"])
+        self.assertEqual(envelope["dependency_hashes"]["external_dependencies"], "none")
+        dispositions = {
+            item["candidate"]: item["disposition"]
+            for item in receipt["payload"]["candidates"]
+        }
+        self.assertEqual(
+            dispositions["stdlib-hashlib-hmac-json-datetime"],
+            "selected",
+        )
+        self.assertEqual(
+            dispositions["domain-validator-or-registry-writer-import"],
+            "rejected-domain-owned-and-side-effecting",
         )
         self.assertEqual(
             dispositions["market-runtime-source"],
