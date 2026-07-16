@@ -1,0 +1,16 @@
+{
+  "lease_id": "lease-s1-assurance-agent-5-20260716",
+  "stage_id": "s1-assurance",
+  "agent_id": "agent-5",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-16T20:19:50Z",
+  "expires_at": "2026-07-17T02:19:50Z",
+  "base_sha": "328a7d2b26b6aa0439475538e46ecc8bbf97dfb0",
+  "branch": "codex/bridge-a5-s1-assurance",
+  "worktree": "ephemeral-worktree:s1-assurance",
+  "write_set": [
+    "tests/test_stage1_assurance.py"
+  ],
+  "delegation_allowed": false,
+  "state": "active"
+}
