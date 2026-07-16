@@ -1,0 +1,49 @@
+{
+  "schema_version": "dual-contour.security-source-freeze-candidate.v1",
+  "status": "CANDIDATE_NOT_CANONICAL",
+  "source": {
+    "logical_repository": "security-domain-runtime-source",
+    "remote_name": "origin",
+    "remote_url_published": false,
+    "branch": "codex/sensor-circulation-repair",
+    "head_sha": "c88ffdb3e90971f1b2369f11ebe3a44d46d20470",
+    "upstream": null,
+    "upstream_status": "not_configured",
+    "observation_mode": "read_only"
+  },
+  "scope_boundary": "Only repository identity and sanitized path-manifest aggregates are frozen. No source diff, untracked filename, private URL, target or program name, file bytes, evidence, or D2/D3 payload is included.",
+  "evidence_status": {
+    "head_verified": true,
+    "tracked_path_manifest_verified": true,
+    "untracked_path_manifest_verified": true,
+    "source_repository_mutated": false,
+    "canonical_receipt_issued": false
+  },
+  "owner_agent_role": "agent-1/security-runtime-inventory",
+  "next_action": "Agent 0 resolves parked categories, verifies ownership and classification, and may issue a canonical SourceFreezeReceipt.",
+  "working_tree": {
+    "tracked_changes": {
+      "entry_count": 0,
+      "path_status_manifest_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "untracked": {
+      "top_level_status_entry_count": 15,
+      "expanded_file_count": 496,
+      "relative_path_manifest_sha256": "3a7f7a5ae0746b98172a10751afc170667942d565123a93f5f7185d883ceff69"
+    },
+    "manifest_hash_method": "SHA-256 over deterministic NUL-delimited relative-path manifests; path values are intentionally not published.",
+    "category_dispositions": [
+      {"category": "runtime_integration_candidates", "top_level_entry_count": 2, "disposition": "park_for_owner_classification_and_sanitized_review"},
+      {"category": "configuration_candidate", "top_level_entry_count": 1, "disposition": "park_private_until_classification"},
+      {"category": "recovery_control_candidate", "top_level_entry_count": 1, "disposition": "park_private_until_canonical_repository_is_proven"},
+      {"category": "report_generation_and_output_artifacts", "top_level_entry_count": 7, "disposition": "exclude_from_public_reuse"},
+      {"category": "dependency_install_artifacts", "top_level_entry_count": 3, "disposition": "exclude_and_rebuild_from_pinned_manifest_if_needed"},
+      {"category": "workspace_control_artifact", "top_level_entry_count": 1, "disposition": "exclude_from_public_reuse"}
+    ],
+    "disposition_totals": {
+      "parked_for_review": 4,
+      "excluded": 11,
+      "selected_for_import": 0
+    }
+  }
+}

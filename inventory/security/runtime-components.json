@@ -1,0 +1,160 @@
+{
+  "schema_version": "dual-contour.security-runtime-inventory.v1",
+  "status": "READY_FOR_AGENT0_REVIEW",
+  "source": {
+    "logical_repository": "security-domain-runtime-source",
+    "remote_name": "origin",
+    "remote_url_published": false,
+    "branch": "codex/sensor-circulation-repair",
+    "head_sha": "c88ffdb3e90971f1b2369f11ebe3a44d46d20470",
+    "upstream": null,
+    "observation_mode": "read_only"
+  },
+  "scope_boundary": "Domain-neutral runtime primitives, strict contracts, and synthetic or repository-local conformance tests only. No target, program, evidence, private URL, raw diff, D2/D3 payload, or live-action material is included.",
+  "evidence_status": {
+    "source_head_pinned": true,
+    "source_files_content_addressed": true,
+    "source_repository_mutated": false,
+    "code_copied": false,
+    "focused_test_result": {
+      "status": "GREEN",
+      "tests_passed": 87,
+      "tests_failed": 0
+    }
+  },
+  "owner_agent_role": "agent-1/security-runtime-inventory",
+  "next_action": "Agent 0 audits each candidate and issues a ReuseDecisionReceipt before extraction, adaptation, or rejection.",
+  "anchors": {
+    "durable_io": {"relative_path": "tools/durable_io.py", "sha256": "9398a9a6f614c19c075a7523ae8321d0bb00782164e79d3a92eba252f6e9fde0", "git_blob_sha1": "46e9738e2acbddfcbb4c20d7503a7e04d0331034"},
+    "mission_runtime": {"relative_path": "tools/mission_runtime.py", "sha256": "65cf76be8f5b10a9fe6486c1e52c8b03f0d91a3cdcef5ce8766ec7c1efe73973", "git_blob_sha1": "83fb9b13ef999716c3623222dcfdf168e23e69ad"},
+    "mission_runner": {"relative_path": "tools/mission_runner.py", "sha256": "39aa7b13ee9d1401a2c483b36823ca8921d891415fe8b5e45840a17e59b03e3a", "git_blob_sha1": "42ab4fb42849882ae1a7b63b68ab151fccab010d"},
+    "execution_gate": {"relative_path": "tools/kernel_execution_gate.py", "sha256": "f6622132a39de62eb315f8966fb362fb196e09ee05966c534dfca6adb14ec920", "git_blob_sha1": "e5ee177d099886604ab2404d8d90d15577eba051"},
+    "decision_validator": {"relative_path": "tools/execution_decision_validator.py", "sha256": "ed0cbc1e426e804ffc817397526a1e501a5353fbee05f794d5d1cf9f7534d576", "git_blob_sha1": "0d1d4d112d592664949f542561bbaf218f640ca5"},
+    "lease_issuer": {"relative_path": "tools/execution_lease_issuer.py", "sha256": "76d43f25ff5bb0c701a734efa400f5558b3321bb4b3a6df62330ccd1b3e0d719", "git_blob_sha1": "541c29a15567f48b8bcbd1720218a464a5b0bf69"},
+    "authorization_packet": {"relative_path": "tools/mission_authorization_packet.py", "sha256": "2c4a840026c3c88a150a3bf1d8aa1eb7ec2c47d73a4db24251e3303338141c97", "git_blob_sha1": "65653539cedf9035671133aeaa204c6c9a562685"},
+    "authorization_review": {"relative_path": "tools/mission_authorization_review.py", "sha256": "ef97e39b82079dd58a706df8bc8e9c04b9b688535061e3e22b0389faa6778fe6", "git_blob_sha1": "cd3ab6e3736ea96f9145c50860168344c38d9cbc"},
+    "backup": {"relative_path": "tools/private_backup.py", "sha256": "c700fe270f12b9512e7c79f5173f94b206b241e7fc6712c3a8e738ab96e5e1af", "git_blob_sha1": "e7b1dcc19b85de09e10020ced7b82068b45a1174"},
+    "release_gate": {"relative_path": "tools/release_freeze_gate.py", "sha256": "7b5f2c6f85e63946de7cd9740a8bb2c56b6de74e054783a937e215cc43283198", "git_blob_sha1": "1fb24f614bb2f3e2ead84d6cb5d5c47dd26313b3"},
+    "test_durable_io": {"relative_path": "tests/test_durable_io.py", "sha256": "f66aaa46d17a8d6f5f93730c4fe80535223d56fe18ffc71337badd43979b9d9c", "git_blob_sha1": "aeb427b3ba4dc503d81a4ceab1e3af065996c9df"},
+    "test_mission_runtime": {"relative_path": "tests/test_mission_runtime.py", "sha256": "c2404a33d9d0bac5e3ca2feccafe0f4e8b3b40914f24ad37a8fa1af9e8f1404f", "git_blob_sha1": "90930f3da14b51dc903f54ef88701bd75a8ef206"},
+    "test_mission_runner": {"relative_path": "tests/test_mission_runner.py", "sha256": "1e4fa3358fae42ba54c949114433643934fdd87cd2cb01309cf66dbcf2763f03", "git_blob_sha1": "05582c0c594b84b39b86244be28aaac885a48ce7"},
+    "test_execution_gate": {"relative_path": "tests/test_kernel_execution_contracts.py", "sha256": "eb0b71a63fd5eb5cdf9b1a6c9b9f241fa44eee5fcdb180e93c8c635c043498dc", "git_blob_sha1": "230707dae1976e4d621e08c2f7ce067f8ee2a79d"},
+    "test_decision_validator": {"relative_path": "tests/test_execution_decision_validator.py", "sha256": "3b358970602eeaab8beeefd0bfaedd267412504c850db47c563fa2707313d838", "git_blob_sha1": "6698fbd13d7d0d54a9c83b7d788a80c12d303176"},
+    "test_lease_issuer": {"relative_path": "tests/test_execution_lease_issuer.py", "sha256": "712583b1ae6fab15a3335555857e2e2a25745ad2c27196c27f7365484aba0899", "git_blob_sha1": "07bd5359591b42351cef34551e1202a352bc9d6e"},
+    "test_authorization_packet": {"relative_path": "tests/test_mission_authorization_packet.py", "sha256": "a68b2cf8067790ff3b6e63abaed7d3012bac93b6e849225abbbed1a3b9bf5c3a", "git_blob_sha1": "147b39aa8a1e4a58f106c919d7672c599865c05a"},
+    "test_authorization_review": {"relative_path": "tests/test_mission_authorization_review.py", "sha256": "19fa747af819c8a55f239f0bfba8d834f0d378a463f89dad49cabdfc45fe31b0", "git_blob_sha1": "27e92b93ed143d343bde9cb6b443ed0b641bbc25"},
+    "test_backup": {"relative_path": "tests/test_private_backup.py", "sha256": "46451cf553f18e96e273b1ba08c3eb0c7415e81cc0b0b6c5375db28c88d97af7", "git_blob_sha1": "ea389663b4c781011cfc70d010b041820d7c79e8"},
+    "test_release_gate": {"relative_path": "tests/test_release_freeze_gate.py", "sha256": "f2706591009134021268138747fabfc53e7ab6d9d42e03670c53b791ce34db0f", "git_blob_sha1": "20081478d8ef10ff1e15653d2fe5cc6f29c5fab5"}
+  },
+  "components": [
+    {
+      "component_id": "security.durable-atomic-replace.v1",
+      "capability": "Crash-durable atomic replacement with file and parent-directory fsync and injected failure boundaries.",
+      "candidate_disposition": "extract_owned_versioned_primitive",
+      "reuse_confidence": "high",
+      "source_anchor_ids": ["durable_io"],
+      "test_anchor_ids": ["test_durable_io"],
+      "bridge_contract_targets": ["ArtifactManifest", "CheckpointManifest", "ExecutionReceipt"],
+      "reusable_guards": ["file_fsync", "atomic_replace", "directory_fsync", "failure_injection"],
+      "portability_gaps": ["Bridge staging, fencing, classification, and receipt-last rules remain mandatory."]
+    },
+    {
+      "component_id": "security.hash-chained-event-ledger.v1",
+      "capability": "Strict hash-chained event ledger with transition validation, locked append, dry-run default, and tamper detection.",
+      "candidate_disposition": "adapt_state_machine_and_ledger_core",
+      "reuse_confidence": "medium",
+      "source_anchor_ids": ["mission_runtime"],
+      "test_anchor_ids": ["test_mission_runtime"],
+      "bridge_contract_targets": ["JobSpec", "ExecutionReceipt", "IncidentReceipt"],
+      "reusable_guards": ["strict_shape", "previous_hash_binding", "legal_transitions", "duplicate_rejection", "dry_run_default", "secret_like_metadata_rejection"],
+      "portability_gaps": ["Source states require explicit Bridge mapping; Bridge events also require monotonic time and immutable boot identity."]
+    },
+    {
+      "component_id": "security.governed-runner-recovery.v1",
+      "capability": "Lease-bound runner with atomic reservation, allowlisted actions, run receipts, concurrency exclusion, and recovery without action replay.",
+      "candidate_disposition": "reuse_failure_and_recovery_patterns_via_adapter",
+      "reuse_confidence": "medium",
+      "source_anchor_ids": ["mission_runner"],
+      "test_anchor_ids": ["test_mission_runner"],
+      "bridge_contract_targets": ["AttemptLease", "ExecutionReceipt", "CheckpointManifest"],
+      "reusable_guards": ["canonical_lease_required", "single_winner_reservation", "replay_denial", "concurrency_denial", "failure_receipt", "no_replay_recovery"],
+      "portability_gaps": ["Source actions are domain-runtime specific; Bridge execution remains offline and staging-only."]
+    },
+    {
+      "component_id": "security.decision-lease-gate.v1",
+      "capability": "Pure fail-closed Decision and Lease evaluation for schema, validity, action/proof binding, replay, and concurrency.",
+      "candidate_disposition": "extract_owned_versioned_primitive",
+      "reuse_confidence": "high",
+      "source_anchor_ids": ["execution_gate"],
+      "test_anchor_ids": ["test_execution_gate"],
+      "bridge_contract_targets": ["Permit", "AttemptLease", "ApprovalReceipt"],
+      "reusable_guards": ["unknown_fields_denied", "expired_authority_denied", "window_binding", "action_and_proof_binding", "replay_denial", "concurrency_denial"],
+      "portability_gaps": ["Decision and Lease are not aliases for Permit and AttemptLease; a typed adapter is required."]
+    },
+    {
+      "component_id": "security.decision-validator.v1",
+      "capability": "Fail-closed validation cases for expiry, limits, and review routing.",
+      "candidate_disposition": "reuse_conformance_cases_only",
+      "reuse_confidence": "low",
+      "source_anchor_ids": ["decision_validator"],
+      "test_anchor_ids": ["test_decision_validator"],
+      "bridge_contract_targets": ["Permit", "PolicySnapshot"],
+      "reusable_guards": ["expiry_denial", "limits_required", "high_risk_review"],
+      "portability_gaps": ["Generation and routing contain domain-policy assumptions; only neutral negative cases are candidates."]
+    },
+    {
+      "component_id": "security.lease-issuance-ledger.v1",
+      "capability": "Short lease issuance bound to decision, proposal, confirmation, authority subject, nonce, and an append-only chain.",
+      "candidate_disposition": "adapt_after_authority_interface_review",
+      "reuse_confidence": "medium",
+      "source_anchor_ids": ["lease_issuer"],
+      "test_anchor_ids": ["test_lease_issuer"],
+      "bridge_contract_targets": ["AttemptLease", "ApprovalReceipt"],
+      "reusable_guards": ["confirmation_binding", "short_window", "nonce_replay_denial", "proposal_replay_denial", "issuance_never_executes"],
+      "portability_gaps": ["Agent 0 must freeze the Bridge issuer boundary and key custody before adaptation."]
+    },
+    {
+      "component_id": "security.authorization-proposal-review.v1",
+      "capability": "Non-authoritative proposal and durable review whose approval cannot itself execute or issue a lease.",
+      "candidate_disposition": "reuse_separation_of_authority_pattern",
+      "reuse_confidence": "high",
+      "source_anchor_ids": ["authorization_packet", "authorization_review"],
+      "test_anchor_ids": ["test_authorization_packet", "test_authorization_review"],
+      "bridge_contract_targets": ["ApprovalReceipt", "DeploymentApprovalReceipt"],
+      "reusable_guards": ["proposal_has_no_authority", "packet_hash_binding", "reviewer_validation", "duplicate_review_denial", "approval_cannot_execute"],
+      "portability_gaps": ["Frozen Bridge approval schemas require explicit mapping; review remains separate from Permit and Lease issuance."]
+    },
+    {
+      "component_id": "security.backup-restore-integrity.v1",
+      "capability": "Manifest-bound byte-identical restore with plaintext, symlink, traversal, duplicate-path, tamper, and overwrite denial.",
+      "candidate_disposition": "reuse_tests_and_domain_vault_pattern",
+      "reuse_confidence": "medium",
+      "source_anchor_ids": ["backup"],
+      "test_anchor_ids": ["test_backup"],
+      "bridge_contract_targets": ["BackupReceipt", "RestoreReceipt"],
+      "reusable_guards": ["byte_identical_restore", "plaintext_denial", "symlink_denial", "traversal_denial", "tamper_before_write_denial", "destination_preserved"],
+      "portability_gaps": ["Sensitive payload remains Domain Vault-owned; Bridge reuse is limited to integrity and synthetic tests."]
+    },
+    {
+      "component_id": "security.release-freeze-gate.v1",
+      "capability": "Pinned release identity and protected-path freeze validation with bounded classified exceptions.",
+      "candidate_disposition": "reuse_release_gate_pattern_only",
+      "reuse_confidence": "medium",
+      "source_anchor_ids": ["release_gate"],
+      "test_anchor_ids": ["test_release_gate"],
+      "bridge_contract_targets": ["ReleaseManifest", "DeploymentApprovalReceipt", "IntegrationReceipt"],
+      "reusable_guards": ["annotated_release_identity", "protected_path_matching", "exception_validation", "unclassified_change_denial"],
+      "portability_gaps": ["Bridge must bind image, config, policy, schema, and release hashes rather than reuse source repository paths."]
+    }
+  ],
+  "contract_candidates": [
+    {"source_contract": "research-os.mission-event.v1", "relative_path": "research-os/kernel/mission_event_schema.json", "sha256": "415aee78c85570d07240763cd286f8a9c1e4a3fca2cd629e265a1fa2c98c0b85", "bridge_projection": ["ExecutionReceipt", "IncidentReceipt"], "disposition": "adapter_and_negative_tests"},
+    {"source_contract": "research-os.execution-decision.v1", "relative_path": "research-os/kernel/execution_decision_schema.json", "sha256": "eeba8403902d6fa08b308a226114d0c5c28674196fa14db39ee17999e4cb3ee3", "bridge_projection": ["Permit"], "disposition": "adapter_not_alias"},
+    {"source_contract": "research-os.execution-lease.v1", "relative_path": "research-os/kernel/execution_lease_schema.json", "sha256": "c749786dc9a2a65dd827cc37256aaad0be80f9caff8dbc8ef3e6678cf9f29dd4", "bridge_projection": ["AttemptLease"], "disposition": "adapter_not_alias"},
+    {"source_contract": "research-os.mission-run-receipt.v1", "relative_path": "research-os/kernel/mission_run_receipt_schema.json", "sha256": "0e8cfd2195446d56b8ccdb4acd03d4ad80ed80c08fae83d859632c52ea16cf36", "bridge_projection": ["ExecutionReceipt"], "disposition": "adapter_and_recovery_tests"},
+    {"source_contract": "research-os.mission-authorization-packet.v1", "relative_path": "research-os/kernel/mission_authorization_packet_schema.json", "sha256": "de2536efa5fe8fd71451de0916366804b1c391b9663e041d946f64b2a483cdba", "bridge_projection": ["ApprovalReceipt"], "disposition": "separation_pattern"},
+    {"source_contract": "research-os.authorization-review-receipt.v1", "relative_path": "research-os/kernel/authorization_review_receipt_schema.json", "sha256": "36367f9a04343426050ad85a958886a96d0190fcf0358de58925019125470c17", "bridge_projection": ["ApprovalReceipt"], "disposition": "adapter_and_no_authority_test"},
+    {"source_contract": "research-os.action-receipt.v2", "relative_path": "research-os/kernel/action_receipt_v2_schema.json", "sha256": "347c2d33cee67fdaf17d0be013c6419fb9724bb057e07d27faf4cb7f277561b4", "bridge_projection": ["ExecutionReceipt", "DomainArtifactReceipt"], "disposition": "lineage_pattern_only"},
+    {"source_contract": "research-os.execution-lease-issuance-record.v1", "relative_path": "research-os/kernel/execution_lease_issuance_record_schema.json", "sha256": "4d6dcd5f82dd50e50ff14cc2364e0c9148883ec841808e092c4eec72b9b3dd92", "bridge_projection": ["AttemptLease"], "disposition": "issuance_audit_pattern"}
+  ]
+}
