@@ -1,0 +1,25 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s0b-security-inventory-20260716",
+  "issued_at": "2026-07-16T19:44:19Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "bridge",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s0b-security-inventory",
+    "agent_id": "agent-1",
+    "ownership_lease_ref": "stages/s0b-security-inventory/ownership-lease.json",
+    "base_sha": "f135fba7e152b3044caa4093f6632c2d8a801c03",
+    "head_sha": "92376ae389b68ef68fe87d4f04fac1ce207e949b",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": ["docs/drafts/stage0b/security-runtime.md", "inventory/security/runtime-components.json", "inventory/security/source-freeze-candidate.json", "tests/stage0b/test_security_inventory.py"],
+    "audit_results": {"contract_gate": "green", "focused_tests": 5, "candidate_tests": 87, "diff_check": "green", "privacy_secret_scan": "green", "source_mutation": false},
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29529141616",
+    "integration_commit_sha": "7a4d4cf93e6ed8a839959ed3cc35cbb0a6220b3b"
+  },
+  "integrity": {
+    "payload_sha256": "9a0949d8fc40c351383fbbc31aa27e49707064457a0cb5efd1e0e50926cdcdc3",
+    "parent_refs": ["git:92376ae389b68ef68fe87d4f04fac1ce207e949b", "ci:29529141616"]
+  }
+}

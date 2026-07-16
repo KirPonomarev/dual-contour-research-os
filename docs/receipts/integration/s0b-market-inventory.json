@@ -1,0 +1,25 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s0b-market-inventory-20260716",
+  "issued_at": "2026-07-16T19:44:19Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "bridge",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s0b-market-inventory",
+    "agent_id": "agent-3",
+    "ownership_lease_ref": "stages/s0b-market-inventory/ownership-lease.json",
+    "base_sha": "f135fba7e152b3044caa4093f6632c2d8a801c03",
+    "head_sha": "fcf2891f79f13a7e374fe2373163a6e7f70a7f1d",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": ["docs/drafts/stage0b/market-runtime.md", "inventory/market/canonical-repository-candidate.json", "inventory/market/reusable-capabilities.json", "inventory/market/source-freeze-candidate.json", "tests/stage0b/test_market_inventory.py"],
+    "audit_results": {"contract_gate": "green", "focused_tests": 4, "source_head_matches_upstream": true, "diff_check": "green", "privacy_secret_scan": "green", "source_mutation": false},
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29529096098",
+    "integration_commit_sha": "11bd35b952b6b982e118107051869bdfc1775b52"
+  },
+  "integrity": {
+    "payload_sha256": "ac3c98cfa914fbf2020752ab3fb495a54a9f850c7dfb827eb70439ada5383454",
+    "parent_refs": ["git:fcf2891f79f13a7e374fe2373163a6e7f70a7f1d", "ci:29529096098"]
+  }
+}

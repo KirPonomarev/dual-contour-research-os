@@ -1,0 +1,25 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s0b-runtime-comparison-20260716",
+  "issued_at": "2026-07-16T19:44:19Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "bridge",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s0b-runtime-comparison",
+    "agent_id": "agent-2",
+    "ownership_lease_ref": "stages/s0b-runtime-comparison/ownership-lease.json",
+    "base_sha": "f135fba7e152b3044caa4093f6632c2d8a801c03",
+    "head_sha": "b60058c9ae0b9389b5b4adcc1673e7c3341d83af",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": ["docs/drafts/stage0b/runtime-comparison.md", "inventory/runtime-comparison/README.md", "inventory/runtime-comparison/comparison.json", "tests/stage0b/test_runtime_comparison.py"],
+    "audit_results": {"contract_gate": "green", "focused_tests": 7, "candidate_tests": 72, "diff_check": "green", "privacy_secret_scan": "green", "source_mutation": false},
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29529033102",
+    "integration_commit_sha": "5a1e3bb638fcbb223d90cefcd2f24a6d172c5a1f"
+  },
+  "integrity": {
+    "payload_sha256": "d1086c0a8ef3e004b975f4195f90b73ec7cdaa9e9dffa9307792d0a0a3bbe74f",
+    "parent_refs": ["git:b60058c9ae0b9389b5b4adcc1673e7c3341d83af", "ci:29529033102"]
+  }
+}
