@@ -1,0 +1,133 @@
+{
+  "inventory_type": "SanitizedMarketRuntimeInventory",
+  "inventory_version": "0.1.0",
+  "status": "candidate_inventory",
+  "authority": false,
+  "classification": "D0_PUBLIC",
+  "observed_at": "2026-07-16T19:27:03Z",
+  "source": {
+    "logical_id": "crypto-market-lab",
+    "selected_source_sha": "636d0b56d13ba919d4af7c4bcd0718ac7fb92945",
+    "tracked_head_files": 2849,
+    "tracked_head_python_files": 1594,
+    "tracked_head_test_files": 490,
+    "root_license_file_present": false,
+    "public_copy_authority": "not_established"
+  },
+  "evidence_method": {
+    "kind": "tracked_head_keyword_manifest",
+    "scope": "python_and_shell_files_at_selected_commit",
+    "meaning": "candidate_presence_only_not_semantic_conformance",
+    "filenames_published": false
+  },
+  "capabilities": [
+    {
+      "capability_id": "append_only_ledger",
+      "candidate_status": "present_requires_semantic_conformance",
+      "reuse_mode": "internal_adapter_first",
+      "canonical_owner": "market-domain",
+      "matched_files": 501,
+      "non_test_matches": 372,
+      "test_matches": 129,
+      "evidence_manifest_sha256": "88b23053cf9b7fe0a0bb7375943e9d6644d0111c78d8108adc2a0d8fda9ae16c"
+    },
+    {
+      "capability_id": "storage_lifecycle",
+      "candidate_status": "present_requires_semantic_conformance",
+      "reuse_mode": "internal_adapter_first",
+      "canonical_owner": "market-domain",
+      "matched_files": 115,
+      "non_test_matches": 75,
+      "test_matches": 40,
+      "evidence_manifest_sha256": "fe996efa0d794ca51c53ddfe97eeacec67e80367406a2a885d5b7d596864f4a8"
+    },
+    {
+      "capability_id": "trial_registry",
+      "candidate_status": "present_requires_semantic_conformance",
+      "reuse_mode": "domain_owned_adapter",
+      "canonical_owner": "market-domain",
+      "matched_files": 176,
+      "non_test_matches": 102,
+      "test_matches": 74,
+      "evidence_manifest_sha256": "efcb0ef99066b692c9e85d66879a6368efda176d213c28ed9045a1b7d325c46d"
+    },
+    {
+      "capability_id": "backtest_primitives",
+      "candidate_status": "present_requires_scientific_conformance",
+      "reuse_mode": "domain_owned_adapter",
+      "canonical_owner": "market-domain",
+      "matched_files": 31,
+      "non_test_matches": 23,
+      "test_matches": 8,
+      "evidence_manifest_sha256": "d13f3024715d935b39ac17a368d7a0023134819c717c784b72b12e42573cd447"
+    },
+    {
+      "capability_id": "chronological_replay",
+      "candidate_status": "present_requires_temporal_conformance",
+      "reuse_mode": "domain_owned_adapter",
+      "canonical_owner": "market-domain",
+      "matched_files": 467,
+      "non_test_matches": 339,
+      "test_matches": 128,
+      "evidence_manifest_sha256": "9ca5d30f6fe3919abfcbfe717e11aa1aafd88ac6c97a9c7e73c04aec234a2d65"
+    },
+    {
+      "capability_id": "dataset_integrity",
+      "candidate_status": "present_requires_input_lineage_conformance",
+      "reuse_mode": "internal_adapter_first",
+      "canonical_owner": "market-domain",
+      "matched_files": 483,
+      "non_test_matches": 388,
+      "test_matches": 95,
+      "evidence_manifest_sha256": "0d54302806cb29bc978fc3070c531e3ab685c8fbdba84c0bd29be6fdfcd3b13b"
+    },
+    {
+      "capability_id": "evidence_routing_quality",
+      "candidate_status": "present_requires_redaction_conformance",
+      "reuse_mode": "internal_adapter_first",
+      "canonical_owner": "market-domain",
+      "matched_files": 1257,
+      "non_test_matches": 996,
+      "test_matches": 261,
+      "evidence_manifest_sha256": "01497190cae5232694200d584f2dbe05983114a29a8f7d5d5610b6edf2442319"
+    },
+    {
+      "capability_id": "preregistration",
+      "candidate_status": "present_requires_protocol_freeze_conformance",
+      "reuse_mode": "domain_owned_adapter",
+      "canonical_owner": "market-domain",
+      "matched_files": 120,
+      "non_test_matches": 89,
+      "test_matches": 31,
+      "evidence_manifest_sha256": "cc2587e3162ab72951dcffffaea698c7c29179f300331bb3cd0027631a8ebfa9"
+    },
+    {
+      "capability_id": "soak_recovery",
+      "candidate_status": "present_requires_failure_conformance",
+      "reuse_mode": "internal_adapter_first",
+      "canonical_owner": "market-domain",
+      "matched_files": 103,
+      "non_test_matches": 68,
+      "test_matches": 35,
+      "evidence_manifest_sha256": "967e6e65f6c8f89dddbff3c3e36128cc43278481e6db2784f8c842e848f813a5"
+    },
+    {
+      "capability_id": "validator_adapters",
+      "candidate_status": "present_domain_semantics_must_remain_private",
+      "reuse_mode": "pinned_domain_validator_adapter",
+      "canonical_owner": "market-domain",
+      "matched_files": 127,
+      "non_test_matches": 30,
+      "test_matches": 97,
+      "evidence_manifest_sha256": "e9e8f0492b275f44369eb8a45b480c8e358d9ba5f5d13fb70841aa447356b425"
+    }
+  ],
+  "admission": {
+    "new_code_authorized": false,
+    "source_copy_authorized": false,
+    "adapter_design_authorized": false,
+    "requires_agent0_reuse_decision_receipt": true,
+    "requires_clean_source_snapshot": true,
+    "requires_domain_conformance_tests": true
+  }
+}
