@@ -1,0 +1,14 @@
+{
+  "lease_id": "lease-s1-execution-finalizer-agent-2-20260716",
+  "stage_id": "s1-execution-finalizer",
+  "agent_id": "agent-2",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-16T22:33:42Z",
+  "expires_at": "2026-07-17T04:33:42Z",
+  "base_sha": "c53d59545b81009a378b9f1213cd2cb3b5b805c3",
+  "branch": "codex/bridge-a2-s1-execution-finalizer",
+  "worktree": "ephemeral-worktree:s1-execution-finalizer",
+  "write_set": ["src/research_bridge/execution.py", "tests/test_stage1_execution.py"],
+  "delegation_allowed": false,
+  "state": "active"
+}

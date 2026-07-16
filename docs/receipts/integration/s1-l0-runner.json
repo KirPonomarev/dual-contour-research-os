@@ -1,0 +1,51 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s1-l0-runner-20260716",
+  "issued_at": "2026-07-16T23:02:06Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "bridge",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s1-l0-runner",
+    "agent_id": "agent-1",
+    "ownership_lease_ref": "stages/s1-l0-runner/ownership-lease.json",
+    "base_sha": "c53d59545b81009a378b9f1213cd2cb3b5b805c3",
+    "head_sha": "d863d64da73b8608d9a9efbf1da651b01805ba99",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "src/research_bridge/l0.py",
+      "tests/test_stage1_l0.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "focused_tests": 16,
+      "connected_tests": 149,
+      "stage0b_tests": 25,
+      "diff_check": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "dependency_adoption": false,
+      "d0_d1_only": true,
+      "fixed_code_ref_selector": "green",
+      "portable_protocol_ref": "green",
+      "cas_input_content_binding": "green",
+      "safe_durable_staging": "green",
+      "process_network_domain_capability": false,
+      "branch_ci": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29541000271"
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29541141301",
+    "integration_commit_sha": "d863d64da73b8608d9a9efbf1da651b01805ba99"
+  },
+  "integrity": {
+    "payload_sha256": "4e95e85f27ce3d23da8811ddf0ed7a9f711df266edd02148f88584aa4a057ede",
+    "parent_refs": [
+      "git:d863d64da73b8608d9a9efbf1da651b01805ba99",
+      "ci:29541000271",
+      "ci:29541141301"
+    ]
+  }
+}

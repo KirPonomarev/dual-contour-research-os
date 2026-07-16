@@ -1,0 +1,55 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s1-execution-finalizer-20260716",
+  "issued_at": "2026-07-16T23:05:25Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "bridge",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s1-execution-finalizer",
+    "agent_id": "agent-2",
+    "ownership_lease_ref": "stages/s1-execution-finalizer/ownership-lease.json",
+    "base_sha": "c53d59545b81009a378b9f1213cd2cb3b5b805c3",
+    "head_sha": "23e7f5bf3cbb9258a456b26d8f347cc6171653f1",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "src/research_bridge/execution.py",
+      "tests/test_stage1_execution.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "focused_tests": 7,
+      "composed_l0_execution_tests": 23,
+      "connected_tests": 156,
+      "stage0b_tests": 25,
+      "diff_check": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "dependency_adoption": false,
+      "claim_validated_before_runner": "green",
+      "cas_before_ledger_checkpoint": "green",
+      "ingestion_before_completion": "green",
+      "receipt_constructed_last": "green",
+      "semantic_and_file_checkpoint_digests_separate": "green",
+      "safe_no_follow_checkpoint_read": "green",
+      "failure_receipt_emission": false,
+      "process_network_domain_capability": false,
+      "branch_ci": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29540963730"
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29541290566",
+    "integration_commit_sha": "36938d5536907a8c58b706266bf54f4605e9fcf9"
+  },
+  "integrity": {
+    "payload_sha256": "f695ad3677d45408b499de7a53151fc5d5d69b227be9aa43086da2a8d3f35f06",
+    "parent_refs": [
+      "git:23e7f5bf3cbb9258a456b26d8f347cc6171653f1",
+      "git:36938d5536907a8c58b706266bf54f4605e9fcf9",
+      "ci:29540963730",
+      "ci:29541290566"
+    ]
+  }
+}

@@ -1,0 +1,84 @@
+{
+  "stage_id": "s1-l0-runner",
+  "agent_id": "agent-1",
+  "objective": "Implement one deterministic in-process L0 chunk-hash template that produces a final checkpoint payload and a strict untrusted StagingEnvelope for D0/D1 inputs.",
+  "executable_blocker": "The admitted Bridge has no executable workload primitive that is frozen, deterministic, offline by construction and incapable of domain or external side effects.",
+  "base_sha": "c53d59545b81009a378b9f1213cd2cb3b5b805c3",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a1-s1-l0-runner",
+  "worktree": "ephemeral-worktree:s1-l0-runner",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "docs/receipts/reuse/s1-offline-execution.json",
+    "docs/receipts/integration/s1-execution-authority.json",
+    "contracts/v1/JobSpec.schema.json",
+    "contracts/v1/AttemptLease.schema.json",
+    "contracts/v1/StagingEnvelope.schema.json"
+  ],
+  "write_set": [
+    "src/research_bridge/l0.py",
+    "tests/test_stage1_l0.py"
+  ],
+  "forbidden_scope": [
+    "kernel-ledger-cas-ingestion-or-finalizer-edit",
+    "subprocess-socket-network-dynamic-code-or-eval",
+    "arbitrary-template-or-argv",
+    "market-or-security-domain-feature",
+    "d2-or-d3-payload",
+    "scientific-validation-or-outcome",
+    "external-dependency",
+    "live-execution-or-deployment",
+    "contract-root-config-or-existing-test-edit"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "reuse_decision": "a02cddf62d5568d5d0dbee73c8ef3d2e61c359e67e581c9583c1aa1928609e51",
+    "authority_receipt": "9d7b5b817f3ac86fafbb8ce490d72f5aa8aceed26c2d107f931aa1d9ca0a1d6a",
+    "external_dependencies": "none"
+  },
+  "interface_contract": {
+    "exports": ["L0Error", "L0Checkpoint", "L0RunResult", "DeterministicL0Runner"],
+    "checkpoint_fields": ["sequence", "completed_ranges", "state_sha256", "relative_path", "size_bytes"],
+    "result_fields": ["checkpoint", "staging_envelope", "started_at", "ended_at", "resource_usage", "code_sha256", "input_sha256", "environment_digest"],
+    "constructor": "DeterministicL0Runner(input_reader, *, chunk_size=65536, clock=None, runner_identity='bridge-l0-runner')",
+    "method": "run(job_spec, lease, staging_root) -> L0RunResult",
+    "input_reader": "callable(ref) -> exact bytes; called once per declared input in order",
+    "frozen_template_material": "research-bridge:l0:chunk-sha256:v1",
+    "template_selector": "JobSpec.payload.code_ref must equal sha256(frozen_template_material); JobSpec.payload.protocol_ref remains an independent portable non-file ProtocolSnapshot reference and is not a template selector",
+    "required_job_profile": {
+      "runner_profile": "L0",
+      "network_policy": "offline",
+      "checkpoint_strategy": "single-final-checkpoint",
+      "expected_output_contract": "StagingEnvelope@1.0.0"
+    },
+    "output_files": ["checkpoint.json", "result.json"],
+    "staging_rule": "checkpoint.json is reference-only runner state and is not listed as a final artifact; result.json is the sole StagingEnvelope file entry",
+    "safety_rule": "output contains only deterministic hashes, sizes, indexes and portable refs; never input bytes, host paths, raw code, scientific outcome or external action"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest discover -s tests -p test_stage1_l0.py",
+    "make test",
+    "git diff --check",
+    "public privacy, secret, forbidden-import and exact write-set scan"
+  ],
+  "risk_class": "deterministic-inprocess-offline-l0-runner",
+  "stop_conditions": [
+    "unknown-template-or-profile-executes",
+    "network-or-process-capability-imported",
+    "input-bytes-or-host-path-enter-output",
+    "d2-or-d3-classification-accepted",
+    "nondeterministic-result-or-checkpoint-bytes",
+    "symlink-nonregular-or-unsafe-staging-write",
+    "domain-outcome-field-added",
+    "external-dependency-needed",
+    "private-data-detected",
+    "write-set-collision"
+  ],
+  "expected_receipt": "docs/receipts/integration/s1-l0-runner.json",
+  "rollback": "Agent 0 reverts the scoped runner commit and discards synthetic staging files; no CAS, ledger, domain or external state is mutated by runner tests.",
+  "commit_authority": "one-scoped-worker-commit",
+  "push_authority": false,
+  "expected_handoff_status": ["ready_for_agent0_audit", "blocked_validation_failed"]
+}
