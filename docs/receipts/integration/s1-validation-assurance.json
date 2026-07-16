@@ -1,0 +1,55 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s1-validation-assurance-20260716",
+  "issued_at": "2026-07-16T23:43:05Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "bridge",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s1-validation-assurance",
+    "agent_id": "agent-5",
+    "ownership_lease_ref": "stages/s1-validation-assurance/ownership-lease.json",
+    "base_sha": "7633fa3fb5c4a970c2378a69d8be001c00dad226",
+    "head_sha": "edbd895eaee97692ad963e817ea750dc8526b1f7",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "tests/test_stage1_validation_assurance.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "focused_tests": 15,
+      "composed_validation_tests": 29,
+      "connected_tests": 199,
+      "stage0b_tests": 25,
+      "skipped_tests": 0,
+      "diff_check": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "dependency_adoption": false,
+      "implementation_files_changed": 0,
+      "canonical_execution_and_parent_matrix": "green",
+      "authority_integrity_scope_time_matrix": "green",
+      "d2_d3_denial": "green",
+      "file_host_windows_reference_denial": "green",
+      "mutation_detachment_and_deep_immutability": "green",
+      "scientific_fields_projected": false,
+      "io_callback_or_domain_writer_surface": false,
+      "branch_ci": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29542715612"
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29542759150",
+    "integration_commit_sha": "617ce49ca171fb6311499afddafb12acccf1da7b"
+  },
+  "integrity": {
+    "payload_sha256": "58c81e512dc1f001748a1a111e8fae9f45c856df4a8724d17fa7dd82a0759588",
+    "parent_refs": [
+      "git:edbd895eaee97692ad963e817ea750dc8526b1f7",
+      "git:617ce49ca171fb6311499afddafb12acccf1da7b",
+      "ci:29542715612",
+      "ci:29542759150"
+    ]
+  }
+}
