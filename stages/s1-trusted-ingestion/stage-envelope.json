@@ -1,0 +1,77 @@
+{
+  "stage_id": "s1-trusted-ingestion",
+  "agent_id": "agent-1",
+  "objective": "Implement a strict Bridge-native StagingEnvelope-to-ArtifactManifest adapter that verifies fencing before any D0/D1 CAS publication.",
+  "executable_blocker": "Untrusted runner claims cannot cross into durable artifact references because strict classification, relative-path, integrity and fencing validation is absent.",
+  "base_sha": "e87bf042a1ffa6f3bc8e042ab1650dd13e336ca4",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a1-s1-trusted-ingestion",
+  "worktree": "ephemeral-worktree:s1-trusted-ingestion",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "docs/receipts/reuse/s1-trusted-storage.json",
+    "docs/receipts/integration/s1-storage-authority.json",
+    "contracts/v1/StagingEnvelope.schema.json",
+    "contracts/v1/ArtifactManifest.schema.json"
+  ],
+  "write_set": [
+    "src/research_bridge/ingestion.py",
+    "tests/test_stage1_ingestion.py"
+  ],
+  "forbidden_scope": [
+    "cas-implementation",
+    "ledger-or-admission-edit",
+    "runner-or-execution-receipt",
+    "scientific-validation-or-domain-outcome",
+    "d2-or-d3-payload-ingestion",
+    "external-dependency",
+    "live-execution",
+    "deployment",
+    "contract-or-root-config-edit"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "reuse_decision": "6f45fa8a12bb073c215dc292cf03a0e8c3bc9f132d521a1e91a0e655102aa5f7",
+    "authority_receipt": "392d3778c42cebeba36927bb9ee4b43bd1cb8413d5483f512e9bbe722974d58c",
+    "external_dependencies": "none"
+  },
+  "interface_contract": {
+    "exports": ["IngestionError", "ArtifactRecord", "TrustedIngestor", "canonical_json_sha256"],
+    "artifact_record_fields": ["artifact_ref", "manifest"],
+    "constructor": "TrustedIngestor(store, *, fence_verifier, clock=None, issuer_id='researchd-trusted-ingestor')",
+    "method": "ingest(staging_envelope, staging_root) -> tuple[ArtifactRecord, ...]",
+    "fence_verifier_keywords": ["attempt_id", "producer_identity", "fencing_token"],
+    "staging_top_level_keys": ["schema_id", "schema_version", "object_id", "issued_at", "issuer", "contour", "classification", "payload", "integrity"],
+    "staging_payload_keys": ["producer_identity", "run_id", "attempt_id", "fencing_token", "relative_file_manifest", "claimed_metrics", "completion_reason"],
+    "file_entry_keys": ["relative_path", "sha256", "size_bytes", "claim_class", "source_refs", "redaction_status", "retention_class", "validator_ref"],
+    "allowed_classifications": ["D0_PUBLIC", "D1_INTERNAL_SANITIZED"],
+    "ordering_rule": "fully validate then verify fence exactly once before any store.publish call; build manifests only after every publication succeeds",
+    "store_boundary": "structural publisher protocol only; no import of the CAS implementation"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest discover -s tests -p test_stage1_ingestion.py",
+    "make test",
+    "git diff --check",
+    "public privacy and secret scan over exact write-set"
+  ],
+  "risk_class": "trusted-staging-ingestion-boundary",
+  "stop_conditions": [
+    "invalid-envelope-reaches-fence-or-store",
+    "stale-fence-publishes",
+    "d2-or-d3-classification-accepted",
+    "absolute-parent-or-symlink-path-accepted",
+    "artifact-manifest-before-all-publications",
+    "fencing-token-persisted-in-artifact-manifest",
+    "scientific-outcome-field-added",
+    "external-dependency-needed",
+    "private-data-detected",
+    "write-set-collision"
+  ],
+  "expected_receipt": "docs/receipts/integration/s1-trusted-ingestion.json",
+  "rollback": "Agent 0 reverts the scoped adapter commit and discards synthetic staging/CAS fixtures; no canonical domain or runtime state is mutated.",
+  "commit_authority": "one-scoped-worker-commit",
+  "push_authority": false,
+  "expected_handoff_status": ["ready_for_agent0_audit", "blocked_validation_failed"]
+}
