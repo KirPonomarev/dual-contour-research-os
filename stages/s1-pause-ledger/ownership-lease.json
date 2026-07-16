@@ -1,0 +1,14 @@
+{
+  "lease_id": "lease-s1-pause-ledger-agent-2-20260716",
+  "stage_id": "s1-pause-ledger",
+  "agent_id": "agent-2",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-16T21:05:08Z",
+  "expires_at": "2026-07-17T03:05:08Z",
+  "base_sha": "1f6f9c0ad874d16bad2b045b02bc1fdb31fdd6c3",
+  "branch": "codex/bridge-a2-s1-pause-ledger",
+  "worktree": "ephemeral-worktree:s1-pause-ledger",
+  "write_set": ["src/research_bridge/ledger.py", "tests/test_stage1_ledger.py"],
+  "delegation_allowed": false,
+  "state": "active"
+}
