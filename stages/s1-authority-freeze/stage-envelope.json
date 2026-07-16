@@ -1,0 +1,71 @@
+{
+  "stage_id": "s1-authority-freeze",
+  "agent_id": "agent-0",
+  "objective": "Freeze sanitized Stage 0B source identities and the exact reuse boundary for one offline Stage 1 Bridge kernel gate.",
+  "executable_blocker": "No Stage 1 implementation may begin before schema-valid SourceFreezeReceipt and component-scoped ReuseDecisionReceipt objects are canonical and tested.",
+  "base_sha": "9f90e989611071290fa1d3ce2ed9937b2aa40972",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "main",
+  "worktree": "canonical-main-worktree",
+  "read_set": [
+    "contracts/v1/SourceFreezeReceipt.schema.json",
+    "contracts/v1/ReuseDecisionReceipt.schema.json",
+    "inventory/security/source-freeze-candidate.json",
+    "inventory/market/source-freeze-candidate.json",
+    "inventory/security/runtime-components.json",
+    "inventory/runtime-comparison/comparison.json",
+    "inventory/dependencies/stage0b-shortlist.json",
+    "docs/receipts/integration/s0b-security-inventory.json",
+    "docs/receipts/integration/s0b-market-inventory.json",
+    "docs/receipts/integration/s0b-runtime-comparison.json",
+    "docs/receipts/integration/s0b-license-audit.json"
+  ],
+  "write_set": [
+    "docs/receipts/source-freeze/s0b-security.json",
+    "docs/receipts/source-freeze/s0b-market.json",
+    "docs/receipts/reuse/s1-admission-kernel.json",
+    "docs/receipts/reuse/s1-ledger-durability.json",
+    "stages/s1-authority-freeze/stage-envelope.json",
+    "stages/s1-authority-freeze/ownership-lease.json",
+    "tests/test_stage1_authority.py"
+  ],
+  "forbidden_scope": [
+    "source-code-copy",
+    "source-repository-mutation",
+    "external-dependency-adoption",
+    "d2-d3-payload",
+    "domain-feature",
+    "live-trading",
+    "live-security-execution",
+    "deployment",
+    "ui",
+    "contract-edit"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "security_freeze_candidate": "a06d6b4147ad3fc68f6f6626cdb44b4af063ff924b39ddd3a946efe612bef87e",
+    "market_freeze_candidate": "3be550e3096c3d9f95b76669972cd484b622934d8a22e55b3afbd69eec2b89d6",
+    "runtime_comparison": "87e1ed2a70ef5968b8c9174f8d7aca615d2b5cfddc167b393b5c71ab65a1dd95",
+    "dependency_shortlist": "018db34454580f8c73e0a0c163a892b11fb64068cc9abcb9f836796a0b0af222"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest discover -s tests -p test_stage1_authority.py",
+    "make test",
+    "git diff --check",
+    "public privacy and secret scan over exact write-set"
+  ],
+  "risk_class": "authority-freeze-and-public-sanitization",
+  "stop_conditions": [
+    "private-data-detected",
+    "source-identity-mismatch",
+    "contract-drift",
+    "external-dependency-selected",
+    "write-set-collision",
+    "deterministic-mismatch"
+  ],
+  "expected_receipt": "docs/receipts/integration/s1-authority-freeze.json",
+  "rollback": "Revert the scoped authority commit before worker bases are issued; do not start Stage 1 workers from a reverted or stale base.",
+  "commit_authority": "agent-0-one-scoped-commit",
+  "push_authority": true
+}

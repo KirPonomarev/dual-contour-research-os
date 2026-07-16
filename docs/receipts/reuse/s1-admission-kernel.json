@@ -1,0 +1,39 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-s1-admission-kernel-20260716",
+  "issued_at": "2026-07-16T20:14:51Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-freeze-authority"},
+  "contour": "bridge",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "stage1-fail-closed-admission-and-kernel-skeleton",
+    "candidates": [
+      {"candidate": "frozen-JobSpec-Permit-AttemptLease-contract-adapter", "disposition": "selected-as-semantic-source"},
+      {"candidate": "security-decision-lease-gate-pattern", "disposition": "reference-only-no-source-copy"},
+      {"candidate": "jsonschema-4.26.0", "disposition": "parked-until-transitive-lock-and-audit"},
+      {"candidate": "pydantic-2.13.4", "disposition": "rejected-for-mvp"}
+    ],
+    "selected_mode": "contract-first-clean-room-minimal-glue",
+    "source_ref": "contracts-catalog-sha256:13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50;source-freeze:source-freeze-security-s0b-20260716",
+    "code_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "license_spdx": "NOASSERTION",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "strict-shape-and-integrity-denial",
+      "expired-not-yet-valid-replayed-and-mismatched-authority-denial",
+      "offline-only-network-boundary",
+      "zero-ledger-writes-before-valid-permit-and-lease"
+    ],
+    "canonical_owner": "bridge-control-plane",
+    "rollback": "Revert the scoped Stage 1 admission implementation commits; retain frozen contracts and authority receipts. No external action or state migration is authorized."
+  },
+  "integrity": {
+    "payload_sha256": "943a2cda775d23333b1acd751674d1bc374feae7635e33ba6fc1a7a39702b950",
+    "parent_refs": [
+      "source-freeze:source-freeze-security-s0b-20260716",
+      "sha256:c3edd2b99259086395d9a9e4f65dfb8bce6186515d34543fa61b5764b10a3a0d",
+      "sha256:018db34454580f8c73e0a0c163a892b11fb64068cc9abcb9f836796a0b0af222"
+    ]
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "lease_id": "lease-s1-authority-freeze-agent-0-20260716",
+  "stage_id": "s1-authority-freeze",
+  "agent_id": "agent-0",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-16T20:14:51Z",
+  "expires_at": "2026-07-17T02:14:51Z",
+  "base_sha": "9f90e989611071290fa1d3ce2ed9937b2aa40972",
+  "branch": "main",
+  "worktree": "canonical-main-worktree",
+  "write_set": [
+    "docs/receipts/source-freeze/s0b-security.json",
+    "docs/receipts/source-freeze/s0b-market.json",
+    "docs/receipts/reuse/s1-admission-kernel.json",
+    "docs/receipts/reuse/s1-ledger-durability.json",
+    "stages/s1-authority-freeze/stage-envelope.json",
+    "stages/s1-authority-freeze/ownership-lease.json",
+    "tests/test_stage1_authority.py"
+  ],
+  "delegation_allowed": false,
+  "state": "active"
+}

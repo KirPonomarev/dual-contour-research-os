@@ -1,0 +1,41 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-s1-ledger-durability-20260716",
+  "issued_at": "2026-07-16T20:14:51Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-freeze-authority"},
+  "contour": "bridge",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "stage1-single-append-only-job-ledger-checkpoint-and-fencing",
+    "candidates": [
+      {"candidate": "security-durable-io-and-ledger-patterns", "disposition": "reference-only-clean-room-adapter"},
+      {"candidate": "market-runtime-source", "disposition": "rejected-no-license-no-code-copy"},
+      {"candidate": "stdlib-sqlite3-hashlib-json", "disposition": "selected"},
+      {"candidate": "second-parallel-ledger", "disposition": "rejected-single-canonical-owner"}
+    ],
+    "selected_mode": "clean-room-stdlib-adapter-single-ledger",
+    "source_ref": "source-freeze:source-freeze-security-s0b-20260716;runtime-comparison-sha256:87e1ed2a70ef5968b8c9174f8d7aca615d2b5cfddc167b393b5c71ab65a1dd95",
+    "code_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "license_spdx": "NOASSERTION",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "append-only-update-delete-denial",
+      "single-concurrent-claim-winner",
+      "stale-fencing-token-zero-write-denial",
+      "checkpoint-sequence-and-portable-reference-validation",
+      "hash-chain-verification-and-durable-transaction-recovery"
+    ],
+    "canonical_owner": "bridge-job-ledger",
+    "rollback": "Revert the scoped Stage 1 ledger implementation commits and discard synthetic test databases. No runtime database, checkpoint payload, or domain registry mutation is authorized."
+  },
+  "integrity": {
+    "payload_sha256": "ae59c9c3a7d6cc1db0b2b110145b33c32347196ead6c3d8c2c3c474914e45d56",
+    "parent_refs": [
+      "source-freeze:source-freeze-security-s0b-20260716",
+      "source-freeze:source-freeze-market-s0b-20260716",
+      "sha256:87e1ed2a70ef5968b8c9174f8d7aca615d2b5cfddc167b393b5c71ab65a1dd95",
+      "sha256:018db34454580f8c73e0a0c163a892b11fb64068cc9abcb9f836796a0b0af222"
+    ]
+  }
+}
