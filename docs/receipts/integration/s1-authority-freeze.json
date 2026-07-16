@@ -1,0 +1,45 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s1-authority-freeze-20260716",
+  "issued_at": "2026-07-16T20:17:58Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "bridge",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s1-authority-freeze",
+    "agent_id": "agent-0",
+    "ownership_lease_ref": "stages/s1-authority-freeze/ownership-lease.json",
+    "base_sha": "9f90e989611071290fa1d3ce2ed9937b2aa40972",
+    "head_sha": "1b45aaa4833854068a71b31c88cd6790fd522bd1",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "docs/receipts/reuse/s1-admission-kernel.json",
+      "docs/receipts/reuse/s1-ledger-durability.json",
+      "docs/receipts/source-freeze/s0b-market.json",
+      "docs/receipts/source-freeze/s0b-security.json",
+      "stages/s1-authority-freeze/ownership-lease.json",
+      "stages/s1-authority-freeze/stage-envelope.json",
+      "tests/test_stage1_authority.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "focused_tests": 4,
+      "connected_tests": 59,
+      "diff_check": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "dependency_adoption": false,
+      "source_code_copy": false
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29531456464",
+    "integration_commit_sha": "1b45aaa4833854068a71b31c88cd6790fd522bd1"
+  },
+  "integrity": {
+    "payload_sha256": "8125871f0a81d001d9bb772f7cd6c4e9f090b7753bcb31d19603c19cec4df48a",
+    "parent_refs": [
+      "git:1b45aaa4833854068a71b31c88cd6790fd522bd1",
+      "ci:29531456464"
+    ]
+  }
+}
