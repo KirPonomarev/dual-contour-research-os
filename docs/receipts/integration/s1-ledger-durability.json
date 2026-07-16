@@ -1,0 +1,44 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s1-ledger-durability-20260716",
+  "issued_at": "2026-07-16T20:42:26Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "bridge",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s1-ledger-durability",
+    "agent_id": "agent-2",
+    "ownership_lease_ref": "stages/s1-ledger-durability/ownership-lease.json",
+    "base_sha": "328a7d2b26b6aa0439475538e46ecc8bbf97dfb0",
+    "head_sha": "2cec25195ee4eeb48b077ee246f36f103a0e2537",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "src/research_bridge/ledger.py",
+      "tests/test_stage1_ledger.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "focused_tests": 7,
+      "connected_tests": 78,
+      "composed_stage1_tests": 35,
+      "diff_check": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "dependency_adoption": false,
+      "single_concurrent_claim_winner": true,
+      "raw_fencing_token_persisted": false,
+      "stale_fence_zero_write": true,
+      "checkpoint_payloads": "portable-reference-only"
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29533143673",
+    "integration_commit_sha": "640f1eab0192cc4ed243eadfdf7ab1e095892923"
+  },
+  "integrity": {
+    "payload_sha256": "709fec5815ad42de193d6b57dc5a2de593c230e90bebab1c2f48fcfd41ac07bd",
+    "parent_refs": [
+      "git:2cec25195ee4eeb48b077ee246f36f103a0e2537",
+      "ci:29533143673"
+    ]
+  }
+}

@@ -1,0 +1,76 @@
+{
+  "stage_id": "s1-admission-kernel",
+  "agent_id": "agent-1",
+  "objective": "Implement the minimal offline Bridge admission boundary and kernel skeleton that requires a valid JobSpec, Permit, and AttemptLease before the canonical ledger claim call.",
+  "executable_blocker": "Stage 1 cannot claim a job fail-closed because no public implementation currently binds JobSpec, Permit, AttemptLease, time windows, integrity hashes, offline policy, and fencing identity before the first ledger write.",
+  "base_sha": "328a7d2b26b6aa0439475538e46ecc8bbf97dfb0",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a1-s1-admission-kernel",
+  "worktree": "ephemeral-worktree:s1-admission-kernel",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "contracts/v1/JobSpec.schema.json",
+    "contracts/v1/Permit.schema.json",
+    "contracts/v1/AttemptLease.schema.json",
+    "docs/receipts/reuse/s1-admission-kernel.json",
+    "docs/receipts/integration/s1-authority-freeze.json",
+    "src/research_bridge/__init__.py"
+  ],
+  "write_set": [
+    "src/research_bridge/admission.py",
+    "src/research_bridge/kernel.py",
+    "tests/test_stage1_admission.py"
+  ],
+  "forbidden_scope": [
+    "frozen-contract-edit",
+    "canonical-doc-edit",
+    "root-config-ci-lockfile-or-migration-edit",
+    "ledger-storage-implementation",
+    "external-dependency-adoption",
+    "source-code-copy",
+    "domain-feature",
+    "live-trading",
+    "live-security-execution",
+    "connected-executor",
+    "deployment",
+    "ui",
+    "external-mutation"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "reuse_decision": "411d1b736bd85f473f6d1e339e44ac62e43a393d87044ab58f3780263eaafaf4",
+    "authority_integration_receipt": "1cffc237cbf4f99788b75b612e57f3f8d37758d0ad8519d1387e56d74d2deab6",
+    "external_dependencies": "none"
+  },
+  "interface_contract": {
+    "admission_exports": ["AdmissionError", "AdmissionGrant", "canonical_json_sha256", "admit"],
+    "grant_fields": ["job_id", "attempt_id", "permit_id", "runner_identity", "fencing_epoch", "fencing_token", "admitted_at", "admission_digest"],
+    "kernel_export": "BridgeKernel",
+    "kernel_claim": "claim(job_spec, permit, lease, *, now) calls the injected ledger exactly once only after admit succeeds",
+    "ledger_claim_keywords": ["job_id", "attempt_id", "permit_id", "runner_identity", "fencing_epoch", "fencing_token", "admitted_at", "admission_digest"]
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest discover -s tests -p test_stage1_admission.py",
+    "make test",
+    "git diff --check",
+    "public privacy and secret scan over exact write-set"
+  ],
+  "risk_class": "execution-authority-boundary",
+  "stop_conditions": [
+    "contract-drift",
+    "unknown-field-accepted",
+    "invalid-authority-causes-ledger-call",
+    "non-offline-policy-accepted",
+    "external-dependency-needed",
+    "private-data-detected",
+    "write-set-collision",
+    "deterministic-mismatch"
+  ],
+  "expected_receipt": "docs/receipts/integration/s1-admission-kernel.json",
+  "rollback": "Agent 0 reverts the scoped admission implementation commit; no ledger schema or persistent state migration is part of this stage.",
+  "commit_authority": "one-scoped-worker-commit",
+  "push_authority": false,
+  "expected_handoff_status": ["ready_for_agent0_audit", "blocked_validation_failed"]
+}

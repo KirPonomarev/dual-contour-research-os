@@ -1,0 +1,17 @@
+{
+  "lease_id": "lease-s1-ledger-durability-agent-2-20260716",
+  "stage_id": "s1-ledger-durability",
+  "agent_id": "agent-2",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-16T20:19:50Z",
+  "expires_at": "2026-07-17T02:19:50Z",
+  "base_sha": "328a7d2b26b6aa0439475538e46ecc8bbf97dfb0",
+  "branch": "codex/bridge-a2-s1-ledger-durability",
+  "worktree": "ephemeral-worktree:s1-ledger-durability",
+  "write_set": [
+    "src/research_bridge/ledger.py",
+    "tests/test_stage1_ledger.py"
+  ],
+  "delegation_allowed": false,
+  "state": "active"
+}
