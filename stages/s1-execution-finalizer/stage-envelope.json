@@ -1,0 +1,91 @@
+{
+  "stage_id": "s1-execution-finalizer",
+  "agent_id": "agent-2",
+  "objective": "Implement a structural researchd coordinator that enforces claim-first, checkpoint durability, trusted artifact ingestion, ledger completion and ExecutionReceipt-last ordering.",
+  "executable_blocker": "Independent kernel, ledger, CAS and ingestion primitives are green but no mechanical coordinator composes them without false success or receipt-before-durability windows.",
+  "base_sha": "c53d59545b81009a378b9f1213cd2cb3b5b805c3",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a2-s1-execution-finalizer",
+  "worktree": "ephemeral-worktree:s1-execution-finalizer",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "docs/receipts/reuse/s1-offline-execution.json",
+    "docs/receipts/integration/s1-execution-authority.json",
+    "src/research_bridge/kernel.py",
+    "src/research_bridge/ledger.py",
+    "src/research_bridge/cas.py",
+    "src/research_bridge/ingestion.py",
+    "contracts/v1/CheckpointManifest.schema.json",
+    "contracts/v1/ExecutionReceipt.schema.json"
+  ],
+  "write_set": [
+    "src/research_bridge/execution.py",
+    "tests/test_stage1_execution.py"
+  ],
+  "forbidden_scope": [
+    "l0-kernel-ledger-cas-ingestion-implementation-edit",
+    "second-ledger-or-runtime-migration",
+    "subprocess-socket-network-or-dynamic-code",
+    "d2-or-d3-payload-publication",
+    "scientific-validation-domain-outcome-or-registry-write",
+    "external-dependency",
+    "live-execution-or-deployment",
+    "contract-root-config-or-existing-test-edit"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "reuse_decision": "a02cddf62d5568d5d0dbee73c8ef3d2e61c359e67e581c9583c1aa1928609e51",
+    "authority_receipt": "9d7b5b817f3ac86fafbb8ce490d72f5aa8aceed26c2d107f931aa1d9ca0a1d6a",
+    "external_dependencies": "none"
+  },
+  "interface_contract": {
+    "exports": ["ExecutionError", "ExecutionRecord", "OfflineExecutionCoordinator", "canonical_json_sha256"],
+    "record_fields": ["checkpoint_manifest", "artifact_records", "execution_receipt"],
+    "constructor": "OfflineExecutionCoordinator(kernel, ledger, runner, checkpoint_store, ingestor, *, issuer_id='researchd')",
+    "method": "execute(job_spec, permit, lease, staging_root, *, now) -> ExecutionRecord",
+    "runner_call": "runner.run(job_spec, lease, staging_root) exactly once and only after kernel.claim succeeds",
+    "ordering": [
+      "kernel.claim",
+      "runner.run",
+      "validate claim-result-fence bindings",
+      "checkpoint_store.publish",
+      "ledger.checkpoint",
+      "construct CheckpointManifest",
+      "ingestor.ingest",
+      "ledger.complete",
+      "construct ExecutionReceipt and ExecutionRecord"
+    ],
+    "checkpoint_rule": "D0/D1 CAS ref only, payload_stored_in_domain_vault=false, sequence from runner checkpoint, manifest after CAS plus ledger checkpoint",
+    "completion_rule": "ledger.complete result_sha256 binds the mechanical checkpoint and artifact refs; ExecutionReceipt.event_chain_head is the returned completion event SHA",
+    "failure_rule": "any prerequisite failure emits no ExecutionReceipt and no ExecutionRecord; durable earlier checkpoint or artifact orphans may remain but never false success",
+    "store_boundary": "structural protocols only; no import of l0, CAS, ingestion, kernel or ledger implementation modules"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest discover -s tests -p test_stage1_execution.py",
+    "make test",
+    "git diff --check",
+    "public privacy, secret, forbidden-import and exact write-set scan"
+  ],
+  "risk_class": "researchd-checkpoint-and-execution-receipt-last",
+  "stop_conditions": [
+    "runner-called-before-valid-claim",
+    "mismatched-fence-reaches-checkpoint-store",
+    "checkpoint-manifest-before-cas-and-ledger-durability",
+    "artifact-ingestion-before-checkpoint-record",
+    "completion-before-artifact-ingestion",
+    "execution-receipt-before-ledger-completion",
+    "receipt-on-any-failure",
+    "raw-host-path-or-scientific-outcome-persisted",
+    "d2-or-d3-payload-accepted",
+    "external-dependency-needed",
+    "private-data-detected",
+    "write-set-collision"
+  ],
+  "expected_receipt": "docs/receipts/integration/s1-execution-finalizer.json",
+  "rollback": "Agent 0 reverts the scoped coordinator commit and discards synthetic D0/D1 staging, CAS and ledger fixtures; no domain or external state is mutated.",
+  "commit_authority": "one-scoped-worker-commit",
+  "push_authority": false,
+  "expected_handoff_status": ["ready_for_agent0_audit", "blocked_validation_failed"]
+}
