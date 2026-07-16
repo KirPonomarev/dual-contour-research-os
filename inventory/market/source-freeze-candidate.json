@@ -1,0 +1,45 @@
+{
+  "candidate_type": "SourceFreezeReceiptCandidate",
+  "canonical_contract_ref": "SourceFreezeReceipt@1.0.0",
+  "candidate_version": "0.1.0",
+  "status": "draft_for_agent0",
+  "authority": false,
+  "classification": "D0_PUBLIC",
+  "observed_at": "2026-07-16T19:27:03Z",
+  "payload": {
+    "source_repo": "crypto-market-lab",
+    "remote": "sha256:c4d97d3379ba70f130a546a4d44b646c935f33e3b1447e0aac185c0d38215815",
+    "branch": "sha256:17992ff3912ac48dd5ac56d510e4eb0508c5603cb97913b1940948d6c2ad7dc5",
+    "head_sha": "636d0b56d13ba919d4af7c4bcd0718ac7fb92945",
+    "upstream": "sha256:ee2e6772c1b448b9047bb543141dcc563599b59f09db2c438b1d32124953850a",
+    "upstream_sha": "636d0b56d13ba919d4af7c4bcd0718ac7fb92945",
+    "tracked_diff_sha256": "6251b70314e9a40af68ac75a12287e6bad6c3e27c2574ab16374f628ef261330",
+    "untracked_manifest_sha256": "e7682afa4bb260dd4eac572d2957075a3365c7d0c106e7671128e0384e52e833",
+    "dirty_manifest_sha256": "99be1d124034221f462b5411bbb138146c48b972aa30e5359854ce96e6dc6b58",
+    "path_dispositions": [
+      {
+        "safe_category": "tracked_worktree_changes",
+        "count": 27,
+        "disposition": "parked_not_selected_pending_domain_owner_review"
+      },
+      {
+        "safe_category": "untracked_worktree_entries",
+        "count": 4,
+        "disposition": "parked_not_selected_pending_domain_owner_review"
+      }
+    ],
+    "selected_source_sha": "636d0b56d13ba919d4af7c4bcd0718ac7fb92945",
+    "selected_source_mode": "committed_head_only"
+  },
+  "integrity_basis": {
+    "head_tree_git_oid": "84daa93d4e66b32e18b09827bb5e1d57f21b4d5e",
+    "head_tree_manifest_sha256": "5ec2a8828eb5484f8af94121d3f1407dc3d31ff7ce1a884531f118467de068a1",
+    "ahead": 0,
+    "behind": 0
+  },
+  "promotion_requirements": [
+    "agent0_reobserves_source_identity_and_dirty_aggregates",
+    "agent0_selects_or_rejects_canonical_branch",
+    "agent0_issues_schema_valid_source_freeze_receipt"
+  ]
+}

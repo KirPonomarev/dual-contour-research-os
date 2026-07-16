@@ -1,0 +1,42 @@
+{
+  "candidate_type": "MarketCanonicalRepositoryReceiptCandidate",
+  "candidate_version": "0.1.0",
+  "status": "draft_for_agent0",
+  "authority": false,
+  "classification": "D0_PUBLIC",
+  "observed_at": "2026-07-16T19:27:03Z",
+  "repository": {
+    "logical_id": "crypto-market-lab",
+    "domain_owner": "market",
+    "remote_host": "github.com",
+    "remote_visibility": "PRIVATE",
+    "remote_identity_sha256": "c4d97d3379ba70f130a546a4d44b646c935f33e3b1447e0aac185c0d38215815",
+    "logical_remote_sha256": "8c72e01a5d0d4e3447be01498ab8ccbfedae343758a660d860a81049caf7caef",
+    "remote_default_branch": "main",
+    "inspected_branch_ref_sha256": "17992ff3912ac48dd5ac56d510e4eb0508c5603cb97913b1940948d6c2ad7dc5",
+    "head_sha": "636d0b56d13ba919d4af7c4bcd0718ac7fb92945",
+    "upstream_ref_sha256": "ee2e6772c1b448b9047bb543141dcc563599b59f09db2c438b1d32124953850a",
+    "upstream_sha": "636d0b56d13ba919d4af7c4bcd0718ac7fb92945",
+    "ahead": 0,
+    "behind": 0,
+    "head_tree_git_oid": "84daa93d4e66b32e18b09827bb5e1d57f21b4d5e",
+    "head_tree_manifest_sha256": "5ec2a8828eb5484f8af94121d3f1407dc3d31ff7ce1a884531f118467de068a1"
+  },
+  "selection": {
+    "repository_candidate": true,
+    "selected_source_sha": "636d0b56d13ba919d4af7c4bcd0718ac7fb92945",
+    "selected_source_is_committed_head": true,
+    "selected_source_matches_upstream": true,
+    "canonical_branch_decision": "pending_agent0",
+    "worktree_bytes_selected": false,
+    "domain_registry_owner": "market-domain",
+    "scientific_outcome_writer": "market-domain-registry-writer",
+    "bridge_authority": false
+  },
+  "constraints": {
+    "source_checkout_mutation": "forbidden",
+    "source_code_copy": "forbidden_pending_reuse_and_license_decision",
+    "public_inventory": "hashes_and_domain_neutral_capabilities_only",
+    "canonical_receipt_writer": "agent-0"
+  }
+}
