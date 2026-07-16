@@ -1,0 +1,44 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s1-cas-core-20260716",
+  "issued_at": "2026-07-16T22:13:47Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "bridge",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s1-cas-core",
+    "agent_id": "agent-2",
+    "ownership_lease_ref": "stages/s1-cas-core/ownership-lease.json",
+    "base_sha": "e87bf042a1ffa6f3bc8e042ab1650dd13e336ca4",
+    "head_sha": "af98dc59886a9b53db27e9b31d47c62fa0f11c90",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "src/research_bridge/cas.py",
+      "tests/test_stage1_cas.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "focused_tests": 11,
+      "connected_tests": 128,
+      "diff_check": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "dependency_adoption": false,
+      "canonical_path_exposure": false,
+      "directory_lock_object_modes": "green",
+      "durability_and_quota_fail_closed": "green",
+      "branch_ci": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29538748731"
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29538807038",
+    "integration_commit_sha": "af98dc59886a9b53db27e9b31d47c62fa0f11c90"
+  },
+  "integrity": {
+    "payload_sha256": "9f7a1d1e872d118a05a7ee18ab0701d88f0471e1050390deafaa08a2f32a91ac",
+    "parent_refs": [
+      "git:af98dc59886a9b53db27e9b31d47c62fa0f11c90",
+      "ci:29538748731",
+      "ci:29538807038"
+    ]
+  }
+}
