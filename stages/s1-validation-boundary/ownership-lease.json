@@ -1,0 +1,17 @@
+{
+  "lease_id": "lease-s1-validation-boundary-agent-1-20260716",
+  "stage_id": "s1-validation-boundary",
+  "agent_id": "agent-1",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-16T23:19:14Z",
+  "expires_at": "2026-07-17T05:19:14Z",
+  "base_sha": "7633fa3fb5c4a970c2378a69d8be001c00dad226",
+  "branch": "codex/bridge-a1-s1-validation-boundary",
+  "worktree": "ephemeral-worktree:s1-validation-boundary",
+  "write_set": [
+    "src/research_bridge/validation.py",
+    "tests/test_stage1_validation.py"
+  ],
+  "delegation_allowed": false,
+  "state": "active"
+}

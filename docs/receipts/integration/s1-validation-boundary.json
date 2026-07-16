@@ -1,0 +1,54 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s1-validation-boundary-20260716",
+  "issued_at": "2026-07-16T23:38:25Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "bridge",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s1-validation-boundary",
+    "agent_id": "agent-1",
+    "ownership_lease_ref": "stages/s1-validation-boundary/ownership-lease.json",
+    "base_sha": "7633fa3fb5c4a970c2378a69d8be001c00dad226",
+    "head_sha": "619bfdd4def26b00b1a3cd829057cce55eb2a484",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "src/research_bridge/validation.py",
+      "tests/test_stage1_validation.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "focused_tests": 14,
+      "connected_tests": 184,
+      "stage0b_tests": 25,
+      "diff_check": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "dependency_adoption": false,
+      "d0_d1_only": true,
+      "canonical_execution_identity_and_parents": "green",
+      "validation_and_domain_link_chain": "green",
+      "validator_and_registry_pins": "green",
+      "portable_reference_denial_matrix": "green",
+      "deeply_immutable_reference_only_projection": "green",
+      "scientific_fields_projected": false,
+      "validator_or_registry_writer_called": false,
+      "io_persistence_or_external_mutation": false,
+      "branch_ci": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29542567482"
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29542614233",
+    "integration_commit_sha": "619bfdd4def26b00b1a3cd829057cce55eb2a484"
+  },
+  "integrity": {
+    "payload_sha256": "390b72d428342a67e4f8cbfb54449f9c7cb5c11a70cbf5571065012d7fee7f43",
+    "parent_refs": [
+      "git:619bfdd4def26b00b1a3cd829057cce55eb2a484",
+      "ci:29542567482",
+      "ci:29542614233"
+    ]
+  }
+}

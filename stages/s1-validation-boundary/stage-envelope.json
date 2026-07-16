@@ -1,0 +1,107 @@
+{
+  "stage_id": "s1-validation-boundary",
+  "agent_id": "agent-1",
+  "objective": "Implement a pure, read-only verifier for one D0/D1 ExecutionReceipt, independent ValidationReceipt and domain-writer-owned DomainTrialLinkReceipt, returning only a deeply immutable reference projection.",
+  "executable_blocker": "Receipt-last execution exists, but the Bridge cannot yet distinguish a pinned, integrity-bound validation/domain-link chain from an untrusted or replayed scientific claim without interpreting or applying that claim.",
+  "base_sha": "7633fa3fb5c4a970c2378a69d8be001c00dad226",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a1-s1-validation-boundary",
+  "worktree": "ephemeral-worktree:s1-validation-boundary",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "docs/ARCHITECTURE.md",
+    "docs/TRUST_BOUNDARIES.md",
+    "docs/receipts/reuse/s1-validation-boundary.json",
+    "docs/receipts/integration/s1-validation-authority.json",
+    "src/research_bridge/execution.py",
+    "contracts/v1/ExecutionReceipt.schema.json",
+    "contracts/v1/ValidationReceipt.schema.json",
+    "contracts/v1/DomainTrialLinkReceipt.schema.json"
+  ],
+  "write_set": [
+    "src/research_bridge/validation.py",
+    "tests/test_stage1_validation.py"
+  ],
+  "forbidden_scope": [
+    "validator-implementation-or-call",
+    "domain-registry-writer-call-or-mutation",
+    "market-or-security-scientific-semantics",
+    "scientific-outcome-interpretation-application-or-projection",
+    "metrics-reasons-tolerances-or-checks-projection",
+    "d2-or-d3-receipt-payload-acceptance",
+    "filesystem-network-process-dynamic-code-or-external-callback",
+    "persistence-ledger-cas-ingestion-or-runtime-edit",
+    "external-dependency",
+    "contract-root-config-existing-test-or-ci-edit",
+    "live-trading-live-target-publication-deployment-or-ui"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "reuse_decision": "ab26cac74aa719ba511b52949daf8c631f71c801cb79c417b962cbbc2769bc8b",
+    "authority_receipt": "d15fd671b26ef38d470620eae1b11b934a1a81067b87d8b9ce494e168d5d84c0",
+    "execution_assurance_receipt": "0ffc990ac136d36c3358c8f668a8eca17c76b9ce31313c7b3f5ce966bb0b6f69",
+    "execution_receipt_schema": "99da44d454db51319969311404e3cbc8707f8aeb94e3f84746c55bc4bdcf9f00",
+    "validation_receipt_schema": "322a3d5f80aeb04fb5e9f77a3f1ef61b467abfeb7663873b362c3523a4676e21",
+    "domain_link_schema": "aeb2e264bf70e1cacd13270237ef582a2f50e993aea13f79376ac1d5a1961b28",
+    "external_dependencies": "none"
+  },
+  "interface_contract": {
+    "exports": [
+      "ValidationBoundaryError",
+      "ValidationProjection",
+      "ValidationBoundary"
+    ],
+    "projection_fields": [
+      "execution_ref",
+      "validation_ref",
+      "domain_link_ref",
+      "protocol_ref",
+      "artifact_refs",
+      "registry_identity",
+      "registry_revision",
+      "applied_outcome_ref",
+      "policy_ref",
+      "contour",
+      "classification"
+    ],
+    "constructor": "ValidationBoundary(*, expected_validator_id, expected_validator_sha256, expected_registry_identity)",
+    "method": "verify(execution_receipt, validation_receipt, domain_link_receipt, *, expected_protocol_ref, expected_policy_ref) -> ValidationProjection",
+    "reference_convention": {
+      "execution": "execution:<ExecutionReceipt.object_id>",
+      "validation": "validation:<ValidationReceipt.object_id>",
+      "domain_link": "domain-link:<DomainTrialLinkReceipt.object_id>"
+    },
+    "authority_rule": "researchd mechanical-success ExecutionReceipt, pinned-validator ValidationReceipt and expected domain-registry-writer identity must be exact and share contour/classification",
+    "chain_rule": "validation binds the exact execution, ordered CAS artifact refs and expected protocol; domain link binds the exact execution, validation parent, protocol and policy; issued_at is monotonic",
+    "projection_rule": "return only portable references and registry identity/revision; never return proposed_outcome, checks, metrics, tolerances or reasons",
+    "side_effect_rule": "pure in-memory verification only; no callback, I/O, persistence, validator execution or registry write"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest discover -s tests -p test_stage1_validation.py",
+    "make test",
+    "git diff --check",
+    "public privacy, secret, forbidden-import and exact write-set scan"
+  ],
+  "risk_class": "pure-validation-domain-link-verifier",
+  "stop_conditions": [
+    "invalid-integrity-authority-or-chain-produces-projection",
+    "non-mechanical-success-execution-can-be-scientifically-applied",
+    "unpinned-validator-or-writer-accepted",
+    "d2-or-d3-receipt-accepted",
+    "scientific-field-returned-or-interpreted",
+    "validator-writer-callback-or-io-added",
+    "external-dependency-needed",
+    "private-data-detected",
+    "write-set-collision"
+  ],
+  "expected_receipt": "docs/receipts/integration/s1-validation-boundary.json",
+  "rollback": "Agent 0 reverts the scoped pure verifier commit. Tests use only synthetic D0/D1 receipts; no validator, registry, runtime database, artifact, domain outcome or external state is touched.",
+  "commit_authority": "one-scoped-worker-commit",
+  "push_authority": false,
+  "expected_handoff_status": [
+    "ready_for_agent0_audit",
+    "blocked_validation_failed"
+  ]
+}
