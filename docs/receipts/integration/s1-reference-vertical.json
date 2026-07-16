@@ -1,0 +1,57 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s1-reference-vertical-20260716",
+  "issued_at": "2026-07-16T23:57:01Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "bridge",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s1-reference-vertical",
+    "agent_id": "agent-5",
+    "ownership_lease_ref": "stages/s1-reference-vertical/ownership-lease.json",
+    "base_sha": "9fcfde7b2a9d8b150434bd0908691e711ae95899",
+    "head_sha": "8a8ca9a20170343b496066dc64c20f1dda377b4c",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "tests/test_stage1_reference_vertical.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "focused_tests": 3,
+      "connected_tests": 202,
+      "stage0b_tests": 25,
+      "skipped_tests": 0,
+      "diff_check": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "dependency_adoption": false,
+      "implementation_files_changed": 0,
+      "real_d0_d1_reference_vertical": "green",
+      "single_canonical_ledger": true,
+      "durable_ledger_and_cas_reopen": "green",
+      "receipt_last_durable_preconditions": "green",
+      "invalid_external_receipt_zero_bridge_mutation": "green",
+      "execution_failure_zero_receipt_or_projection": "green",
+      "reference_only_immutable_projection": "green",
+      "validator_called": false,
+      "domain_registry_writer_called": false,
+      "global_skeleton_green": false,
+      "remaining_gate": "domain-owned-frozen-data-hypothesis-protocol-validator-and-registry-writer-evidence",
+      "branch_ci": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29543337486"
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29543374095",
+    "integration_commit_sha": "8a8ca9a20170343b496066dc64c20f1dda377b4c"
+  },
+  "integrity": {
+    "payload_sha256": "466eddcd6cd200e30c7fbe565c649b59c2c9afd2b6fae521ff76bbd46cf077eb",
+    "parent_refs": [
+      "git:8a8ca9a20170343b496066dc64c20f1dda377b4c",
+      "ci:29543337486",
+      "ci:29543374095"
+    ]
+  }
+}
