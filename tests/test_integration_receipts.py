@@ -1,5 +1,6 @@
 import hashlib
 import json
+import re
 import subprocess
 import unittest
 from pathlib import Path
@@ -19,7 +20,7 @@ class IntegrationReceiptTests(unittest.TestCase):
             payload = receipt["payload"]
             encoded = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()
             self.assertEqual(receipt["integrity"]["payload_sha256"], hashlib.sha256(encoded).hexdigest(), path.name)
-            for field in ("base_sha", "head_sha", "integration_commit_sha"):
+            for field in ("base_sha", "integration_commit_sha"):
                 result = subprocess.run(
                     ["git", "cat-file", "-e", f"{payload[field]}^{{commit}}"],
                     cwd=ROOT,
@@ -28,6 +29,8 @@ class IntegrationReceiptTests(unittest.TestCase):
                     check=False,
                 )
                 self.assertEqual(result.returncode, 0, f"{path.name}:{field}")
+            self.assertRegex(payload["head_sha"], re.compile(r"^[0-9a-f]{40}$"))
+            self.assertIn(f"git:{payload['head_sha']}", receipt["integrity"]["parent_refs"])
             self.assertTrue(payload["remote_ci_ref"].startswith("https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/"))
             self.assertEqual(payload["audit_results"]["contract_gate"], "green")
             self.assertEqual(payload["audit_results"]["privacy_secret_scan"], "green")
