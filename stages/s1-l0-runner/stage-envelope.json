@@ -45,6 +45,7 @@
     "method": "run(job_spec, lease, staging_root) -> L0RunResult",
     "input_reader": "callable(ref) -> exact bytes; called once per declared input in order",
     "frozen_template_material": "research-bridge:l0:chunk-sha256:v1",
+    "template_selector": "JobSpec.payload.code_ref must equal sha256(frozen_template_material); JobSpec.payload.protocol_ref remains an independent portable non-file ProtocolSnapshot reference and is not a template selector",
     "required_job_profile": {
       "runner_profile": "L0",
       "network_policy": "offline",
