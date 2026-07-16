@@ -1,0 +1,164 @@
+{
+  "schema_version": "dual_contour.runtime_comparison.v1",
+  "status": "draft_evidence_for_agent0",
+  "owner": "agent-2",
+  "source": "read_only_review_of_two_owned_runtime_snapshots",
+  "scope_boundary": [
+    "domain_neutral_runtime_primitives_only",
+    "tracked_head_content_only",
+    "no_source_code_copied",
+    "no_domain_payloads_or_scientific_truth",
+    "no_canonical_reuse_decision"
+  ],
+  "evidence_status": {
+    "contracts_catalog_verified": true,
+    "contracts_catalog_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "source_freeze_receipts_present": false,
+    "owned_control_runtime_focused_tests": {
+      "passed": 36,
+      "failed": 0
+    },
+    "owned_durable_runtime_focused_tests": {
+      "passed": 36,
+      "failed": 0
+    },
+    "interpretation": "Focused tests support comparison claims but do not authorize public extraction or canonical reuse."
+  },
+  "candidates": {
+    "owned_control_runtime": {
+      "snapshot_class": "tracked_head_snapshot",
+      "source_freeze_required": true,
+      "public_release_authorization_required": true,
+      "strengths": [
+        "fail_closed_decision_and_lease_gate",
+        "short_lived_lease_and_replay_rejection",
+        "atomic_concurrency_reservation",
+        "hash_chained_control_receipts",
+        "conservative_no_replay_recovery",
+        "small_fsync_replace_primitive"
+      ],
+      "limits": [
+        "no_chunk_checkpoint_protocol",
+        "no_monotonic_fencing_epoch",
+        "no_indexed_rng_contract",
+        "whole_ledger_rewrite_cost",
+        "private_schema_family_not_bridge_v1",
+        "no_complete_cas_or_staging_ingestor"
+      ]
+    },
+    "owned_durable_runtime": {
+      "snapshot_class": "tracked_head_snapshot",
+      "source_freeze_required": true,
+      "public_release_authorization_required": true,
+      "strengths": [
+        "sqlite_wal_full_sync_ledger",
+        "monotonic_fencing_tokens_and_boot_binding",
+        "immutable_content_hashed_checkpoints",
+        "indexed_deterministic_chunk_seeds",
+        "resume_sha_equality_evidence",
+        "exclusive_regular_file_publication",
+        "orphan_adoption_on_exact_retry",
+        "reboot_restore_and_soak_evidence_patterns"
+      ],
+      "limits": [
+        "private_schema_family_not_bridge_v1",
+        "no_permit_policy_or_approval_binding",
+        "validation_executes_inside_runner_boundary",
+        "no_d0_d1_d2_d3_payload_enforcement",
+        "no_bridge_staging_envelope_boundary",
+        "no_complete_global_cas_quota_or_gc",
+        "path_values_are_not_portable_public_references",
+        "offline_container_and_network_denial_not_enforced_by_primitive"
+      ]
+    }
+  },
+  "comparison": [
+    {
+      "capability": "mutable_control_file_durability",
+      "owned_control_runtime": "strong_minimal_atomic_replace",
+      "owned_durable_runtime": "stronger_immutable_publish_primitive",
+      "recommended_mode": "extract_then_harden",
+      "canonical_owner": "bridge_durable_fs",
+      "decision_evidence": "Retain one Bridge-owned mutable replace helper; add regular-file, no-follow and parent-directory defenses from the immutable publisher pattern."
+    },
+    {
+      "capability": "job_runner_checkpoint_and_fencing",
+      "owned_control_runtime": "strong_authority_gate_but_not_resumable",
+      "owned_durable_runtime": "strong_resumable_fenced_chunk_kernel",
+      "recommended_mode": "adapter_select_one_owner",
+      "canonical_owner": "bridge_job_ledger",
+      "decision_evidence": "Use the resumable fenced ledger as the single mechanical job owner and place the fail-closed Permit and Lease adapter before claim. Do not retain two run ledgers."
+    },
+    {
+      "capability": "cas_and_staging",
+      "owned_control_runtime": "reject_as_complete_solution",
+      "owned_durable_runtime": "adapt_immutable_publication_only",
+      "recommended_mode": "minimal_bridge_glue",
+      "canonical_owner": "bridge_trusted_ingestor",
+      "decision_evidence": "Neither candidate is a complete Bridge CAS. Reuse the exclusive content-hashed publication primitive behind a new StagingEnvelope-to-ArtifactManifest adapter."
+    },
+    {
+      "capability": "receipts_and_event_integrity",
+      "owned_control_runtime": "adapt_hash_chain_and_replay_guards",
+      "owned_durable_runtime": "adapt_artifact_and_recovery_receipt_patterns",
+      "recommended_mode": "bridge_native_contract_adapters",
+      "canonical_owner": "researchd",
+      "decision_evidence": "Bridge v1 schemas remain canonical. Reuse implementation patterns only; private receipt schemas do not cross the boundary."
+    },
+    {
+      "capability": "recovery_behavior",
+      "owned_control_runtime": "select_no_replay_for_non_resumable_actions",
+      "owned_durable_runtime": "select_checkpoint_resume_for_deterministic_jobs",
+      "recommended_mode": "policy_composition_single_ledger",
+      "canonical_owner": "bridge_job_ledger",
+      "decision_evidence": "One ledger classifies work as resumable or non-resumable. Deterministic chunks resume from verified manifests; ambiguous non-resumable starts park or fail without replay."
+    }
+  ],
+  "mandatory_conformance_gaps": [
+    "agent0_source_freeze_and_public_release_authorization",
+    "bridge_v1_contract_mapping",
+    "permit_policy_approval_and_budget_binding_before_claim",
+    "single_attempt_lease_with_fencing_epoch_and_opaque_token",
+    "independent_validator_outside_runner",
+    "domain_registry_writer_is_only_scientific_outcome_writer",
+    "d2_d3_payloads_remain_domain_vault_refs_only",
+    "trusted_ingestion_from_untrusted_staging",
+    "receipt_last_after_artifact_durability_and_state_commit",
+    "portable_refs_instead_of_host_paths",
+    "offline_container_network_and_resource_enforcement",
+    "monotonic_time_plus_boot_identity",
+    "sqlite_wal_backup_restore_and_corruption_drill",
+    "cas_quota_retention_gc_and_orphan_reconciliation"
+  ],
+  "minimal_acceptance_tests": [
+    "invalid_expired_replayed_or_mismatched_permit_or_lease_causes_zero_writes",
+    "only_one_concurrent_claim_wins",
+    "stale_fencing_token_cannot_checkpoint_stage_or_complete",
+    "indexed_rng_and_resume_match_uninterrupted_result_sha",
+    "corrupt_checkpoint_blocks_adapter_work",
+    "crash_at_each_file_db_and_receipt_boundary_recovers_without_false_success",
+    "receipt_is_absent_until_artifacts_and_canonical_state_are_durable",
+    "d2_d3_bytes_are_rejected_and_vault_refs_are_accepted",
+    "symlink_non_regular_short_write_and_disk_full_fail_closed",
+    "worker_cannot_emit_or_apply_scientific_outcome",
+    "boot_change_fences_old_attempt_and_recovery_resumes_monitoring",
+    "wal_backup_restore_preserves_event_chain_and_checkpoint_hashes",
+    "orphan_reconciliation_is_idempotent_and_quota_bounded",
+    "offline_runner_has_no_network_and_cannot_escape_resource_limits"
+  ],
+  "draft_decision": {
+    "status": "recommend_for_agent0_review",
+    "single_runtime_owner": "bridge_job_ledger",
+    "authority_front_door": "bridge_permit_and_attempt_lease_adapter",
+    "durable_execution_basis": "owned_durable_runtime_patterns",
+    "control_gate_basis": "owned_control_runtime_patterns",
+    "cas_result": "no_complete_candidate_adapt_immutable_publication_with_minimal_glue",
+    "validator_result": "mechanical_runner_validation_only_domain_validation_stays_external",
+    "blockers": [
+      "source_freeze_receipts_missing",
+      "public_release_authorization_not_recorded",
+      "conformance_suite_not_yet_implemented"
+    ]
+  },
+  "next_action": "Agent 0 reviews this draft, issues source freezes, records public-release provenance, and creates canonical ReuseDecisionReceipts before implementation."
+}
