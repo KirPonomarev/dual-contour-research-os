@@ -1,0 +1,60 @@
+{
+  "stage_id": "s1-storage-assurance",
+  "agent_id": "agent-5",
+  "objective": "Create independent adversarial and conformance tests for the composed CAS and trusted-ingestion boundary without implementation edits.",
+  "executable_blocker": "The storage gate lacks independently owned proof for path attacks, stale fences, classification denial, quota/durability failures and manifest-last ordering.",
+  "base_sha": "e87bf042a1ffa6f3bc8e042ab1650dd13e336ca4",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a5-s1-storage-assurance",
+  "worktree": "ephemeral-worktree:s1-storage-assurance",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "docs/receipts/reuse/s1-trusted-storage.json",
+    "contracts/v1/StagingEnvelope.schema.json",
+    "contracts/v1/ArtifactManifest.schema.json"
+  ],
+  "write_set": ["tests/test_stage1_storage_assurance.py"],
+  "forbidden_scope": [
+    "implementation-edit",
+    "contract-or-root-config-edit",
+    "external-dependency",
+    "domain-or-live-fixture",
+    "runner-or-execution-receipt",
+    "deployment"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "reuse_decision": "6f45fa8a12bb073c215dc292cf03a0e8c3bc9f132d521a1e91a0e655102aa5f7",
+    "authority_receipt": "392d3778c42cebeba36927bb9ee4b43bd1cb8413d5483f512e9bbe722974d58c",
+    "external_dependencies": "none"
+  },
+  "interface_contract": {
+    "cas_exports": ["CASError", "CASObject", "ContentAddressedStore"],
+    "ingestion_exports": ["IngestionError", "ArtifactRecord", "TrustedIngestor", "canonical_json_sha256"],
+    "composed_candidate_test_owner": "agent-0"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m py_compile tests/test_stage1_storage_assurance.py",
+    "python3 -m unittest discover -s tests -p test_stage1_authority.py",
+    "Agent 0 composed acceptance: python3 -m unittest discover -s tests -p 'test_stage1_*storage*.py'",
+    "git diff --check",
+    "public privacy and secret scan over exact write-set"
+  ],
+  "risk_class": "independent-storage-adversarial-assurance",
+  "stop_conditions": [
+    "test-skips-without-implementation",
+    "path-or-symlink-attack-not-denied",
+    "stale-fence-not-zero-publication",
+    "d2-or-d3-bytes-accepted",
+    "manifest-issued-before-durable-publication",
+    "domain-or-live-fixture-needed",
+    "private-data-detected"
+  ],
+  "expected_receipt": "docs/receipts/integration/s1-storage-assurance.json",
+  "rollback": "Agent 0 reverts the test-only commit; storage implementation and runtime state remain unchanged.",
+  "commit_authority": "one-scoped-worker-commit",
+  "push_authority": false,
+  "expected_handoff_status": ["ready_for_agent0_audit", "blocked_validation_failed"]
+}

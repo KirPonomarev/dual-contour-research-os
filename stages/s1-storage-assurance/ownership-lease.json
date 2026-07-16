@@ -1,0 +1,14 @@
+{
+  "lease_id": "lease-s1-storage-assurance-agent-5-20260716",
+  "stage_id": "s1-storage-assurance",
+  "agent_id": "agent-5",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-16T21:57:52Z",
+  "expires_at": "2026-07-17T03:57:52Z",
+  "base_sha": "e87bf042a1ffa6f3bc8e042ab1650dd13e336ca4",
+  "branch": "codex/bridge-a5-s1-storage-assurance",
+  "worktree": "ephemeral-worktree:s1-storage-assurance",
+  "write_set": ["tests/test_stage1_storage_assurance.py"],
+  "delegation_allowed": false,
+  "state": "active"
+}
