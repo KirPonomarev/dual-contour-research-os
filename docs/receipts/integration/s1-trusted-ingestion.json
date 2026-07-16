@@ -1,0 +1,47 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s1-trusted-ingestion-20260716",
+  "issued_at": "2026-07-16T22:18:31Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "bridge",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s1-trusted-ingestion",
+    "agent_id": "agent-1",
+    "ownership_lease_ref": "stages/s1-trusted-ingestion/ownership-lease.json",
+    "base_sha": "e87bf042a1ffa6f3bc8e042ab1650dd13e336ca4",
+    "head_sha": "ece7204d052ab703d4ad4e563fb8c6462cf7bf9b",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "src/research_bridge/ingestion.py",
+      "tests/test_stage1_ingestion.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "focused_tests": 16,
+      "composed_storage_tests": 27,
+      "connected_tests": 144,
+      "diff_check": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "dependency_adoption": false,
+      "d0_d1_only": true,
+      "fence_before_publication": "green",
+      "manifest_after_all_publications": "green",
+      "host_path_or_fencing_token_persisted": false,
+      "branch_ci": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29539035958"
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29539094218",
+    "integration_commit_sha": "1be1522568fad7a20e72e718fd426cf4e1f28d78"
+  },
+  "integrity": {
+    "payload_sha256": "2b2d1e26d009c11fbbd73d4723780e48c521f362c3cbcd0387b6b0fa7b896245",
+    "parent_refs": [
+      "git:ece7204d052ab703d4ad4e563fb8c6462cf7bf9b",
+      "git:1be1522568fad7a20e72e718fd426cf4e1f28d78",
+      "ci:29539035958",
+      "ci:29539094218"
+    ]
+  }
+}
