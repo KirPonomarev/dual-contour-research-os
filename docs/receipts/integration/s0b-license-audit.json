@@ -1,0 +1,25 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s0b-license-audit-20260716",
+  "issued_at": "2026-07-16T20:03:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "bridge",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s0b-license-audit",
+    "agent_id": "agent-5",
+    "ownership_lease_ref": "stages/s0b-license-audit/ownership-lease.json",
+    "base_sha": "f135fba7e152b3044caa4093f6632c2d8a801c03",
+    "head_sha": "a50ea8fefe42400c3740aec1360c18c362980a3d",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": ["docs/drafts/stage0b/license-security-shortlist.md", "inventory/dependencies/stage0b-shortlist.json", "tests/stage0b/__init__.py", "tests/stage0b/test_dependency_shortlist.py"],
+    "audit_results": {"contract_gate": "green", "focused_tests": 9, "connected_tests": 30, "diff_check": "green", "privacy_secret_scan": "green", "source_mutation": false, "dependency_adoption": false},
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29530052378",
+    "integration_commit_sha": "b44b65d4bfc3fd378b6599a931a785ef33554b54"
+  },
+  "integrity": {
+    "payload_sha256": "645118889763955446a22f597bfaf29346618317ae321bb3f17f6fa025af0537",
+    "parent_refs": ["git:a50ea8fefe42400c3740aec1360c18c362980a3d", "ci:29530052378"]
+  }
+}
