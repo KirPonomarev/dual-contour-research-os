@@ -25,7 +25,9 @@ _RFC3339_RE = re.compile(
     r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$"
 )
 _PAYLOAD_REF_RE = re.compile(r"^(?:cas|vault):[A-Za-z0-9][A-Za-z0-9._:/+-]{0,511}$")
-_EVENT_TYPES = frozenset({"claim", "checkpoint", "complete"})
+_EVENT_TYPES = frozenset({"claim", "checkpoint", "complete", "pause", "resume"})
+_CONTROL_EVENT_TYPES = frozenset({"pause", "resume"})
+_GLOBAL_CONTROL_JOB_ID = "bridge-global-control"
 
 
 class LedgerError(RuntimeError):
@@ -101,7 +103,7 @@ class JobLedger:
             CREATE TABLE IF NOT EXISTS bridge_job_ledger (
                 sequence INTEGER PRIMARY KEY,
                 event_type TEXT NOT NULL
-                    CHECK (event_type IN ('claim', 'checkpoint', 'complete')),
+                    CHECK (event_type IN ('claim', 'checkpoint', 'complete', 'pause', 'resume')),
                 job_id TEXT NOT NULL,
                 attempt_id TEXT NOT NULL,
                 fencing_epoch INTEGER NOT NULL CHECK (fencing_epoch >= 0),
@@ -127,6 +129,10 @@ class JobLedger:
             CREATE UNIQUE INDEX IF NOT EXISTS bridge_job_checkpoint_sequence
                 ON bridge_job_ledger(job_id, attempt_id, checkpoint_sequence)
                 WHERE event_type = 'checkpoint';
+
+            CREATE UNIQUE INDEX IF NOT EXISTS bridge_control_idempotency_key
+                ON bridge_job_ledger(attempt_id)
+                WHERE event_type IN ('pause', 'resume');
 
             CREATE TRIGGER IF NOT EXISTS bridge_job_ledger_no_update
             BEFORE UPDATE ON bridge_job_ledger
@@ -180,6 +186,8 @@ class JobLedger:
             self._ensure_open()
             self._begin_immediate()
             try:
+                if self._pause_snapshot_in_transaction()["paused"]:
+                    raise LedgerError("global pause blocks job claims")
                 existing = self._connection.execute(
                     "SELECT 1 FROM bridge_job_ledger WHERE job_id = ? AND event_type = 'claim'",
                     (job_id,),
@@ -200,6 +208,121 @@ class JobLedger:
             except Exception as exc:
                 self._rollback()
                 self._raise_ledger_error(exc)
+
+    def pause_global(
+        self,
+        *,
+        actor: str,
+        reason: str,
+        authority_ref: str,
+        idempotency_key: str,
+        event_at: str,
+    ) -> LedgerEvent:
+        """Persist one idempotent transition into the globally paused state."""
+
+        actor = _nonempty_text("actor", actor)
+        reason = _nonempty_text("reason", reason)
+        authority_ref = _nonempty_text("authority_ref", authority_ref)
+        idempotency_key = _nonempty_text("idempotency_key", idempotency_key)
+        event_at = _timestamp("event_at", event_at)
+        payload = {
+            "actor": actor,
+            "authority_ref": authority_ref,
+            "event_at": event_at,
+            "idempotency_key": idempotency_key,
+            "reason": reason,
+        }
+
+        with self._lock:
+            self._ensure_open()
+            self._begin_immediate()
+            try:
+                duplicate = self._idempotent_control_event(
+                    event_type="pause",
+                    idempotency_key=idempotency_key,
+                    payload=payload,
+                )
+                if duplicate is not None:
+                    self._connection.execute("COMMIT")
+                    return duplicate
+                if self._pause_snapshot_in_transaction()["paused"]:
+                    raise LedgerError("global pause is already active")
+                event = self._append(
+                    event_type="pause",
+                    job_id=_GLOBAL_CONTROL_JOB_ID,
+                    attempt_id=idempotency_key,
+                    fencing_epoch=0,
+                    checkpoint_sequence=None,
+                    event_at=event_at,
+                    payload=payload,
+                )
+                self._connection.execute("COMMIT")
+                return event
+            except Exception as exc:
+                self._rollback()
+                self._raise_ledger_error(exc)
+
+    def resume_global(
+        self,
+        *,
+        actor: str,
+        approval_ref: str,
+        idempotency_key: str,
+        event_at: str,
+    ) -> LedgerEvent:
+        """Persist one explicitly approved transition out of global pause."""
+
+        actor = _nonempty_text("actor", actor)
+        approval_ref = _nonempty_text("approval_ref", approval_ref)
+        idempotency_key = _nonempty_text("idempotency_key", idempotency_key)
+        event_at = _timestamp("event_at", event_at)
+        payload = {
+            "actor": actor,
+            "approval_ref": approval_ref,
+            "event_at": event_at,
+            "idempotency_key": idempotency_key,
+        }
+
+        with self._lock:
+            self._ensure_open()
+            self._begin_immediate()
+            try:
+                duplicate = self._idempotent_control_event(
+                    event_type="resume",
+                    idempotency_key=idempotency_key,
+                    payload=payload,
+                )
+                if duplicate is not None:
+                    self._connection.execute("COMMIT")
+                    return duplicate
+                if not self._pause_snapshot_in_transaction()["paused"]:
+                    raise LedgerError("global pause is not active")
+                event = self._append(
+                    event_type="resume",
+                    job_id=_GLOBAL_CONTROL_JOB_ID,
+                    attempt_id=idempotency_key,
+                    fencing_epoch=0,
+                    checkpoint_sequence=None,
+                    event_at=event_at,
+                    payload=payload,
+                )
+                self._connection.execute("COMMIT")
+                return event
+            except Exception as exc:
+                self._rollback()
+                self._raise_ledger_error(exc)
+
+    def is_globally_paused(self) -> bool:
+        """Return durable global pause state derived from the latest control event."""
+
+        return bool(self.pause_snapshot()["paused"])
+
+    def pause_snapshot(self) -> dict[str, object]:
+        """Return a detached, JSON-compatible snapshot of global pause state."""
+
+        with self._lock:
+            self._ensure_open()
+            return self._pause_snapshot_in_transaction()
 
     def checkpoint(
         self,
@@ -540,6 +663,105 @@ class JobLedger:
         ).fetchone()
         if row is not None:
             raise LedgerError("job is already complete")
+
+    def _pause_snapshot_in_transaction(self) -> dict[str, object]:
+        row = self._connection.execute(
+            """
+            SELECT *
+            FROM bridge_job_ledger
+            WHERE event_type IN ('pause', 'resume')
+            ORDER BY sequence DESC
+            LIMIT 1
+            """
+        ).fetchone()
+        if row is None:
+            return {"paused": False}
+        event = self._control_event_from_row(row)
+        snapshot = dict(event.payload)
+        snapshot.update(
+            {
+                "event_sha256": event.event_sha256,
+                "event_type": event.event_type,
+                "paused": event.event_type == "pause",
+                "sequence": event.sequence,
+            }
+        )
+        return snapshot
+
+    def _idempotent_control_event(
+        self,
+        *,
+        event_type: str,
+        idempotency_key: str,
+        payload: dict[str, object],
+    ) -> LedgerEvent | None:
+        row = self._connection.execute(
+            """
+            SELECT *
+            FROM bridge_job_ledger
+            WHERE event_type IN ('pause', 'resume') AND attempt_id = ?
+            """,
+            (idempotency_key,),
+        ).fetchone()
+        if row is None:
+            return None
+        event = self._control_event_from_row(row)
+        if event.event_type != event_type or dict(event.payload) != payload:
+            raise LedgerError("idempotency_key was already used for a different control request")
+        return event
+
+    def _control_event_from_row(self, row: sqlite3.Row) -> LedgerEvent:
+        if row["event_type"] not in _CONTROL_EVENT_TYPES:
+            raise LedgerError("persisted control event type is invalid")
+        if row["job_id"] != _GLOBAL_CONTROL_JOB_ID or row["fencing_epoch"] != 0:
+            raise LedgerError("persisted control event scope is invalid")
+        try:
+            payload = json.loads(row["payload_json"])
+        except (json.JSONDecodeError, TypeError) as exc:
+            raise LedgerError("persisted control event payload is invalid") from exc
+        expected_fields = (
+            {"actor", "authority_ref", "event_at", "idempotency_key", "reason"}
+            if row["event_type"] == "pause"
+            else {"actor", "approval_ref", "event_at", "idempotency_key"}
+        )
+        if not isinstance(payload, dict) or set(payload) != expected_fields:
+            raise LedgerError("persisted control event payload is invalid")
+        try:
+            _nonempty_text("actor", payload["actor"])
+            _nonempty_text("idempotency_key", payload["idempotency_key"])
+            _timestamp("event_at", payload["event_at"])
+            if row["event_type"] == "pause":
+                _nonempty_text("authority_ref", payload["authority_ref"])
+                _nonempty_text("reason", payload["reason"])
+            else:
+                _nonempty_text("approval_ref", payload["approval_ref"])
+        except (KeyError, LedgerError) as exc:
+            raise LedgerError("persisted control event payload is invalid") from exc
+        if payload["idempotency_key"] != row["attempt_id"] or payload["event_at"] != row["event_at"]:
+            raise LedgerError("persisted control event columns do not match payload")
+        material = self._hash_material(
+            sequence=row["sequence"],
+            event_type=row["event_type"],
+            job_id=row["job_id"],
+            attempt_id=row["attempt_id"],
+            fencing_epoch=row["fencing_epoch"],
+            event_at=row["event_at"],
+            payload=payload,
+            previous_sha256=row["previous_sha256"],
+        )
+        if not _constant_time_equal(_digest(material), row["event_sha256"]):
+            raise LedgerError("persisted control event integrity is invalid")
+        return LedgerEvent(
+            sequence=row["sequence"],
+            event_type=row["event_type"],
+            job_id=row["job_id"],
+            attempt_id=row["attempt_id"],
+            fencing_epoch=row["fencing_epoch"],
+            event_at=row["event_at"],
+            payload=MappingProxyType(dict(payload)),
+            previous_sha256=row["previous_sha256"],
+            event_sha256=row["event_sha256"],
+        )
 
     def _ensure_open(self) -> None:
         if self._closed:

@@ -108,8 +108,15 @@ class JobLedgerTests(unittest.TestCase):
         claim(self.ledger)
         mode = self.ledger._connection.execute("PRAGMA journal_mode").fetchone()[0]
         synchronous = self.ledger._connection.execute("PRAGMA synchronous").fetchone()[0]
+        tables = [
+            row[0]
+            for row in self.ledger._connection.execute(
+                "SELECT name FROM sqlite_master WHERE type = 'table' ORDER BY name"
+            ).fetchall()
+        ]
         self.assertEqual(mode.lower(), "wal")
         self.assertEqual(synchronous, 2)
+        self.assertEqual(tables, ["bridge_job_ledger"])
 
         with self.assertRaises(sqlite3.IntegrityError):
             self.ledger._connection.execute(
@@ -273,6 +280,156 @@ class JobLedgerTests(unittest.TestCase):
         with self.assertRaises(LedgerError):
             self.ledger.event_count()
         self.ledger.close()
+
+    def test_global_pause_survives_reopen_and_blocks_claim_without_a_write(self) -> None:
+        paused = self.ledger.pause_global(
+            actor="uid:1000",
+            reason="synthetic safety hold",
+            authority_ref="authority:synthetic-offline",
+            idempotency_key="pause-request-a",
+            event_at=AT,
+        )
+        self.assertEqual(paused.event_type, "pause")
+        self.assertTrue(self.ledger.is_globally_paused())
+        self.assertEqual(self.ledger.pause_snapshot()["reason"], "synthetic safety hold")
+
+        self.ledger.close()
+        self.ledger = JobLedger(self.database)
+        self.assertTrue(self.ledger.is_globally_paused())
+        before = self.ledger.event_count()
+        with self.assertRaisesRegex(LedgerError, "global pause"):
+            claim(self.ledger)
+        self.assertEqual(self.ledger.event_count(), before)
+        self.assertEqual(self.ledger.event_count("pause"), 1)
+        self.assertTrue(self.ledger.verify_chain())
+
+    def test_resume_requires_approval_and_unblocks_claim(self) -> None:
+        self.ledger.pause_global(
+            actor="uid:1000",
+            reason="synthetic safety hold",
+            authority_ref="authority:synthetic-offline",
+            idempotency_key="pause-request-a",
+            event_at=AT,
+        )
+        before = self.ledger.event_count()
+        for approval_ref in ("", " approval:synthetic ", b"payload"):
+            with self.assertRaises(LedgerError):
+                self.ledger.resume_global(
+                    actor="uid:1000",
+                    approval_ref=approval_ref,
+                    idempotency_key="resume-request-a",
+                    event_at=AT,
+                )
+            self.assertEqual(self.ledger.event_count(), before)
+
+        resumed = self.ledger.resume_global(
+            actor="uid:1000",
+            approval_ref="approval:synthetic-offline",
+            idempotency_key="resume-request-a",
+            event_at=AT,
+        )
+        self.assertEqual(resumed.event_type, "resume")
+        self.assertFalse(self.ledger.is_globally_paused())
+        self.assertEqual(self.ledger.pause_snapshot()["approval_ref"], "approval:synthetic-offline")
+        claimed = claim(self.ledger)
+        self.assertEqual(claimed.event_type, "claim")
+        self.assertTrue(self.ledger.verify_chain())
+
+    def test_control_idempotency_is_durable_and_conflicting_reuse_is_rejected(self) -> None:
+        first = self.ledger.pause_global(
+            actor="uid:1000",
+            reason="synthetic safety hold",
+            authority_ref="authority:synthetic-offline",
+            idempotency_key="pause-request-a",
+            event_at=AT,
+        )
+        duplicate = self.ledger.pause_global(
+            actor="uid:1000",
+            reason="synthetic safety hold",
+            authority_ref="authority:synthetic-offline",
+            idempotency_key="pause-request-a",
+            event_at=AT,
+        )
+        self.assertEqual(duplicate.event_sha256, first.event_sha256)
+        self.assertEqual(self.ledger.event_count(), 1)
+
+        self.ledger.close()
+        self.ledger = JobLedger(self.database)
+        duplicate_after_reopen = self.ledger.pause_global(
+            actor="uid:1000",
+            reason="synthetic safety hold",
+            authority_ref="authority:synthetic-offline",
+            idempotency_key="pause-request-a",
+            event_at=AT,
+        )
+        self.assertEqual(duplicate_after_reopen.event_sha256, first.event_sha256)
+        with self.assertRaisesRegex(LedgerError, "different control request"):
+            self.ledger.resume_global(
+                actor="uid:1000",
+                approval_ref="approval:synthetic-offline",
+                idempotency_key="pause-request-a",
+                event_at=AT,
+            )
+        self.assertEqual(self.ledger.event_count(), 1)
+        self.assertTrue(self.ledger.verify_chain())
+
+    def test_control_transitions_fail_closed_and_add_zero_events(self) -> None:
+        self.assertEqual(self.ledger.pause_snapshot(), {"paused": False})
+        invalid_calls = (
+            lambda: self.ledger.resume_global(
+                actor="uid:1000",
+                approval_ref="approval:synthetic-offline",
+                idempotency_key="resume-request-a",
+                event_at=AT,
+            ),
+            lambda: self.ledger.pause_global(
+                actor="uid:1000",
+                reason="",
+                authority_ref="authority:synthetic-offline",
+                idempotency_key="pause-request-a",
+                event_at=AT,
+            ),
+        )
+        for call in invalid_calls:
+            before = self.ledger.event_count()
+            with self.assertRaises(LedgerError):
+                call()
+            self.assertEqual(self.ledger.event_count(), before)
+
+        self.ledger.pause_global(
+            actor="uid:1000",
+            reason="synthetic safety hold",
+            authority_ref="authority:synthetic-offline",
+            idempotency_key="pause-request-a",
+            event_at=AT,
+        )
+        before = self.ledger.event_count()
+        with self.assertRaisesRegex(LedgerError, "already active"):
+            self.ledger.pause_global(
+                actor="uid:1001",
+                reason="second hold",
+                authority_ref="authority:synthetic-offline",
+                idempotency_key="pause-request-b",
+                event_at=AT,
+            )
+        self.assertEqual(self.ledger.event_count(), before)
+
+        self.ledger.resume_global(
+            actor="uid:1000",
+            approval_ref="approval:synthetic-offline",
+            idempotency_key="resume-request-a",
+            event_at=AT,
+        )
+        before = self.ledger.event_count()
+        with self.assertRaisesRegex(LedgerError, "not active"):
+            self.ledger.resume_global(
+                actor="uid:1000",
+                approval_ref="approval:synthetic-offline",
+                idempotency_key="resume-request-b",
+                event_at=AT,
+            )
+        self.assertEqual(self.ledger.event_count(), before)
+        self.assertTrue(self.ledger.verify_chain())
 
 
 if __name__ == "__main__":
