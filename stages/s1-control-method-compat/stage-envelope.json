@@ -1,0 +1,59 @@
+{
+  "stage_id": "s1-control-method-compat",
+  "agent_id": "agent-0",
+  "objective": "Update the pre-existing exact JobLedger public-method assertion for the four authority-mandated persistent global pause methods without weakening any safety boundary.",
+  "executable_blocker": "The composed candidate is otherwise green, but the earlier assurance gate rejects the newly authorized methods because its exact public-method set is pinned to the initial ledger surface.",
+  "base_sha": "7fc81d090246fa69f1f17a11a276afb6c862122d",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a0-s1-control-method-compat",
+  "worktree": "ephemeral-worktree:s1-control-method-compat",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "docs/receipts/integration/s1-control-authority.json",
+    "stages/s1-pause-ledger/stage-envelope.json",
+    "src/research_bridge/ledger.py",
+    "tests/test_stage1_assurance.py"
+  ],
+  "write_set": [
+    "stages/s1-control-method-compat/stage-envelope.json",
+    "stages/s1-control-method-compat/ownership-lease.json",
+    "tests/test_stage1_assurance.py"
+  ],
+  "forbidden_scope": [
+    "implementation-edit",
+    "removal-or-weakening-of-existing-safety-assertions",
+    "additional-public-method",
+    "contract-or-root-config-edit",
+    "external-dependency",
+    "domain-or-live-feature",
+    "deployment"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "control_authority_receipt": "32c1323e9bb2e7f10cc997ab413e21d56e6af972cce5e893d62af8c26e91d13b",
+    "pause_ledger_worker_commit": "858c7febf248ae35213fee026f6b05c8f766bd68",
+    "external_dependencies": "none"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest discover -s tests -p test_stage1_assurance.py",
+    "python3 -m unittest discover -s tests -p 'test_stage1_control*.py'",
+    "make test",
+    "git diff --check",
+    "public privacy and secret scan over exact write-set"
+  ],
+  "risk_class": "test-only-authorized-interface-compatibility",
+  "stop_conditions": [
+    "implementation-edit-needed",
+    "method-set-broadened-beyond-authorized-four",
+    "existing-forbidden-surface-check-weakened",
+    "composed-negative-test-failure",
+    "private-data-detected",
+    "write-set-collision"
+  ],
+  "expected_receipt": "docs/receipts/integration/s1-control-method-compat.json",
+  "rollback": "Agent 0 reverts the test-only compatibility commit; worker implementation commits remain independently reversible.",
+  "commit_authority": "agent-0-one-scoped-commit",
+  "push_authority": true
+}
