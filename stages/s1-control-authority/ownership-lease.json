@@ -1,0 +1,19 @@
+{
+  "lease_id": "lease-s1-control-authority-agent-0-20260716",
+  "stage_id": "s1-control-authority",
+  "agent_id": "agent-0",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-16T21:00:51Z",
+  "expires_at": "2026-07-17T03:00:51Z",
+  "base_sha": "57f1ba40b9964b0be147151b72d1a3821493b916",
+  "branch": "main",
+  "worktree": "canonical-main-worktree",
+  "write_set": [
+    "docs/receipts/reuse/s1-control-ipc-pause.json",
+    "stages/s1-control-authority/stage-envelope.json",
+    "stages/s1-control-authority/ownership-lease.json",
+    "tests/test_stage1_authority.py"
+  ],
+  "delegation_allowed": false,
+  "state": "active"
+}

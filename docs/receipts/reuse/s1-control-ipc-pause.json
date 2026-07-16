@@ -1,0 +1,43 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-s1-control-ipc-pause-20260716",
+  "issued_at": "2026-07-16T21:00:51Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-freeze-authority"},
+  "contour": "bridge",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "stage1-local-control-ipc-and-persistent-global-pause",
+    "candidates": [
+      {"candidate": "existing-bridge-job-ledger-event-core", "disposition": "selected-internal-adapter"},
+      {"candidate": "stdlib-unix-socket-json-os-stat", "disposition": "selected"},
+      {"candidate": "security-control-runtime-patterns", "disposition": "reference-only-no-source-copy"},
+      {"candidate": "public-http-or-web-framework", "disposition": "rejected-no-network-service"},
+      {"candidate": "second-control-ledger", "disposition": "rejected-single-canonical-ledger"}
+    ],
+    "selected_mode": "internal-adapter-plus-stdlib-minimal-glue",
+    "source_ref": "git:57f1ba40b9964b0be147151b72d1a3821493b916;source-freeze:source-freeze-security-s0b-20260716",
+    "code_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "license_spdx": "NOASSERTION",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "unix-socket-mode-and-peer-credential-denial",
+      "strict-message-shape-size-and-deadline-denial",
+      "persistent-global-pause-survives-reopen",
+      "paused-ledger-rejects-claim-in-same-transaction",
+      "resume-requires-explicit-approval-reference",
+      "invalid-control-command-causes-zero-ledger-writes"
+    ],
+    "canonical_owner": "bridge-control-plane",
+    "rollback": "Revert the scoped control IPC and pause-event commits. Discard synthetic test databases and sockets; no runtime migration, deployment, or external endpoint is authorized."
+  },
+  "integrity": {
+    "payload_sha256": "027a3d3ed990efba1b2b0fff5b0cc7edea6e126d0dd86dc4aa64b496b68193ba",
+    "parent_refs": [
+      "git:57f1ba40b9964b0be147151b72d1a3821493b916",
+      "sha256:411d1b736bd85f473f6d1e339e44ac62e43a393d87044ab58f3780263eaafaf4",
+      "sha256:b3457f56429e9b0d73158c77fc4cbdf1e59ac9499b5f8b36054d693f0c8d8bc7",
+      "sha256:be5c339754fbb336f27b5bee6139919009e466095dd21baceb43cc95831fdb12"
+    ]
+  }
+}

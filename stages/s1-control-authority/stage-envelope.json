@@ -1,0 +1,69 @@
+{
+  "stage_id": "s1-control-authority",
+  "agent_id": "agent-0",
+  "objective": "Authorize one bounded Stage 1 gate for a local typed Unix-socket control front door and persistent global pause in the existing canonical job ledger.",
+  "executable_blocker": "Offline execution cannot safely proceed until a durable global pause blocks claim atomically and the control surface is local, typed, size-bounded, deadline-bounded, and peer-authenticated.",
+  "base_sha": "57f1ba40b9964b0be147151b72d1a3821493b916",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "main",
+  "worktree": "canonical-main-worktree",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "docs/receipts/reuse/s1-admission-kernel.json",
+    "docs/receipts/reuse/s1-ledger-durability.json",
+    "docs/receipts/source-freeze/s0b-security.json",
+    "docs/receipts/integration/s1-assurance.json",
+    "src/research_bridge/admission.py",
+    "src/research_bridge/kernel.py",
+    "src/research_bridge/ledger.py"
+  ],
+  "write_set": [
+    "docs/receipts/reuse/s1-control-ipc-pause.json",
+    "stages/s1-control-authority/stage-envelope.json",
+    "stages/s1-control-authority/ownership-lease.json",
+    "tests/test_stage1_authority.py"
+  ],
+  "forbidden_scope": [
+    "runner-or-generated-code",
+    "cas-or-artifact-ingestion",
+    "market-or-security-domain-feature",
+    "external-dependency-adoption",
+    "public-http",
+    "live-trading",
+    "live-security-execution",
+    "deployment",
+    "ui",
+    "contract-edit",
+    "runtime-database-or-migration"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "admission_reuse_decision": "411d1b736bd85f473f6d1e339e44ac62e43a393d87044ab58f3780263eaafaf4",
+    "ledger_reuse_decision": "b3457f56429e9b0d73158c77fc4cbdf1e59ac9499b5f8b36054d693f0c8d8bc7",
+    "security_source_freeze": "be5c339754fbb336f27b5bee6139919009e466095dd21baceb43cc95831fdb12",
+    "stage1_assurance_receipt": "99310bf6d4235ee2b8132b9b9f2bd216d74faa5bd9a4bd294bcff421b914a8e6",
+    "external_dependencies": "none"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest discover -s tests -p test_stage1_authority.py",
+    "make test",
+    "git diff --check",
+    "public privacy and secret scan over exact write-set"
+  ],
+  "risk_class": "control-authority-and-persistent-safety-state",
+  "stop_conditions": [
+    "contract-drift",
+    "second-ledger-selected",
+    "public-network-surface-selected",
+    "external-dependency-selected",
+    "private-data-detected",
+    "write-set-collision",
+    "deterministic-mismatch"
+  ],
+  "expected_receipt": "docs/receipts/integration/s1-control-authority.json",
+  "rollback": "Revert this scoped authority commit before worker bases are issued; do not start workers from a reverted or stale base.",
+  "commit_authority": "agent-0-one-scoped-commit",
+  "push_authority": true
+}

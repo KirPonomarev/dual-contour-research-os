@@ -45,6 +45,7 @@ class Stage1AuthorityTests(unittest.TestCase):
     def test_reuse_decisions_select_no_external_or_domain_source_bytes(self) -> None:
         expected_modes = {
             "s1-admission-kernel.json": "contract-first-clean-room-minimal-glue",
+            "s1-control-ipc-pause.json": "internal-adapter-plus-stdlib-minimal-glue",
             "s1-ledger-durability.json": "clean-room-stdlib-adapter-single-ledger",
         }
         schema = load(ROOT / "contracts" / "v1" / "ReuseDecisionReceipt.schema.json")
@@ -70,6 +71,17 @@ class Stage1AuthorityTests(unittest.TestCase):
         self.assertEqual(envelope["write_set"], lease["write_set"])
         self.assertTrue(envelope["executable_blocker"])
         self.assertTrue(envelope["acceptance_commands"])
+        self.assertTrue(envelope["rollback"])
+        self.assertFalse(lease["delegation_allowed"])
+
+    def test_control_authority_is_pinned_and_reversible(self) -> None:
+        envelope = load(ROOT / "stages" / "s1-control-authority" / "stage-envelope.json")
+        lease = load(ROOT / "stages" / "s1-control-authority" / "ownership-lease.json")
+        self.assertEqual(envelope["base_sha"], "57f1ba40b9964b0be147151b72d1a3821493b916")
+        self.assertEqual(envelope["write_set"], lease["write_set"])
+        self.assertIn("public-http", envelope["forbidden_scope"])
+        self.assertEqual(envelope["dependency_hashes"]["external_dependencies"], "none")
+        self.assertTrue(envelope["executable_blocker"])
         self.assertTrue(envelope["rollback"])
         self.assertFalse(lease["delegation_allowed"])
 
