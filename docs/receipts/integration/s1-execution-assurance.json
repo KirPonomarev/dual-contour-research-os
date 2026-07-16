@@ -1,0 +1,54 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s1-execution-assurance-20260716",
+  "issued_at": "2026-07-16T23:09:48Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "bridge",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s1-execution-assurance",
+    "agent_id": "agent-5",
+    "ownership_lease_ref": "stages/s1-execution-assurance/ownership-lease.json",
+    "base_sha": "c53d59545b81009a378b9f1213cd2cb3b5b805c3",
+    "head_sha": "ba6c61d3a922b9ace40671f3f3c1fdc1ccccd70d",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "tests/test_stage1_execution_assurance.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "focused_tests": 13,
+      "composed_execution_tests": 36,
+      "connected_tests": 169,
+      "stage0b_tests": 25,
+      "skipped_tests": 0,
+      "diff_check": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "dependency_adoption": false,
+      "implementation_files_changed": 0,
+      "real_composed_durable_path": "green",
+      "receipt_last_failure_matrix": "green",
+      "sequence_zero_checkpoint": "green",
+      "semantic_file_digest_separation": "green",
+      "d2_d3_denied_before_execution": "green",
+      "process_network_dynamic_domain_capability": false,
+      "branch_ci": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29541414618"
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29541471142",
+    "integration_commit_sha": "b22fb85be71e2b4a544f7bd832679467b4d308c3"
+  },
+  "integrity": {
+    "payload_sha256": "0fb4f2dd00e63e6098242c11d516ef1f1ec9079ddf78fd61e48bd516c13f33db",
+    "parent_refs": [
+      "git:ba6c61d3a922b9ace40671f3f3c1fdc1ccccd70d",
+      "git:b22fb85be71e2b4a544f7bd832679467b4d308c3",
+      "ci:29541414618",
+      "ci:29541471142"
+    ]
+  }
+}
