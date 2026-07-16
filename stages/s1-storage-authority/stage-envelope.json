@@ -1,0 +1,69 @@
+{
+  "stage_id": "s1-storage-authority",
+  "agent_id": "agent-0",
+  "objective": "Freeze one bounded Stage 1 prerequisite for a Bridge-owned D0/D1 content-addressed store and a trusted StagingEnvelope-to-ArtifactManifest ingestion boundary.",
+  "executable_blocker": "The offline execution spine cannot safely progress because untrusted staging has no durable, quota-bounded, classification-aware and fencing-aware publication boundary with portable artifact references.",
+  "base_sha": "2343613cfe4c4a2fe5bd19d4caca43eeb3e40d22",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "main",
+  "worktree": "canonical-main-worktree",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "docs/drafts/stage0b/runtime-comparison.md",
+    "inventory/runtime-comparison/comparison.json",
+    "docs/receipts/source-freeze/s0b-security.json",
+    "docs/receipts/source-freeze/s0b-market.json",
+    "contracts/v1/StagingEnvelope.schema.json",
+    "contracts/v1/ArtifactManifest.schema.json"
+  ],
+  "write_set": [
+    "docs/receipts/reuse/s1-trusted-storage.json",
+    "stages/s1-storage-authority/stage-envelope.json",
+    "stages/s1-storage-authority/ownership-lease.json",
+    "tests/test_stage1_authority.py"
+  ],
+  "forbidden_scope": [
+    "private-source-code-copy",
+    "market-or-security-domain-feature",
+    "d2-or-d3-payload-storage",
+    "runner-or-container-execution",
+    "execution-or-validation-receipt-issuance",
+    "external-dependency-adoption",
+    "live-execution",
+    "deployment",
+    "ui",
+    "contract-or-root-config-edit",
+    "runtime-database-or-migration"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "runtime_comparison_receipt": "06bd1aa0bc55b4432887d3213c83de3289b0ac857ac288872cea68d7f4f06adb",
+    "security_source_freeze": "be5c339754fbb336f27b5bee6139919009e466095dd21baceb43cc95831fdb12",
+    "market_source_freeze": "6de45dbbfebddb732ab8e166cc1b1ac31a3c1371561f03f348f9c66cb918ab34",
+    "prior_control_assurance": "5b7411bd4776a303fa61b646f9f1cd11a7c3156f34e03de68275dcda8245798a",
+    "external_dependencies": "none"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest discover -s tests -p test_stage1_authority.py",
+    "make test",
+    "git diff --check",
+    "public privacy and secret scan over exact write-set"
+  ],
+  "risk_class": "storage-authority-and-trusted-ingestion-boundary",
+  "stop_conditions": [
+    "private-source-copy-needed",
+    "d2-or-d3-bytes-selected-for-bridge-storage",
+    "mutable-or-host-path-artifact-reference-selected",
+    "external-dependency-selected",
+    "runner-authority-widened",
+    "contract-drift",
+    "private-data-detected",
+    "write-set-collision"
+  ],
+  "expected_receipt": "docs/receipts/integration/s1-storage-authority.json",
+  "rollback": "Revert the scoped authority commit before worker bases are issued; no artifact bytes, runtime database, deployment, or external state is created by this authority stage.",
+  "commit_authority": "agent-0-one-scoped-commit",
+  "push_authority": true
+}

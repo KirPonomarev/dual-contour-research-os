@@ -47,6 +47,7 @@ class Stage1AuthorityTests(unittest.TestCase):
             "s1-admission-kernel.json": "contract-first-clean-room-minimal-glue",
             "s1-control-ipc-pause.json": "internal-adapter-plus-stdlib-minimal-glue",
             "s1-ledger-durability.json": "clean-room-stdlib-adapter-single-ledger",
+            "s1-trusted-storage.json": "clean-room-stdlib-owned-cas-ingestor",
         }
         schema = load(ROOT / "contracts" / "v1" / "ReuseDecisionReceipt.schema.json")
         allowed = set(schema["properties"])
@@ -82,6 +83,27 @@ class Stage1AuthorityTests(unittest.TestCase):
         self.assertIn("public-http", envelope["forbidden_scope"])
         self.assertEqual(envelope["dependency_hashes"]["external_dependencies"], "none")
         self.assertTrue(envelope["executable_blocker"])
+        self.assertTrue(envelope["rollback"])
+        self.assertFalse(lease["delegation_allowed"])
+
+    def test_storage_authority_is_pinned_and_excludes_payload_and_runner_authority(self) -> None:
+        envelope = load(ROOT / "stages" / "s1-storage-authority" / "stage-envelope.json")
+        lease = load(ROOT / "stages" / "s1-storage-authority" / "ownership-lease.json")
+        receipt = load(REUSE_RECEIPTS / "s1-trusted-storage.json")
+        self.assertEqual(envelope["base_sha"], "2343613cfe4c4a2fe5bd19d4caca43eeb3e40d22")
+        self.assertEqual(envelope["write_set"], lease["write_set"])
+        self.assertIn("d2-or-d3-payload-storage", envelope["forbidden_scope"])
+        self.assertIn("runner-or-container-execution", envelope["forbidden_scope"])
+        self.assertEqual(envelope["dependency_hashes"]["external_dependencies"], "none")
+        dispositions = {
+            item["candidate"]: item["disposition"]
+            for item in receipt["payload"]["candidates"]
+        }
+        self.assertEqual(dispositions["stdlib-os-hashlib-json-pathlib"], "selected")
+        self.assertEqual(
+            dispositions["market-runtime-source"],
+            "rejected-no-license-no-code-copy",
+        )
         self.assertTrue(envelope["rollback"])
         self.assertFalse(lease["delegation_allowed"])
 

@@ -1,0 +1,44 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-s1-trusted-storage-20260716",
+  "issued_at": "2026-07-16T21:52:07Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-freeze-authority"},
+  "contour": "bridge",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "stage1-d0-d1-content-addressed-storage-and-trusted-staging-ingestion",
+    "candidates": [
+      {"candidate": "owned-durable-runtime-exclusive-publication-pattern", "disposition": "reference-only-no-source-copy"},
+      {"candidate": "security-durable-atomic-replace-pattern", "disposition": "reference-only-no-source-copy"},
+      {"candidate": "market-runtime-source", "disposition": "rejected-no-license-no-code-copy"},
+      {"candidate": "stdlib-os-hashlib-json-pathlib", "disposition": "selected"},
+      {"candidate": "external-cas-package", "disposition": "rejected-unnecessary-and-unaudited"}
+    ],
+    "selected_mode": "clean-room-stdlib-owned-cas-ingestor",
+    "source_ref": "git:2343613cfe4c4a2fe5bd19d4caca43eeb3e40d22;integration:s0b-runtime-comparison;source-freeze:source-freeze-security-s0b-20260716;source-freeze:source-freeze-market-s0b-20260716",
+    "code_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "license_spdx": "NOASSERTION",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "exclusive-content-hashed-publication-and-exact-retry",
+      "symlink-non-regular-path-traversal-and-race-denial",
+      "quota-short-write-and-durability-failure-denial",
+      "d2-d3-payload-byte-denial",
+      "stale-fencing-authority-zero-publication",
+      "artifact-manifest-issued-only-after-durable-cas-publication",
+      "portable-artifact-reference-contains-no-host-path"
+    ],
+    "canonical_owner": "bridge-trusted-ingestor",
+    "rollback": "Revert the scoped CAS and trusted-ingestion commits and discard synthetic D0/D1 test stores. No private source bytes, D2/D3 payloads, runtime deployment, or domain canonical state are authorized."
+  },
+  "integrity": {
+    "payload_sha256": "a40f09ac806714091763a6bccc097d6821834644e56cbed7afa3e60189498ac8",
+    "parent_refs": [
+      "git:2343613cfe4c4a2fe5bd19d4caca43eeb3e40d22",
+      "sha256:06bd1aa0bc55b4432887d3213c83de3289b0ac857ac288872cea68d7f4f06adb",
+      "sha256:be5c339754fbb336f27b5bee6139919009e466095dd21baceb43cc95831fdb12",
+      "sha256:6de45dbbfebddb732ab8e166cc1b1ac31a3c1371561f03f348f9c66cb918ab34"
+    ]
+  }
+}
