@@ -1,0 +1,79 @@
+{
+  "stage_id": "s1-ledger-durability",
+  "agent_id": "agent-2",
+  "objective": "Implement one stdlib-only append-only canonical bridge_job_ledger with durable claim, checkpoint, completion, hash chaining, and fencing checks for the offline Stage 1 kernel.",
+  "executable_blocker": "Stage 1 has no durable single-writer ledger that makes one claim winner, rejects stale fencing authority before writes, and records checkpoint transitions append-only.",
+  "base_sha": "328a7d2b26b6aa0439475538e46ecc8bbf97dfb0",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a2-s1-ledger-durability",
+  "worktree": "ephemeral-worktree:s1-ledger-durability",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "contracts/v1/AttemptLease.schema.json",
+    "contracts/v1/CheckpointManifest.schema.json",
+    "docs/receipts/reuse/s1-ledger-durability.json",
+    "docs/receipts/integration/s1-authority-freeze.json",
+    "src/research_bridge/__init__.py"
+  ],
+  "write_set": [
+    "src/research_bridge/ledger.py",
+    "tests/test_stage1_ledger.py"
+  ],
+  "forbidden_scope": [
+    "frozen-contract-edit",
+    "canonical-doc-edit",
+    "root-config-ci-lockfile-or-migration-edit",
+    "second-ledger",
+    "permit-issuance",
+    "domain-registry-write",
+    "d2-d3-payload-storage",
+    "external-dependency-adoption",
+    "source-code-copy",
+    "domain-feature",
+    "live-trading",
+    "live-security-execution",
+    "deployment",
+    "ui",
+    "external-mutation"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "reuse_decision": "b3457f56429e9b0d73158c77fc4cbdf1e59ac9499b5f8b36054d693f0c8d8bc7",
+    "authority_integration_receipt": "1cffc237cbf4f99788b75b612e57f3f8d37758d0ad8519d1387e56d74d2deab6",
+    "external_dependencies": "none"
+  },
+  "interface_contract": {
+    "exports": ["LedgerError", "LedgerEvent", "JobLedger"],
+    "claim_keywords": ["job_id", "attempt_id", "permit_id", "runner_identity", "fencing_epoch", "fencing_token", "admitted_at", "admission_digest"],
+    "checkpoint_keywords": ["job_id", "attempt_id", "fencing_epoch", "fencing_token", "sequence", "state_sha256", "payload_ref", "payload_stored_in_domain_vault", "event_at"],
+    "complete_keywords": ["job_id", "attempt_id", "fencing_epoch", "fencing_token", "result_sha256", "event_at"],
+    "inspection_methods": ["event_count", "verify_chain", "close"],
+    "durability": "sqlite WAL, synchronous FULL, explicit immediate transactions, append-only update/delete denial",
+    "portable_checkpoint_refs": ["cas:", "vault:"]
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest discover -s tests -p test_stage1_ledger.py",
+    "make test",
+    "git diff --check",
+    "public privacy and secret scan over exact write-set"
+  ],
+  "risk_class": "durable-state-and-fencing",
+  "stop_conditions": [
+    "contract-drift",
+    "more-than-one-concurrent-claim-winner",
+    "stale-fence-causes-write",
+    "update-or-delete-succeeds",
+    "non-portable-or-inline-checkpoint-payload-accepted",
+    "external-dependency-needed",
+    "private-data-detected",
+    "write-set-collision",
+    "deterministic-mismatch"
+  ],
+  "expected_receipt": "docs/receipts/integration/s1-ledger-durability.json",
+  "rollback": "Agent 0 reverts the scoped ledger implementation commit and discards synthetic test databases; no runtime database or migration is shipped by this stage.",
+  "commit_authority": "one-scoped-worker-commit",
+  "push_authority": false,
+  "expected_handoff_status": ["ready_for_agent0_audit", "blocked_validation_failed"]
+}
