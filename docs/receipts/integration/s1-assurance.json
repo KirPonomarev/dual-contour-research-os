@@ -1,0 +1,45 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s1-assurance-20260716",
+  "issued_at": "2026-07-16T20:47:04Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "bridge",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s1-assurance",
+    "agent_id": "agent-5",
+    "ownership_lease_ref": "stages/s1-assurance/ownership-lease.json",
+    "base_sha": "328a7d2b26b6aa0439475538e46ecc8bbf97dfb0",
+    "head_sha": "360cbab6f61849b7a4717ae1a10000611fe2b882",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "tests/test_stage1_assurance.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "focused_tests": 12,
+      "connected_tests": 90,
+      "composed_stage1_tests": 35,
+      "diff_check": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "dependency_adoption": false,
+      "skipped_tests": 0,
+      "initial_isolated_ci": "failed-because-implementation-prerequisites-absent",
+      "composed_branch_ci": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29533349215",
+      "zero_write_and_static_authority_boundary": "green"
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29533441317",
+    "integration_commit_sha": "9ec4bdd53e2a2a9d51c070609a800b4570e1f769"
+  },
+  "integrity": {
+    "payload_sha256": "4356645df8647f27fccb64d168a136fa7df619ed0b5c1626dc43737b149c23de",
+    "parent_refs": [
+      "git:360cbab6f61849b7a4717ae1a10000611fe2b882",
+      "git:9ec4bdd53e2a2a9d51c070609a800b4570e1f769",
+      "ci:29533349215",
+      "ci:29533441317"
+    ]
+  }
+}
