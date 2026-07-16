@@ -1,0 +1,89 @@
+{
+  "stage_id": "s1-validation-assurance",
+  "agent_id": "agent-5",
+  "objective": "Provide independent no-skip adversarial and conformance tests for the pure Stage 1 ValidationReceipt and DomainTrialLinkReceipt boundary without changing implementation files.",
+  "executable_blocker": "The validation boundary cannot be accepted until independent tests prove that malformed, unpinned, replayed, cross-contour, D2/D3 or scientifically unbound receipts never produce a reference projection.",
+  "base_sha": "7633fa3fb5c4a970c2378a69d8be001c00dad226",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a5-s1-validation-assurance",
+  "worktree": "ephemeral-worktree:s1-validation-assurance",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "docs/ARCHITECTURE.md",
+    "docs/TRUST_BOUNDARIES.md",
+    "docs/receipts/reuse/s1-validation-boundary.json",
+    "docs/receipts/integration/s1-validation-authority.json",
+    "contracts/v1/ExecutionReceipt.schema.json",
+    "contracts/v1/ValidationReceipt.schema.json",
+    "contracts/v1/DomainTrialLinkReceipt.schema.json",
+    "src/research_bridge/execution.py",
+    "src/research_bridge/validation.py",
+    "tests/test_stage1_validation.py"
+  ],
+  "write_set": [
+    "tests/test_stage1_validation_assurance.py"
+  ],
+  "forbidden_scope": [
+    "implementation-contract-config-ci-or-existing-test-edit",
+    "validator-or-domain-writer-implementation-or-call",
+    "market-or-security-scientific-semantics",
+    "scientific-outcome-interpretation-or-application",
+    "d2-or-d3-payload-fixture",
+    "filesystem-network-process-dynamic-code-or-external-callback",
+    "external-dependency",
+    "skip-conditional-skip-or-expected-failure",
+    "private-data-live-authority-deployment-or-ui"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "reuse_decision": "ab26cac74aa719ba511b52949daf8c631f71c801cb79c417b962cbbc2769bc8b",
+    "authority_receipt": "d15fd671b26ef38d470620eae1b11b934a1a81067b87d8b9ce494e168d5d84c0",
+    "execution_assurance_receipt": "0ffc990ac136d36c3358c8f668a8eca17c76b9ce31313c7b3f5ce966bb0b6f69",
+    "external_dependencies": "none"
+  },
+  "assurance_contract": {
+    "required_success": [
+      "one exact synthetic D0 and one exact synthetic D1 chain",
+      "deeply immutable reference-only projection",
+      "projection contains no proposed_outcome checks metrics tolerances reasons or raw payload"
+    ],
+    "required_failures": [
+      "all three canonical-integrity and exact-shape failures",
+      "non-mechanical execution and execution-validation artifact mismatch",
+      "unpinned validator id or sha and unexpected registry writer",
+      "missing execution or validation parent binding",
+      "protocol policy contour classification or timestamp mismatch",
+      "D2 and D3 denial before projection",
+      "nonportable file or host reference denial",
+      "input mutation cannot mutate projection"
+    ],
+    "static_boundary": "validation.py has no file network process dynamic import eval exec callback persistence ledger CAS ingestion or domain writer surface"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest discover -s tests -p test_stage1_validation_assurance.py",
+    "make test after Agent 0 composes audited implementation",
+    "git diff --check",
+    "public privacy, secret, skip, forbidden-import and exact write-set scan"
+  ],
+  "risk_class": "adversarial-validation-boundary-assurance",
+  "stop_conditions": [
+    "invalid-chain-produces-projection",
+    "scientific-field-enters-projection",
+    "d2-or-d3-fixture-needs-payload-bytes",
+    "implementation-edit-needed",
+    "skip-or-expected-failure-needed",
+    "external-dependency-needed",
+    "private-data-detected",
+    "write-set-collision"
+  ],
+  "expected_receipt": "docs/receipts/integration/s1-validation-assurance.json",
+  "rollback": "Agent 0 reverts the assurance-only commit and discards synthetic in-memory fixtures; implementation, domain registries and external state are untouched.",
+  "commit_authority": "one-scoped-worker-commit",
+  "push_authority": false,
+  "expected_handoff_status": [
+    "ready_for_agent0_audit",
+    "blocked_validation_failed"
+  ]
+}
