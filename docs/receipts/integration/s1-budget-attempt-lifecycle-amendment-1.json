@@ -1,0 +1,56 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s1-budget-attempt-lifecycle-amendment-1-20260717",
+  "issued_at": "2026-07-17T12:34:24Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "bridge",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s1-budget-attempt-lifecycle-amendment-1",
+    "agent_id": "agent-0",
+    "ownership_lease_ref": "stages/s1-budget-attempt-lifecycle/ownership-lease-amendment-1.json",
+    "base_sha": "69f90c589e8884a747849fdbdac1058dc9bf04e1",
+    "head_sha": "84f16e808abdbae4eee0816d3784a3943f193f98",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "stages/s1-budget-attempt-lifecycle/stage-envelope-amendment-1.json",
+      "stages/s1-budget-attempt-lifecycle/ownership-lease-amendment-1.json",
+      "tests/test_stage1_authority.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "focused_tests": 1,
+      "canonical_tests": 245,
+      "stage0b_tests": 25,
+      "skipped_tests": 0,
+      "diff_check": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "worker_write_set_expansion": false,
+      "frozen_contract_edit": false,
+      "dependency_adoption": false,
+      "ledger_chain_and_schema_versions_disambiguated": true,
+      "exact_replay_projection_fields": 17,
+      "attestation_exact_keys": 11,
+      "completion_precommit_boundary_frozen": true,
+      "cumulative_fixed_charge_cap_frozen": true,
+      "release_recovery_retry_or_multi_attempt_authorized": false,
+      "live_or_connected_authority": false
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29580678734",
+    "integration_commit_sha": "84f16e808abdbae4eee0816d3784a3943f193f98"
+  },
+  "integrity": {
+    "payload_sha256": "3597f82186339263c3c18700d1c4cca0d7b2760523cc35810b0ae5b4c490d227",
+    "parent_refs": [
+      "git:84f16e808abdbae4eee0816d3784a3943f193f98",
+      "ci:29580678734",
+      "integration:integration-s1-budget-attempt-lifecycle-authority-20260717",
+      "integration:integration-s1-budget-profile-20260717"
+    ]
+  }
+}
