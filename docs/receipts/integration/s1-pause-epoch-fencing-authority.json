@@ -1,0 +1,54 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s1-pause-epoch-fencing-authority-20260717",
+  "issued_at": "2026-07-17T09:37:00Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "bridge",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s1-pause-epoch-fencing-authority",
+    "agent_id": "agent-0",
+    "ownership_lease_ref": "stages/s1-pause-epoch-fencing-authority/ownership-lease.json",
+    "base_sha": "b263d387510cc74cb159144f1725957989938731",
+    "head_sha": "c04b3b0d0961dc2fb3c1e9c03898bef12529497f",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "docs/receipts/reuse/s1-pause-epoch-fencing.json",
+      "stages/s1-pause-epoch-fencing-authority/ownership-lease.json",
+      "stages/s1-pause-epoch-fencing-authority/stage-envelope.json",
+      "tests/test_stage1_authority.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "focused_tests": 17,
+      "connected_tests": 211,
+      "stage0b_tests": 25,
+      "skipped_tests": 0,
+      "diff_check": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "dependency_adoption": false,
+      "frozen_contract_edit": false,
+      "schema_migration_authorized": false,
+      "new_event_type_authorized": false,
+      "second_ledger_authorized": false,
+      "active_pause_only_check_authorized": false,
+      "domain_or_live_authority": false,
+      "selected_mode": "owned-stdlib-canonical-ledger-sequence-fence"
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29570540104",
+    "integration_commit_sha": "c04b3b0d0961dc2fb3c1e9c03898bef12529497f"
+  },
+  "integrity": {
+    "payload_sha256": "2c7c7d6e556285b195416e98a89c870986234aac20e4afd43e6d25f3184df5b8",
+    "parent_refs": [
+      "git:c04b3b0d0961dc2fb3c1e9c03898bef12529497f",
+      "ci:29570540104",
+      "reuse:reuse-s1-pause-epoch-fencing-20260717"
+    ]
+  }
+}
