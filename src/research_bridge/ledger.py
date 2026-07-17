@@ -632,7 +632,7 @@ class JobLedger:
     ) -> None:
         row = self._connection.execute(
             """
-            SELECT attempt_id, fencing_epoch, payload_json
+            SELECT sequence, attempt_id, fencing_epoch, payload_json
             FROM bridge_job_ledger
             WHERE job_id = ? AND event_type = 'claim'
             """,
@@ -655,6 +655,15 @@ class JobLedger:
             or not _constant_time_equal(claim_token_sha256, presented_token_sha256)
         ):
             raise LedgerError("stale or mismatched fencing authority")
+        latest_pause = self._connection.execute(
+            """
+            SELECT MAX(sequence) AS sequence
+            FROM bridge_job_ledger
+            WHERE event_type = 'pause'
+            """
+        ).fetchone()
+        if latest_pause["sequence"] is not None and row["sequence"] <= latest_pause["sequence"]:
+            raise LedgerError("attempt was claimed before the latest global pause")
 
     def _require_not_completed(self, job_id: str) -> None:
         row = self._connection.execute(
