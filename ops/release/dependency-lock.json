@@ -1,0 +1,11 @@
+{
+  "schema_version": "research-os.release-dependency-lock.v1",
+  "platform": "linux/amd64",
+  "base_image": "docker.io/library/python@sha256:65a93d69fa75478d554f4ad27c85c1e69fa184956261b4301ebaf6dbb0a3543d",
+  "base_tag_observed": "python:3.11.14-slim-bookworm",
+  "python_version": "3.11.14",
+  "python_dependencies": [],
+  "operating_system_family": "debian-bookworm",
+  "transitive_package_inventory": "generated-from-image-dpkg-query-and-bound-in-release-SBOM",
+  "network_required_at_runtime": false
+}

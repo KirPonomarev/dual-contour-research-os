@@ -1,0 +1,43 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-s4-rootless-release-blueprint-20260718",
+  "issued_at": "2026-07-17T22:40:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-freeze-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "pinned-rootless-no-network-read-only-linux-amd64-release-image-blueprint",
+    "candidates": [
+      {"candidate": "existing-public-Bridge-researchd-AF_UNIX-single-writer-entrypoint", "disposition": "selected-runtime"},
+      {"candidate": "Docker-Official-Image-python-3.11.14-slim-bookworm-at-sha256-65a93d69fa75478d554f4ad27c85c1e69fa184956261b4301ebaf6dbb0a3543d", "disposition": "selected-pinned-permissive-runtime-base"},
+      {"candidate": "existing-owner-release-recovery-and-rootless-service-hardening-patterns", "disposition": "selected-design-reference-without-private-payload-copy"},
+      {"candidate": "new-framework-package-manager-runtime-network-or-container-orchestrator", "disposition": "rejected-unnecessary"},
+      {"candidate": "live-connected-service-public-port-or-privileged-container", "disposition": "rejected-forbidden"}
+    ],
+    "selected_mode": "minimal-Containerfile-copying-only-public-src-with-pinned-base-nonroot-uid-10001-and-separate-fail-closed-runtime-policy",
+    "source_ref": "git:148147845667bfa6d7afc2fca8ffe04bf10f10ed;docker.io/library/python@sha256:65a93d69fa75478d554f4ad27c85c1e69fa184956261b4301ebaf6dbb0a3543d",
+    "code_sha256": "65a93d69fa75478d554f4ad27c85c1e69fa184956261b4301ebaf6dbb0a3543d",
+    "license_spdx": "PSF-2.0 AND Debian-free-software-licenses",
+    "license_sha256": "3b2f81fe21d181c499c59a256c8e1968455d6689d269aa85373bfb6af41da3bf",
+    "tests": [
+      "pinned linux-amd64 base and zero unpinned install or ADD instructions",
+      "minimal src-only Docker build context",
+      "nonroot UID 10001 no published ports no network read-only root filesystem all capabilities dropped and no-new-privileges",
+      "owner-only config mount and AF_UNIX control transport",
+      "empty runtime policy and approval maps at image-build time",
+      "third-party provenance license locations dependency lock and later SBOM requirement",
+      "local amd64 rootless read-only no-network smoke image"
+    ],
+    "canonical_owner": "Agent0-release-and-deployment",
+    "rollback": "Revert the blueprint files and discard the local smoke image. No registry, server, service, backup destination or domain repository is mutated."
+  },
+  "integrity": {
+    "payload_sha256": "d9bf09d659173c3af5eb2d46b825bd71d98f4ca7f00b5efabdb961e669237dec",
+    "parent_refs": [
+      "git:148147845667bfa6d7afc2fca8ffe04bf10f10ed",
+      "integration:integration-s4-deployment-approval-consumer-20260718",
+      "image-base:sha256:65a93d69fa75478d554f4ad27c85c1e69fa184956261b4301ebaf6dbb0a3543d"
+    ]
+  }
+}

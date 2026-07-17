@@ -1,0 +1,21 @@
+{
+  "schema_id": "ResearchdServiceConfig",
+  "schema_version": "1.0.0",
+  "runtime_root": "/var/lib/research-os",
+  "runner_identity": "pre-soak-offline-l0",
+  "allowed_uids": [10001],
+  "input_quota_bytes": 16777216,
+  "checkpoint_quota_bytes": 16777216,
+  "artifact_quota_bytes": 16777216,
+  "maximum_input_bytes": 4194304,
+  "deadline_seconds": 5,
+  "trusted_issuers": {
+    "JobSpec": {"issuer_id": "domain-job-authority", "authority_class": "job-authority"},
+    "Permit": {"issuer_id": "bridge-permit-authority", "authority_class": "permit-authority"},
+    "AttemptLease": {"issuer_id": "bridge-lease-authority", "authority_class": "lease-authority"},
+    "PolicySnapshot": {"issuer_id": "governance-policy-authority", "authority_class": "policy-authority"},
+    "ApprovalReceipt": {"issuer_id": "operator-approval-authority", "authority_class": "operator-authority"}
+  },
+  "policy_snapshots": {},
+  "approval_receipts": {}
+}

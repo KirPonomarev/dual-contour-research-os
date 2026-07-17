@@ -1,0 +1,26 @@
+{
+  "lease_id": "lease-s4-rootless-release-blueprint-agent-0-20260718",
+  "stage_id": "s4-rootless-release-blueprint",
+  "agent_id": "agent-0",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-17T22:40:00Z",
+  "expires_at": "2026-07-18T04:40:00Z",
+  "base_sha": "148147845667bfa6d7afc2fca8ffe04bf10f10ed",
+  "branch": "main",
+  "worktree": "canonical-public-worktree",
+  "write_set": [
+    ".dockerignore",
+    "ops/release/Containerfile",
+    "ops/release/dependency-lock.json",
+    "ops/release/researchd.config.template.json",
+    "ops/release/runtime-policy.json",
+    "ops/release/THIRD_PARTY_NOTICES.md",
+    "tools/verify_release_blueprint.py",
+    "tests/test_release_blueprint.py",
+    "docs/receipts/reuse/s4-rootless-release-blueprint.json",
+    "stages/s4-rootless-release-blueprint/stage-envelope.json",
+    "stages/s4-rootless-release-blueprint/ownership-lease.json"
+  ],
+  "delegation_allowed": false,
+  "state": "active"
+}

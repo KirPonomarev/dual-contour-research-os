@@ -1,0 +1,23 @@
+FROM python@sha256:65a93d69fa75478d554f4ad27c85c1e69fa184956261b4301ebaf6dbb0a3543d
+
+ARG RELEASE_SHA
+LABEL org.opencontainers.image.title="Dual-Contour Research OS Bridge" \
+      org.opencontainers.image.source="https://github.com/KirPonomarev/dual-contour-research-os" \
+      org.opencontainers.image.revision="${RELEASE_SHA}"
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONHASHSEED=0 \
+    PYTHONPATH=/opt/research-os/src \
+    PYTHONUNBUFFERED=1
+
+RUN groupadd --gid 10001 research-os \
+    && useradd --uid 10001 --gid 10001 --no-create-home --no-log-init --shell /usr/sbin/nologin research-os \
+    && install -d -m 0700 -o 10001 -g 10001 /var/lib/research-os /run/research-os
+
+WORKDIR /opt/research-os
+COPY --chown=10001:10001 src/ /opt/research-os/src/
+
+USER 10001:10001
+STOPSIGNAL SIGTERM
+ENTRYPOINT ["python", "-m", "research_bridge.researchd"]
+CMD ["--config", "/run/research-os/researchd.json"]

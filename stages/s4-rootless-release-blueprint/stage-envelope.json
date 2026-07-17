@@ -1,0 +1,77 @@
+{
+  "stage_id": "s4-rootless-release-blueprint",
+  "agent_id": "agent-0",
+  "objective": "Add and prove the pinned rootless no-network release image blueprint and immutable config, policy, dependency and license inputs needed before an exact release image can be built.",
+  "executable_blocker": "The deployment approval consumer is integrated, but there is no reproducible rootless image recipe or frozen config-policy-dependency input set from which a ReleaseManifest can bind an exact image digest.",
+  "base_sha": "148147845667bfa6d7afc2fca8ffe04bf10f10ed",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "main",
+  "worktree": "canonical-public-worktree",
+  "read_set": ["AGENTS.md", "docs/DEVELOPMENT_AGENT_CONTRACT.md", "src/research_bridge/researchd.py", "pyproject.toml", "docs/receipts/integration/s4-deployment-approval-consumer.json"],
+  "write_set": [
+    ".dockerignore",
+    "ops/release/Containerfile",
+    "ops/release/dependency-lock.json",
+    "ops/release/researchd.config.template.json",
+    "ops/release/runtime-policy.json",
+    "ops/release/THIRD_PARTY_NOTICES.md",
+    "tools/verify_release_blueprint.py",
+    "tests/test_release_blueprint.py",
+    "docs/receipts/reuse/s4-rootless-release-blueprint.json",
+    "stages/s4-rootless-release-blueprint/stage-envelope.json",
+    "stages/s4-rootless-release-blueprint/ownership-lease.json"
+  ],
+  "boundary_contract": {
+    "platform": "linux/amd64",
+    "base_image": "sha256:65a93d69fa75478d554f4ad27c85c1e69fa184956261b4301ebaf6dbb0a3543d",
+    "runtime_user": "10001:10001",
+    "network": "none",
+    "published_ports": 0,
+    "root_filesystem": "read-only",
+    "capabilities": "drop-ALL",
+    "control_transport": "AF_UNIX",
+    "runtime_authority": "empty-until-owner-only-config-is-mounted",
+    "declares_exact_release_image": false,
+    "declares_ready_for_72h_soak": false
+  },
+  "forbidden_scope": [
+    "frozen-contract-runtime-source-workflow-migration-or-domain-repository-edit",
+    "unpinned-base-package-or-Python-dependency",
+    "network-at-runtime-published-port-root-user-added-capability-or-writable-root-filesystem",
+    "secret-private-locator-D2-D3-payload-runtime-database-checkpoint-or-domain-scientific-content",
+    "registry-push-server-deploy-service-change-backup-restore-reboot-rollback-or-approval-consumption",
+    "claim-exact-final-image-ReleaseManifest-or-READY_FOR_72H_SOAK"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "base_image_digest": "65a93d69fa75478d554f4ad27c85c1e69fa184956261b4301ebaf6dbb0a3543d",
+    "python_license": "3b2f81fe21d181c499c59a256c8e1968455d6689d269aa85373bfb6af41da3bf",
+    "prior_integration_receipt": "780d9433b68aeef457819bd768897836e5944a6cf9c73fb6f6515e5ac00e6212",
+    "reuse_decision": "d9bf09d659173c3af5eb2d46b825bd71d98f4ca7f00b5efabdb961e669237dec",
+    "public_head": "148147845667bfa6d7afc2fca8ffe04bf10f10ed",
+    "external_dependencies": "one-pinned-Docker-Official-Python-base-only"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 tools/verify_release_blueprint.py",
+    "python3 -m unittest tests.test_release_blueprint -v",
+    "local linux-amd64 no-cache image build from pinned base",
+    "local rootless read-only no-network no-capabilities image smoke",
+    "make test",
+    "git diff --check",
+    "exact write-set privacy secret dependency license network privilege deployment-claim and weakening scans",
+    "exact-head public CI before integration receipt"
+  ],
+  "risk_class": "public-rootless-release-image-blueprint",
+  "stop_conditions": [
+    "base-contract-prior-integration-base-image-license-or-write-set-mismatch",
+    "image-build-requires-unpinned-download-or-new-runtime-dependency",
+    "rootless-read-only-no-network-or-AF_UNIX-smoke-fails",
+    "private-payload-external-action-or-final-release-claim-is-required",
+    "before-equals-after-or-executable-blocker-remains"
+  ],
+  "expected_receipt": "docs/receipts/integration/s4-rootless-release-blueprint.json",
+  "rollback": "Revert blueprint and conformance files and discard the local smoke image only.",
+  "commit_authority": "agent-0-only",
+  "push_authority": "agent-0-only"
+}
