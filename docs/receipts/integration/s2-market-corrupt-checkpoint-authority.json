@@ -1,0 +1,64 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s2-market-corrupt-checkpoint-authority-20260717",
+  "issued_at": "2026-07-17T23:18:00Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "market",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s2-market-corrupt-checkpoint-authority",
+    "agent_id": "agent-0",
+    "ownership_lease_ref": "stages/s2-market-corrupt-checkpoint-authority/ownership-lease.json",
+    "base_sha": "d6a5933cc46165633956090071253acc202a94a2",
+    "head_sha": "d187111a4dd360a2e7e76cfbfc8525c92d98d423",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "docs/receipts/source-freeze/s2-market-corrupt-checkpoint.json",
+      "docs/receipts/reuse/s2-market-corrupt-checkpoint.json",
+      "stages/s2-market-corrupt-checkpoint-authority/stage-envelope.json",
+      "stages/s2-market-corrupt-checkpoint-authority/ownership-lease.json",
+      "tests/test_stage2_authority.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "focused_stage2_authority_tests": 23,
+      "canonical_tests": 332,
+      "stage0b_tests": 25,
+      "skipped_tests": 0,
+      "diff_check": "green",
+      "privacy_secret_scan": "green",
+      "privacy_secret_scan_notes": "intentional deny-list and scope-boundary literals only; no secret private path or runtime payload detected",
+      "source_mutation": false,
+      "public_source_mutation": false,
+      "private_source_mutation": false,
+      "dependency_adoption": false,
+      "frozen_contract_edit": false,
+      "selected_private_head_clean": true,
+      "selected_private_head": "b53361cc5c505f5867176810d8ea8a210e8135eb",
+      "authorized_worker_files": 3,
+      "public_runtime_checkpoint_payload_in_public_repo": false,
+      "silent_repair_authorized": false,
+      "backup_restore_scope_included": false,
+      "declares_market_pre_soak_green": false,
+      "live_or_connected_authority": false,
+      "exact_head_remote_ci": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29613589742"
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29613589742",
+    "integration_commit_sha": "d187111a4dd360a2e7e76cfbfc8525c92d98d423"
+  },
+  "integrity": {
+    "payload_sha256": "2671f506b8cacc4195c73fa5f70aec3bd7468e17b603b7bd376efb7c65fe602c",
+    "parent_refs": [
+      "git:d187111a4dd360a2e7e76cfbfc8525c92d98d423",
+      "git:b53361cc5c505f5867176810d8ea8a210e8135eb",
+      "ci:29613589742",
+      "source-freeze:source-freeze-market-s2-corrupt-checkpoint-20260717",
+      "reuse:reuse-s2-market-corrupt-checkpoint-20260717",
+      "integration:integration-s2-market-crash-resume-20260717"
+    ]
+  }
+}

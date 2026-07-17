@@ -1,0 +1,99 @@
+{
+  "stage_id": "s2-market-corrupt-checkpoint",
+  "agent_id": "agent-3",
+  "objective": "Implement deterministic fail-closed corrupt checkpoint detection, sanitized containment evidence and RECOVERY_REQUIRED parking.",
+  "executable_blocker": "Crash/resume equivalence is frozen, but corrupt, missing, replaced or non-regular checkpoints still need a hermetic proof that no new work or completion occurs and that recovery-required evidence contains hashes only.",
+  "base_sha": "b53361cc5c505f5867176810d8ea8a210e8135eb",
+  "public_authority_sha": "d187111a4dd360a2e7e76cfbfc8525c92d98d423",
+  "public_authority_ci": "29613589742",
+  "public_development_sha": "d187111a4dd360a2e7e76cfbfc8525c92d98d423",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a3-s2-market-corrupt-checkpoint",
+  "worktree": "ephemeral-private-domain-worktree:s2-market-corrupt-checkpoint",
+  "read_set": [
+    "public AGENTS.md and docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "public docs/receipts/source-freeze/s2-market-corrupt-checkpoint.json",
+    "public docs/receipts/reuse/s2-market-corrupt-checkpoint.json",
+    "public docs/receipts/integration/s2-market-corrupt-checkpoint-authority.json",
+    "public contracts/v1/CheckpointManifest.schema.json",
+    "public contracts/v1/IncidentReceipt.schema.json",
+    "public contracts/v1/ValidationReceipt.schema.json",
+    "private data/bridge_pre_soak/crash_resume/market_pre_soak_crash_resume_profile.json",
+    "private src/market_lab/bridge_pre_soak_crash_resume.py",
+    "private tests/test_bridge_pre_soak_crash_resume.py",
+    "private src/market_lab/durable_jobs.py",
+    "private src/market_lab/durable_executor.py"
+  ],
+  "write_set": [
+    "data/bridge_pre_soak/corrupt_checkpoint/market_pre_soak_corrupt_checkpoint_profile.json",
+    "src/market_lab/bridge_pre_soak_corrupt_checkpoint.py",
+    "tests/test_bridge_pre_soak_corrupt_checkpoint.py"
+  ],
+  "semantic_freeze": {
+    "profile": "D1-sanitized-corrupt-checkpoint-fail-closed-profile-private-Market-only",
+    "runtime_payload": "private-runtime-checkpoint-bytes-and-database-never-public",
+    "lineage_binding": "must-match-crash-resume-and-prior-Stage2-receipts",
+    "corruption_semantics": "deterministic-byte-drift-missing-symlink-and-non-regular-checkpoint-detection-before-resume-work",
+    "containment": "IncidentReceipt-shaped-hash-only-evidence-and-RECOVERY_REQUIRED-parking",
+    "repair": "none-no-delete-overwrite-skip-or-continue",
+    "validator": "hermetic-fail-closed-corrupt-checkpoint-validator-only",
+    "receipt": "ValidationReceipt-shape-with-CORRUPT_CHECKPOINT_FAIL_CLOSED_PASS-not-scientific-outcome",
+    "public_boundary": "hashes-counts-checkpoint-manifest-ref-incident-ref-and-parking-state-only"
+  },
+  "preservation_contract": [
+    "private-Market-remains-owner-of-runtime-checkpoint-state-result-payload-and-validator",
+    "existing-durable-kernel-executor-Bridge-contracts-and-registry-remain-unmodified",
+    "validator-and-incident-controller-do-not-repair-delete-overwrite-or-apply-scientific-outcomes",
+    "tests-and-validator-do-not-fetch-network-data",
+    "no-external-dependency-workflow-config-lockfile-or-existing-schema-edit",
+    "no-backup-restore-exchange-order-live-paper-trading-publication-deployment-or-UI-authority"
+  ],
+  "forbidden_scope": [
+    "write-outside-one-corrupt-checkpoint-profile-one-source-file-and-one-test-file",
+    "public-repository-write-or-copy-of-private-source-result-runtime-checkpoint-database-bytes-strategy-or-scientific-payload",
+    "automatic-checkpoint-repair-delete-overwrite-skip-or-continue-execution-after-detection",
+    "backup-restore-implementation",
+    "network-fetch-inside-tests-validator-or-Bridge-runtime",
+    "contract-schema-lockfile-dependency-config-workflow-migration-or-existing-registry-edit",
+    "scientific-outcome-application-or-Market-Trial-Ledger-write",
+    "exchange-key-account-secret-live-paper-trading-publication-deployment-or-UI",
+    "skip-xfail-continue-on-error-optional-gate-or-validation-weakening",
+    "dirty-owner-checkout-mutation-or-push-merge-deploy-public-write"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "source_freeze": "fb69455c472077316c306e85b221bc5ddc3c98963a30191c708a2ca7e8c1a6f4",
+    "reuse_decision": "7ef2b09a6d8e5bc48aff6ef033072388f3c62a6a896eb5f1330e3c65994e6fcf",
+    "authority_receipt": "2671f506b8cacc4195c73fa5f70aec3bd7468e17b603b7bd376efb7c65fe602c",
+    "crash_resume_receipt": "14b336e771f6ce3e0ac918b8e54429f001926ee3a4069f53edd0be1eea3239da",
+    "private_market_head": "b53361cc5c505f5867176810d8ea8a210e8135eb",
+    "public_authority_head": "d187111a4dd360a2e7e76cfbfc8525c92d98d423",
+    "external_dependencies": "none"
+  },
+  "acceptance_commands": [
+    "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src python3 -m pytest -q -p no:cacheprovider tests/test_bridge_pre_soak_corrupt_checkpoint.py",
+    "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src:<pinned-public-bridge>/src python3 -m pytest -q -p no:cacheprovider tests/test_bridge_pre_soak_corrupt_checkpoint.py tests/test_bridge_pre_soak_crash_resume.py tests/test_durable_jump_reversal_v3_adapter.py tests/test_bridge_pre_soak_sealed_holdout.py",
+    "git diff --check",
+    "exact three-file write-set privacy dependency network live-authority repair and weakening scan",
+    "after Agent0 CI binding exact-head private focused CI against final public SHA"
+  ],
+  "risk_class": "private-market-pre-soak-corrupt-checkpoint-slice",
+  "stop_conditions": [
+    "private-base-public-authority-contract-source-freeze-reuse-or-receipt-hash-mismatch",
+    "write-set-collision-dirty-owner-checkout-mutation-or-fourth-file-required",
+    "proof-cannot-bind-job-spec-checkpoint-manifest-incident-receipt-and-crash-resume-lineage",
+    "validator-accepts-undetected-corruption-new-work-after-detection-completion-silent-repair-non-RECOVERY_REQUIRED-state-or-runtime-public-copy",
+    "incident-receipt-contains-runtime-checkpoint-bytes-private-path-account-order-or-domain-truth",
+    "network-fetch-backup-restore-or-new-dependency-is-required",
+    "any-live-order-exchange-publication-deployment-registry-write-or-scientific-outcome-authority-appears",
+    "before-equals-after-or-corrupt-checkpoint-blocker-remains"
+  ],
+  "expected_receipt": "public:docs/receipts/integration/s2-market-corrupt-checkpoint.json",
+  "rollback": "Agent 0 discards the isolated worker commit and branch; owner checkout, completed stages, public Bridge and external systems remain unchanged.",
+  "commit_authority": "one-scoped-worker-commit",
+  "push_authority": false,
+  "expected_handoff_status": [
+    "ready_for_agent0_audit",
+    "blocked_validation_failed"
+  ]
+}

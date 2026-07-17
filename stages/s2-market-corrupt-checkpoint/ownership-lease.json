@@ -1,0 +1,19 @@
+{
+  "lease_id": "lease-s2-market-corrupt-checkpoint-agent-3-20260717",
+  "stage_id": "s2-market-corrupt-checkpoint",
+  "agent_id": "agent-3",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-17T23:19:00Z",
+  "expires_at": "2026-07-18T05:19:00Z",
+  "base_sha": "b53361cc5c505f5867176810d8ea8a210e8135eb",
+  "public_authority_sha": "d187111a4dd360a2e7e76cfbfc8525c92d98d423",
+  "branch": "codex/bridge-a3-s2-market-corrupt-checkpoint",
+  "worktree": "ephemeral-private-domain-worktree:s2-market-corrupt-checkpoint",
+  "write_set": [
+    "data/bridge_pre_soak/corrupt_checkpoint/market_pre_soak_corrupt_checkpoint_profile.json",
+    "src/market_lab/bridge_pre_soak_corrupt_checkpoint.py",
+    "tests/test_bridge_pre_soak_corrupt_checkpoint.py"
+  ],
+  "delegation_allowed": false,
+  "state": "active"
+}
