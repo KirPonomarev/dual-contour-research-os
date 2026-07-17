@@ -1,0 +1,69 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s1-budget-profile-20260717",
+  "issued_at": "2026-07-17T11:57:41Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "bridge",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s1-budget-profile",
+    "agent_id": "agent-1",
+    "ownership_lease_ref": "stages/s1-budget-profile/ownership-lease-amendment-1.json",
+    "base_sha": "48074b1cf4ecc238764b3aa49e83602bcd55369a",
+    "head_sha": "926b29d1b4496feb2a020a755a7dc11b3af519fa",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "src/research_bridge/admission.py",
+      "src/research_bridge/l0.py",
+      "tests/test_stage1_admission.py",
+      "tests/test_stage1_assurance.py",
+      "tests/test_stage1_authority_policy.py",
+      "tests/test_stage1_l0.py",
+      "tests/test_stage1_execution_assurance.py",
+      "tests/test_stage1_reference_vertical.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "targeted_tests": 70,
+      "stage1_tests": 212,
+      "canonical_tests": 242,
+      "stage0b_tests": 25,
+      "skipped_tests": 0,
+      "diff_check": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "dependency_adoption": false,
+      "frozen_contract_edit": false,
+      "worker_write_set_files": 8,
+      "worker_source_files": 2,
+      "worker_test_files": 6,
+      "arbitrary_budget_shape_admitted_after": false,
+      "reservation_above_signed_scope_admitted_after": false,
+      "exact_positive_safe_integer_profile": "green",
+      "claims_max_uses_and_provider_bindings": "green",
+      "immutable_receipt_ready_grant_bindings": "green",
+      "standalone_l0_exact_profile": "green",
+      "kernel_ledger_execution_source_edit": false,
+      "capacity_settlement_or_receipt_green_declared": false,
+      "worker_exact_head_remote_ci": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29578408850",
+      "canonical_exact_head_remote_ci": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29578488825",
+      "live_or_connected_authority": false
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29578488825",
+    "integration_commit_sha": "e162669b972b29ea4fb6937e0bd1e1b33a00d623"
+  },
+  "integrity": {
+    "payload_sha256": "b363f06578d715629a37dfdde3891ce072737c79a63a1d2040f767c44b44c5a6",
+    "parent_refs": [
+      "git:926b29d1b4496feb2a020a755a7dc11b3af519fa",
+      "git:e162669b972b29ea4fb6937e0bd1e1b33a00d623",
+      "ci:29578408850",
+      "ci:29578488825",
+      "reuse:reuse-s1-budget-profile-20260717"
+    ]
+  }
+}
