@@ -1,0 +1,154 @@
+{
+  "stage_id": "s1-researchd-researchctl-single-writer-authority",
+  "agent_id": "agent-0",
+  "objective": "Authorize one offline single-writer researchd and local researchctl executable gate over existing canonical runtime boundaries.",
+  "executable_blocker": "The runtime primitives exist only as library components; there is no one-process owner, executable submit/lookup path, or user-facing local control command that composes them without a second writer.",
+  "base_sha": "9a5923d41883447d06b17899734853f45f117e3a",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "main",
+  "worktree": "canonical-public-worktree",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "docs/receipts/integration/s1-terminal-execution-receipt-lookup.json",
+    "docs/receipts/reuse/s1-control-ipc-pause.json",
+    "docs/receipts/reuse/s1-offline-execution.json",
+    "src/research_bridge/control.py",
+    "src/research_bridge/ipc.py",
+    "src/research_bridge/kernel.py",
+    "src/research_bridge/ledger.py",
+    "src/research_bridge/cas.py",
+    "src/research_bridge/ingestion.py",
+    "src/research_bridge/l0.py",
+    "src/research_bridge/execution.py",
+    "existing connected tests"
+  ],
+  "write_set": [
+    "docs/receipts/reuse/s1-researchd-researchctl-single-writer.json",
+    "stages/s1-researchd-researchctl-single-writer-authority/stage-envelope.json",
+    "stages/s1-researchd-researchctl-single-writer-authority/ownership-lease.json",
+    "tests/test_stage1_authority.py"
+  ],
+  "authorized_worker_stage": {
+    "stage_id": "s1-researchd-researchctl-single-writer",
+    "agent_id": "agent-1",
+    "branch": "codex/bridge-a1-s1-researchd-researchctl-single-writer",
+    "source_write_set": [
+      "src/research_bridge/control.py",
+      "src/research_bridge/ipc.py",
+      "src/research_bridge/researchd.py",
+      "src/research_bridge/researchctl.py"
+    ],
+    "test_write_set": [
+      "tests/test_stage1_control.py",
+      "tests/test_stage1_control_assurance.py",
+      "tests/test_stage1_researchd.py",
+      "tests/test_stage1_researchctl.py"
+    ]
+  },
+  "runtime_contract": {
+    "protocol_version": "1.1",
+    "commands": [
+      "status",
+      "pause_global",
+      "resume_global",
+      "submit",
+      "lookup"
+    ],
+    "single_writer": "one-fcntl-lock-one-RW-JobLedger-one-serial-AF_UNIX-dispatcher-per-runtime-root",
+    "startup_order": [
+      "validate-private-runtime-root-mode-and-owner",
+      "acquire-nonblocking-exclusive-lock",
+      "open-and-validate-one-ledger-and-existing-CAS-roots",
+      "compose-existing-kernel-runner-ingestor-coordinator-and-terminal-lookup",
+      "bind-authenticated-AF_UNIX-socket-last"
+    ],
+    "runtime_layout": [
+      ".researchd.lock",
+      "bridge-job-ledger.sqlite3",
+      "input-cas",
+      "checkpoint-cas",
+      "artifact-cas",
+      "staging-by-attempt-digest",
+      "researchd.sock"
+    ],
+    "request_maximum_bytes": 65536,
+    "response_maximum_bytes": 262144,
+    "submit_result": "canonical-ExecutionReceipt-equal-to-immediate-terminal-lookup",
+    "lookup_result": "zero-write-canonical-ExecutionReceipt",
+    "lost_response": "client-uses-lookup-and-never-retries-submit",
+    "close": "remove-only-owned-socket-close-ledger-release-lock"
+  },
+  "cli_contract": {
+    "commands": [
+      "status",
+      "pause",
+      "resume",
+      "submit",
+      "lookup"
+    ],
+    "submit_input": "strict-stdin-JSON-object-with-job_spec-permit-lease",
+    "success_exit": 0,
+    "local_input_error_exit": 2,
+    "transport_error_exit": 3,
+    "daemon_failure_exit": 4,
+    "error_policy": "no-detailed-remote-error-payload-or-authority-data-echo"
+  },
+  "concurrency_contract": [
+    "pause-before-submit-denies-submit-zero-runner",
+    "submit-before-pause-completes-bounded-L0-then-pause-applies",
+    "pause-does-not-preempt-an-inflight-submit",
+    "duplicate-submit-cannot-run-concurrently-for-the-same-attempt",
+    "lookup-after-reopen-does-not-call-runner-ingestor-or-publication"
+  ],
+  "preservation_contract": [
+    "one-existing-canonical-ledger-and-existing-CAS-roots-only",
+    "terminal-material-recovery-budget-pause-fence-nonce-settlement-and-validation-semantics-unchanged",
+    "no-contract-schema-event-database-dependency-root-config-workflow-or-package-export-change",
+    "no-HTTP-TCP-queue-scheduler-subprocess-container-deployment-UI-or-domain-feature",
+    "no-live-network-order-target-publication-or-external-mutation-authority"
+  ],
+  "forbidden_scope": [
+    "write-outside-four-source-and-four-test-files",
+    "ledger-CAS-ingestion-L0-execution-kernel-validation-admission-or-authority-source-edit",
+    "second-ledger-store-writer-queue-scheduler-table-column-index-trigger-event-or-schema-version",
+    "HTTP-TCP-web-framework-message-broker-subprocess-worker-container-or-dynamic-code",
+    "retry-submit-after-lost-response-preemptive-cancel-crash-repair-or-stale-socket-auto-delete",
+    "contract-config-workflow-lockfile-migration-package-export-or-dependency-edit",
+    "private-path-url-secret-account-dataset-strategy-domain-payload-D2-or-D3-material",
+    "network-external-mutation-live-operation-publication-deployment-or-UI",
+    "test-skip-xfail-continue-on-error-timeout-inflation-or-validation-weakening",
+    "push-merge-or-canonical-main-write"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "reuse_decision": "7d291631c2dd1d21d6822e83a4d73d5b21e83e8072105bca467630cb3b87a627",
+    "terminal_lookup_receipt": "d5451aef0793a8384d4ae56912407eb4dc6e7083c1ad2bb32f9797f35c07a3ac",
+    "external_dependencies": "none"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest tests.test_stage1_control tests.test_stage1_control_assurance tests.test_stage1_researchd tests.test_stage1_researchctl -v",
+    "python3 -m unittest tests.test_stage1_terminal_lookup tests.test_stage1_recovery tests.test_stage1_reference_vertical -v",
+    "python3 -m unittest discover -s tests -p 'test_stage1_*.py'",
+    "make test",
+    "git diff --check",
+    "exact eight-file write-set process-lock concurrency lost-response framing identity runtime-root privacy dependency network live-authority and weakening scan",
+    "exact-head public remote CI"
+  ],
+  "risk_class": "bridge-sev1-single-writer-executable-runtime",
+  "stop_conditions": [
+    "base-contract-reuse-or-terminal-receipt-hash-mismatch",
+    "write-set-ledger-store-schema-event-config-workflow-or-dependency-expands",
+    "second-process-can-acquire-the-same-runtime-root-or-second-writer-can-open",
+    "submit-or-lookup-bypasses-existing-admission-ledger-execution-or-terminal-boundary",
+    "lost-response-recovery-reruns-the-job-or-lookup-causes-any-write",
+    "request-response-bound-peer-identity-runtime-root-mode-or-socket-inode-cannot-be-proven",
+    "HTTP-TCP-queue-scheduler-subprocess-deployment-UI-or-domain-authority-appears",
+    "before-equals-after-or-single-writer-executable-blocker-remains"
+  ],
+  "expected_receipt": "docs/receipts/integration/s1-researchd-researchctl-single-writer.json",
+  "rollback": "Agent 0 discards or reverts only the scoped researchd researchctl and protocol worker commit. Existing ledger schema, CAS and terminal objects remain unchanged; synthetic offline runtime roots may be discarded.",
+  "commit_authority": "agent-0-only",
+  "push_authority": "agent-0-only"
+}

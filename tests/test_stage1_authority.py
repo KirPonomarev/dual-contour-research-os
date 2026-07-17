@@ -60,6 +60,7 @@ class Stage1AuthorityTests(unittest.TestCase):
             "s1-budget-attempt-lifecycle.json": "owned-stdlib-single-ledger-embedded-budget-receipts-fixed-charge",
             "s1-final-checkpoint-reopen-recovery.json": "owned-stdlib-verified-final-checkpoint-same-attempt-replay-single-ledger",
             "s1-terminal-execution-receipt-lookup.json": "owned-stdlib-existing-ledger-existing-checkpoint-cas-versioned-terminal-material",
+            "s1-researchd-researchctl-single-writer.json": "owned-stdlib-single-writer-af-unix-daemon-existing-runtime-boundaries",
             "s1-pause-epoch-fencing.json": "owned-stdlib-canonical-ledger-sequence-fence",
             "s1-market-ci-reality-loop-prerequisite.json": "existing-real-cli-synthetic-prerequisite-hard-gate-no-runtime-change",
             "s1-market-storage-accounting-portability.json": "owner-local-stdlib-conservative-byte-accounting-no-public-copy",
@@ -385,6 +386,38 @@ class Stage1AuthorityTests(unittest.TestCase):
         )
         self.assertIn("zero_write", envelope["semantic_freeze"]["lookup"])
         self.assertFalse(envelope["push_authority"])
+        self.assertFalse(lease["delegation_allowed"])
+
+    def test_researchd_researchctl_authority_is_single_writer_local_and_executable(self) -> None:
+        envelope = load(
+            ROOT
+            / "stages"
+            / "s1-researchd-researchctl-single-writer-authority"
+            / "stage-envelope.json"
+        )
+        lease = load(
+            ROOT
+            / "stages"
+            / "s1-researchd-researchctl-single-writer-authority"
+            / "ownership-lease.json"
+        )
+        reuse = load(
+            REUSE_RECEIPTS / "s1-researchd-researchctl-single-writer.json"
+        )
+
+        self.assertEqual(envelope["write_set"], lease["write_set"])
+        worker = envelope["authorized_worker_stage"]
+        self.assertEqual(len(worker["source_write_set"]), 4)
+        self.assertEqual(len(worker["test_write_set"]), 4)
+        runtime = envelope["runtime_contract"]
+        self.assertEqual(runtime["protocol_version"], "1.1")
+        self.assertEqual(runtime["request_maximum_bytes"], 65536)
+        self.assertEqual(runtime["response_maximum_bytes"], 262144)
+        self.assertEqual(len(runtime["commands"]), 5)
+        self.assertIn("one-fcntl-lock-one-RW-JobLedger", runtime["single_writer"])
+        self.assertEqual(len(envelope["cli_contract"]["commands"]), 5)
+        self.assertEqual(reuse["integrity"]["payload_sha256"], payload_sha256(reuse))
+        self.assertTrue(envelope["rollback"])
         self.assertFalse(lease["delegation_allowed"])
 
     def test_budget_attempt_lifecycle_semantic_amendment_is_exact_and_non_expansive(self) -> None:

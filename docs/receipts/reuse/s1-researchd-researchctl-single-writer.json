@@ -1,0 +1,76 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-s1-researchd-researchctl-single-writer-20260717",
+  "issued_at": "2026-07-17T15:10:31Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "reuse-freeze-authority"
+  },
+  "contour": "bridge",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "single-writer-offline-researchd-and-local-researchctl-executable-control-plane",
+    "candidates": [
+      {
+        "candidate": "existing-typed-control-router-and-AF_UNIX-peer-credential-transport",
+        "disposition": "selected"
+      },
+      {
+        "candidate": "existing-canonical-ledger-CAS-ingestor-kernel-L0-coordinator-and-terminal-lookup",
+        "disposition": "selected"
+      },
+      {
+        "candidate": "stdlib-fcntl-runtime-root-lock-and-serial-dispatcher",
+        "disposition": "selected-minimal-glue"
+      },
+      {
+        "candidate": "second-ledger-store-queue-scheduler-or-service-database",
+        "disposition": "rejected-duplicate-authority"
+      },
+      {
+        "candidate": "HTTP-TCP-web-framework-or-message-broker",
+        "disposition": "rejected-nonlocal-surface"
+      },
+      {
+        "candidate": "subprocess-container-or-distributed-worker-runtime",
+        "disposition": "parked-for-separately-authorized-worker-isolation-stage"
+      },
+      {
+        "candidate": "external-dependency",
+        "disposition": "rejected-unnecessary"
+      },
+      {
+        "candidate": "crash-before-complete-repair-preemptive-cancel-or-stale-socket-cleanup",
+        "disposition": "parked-for-separate-operations-stage"
+      }
+    ],
+    "selected_mode": "owned-stdlib-single-writer-af-unix-daemon-existing-runtime-boundaries",
+    "source_ref": "git:9a5923d41883447d06b17899734853f45f117e3a;integration:integration-s1-terminal-execution-receipt-lookup-20260717;reuse:reuse-s1-control-ipc-pause-20260716;reuse:reuse-s1-offline-execution-20260716",
+    "code_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "license_spdx": "NOASSERTION",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "one process holds the runtime root lock and one JobLedger writer",
+      "status pause resume submit and lookup use strict protocol 1.1 over authenticated AF_UNIX",
+      "submit composes existing admission execution checkpoint CAS ingestion and terminal material boundaries",
+      "lost response is recovered only through zero-write terminal lookup",
+      "pause and submit ordering is deterministic under serial dispatch",
+      "oversize malformed unauthorized symlink stale-socket and mode-owner cases fail closed",
+      "request and response bounds are independently enforced",
+      "no HTTP TCP queue scheduler deployment UI or domain authority",
+      "full Stage 1 and repository gates"
+    ],
+    "canonical_owner": "bridge-researchd-single-writer-and-agent0-integration",
+    "rollback": "Revert only the scoped researchd researchctl and protocol implementation commit. Existing ledger, CAS and terminal objects remain valid; synthetic offline runtime roots may be discarded."
+  },
+  "integrity": {
+    "payload_sha256": "7d291631c2dd1d21d6822e83a4d73d5b21e83e8072105bca467630cb3b87a627",
+    "parent_refs": [
+      "git:9a5923d41883447d06b17899734853f45f117e3a",
+      "integration:integration-s1-terminal-execution-receipt-lookup-20260717",
+      "reuse:reuse-s1-control-ipc-pause-20260716",
+      "reuse:reuse-s1-offline-execution-20260716"
+    ]
+  }
+}
