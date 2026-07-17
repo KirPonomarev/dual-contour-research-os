@@ -1,0 +1,54 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s1-auth-policy-authority-20260717",
+  "issued_at": "2026-07-17T08:55:04Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "bridge",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s1-auth-policy-authority",
+    "agent_id": "agent-0",
+    "ownership_lease_ref": "stages/s1-auth-policy-authority/ownership-lease.json",
+    "base_sha": "90620ec0dabc547bd36829cf70784ba4d300b242",
+    "head_sha": "432636cef1cc95c95ef097212c520bfb439dd966",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "docs/receipts/reuse/s1-authority-policy-boundary.json",
+      "stages/s1-auth-policy-authority/ownership-lease.json",
+      "stages/s1-auth-policy-authority/stage-envelope.json",
+      "tests/test_stage1_authority.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "focused_tests": 14,
+      "connected_tests": 208,
+      "stage0b_tests": 25,
+      "skipped_tests": 0,
+      "diff_check": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "dependency_adoption": false,
+      "frozen_contract_edit": false,
+      "forged_authority_probe_reproduced": true,
+      "worker_boolean_bypass_authorized": false,
+      "unresolved_policy_or_approval_authorized": false,
+      "second_kernel_or_ledger_authorized": false,
+      "live_or_connected_authority": false,
+      "selected_mode": "owned-stdlib-pinned-authority-policy-fail-closed"
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29568037456",
+    "integration_commit_sha": "432636cef1cc95c95ef097212c520bfb439dd966"
+  },
+  "integrity": {
+    "payload_sha256": "904337ec4e026bfd4066c4e086a642ae5c8fbc9bedfe1ffd1fce13affd947e3f",
+    "parent_refs": [
+      "git:432636cef1cc95c95ef097212c520bfb439dd966",
+      "ci:29568037456",
+      "reuse:reuse-s1-authority-policy-boundary-20260717"
+    ]
+  }
+}
