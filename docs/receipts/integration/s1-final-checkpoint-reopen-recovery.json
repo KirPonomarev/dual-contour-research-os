@@ -1,0 +1,77 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s1-final-checkpoint-reopen-recovery-20260717",
+  "issued_at": "2026-07-17T14:28:00Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "bridge",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s1-final-checkpoint-reopen-recovery",
+    "agent_id": "agent-2",
+    "ownership_lease_ref": "stages/s1-final-checkpoint-reopen-recovery/ownership-lease-amendment-1.json",
+    "base_sha": "4e4e5a8677f1c189d6cde2b86626186f36701aad",
+    "head_sha": "918cae32cb26f05d2726b01fba4c96b64a203907",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "src/research_bridge/execution.py",
+      "src/research_bridge/ledger.py",
+      "tests/test_stage1_assurance.py",
+      "tests/test_stage1_execution.py",
+      "tests/test_stage1_ledger.py",
+      "tests/test_stage1_recovery.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "worker_focused_tests": 71,
+      "worker_stage1_tests": 238,
+      "worker_canonical_tests": 268,
+      "canonical_stage1_tests": 239,
+      "canonical_tests": 269,
+      "stage0b_tests": 25,
+      "skipped_tests": 0,
+      "diff_check": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "dependency_adoption": false,
+      "frozen_contract_edit": false,
+      "schema_version": 1,
+      "single_canonical_ledger": true,
+      "checkpoint_projection_validation": "green",
+      "checkpoint_and_completion_causality": "green",
+      "same_session_exact_replay_zero_write": "green",
+      "post_reopen_exact_replay_zero_write": "green",
+      "conflicting_replay_zero_write": "green",
+      "original_checkpoint_time_authoritative": "green",
+      "deterministic_same_attempt_artifact_identity": "green",
+      "checkpoint_cas_deduplication": "green",
+      "corrupt_checkpoint_fail_closed": "green",
+      "expired_authority_pre_runner_rejection": "green",
+      "duplicate_claim_checkpoint_complete_reservation_settlement": false,
+      "terminal_execution_receipt_lookup_claimed": false,
+      "multi_attempt_resume_claimed": false,
+      "live_or_connected_authority": false,
+      "global_stage1_gate_declared_green": false,
+      "remaining_gate": "durable-terminal-execution-receipt-lookup-single-writer-researchd-and-domain-owned-offline-reference-e2e",
+      "worker_exact_head_ci": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29588126298",
+      "canonical_exact_head_ci": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29588203035",
+      "authority_amendment_receipt": "5d0cec812300bcf967aa4c14c1a515fab282bca6abac40ce5b67b50cc7ffb755"
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29588203035",
+    "integration_commit_sha": "fa82921613b99b2c7eea85193db4717844230c45"
+  },
+  "integrity": {
+    "payload_sha256": "3899b964348af5f4c1b77d8910dc8b9168ad7ca98a2bbaac560ebb05c8f15762",
+    "parent_refs": [
+      "git:918cae32cb26f05d2726b01fba4c96b64a203907",
+      "git:fa82921613b99b2c7eea85193db4717844230c45",
+      "ci:29588126298",
+      "ci:29588203035",
+      "integration:integration-s1-final-checkpoint-reopen-recovery-amendment-1-20260717",
+      "reuse:reuse-s1-final-checkpoint-reopen-recovery-20260717"
+    ]
+  }
+}
