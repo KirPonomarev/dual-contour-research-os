@@ -139,6 +139,31 @@ class Stage2AuthorityTests(unittest.TestCase):
             envelope["stop_conditions"],
         )
 
+    def test_market_dataset_worker_receipt_is_sanitized_slice_only(self) -> None:
+        receipt = load(
+            INTEGRATION_RECEIPTS / "s2-market-public-dataset-temporal-integrity.json"
+        )
+
+        self.assertEqual(receipt["schema_id"], "IntegrationReceipt")
+        self.assertEqual(receipt["integrity"]["payload_sha256"], payload_sha256(receipt))
+        self.assertEqual(receipt["payload"]["head_sha"], "b9fd2b8af8d3ab9405dd0f432d2a39bbb6e3bb94")
+        audit = receipt["payload"]["audit_results"]
+        self.assertEqual(audit["dataset_sha256"], "20d4a28d97c5f195df0e421c8449cfcf8825e33940e12fcbd5b7a66650535080")
+        self.assertEqual(audit["dataset_rows"], 24)
+        self.assertEqual(audit["validation_receipt_outcome"], "DATASET_INTEGRITY_PASS")
+        self.assertFalse(audit["scientific_outcome_applied"])
+        self.assertFalse(audit["public_dataset_payload_in_public_repo"])
+        self.assertFalse(audit["network_during_validation_or_tests"])
+        self.assertFalse(audit["declares_market_pre_soak_green"])
+        self.assertEqual(audit["private_full_suite_initial_failure_rerun"], "green")
+        self.assertTrue(audit["private_full_suite_initial_failure_unrelated_to_write_set"])
+
+        text = (INTEGRATION_RECEIPTS / "s2-market-public-dataset-temporal-integrity.json").read_text()
+        self.assertNotIn("42283.58000000", text)
+        self.assertNotIn("44179.55000000", text)
+        self.assertNotIn("/Users/", text)
+        self.assertNotIn("/Volumes/", text)
+
 
 if __name__ == "__main__":
     unittest.main()
