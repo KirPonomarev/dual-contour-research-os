@@ -1,0 +1,76 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-s1-market-offline-reference-e2e-20260717",
+  "issued_at": "2026-07-17T14:45:49Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "reuse-freeze-authority"
+  },
+  "contour": "market",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "domain-owned-synthetic-Market-offline-reference-E2E-through-canonical-Bridge-receipts",
+    "candidates": [
+      {
+        "candidate": "existing-Bridge-injected-Runner-execution-and-validation-boundaries",
+        "disposition": "selected"
+      },
+      {
+        "candidate": "existing-Market-Trial-Ledger-as-single-domain-outcome-registry",
+        "disposition": "selected"
+      },
+      {
+        "candidate": "owner-local-stdlib-HypothesisCard-ProtocolSnapshot-numeric-runner-validator-and-writer-adapters",
+        "disposition": "selected-minimal-glue"
+      },
+      {
+        "candidate": "public-copy-of-private-Market-source-fixtures-or-scientific-payload",
+        "disposition": "rejected-boundary-and-license"
+      },
+      {
+        "candidate": "second-domain-registry-ledger-or-Bridge-scientific-writer",
+        "disposition": "rejected-duplicate-or-wrong-authority"
+      },
+      {
+        "candidate": "Market-Claim-Registry-draft-observed-only-route",
+        "disposition": "parked-incompatible-with-canonical-outcome-application"
+      },
+      {
+        "candidate": "human-only-Decision-OS-writer-route",
+        "disposition": "parked-incompatible-with-this-offline-validated-flow"
+      },
+      {
+        "candidate": "external-dependency",
+        "disposition": "rejected-unnecessary"
+      }
+    ],
+    "selected_mode": "existing-bridge-injection-existing-market-trial-ledger-owner-stdlib-adapters",
+    "source_ref": "source-freeze:source-freeze-market-s1-offline-reference-e2e-20260717;git:c4c697ef3dc8532321349917a65e1afb379e0ae2;git:4b8c2cb489919658260fb5f597dc3ae70d251707",
+    "code_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "license_spdx": "NOASSERTION",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "independently created synthetic OHLCV fixture enters only the private Market adapter",
+      "HypothesisCard and ProtocolSnapshot bind exact fixture code environment and execution references",
+      "domain-owned numeric runner executes through the existing Bridge Runner injection boundary",
+      "numeric result maps to one canonical ValidationReceipt outcome",
+      "only the Market writer applies SUPPORTED REFUTED INCONCLUSIVE or INVALID to the existing Trial Ledger",
+      "valid exact replay returns the same DomainTrialLinkReceipt with one trial row",
+      "tamper expired authority binding mismatch unknown outcome and conflicting replay cause zero registry writes",
+      "Bridge observes D0 or D1 references only and never receives domain scientific payload",
+      "combined exact public and private head CI"
+    ],
+    "canonical_owner": "private-Market-Trial-Ledger-domain-writer-and-Agent0-cross-repository-integration",
+    "rollback": "Discard or revert only the isolated private adapter and writer commit plus its exact CI binding. The selected public Bridge head, Market owner checkout, existing Trial Ledger data and external systems remain unchanged."
+  },
+  "integrity": {
+    "payload_sha256": "acb60c052b94231e28858e382264160d7f483b274e538965341fa627b896378c",
+    "parent_refs": [
+      "source-freeze:source-freeze-market-s1-offline-reference-e2e-20260717",
+      "sha256:3bacb20065e79d5999d6d3e3f5c9d7862836c71f4595358c9b4831a2faecadbc",
+      "git:c4c697ef3dc8532321349917a65e1afb379e0ae2",
+      "git:4b8c2cb489919658260fb5f597dc3ae70d251707"
+    ]
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "schema_id": "SourceFreezeReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "source-freeze-market-s1-offline-reference-e2e-20260717",
+  "issued_at": "2026-07-17T14:45:49Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "source-freeze-authority"
+  },
+  "contour": "market",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "source_repo": "crypto-market-lab",
+    "remote": "sha256:c4d97d3379ba70f130a546a4d44b646c935f33e3b1447e0aac185c0d38215815",
+    "branch": "sha256:342142fb71106cad14d40a2c2cb06113ff7e42837f80fe5781fc2fbe3068a211",
+    "head_sha": "c4c697ef3dc8532321349917a65e1afb379e0ae2",
+    "upstream_sha": "c4c697ef3dc8532321349917a65e1afb379e0ae2",
+    "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "untracked_manifest_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "path_dispositions": [
+      {
+        "category": "tracked_worktree_changes",
+        "count": 0,
+        "disposition": "none-clean-selected-source"
+      },
+      {
+        "category": "untracked_worktree_entries",
+        "count": 0,
+        "disposition": "none-clean-selected-source"
+      }
+    ],
+    "selected_source_sha": "c4c697ef3dc8532321349917a65e1afb379e0ae2"
+  },
+  "integrity": {
+    "payload_sha256": "3bacb20065e79d5999d6d3e3f5c9d7862836c71f4595358c9b4831a2faecadbc",
+    "parent_refs": [
+      "git:c4c697ef3dc8532321349917a65e1afb379e0ae2",
+      "ci:private-exact-head-success-withheld",
+      "integration:integration-s1-market-storage-accounting-portability-20260717"
+    ]
+  }
+}

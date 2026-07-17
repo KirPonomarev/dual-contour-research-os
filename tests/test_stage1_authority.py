@@ -63,6 +63,7 @@ class Stage1AuthorityTests(unittest.TestCase):
             "s1-pause-epoch-fencing.json": "owned-stdlib-canonical-ledger-sequence-fence",
             "s1-market-ci-reality-loop-prerequisite.json": "existing-real-cli-synthetic-prerequisite-hard-gate-no-runtime-change",
             "s1-market-storage-accounting-portability.json": "owner-local-stdlib-conservative-byte-accounting-no-public-copy",
+            "s1-market-offline-reference-e2e.json": "existing-bridge-injection-existing-market-trial-ledger-owner-stdlib-adapters",
             "s1-permit-nonce-ledger.json": "owned-stdlib-canonical-ledger-permit-nonce-digest-unique-index",
         }
         schema = load(ROOT / "contracts" / "v1" / "ReuseDecisionReceipt.schema.json")
@@ -657,6 +658,54 @@ class Stage1AuthorityTests(unittest.TestCase):
         self.assertFalse(lease["delegation_allowed"])
         self.assertFalse(envelope["push_authority"])
         self.assertIn("exact-head private remote CI", envelope["acceptance_commands"])
+
+    def test_market_offline_reference_e2e_authority_is_clean_domain_owned_and_cross_pinned(self) -> None:
+        envelope = load(
+            ROOT
+            / "stages"
+            / "s1-market-offline-reference-e2e-authority"
+            / "stage-envelope.json"
+        )
+        lease = load(
+            ROOT
+            / "stages"
+            / "s1-market-offline-reference-e2e-authority"
+            / "ownership-lease.json"
+        )
+        source = load(
+            SOURCE_RECEIPTS / "s1-market-offline-reference-e2e.json"
+        )
+        reuse = load(REUSE_RECEIPTS / "s1-market-offline-reference-e2e.json")
+
+        self.assertEqual(envelope["write_set"], lease["write_set"])
+        self.assertEqual(source["payload"]["head_sha"], source["payload"]["upstream_sha"])
+        self.assertEqual(source["payload"]["head_sha"], source["payload"]["selected_source_sha"])
+        self.assertEqual(
+            source["payload"]["tracked_diff_sha256"], EMPTY_SHA256
+        )
+        self.assertEqual(
+            source["payload"]["untracked_manifest_sha256"], EMPTY_SHA256
+        )
+        self.assertTrue(
+            all(item["count"] == 0 for item in source["payload"]["path_dispositions"])
+        )
+        self.assertEqual(source["integrity"]["payload_sha256"], payload_sha256(source))
+        self.assertEqual(reuse["integrity"]["payload_sha256"], payload_sha256(reuse))
+        worker = envelope["authorized_worker_stage"]
+        self.assertEqual(len(worker["write_set"]), 4)
+        self.assertTrue(all(path.startswith(("src/market_lab/", "tests/")) for path in worker["write_set"]))
+        self.assertEqual(
+            envelope["domain_vertical"]["registry"],
+            "existing-Market-Trial-Ledger-only",
+        )
+        self.assertEqual(
+            envelope["agent0_integration_tail"]["private_write_set"],
+            [".github/workflows/ci.yml"],
+        )
+        public_text = json.dumps([source, reuse, envelope, lease], sort_keys=True)
+        self.assertNotIn("/Users/", public_text)
+        self.assertNotIn("/Volumes/", public_text)
+        self.assertFalse(lease["delegation_allowed"])
 
     def test_market_base_authority_refresh_is_sanitized_pinned_and_reversible(self) -> None:
         envelope = load(ROOT / "stages" / "s1-market-base-authority" / "stage-envelope.json")
