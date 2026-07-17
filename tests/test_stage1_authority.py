@@ -59,6 +59,7 @@ class Stage1AuthorityTests(unittest.TestCase):
             "s1-budget-profile.json": "owned-stdlib-exact-fixed-charge-budget-profile-single-ledger-ready",
             "s1-budget-attempt-lifecycle.json": "owned-stdlib-single-ledger-embedded-budget-receipts-fixed-charge",
             "s1-final-checkpoint-reopen-recovery.json": "owned-stdlib-verified-final-checkpoint-same-attempt-replay-single-ledger",
+            "s1-terminal-execution-receipt-lookup.json": "owned-stdlib-existing-ledger-existing-checkpoint-cas-versioned-terminal-material",
             "s1-pause-epoch-fencing.json": "owned-stdlib-canonical-ledger-sequence-fence",
             "s1-market-ci-reality-loop-prerequisite.json": "existing-real-cli-synthetic-prerequisite-hard-gate-no-runtime-change",
             "s1-market-storage-accounting-portability.json": "owner-local-stdlib-conservative-byte-accounting-no-public-copy",
@@ -312,6 +313,45 @@ class Stage1AuthorityTests(unittest.TestCase):
         )
         self.assertTrue(amendment["rollback"])
         self.assertFalse(amendment["push_authority"])
+        self.assertFalse(lease["delegation_allowed"])
+
+    def test_terminal_execution_receipt_lookup_authority_is_zero_write_and_single_store(self) -> None:
+        envelope = load(
+            ROOT
+            / "stages"
+            / "s1-terminal-execution-receipt-lookup-authority"
+            / "stage-envelope.json"
+        )
+        lease = load(
+            ROOT
+            / "stages"
+            / "s1-terminal-execution-receipt-lookup-authority"
+            / "ownership-lease.json"
+        )
+        reuse = load(
+            REUSE_RECEIPTS / "s1-terminal-execution-receipt-lookup.json"
+        )
+
+        self.assertEqual(envelope["write_set"], lease["write_set"])
+        worker = envelope["authorized_worker_stage"]
+        self.assertEqual(
+            worker["source_write_set"],
+            [
+                "src/research_bridge/cas.py",
+                "src/research_bridge/ledger.py",
+                "src/research_bridge/execution.py",
+            ],
+        )
+        self.assertEqual(len(worker["test_write_set"]), 9)
+        material = envelope["terminal_material_contract"]
+        self.assertEqual(material["maximum_bytes"], 65536)
+        self.assertEqual(len(material["exact_fields"]), 19)
+        self.assertIn("raw-fencing-token", material["forbidden_fields"])
+        lookup = envelope["lookup_contract"]
+        self.assertEqual(len(lookup["zero_write"]), 7)
+        self.assertIn("without-backfill-rerun-repair", lookup["legacy_policy"])
+        self.assertEqual(reuse["integrity"]["payload_sha256"], payload_sha256(reuse))
+        self.assertTrue(envelope["rollback"])
         self.assertFalse(lease["delegation_allowed"])
 
     def test_budget_attempt_lifecycle_semantic_amendment_is_exact_and_non_expansive(self) -> None:

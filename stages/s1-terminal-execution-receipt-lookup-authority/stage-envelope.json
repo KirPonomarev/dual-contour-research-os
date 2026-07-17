@@ -1,0 +1,162 @@
+{
+  "stage_id": "s1-terminal-execution-receipt-lookup-authority",
+  "agent_id": "agent-0",
+  "objective": "Authorize one bounded durable terminal-material lookup gate that reconstructs the exact completed ExecutionReceipt after reopen without rerunning or writing.",
+  "executable_blocker": "A lost response after durable completion cannot be reconstructed from the ledger because the current result digest does not address a complete bounded receipt reconstruction material object.",
+  "base_sha": "9d20a780534d6cabb191ee2583835d3c161dc29f",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "main",
+  "worktree": "canonical-public-worktree",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "contracts/v1/ExecutionReceipt.schema.json",
+    "contracts/v1/CheckpointManifest.schema.json",
+    "docs/receipts/integration/s1-final-checkpoint-reopen-recovery.json",
+    "docs/receipts/reuse/s1-offline-execution.json",
+    "docs/receipts/reuse/s1-trusted-storage.json",
+    "src/research_bridge/cas.py",
+    "src/research_bridge/ledger.py",
+    "src/research_bridge/execution.py",
+    "existing connected tests"
+  ],
+  "write_set": [
+    "docs/receipts/reuse/s1-terminal-execution-receipt-lookup.json",
+    "stages/s1-terminal-execution-receipt-lookup-authority/stage-envelope.json",
+    "stages/s1-terminal-execution-receipt-lookup-authority/ownership-lease.json",
+    "tests/test_stage1_authority.py"
+  ],
+  "authorized_worker_stage": {
+    "stage_id": "s1-terminal-execution-receipt-lookup",
+    "agent_id": "agent-2",
+    "branch": "codex/bridge-a2-s1-terminal-execution-receipt-lookup",
+    "source_write_set": [
+      "src/research_bridge/cas.py",
+      "src/research_bridge/ledger.py",
+      "src/research_bridge/execution.py"
+    ],
+    "test_write_set": [
+      "tests/test_stage1_cas.py",
+      "tests/test_stage1_storage_assurance.py",
+      "tests/test_stage1_ledger.py",
+      "tests/test_stage1_assurance.py",
+      "tests/test_stage1_execution.py",
+      "tests/test_stage1_execution_assurance.py",
+      "tests/test_stage1_reference_vertical.py",
+      "tests/test_stage1_recovery.py",
+      "tests/test_stage1_terminal_lookup.py"
+    ]
+  },
+  "terminal_material_contract": {
+    "schema_id": "OwnedExecutionTerminalMaterial",
+    "schema_version": "1.0.0",
+    "maximum_bytes": 65536,
+    "durable_order": [
+      "validate-authority-claim-runner-checkpoint-and-artifacts",
+      "construct-strict-terminal-material",
+      "publish-to-existing-checkpoint-CAS",
+      "verify-derived-cas-ref-and-digest",
+      "complete-ledger-with-result_sha256-equal-to-terminal-material-digest",
+      "construct-ExecutionReceipt-through-shared-constructor"
+    ],
+    "exact_fields": [
+      "schema_id",
+      "schema_version",
+      "job_spec_ref",
+      "permit_ref",
+      "lease_ref",
+      "attempt_id",
+      "issuer_id",
+      "contour",
+      "classification",
+      "code_sha256",
+      "input_sha256",
+      "environment_digest",
+      "started_at",
+      "ended_at",
+      "exit_classification",
+      "artifact_refs",
+      "resource_usage",
+      "checkpoint_manifest_object_id",
+      "checkpoint_manifest_sha256"
+    ],
+    "forbidden_fields": [
+      "raw-fencing-token",
+      "permit-nonce",
+      "filesystem-path",
+      "raw-artifact-or-checkpoint-bytes",
+      "domain-outcome-or-scientific-payload",
+      "D2-or-D3-material"
+    ]
+  },
+  "lookup_contract": {
+    "entrypoint": "OfflineExecutionCoordinator.lookup_execution_receipt(job_spec_ref)",
+    "order": [
+      "read-and-validate-entire-ledger-chain-budget-and-checkpoint-projection",
+      "select-the-single-complete-event",
+      "derive-cas-ref-from-complete.result_sha256",
+      "bounded-no-follow-CAS-read-and-hash-verification",
+      "strict-canonical-terminal-material-decode-and-binding-validation",
+      "construct-ExecutionReceipt-through-the-same-constructor-as-normal-execution"
+    ],
+    "zero_write": [
+      "runner-calls",
+      "ingestor-calls",
+      "CAS-publish-calls",
+      "staging-files",
+      "ledger-events",
+      "budget-capacity",
+      "reservations-or-settlements"
+    ],
+    "legacy_policy": "explicit-terminal-material-unavailable-without-backfill-rerun-repair-or-fabrication"
+  },
+  "preservation_contract": [
+    "database-user-version-schema-fingerprint-table-index-trigger-and-event-vocabulary-unchanged",
+    "existing-checkpoint-CAS-is-the-only-terminal-material-store",
+    "complete-result_sha256-remains-the-single-durable-terminal-digest-binding",
+    "normal-and-lookup-receipts-use-one-shared-constructor-and-canonical-serializer",
+    "no-domain-registry-writer-scientific-outcome-or-live-authority"
+  ],
+  "forbidden_scope": [
+    "write-outside-three-source-and-nine-test-files",
+    "contract-catalog-schema-config-workflow-lockfile-dependency-migration-or-package-export-edit",
+    "new-ledger-store-table-column-index-trigger-event-type-or-user-version",
+    "lookup-runner-ingestion-publication-staging-ledger-budget-or-CAS-mutation",
+    "legacy-backfill-repair-rerun-receipt-fabrication-or-silent-fallback",
+    "multi-attempt-resume-scheduler-queue-garbage-collection-release-or-refund",
+    "private-path-url-secret-account-dataset-strategy-or-confidential-payload",
+    "network-external-mutation-live-operation-publication-deployment-or-UI",
+    "push-merge-or-canonical-main-write"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "reuse_decision": "5a79e766f56bd6a5a1181aa840791998ac7de4f81d701071f10df897d06067b5",
+    "recovery_receipt": "3899b964348af5f4c1b77d8910dc8b9168ad7ca98a2bbaac560ebb05c8f15762",
+    "external_dependencies": "none"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest tests.test_stage1_cas tests.test_stage1_storage_assurance tests.test_stage1_ledger tests.test_stage1_assurance tests.test_stage1_execution tests.test_stage1_execution_assurance tests.test_stage1_reference_vertical tests.test_stage1_recovery tests.test_stage1_terminal_lookup -v",
+    "python3 -m unittest discover -s tests -p 'test_stage1_*.py'",
+    "make test",
+    "git diff --check",
+    "exact twelve-file write-set terminal mutation matrix schema contract dependency private-locator network live-authority and weakening scan",
+    "exact-head public remote CI"
+  ],
+  "risk_class": "bridge-sev1-durable-terminal-reconstruction",
+  "stop_conditions": [
+    "base-contract-reuse-or-recovery-receipt-hash-mismatch",
+    "write-set-schema-event-vocabulary-store-ledger-or-dependency-expands",
+    "terminal-material-is-not-durable-and-verified-before-complete",
+    "complete-result_sha256-does-not-exactly-address-terminal-material",
+    "normal-and-lookup-ExecutionReceipt-canonical-bytes-or-parents-differ",
+    "successful-or-failed-lookup-runs-execution-or-causes-any-write",
+    "malformed-missing-tampered-legacy-or-mismatched-material-reaches-a-receipt",
+    "raw-fence-path-private-domain-or-D2-D3-material-enters-terminal-object",
+    "before-equals-after-or-lost-response-terminal-reconstruction-blocker-remains"
+  ],
+  "expected_receipt": "docs/receipts/integration/s1-terminal-execution-receipt-lookup.json",
+  "rollback": "Agent 0 discards or reverts only the scoped terminal implementation commit. No schema, contract, domain state, external system or live authority changes; bounded orphan synthetic CAS objects may be discarded.",
+  "commit_authority": "agent-0-only",
+  "push_authority": "agent-0-only"
+}

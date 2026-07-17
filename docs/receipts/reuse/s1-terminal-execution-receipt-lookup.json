@@ -1,0 +1,75 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-s1-terminal-execution-receipt-lookup-20260717",
+  "issued_at": "2026-07-17T14:33:40Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "reuse-freeze-authority"
+  },
+  "contour": "bridge",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "durable-zero-write-terminal-ExecutionReceipt-reconstruction-after-process-reopen",
+    "candidates": [
+      {
+        "candidate": "existing-canonical-job-ledger-complete-event-and-result-sha-binding",
+        "disposition": "selected"
+      },
+      {
+        "candidate": "existing-owned-checkpoint-content-addressed-store",
+        "disposition": "selected"
+      },
+      {
+        "candidate": "owned-versioned-canonical-terminal-material-and-shared-receipt-constructor",
+        "disposition": "selected-minimal-glue"
+      },
+      {
+        "candidate": "new-terminal-table-ledger-or-store",
+        "disposition": "rejected-duplicate-durable-authority"
+      },
+      {
+        "candidate": "database-migration-new-event-type-or-frozen-contract-change",
+        "disposition": "rejected-unnecessary"
+      },
+      {
+        "candidate": "rerun-reingest-republish-or-backfill-on-lookup",
+        "disposition": "rejected-not-zero-write"
+      },
+      {
+        "candidate": "jsonschema-or-other-external-dependency",
+        "disposition": "rejected-unnecessary"
+      },
+      {
+        "candidate": "legacy-completion-repair-or-terminal-object-garbage-collection",
+        "disposition": "parked-for-separate-operations-stage"
+      }
+    ],
+    "selected_mode": "owned-stdlib-existing-ledger-existing-checkpoint-cas-versioned-terminal-material",
+    "source_ref": "git:9d20a780534d6cabb191ee2583835d3c161dc29f;integration:integration-s1-final-checkpoint-reopen-recovery-20260717;reuse:reuse-s1-offline-execution-20260716;reuse:reuse-s1-trusted-storage-20260716",
+    "code_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "license_spdx": "NOASSERTION",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "normal execution publishes bounded canonical terminal material before complete",
+      "complete result_sha256 equals terminal material bytes digest and derives its CAS reference",
+      "post-reopen lookup reconstructs byte-identical ExecutionReceipt through the shared constructor",
+      "successful lookup causes zero runner ingestion publication staging ledger budget and CAS mutations",
+      "missing duplicate conflicting malformed oversized tampered or mismatched material fails closed",
+      "legacy completion without valid terminal material is explicitly unavailable without rerun or repair",
+      "receipt and parent ordering remain exact across normal execution and lookup",
+      "full Stage 1 and repository gates"
+    ],
+    "canonical_owner": "bridge-canonical-job-ledger-existing-checkpoint-cas-and-agent0-integration",
+    "rollback": "Revert only the scoped terminal-material and lookup implementation commit. Existing completions remain readable under their prior explicit limitations; no schema, event vocabulary, external system or domain registry changes."
+  },
+  "integrity": {
+    "payload_sha256": "5a79e766f56bd6a5a1181aa840791998ac7de4f81d701071f10df897d06067b5",
+    "parent_refs": [
+      "git:9d20a780534d6cabb191ee2583835d3c161dc29f",
+      "integration:integration-s1-final-checkpoint-reopen-recovery-20260717",
+      "reuse:reuse-s1-offline-execution-20260716",
+      "reuse:reuse-s1-trusted-storage-20260716"
+    ]
+  }
+}

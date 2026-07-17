@@ -1,0 +1,19 @@
+{
+  "lease_id": "lease-s1-terminal-execution-receipt-lookup-authority-agent-0-20260717",
+  "stage_id": "s1-terminal-execution-receipt-lookup-authority",
+  "agent_id": "agent-0",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-17T14:33:40Z",
+  "expires_at": "2026-07-17T20:33:40Z",
+  "base_sha": "9d20a780534d6cabb191ee2583835d3c161dc29f",
+  "branch": "main",
+  "worktree": "canonical-public-worktree",
+  "write_set": [
+    "docs/receipts/reuse/s1-terminal-execution-receipt-lookup.json",
+    "stages/s1-terminal-execution-receipt-lookup-authority/stage-envelope.json",
+    "stages/s1-terminal-execution-receipt-lookup-authority/ownership-lease.json",
+    "tests/test_stage1_authority.py"
+  ],
+  "delegation_allowed": false,
+  "state": "active"
+}
