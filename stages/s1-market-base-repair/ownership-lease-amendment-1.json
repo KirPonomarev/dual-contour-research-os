@@ -1,0 +1,21 @@
+{
+  "lease_id": "lease-s1-market-base-repair-agent-3-amendment-1-20260717",
+  "stage_id": "s1-market-base-repair",
+  "amendment_id": "s1-market-base-repair-amendment-1",
+  "agent_id": "agent-3",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-17T06:19:55Z",
+  "expires_at": "2026-07-17T12:19:55Z",
+  "base_sha": "636d0b56d13ba919d4af7c4bcd0718ac7fb92945",
+  "public_authority_sha": "41fcec11587dc1e393d7e5adcc70b8cac4e5d902",
+  "authority_receipt_sha256": "0491c1107bc731a916452995e5fb0b9c0e3cc4f3199c48fab2c9d91bb34f39fc",
+  "branch": "codex/bridge-a3-s1-market-base-repair",
+  "worktree": "ephemeral-private-domain-clone:s1-market-base-repair",
+  "write_set": [
+    "src/market_lab/unified_product_access.py",
+    "tests/test_unified_product_access.py",
+    "tests/test_paper_reality_loop_cli.py"
+  ],
+  "delegation_allowed": false,
+  "state": "active"
+}

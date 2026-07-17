@@ -1,0 +1,107 @@
+{
+  "stage_id": "s1-market-base-repair",
+  "amendment_id": "s1-market-base-repair-amendment-1",
+  "agent_id": "agent-3",
+  "objective": "Restore clean-checkout exact-head CI by preserving the caller-supplied Unified latest path through the existing non-symlink admission check, then proving the fail-closed boundary and prerequisite-aware paper-reality CLI with synthetic fixtures only.",
+  "executable_blocker": "The existing loader resolves the Unified latest path before checking whether the supplied path is a symlink, so a same-directory symlink is accepted and the frozen negative contract is false.",
+  "base_sha": "636d0b56d13ba919d4af7c4bcd0718ac7fb92945",
+  "public_authority_sha": "41fcec11587dc1e393d7e5adcc70b8cac4e5d902",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a3-s1-market-base-repair",
+  "worktree": "ephemeral-private-domain-clone:s1-market-base-repair",
+  "amends": {
+    "stage_envelope": "stages/s1-market-base-repair/stage-envelope.json",
+    "stage_envelope_sha256": "72a93fc3a4e77f173cf800cb678b20d352224bf54f7f428123d12ae754a9eef9",
+    "ownership_lease": "stages/s1-market-base-repair/ownership-lease.json",
+    "ownership_lease_sha256": "d22cbd905e1fc18ba49ab79686dda6ef1b93c93db400b7e133522cc18e3fcb1f",
+    "supersedes_forbidden_scope": [
+      "runtime-source-or-domain-scientific-semantics-edit"
+    ],
+    "supersedes_stop_conditions": [
+      "runtime-or-scientific-code-change-required"
+    ]
+  },
+  "read_set": [
+    "market-domain:pinned-clean-tree@636d0b56d13ba919d4af7c4bcd0718ac7fb92945",
+    "market-domain:unified-product-access-boundary",
+    "market-domain:paper-reality-cli",
+    "market-domain:existing-unified-product-and-paper-reality-tests",
+    "docs/receipts/source-freeze/s1-market-base-repair.json",
+    "docs/receipts/reuse/s1-market-base-repair.json",
+    "docs/receipts/reuse/s1-market-base-symlink-fix.json",
+    "docs/receipts/integration/s1-market-base-repair-authority-amendment.json"
+  ],
+  "write_set": [
+    ".github/workflows/ci.yml",
+    "src/market_lab/unified_product_access.py",
+    "tests/test_unified_product_access.py",
+    "tests/test_paper_reality_loop_cli.py"
+  ],
+  "worker_write_set": [
+    "src/market_lab/unified_product_access.py",
+    "tests/test_unified_product_access.py",
+    "tests/test_paper_reality_loop_cli.py"
+  ],
+  "integrator_write_set": [
+    ".github/workflows/ci.yml"
+  ],
+  "source_change_limit": "In load_unified_product_context, do not resolve unified_latest_path before _read_object has enforced the existing regular non-symlink file boundary. Resolve only the accepted path for containment and returned canonical context. No other runtime or domain behavior may change.",
+  "forbidden_scope": [
+    "runtime-source-or-domain-semantic-edit-outside-the-exact-source-change-limit",
+    "existing-test-deletion-assertion-weakening-skip-xfail-or-conditional-bypass",
+    "market-ledger-dataset-report-registry-or-evidence-mutation",
+    "network-exchange-order-private-api-or-key-access",
+    "live-trading-paper-order-publication-or-deployment",
+    "external-dependency-lockfile-or-migration-change",
+    "dirty-source-checkout-mutation",
+    "public-copy-of-private-market-source",
+    "d2-or-d3-payload"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "authority_receipt": "0491c1107bc731a916452995e5fb0b9c0e3cc4f3199c48fab2c9d91bb34f39fc",
+    "reuse_decision": "857d8df94bfdf2da3b17dbc0f4b859026c3d3712a5efd76caed4db38eb11dbbd",
+    "source_freeze": "f6ac6b7ebd5920c89348c58f0ddf955b28a823c31bb676c92403fa45e761a0ce",
+    "external_dependencies": "none"
+  },
+  "interface_contract": {
+    "positive_case": "A complete internally consistent synthetic Unified latest pointer, snapshot, core snapshot and recommendation produces CLI status ok in dry-run without canonical write.",
+    "negative_cases": [
+      "missing Unified latest pointer returns exit 1 and no domain mutation",
+      "same-directory symlink Unified latest pointer returns exit 1 before target resolution and no domain mutation",
+      "malformed Unified pointer returns exit 1 and no domain mutation",
+      "binding drift returns exit 1 and no domain mutation"
+    ],
+    "ci_rule": "Replace only the impossible clean-checkout reality-loop invocation with the prerequisite-aware conformance test; do not suppress, continue, skip or downgrade failure.",
+    "authority_rule": "Synthetic fixtures and the boundary fix grant no live, order, private API, registry writer, deployment or external mutation authority."
+  },
+  "acceptance_commands": [
+    "PYTHONDONTWRITEBYTECODE=1 python3 -m pytest -q -p no:cacheprovider tests/test_paper_reality_loop_cli.py tests/test_unified_product_access.py tests/test_paper_reality_loop.py",
+    "PYTHONDONTWRITEBYTECODE=1 python3 -m pytest -q -p no:cacheprovider",
+    "git diff --check",
+    "git status --porcelain=v1 --untracked-files=all",
+    "private secret, network, live-authority, skip and exact write-set scan"
+  ],
+  "risk_class": "private-market-owner-boundary-and-clean-checkout-ci-repair",
+  "stop_conditions": [
+    "runtime-change-exceeds-the-exact-source-change-limit",
+    "symlink-pointer-remains-accepted",
+    "regular-valid-pointer-becomes-rejected",
+    "validation-bypass-or-existing-test-weakening-required",
+    "external-network-data-or-dependency-required",
+    "synthetic-fixture-can-mutate-domain-state",
+    "full-suite-regression",
+    "dirty-source-checkout-changed",
+    "private-data-enters-public-control-plane",
+    "write-set-collision",
+    "before-equals-after-or-ci-blocker-remains"
+  ],
+  "expected_receipt": "docs/receipts/integration/s1-market-base-repair.json",
+  "rollback": "Agent 0 reverts the scoped private runtime, conformance-test and CI workflow commits and deletes the isolated stage branch. The original dirty checkout, domain state, external services and public Bridge runtime remain unchanged.",
+  "commit_authority": "one-scoped-worker-commit-plus-one-agent0-ci-integration-commit",
+  "push_authority": false,
+  "expected_handoff_status": [
+    "ready_for_agent0_audit",
+    "blocked_validation_failed"
+  ]
+}
