@@ -1,0 +1,19 @@
+{
+  "lease_id": "lease-s1-market-ci-reality-loop-authority-agent-0-20260717",
+  "stage_id": "s1-market-ci-reality-loop-authority",
+  "agent_id": "agent-0",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-17T10:15:28Z",
+  "expires_at": "2026-07-17T16:15:28Z",
+  "base_sha": "7829846c779b0c7abe3820077ca4173e6b7bc056",
+  "branch": "main",
+  "worktree": "canonical-main-worktree",
+  "write_set": [
+    "docs/receipts/reuse/s1-market-ci-reality-loop-prerequisite.json",
+    "stages/s1-market-ci-reality-loop-authority/stage-envelope.json",
+    "stages/s1-market-ci-reality-loop-authority/ownership-lease.json",
+    "tests/test_stage1_authority.py"
+  ],
+  "delegation_allowed": false,
+  "state": "active"
+}

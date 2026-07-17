@@ -1,0 +1,64 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-s1-market-ci-reality-loop-prerequisite-20260717",
+  "issued_at": "2026-07-17T10:15:28Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "reuse-freeze-authority"
+  },
+  "contour": "market",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "clean-checkout-real-cli-prerequisite-conformance-gate",
+    "candidates": [
+      {
+        "candidate": "existing-real-cli-temporary-prerequisite-conformance-test",
+        "disposition": "selected"
+      },
+      {
+        "candidate": "default-cli-dry-run-without-required-prerequisite",
+        "disposition": "rejected-deterministic-clean-checkout-failure"
+      },
+      {
+        "candidate": "commit-runtime-prerequisite-state",
+        "disposition": "rejected-runtime-state-in-source-control"
+      },
+      {
+        "candidate": "change-runtime-default-or-validation-boundary",
+        "disposition": "rejected-runtime-scope-expansion"
+      },
+      {
+        "candidate": "skip-continue-on-error-or-advisory-gate",
+        "disposition": "rejected-validation-weakening"
+      },
+      {
+        "candidate": "external-dependency",
+        "disposition": "rejected-unnecessary"
+      }
+    ],
+    "selected_mode": "existing-real-cli-synthetic-prerequisite-hard-gate-no-runtime-change",
+    "source_ref": "source-freeze:source-freeze-market-s1-base-repair-20260717;git:0d188866cbcd8ad86db049fd250d5490bedcc6d5",
+    "code_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "license_spdx": "NOASSERTION",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "real CLI succeeds against a complete synthetic prerequisite chain without mutation",
+      "missing symlinked malformed and drifted prerequisites fail closed without mutation",
+      "the focused conformance module remains a required CI step without continue-on-error",
+      "the full clean-checkout Market suite remains green",
+      "exact-head private remote CI"
+    ],
+    "canonical_owner": "market-domain-ci-with-agent0-integration",
+    "rollback": "Revert the single workflow-only commit. Runtime code, tests, prerequisite state, scientific artifacts, datasets, registries, public Bridge and external systems remain unchanged."
+  },
+  "integrity": {
+    "payload_sha256": "1d83f5486d58c418f54f4589970f97b62f938331473609a3621925b197d66eb1",
+    "parent_refs": [
+      "git:7829846c779b0c7abe3820077ca4173e6b7bc056",
+      "git:0d188866cbcd8ad86db049fd250d5490bedcc6d5",
+      "source-freeze:source-freeze-market-s1-base-repair-20260717",
+      "reuse:reuse-s1-market-base-symlink-fix-20260717"
+    ]
+  }
+}

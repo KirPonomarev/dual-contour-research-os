@@ -57,6 +57,7 @@ class Stage1AuthorityTests(unittest.TestCase):
             "s1-market-sanitized-count-fixture.json": "owner-private-sanitized-count-sufficient-statistics-no-public-payload",
             "s1-authority-policy-boundary.json": "owned-stdlib-pinned-authority-policy-fail-closed",
             "s1-pause-epoch-fencing.json": "owned-stdlib-canonical-ledger-sequence-fence",
+            "s1-market-ci-reality-loop-prerequisite.json": "existing-real-cli-synthetic-prerequisite-hard-gate-no-runtime-change",
         }
         schema = load(ROOT / "contracts" / "v1" / "ReuseDecisionReceipt.schema.json")
         allowed = set(schema["properties"])
@@ -377,6 +378,78 @@ class Stage1AuthorityTests(unittest.TestCase):
         self.assertNotIn("/Users/", public_text)
         self.assertNotIn("/Volumes/", public_text)
         self.assertNotIn("github.com/KirPonomarev/crypto-market-lab", public_text)
+        self.assertTrue(envelope["rollback"])
+        self.assertFalse(lease["delegation_allowed"])
+
+    def test_market_ci_reality_loop_authority_is_workflow_only_and_nonweakening(self) -> None:
+        envelope = load(
+            ROOT
+            / "stages"
+            / "s1-market-ci-reality-loop-authority"
+            / "stage-envelope.json"
+        )
+        lease = load(
+            ROOT
+            / "stages"
+            / "s1-market-ci-reality-loop-authority"
+            / "ownership-lease.json"
+        )
+        reuse = load(
+            REUSE_RECEIPTS / "s1-market-ci-reality-loop-prerequisite.json"
+        )
+
+        self.assertEqual(
+            envelope["base_sha"],
+            "7829846c779b0c7abe3820077ca4173e6b7bc056",
+        )
+        self.assertEqual(
+            envelope["candidate_market_base_sha"],
+            "0d188866cbcd8ad86db049fd250d5490bedcc6d5",
+        )
+        self.assertEqual(envelope["write_set"], lease["write_set"])
+        worker = envelope["authorized_worker_stage"]
+        self.assertEqual(worker["agent_id"], "agent-5")
+        self.assertEqual(worker["write_set"], [".github/workflows/ci.yml"])
+        self.assertEqual(reuse["integrity"]["payload_sha256"], payload_sha256(reuse))
+        dispositions = {
+            item["candidate"]: item["disposition"]
+            for item in reuse["payload"]["candidates"]
+        }
+        self.assertEqual(
+            dispositions["existing-real-cli-temporary-prerequisite-conformance-test"],
+            "selected",
+        )
+        self.assertEqual(
+            dispositions["skip-continue-on-error-or-advisory-gate"],
+            "rejected-validation-weakening",
+        )
+        public_text = "\n".join(
+            (
+                (
+                    REUSE_RECEIPTS
+                    / "s1-market-ci-reality-loop-prerequisite.json"
+                ).read_text(),
+                (
+                    ROOT
+                    / "stages"
+                    / "s1-market-ci-reality-loop-authority"
+                    / "stage-envelope.json"
+                ).read_text(),
+                (
+                    ROOT
+                    / "stages"
+                    / "s1-market-ci-reality-loop-authority"
+                    / "ownership-lease.json"
+                ).read_text(),
+            )
+        )
+        self.assertNotIn("/Users/", public_text)
+        self.assertNotIn("/Volumes/", public_text)
+        self.assertNotIn("github.com/KirPonomarev/crypto-market-lab", public_text)
+        self.assertIn(
+            "skip-xfail-continue-on-error-shell-fallback-or-advisory-conversion",
+            envelope["forbidden_scope"],
+        )
         self.assertTrue(envelope["rollback"])
         self.assertFalse(lease["delegation_allowed"])
 

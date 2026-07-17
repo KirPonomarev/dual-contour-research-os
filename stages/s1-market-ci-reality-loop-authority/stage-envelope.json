@@ -1,0 +1,81 @@
+{
+  "stage_id": "s1-market-ci-reality-loop-authority",
+  "agent_id": "agent-0",
+  "objective": "Authorize one workflow-only substitution from a clean-checkout-impossible default dry-run to the existing hard real-CLI prerequisite conformance module.",
+  "executable_blocker": "The composed Market tree passes 2933 tests, but exact CI deterministically exits before the test gate because the default reality-loop command requires runtime prerequisite state that is intentionally absent from a clean checkout; the existing focused module constructs that state under a temporary root and exercises the real CLI.",
+  "base_sha": "7829846c779b0c7abe3820077ca4173e6b7bc056",
+  "candidate_market_base_sha": "0d188866cbcd8ad86db049fd250d5490bedcc6d5",
+  "candidate_market_tree_sha": "776b5124e53a7dbc3b38fed0bef135fc035db74c",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "main",
+  "worktree": "canonical-main-worktree",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "docs/receipts/source-freeze/s1-market-base-repair.json",
+    "docs/receipts/reuse/s1-market-base-symlink-fix.json",
+    "docs/receipts/reuse/s1-market-ci-reality-loop-prerequisite.json",
+    "market-domain:candidate-clean-tree@0d188866cbcd8ad86db049fd250d5490bedcc6d5",
+    "market-domain:clean-ci-reality-loop-step-and-existing-cli-conformance-test"
+  ],
+  "write_set": [
+    "docs/receipts/reuse/s1-market-ci-reality-loop-prerequisite.json",
+    "stages/s1-market-ci-reality-loop-authority/stage-envelope.json",
+    "stages/s1-market-ci-reality-loop-authority/ownership-lease.json",
+    "tests/test_stage1_authority.py"
+  ],
+  "authorized_worker_stage": {
+    "stage_id": "s1-market-ci-reality-loop",
+    "agent_id": "agent-5",
+    "branch": "codex/bridge-a5-s1-market-ci-reality-loop",
+    "write_set": [
+      ".github/workflows/ci.yml"
+    ],
+    "required_substitution": "Replace only the default clean-checkout reality-loop dry-run workflow invocation with the existing focused real-CLI prerequisite conformance module as a hard gate.",
+    "preservation_rule": "Do not edit runtime or tests, do not change any other workflow step, and do not add skip, continue-on-error, shell fallback, dependency, fixture payload or external mutation."
+  },
+  "forbidden_scope": [
+    "runtime-source-test-script-config-lockfile-migration-or-contract-edit",
+    "other-workflow-step-permission-trigger-runner-action-or-environment-edit",
+    "test-assertion-expected-value-fixture-or-cli-behavior-change",
+    "skip-xfail-continue-on-error-shell-fallback-or-advisory-conversion",
+    "runtime-prerequisite-state-report-ledger-dataset-or-private-payload-commit",
+    "private-path-url-secret-account-key-or-d2-d3-payload",
+    "network-download-exchange-order-private-api-or-external-mutation",
+    "live-trading-publication-deployment-or-ui",
+    "external-dependency-adoption",
+    "dirty-source-checkout-mutation",
+    "public-copy-of-private-market-source",
+    "frozen-contract-edit"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "source_freeze": "f6ac6b7ebd5920c89348c58f0ddf955b28a823c31bb676c92403fa45e761a0ce",
+    "reuse_decision": "1d83f5486d58c418f54f4589970f97b62f938331473609a3621925b197d66eb1",
+    "candidate_market_tree": "776b5124e53a7dbc3b38fed0bef135fc035db74c",
+    "external_dependencies": "none"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest tests.test_stage1_authority -v",
+    "make test",
+    "git diff --check",
+    "public privacy secret private-locator private-URL and exact write-set scan"
+  ],
+  "risk_class": "private-market-workflow-only-real-cli-prerequisite-gate-authority",
+  "stop_conditions": [
+    "candidate-base-tree-or-parent-mismatch",
+    "focused-test-does-not-execute-the-real-cli",
+    "focused-test-success-and-four-negative-paths-do-not-pass",
+    "runtime-test-other-workflow-step-or-dependency-edit-required",
+    "skip-continue-on-error-fallback-or-validation-weakening-required",
+    "full-suite-regression-or-new-failure",
+    "dirty-source-checkout-changed",
+    "private-data-enters-public-control-plane",
+    "before-equals-after-or-exact-ci-blocker-remains"
+  ],
+  "expected_receipt": "docs/receipts/integration/s1-market-ci-reality-loop-authority.json",
+  "rollback": "Revert the scoped public authority commit before issuing the worker lease. No private runtime, test, prerequisite state, scientific artifact, dataset, deployment or external system is mutated by this authority stage.",
+  "commit_authority": "agent-0-one-scoped-commit",
+  "push_authority": true
+}
