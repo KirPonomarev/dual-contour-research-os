@@ -58,6 +58,7 @@ class Stage1AuthorityTests(unittest.TestCase):
             "s1-authority-policy-boundary.json": "owned-stdlib-pinned-authority-policy-fail-closed",
             "s1-pause-epoch-fencing.json": "owned-stdlib-canonical-ledger-sequence-fence",
             "s1-market-ci-reality-loop-prerequisite.json": "existing-real-cli-synthetic-prerequisite-hard-gate-no-runtime-change",
+            "s1-market-storage-accounting-portability.json": "owner-local-stdlib-conservative-byte-accounting-no-public-copy",
             "s1-permit-nonce-ledger.json": "owned-stdlib-canonical-ledger-permit-nonce-digest-unique-index",
         }
         schema = load(ROOT / "contracts" / "v1" / "ReuseDecisionReceipt.schema.json")
@@ -83,6 +84,68 @@ class Stage1AuthorityTests(unittest.TestCase):
         self.assertEqual(envelope["write_set"], lease["write_set"])
         self.assertTrue(envelope["executable_blocker"])
         self.assertTrue(envelope["acceptance_commands"])
+        self.assertTrue(envelope["rollback"])
+        self.assertFalse(lease["delegation_allowed"])
+
+    def test_market_storage_accounting_authority_is_two_file_and_nonweakening(self) -> None:
+        envelope = load(
+            ROOT
+            / "stages"
+            / "s1-market-storage-accounting-authority"
+            / "stage-envelope.json"
+        )
+        lease = load(
+            ROOT
+            / "stages"
+            / "s1-market-storage-accounting-authority"
+            / "ownership-lease.json"
+        )
+        reuse = load(
+            REUSE_RECEIPTS / "s1-market-storage-accounting-portability.json"
+        )
+
+        self.assertEqual(envelope["write_set"], lease["write_set"])
+        self.assertEqual(
+            envelope["authorized_worker_stage"]["write_set"],
+            ["src/market_lab/system_state.py", "tests/test_system_state.py"],
+        )
+        self.assertEqual(reuse["integrity"]["payload_sha256"], payload_sha256(reuse))
+        dispositions = {
+            item["candidate"]: item["disposition"]
+            for item in reuse["payload"]["candidates"]
+        }
+        self.assertEqual(
+            dispositions["derive-used-bytes-as-total-minus-available-free-bytes"],
+            "selected",
+        )
+        self.assertEqual(
+            dispositions["relax-snapshot-accounting-validation"],
+            "rejected-validation-weakening",
+        )
+        public_text = "\n".join(
+            (
+                (REUSE_RECEIPTS / "s1-market-storage-accounting-portability.json").read_text(),
+                (
+                    ROOT
+                    / "stages"
+                    / "s1-market-storage-accounting-authority"
+                    / "stage-envelope.json"
+                ).read_text(),
+                (
+                    ROOT
+                    / "stages"
+                    / "s1-market-storage-accounting-authority"
+                    / "ownership-lease.json"
+                ).read_text(),
+            )
+        )
+        self.assertNotIn("/Users/", public_text)
+        self.assertNotIn("/Volumes/", public_text)
+        self.assertNotIn("github.com/KirPonomarev/crypto-market-lab", public_text)
+        self.assertIn(
+            "snapshot-validator-relaxation-or-accounting-identity-removal",
+            envelope["forbidden_scope"],
+        )
         self.assertTrue(envelope["rollback"])
         self.assertFalse(lease["delegation_allowed"])
 

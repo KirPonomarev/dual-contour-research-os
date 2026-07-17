@@ -1,0 +1,80 @@
+{
+  "stage_id": "s1-market-storage-accounting-authority",
+  "agent_id": "agent-0",
+  "objective": "Authorize one owner-local portability repair for conservative storage snapshot byte accounting after exact Linux CI exposed reserved-block semantics.",
+  "executable_blocker": "The exact private Market head passes the repaired reality-loop prerequisite gate, but full clean-checkout CI fails because Linux reports reserved filesystem blocks as neither used nor available and the current capture forwards that non-canonical triple into an intentionally strict validator.",
+  "base_sha": "a6b2fce8f47f89c697f60f2443ee91e5987e9b33",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "main",
+  "worktree": "canonical-public-worktree",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "docs/receipts/source-freeze/s1-market-base-repair.json",
+    "docs/receipts/reuse/s1-market-ci-reality-loop-prerequisite.json",
+    "sanitized exact-head CI failure classification"
+  ],
+  "write_set": [
+    "docs/receipts/reuse/s1-market-storage-accounting-portability.json",
+    "stages/s1-market-storage-accounting-authority/stage-envelope.json",
+    "stages/s1-market-storage-accounting-authority/ownership-lease.json",
+    "tests/test_stage1_authority.py"
+  ],
+  "authorized_worker_stage": {
+    "stage_id": "s1-market-storage-accounting-portability",
+    "agent_id": "agent-5",
+    "base_sha": "ddd80d06e5419113ede9fbce65dcb40b0c0bdc42",
+    "branch": "codex/bridge-a5-s1-market-storage-accounting-portability",
+    "write_set": [
+      "src/market_lab/system_state.py",
+      "tests/test_system_state.py"
+    ],
+    "acceptance_commands": [
+      "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src python -m pytest -q -p no:cacheprovider tests/test_system_state.py tests/test_capture_system_state_storage_snapshot.py",
+      "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src python -m pytest -q -p no:cacheprovider",
+      "git diff --check",
+      "exact two-file diff and no validation-weakening platform-skip private-locator network or live-authority scan",
+      "exact-head private remote CI"
+    ],
+    "rollback": "Discard the isolated two-file worker commit and branch. The prior exact Market head, original dirty checkout, runtime state and external systems remain unchanged."
+  },
+  "forbidden_scope": [
+    "public-copy-of-private-market-source-or-test-bytes",
+    "worker-write-outside-system-state-source-and-test",
+    "snapshot-validator-relaxation-or-accounting-identity-removal",
+    "platform-skip-xfail-continue-on-error-fallback-or-advisory-conversion",
+    "schema-field-fixture-expected-identity-contract-dependency-lockfile-config-or-workflow-edit",
+    "private-path-url-secret-account-dataset-strategy-or-d2-d3-payload",
+    "network-exchange-order-external-mutation-live-trading-publication-deployment-or-ui",
+    "dirty-source-checkout-mutation",
+    "worker-push-merge-deploy-or-public-repository-write"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "reuse_decision": "3b991a1214bae56a14190694cb84ff2da35ebf6f9e429166f8d8cd1c965be731",
+    "candidate_market_head": "ddd80d06e5419113ede9fbce65dcb40b0c0bdc42",
+    "external_dependencies": "none"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest tests.test_stage1_authority -v",
+    "make test",
+    "git diff --check",
+    "exact public authority write-set privacy dependency network live-authority and weakening scan",
+    "exact-head public remote CI"
+  ],
+  "risk_class": "private-market-two-file-portability-repair-authority",
+  "stop_conditions": [
+    "public-base-private-head-contract-or-reuse-hash-mismatch",
+    "repair-requires-validator-relaxation-schema-workflow-dependency-or-third-file",
+    "normalized-accounting-does-not-preserve-total-equals-used-plus-available-free",
+    "content-identity-tamper-or-existing-storage-tests-regress",
+    "full-suite-or-exact-head-CI-remains-red",
+    "dirty-source-checkout-changed",
+    "before-equals-after-or-executable-blocker-remains"
+  ],
+  "expected_receipt": "docs/receipts/integration/s1-market-storage-accounting-portability.json",
+  "rollback": "Agent 0 reverts only this public authority commit if unused. If exercised, Agent 0 rejects or reverts the isolated private worker commit; no public source, runtime storage, scientific artifact or external system is changed.",
+  "commit_authority": "agent-0-only",
+  "push_authority": "agent-0-only"
+}

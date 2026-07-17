@@ -1,0 +1,64 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-s1-market-storage-accounting-portability-20260717",
+  "issued_at": "2026-07-17T11:07:18Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "reuse-freeze-authority"
+  },
+  "contour": "market",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "portable-conservative-storage-byte-accounting",
+    "candidates": [
+      {
+        "candidate": "existing-owned-storage-snapshot-boundary",
+        "disposition": "selected"
+      },
+      {
+        "candidate": "derive-used-bytes-as-total-minus-available-free-bytes",
+        "disposition": "selected"
+      },
+      {
+        "candidate": "relax-snapshot-accounting-validation",
+        "disposition": "rejected-validation-weakening"
+      },
+      {
+        "candidate": "platform-specific-linux-branch",
+        "disposition": "rejected-unnecessary-divergence"
+      },
+      {
+        "candidate": "skip-or-xfail-linux-test",
+        "disposition": "rejected-validation-weakening"
+      },
+      {
+        "candidate": "external-dependency",
+        "disposition": "rejected-unnecessary"
+      }
+    ],
+    "selected_mode": "owner-local-stdlib-conservative-byte-accounting-no-public-copy",
+    "source_ref": "source-freeze:source-freeze-market-s1-base-repair-20260717;git:ddd80d06e5419113ede9fbce65dcb40b0c0bdc42",
+    "code_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "license_spdx": "NOASSERTION",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "snapshot normalizes reserved-block filesystems to total equals used plus available free",
+      "content-addressed snapshot identity remains deterministic",
+      "tampered byte accounting remains rejected",
+      "existing storage SystemState tests remain green",
+      "full clean-checkout Market suite and exact-head private remote CI"
+    ],
+    "canonical_owner": "market-domain-storage-boundary-with-agent0-integration",
+    "rollback": "Revert the two-file owner-local repair commit. No runtime storage, datasets, ledgers, scientific artifacts, public Bridge state or external systems are mutated."
+  },
+  "integrity": {
+    "payload_sha256": "3b991a1214bae56a14190694cb84ff2da35ebf6f9e429166f8d8cd1c965be731",
+    "parent_refs": [
+      "git:a6b2fce8f47f89c697f60f2443ee91e5987e9b33",
+      "git:ddd80d06e5419113ede9fbce65dcb40b0c0bdc42",
+      "source-freeze:source-freeze-market-s1-base-repair-20260717",
+      "reuse:reuse-s1-market-ci-reality-loop-prerequisite-20260717"
+    ]
+  }
+}
