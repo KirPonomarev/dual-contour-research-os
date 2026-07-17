@@ -1,0 +1,62 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s1-budget-attempt-lifecycle-authority-20260717",
+  "issued_at": "2026-07-17T12:04:13Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "bridge",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s1-budget-attempt-lifecycle-authority",
+    "agent_id": "agent-0",
+    "ownership_lease_ref": "stages/s1-budget-attempt-lifecycle-authority/ownership-lease.json",
+    "base_sha": "d75a2ce31764d03ed1472bfa60c7d9fef2fbbea2",
+    "head_sha": "b459ea04e2767d0c833328cd432270987f4d4399",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "docs/receipts/reuse/s1-budget-attempt-lifecycle.json",
+      "stages/s1-budget-attempt-lifecycle-authority/stage-envelope.json",
+      "stages/s1-budget-attempt-lifecycle-authority/ownership-lease.json",
+      "tests/test_stage1_authority.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "focused_tests": 28,
+      "connected_tests": 243,
+      "stage0b_tests": 25,
+      "skipped_tests": 0,
+      "diff_check": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "dependency_adoption": false,
+      "frozen_contract_edit": false,
+      "budget_profile_receipt_bound": true,
+      "second_table_or_ledger_authorized": false,
+      "new_event_type_column_or_rebuild_authorized": false,
+      "full_budget_reservation_and_settlement_required": true,
+      "hard_cap_concurrency_and_reopen_required": true,
+      "schema_fingerprint_and_version_required": true,
+      "legacy_nonempty_backfill_authorized": false,
+      "fixed_charge_is_provider_metered_or_monetary": false,
+      "release_recovery_or_multi_attempt_authorized": false,
+      "worker_source_files": 3,
+      "worker_test_files": 8,
+      "live_or_connected_authority": false,
+      "selected_mode": "owned-stdlib-single-ledger-embedded-budget-receipts-fixed-charge"
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29578918523",
+    "integration_commit_sha": "b459ea04e2767d0c833328cd432270987f4d4399"
+  },
+  "integrity": {
+    "payload_sha256": "c274e57ff9c571c07d41d7e01af2c75a4dc1747ad24dabe9718584ec5edb2f12",
+    "parent_refs": [
+      "git:b459ea04e2767d0c833328cd432270987f4d4399",
+      "ci:29578918523",
+      "integration:integration-s1-budget-profile-20260717",
+      "reuse:reuse-s1-budget-attempt-lifecycle-20260717"
+    ]
+  }
+}
