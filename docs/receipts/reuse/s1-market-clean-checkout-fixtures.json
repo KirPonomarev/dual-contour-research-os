@@ -1,0 +1,70 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-s1-market-clean-checkout-fixtures-20260717",
+  "issued_at": "2026-07-17T06:45:55Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "reuse-freeze-authority"
+  },
+  "contour": "market",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "self-contained-clean-checkout-conformance-fixtures",
+    "candidates": [
+      {
+        "candidate": "existing-test-builders-and-frozen-contract-constructors",
+        "disposition": "selected"
+      },
+      {
+        "candidate": "stdlib-tempfile-pathlib-shutil-sys-executable",
+        "disposition": "selected"
+      },
+      {
+        "candidate": "existing-pinned-pandas-pyarrow-test-runtime",
+        "disposition": "selected-no-new-dependency"
+      },
+      {
+        "candidate": "local-absolute-path-or-gitignored-artifact-dependency",
+        "disposition": "rejected-nonportable"
+      },
+      {
+        "candidate": "skip-xfail-marker-or-missing-fixture-early-return",
+        "disposition": "rejected-validation-weakening"
+      },
+      {
+        "candidate": "private-domain-data-or-report-copy",
+        "disposition": "rejected-classification-boundary"
+      },
+      {
+        "candidate": "external-dependency-or-network-fixture-download",
+        "disposition": "rejected-unnecessary-and-nondeterministic"
+      }
+    ],
+    "selected_mode": "owner-local-synthetic-clean-checkout-fixtures-no-new-dependency",
+    "source_ref": "source-freeze:source-freeze-market-s1-base-repair-20260717;git:6299f65f92d8bc6964c423775a5cce1f2fdef58a",
+    "code_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "license_spdx": "NOASSERTION",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "all existing positive scientific and safety assertions remain present",
+      "synthetic fixtures are deterministic sanitized and generated only under temporary roots",
+      "missing dependency paths continue to fail closed",
+      "CLI help uses the active interpreter instead of a repository-local absolute assumption",
+      "release fixtures use isolated temporary Git repositories and contain no live authority",
+      "full clean-checkout Market test suite",
+      "exact-head private remote CI"
+    ],
+    "canonical_owner": "market-domain-tests-with-agent0-integration",
+    "rollback": "Revert the scoped test-only synthetic fixture commits and delete both isolated worker branches. No runtime, scientific registry, dataset, report, external service or public Bridge behavior is mutated."
+  },
+  "integrity": {
+    "payload_sha256": "a2ea585011a75ae115e9f65bb48177943750149278ac356ab5960de37ecae5a5",
+    "parent_refs": [
+      "git:0afc73836136df0e12cbb6ca3dbe9429ffdfd0df",
+      "git:6299f65f92d8bc6964c423775a5cce1f2fdef58a",
+      "source-freeze:source-freeze-market-s1-base-repair-20260717",
+      "reuse:reuse-s1-market-base-symlink-fix-20260717"
+    ]
+  }
+}

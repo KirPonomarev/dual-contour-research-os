@@ -52,6 +52,7 @@ class Stage1AuthorityTests(unittest.TestCase):
             "s1-validation-boundary.json": "clean-room-stdlib-pure-receipt-verifier",
             "s1-market-base-repair.json": "pinned-private-domain-ci-repair-no-public-code-copy",
             "s1-market-base-symlink-fix.json": "owner-local-minimal-fail-closed-glue-no-public-copy",
+            "s1-market-clean-checkout-fixtures.json": "owner-local-synthetic-clean-checkout-fixtures-no-new-dependency",
         }
         schema = load(ROOT / "contracts" / "v1" / "ReuseDecisionReceipt.schema.json")
         allowed = set(schema["properties"])
@@ -187,6 +188,62 @@ class Stage1AuthorityTests(unittest.TestCase):
         self.assertNotIn("github.com/KirPonomarev/crypto-market-lab", public_text)
         self.assertIn(
             "runtime-edit-outside-the-authorized-owner-boundary",
+            envelope["forbidden_scope"],
+        )
+        self.assertTrue(envelope["rollback"])
+        self.assertFalse(lease["delegation_allowed"])
+
+    def test_market_clean_checkout_authority_is_test_only_disjoint_and_nonweakening(self) -> None:
+        envelope = load(
+            ROOT / "stages" / "s1-market-clean-checkout-authority" / "stage-envelope.json"
+        )
+        lease = load(
+            ROOT / "stages" / "s1-market-clean-checkout-authority" / "ownership-lease.json"
+        )
+        reuse = load(REUSE_RECEIPTS / "s1-market-clean-checkout-fixtures.json")
+
+        self.assertEqual(envelope["base_sha"], "0afc73836136df0e12cbb6ca3dbe9429ffdfd0df")
+        self.assertEqual(
+            envelope["candidate_market_base_sha"],
+            "6299f65f92d8bc6964c423775a5cce1f2fdef58a",
+        )
+        self.assertEqual(envelope["write_set"], lease["write_set"])
+        workers = envelope["authorized_worker_stages"]
+        self.assertEqual([worker["agent_id"] for worker in workers], ["agent-3", "agent-5"])
+        owned = [set(worker["write_set"]) for worker in workers]
+        self.assertFalse(owned[0] & owned[1])
+        self.assertTrue(all(path.startswith("tests/") for paths in owned for path in paths))
+        self.assertEqual(reuse["integrity"]["payload_sha256"], payload_sha256(reuse))
+        dispositions = {
+            item["candidate"]: item["disposition"]
+            for item in reuse["payload"]["candidates"]
+        }
+        self.assertEqual(
+            dispositions["skip-xfail-marker-or-missing-fixture-early-return"],
+            "rejected-validation-weakening",
+        )
+        public_text = "\n".join(
+            (
+                (REUSE_RECEIPTS / "s1-market-clean-checkout-fixtures.json").read_text(),
+                (
+                    ROOT
+                    / "stages"
+                    / "s1-market-clean-checkout-authority"
+                    / "stage-envelope.json"
+                ).read_text(),
+                (
+                    ROOT
+                    / "stages"
+                    / "s1-market-clean-checkout-authority"
+                    / "ownership-lease.json"
+                ).read_text(),
+            )
+        )
+        self.assertNotIn("/Users/", public_text)
+        self.assertNotIn("/Volumes/", public_text)
+        self.assertNotIn("github.com/KirPonomarev/crypto-market-lab", public_text)
+        self.assertIn(
+            "existing-assertion-deletion-relaxation-or-value-change",
             envelope["forbidden_scope"],
         )
         self.assertTrue(envelope["rollback"])
