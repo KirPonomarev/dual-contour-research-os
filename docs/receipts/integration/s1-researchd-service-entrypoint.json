@@ -1,0 +1,88 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s1-researchd-service-entrypoint-20260717",
+  "issued_at": "2026-07-17T16:49:11Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "bridge",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s1-researchd-service-entrypoint",
+    "agent_id": "agent-1",
+    "ownership_lease_ref": "stages/s1-researchd-service-entrypoint/ownership-lease.json",
+    "base_sha": "f8d77da5855de12bdd103d55ba02275a3fc4ed13",
+    "public_authority_sha": "20591bd9a85bdae087f4996aee93f39066133959",
+    "head_sha": "44e6baa4fb9d04b93fca80c4ea42f99227efcfa1",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "src/research_bridge/researchd.py",
+      "tests/test_stage1_researchd.py",
+      "tests/test_stage1_control_assurance.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "worker_focused_tests": 19,
+      "worker_stage1_tests": 272,
+      "canonical_tests": 302,
+      "stage0b_tests": 25,
+      "skipped_tests": 0,
+      "diff_check": "green",
+      "ast_boundary_scan": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "dependency_adoption": false,
+      "frozen_contract_edit": false,
+      "schema_database_or_event_vocabulary_change": false,
+      "worker_authorized_files": 3,
+      "worker_changed_files": 3,
+      "worker_source_files": 1,
+      "worker_test_files": 2,
+      "module_entrypoint": "python3 -m research_bridge.researchd --config <owner-only-json>",
+      "module_entrypoint_smoke_exit_2_without_config": true,
+      "config_file_open": "O_RDONLY-O_NOFOLLOW-O_CLOEXEC-regular-nonsymlink-euid-owned-0600-link-count-one-stable-identity",
+      "config_file_maximum_bytes": 262144,
+      "strict_json_duplicate_key_rejection": "green",
+      "strict_json_nonfinite_rejection": "green",
+      "allowed_uid_source": "effective-uid-only",
+      "quota_maximum_bytes": 1099511627776,
+      "deadline_seconds_maximum": 5,
+      "authority_constructed_before_runtime_start": true,
+      "policy_and_approval_classification_limit": "D0-D1-only",
+      "real_process_SIGTERM_SIGINT_shutdown": "green",
+      "exit_codes": {
+        "clean_shutdown": 0,
+        "configuration_rejected": 2,
+        "runtime_failed": 3
+      },
+      "error_redaction": "generic-one-line-no-path-or-exception-detail",
+      "systemd_or_host_install_added": false,
+      "environment_or_dynamic_reload_added": false,
+      "subprocess_container_or_worker_added": false,
+      "network_second_ledger_database_or_domain_authority_added": false,
+      "single_read_write_job_ledger": true,
+      "AF_UNIX_only": true,
+      "stage_branch_exact_head_ci": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29597575020",
+      "main_exact_head_ci": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29597610512",
+      "authority_receipt_payload_sha256": "4475be65ee0f169b50c48ac02507e6405f33b3608a70bdb09320b2a9c0176de0",
+      "reuse_decision_payload_sha256": "d194834c975d479acb5c8fab7d6861ce9f5a4abd8b2817d24cc0a24814cd1fb4",
+      "researchd_integration_receipt_payload_sha256": "5d99b29801d76c4dbe52fe2f1d825087cd8a12128476a6014aab4f644d532ae9",
+      "remaining_gate": "domain-owned-Market-offline-reference-E2E-and-Agent0-SKELETON_GREEN-audit"
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29597610512",
+    "integration_commit_sha": "44e6baa4fb9d04b93fca80c4ea42f99227efcfa1"
+  },
+  "integrity": {
+    "payload_sha256": "1075b5d9ec3c3445fe7d32ea9aaa0866afd45eb1204918eb6234ddfa6c40944d",
+    "parent_refs": [
+      "git:44e6baa4fb9d04b93fca80c4ea42f99227efcfa1",
+      "ci:29597575020",
+      "ci:29597610512",
+      "integration:integration-s1-researchd-service-entrypoint-authority-20260717",
+      "integration:integration-s1-researchd-researchctl-single-writer-20260717",
+      "reuse:reuse-s1-researchd-service-entrypoint-20260717"
+    ]
+  }
+}
