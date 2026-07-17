@@ -682,6 +682,77 @@ class Stage2AuthorityTests(unittest.TestCase):
         self.assertNotIn("/Users/", text)
         self.assertNotIn("/Volumes/", text)
 
+    def test_market_corrupt_checkpoint_source_reuse_and_authority_are_exact(self) -> None:
+        source = load(SOURCE_RECEIPTS / "s2-market-corrupt-checkpoint.json")
+        reuse = load(REUSE_RECEIPTS / "s2-market-corrupt-checkpoint.json")
+        envelope = load(
+            STAGES / "s2-market-corrupt-checkpoint-authority" / "stage-envelope.json"
+        )
+        lease = load(
+            STAGES / "s2-market-corrupt-checkpoint-authority" / "ownership-lease.json"
+        )
+
+        self.assertEqual(source["schema_id"], "SourceFreezeReceipt")
+        self.assertEqual(reuse["schema_id"], "ReuseDecisionReceipt")
+        self.assertEqual(source["integrity"]["payload_sha256"], payload_sha256(source))
+        self.assertEqual(reuse["integrity"]["payload_sha256"], payload_sha256(reuse))
+        self.assertEqual(
+            source["payload"]["selected_source_sha"],
+            "b53361cc5c505f5867176810d8ea8a210e8135eb",
+        )
+        self.assertEqual(
+            reuse["payload"]["selected_mode"],
+            "existing-private-Market-checkpoint-verifier-plus-IncidentReceipt-shape-owner-stdlib-fail-closed-parking-no-runtime-payload",
+        )
+        self.assertEqual(reuse["payload"]["code_sha256"], EMPTY_SHA256)
+        self.assertEqual(envelope["base_sha"], "d6a5933cc46165633956090071253acc202a94a2")
+        self.assertEqual(envelope["write_set"], lease["write_set"])
+        self.assertFalse(lease["delegation_allowed"])
+        self.assertFalse(envelope["corrupt_checkpoint_contract"]["declares_market_pre_soak_green"])
+        self.assertIn(
+            "corruption-is-detected-before-new-chunk-merge-result-or-completion",
+            envelope["corrupt_checkpoint_contract"]["invariants"],
+        )
+        self.assertIn(
+            "no-silent-repair-deletion-overwrite-or-continue",
+            envelope["corrupt_checkpoint_contract"]["invariants"],
+        )
+        self.assertEqual(
+            envelope["authorized_worker_stage"]["write_set"],
+            [
+                "data/bridge_pre_soak/corrupt_checkpoint/market_pre_soak_corrupt_checkpoint_profile.json",
+                "src/market_lab/bridge_pre_soak_corrupt_checkpoint.py",
+                "tests/test_bridge_pre_soak_corrupt_checkpoint.py",
+            ],
+        )
+        self.assertFalse(envelope["authorized_worker_stage"]["push_authority"])
+
+    def test_market_corrupt_checkpoint_authority_is_sanitized_and_non_live(self) -> None:
+        public_text = "\n".join(
+            [
+                (SOURCE_RECEIPTS / "s2-market-corrupt-checkpoint.json").read_text(),
+                (REUSE_RECEIPTS / "s2-market-corrupt-checkpoint.json").read_text(),
+                (
+                    STAGES
+                    / "s2-market-corrupt-checkpoint-authority"
+                    / "stage-envelope.json"
+                ).read_text(),
+                (
+                    STAGES
+                    / "s2-market-corrupt-checkpoint-authority"
+                    / "ownership-lease.json"
+                ).read_text(),
+            ]
+        )
+        self.assertNotIn("/Users/", public_text)
+        self.assertNotIn("/Volumes/", public_text)
+        self.assertNotIn("api_key", public_text.lower())
+        self.assertNotIn("secret_key", public_text.lower())
+        self.assertNotIn("access_token", public_text.lower())
+        self.assertIn("RECOVERY_REQUIRED", public_text)
+        self.assertIn("no-silent-repair-deletion-overwrite-or-continue", public_text)
+        self.assertIn("backup-restore-implementation-in-this-slice", public_text)
+
 
 if __name__ == "__main__":
     unittest.main()

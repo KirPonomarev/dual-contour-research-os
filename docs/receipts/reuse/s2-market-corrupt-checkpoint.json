@@ -1,0 +1,73 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-s2-market-corrupt-checkpoint-20260717",
+  "issued_at": "2026-07-17T23:10:00Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "reuse-freeze-authority"
+  },
+  "contour": "market",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "market-pre-soak-corrupt-checkpoint-fail-closed-detection-containment-and-recovery-required-parking",
+    "candidates": [
+      {
+        "candidate": "existing-private-Market-durable_jobs-checkpoint-hash-and-regular-file-verifier",
+        "disposition": "selected-internal-adapter"
+      },
+      {
+        "candidate": "existing-private-Market-durable_executor-resume-before-new-work-boundary",
+        "disposition": "selected-fail-closed-execution-boundary"
+      },
+      {
+        "candidate": "existing-private-Market-crash-resume-fixture-and-stage2-lineage",
+        "disposition": "selected-lineage-and-test-pattern"
+      },
+      {
+        "candidate": "existing-public-Bridge-IncidentReceipt-and-ValidationReceipt-contract-shapes",
+        "disposition": "selected-contract-boundary"
+      },
+      {
+        "candidate": "owner-local-stdlib-corrupt-checkpoint-validator-containment-projection-and-tests",
+        "disposition": "selected-minimal-glue"
+      },
+      {
+        "candidate": "automatic-checkpoint-repair-or-backup-restore",
+        "disposition": "rejected-separate-next-slice-and-no-silent-repair"
+      },
+      {
+        "candidate": "new-external-recovery-workflow-or-storage-dependency",
+        "disposition": "rejected-unnecessary-for-bounded-pre-soak-slice"
+      },
+      {
+        "candidate": "public-copy-of-corrupt-checkpoint-runtime-bytes-database-or-private-result",
+        "disposition": "rejected-boundary"
+      }
+    ],
+    "selected_mode": "existing-private-Market-checkpoint-verifier-plus-IncidentReceipt-shape-owner-stdlib-fail-closed-parking-no-runtime-payload",
+    "source_ref": "source-freeze:source-freeze-market-s2-corrupt-checkpoint-20260717;git:b53361cc5c505f5867176810d8ea8a210e8135eb;git:d6a5933cc46165633956090071253acc202a94a2",
+    "code_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "license_spdx": "NOASSERTION",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "inject deterministic checkpoint byte corruption after a valid committed checkpoint and prove hash drift is detected before resume work merge or completion",
+      "emit sanitized IncidentReceipt-shaped containment evidence with RECOVERY_REQUIRED parking and hash refs only",
+      "reject missing checkpoint symlink non-regular file wrong job sequence forged detection evidence silent repair and continued execution",
+      "accepted validation emits CORRUPT_CHECKPOINT_FAIL_CLOSED_PASS only and never applies scientific truth",
+      "no backup restore network exchange order runtime payload or new dependency enters public Bridge",
+      "focused private tests plus bounded crash-resume durable-kernel and Stage 2 lineage tests run against exact pinned public Bridge source"
+    ],
+    "canonical_owner": "private-Market-corrupt-checkpoint-validator-and-Agent0-cross-repository-integration",
+    "rollback": "Discard or revert only the isolated private corrupt checkpoint profile validator and tests. No public runtime payload, automatic repair, backup, restore, Market scientific outcome, live system, or owner checkout is changed."
+  },
+  "integrity": {
+    "payload_sha256": "7ef2b09a6d8e5bc48aff6ef033072388f3c62a6a896eb5f1330e3c65994e6fcf",
+    "parent_refs": [
+      "source-freeze:source-freeze-market-s2-corrupt-checkpoint-20260717",
+      "sha256:fb69455c472077316c306e85b221bc5ddc3c98963a30191c708a2ca7e8c1a6f4",
+      "git:b53361cc5c505f5867176810d8ea8a210e8135eb",
+      "git:d6a5933cc46165633956090071253acc202a94a2"
+    ]
+  }
+}

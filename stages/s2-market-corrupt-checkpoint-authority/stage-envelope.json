@@ -1,0 +1,121 @@
+{
+  "stage_id": "s2-market-corrupt-checkpoint-authority",
+  "agent_id": "agent-0",
+  "objective": "Authorize deterministic fail-closed corrupt checkpoint detection, containment evidence and RECOVERY_REQUIRED parking for Market pre-soak.",
+  "executable_blocker": "Stage 2 proves clean checkpoint crash/resume equivalence, but a missing, replaced or byte-corrupted checkpoint can still lack a bounded proof that execution stops before new work or completion and emits sanitized recovery-required evidence.",
+  "base_sha": "d6a5933cc46165633956090071253acc202a94a2",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "main",
+  "worktree": "canonical-public-worktree",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "docs/receipts/integration/s2-market-crash-resume.json",
+    "docs/receipts/source-freeze/s2-market-corrupt-checkpoint.json",
+    "docs/receipts/reuse/s2-market-corrupt-checkpoint.json",
+    "contracts/v1/CheckpointManifest.schema.json",
+    "contracts/v1/IncidentReceipt.schema.json",
+    "contracts/v1/ValidationReceipt.schema.json",
+    "private Market durable_jobs checkpoint verifier",
+    "private Market durable_executor resume boundary",
+    "private Market crash-resume equivalence fixture"
+  ],
+  "write_set": [
+    "docs/receipts/source-freeze/s2-market-corrupt-checkpoint.json",
+    "docs/receipts/reuse/s2-market-corrupt-checkpoint.json",
+    "stages/s2-market-corrupt-checkpoint-authority/stage-envelope.json",
+    "stages/s2-market-corrupt-checkpoint-authority/ownership-lease.json",
+    "tests/test_stage2_authority.py"
+  ],
+  "authorized_worker_stage": {
+    "stage_id": "s2-market-corrupt-checkpoint",
+    "agent_id": "agent-3",
+    "private_base_sha": "b53361cc5c505f5867176810d8ea8a210e8135eb",
+    "public_development_sha": "d6a5933cc46165633956090071253acc202a94a2",
+    "branch": "codex/bridge-a3-s2-market-corrupt-checkpoint",
+    "worktree": "ephemeral-private-domain-worktree:s2-market-corrupt-checkpoint",
+    "write_set": [
+      "data/bridge_pre_soak/corrupt_checkpoint/market_pre_soak_corrupt_checkpoint_profile.json",
+      "src/market_lab/bridge_pre_soak_corrupt_checkpoint.py",
+      "tests/test_bridge_pre_soak_corrupt_checkpoint.py"
+    ],
+    "commit_authority": "one-scoped-worker-commit",
+    "push_authority": false
+  },
+  "corrupt_checkpoint_contract": {
+    "profile_classification": "D1_INTERNAL_SANITIZED",
+    "runtime_payload_classification": "D2_DOMAIN_CONFIDENTIAL_OR_D3_RESTRICTED_PRIVATE_RUNTIME_ONLY",
+    "scope": "corrupt-checkpoint-detection-containment-and-recovery-required-parking-only",
+    "required_refs": [
+      "previous_crash_resume_receipt_ref",
+      "job_spec_sha256",
+      "checkpoint_manifest_ref",
+      "corrupt_checkpoint_state_sha256",
+      "incident_receipt_ref"
+    ],
+    "invariants": [
+      "valid-checkpoint-is-committed-before-deterministic-corruption-injection",
+      "missing-hash-drift-symlink-and-non-regular-checkpoint-fail-closed",
+      "corruption-is-detected-before-new-chunk-merge-result-or-completion",
+      "affected-job-is-projected-as-RECOVERY_REQUIRED",
+      "IncidentReceipt-contains-hashes-and-refs-only-never-runtime-payload",
+      "no-silent-repair-deletion-overwrite-or-continue",
+      "no-backup-or-restore-in-this-slice",
+      "no-live-paper-order-or-scientific-outcome-authority"
+    ],
+    "stage_exit_authorized": "slice-only",
+    "declares_market_pre_soak_green": false
+  },
+  "preservation_contract": [
+    "completed Stage 2 dataset cost provider budget holdout and crash-resume slices remain pinned",
+    "public repository stores sanitized authority receipts and hashes only",
+    "private Market retains runtime checkpoint database result payload and domain ownership",
+    "validator and incident controller do not repair checkpoints or apply scientific outcomes",
+    "tests are hermetic and do not fetch network data",
+    "backup and restore remain the final separate Stage 2 slice"
+  ],
+  "forbidden_scope": [
+    "public-copy-of-runtime-checkpoint-database-checkpoint-bytes-result-strategy-or-scientific-payload",
+    "worker-write-outside-one-private-profile-one-private-source-file-and-one-private-test-file",
+    "automatic-repair-delete-overwrite-skip-corrupt-checkpoint-or-continue-execution",
+    "backup-restore-implementation-in-this-slice",
+    "network-capture-inside-tests-validator-or-Bridge-runtime",
+    "contract-schema-lockfile-dependency-config-workflow-migration-or-existing-registry-edit",
+    "scientific-outcome-application-or-Market-Trial-Ledger-write",
+    "exchange-key-account-secret-live-paper-trading-publication-deployment-or-UI-authority",
+    "skip-xfail-continue-on-error-optional-gate-or-validation-weakening",
+    "dirty-owner-checkout-mutation-or-worker-push-merge-deploy-public-write"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "source_freeze": "fb69455c472077316c306e85b221bc5ddc3c98963a30191c708a2ca7e8c1a6f4",
+    "reuse_decision": "7ef2b09a6d8e5bc48aff6ef033072388f3c62a6a896eb5f1330e3c65994e6fcf",
+    "crash_resume_receipt": "14b336e771f6ce3e0ac918b8e54429f001926ee3a4069f53edd0be1eea3239da",
+    "private_market_head": "b53361cc5c505f5867176810d8ea8a210e8135eb",
+    "external_dependencies": "none"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest tests.test_stage2_authority -v",
+    "make test",
+    "private focused corrupt checkpoint tests with PYTHONDONTWRITEBYTECODE=1 and no pytest cache",
+    "private bounded durable checkpoint crash-resume and Stage 2 lineage tests against exact pinned public Bridge source",
+    "git diff --check in both repositories",
+    "exact public and private write-set privacy dependency network live-authority and weakening scans",
+    "exact-head public CI and withheld-locator private focused CI"
+  ],
+  "risk_class": "cross-repository-market-pre-soak-corrupt-checkpoint-slice",
+  "stop_conditions": [
+    "public-base-private-head-contract-source-freeze-reuse-or-crash-resume-receipt-hash-mismatch",
+    "worker-write-set-collision-dirty-owner-checkout-mutation-or-fourth-file-required",
+    "validator-accepts-undetected-corruption-new-work-after-detection-silent-repair-continued-completion-or-non-RECOVERY_REQUIRED-state",
+    "incident-evidence-copies-runtime-checkpoint-result-private-path-account-order-or-domain-truth",
+    "network-fetch-backup-restore-or-new-dependency-is-required",
+    "any-live-paper-order-exchange-publication-deployment-registry-write-or-scientific-outcome-authority-appears",
+    "before-equals-after-or-Market-corrupt-checkpoint-blocker-remains"
+  ],
+  "expected_receipt": "docs/receipts/integration/s2-market-corrupt-checkpoint.json",
+  "rollback": "Agent 0 rejects or reverts only this authority and isolated worker commit; completed Stage 2 slices, owner checkout, public runtime and external systems remain unchanged.",
+  "commit_authority": "agent-0-only",
+  "push_authority": "agent-0-only"
+}

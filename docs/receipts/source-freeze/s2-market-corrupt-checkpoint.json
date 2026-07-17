@@ -1,0 +1,50 @@
+{
+  "schema_id": "SourceFreezeReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "source-freeze-market-s2-corrupt-checkpoint-20260717",
+  "issued_at": "2026-07-17T23:10:00Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "source-freeze-authority"
+  },
+  "contour": "market",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "source_repo": "crypto-market-lab",
+    "remote": "sha256:c4d97d3379ba70f130a546a4d44b646c935f33e3b1447e0aac185c0d38215815",
+    "branch": "sha256:06c6d546bd70182f932de85ca877afaf13189008d78f28b51145530a265c9c99",
+    "head_sha": "b53361cc5c505f5867176810d8ea8a210e8135eb",
+    "upstream_sha": "b53361cc5c505f5867176810d8ea8a210e8135eb",
+    "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "untracked_manifest_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "path_dispositions": [
+      {
+        "category": "tracked_worktree_changes",
+        "count": 0,
+        "disposition": "none-clean-selected-market-crash-resume-head"
+      },
+      {
+        "category": "untracked_worktree_entries",
+        "count": 0,
+        "disposition": "none-clean-selected-market-crash-resume-head"
+      },
+      {
+        "category": "corrupt-checkpoint-runtime-payload",
+        "count": 0,
+        "disposition": "not-copied-to-public-repository-private-ephemeral-runtime-only"
+      }
+    ],
+    "selected_source_sha": "b53361cc5c505f5867176810d8ea8a210e8135eb"
+  },
+  "integrity": {
+    "payload_sha256": "fb69455c472077316c306e85b221bc5ddc3c98963a30191c708a2ca7e8c1a6f4",
+    "parent_refs": [
+      "git:b53361cc5c505f5867176810d8ea8a210e8135eb",
+      "integration:integration-s2-market-crash-resume-20260717",
+      "integration:integration-s2-market-sealed-holdout-20260717",
+      "integration:integration-s2-market-budget-hard-caps-20260717",
+      "integration:integration-s2-market-cost-provider-accounting-20260717",
+      "integration:integration-s2-market-public-dataset-temporal-integrity-20260717"
+    ]
+  }
+}
