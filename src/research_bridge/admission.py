@@ -15,6 +15,12 @@ import math
 import re
 from typing import Any
 
+from .authority import (
+    AuthorityError,
+    PinnedOfflineAuthority,
+    require_pinned_authority,
+)
+
 
 _COMMON_KEYS = {
     "schema_id",
@@ -120,13 +126,27 @@ def admit(
     lease: dict[str, Any],
     *,
     now: datetime | str,
+    authority: PinnedOfflineAuthority | None = None,
 ) -> AdmissionGrant:
     """Validate and bind JobSpec, Permit, and AttemptLease without side effects."""
 
+    try:
+        verifier = require_pinned_authority(authority)
+    except AuthorityError as exc:
+        raise AdmissionError("pinned authority verifier is required") from exc
     admitted_time = _parse_now(now)
     job_payload, job_issued = _validate_contract(job_spec, "JobSpec")
     permit_payload, permit_issued = _validate_contract(permit, "Permit")
     lease_payload, lease_issued = _validate_contract(lease, "AttemptLease")
+    try:
+        verifier.verify_admission(
+            job_spec,
+            permit,
+            lease,
+            now=admitted_time,
+        )
+    except AuthorityError as exc:
+        raise AdmissionError("authority verification failed") from exc
 
     permit_not_before = _parse_timestamp(
         permit_payload["not_before"], "permit.payload.not_before"

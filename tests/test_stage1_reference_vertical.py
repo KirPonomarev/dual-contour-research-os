@@ -28,6 +28,10 @@ from research_bridge.execution import (  # noqa: E402
 )
 from research_bridge.ingestion import TrustedIngestor  # noqa: E402
 from research_bridge.kernel import BridgeKernel  # noqa: E402
+from tests.test_stage1_authority_policy import (  # noqa: E402
+    SYNTHETIC_POLICY_SHA256,
+    synthetic_authority,
+)
 from research_bridge.l0 import DeterministicL0Runner  # noqa: E402
 from research_bridge.ledger import JobLedger  # noqa: E402
 from research_bridge.validation import (  # noqa: E402
@@ -46,7 +50,11 @@ INPUT_REFS = (
     f"cas:sha256:{hashlib.sha256(INPUT_B).hexdigest()}",
 )
 IMAGE_SHA256 = hashlib.sha256(b"synthetic-offline-reference-environment").hexdigest()
-POLICY_SHA256 = hashlib.sha256(b"synthetic-offline-reference-policy").hexdigest()
+POLICY_SHA256 = SYNTHETIC_POLICY_SHA256
+
+
+def _authority_verifier():
+    return synthetic_authority(lease_issuer=("researchd", "researchd"))
 PROTOCOL_REF = "research-bridge:l0:chunk-sha256:v1"
 VALIDATION_POLICY_REF = "policy:synthetic-offline-reference-v1"
 VALIDATOR_ID = "synthetic-reference-validator"
@@ -324,7 +332,7 @@ def _environment(
         event_log,
     )
     coordinator = OfflineExecutionCoordinator(
-        BridgeKernel(ledger),
+        BridgeKernel(ledger, authority=_authority_verifier()),
         ledger,
         runner,
         _LoggingCheckpointStore(checkpoint_store, event_log),

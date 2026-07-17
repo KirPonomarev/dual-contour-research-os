@@ -19,16 +19,24 @@ from research_bridge.admission import (  # noqa: E402
 )
 from research_bridge.kernel import BridgeKernel  # noqa: E402
 from research_bridge.ledger import JobLedger, LedgerError  # noqa: E402
+from tests.test_stage1_authority_policy import (  # noqa: E402
+    SYNTHETIC_POLICY_SHA256,
+    synthetic_authority,
+)
 
 
 NOW = datetime(2026, 1, 15, 12, 0, tzinfo=timezone.utc)
 CODE_SHA256 = "1" * 64
 INPUT_REF_SHA256 = "2" * 64
 IMAGE_SHA256 = "3" * 64
-POLICY_SHA256 = "4" * 64
+POLICY_SHA256 = SYNTHETIC_POLICY_SHA256
 STATE_SHA256 = "5" * 64
 RESULT_SHA256 = "6" * 64
 ADMISSION_SHA256 = "7" * 64
+
+
+def _authority_verifier():
+    return synthetic_authority()
 
 
 def _timestamp(value: datetime) -> str:
@@ -185,7 +193,7 @@ class Stage1AdmissionAssuranceTests(unittest.TestCase):
         lease: dict,
     ) -> None:
         ledger = _RecordingLedger()
-        kernel = BridgeKernel(ledger)
+        kernel = BridgeKernel(ledger, authority=_authority_verifier())
         with self.assertRaises(AdmissionError):
             kernel.claim(job_spec, permit, lease, now=NOW)
         self.assertEqual(ledger.calls, [])
@@ -194,7 +202,9 @@ class Stage1AdmissionAssuranceTests(unittest.TestCase):
         job_spec, permit, lease = _valid_authority()
         ledger = _RecordingLedger()
 
-        BridgeKernel(ledger).claim(job_spec, permit, lease, now=NOW)
+        BridgeKernel(ledger, authority=_authority_verifier()).claim(
+            job_spec, permit, lease, now=NOW
+        )
 
         self.assertEqual(len(ledger.calls), 1)
         self.assertEqual(
@@ -311,7 +321,7 @@ class Stage1AdmissionAssuranceTests(unittest.TestCase):
         job_spec, permit, lease = _valid_authority()
         with tempfile.TemporaryDirectory() as temporary_directory:
             ledger = JobLedger(Path(temporary_directory) / "synthetic-ledger.sqlite3")
-            kernel = BridgeKernel(ledger)
+            kernel = BridgeKernel(ledger, authority=_authority_verifier())
             try:
                 kernel.claim(job_spec, permit, lease, now=NOW)
                 self.assertEqual(ledger.event_count(), 1)

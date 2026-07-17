@@ -29,11 +29,16 @@ from research_bridge.ipc import (  # noqa: E402
     encode_message,
 )
 from research_bridge.ledger import JobLedger, LedgerError  # noqa: E402
+from tests.test_stage1_authority_policy import synthetic_authority  # noqa: E402
 
 
 AT = "2026-01-02T03:04:05Z"
 ADMISSION_SHA256 = hashlib.sha256(b"synthetic-control-admission").hexdigest()
 NOW = datetime(2026, 1, 2, 3, 4, 5, tzinfo=timezone.utc)
+
+
+def _authority_verifier():
+    return synthetic_authority()
 
 
 def _claim(ledger: JobLedger, *, job_id: str = "job-control-synthetic") -> None:
@@ -92,7 +97,11 @@ class LocalControlFrontDoorAssuranceTests(unittest.TestCase):
         peer_uid: int = 1001,
         allowed_uids: set[int] | None = None,
     ) -> UnixControlServer:
-        router = ControlRouter(backend, clock=lambda: NOW)
+        router = ControlRouter(
+            backend,
+            authority=_authority_verifier(),
+            clock=lambda: NOW,
+        )
         return UnixControlServer(
             Path(self.temporary_directory.name) / "synthetic-control.sock",
             router,
@@ -204,7 +213,11 @@ class LocalControlFrontDoorAssuranceTests(unittest.TestCase):
         with self.assertRaises(IPCError):
             UnixControlServer(
                 socket_path,
-                ControlRouter(backend, clock=lambda: NOW),
+                ControlRouter(
+                    backend,
+                    authority=_authority_verifier(),
+                    clock=lambda: NOW,
+                ),
                 allowed_uids={os.getuid()},
                 deadline_seconds=5.001,
             )
@@ -212,7 +225,11 @@ class LocalControlFrontDoorAssuranceTests(unittest.TestCase):
     def test_router_pause_replay_and_approval_bound_resume_compose_with_ledger(self) -> None:
         database = Path(self.temporary_directory.name) / "synthetic-router-ledger.sqlite3"
         ledger = JobLedger(database)
-        router = ControlRouter(ledger, clock=lambda: NOW)
+        router = ControlRouter(
+            ledger,
+            authority=_authority_verifier(),
+            clock=lambda: NOW,
+        )
         try:
             pause = _request(
                 "pause_global",

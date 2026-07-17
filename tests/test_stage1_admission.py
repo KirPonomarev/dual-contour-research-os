@@ -17,12 +17,24 @@ from research_bridge.admission import (
     canonical_json_sha256,
 )
 from research_bridge.kernel import BridgeKernel
+from tests.test_stage1_authority_policy import (  # noqa: E402
+    SYNTHETIC_POLICY_SHA256,
+    synthetic_authority,
+)
 
 
 NOW = datetime(2026, 7, 16, 12, 0, tzinfo=timezone.utc)
 ZERO = "0" * 64
 ONE = "1" * 64
 TWO = "2" * 64
+
+
+def trusted_authority():
+    return synthetic_authority(
+        job_issuer=("admission-test", "job-authority"),
+        permit_issuer=("permit-test", "permit-authority"),
+        lease_issuer=("researchd-test", "lease-authority"),
+    )
 
 
 def with_integrity(document: dict) -> dict:
@@ -69,7 +81,7 @@ def authority_documents() -> tuple[dict, dict, dict]:
             "payload": {
                 "subject": "runner-public-synthetic-1",
                 "job_spec_sha256": canonical_json_sha256(job),
-                "policy_snapshot_sha256": ZERO,
+                "policy_snapshot_sha256": SYNTHETIC_POLICY_SHA256,
                 "code_sha256": ONE,
                 "input_sha256": canonical_json_sha256(job["payload"]["input_refs"]),
                 "image_digest": job["payload"]["image_digest"],
@@ -126,7 +138,7 @@ class AdmissionTests(unittest.TestCase):
 
     def test_valid_authority_returns_exact_immutable_grant(self) -> None:
         job, permit, lease = authority_documents()
-        grant = admit(job, permit, lease, now=NOW)
+        grant = admit(job, permit, lease, now=NOW, authority=trusted_authority())
         self.assertEqual(
             [field.name for field in fields(AdmissionGrant)],
             [
@@ -157,13 +169,13 @@ class AdmissionTests(unittest.TestCase):
                 if location == "payload":
                     with_integrity(target)
                 with self.assertRaises(AdmissionError):
-                    admit(*documents, now=NOW)
+                    admit(*documents, now=NOW, authority=trusted_authority())
 
         job, permit, lease = authority_documents()
         del job["payload"]["runner_profile"]
         with_integrity(job)
         with self.assertRaises(AdmissionError):
-            admit(job, permit, lease, now=NOW)
+            admit(job, permit, lease, now=NOW, authority=trusted_authority())
 
     def test_payload_integrity_mismatch_fails_closed(self) -> None:
         for index in range(3):
@@ -171,7 +183,7 @@ class AdmissionTests(unittest.TestCase):
                 documents = list(authority_documents())
                 documents[index]["integrity"]["payload_sha256"] = ZERO
                 with self.assertRaises(AdmissionError):
-                    admit(*documents, now=NOW)
+                    admit(*documents, now=NOW, authority=trusted_authority())
 
     def test_job_permit_and_lease_bindings_fail_closed(self) -> None:
         mutations = (
@@ -187,7 +199,7 @@ class AdmissionTests(unittest.TestCase):
                 documents[document_index]["payload"][field] = value
                 with_integrity(documents[document_index])
                 with self.assertRaises(AdmissionError):
-                    admit(*documents, now=NOW)
+                    admit(*documents, now=NOW, authority=trusted_authority())
 
     def test_only_single_use_offline_authority_is_admitted(self) -> None:
         mutations = (
@@ -207,7 +219,7 @@ class AdmissionTests(unittest.TestCase):
                     )
                     with_integrity(documents[1])
                 with self.assertRaises(AdmissionError):
-                    admit(*documents, now=NOW)
+                    admit(*documents, now=NOW, authority=trusted_authority())
 
     def test_invalid_time_windows_fail_closed(self) -> None:
         mutations = (
@@ -233,31 +245,39 @@ class AdmissionTests(unittest.TestCase):
                     )
                     with_integrity(documents[1])
                 with self.assertRaises(AdmissionError):
-                    admit(*documents, now=NOW)
+                    admit(*documents, now=NOW, authority=trusted_authority())
 
     def test_lease_issued_at_fields_must_match(self) -> None:
         job, permit, lease = authority_documents()
         lease["issued_at"] = "2026-07-16T11:29:59Z"
         with self.assertRaises(AdmissionError):
-            admit(job, permit, lease, now=NOW)
+            admit(job, permit, lease, now=NOW, authority=trusted_authority())
 
     def test_malformed_timestamp_and_naive_now_fail_closed(self) -> None:
         job, permit, lease = authority_documents()
         permit["payload"]["not_before"] = "2026-07-16 11:00:00"
         with_integrity(permit)
         with self.assertRaises(AdmissionError):
-            admit(job, permit, lease, now=NOW)
+            admit(job, permit, lease, now=NOW, authority=trusted_authority())
 
         job, permit, lease = authority_documents()
         with self.assertRaises(AdmissionError):
-            admit(job, permit, lease, now=datetime(2026, 7, 16, 12, 0))
+            admit(
+                job,
+                permit,
+                lease,
+                now=datetime(2026, 7, 16, 12, 0),
+                authority=trusted_authority(),
+            )
 
 
 class KernelTests(unittest.TestCase):
     def test_valid_authority_calls_ledger_once_with_exact_keywords(self) -> None:
         job, permit, lease = authority_documents()
         ledger = CountingLedger()
-        result = BridgeKernel(ledger).claim(job, permit, lease, now=NOW)
+        result = BridgeKernel(ledger, authority=trusted_authority()).claim(
+            job, permit, lease, now=NOW
+        )
         self.assertEqual(result, "claimed")
         self.assertEqual(len(ledger.calls), 1)
         self.assertEqual(
@@ -305,7 +325,9 @@ class KernelTests(unittest.TestCase):
                 mutate(documents)
                 ledger = CountingLedger()
                 with self.assertRaises(AdmissionError):
-                    BridgeKernel(ledger).claim(*documents, now=NOW)
+                    BridgeKernel(ledger, authority=trusted_authority()).claim(
+                        *documents, now=NOW
+                    )
                 self.assertEqual(ledger.calls, [])
 
     def test_ledger_requires_claim_method(self) -> None:

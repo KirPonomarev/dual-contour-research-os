@@ -36,6 +36,10 @@ from research_bridge.l0 import (  # noqa: E402
     L0RunResult,
 )
 from research_bridge.ledger import JobLedger  # noqa: E402
+from tests.test_stage1_authority_policy import (  # noqa: E402
+    SYNTHETIC_POLICY_SHA256,
+    synthetic_authority,
+)
 
 
 NOW = datetime(2026, 1, 15, 12, 0, tzinfo=timezone.utc)
@@ -47,7 +51,11 @@ INPUT_REFS = (
     f"cas:sha256:{hashlib.sha256(INPUT_B).hexdigest()}",
 )
 IMAGE_SHA256 = hashlib.sha256(b"synthetic-offline-environment").hexdigest()
-POLICY_SHA256 = hashlib.sha256(b"synthetic-offline-policy").hexdigest()
+POLICY_SHA256 = SYNTHETIC_POLICY_SHA256
+
+
+def _authority_verifier():
+    return synthetic_authority()
 
 
 def _timestamp(value: datetime) -> str:
@@ -677,7 +685,7 @@ class OfflineExecutionCoordinatorAssuranceTests(unittest.TestCase):
 
         runner = WritingRunner()
         coordinator = OfflineExecutionCoordinator(
-            BridgeKernel(ledger),
+            BridgeKernel(ledger, authority=_authority_verifier()),
             ledger,
             runner,
             _CheckpointStoreSpy([]),
@@ -955,7 +963,7 @@ class OfflineExecutionCoordinatorAssuranceTests(unittest.TestCase):
         logging_ledger = LoggingLedger()
         logging_runner = LoggingRunner()
         coordinator = OfflineExecutionCoordinator(
-            BridgeKernel(logging_ledger),
+            BridgeKernel(logging_ledger, authority=_authority_verifier()),
             logging_ledger,
             logging_runner,
             LoggingCheckpointStore(),

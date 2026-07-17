@@ -12,6 +12,12 @@ from datetime import datetime, timezone
 from types import MappingProxyType
 from typing import Callable, Mapping, Protocol
 
+from .authority import (
+    AuthorityError,
+    PinnedOfflineAuthority,
+    require_pinned_authority,
+)
+
 
 _PROTOCOL_VERSION = "1.0"
 _REQUEST_KEYS = frozenset(
@@ -156,12 +162,17 @@ class ControlRouter:
         self,
         backend: _ControlBackend,
         *,
+        authority: PinnedOfflineAuthority | None = None,
         clock: Callable[[], datetime] | None = None,
     ) -> None:
         if backend is None:
             raise ControlError("control backend is required")
         if clock is not None and not callable(clock):
             raise ControlError("clock must be callable")
+        try:
+            self._authority = require_pinned_authority(authority)
+        except AuthorityError as exc:
+            raise ControlError("pinned authority verifier is required") from exc
         self._backend = backend
         self._clock = clock if clock is not None else lambda: datetime.now(timezone.utc)
 
@@ -187,11 +198,19 @@ class ControlRouter:
                 )
                 result = self._backend.pause_snapshot()
             elif request.command == "resume_global":
+                event_at = self._event_at()
+                try:
+                    self._authority.verify_resume(
+                        request.payload["approval_ref"],  # type: ignore[arg-type]
+                        now=event_at,
+                    )
+                except AuthorityError as exc:
+                    raise ControlError("resume approval verification failed") from exc
                 self._backend.resume_global(
                     actor=actor,
                     approval_ref=request.payload["approval_ref"],  # type: ignore[arg-type]
                     idempotency_key=request.idempotency_key,
-                    event_at=self._event_at(),
+                    event_at=event_at,
                 )
                 result = self._backend.pause_snapshot()
             else:  # pragma: no cover - ControlRequest enforces the closed command set.

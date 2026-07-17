@@ -27,9 +27,14 @@ from research_bridge.ipc import (
     encode_message,
     resolve_peer_credentials,
 )
+from tests.test_stage1_authority_policy import synthetic_authority  # noqa: E402
 
 
 NOW = datetime(2026, 1, 2, 3, 4, 5, tzinfo=timezone.utc)
+
+
+def trusted_authority():
+    return synthetic_authority()
 
 
 class RecordingBackend:
@@ -68,7 +73,11 @@ def request(command: str, payload: dict[str, object]) -> ControlRequest:
 class ControlRouterTests(unittest.TestCase):
     def setUp(self) -> None:
         self.backend = RecordingBackend()
-        self.router = ControlRouter(self.backend, clock=lambda: NOW)
+        self.router = ControlRouter(
+            self.backend,
+            authority=trusted_authority(),
+            clock=lambda: NOW,
+        )
 
     def test_only_literal_commands_and_shapes_are_accepted_before_backend_calls(self) -> None:
         valid_status = {
@@ -166,6 +175,7 @@ class ControlRouterTests(unittest.TestCase):
 
         invalid_clock_router = ControlRouter(
             self.backend,
+            authority=trusted_authority(),
             clock=lambda: datetime(2026, 1, 2, 3, 4, 5),
         )
         with self.assertRaises(ControlError):
@@ -221,7 +231,11 @@ class IPCMessageTests(unittest.TestCase):
 class UnixControlServerTests(unittest.TestCase):
     def setUp(self) -> None:
         self.backend = RecordingBackend()
-        self.router = ControlRouter(self.backend, clock=lambda: NOW)
+        self.router = ControlRouter(
+            self.backend,
+            authority=trusted_authority(),
+            clock=lambda: NOW,
+        )
         self.temporary_directory = tempfile.TemporaryDirectory()
         self.socket_path = Path(self.temporary_directory.name) / "control.sock"
 
