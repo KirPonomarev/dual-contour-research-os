@@ -1,0 +1,47 @@
+{
+  "schema_id": "SourceFreezeReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "source-freeze-market-s2-public-dataset-temporal-integrity-20260717",
+  "issued_at": "2026-07-17T18:44:04Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "source-freeze-authority"
+  },
+  "contour": "market",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "source_repo": "crypto-market-lab",
+    "remote": "sha256:c4d97d3379ba70f130a546a4d44b646c935f33e3b1447e0aac185c0d38215815",
+    "branch": "sha256:03aa4bfb2daa010d4709c53744bda5e583beb4dcba6c590c3a3a583d897282e1",
+    "head_sha": "96da40a62ef021a6bc5fbe4820e388ee961899a7",
+    "upstream_sha": "96da40a62ef021a6bc5fbe4820e388ee961899a7",
+    "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "untracked_manifest_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "path_dispositions": [
+      {
+        "category": "tracked_worktree_changes",
+        "count": 0,
+        "disposition": "none-clean-selected-stage1-market-e2e-head"
+      },
+      {
+        "category": "untracked_worktree_entries",
+        "count": 0,
+        "disposition": "none-clean-selected-stage1-market-e2e-head"
+      },
+      {
+        "category": "selected_public_dataset_payload",
+        "count": 0,
+        "disposition": "not-copied-to-public-repository-private-worker-only"
+      }
+    ],
+    "selected_source_sha": "96da40a62ef021a6bc5fbe4820e388ee961899a7"
+  },
+  "integrity": {
+    "payload_sha256": "e6e34e41eeb604d25de34c35421e43bfa989dd912d68b9d0590effe049373c6f",
+    "parent_refs": [
+      "git:96da40a62ef021a6bc5fbe4820e388ee961899a7",
+      "integration:integration-s1-market-offline-reference-e2e-20260717",
+      "integration:integration-s1-skeleton-green-audit-20260717"
+    ]
+  }
+}

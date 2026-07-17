@@ -1,0 +1,128 @@
+{
+  "stage_id": "s2-market-public-dataset-temporal-integrity-authority",
+  "agent_id": "agent-0",
+  "objective": "Authorize the first Market pre-soak slice: one frozen real public OHLCV dataset fixture, its manifest, and a fail-closed temporal integrity validator in the private Market repository.",
+  "executable_blocker": "Stage 1 is SKELETON_GREEN, but Market pre-soak cannot start until a real public dataset is frozen and validated for chronological integrity without introducing live trading, network capture during validation, or public-domain payload leakage.",
+  "base_sha": "9d7f4e1637ecc7000a235d1b33c8afb0edfb8ff9",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "main",
+  "worktree": "canonical-public-worktree",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "docs/receipts/integration/s1-skeleton-green-audit.json",
+    "docs/receipts/integration/s1-market-offline-reference-e2e.json",
+    "docs/receipts/source-freeze/s2-market-public-dataset-temporal-integrity.json",
+    "docs/receipts/reuse/s2-market-public-dataset-temporal-integrity.json",
+    "contracts/v1/ValidationReceipt.schema.json",
+    "existing private Market closed_candles.py",
+    "existing private Market ban_dataset_integrity.py hash-chain pattern",
+    "existing private Market public OHLCV capture and timestamp contract gates"
+  ],
+  "write_set": [
+    "docs/receipts/source-freeze/s2-market-public-dataset-temporal-integrity.json",
+    "docs/receipts/reuse/s2-market-public-dataset-temporal-integrity.json",
+    "stages/s2-market-public-dataset-temporal-integrity-authority/stage-envelope.json",
+    "stages/s2-market-public-dataset-temporal-integrity-authority/ownership-lease.json",
+    "tests/test_stage2_authority.py"
+  ],
+  "authorized_worker_stage": {
+    "stage_id": "s2-market-public-dataset-temporal-integrity",
+    "agent_id": "agent-3",
+    "private_base_sha": "96da40a62ef021a6bc5fbe4820e388ee961899a7",
+    "public_development_sha": "9d7f4e1637ecc7000a235d1b33c8afb0edfb8ff9",
+    "branch": "codex/bridge-a3-s2-market-public-dataset-temporal-integrity",
+    "worktree": "ephemeral-private-domain-worktree:s2-market-public-dataset-temporal-integrity",
+    "write_set": [
+      "data/bridge_pre_soak/public_ohlcv/binance_spot_btcusdt_1h_2024-01-01_2024-01-02.csv",
+      "data/bridge_pre_soak/public_ohlcv/binance_spot_btcusdt_1h_2024-01-01_2024-01-02.manifest.json",
+      "src/market_lab/bridge_pre_soak_dataset.py",
+      "tests/test_bridge_pre_soak_dataset.py"
+    ],
+    "commit_authority": "one-scoped-worker-commit",
+    "push_authority": false
+  },
+  "dataset_contract": {
+    "classification": "D0_PUBLIC",
+    "source": "frozen-historical-public-OHLCV",
+    "fixture_scope": "small-hermetic-pre-soak-reference-window",
+    "manifest_required_fields": [
+      "provider",
+      "market_type",
+      "symbol",
+      "timeframe",
+      "source_url",
+      "capture_timestamp_utc",
+      "row_count",
+      "first_open_time_utc",
+      "last_open_time_utc",
+      "dataset_sha256"
+    ],
+    "temporal_invariants": [
+      "timestamps-utc-and-strictly-increasing",
+      "timeframe-cadence-exact",
+      "no-duplicate-or-gap",
+      "closed-candle-only",
+      "finite-nonnegative-OHLCV",
+      "OHLC-geometry-valid",
+      "manifest-sha-and-row-count-match"
+    ],
+    "stage_exit_authorized": "slice-only",
+    "declares_market_pre_soak_green": false
+  },
+  "preservation_contract": [
+    "Stage 1 SKELETON_GREEN remains pinned and unexpanded",
+    "public repository stores only sanitized authority receipts and hashes, never dataset payloads or Market scientific truth",
+    "private Market remains the owner of dataset payloads, validators and domain semantics",
+    "validator emits immutable dataset integrity receipt material and does not apply any scientific outcome",
+    "dataset validation is hermetic after fixture capture; tests must not fetch network data",
+    "no live order trading exchange account deployment publication or autonomous paper/live authority is introduced"
+  ],
+  "forbidden_scope": [
+    "public-copy-of-OHLCV-rows-private-Market-source-results-strategy-or-scientific-payload",
+    "worker-write-outside-one-private-data-file-one-private-manifest-one-private-source-file-and-one-private-test-file",
+    "network-capture-inside-validator-tests-or-Bridge-runtime",
+    "new-public-Bridge-runtime-store-ledger-contract-schema-event-dependency-workflow-lockfile-or-migration",
+    "fees-slippage-funding-provider-accounting-budget-hard-caps-holdout-crash-resume-corrupt-checkpoint-or-backup-restore-implementation-in-this-slice",
+    "ValidationReceipt-use-to-apply-SUPPORTED-REFUTED-INCONCLUSIVE-INVALID-or-any-domain-truth",
+    "exchange-order-key-account-secret-D2-D3-payload-live-trading-paper-trading-publication-deployment-or-UI-authority",
+    "test-skip-xfail-continue-on-error-optional-gate-or-validation-weakening",
+    "dirty-owner-checkout-mutation",
+    "worker-push-merge-deploy-or-public-repository-write"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "source_freeze": "e6e34e41eeb604d25de34c35421e43bfa989dd912d68b9d0590effe049373c6f",
+    "reuse_decision": "3e91a340c0be5836e41038b90b7fcbe2e8d6f2fc03af81edc59db7a4e816f410",
+    "skeleton_green_receipt": "4e98f8fc204e281446f64a11ca091060f1d9a4dfb78394b8d9822a55e7a48967",
+    "market_reference_e2e_receipt": "274de6b3fdb77f47756dc42d3293cbf0b1a5c8e506732bf72c2679fc4609cecb",
+    "private_market_head": "96da40a62ef021a6bc5fbe4820e388ee961899a7",
+    "external_dependencies": "none"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest tests.test_stage2_authority -v",
+    "make test",
+    "private focused dataset temporal integrity tests with PYTHONDONTWRITEBYTECODE=1 and no pytest cache",
+    "private full suite against exact pinned public Bridge source",
+    "git diff --check in both repositories",
+    "exact public and private write-set privacy dependency network live-authority and weakening scans",
+    "exact-head public CI and withheld-locator private combined CI"
+  ],
+  "risk_class": "cross-repository-market-pre-soak-dataset-integrity-slice",
+  "stop_conditions": [
+    "public-base-private-head-contract-source-freeze-reuse-or-stage1-receipt-hash-mismatch",
+    "worker-write-set-collision-or-private-owner-checkout-mutation",
+    "real-public-dataset-provenance-cannot-be-frozen-without-live-or-account-authority",
+    "temporal-verifier-accepts-duplicate-gap-out-of-order-unclosed-invalid-or-manifest-mismatched-data",
+    "dataset-payload-or-domain-scientific-truth-would-enter-the-public-repository",
+    "worker-needs-network-capture-during-tests-or-validation",
+    "any-fees-slippage-funding-provider-accounting-hard-cap-holdout-recovery-or-backup-scope-is-required-before-this-slice-can land",
+    "any-live-network-order-exchange-target-publication-or-deployment-authority-appears",
+    "before-equals-after-or-Market-pre-soak-dataset-integrity-blocker-remains"
+  ],
+  "expected_receipt": "docs/receipts/integration/s2-market-public-dataset-temporal-integrity.json",
+  "rollback": "Agent 0 rejects or reverts only this public authority and the isolated private worker commit. The existing Stage 1 skeleton, public Bridge runtime, Market Trial Ledger, external systems and owner checkout remain unchanged.",
+  "commit_authority": "agent-0-only",
+  "push_authority": "agent-0-only"
+}

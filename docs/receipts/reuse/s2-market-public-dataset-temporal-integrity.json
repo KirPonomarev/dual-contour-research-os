@@ -1,0 +1,74 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-s2-market-public-dataset-temporal-integrity-20260717",
+  "issued_at": "2026-07-17T18:44:04Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "reuse-freeze-authority"
+  },
+  "contour": "market",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "market-pre-soak-frozen-public-dataset-temporal-integrity-over-private-domain-runtime",
+    "candidates": [
+      {
+        "candidate": "existing-private-Market-closed-candle-OHLCV-normalization",
+        "disposition": "selected"
+      },
+      {
+        "candidate": "existing-private-Market-dataset-integrity-hash-chain-pattern",
+        "disposition": "selected-pattern-only-no-domain-payload-copy"
+      },
+      {
+        "candidate": "existing-private-Market-public-OHLCV-request-and-timestamp-contract-gates",
+        "disposition": "selected"
+      },
+      {
+        "candidate": "existing-public-Bridge-ValidationReceipt-and-DomainTrialLinkReceipt-contracts",
+        "disposition": "selected"
+      },
+      {
+        "candidate": "owner-local-stdlib-pre-soak-dataset-manifest-and-temporal-verifier",
+        "disposition": "selected-minimal-glue"
+      },
+      {
+        "candidate": "new-network-capture-inside-validator-or-tests",
+        "disposition": "rejected-live-unstable-and-non-hermetic"
+      },
+      {
+        "candidate": "public-copy-of-private-Market-dataset-source-results-or-scientific-payload",
+        "disposition": "rejected-boundary"
+      },
+      {
+        "candidate": "external-market-data-dependency",
+        "disposition": "rejected-unnecessary-for-frozen-fixture"
+      }
+    ],
+    "selected_mode": "owner-local-existing-public-ohlcv-and-temporal-integrity-adapters-minimal-glue-no-public-payload",
+    "source_ref": "source-freeze:source-freeze-market-s2-public-dataset-temporal-integrity-20260717;git:96da40a62ef021a6bc5fbe4820e388ee961899a7;git:9d7f4e1637ecc7000a235d1b33c8afb0edfb8ff9",
+    "code_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "license_spdx": "NOASSERTION",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "private worker commits one small frozen D0 public OHLCV fixture and manifest only in the Market repository",
+      "manifest binds provider dataset symbol timeframe source URL capture timestamp row count and sha256 without trading strategy payload",
+      "temporal verifier rejects duplicate out-of-order gapped unclosed non-finite and invalid OHLCV rows",
+      "accepted dataset emits a ValidationReceipt-bound dataset integrity summary without applying scientific outcome",
+      "Bridge/public repository receives only sanitized hashes counts and receipt references",
+      "no network exchange order live trading paper deployment publication or domain-truth authority is introduced",
+      "focused private tests plus full private suite run against the exact pinned public Bridge source"
+    ],
+    "canonical_owner": "private-Market-dataset-validator-and-Agent0-cross-repository-integration",
+    "rollback": "Discard or revert only the isolated private dataset fixture, manifest, verifier and tests. No public dataset payload, Market scientific outcome, live system, or Bridge runtime state is changed."
+  },
+  "integrity": {
+    "payload_sha256": "3e91a340c0be5836e41038b90b7fcbe2e8d6f2fc03af81edc59db7a4e816f410",
+    "parent_refs": [
+      "source-freeze:source-freeze-market-s2-public-dataset-temporal-integrity-20260717",
+      "sha256:e6e34e41eeb604d25de34c35421e43bfa989dd912d68b9d0590effe049373c6f",
+      "git:96da40a62ef021a6bc5fbe4820e388ee961899a7",
+      "git:9d7f4e1637ecc7000a235d1b33c8afb0edfb8ff9"
+    ]
+  }
+}

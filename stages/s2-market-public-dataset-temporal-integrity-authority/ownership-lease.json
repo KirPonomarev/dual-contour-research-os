@@ -1,0 +1,20 @@
+{
+  "lease_id": "lease-s2-market-public-dataset-temporal-integrity-authority-agent-0-20260717",
+  "stage_id": "s2-market-public-dataset-temporal-integrity-authority",
+  "agent_id": "agent-0",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-17T18:44:04Z",
+  "expires_at": "2026-07-18T00:44:04Z",
+  "base_sha": "9d7f4e1637ecc7000a235d1b33c8afb0edfb8ff9",
+  "branch": "main",
+  "worktree": "canonical-public-worktree",
+  "write_set": [
+    "docs/receipts/source-freeze/s2-market-public-dataset-temporal-integrity.json",
+    "docs/receipts/reuse/s2-market-public-dataset-temporal-integrity.json",
+    "stages/s2-market-public-dataset-temporal-integrity-authority/stage-envelope.json",
+    "stages/s2-market-public-dataset-temporal-integrity-authority/ownership-lease.json",
+    "tests/test_stage2_authority.py"
+  ],
+  "delegation_allowed": false,
+  "state": "active"
+}
