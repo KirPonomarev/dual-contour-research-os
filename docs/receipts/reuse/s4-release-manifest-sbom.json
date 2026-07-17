@@ -1,0 +1,43 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-s4-release-manifest-sbom-20260718",
+  "issued_at": "2026-07-17T22:51:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-freeze-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "immutable-release-manifest-and-full-pinned-image-package-SBOM",
+    "candidates": [
+      {"candidate": "frozen-ReleaseManifest-v1-contract", "disposition": "selected-canonical-release-identity"},
+      {"candidate": "SPDX-2.3-document-model", "disposition": "selected-established-SBOM-format"},
+      {"candidate": "pinned-image-dpkg-query-inventory", "disposition": "selected-exact-transitive-package-source"},
+      {"candidate": "external-SBOM-generator-or-new-package", "disposition": "rejected-unnecessary"},
+      {"candidate": "mutable-tag-floating-release-or-uncommitted-image", "disposition": "rejected-non-immutable"}
+    ],
+    "selected_mode": "contract-shaped-ReleaseManifest-bound-to-exact-git-CI-image-config-policy-schema-lock-and-committed-SPDX-SBOM",
+    "source_ref": "git:5c2bd7c090fada6e5b65dc955e80b256d88252de;ci:29618911213;image:sha256:36069ee7a9db78af747d7fad65f9e33073824f27be898cdc0b7dd3b77ac5c235",
+    "code_sha256": "36069ee7a9db78af747d7fad65f9e33073824f27be898cdc0b7dd3b77ac5c235",
+    "license_spdx": "CC0-1.0-for-SBOM-data;PSF-2.0-and-Debian-package-licenses-for-image-components",
+    "license_sha256": "3b2f81fe21d181c499c59a256c8e1968455d6689d269aa85373bfb6af41da3bf",
+    "tests": [
+      "ReleaseManifest exact shape and canonical payload integrity",
+      "exact git SHA image digest policy config schema dependency lock SBOM and previous safe-state binding",
+      "SPDX 2.3 unique package identities image and base checksums",
+      "107 image Python and Debian package records with containment relationships",
+      "config manifest and SBOM tamper rejection",
+      "release identity grants no deployment or external-action authority"
+    ],
+    "canonical_owner": "Agent0-immutable-release",
+    "rollback": "Revert the manifest, SBOM, verifier, tests and receipts. The local image may be discarded; no remote registry, host or service is mutated."
+  },
+  "integrity": {
+    "payload_sha256": "4c0b3c5a33bd95caed45eceb68b8e73bdc387fa4d39680b3d0f4c5765a60e7c7",
+    "parent_refs": [
+      "git:5c2bd7c090fada6e5b65dc955e80b256d88252de",
+      "ci:29618911213",
+      "integration:integration-s4-rootless-release-blueprint-20260718",
+      "image:sha256:36069ee7a9db78af747d7fad65f9e33073824f27be898cdc0b7dd3b77ac5c235"
+    ]
+  }
+}

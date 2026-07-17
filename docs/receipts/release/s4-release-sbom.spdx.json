@@ -1,0 +1,1864 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "dual-contour-research-os-5c2bd7c090fada6e5b65dc955e80b256d88252de-linux-amd64",
+  "documentNamespace": "https://github.com/KirPonomarev/dual-contour-research-os/sbom/5c2bd7c090fada6e5b65dc955e80b256d88252de/36069ee7a9db78af747d7fad65f9e33073824f27be898cdc0b7dd3b77ac5c235",
+  "creationInfo": {
+    "created": "2026-07-17T22:51:00Z",
+    "creators": [
+      "Tool: dpkg-query",
+      "Tool: Agent0 deterministic SPDX assembler"
+    ]
+  },
+  "packages": [
+    {
+      "SPDXID": "SPDXRef-ReleaseImage",
+      "name": "dual-contour-research-os",
+      "versionInfo": "5c2bd7c090fada6e5b65dc955e80b256d88252de",
+      "packageFileName": "dual-contour-research-os@sha256:36069ee7a9db78af747d7fad65f9e33073824f27be898cdc0b7dd3b77ac5c235",
+      "supplier": "Organization: Dual-Contour Research OS",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "36069ee7a9db78af747d7fad65f9e33073824f27be898cdc0b7dd3b77ac5c235"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:oci/dual-contour-research-os@sha256%3A36069ee7a9db78af747d7fad65f9e33073824f27be898cdc0b7dd3b77ac5c235?arch=amd64"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-PythonRuntime",
+      "name": "python",
+      "versionInfo": "3.11.14",
+      "packageFileName": "python:3.11.14-slim-bookworm",
+      "supplier": "Organization: Python Software Foundation",
+      "downloadLocation": "https://github.com/docker-library/python",
+      "filesAnalyzed": false,
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "65a93d69fa75478d554f4ad27c85c1e69fa184956261b4301ebaf6dbb0a3543d"
+        }
+      ],
+      "licenseConcluded": "PSF-2.0",
+      "licenseDeclared": "PSF-2.0",
+      "copyrightText": "Copyright Python Software Foundation and contributors"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-adduser-1",
+      "name": "adduser",
+      "versionInfo": "3.134",
+      "packageFileName": "adduser_3.134_all",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-apt-2",
+      "name": "apt",
+      "versionInfo": "2.6.1",
+      "packageFileName": "apt_2.6.1_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-base-files-3",
+      "name": "base-files",
+      "versionInfo": "12.4+deb12u13",
+      "packageFileName": "base-files_12.4+deb12u13_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-base-passwd-4",
+      "name": "base-passwd",
+      "versionInfo": "3.6.1",
+      "packageFileName": "base-passwd_3.6.1_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-bash-5",
+      "name": "bash",
+      "versionInfo": "5.2.15-2+b10",
+      "packageFileName": "bash_5.2.15-2+b10_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-bsdutils-6",
+      "name": "bsdutils",
+      "versionInfo": "1:2.38.1-5+deb12u3",
+      "packageFileName": "bsdutils_1:2.38.1-5+deb12u3_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-ca-certificates-7",
+      "name": "ca-certificates",
+      "versionInfo": "20230311+deb12u1",
+      "packageFileName": "ca-certificates_20230311+deb12u1_all",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-coreutils-8",
+      "name": "coreutils",
+      "versionInfo": "9.1-1",
+      "packageFileName": "coreutils_9.1-1_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-dash-9",
+      "name": "dash",
+      "versionInfo": "0.5.12-2",
+      "packageFileName": "dash_0.5.12-2_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-debconf-10",
+      "name": "debconf",
+      "versionInfo": "1.5.82",
+      "packageFileName": "debconf_1.5.82_all",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-debian-archive-keyring-11",
+      "name": "debian-archive-keyring",
+      "versionInfo": "2023.3+deb12u2",
+      "packageFileName": "debian-archive-keyring_2023.3+deb12u2_all",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-debianutils-12",
+      "name": "debianutils",
+      "versionInfo": "5.7-0.5~deb12u1",
+      "packageFileName": "debianutils_5.7-0.5~deb12u1_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-diffutils-13",
+      "name": "diffutils",
+      "versionInfo": "1:3.8-4",
+      "packageFileName": "diffutils_1:3.8-4_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-dpkg-14",
+      "name": "dpkg",
+      "versionInfo": "1.21.22",
+      "packageFileName": "dpkg_1.21.22_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-e2fsprogs-15",
+      "name": "e2fsprogs",
+      "versionInfo": "1.47.0-2+b2",
+      "packageFileName": "e2fsprogs_1.47.0-2+b2_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-findutils-16",
+      "name": "findutils",
+      "versionInfo": "4.9.0-4",
+      "packageFileName": "findutils_4.9.0-4_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-gcc-12-base-amd64-17",
+      "name": "gcc-12-base:amd64",
+      "versionInfo": "12.2.0-14+deb12u1",
+      "packageFileName": "gcc-12-base:amd64_12.2.0-14+deb12u1_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-gpgv-18",
+      "name": "gpgv",
+      "versionInfo": "2.2.40-1.1+deb12u2",
+      "packageFileName": "gpgv_2.2.40-1.1+deb12u2_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-grep-19",
+      "name": "grep",
+      "versionInfo": "3.8-5",
+      "packageFileName": "grep_3.8-5_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-gzip-20",
+      "name": "gzip",
+      "versionInfo": "1.12-1",
+      "packageFileName": "gzip_1.12-1_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-hostname-21",
+      "name": "hostname",
+      "versionInfo": "3.23+nmu1",
+      "packageFileName": "hostname_3.23+nmu1_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-init-system-helpers-22",
+      "name": "init-system-helpers",
+      "versionInfo": "1.65.2+deb12u1",
+      "packageFileName": "init-system-helpers_1.65.2+deb12u1_all",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-libacl1-amd64-23",
+      "name": "libacl1:amd64",
+      "versionInfo": "2.3.1-3",
+      "packageFileName": "libacl1:amd64_2.3.1-3_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-libapt-pkg6.0-amd64-24",
+      "name": "libapt-pkg6.0:amd64",
+      "versionInfo": "2.6.1",
+      "packageFileName": "libapt-pkg6.0:amd64_2.6.1_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-libattr1-amd64-25",
+      "name": "libattr1:amd64",
+      "versionInfo": "1:2.5.1-4",
+      "packageFileName": "libattr1:amd64_1:2.5.1-4_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-libaudit-common-26",
+      "name": "libaudit-common",
+      "versionInfo": "1:3.0.9-1",
+      "packageFileName": "libaudit-common_1:3.0.9-1_all",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-libaudit1-amd64-27",
+      "name": "libaudit1:amd64",
+      "versionInfo": "1:3.0.9-1",
+      "packageFileName": "libaudit1:amd64_1:3.0.9-1_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-libblkid1-amd64-28",
+      "name": "libblkid1:amd64",
+      "versionInfo": "2.38.1-5+deb12u3",
+      "packageFileName": "libblkid1:amd64_2.38.1-5+deb12u3_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-libbz2-1.0-amd64-29",
+      "name": "libbz2-1.0:amd64",
+      "versionInfo": "1.0.8-5+b1",
+      "packageFileName": "libbz2-1.0:amd64_1.0.8-5+b1_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-libc-bin-30",
+      "name": "libc-bin",
+      "versionInfo": "2.36-9+deb12u13",
+      "packageFileName": "libc-bin_2.36-9+deb12u13_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-libc6-amd64-31",
+      "name": "libc6:amd64",
+      "versionInfo": "2.36-9+deb12u13",
+      "packageFileName": "libc6:amd64_2.36-9+deb12u13_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-libcap-ng0-amd64-32",
+      "name": "libcap-ng0:amd64",
+      "versionInfo": "0.8.3-1+b3",
+      "packageFileName": "libcap-ng0:amd64_0.8.3-1+b3_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-libcap2-amd64-33",
+      "name": "libcap2:amd64",
+      "versionInfo": "1:2.66-4+deb12u2+b2",
+      "packageFileName": "libcap2:amd64_1:2.66-4+deb12u2+b2_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-libcom-err2-amd64-34",
+      "name": "libcom-err2:amd64",
+      "versionInfo": "1.47.0-2+b2",
+      "packageFileName": "libcom-err2:amd64_1.47.0-2+b2_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-libcrypt1-amd64-35",
+      "name": "libcrypt1:amd64",
+      "versionInfo": "1:4.4.33-2",
+      "packageFileName": "libcrypt1:amd64_1:4.4.33-2_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-libdb5.3-amd64-36",
+      "name": "libdb5.3:amd64",
+      "versionInfo": "5.3.28+dfsg2-1",
+      "packageFileName": "libdb5.3:amd64_5.3.28+dfsg2-1_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-libdebconfclient0-amd64-37",
+      "name": "libdebconfclient0:amd64",
+      "versionInfo": "0.270",
+      "packageFileName": "libdebconfclient0:amd64_0.270_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-libext2fs2-amd64-38",
+      "name": "libext2fs2:amd64",
+      "versionInfo": "1.47.0-2+b2",
+      "packageFileName": "libext2fs2:amd64_1.47.0-2+b2_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-libffi8-amd64-39",
+      "name": "libffi8:amd64",
+      "versionInfo": "3.4.4-1",
+      "packageFileName": "libffi8:amd64_3.4.4-1_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-libgcc-s1-amd64-40",
+      "name": "libgcc-s1:amd64",
+      "versionInfo": "12.2.0-14+deb12u1",
+      "packageFileName": "libgcc-s1:amd64_12.2.0-14+deb12u1_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-libgcrypt20-amd64-41",
+      "name": "libgcrypt20:amd64",
+      "versionInfo": "1.10.1-3",
+      "packageFileName": "libgcrypt20:amd64_1.10.1-3_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-libgdbm6-amd64-42",
+      "name": "libgdbm6:amd64",
+      "versionInfo": "1.23-3",
+      "packageFileName": "libgdbm6:amd64_1.23-3_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-libgmp10-amd64-43",
+      "name": "libgmp10:amd64",
+      "versionInfo": "2:6.2.1+dfsg1-1.1",
+      "packageFileName": "libgmp10:amd64_2:6.2.1+dfsg1-1.1_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-libgnutls30-amd64-44",
+      "name": "libgnutls30:amd64",
+      "versionInfo": "3.7.9-2+deb12u6",
+      "packageFileName": "libgnutls30:amd64_3.7.9-2+deb12u6_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-libgpg-error0-amd64-45",
+      "name": "libgpg-error0:amd64",
+      "versionInfo": "1.46-1",
+      "packageFileName": "libgpg-error0:amd64_1.46-1_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-libgssapi-krb5-2-amd64-46",
+      "name": "libgssapi-krb5-2:amd64",
+      "versionInfo": "1.20.1-2+deb12u4",
+      "packageFileName": "libgssapi-krb5-2:amd64_1.20.1-2+deb12u4_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-libhogweed6-amd64-47",
+      "name": "libhogweed6:amd64",
+      "versionInfo": "3.8.1-2",
+      "packageFileName": "libhogweed6:amd64_3.8.1-2_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-libidn2-0-amd64-48",
+      "name": "libidn2-0:amd64",
+      "versionInfo": "2.3.3-1+b1",
+      "packageFileName": "libidn2-0:amd64_2.3.3-1+b1_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-libk5crypto3-amd64-49",
+      "name": "libk5crypto3:amd64",
+      "versionInfo": "1.20.1-2+deb12u4",
+      "packageFileName": "libk5crypto3:amd64_1.20.1-2+deb12u4_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-libkeyutils1-amd64-50",
+      "name": "libkeyutils1:amd64",
+      "versionInfo": "1.6.3-2",
+      "packageFileName": "libkeyutils1:amd64_1.6.3-2_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-libkrb5-3-amd64-51",
+      "name": "libkrb5-3:amd64",
+      "versionInfo": "1.20.1-2+deb12u4",
+      "packageFileName": "libkrb5-3:amd64_1.20.1-2+deb12u4_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-libkrb5support0-amd64-52",
+      "name": "libkrb5support0:amd64",
+      "versionInfo": "1.20.1-2+deb12u4",
+      "packageFileName": "libkrb5support0:amd64_1.20.1-2+deb12u4_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-liblz4-1-amd64-53",
+      "name": "liblz4-1:amd64",
+      "versionInfo": "1.9.4-1",
+      "packageFileName": "liblz4-1:amd64_1.9.4-1_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-liblzma5-amd64-54",
+      "name": "liblzma5:amd64",
+      "versionInfo": "5.4.1-1",
+      "packageFileName": "liblzma5:amd64_5.4.1-1_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-libmd0-amd64-55",
+      "name": "libmd0:amd64",
+      "versionInfo": "1.0.4-2",
+      "packageFileName": "libmd0:amd64_1.0.4-2_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-libmount1-amd64-56",
+      "name": "libmount1:amd64",
+      "versionInfo": "2.38.1-5+deb12u3",
+      "packageFileName": "libmount1:amd64_2.38.1-5+deb12u3_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-libncursesw6-amd64-57",
+      "name": "libncursesw6:amd64",
+      "versionInfo": "6.4-4",
+      "packageFileName": "libncursesw6:amd64_6.4-4_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-libnettle8-amd64-58",
+      "name": "libnettle8:amd64",
+      "versionInfo": "3.8.1-2",
+      "packageFileName": "libnettle8:amd64_3.8.1-2_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-libnsl2-amd64-59",
+      "name": "libnsl2:amd64",
+      "versionInfo": "1.3.0-2",
+      "packageFileName": "libnsl2:amd64_1.3.0-2_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-libp11-kit0-amd64-60",
+      "name": "libp11-kit0:amd64",
+      "versionInfo": "0.24.1-2",
+      "packageFileName": "libp11-kit0:amd64_0.24.1-2_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-libpam-modules-bin-61",
+      "name": "libpam-modules-bin",
+      "versionInfo": "1.5.2-6+deb12u2",
+      "packageFileName": "libpam-modules-bin_1.5.2-6+deb12u2_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-libpam-modules-amd64-62",
+      "name": "libpam-modules:amd64",
+      "versionInfo": "1.5.2-6+deb12u2",
+      "packageFileName": "libpam-modules:amd64_1.5.2-6+deb12u2_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-libpam-runtime-63",
+      "name": "libpam-runtime",
+      "versionInfo": "1.5.2-6+deb12u2",
+      "packageFileName": "libpam-runtime_1.5.2-6+deb12u2_all",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-libpam0g-amd64-64",
+      "name": "libpam0g:amd64",
+      "versionInfo": "1.5.2-6+deb12u2",
+      "packageFileName": "libpam0g:amd64_1.5.2-6+deb12u2_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-libpcre2-8-0-amd64-65",
+      "name": "libpcre2-8-0:amd64",
+      "versionInfo": "10.42-1",
+      "packageFileName": "libpcre2-8-0:amd64_10.42-1_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-libreadline8-amd64-66",
+      "name": "libreadline8:amd64",
+      "versionInfo": "8.2-1.3",
+      "packageFileName": "libreadline8:amd64_8.2-1.3_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-libseccomp2-amd64-67",
+      "name": "libseccomp2:amd64",
+      "versionInfo": "2.5.4-1+deb12u1",
+      "packageFileName": "libseccomp2:amd64_2.5.4-1+deb12u1_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-libselinux1-amd64-68",
+      "name": "libselinux1:amd64",
+      "versionInfo": "3.4-1+b6",
+      "packageFileName": "libselinux1:amd64_3.4-1+b6_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-libsemanage-common-69",
+      "name": "libsemanage-common",
+      "versionInfo": "3.4-1",
+      "packageFileName": "libsemanage-common_3.4-1_all",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-libsemanage2-amd64-70",
+      "name": "libsemanage2:amd64",
+      "versionInfo": "3.4-1+b5",
+      "packageFileName": "libsemanage2:amd64_3.4-1+b5_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-libsepol2-amd64-71",
+      "name": "libsepol2:amd64",
+      "versionInfo": "3.4-2.1",
+      "packageFileName": "libsepol2:amd64_3.4-2.1_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-libsmartcols1-amd64-72",
+      "name": "libsmartcols1:amd64",
+      "versionInfo": "2.38.1-5+deb12u3",
+      "packageFileName": "libsmartcols1:amd64_2.38.1-5+deb12u3_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-libsqlite3-0-amd64-73",
+      "name": "libsqlite3-0:amd64",
+      "versionInfo": "3.40.1-2+deb12u2",
+      "packageFileName": "libsqlite3-0:amd64_3.40.1-2+deb12u2_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-libss2-amd64-74",
+      "name": "libss2:amd64",
+      "versionInfo": "1.47.0-2+b2",
+      "packageFileName": "libss2:amd64_1.47.0-2+b2_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-libssl3-amd64-75",
+      "name": "libssl3:amd64",
+      "versionInfo": "3.0.18-1~deb12u2",
+      "packageFileName": "libssl3:amd64_3.0.18-1~deb12u2_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-libstdc--6-amd64-76",
+      "name": "libstdc++6:amd64",
+      "versionInfo": "12.2.0-14+deb12u1",
+      "packageFileName": "libstdc++6:amd64_12.2.0-14+deb12u1_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-libsystemd0-amd64-77",
+      "name": "libsystemd0:amd64",
+      "versionInfo": "252.39-1~deb12u1",
+      "packageFileName": "libsystemd0:amd64_252.39-1~deb12u1_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-libtasn1-6-amd64-78",
+      "name": "libtasn1-6:amd64",
+      "versionInfo": "4.19.0-2+deb12u1",
+      "packageFileName": "libtasn1-6:amd64_4.19.0-2+deb12u1_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-libtinfo6-amd64-79",
+      "name": "libtinfo6:amd64",
+      "versionInfo": "6.4-4",
+      "packageFileName": "libtinfo6:amd64_6.4-4_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-libtirpc-common-80",
+      "name": "libtirpc-common",
+      "versionInfo": "1.3.3+ds-1",
+      "packageFileName": "libtirpc-common_1.3.3+ds-1_all",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-libtirpc3-amd64-81",
+      "name": "libtirpc3:amd64",
+      "versionInfo": "1.3.3+ds-1",
+      "packageFileName": "libtirpc3:amd64_1.3.3+ds-1_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-libudev1-amd64-82",
+      "name": "libudev1:amd64",
+      "versionInfo": "252.39-1~deb12u1",
+      "packageFileName": "libudev1:amd64_252.39-1~deb12u1_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-libunistring2-amd64-83",
+      "name": "libunistring2:amd64",
+      "versionInfo": "1.0-2",
+      "packageFileName": "libunistring2:amd64_1.0-2_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-libuuid1-amd64-84",
+      "name": "libuuid1:amd64",
+      "versionInfo": "2.38.1-5+deb12u3",
+      "packageFileName": "libuuid1:amd64_2.38.1-5+deb12u3_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-libxxhash0-amd64-85",
+      "name": "libxxhash0:amd64",
+      "versionInfo": "0.8.1-1",
+      "packageFileName": "libxxhash0:amd64_0.8.1-1_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-libzstd1-amd64-86",
+      "name": "libzstd1:amd64",
+      "versionInfo": "1.5.4+dfsg2-5",
+      "packageFileName": "libzstd1:amd64_1.5.4+dfsg2-5_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-login-87",
+      "name": "login",
+      "versionInfo": "1:4.13+dfsg1-1+deb12u2",
+      "packageFileName": "login_1:4.13+dfsg1-1+deb12u2_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-logsave-88",
+      "name": "logsave",
+      "versionInfo": "1.47.0-2+b2",
+      "packageFileName": "logsave_1.47.0-2+b2_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-mawk-89",
+      "name": "mawk",
+      "versionInfo": "1.3.4.20200120-3.1",
+      "packageFileName": "mawk_1.3.4.20200120-3.1_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-mount-90",
+      "name": "mount",
+      "versionInfo": "2.38.1-5+deb12u3",
+      "packageFileName": "mount_2.38.1-5+deb12u3_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-ncurses-base-91",
+      "name": "ncurses-base",
+      "versionInfo": "6.4-4",
+      "packageFileName": "ncurses-base_6.4-4_all",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-ncurses-bin-92",
+      "name": "ncurses-bin",
+      "versionInfo": "6.4-4",
+      "packageFileName": "ncurses-bin_6.4-4_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-netbase-93",
+      "name": "netbase",
+      "versionInfo": "6.4",
+      "packageFileName": "netbase_6.4_all",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-openssl-94",
+      "name": "openssl",
+      "versionInfo": "3.0.18-1~deb12u2",
+      "packageFileName": "openssl_3.0.18-1~deb12u2_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-passwd-95",
+      "name": "passwd",
+      "versionInfo": "1:4.13+dfsg1-1+deb12u2",
+      "packageFileName": "passwd_1:4.13+dfsg1-1+deb12u2_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-perl-base-96",
+      "name": "perl-base",
+      "versionInfo": "5.36.0-7+deb12u3",
+      "packageFileName": "perl-base_5.36.0-7+deb12u3_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-readline-common-97",
+      "name": "readline-common",
+      "versionInfo": "8.2-1.3",
+      "packageFileName": "readline-common_8.2-1.3_all",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-sed-98",
+      "name": "sed",
+      "versionInfo": "4.9-1",
+      "packageFileName": "sed_4.9-1_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-sysvinit-utils-99",
+      "name": "sysvinit-utils",
+      "versionInfo": "3.06-4",
+      "packageFileName": "sysvinit-utils_3.06-4_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-tar-100",
+      "name": "tar",
+      "versionInfo": "1.34+dfsg-1.2+deb12u1",
+      "packageFileName": "tar_1.34+dfsg-1.2+deb12u1_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-tzdata-101",
+      "name": "tzdata",
+      "versionInfo": "2025b-0+deb12u2",
+      "packageFileName": "tzdata_2025b-0+deb12u2_all",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-usr-is-merged-102",
+      "name": "usr-is-merged",
+      "versionInfo": "37~deb12u1",
+      "packageFileName": "usr-is-merged_37~deb12u1_all",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-util-linux-103",
+      "name": "util-linux",
+      "versionInfo": "2.38.1-5+deb12u3",
+      "packageFileName": "util-linux_2.38.1-5+deb12u3_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-util-linux-extra-104",
+      "name": "util-linux-extra",
+      "versionInfo": "2.38.1-5+deb12u3",
+      "packageFileName": "util-linux-extra_2.38.1-5+deb12u3_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Debian-zlib1g-amd64-105",
+      "name": "zlib1g:amd64",
+      "versionInfo": "1:1.2.13.dfsg-1",
+      "packageFileName": "zlib1g:amd64_1:1.2.13.dfsg-1_amd64",
+      "supplier": "Organization: Debian",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relationshipType": "DESCRIBES",
+      "relatedSpdxElement": "SPDXRef-ReleaseImage"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-PythonRuntime"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-adduser-1"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-apt-2"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-base-files-3"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-base-passwd-4"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-bash-5"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-bsdutils-6"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-ca-certificates-7"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-coreutils-8"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-dash-9"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-debconf-10"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-debian-archive-keyring-11"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-debianutils-12"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-diffutils-13"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-dpkg-14"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-e2fsprogs-15"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-findutils-16"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-gcc-12-base-amd64-17"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-gpgv-18"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-grep-19"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-gzip-20"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-hostname-21"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-init-system-helpers-22"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-libacl1-amd64-23"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-libapt-pkg6.0-amd64-24"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-libattr1-amd64-25"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-libaudit-common-26"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-libaudit1-amd64-27"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-libblkid1-amd64-28"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-libbz2-1.0-amd64-29"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-libc-bin-30"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-libc6-amd64-31"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-libcap-ng0-amd64-32"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-libcap2-amd64-33"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-libcom-err2-amd64-34"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-libcrypt1-amd64-35"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-libdb5.3-amd64-36"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-libdebconfclient0-amd64-37"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-libext2fs2-amd64-38"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-libffi8-amd64-39"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-libgcc-s1-amd64-40"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-libgcrypt20-amd64-41"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-libgdbm6-amd64-42"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-libgmp10-amd64-43"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-libgnutls30-amd64-44"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-libgpg-error0-amd64-45"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-libgssapi-krb5-2-amd64-46"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-libhogweed6-amd64-47"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-libidn2-0-amd64-48"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-libk5crypto3-amd64-49"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-libkeyutils1-amd64-50"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-libkrb5-3-amd64-51"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-libkrb5support0-amd64-52"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-liblz4-1-amd64-53"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-liblzma5-amd64-54"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-libmd0-amd64-55"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-libmount1-amd64-56"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-libncursesw6-amd64-57"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-libnettle8-amd64-58"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-libnsl2-amd64-59"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-libp11-kit0-amd64-60"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-libpam-modules-bin-61"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-libpam-modules-amd64-62"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-libpam-runtime-63"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-libpam0g-amd64-64"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-libpcre2-8-0-amd64-65"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-libreadline8-amd64-66"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-libseccomp2-amd64-67"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-libselinux1-amd64-68"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-libsemanage-common-69"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-libsemanage2-amd64-70"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-libsepol2-amd64-71"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-libsmartcols1-amd64-72"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-libsqlite3-0-amd64-73"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-libss2-amd64-74"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-libssl3-amd64-75"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-libstdc--6-amd64-76"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-libsystemd0-amd64-77"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-libtasn1-6-amd64-78"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-libtinfo6-amd64-79"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-libtirpc-common-80"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-libtirpc3-amd64-81"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-libudev1-amd64-82"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-libunistring2-amd64-83"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-libuuid1-amd64-84"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-libxxhash0-amd64-85"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-libzstd1-amd64-86"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-login-87"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-logsave-88"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-mawk-89"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-mount-90"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-ncurses-base-91"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-ncurses-bin-92"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-netbase-93"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-openssl-94"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-passwd-95"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-perl-base-96"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-readline-common-97"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-sed-98"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-sysvinit-utils-99"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-tar-100"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-tzdata-101"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-usr-is-merged-102"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-util-linux-103"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-util-linux-extra-104"
+    },
+    {
+      "spdxElementId": "SPDXRef-ReleaseImage",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-Debian-zlib1g-amd64-105"
+    }
+  ],
+  "annotations": [
+    {
+      "annotationDate": "2026-07-17T22:51:00Z",
+      "annotationType": "OTHER",
+      "annotator": "Tool: Agent0 deterministic SPDX assembler",
+      "comment": "Exact linux/amd64 package versions were observed from the pinned base image with network disabled. Debian license texts remain at /usr/share/doc/*/copyright; Python license text remains at /usr/local/lib/python3.11/LICENSE.txt."
+    }
+  ]
+}

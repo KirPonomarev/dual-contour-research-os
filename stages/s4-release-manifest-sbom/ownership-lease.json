@@ -1,0 +1,22 @@
+{
+  "lease_id": "lease-s4-release-manifest-sbom-agent-0-20260718",
+  "stage_id": "s4-release-manifest-sbom",
+  "agent_id": "agent-0",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-17T22:51:00Z",
+  "expires_at": "2026-07-18T04:51:00Z",
+  "base_sha": "685267795fda8ecfaf3765a6a29bfdfc9d7fd42a",
+  "branch": "main",
+  "worktree": "canonical-public-worktree",
+  "write_set": [
+    "docs/receipts/release/s4-release-sbom.spdx.json",
+    "docs/receipts/release/s4-release-manifest.json",
+    "tools/verify_release_identity.py",
+    "tests/test_release_identity.py",
+    "docs/receipts/reuse/s4-release-manifest-sbom.json",
+    "stages/s4-release-manifest-sbom/stage-envelope.json",
+    "stages/s4-release-manifest-sbom/ownership-lease.json"
+  ],
+  "delegation_allowed": false,
+  "state": "active"
+}

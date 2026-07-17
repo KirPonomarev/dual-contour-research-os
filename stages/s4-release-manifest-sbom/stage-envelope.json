@@ -1,0 +1,67 @@
+{
+  "stage_id": "s4-release-manifest-sbom",
+  "agent_id": "agent-0",
+  "objective": "Issue and verify the immutable ReleaseManifest and committed SPDX SBOM for the exact rootless candidate image.",
+  "executable_blocker": "The rootless blueprint is integrated and the exact candidate image is locally proven, but its release SHA, digest, config, policy, schema, lock and transitive packages are not yet bound in an immutable ReleaseManifest and SBOM.",
+  "base_sha": "685267795fda8ecfaf3765a6a29bfdfc9d7fd42a",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "main",
+  "worktree": "canonical-public-worktree",
+  "read_set": ["AGENTS.md", "docs/DEVELOPMENT_AGENT_CONTRACT.md", "contracts/v1/ReleaseManifest.schema.json", "docs/receipts/integration/s4-rootless-release-blueprint.json", "ops/release/"],
+  "write_set": [
+    "docs/receipts/release/s4-release-sbom.spdx.json",
+    "docs/receipts/release/s4-release-manifest.json",
+    "tools/verify_release_identity.py",
+    "tests/test_release_identity.py",
+    "docs/receipts/reuse/s4-release-manifest-sbom.json",
+    "stages/s4-release-manifest-sbom/stage-envelope.json",
+    "stages/s4-release-manifest-sbom/ownership-lease.json"
+  ],
+  "boundary_contract": {
+    "release_sha": "5c2bd7c090fada6e5b65dc955e80b256d88252de",
+    "image_digest": "sha256:36069ee7a9db78af747d7fad65f9e33073824f27be898cdc0b7dd3b77ac5c235",
+    "exact_head_ci": "29618911213",
+    "sbom_format": "SPDX-2.3",
+    "sbom_package_count": 107,
+    "previous_safe_state": "release:none-service-stopped",
+    "deployment_authority": false,
+    "declares_ready_for_72h_soak": false
+  },
+  "forbidden_scope": [
+    "runtime-source-contract-schema-config-policy-lock-blueprint-workflow-migration-or-domain-repository-edit",
+    "floating-tag-uncommitted-source-missing-package-or-unbound-image-config-policy-schema-lock-SBOM",
+    "secret-private-locator-D2-D3-payload-runtime-database-checkpoint-or-domain-content",
+    "registry-push-host-service-backup-restore-reboot-rollback-deploy-or-approval-consumption",
+    "claim-READY_FOR_72H_SOAK-or-real-deployment-success"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "release_source_sha": "5c2bd7c090fada6e5b65dc955e80b256d88252de",
+    "image_digest": "36069ee7a9db78af747d7fad65f9e33073824f27be898cdc0b7dd3b77ac5c235",
+    "prior_integration_receipt_file": "ff7749eb6ff6e20b323132da63739db13b5cadd133f89e3ef949749f58845c90",
+    "reuse_decision": "4c0b3c5a33bd95caed45eceb68b8e73bdc387fa4d39680b3d0f4c5765a60e7c7",
+    "public_head": "685267795fda8ecfaf3765a6a29bfdfc9d7fd42a",
+    "external_dependencies": "none-new"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 tools/verify_release_identity.py",
+    "python3 -m unittest tests.test_release_identity -v",
+    "make test",
+    "git diff --check",
+    "exact write-set privacy secret release-binding SBOM completeness deployment-claim and weakening scans",
+    "exact-head public CI before integration receipt"
+  ],
+  "risk_class": "immutable-release-identity-and-SBOM",
+  "stop_conditions": [
+    "base-contract-image-CI-policy-config-schema-lock-SBOM-or-prior-integration-mismatch",
+    "manifest-or-SBOM-can-drift-without-test-failure",
+    "package-inventory-is-incomplete-or-non-unique",
+    "external-action-or-deployment-authority-is-required",
+    "before-equals-after-or-executable-blocker-remains"
+  ],
+  "expected_receipt": "docs/receipts/integration/s4-release-manifest-sbom.json",
+  "rollback": "Revert release identity artifacts and receipts only; no external state changes.",
+  "commit_authority": "agent-0-only",
+  "push_authority": "agent-0-only"
+}

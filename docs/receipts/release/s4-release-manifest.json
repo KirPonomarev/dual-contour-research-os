@@ -1,0 +1,29 @@
+{
+  "schema_id": "ReleaseManifest",
+  "schema_version": "1.0.0",
+  "object_id": "release-dual-contour-pre-soak-5c2bd7c-20260718",
+  "issued_at": "2026-07-17T22:51:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "immutable-release-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "release_sha": "5c2bd7c090fada6e5b65dc955e80b256d88252de",
+    "image_digests": ["sha256:36069ee7a9db78af747d7fad65f9e33073824f27be898cdc0b7dd3b77ac5c235"],
+    "policy_sha256": "61eac550de8a24ef24ab1dbb699ee874e32b4599dcdd23369319c27b5545c405",
+    "config_sha256": "0b186888a3a1bb8fb028315681bf4073ec4186a0acbdf2f226b5a53d69a9d542",
+    "schema_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "dependency_lock_sha256": "58cd81aa9e5554e5ae88a0d86822e341a6ac25eb8179cca9a9fb3e4512493be9",
+    "sbom_ref": "artifact:sha256:60f9261a9dad06a8723c5c17bb77d2e34e8608586c19bd28049921ea028d5c15",
+    "previous_release_ref": "release:none-service-stopped"
+  },
+  "integrity": {
+    "payload_sha256": "5f2bfc7899accc827052254c552011e872d35d84f0a245ef942b078bb3c27df1",
+    "parent_refs": [
+      "git:5c2bd7c090fada6e5b65dc955e80b256d88252de",
+      "ci:29618911213",
+      "integration:integration-s4-rootless-release-blueprint-20260718",
+      "image:sha256:36069ee7a9db78af747d7fad65f9e33073824f27be898cdc0b7dd3b77ac5c235",
+      "artifact:sha256:60f9261a9dad06a8723c5c17bb77d2e34e8608586c19bd28049921ea028d5c15"
+    ]
+  }
+}
