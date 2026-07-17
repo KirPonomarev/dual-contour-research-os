@@ -1,0 +1,18 @@
+{
+  "lease_id": "lease-s1-market-portable-fixtures-agent-5-20260717",
+  "stage_id": "s1-market-portable-fixtures",
+  "agent_id": "agent-5",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-17T06:50:48Z",
+  "expires_at": "2026-07-17T12:50:48Z",
+  "base_sha": "6299f65f92d8bc6964c423775a5cce1f2fdef58a",
+  "public_authority_sha": "f6791a65c56070c824a5ebe69bca26109aaaf739",
+  "branch": "codex/bridge-a5-s1-market-portable-fixtures",
+  "worktree": "ephemeral-private-domain-worktree:s1-market-portable-fixtures",
+  "write_set": [
+    "tests/test_build_ban_workstream_observation.py",
+    "tests/test_durable_spread_canary_release.py"
+  ],
+  "delegation_allowed": false,
+  "state": "active"
+}

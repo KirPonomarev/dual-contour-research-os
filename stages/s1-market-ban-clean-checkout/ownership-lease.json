@@ -1,0 +1,24 @@
+{
+  "lease_id": "lease-s1-market-ban-clean-checkout-agent-3-20260717",
+  "stage_id": "s1-market-ban-clean-checkout",
+  "agent_id": "agent-3",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-17T06:50:48Z",
+  "expires_at": "2026-07-17T12:50:48Z",
+  "base_sha": "6299f65f92d8bc6964c423775a5cce1f2fdef58a",
+  "public_authority_sha": "f6791a65c56070c824a5ebe69bca26109aaaf739",
+  "branch": "codex/bridge-a3-s1-market-ban-clean-checkout",
+  "worktree": "ephemeral-private-domain-worktree:s1-market-ban-clean-checkout",
+  "write_set": [
+    "tests/ban_clean_checkout_fixtures.py",
+    "tests/test_ban_local_eventness_nonlinear_candidate_blind_window_design.py",
+    "tests/test_ban_local_eventness_nonlinear_candidate_event_clustered_power_design.py",
+    "tests/test_ban_local_eventness_nonlinear_candidate_experimental_unit_preregistration.py",
+    "tests/test_ban_local_eventness_nonlinear_candidate_independent_coverage_expansion_feasibility.py",
+    "tests/test_ban_local_eventness_nonlinear_candidate_power_design.py",
+    "tests/test_ban_local_eventness_nonlinear_mechanism_cross_asset_transfer_preregistration.py",
+    "tests/test_ban_local_eventness_nonlinear_mechanism_cross_asset_transfer_power_design.py"
+  ],
+  "delegation_allowed": false,
+  "state": "active"
+}

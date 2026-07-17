@@ -1,0 +1,90 @@
+{
+  "stage_id": "s1-market-ban-clean-checkout",
+  "agent_id": "agent-3",
+  "objective": "Make the BAN clean-checkout tests self-contained by generating deterministic sanitized temporary inputs and using the active interpreter while preserving every existing numeric, lineage, safety and fail-closed assertion.",
+  "executable_blocker": "The candidate Market tree is regression-free but BAN tests require gitignored local OHLCV and derived artifacts or a repository-local interpreter, so the clean checkout cannot prove the existing assertions.",
+  "base_sha": "6299f65f92d8bc6964c423775a5cce1f2fdef58a",
+  "public_authority_sha": "f6791a65c56070c824a5ebe69bca26109aaaf739",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a3-s1-market-ban-clean-checkout",
+  "worktree": "ephemeral-private-domain-worktree:s1-market-ban-clean-checkout",
+  "read_set": [
+    "market-domain:candidate-clean-tree@6299f65f92d8bc6964c423775a5cce1f2fdef58a",
+    "market-domain:BAN-test-modules-and-existing-fixture-builders",
+    "market-domain:BAN-validator-read-boundaries",
+    "docs/receipts/reuse/s1-market-clean-checkout-fixtures.json",
+    "docs/receipts/integration/s1-market-clean-checkout-authority.json"
+  ],
+  "write_set": [
+    "tests/ban_clean_checkout_fixtures.py",
+    "tests/test_ban_local_eventness_nonlinear_candidate_blind_window_design.py",
+    "tests/test_ban_local_eventness_nonlinear_candidate_event_clustered_power_design.py",
+    "tests/test_ban_local_eventness_nonlinear_candidate_experimental_unit_preregistration.py",
+    "tests/test_ban_local_eventness_nonlinear_candidate_independent_coverage_expansion_feasibility.py",
+    "tests/test_ban_local_eventness_nonlinear_candidate_power_design.py",
+    "tests/test_ban_local_eventness_nonlinear_mechanism_cross_asset_transfer_preregistration.py",
+    "tests/test_ban_local_eventness_nonlinear_mechanism_cross_asset_transfer_power_design.py"
+  ],
+  "preservation_contract": {
+    "required": [
+      "retain every existing positive numeric and distribution assertion",
+      "retain every existing lineage and metadata-only assertion",
+      "retain every existing safety and zero-prohibited-operation assertion",
+      "retain every existing fail-closed assertion",
+      "materialize synthetic inputs only under pytest temporary roots",
+      "use sys.executable for local CLI conformance"
+    ],
+    "forbidden": [
+      "change expected numeric values",
+      "delete or relax assertions",
+      "skip xfail marker or conditional early return",
+      "read real local domain data or reports",
+      "copy private scientific payloads"
+    ]
+  },
+  "forbidden_scope": [
+    "source-script-config-workflow-lockfile-migration-or-non-test-edit",
+    "assertion-deletion-relaxation-or-expected-value-change",
+    "skip-xfail-marker-conditional-return-or-validation-bypass",
+    "real-domain-data-report-evidence-ledger-registry-or-strategy-copy",
+    "private-path-url-secret-account-key-or-d2-d3-payload",
+    "network-download-exchange-order-private-api-or-external-mutation",
+    "external-dependency-adoption",
+    "dirty-source-checkout-mutation",
+    "push-merge-deploy-or-public-repository-write"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "reuse_decision": "ad2ec7b2f4ab8e357574fb1228d01b136958fd0983434886519b23062631906a",
+    "authority_receipt": "c9d4cc03f306ac675064751243052f5840968f6b382a74699fd8f1c08fd00366",
+    "candidate_market_tree": "a355545f90e43f64b6525ec5d839b59975c408bc",
+    "external_dependencies": "none"
+  },
+  "acceptance_commands": [
+    "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src python -m pytest -q -p no:cacheprovider seven authorized BAN test modules",
+    "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src python -m pytest -q -p no:cacheprovider",
+    "git diff --check",
+    "git status --porcelain=v1 --untracked-files=all",
+    "exact write-set, assertion-preservation, skip, private-locator, network and live-authority scan"
+  ],
+  "risk_class": "private-market-ban-synthetic-test-fixtures",
+  "stop_conditions": [
+    "candidate-base-or-public-authority-mismatch",
+    "source-runtime-workflow-or-domain-edit-required",
+    "existing-assertion-removal-relaxation-or-value-change-required",
+    "skip-xfail-marker-conditional-return-or-validation-bypass-required",
+    "real-domain-payload-private-locator-network-or-new-dependency-required",
+    "full-suite-regression-or-new-failure",
+    "dirty-source-checkout-changed",
+    "write-set-collision",
+    "before-equals-after-or-clean-checkout-blocker-remains"
+  ],
+  "expected_receipt": "docs/receipts/integration/s1-market-ban-clean-checkout.json",
+  "rollback": "Agent 0 discards the single test-only worker commit and deletes the isolated branch/worktree. Candidate runtime commit, original dirty checkout, domain state and external systems remain unchanged.",
+  "commit_authority": "one-scoped-worker-commit",
+  "push_authority": false,
+  "expected_handoff_status": [
+    "ready_for_agent0_audit",
+    "blocked_validation_failed"
+  ]
+}
