@@ -1,0 +1,61 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s2-market-sealed-holdout-authority-20260717",
+  "issued_at": "2026-07-17T21:08:00Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "market",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s2-market-sealed-holdout-authority",
+    "agent_id": "agent-0",
+    "ownership_lease_ref": "stages/s2-market-sealed-holdout-authority/ownership-lease.json",
+    "base_sha": "309344bea5d5eb432f9e21dc5e05202ca00dd43f",
+    "head_sha": "9d39f6661693c401d63090cb3be1fe6d0bdf0d6b",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "docs/receipts/source-freeze/s2-market-sealed-holdout.json",
+      "docs/receipts/reuse/s2-market-sealed-holdout.json",
+      "stages/s2-market-sealed-holdout-authority/stage-envelope.json",
+      "stages/s2-market-sealed-holdout-authority/ownership-lease.json",
+      "tests/test_stage2_authority.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "focused_stage2_authority_tests": 15,
+      "canonical_tests": 324,
+      "stage0b_tests": 25,
+      "skipped_tests": 0,
+      "diff_check": "green",
+      "privacy_secret_scan": "green",
+      "privacy_secret_scan_notes": "intentional deny-list literals only; no secret material detected",
+      "source_mutation": false,
+      "public_source_mutation": false,
+      "private_source_mutation": false,
+      "dependency_adoption": false,
+      "frozen_contract_edit": false,
+      "selected_private_head_clean": true,
+      "selected_private_head": "0f2eff1f9acde1d4bcca9bbe438e0cefeee351b7",
+      "authorized_worker_files": 3,
+      "public_holdout_payload_in_public_repo": false,
+      "declares_market_pre_soak_green": false,
+      "live_or_connected_authority": false,
+      "exact_head_remote_ci": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29611191353"
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29611191353",
+    "integration_commit_sha": "9d39f6661693c401d63090cb3be1fe6d0bdf0d6b"
+  },
+  "integrity": {
+    "payload_sha256": "31d506fdf2e1cb55f4df2b8a6ae158cb0d8c93fea6f4eb2ad69e09a5714c5c7b",
+    "parent_refs": [
+      "git:9d39f6661693c401d63090cb3be1fe6d0bdf0d6b",
+      "git:0f2eff1f9acde1d4bcca9bbe438e0cefeee351b7",
+      "ci:29611191353",
+      "source-freeze:source-freeze-market-s2-sealed-holdout-20260717",
+      "reuse:reuse-s2-market-sealed-holdout-20260717"
+    ]
+  }
+}

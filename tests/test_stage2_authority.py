@@ -470,6 +470,31 @@ class Stage2AuthorityTests(unittest.TestCase):
         self.assertIn("raw_egress-false", public_text)
         self.assertIn("D3-holdout-bytes-never-enter-Bridge-public-repository-or-validator-receipt", public_text)
 
+    def test_market_sealed_holdout_worker_lease_is_exact_and_receipt_bound(self) -> None:
+        receipt = load(INTEGRATION_RECEIPTS / "s2-market-sealed-holdout-authority.json")
+        envelope = load(
+            STAGES / "s2-market-sealed-holdout" / "stage-envelope.json"
+        )
+        lease = load(
+            STAGES / "s2-market-sealed-holdout" / "ownership-lease.json"
+        )
+
+        self.assertEqual(receipt["schema_id"], "IntegrationReceipt")
+        self.assertEqual(receipt["integrity"]["payload_sha256"], payload_sha256(receipt))
+        self.assertEqual(receipt["payload"]["head_sha"], "9d39f6661693c401d63090cb3be1fe6d0bdf0d6b")
+        self.assertFalse(receipt["payload"]["audit_results"]["declares_market_pre_soak_green"])
+        self.assertFalse(receipt["payload"]["audit_results"]["public_holdout_payload_in_public_repo"])
+        self.assertEqual(envelope["public_authority_sha"], receipt["payload"]["head_sha"])
+        self.assertEqual(envelope["public_authority_ci"], "29611191353")
+        self.assertEqual(envelope["dependency_hashes"]["authority_receipt"], receipt["integrity"]["payload_sha256"])
+        self.assertEqual(envelope["write_set"], lease["write_set"])
+        self.assertFalse(lease["delegation_allowed"])
+        self.assertFalse(envelope["push_authority"])
+        self.assertIn(
+            "holdout-verifier-accepts-raw-egress-unconsumed-grant-stale-access-wrong-query-wrong-grant-ref-label-feature-price-return-row-payload-private-account-order-live-paper-authority-or-D3-public-copy",
+            envelope["stop_conditions"],
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -1,0 +1,19 @@
+{
+  "lease_id": "lease-s2-market-sealed-holdout-agent-3-20260717",
+  "stage_id": "s2-market-sealed-holdout",
+  "agent_id": "agent-3",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-17T21:09:00Z",
+  "expires_at": "2026-07-18T03:09:00Z",
+  "base_sha": "0f2eff1f9acde1d4bcca9bbe438e0cefeee351b7",
+  "public_authority_sha": "9d39f6661693c401d63090cb3be1fe6d0bdf0d6b",
+  "branch": "codex/bridge-a3-s2-market-sealed-holdout",
+  "worktree": "ephemeral-private-domain-worktree:s2-market-sealed-holdout",
+  "write_set": [
+    "data/bridge_pre_soak/sealed_holdout/market_pre_soak_sealed_holdout_profile.json",
+    "src/market_lab/bridge_pre_soak_sealed_holdout.py",
+    "tests/test_bridge_pre_soak_sealed_holdout.py"
+  ],
+  "delegation_allowed": false,
+  "state": "active"
+}
