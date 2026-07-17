@@ -516,6 +516,25 @@ class Stage1AuthorityTests(unittest.TestCase):
         )
         self.assertFalse(lease["delegation_allowed"])
 
+    def test_pause_epoch_fencing_worker_lease_is_exact(self) -> None:
+        envelope = load(
+            ROOT / "stages" / "s1-pause-epoch-fencing" / "stage-envelope.json"
+        )
+        lease = load(
+            ROOT / "stages" / "s1-pause-epoch-fencing" / "ownership-lease.json"
+        )
+        expected = [
+            "src/research_bridge/ledger.py",
+            "tests/test_stage1_pause_epoch_fencing.py",
+        ]
+
+        self.assertEqual(envelope["base_sha"], "715a87255b9d81ea30f303b07d0bda9a86eaafae")
+        self.assertEqual(envelope["public_authority_sha"], envelope["base_sha"])
+        self.assertEqual(envelope["write_set"], expected)
+        self.assertEqual(lease["write_set"], expected)
+        self.assertFalse(envelope["push_authority"])
+        self.assertFalse(lease["delegation_allowed"])
+
     def test_control_authority_is_pinned_and_reversible(self) -> None:
         envelope = load(ROOT / "stages" / "s1-control-authority" / "stage-envelope.json")
         lease = load(ROOT / "stages" / "s1-control-authority" / "ownership-lease.json")

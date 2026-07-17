@@ -1,0 +1,18 @@
+{
+  "lease_id": "lease-s1-pause-epoch-fencing-agent-2-20260717",
+  "stage_id": "s1-pause-epoch-fencing",
+  "agent_id": "agent-2",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-17T09:39:00Z",
+  "expires_at": "2026-07-17T15:39:00Z",
+  "base_sha": "715a87255b9d81ea30f303b07d0bda9a86eaafae",
+  "public_authority_sha": "715a87255b9d81ea30f303b07d0bda9a86eaafae",
+  "branch": "codex/bridge-a2-s1-pause-epoch-fencing",
+  "worktree": "ephemeral-public-worktree:s1-pause-epoch-fencing",
+  "write_set": [
+    "src/research_bridge/ledger.py",
+    "tests/test_stage1_pause_epoch_fencing.py"
+  ],
+  "delegation_allowed": false,
+  "state": "active"
+}

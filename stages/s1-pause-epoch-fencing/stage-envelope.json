@@ -1,0 +1,80 @@
+{
+  "stage_id": "s1-pause-epoch-fencing",
+  "agent_id": "agent-2",
+  "objective": "Make every durable global pause an irreversible fence for attempts claimed before that pause, while allowing only newly claimed attempts after a verified resume to progress.",
+  "executable_blocker": "The canonical ledger currently accepts checkpoint and completion writes from a pre-pause attempt during active pause and after resume and reopen.",
+  "base_sha": "715a87255b9d81ea30f303b07d0bda9a86eaafae",
+  "public_authority_sha": "715a87255b9d81ea30f303b07d0bda9a86eaafae",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a2-s1-pause-epoch-fencing",
+  "worktree": "ephemeral-public-worktree:s1-pause-epoch-fencing",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "docs/receipts/reuse/s1-ledger-durability.json",
+    "docs/receipts/reuse/s1-pause-epoch-fencing.json",
+    "docs/receipts/integration/s1-pause-epoch-fencing-authority.json",
+    "src/research_bridge/ledger.py",
+    "tests/test_stage1_ledger.py",
+    "tests/test_stage1_control.py"
+  ],
+  "write_set": [
+    "src/research_bridge/ledger.py",
+    "tests/test_stage1_pause_epoch_fencing.py"
+  ],
+  "preservation_contract": {
+    "required": [
+      "compare the winning claim event sequence with the latest durable pause event sequence inside the existing immediate transaction",
+      "deny checkpoint and completion when a pause sequence is newer than the attempt claim sequence",
+      "persist the fence across resume process restart and ledger reopen",
+      "allow an attempt claimed after verified resume to use normal checkpoint and completion semantics",
+      "all denials append zero events and preserve the existing hash chain"
+    ],
+    "forbidden": [
+      "new event type schema migration trigger index table or second ledger",
+      "in-memory pause generation active-pause-only check or resume revival",
+      "admission kernel control IPC domain or budget behavior change"
+    ]
+  },
+  "forbidden_scope": [
+    "unlisted-source-test-doc-config-workflow-lockfile-migration-or-contract-edit",
+    "new-event-type-table-trigger-index-second-ledger-or-destructive-database-change",
+    "admission-kernel-control-ipc-cas-execution-validation-domain-or-budget-edit",
+    "in-memory-only-generation-active-pause-only-check-or-resume-revival",
+    "existing-test-deletion-relaxation-skip-xfail-or-continue-on-error",
+    "dependency-network-deployment-publication-live-market-live-target-or-authority-expansion",
+    "push-merge-or-canonical-main-write"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "reuse_decision": "08db3b5eb94a941f668033c57c77a56ff018155498191db6a526e0816634a1ad",
+    "authority_receipt": "2c7c7d6e556285b195416e98a89c870986234aac20e4afd43e6d25f3184df5b8",
+    "external_dependencies": "none"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest tests.test_stage1_pause_epoch_fencing -v",
+    "python3 -m unittest tests.test_stage1_ledger tests.test_stage1_control -v",
+    "python3 -m unittest discover -s tests -p 'test_stage1_*.py'",
+    "make test",
+    "git diff --check",
+    "exact write-set schema dependency skip privacy network and live-authority scan"
+  ],
+  "risk_class": "bridge-sev0-durable-pause-epoch-fencing",
+  "stop_conditions": [
+    "base-authority-or-contract-hash-mismatch",
+    "schema-migration-new-event-type-second-ledger-or-write-set-expansion-required",
+    "pre-pause-attempt-can-write-during-or-after-pause-resume-reopen",
+    "post-resume-new-attempt-cannot-progress",
+    "rejected-transition-adds-an-event-or-breaks-chain",
+    "before-equals-after-or-pause-fencing-blocker-remains"
+  ],
+  "expected_receipt": "docs/receipts/integration/s1-pause-epoch-fencing.json",
+  "rollback": "Agent 0 discards the single worker commit and deletes the isolated branch/worktree. The canonical ledger schema and any real runtime database remain unchanged.",
+  "commit_authority": "one-scoped-worker-commit",
+  "push_authority": false,
+  "expected_handoff_status": [
+    "ready_for_agent0_audit",
+    "blocked_validation_failed"
+  ]
+}
