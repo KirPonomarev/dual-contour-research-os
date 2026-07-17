@@ -1,0 +1,102 @@
+{
+  "stage_id": "s1-market-offline-reference-e2e",
+  "agent_id": "agent-3",
+  "objective": "Implement one domain-owned synthetic numeric Market vertical through canonical Bridge execution and validation receipts into the existing Market Trial Ledger.",
+  "executable_blocker": "No private Market adapter currently creates the protocol, runner, validation and registry-writer chain needed for a real offline Bridge-to-domain-to-Bridge reference flow.",
+  "base_sha": "c4c697ef3dc8532321349917a65e1afb379e0ae2",
+  "public_authority_sha": "a61d4191c25f05bb6cfa9a8e3ab0c6d90abb0aff",
+  "public_authority_ci": "29589763750",
+  "public_development_sha": "4b8c2cb489919658260fb5f597dc3ae70d251707",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a3-s1-market-offline-reference-e2e",
+  "worktree": "ephemeral-private-domain-worktree:s1-market-offline-reference-e2e",
+  "read_set": [
+    "private-domain AGENTS.md and local development contract",
+    "public AGENTS.md and docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "public docs/receipts/source-freeze/s1-market-offline-reference-e2e.json",
+    "public docs/receipts/reuse/s1-market-offline-reference-e2e.json",
+    "public docs/receipts/integration/s1-market-offline-reference-e2e-authority.json",
+    "public stages/s1-market-offline-reference-e2e-authority/stage-envelope.json",
+    "public frozen HypothesisCard ProtocolSnapshot ExecutionReceipt ValidationReceipt and DomainTrialLinkReceipt contracts",
+    "existing private Trial Ledger append and history validation APIs",
+    "existing private synthetic fixture and Decision OS tests",
+    "existing public Bridge execution validation and reference APIs"
+  ],
+  "write_set": [
+    "src/market_lab/bridge_reference_adapter.py",
+    "src/market_lab/bridge_reference_registry.py",
+    "tests/test_bridge_reference_adapter.py",
+    "tests/test_bridge_reference_e2e.py"
+  ],
+  "semantic_freeze": {
+    "fixture": "new-independent-synthetic-D0-OHLCV-only-no-copy-from-private-existing-fixtures-or-public-repository",
+    "adapter": "strict-canonical-HypothesisCard-and-ProtocolSnapshot-bound-to-fixture-code-environment-and-lineage",
+    "runner": "domain-owned-deterministic-numeric-L0-implementation-of-the-existing-Bridge-Runner-protocol",
+    "validator": "pure-result-to-canonical-ValidationReceipt-adapter-with-no-registry-write",
+    "writer": "existing-Market-Trial-Ledger-only-and-accept-only-a-fully-validated-receipt",
+    "outcomes": [
+      "SUPPORTED",
+      "REFUTED",
+      "INCONCLUSIVE",
+      "INVALID"
+    ],
+    "link": "one-canonical-DomainTrialLinkReceipt-after-one-durable-trial-row-append",
+    "replay": "exact-replay-returns-identical-link-with-one-row;-any-conflict-or-invalid-receipt-rejects-zero-write",
+    "public_boundary": "Bridge-receives-D0-D1-references-and-receipts-only-never-domain-payload-or-scientific-truth"
+  },
+  "preservation_contract": [
+    "existing-Market-Trial-Ledger-remains-the-only-domain-registry",
+    "existing-Bridge-source-contracts-ledger-CAS-and-validator-remain-unmodified",
+    "private-Market-source-fixtures-results-and-domain-truth-remain-private",
+    "no-external-dependency-workflow-config-or-lockfile-edit-by-the-worker",
+    "no-network-exchange-order-live-target-publication-deployment-or-UI-authority"
+  ],
+  "forbidden_scope": [
+    "write-outside-two-source-and-two-test-files",
+    "public-repository-write-or-copy-of-private-source-fixture-result-dataset-strategy-or-scientific-payload",
+    "contract-schema-lockfile-dependency-config-workflow-migration-or-existing-registry-schema-edit",
+    "second-registry-ledger-store-or-Claim-Registry-substitution",
+    "validator-direct-registry-write-unvalidated-outcome-or-scientific-result-fabrication",
+    "existing-private-fixture-copy-non-synthetic-input-network-exchange-order-live-trading-publication-deployment-or-UI",
+    "private-path-url-secret-account-D2-or-D3-payload-in-public-or-receipt-material",
+    "skip-xfail-continue-on-error-optional-gate-or-validation-weakening",
+    "dirty-owner-checkout-mutation",
+    "push-merge-deploy-or-canonical-public-write"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "source_freeze": "3bacb20065e79d5999d6d3e3f5c9d7862836c71f4595358c9b4831a2faecadbc",
+    "reuse_decision": "acb60c052b94231e28858e382264160d7f483b274e538965341fa627b896378c",
+    "authority_receipt": "69e681ab93813d0b309682d7508c242467e71a1e1ce32a8f0990fc13dbd62667",
+    "private_market_head": "c4c697ef3dc8532321349917a65e1afb379e0ae2",
+    "external_dependencies": "none"
+  },
+  "acceptance_commands": [
+    "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src python -m pytest -q -p no:cacheprovider tests/test_bridge_reference_adapter.py",
+    "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src:<pinned-public-bridge>/src python -m pytest -q -p no:cacheprovider tests/test_bridge_reference_e2e.py",
+    "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src:<pinned-public-bridge>/src python -m pytest -q -p no:cacheprovider",
+    "git diff --check",
+    "exact four-file write-set tamper authority lineage outcome replay registry privacy dependency network live-authority and weakening scan",
+    "after Agent0 CI binding exact-head private combined CI against final post-terminal public SHA"
+  ],
+  "risk_class": "private-market-offline-domain-reference-vertical",
+  "stop_conditions": [
+    "private-base-public-authority-contract-source-freeze-reuse-or-receipt-hash-mismatch",
+    "write-set-collision-dirty-owner-checkout-mutation-or-fifth-file-required",
+    "numeric-runner-needs-public-domain-code-non-synthetic-input-or-external-dependency",
+    "ValidationReceipt-does-not-exactly-bind-protocol-execution-artifacts-validator-and-outcome",
+    "invalid-or-conflicting-receipt-can-write-a-trial-row-or-exact-replay-duplicates-a-row",
+    "Bridge-observes-domain-payload-or-the-validator-writes-the-registry",
+    "final-combined-CI-cannot-pass-against-the-post-terminal-public-Bridge-SHA",
+    "any-live-network-order-exchange-target-publication-or-deployment-authority-appears",
+    "before-equals-after-or-Market-reference-E2E-blocker-remains"
+  ],
+  "expected_receipt": "public:docs/receipts/integration/s1-market-offline-reference-e2e.json",
+  "rollback": "Agent 0 discards the isolated worker commit and branch. The private owner checkout, existing registry data, public Bridge repository and external systems remain unchanged.",
+  "commit_authority": "one-scoped-worker-commit",
+  "push_authority": false,
+  "expected_handoff_status": [
+    "ready_for_agent0_audit",
+    "blocked_validation_failed"
+  ]
+}

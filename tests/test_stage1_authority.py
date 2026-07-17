@@ -707,6 +707,38 @@ class Stage1AuthorityTests(unittest.TestCase):
         self.assertNotIn("/Volumes/", public_text)
         self.assertFalse(lease["delegation_allowed"])
 
+    def test_market_offline_reference_e2e_worker_lease_is_four_file_private_only(self) -> None:
+        envelope = load(
+            ROOT
+            / "stages"
+            / "s1-market-offline-reference-e2e"
+            / "stage-envelope.json"
+        )
+        lease = load(
+            ROOT
+            / "stages"
+            / "s1-market-offline-reference-e2e"
+            / "ownership-lease.json"
+        )
+
+        self.assertEqual(envelope["write_set"], lease["write_set"])
+        self.assertEqual(
+            envelope["write_set"],
+            [
+                "src/market_lab/bridge_reference_adapter.py",
+                "src/market_lab/bridge_reference_registry.py",
+                "tests/test_bridge_reference_adapter.py",
+                "tests/test_bridge_reference_e2e.py",
+            ],
+        )
+        self.assertEqual(
+            envelope["dependency_hashes"]["authority_receipt"],
+            "69e681ab93813d0b309682d7508c242467e71a1e1ce32a8f0990fc13dbd62667",
+        )
+        self.assertIn("public_boundary", envelope["semantic_freeze"])
+        self.assertFalse(envelope["push_authority"])
+        self.assertFalse(lease["delegation_allowed"])
+
     def test_market_base_authority_refresh_is_sanitized_pinned_and_reversible(self) -> None:
         envelope = load(ROOT / "stages" / "s1-market-base-authority" / "stage-envelope.json")
         lease = load(ROOT / "stages" / "s1-market-base-authority" / "ownership-lease.json")

@@ -1,0 +1,20 @@
+{
+  "lease_id": "lease-s1-market-offline-reference-e2e-agent-3-20260717",
+  "stage_id": "s1-market-offline-reference-e2e",
+  "agent_id": "agent-3",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-17T14:52:51Z",
+  "expires_at": "2026-07-17T20:52:51Z",
+  "base_sha": "c4c697ef3dc8532321349917a65e1afb379e0ae2",
+  "public_authority_sha": "a61d4191c25f05bb6cfa9a8e3ab0c6d90abb0aff",
+  "branch": "codex/bridge-a3-s1-market-offline-reference-e2e",
+  "worktree": "ephemeral-private-domain-worktree:s1-market-offline-reference-e2e",
+  "write_set": [
+    "src/market_lab/bridge_reference_adapter.py",
+    "src/market_lab/bridge_reference_registry.py",
+    "tests/test_bridge_reference_adapter.py",
+    "tests/test_bridge_reference_e2e.py"
+  ],
+  "delegation_allowed": false,
+  "state": "active"
+}
