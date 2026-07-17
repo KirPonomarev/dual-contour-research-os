@@ -372,6 +372,35 @@ class Stage2AuthorityTests(unittest.TestCase):
             envelope["stop_conditions"],
         )
 
+    def test_market_budget_hard_caps_worker_receipt_is_sanitized_slice_only(self) -> None:
+        receipt = load(INTEGRATION_RECEIPTS / "s2-market-budget-hard-caps.json")
+
+        self.assertEqual(receipt["schema_id"], "IntegrationReceipt")
+        self.assertEqual(receipt["integrity"]["payload_sha256"], payload_sha256(receipt))
+        self.assertEqual(receipt["payload"]["head_sha"], "0f2eff1f9acde1d4bcca9bbe438e0cefeee351b7")
+        audit = receipt["payload"]["audit_results"]
+        self.assertEqual(audit["focused_budget_cap_tests"], 14)
+        self.assertEqual(audit["bounded_budget_cost_funding_tests"], 44)
+        self.assertEqual(audit["private_full_suite_passed"], 2975)
+        self.assertEqual(audit["budget_profile_file_sha256"], "cfe8b31328b705a09d720f9b0f2a3e958fd68a2875c14d950cceaf8eab55e0c5")
+        self.assertEqual(audit["hard_cap_count"], 10)
+        self.assertEqual(audit["budget_cap_breach_count"], 0)
+        self.assertEqual(audit["round_trip_execution_cost_bps"], 48.0)
+        self.assertEqual(audit["provider_cost_headroom_bps"], 12.0)
+        self.assertEqual(audit["minimum_free_disk_headroom_bytes"], 2147483648.0)
+        self.assertEqual(audit["validation_receipt_outcome"], "BUDGET_HARD_CAPS_PASS")
+        self.assertFalse(audit["scientific_outcome_applied"])
+        self.assertFalse(audit["public_budget_payload_in_public_repo"])
+        self.assertFalse(audit["network_during_validation_or_tests"])
+        self.assertFalse(audit["declares_market_pre_soak_green"])
+
+        text = (INTEGRATION_RECEIPTS / "s2-market-budget-hard-caps.json").read_text()
+        self.assertNotIn("model_daily_usd_cap", text)
+        self.assertNotIn("trial_family_usd_cap", text)
+        self.assertNotIn("binance_spot_public", text)
+        self.assertNotIn("/Users/", text)
+        self.assertNotIn("/Volumes/", text)
+
 
 if __name__ == "__main__":
     unittest.main()

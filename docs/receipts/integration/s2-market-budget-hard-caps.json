@@ -1,0 +1,81 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s2-market-budget-hard-caps-20260717",
+  "issued_at": "2026-07-17T20:50:00Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "market",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s2-market-budget-hard-caps",
+    "agent_id": "agent-3",
+    "ownership_lease_ref": "stages/s2-market-budget-hard-caps/ownership-lease.json",
+    "base_sha": "498e21ee2518997771ec2e3834548ad8a26dd9ce",
+    "head_sha": "0f2eff1f9acde1d4bcca9bbe438e0cefeee351b7",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "data/bridge_pre_soak/budget_caps/market_pre_soak_budget_caps_profile.json",
+      "src/market_lab/bridge_pre_soak_budget_caps.py",
+      "tests/test_bridge_pre_soak_budget_caps.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "public_bridge_sha": "498e21ee2518997771ec2e3834548ad8a26dd9ce",
+      "public_exact_head_ci": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29609625241",
+      "private_base_sha": "13f24633c4371dcd47737f62dc667fc6b35b0122",
+      "private_worker_commit_sha": "0f2eff1f9acde1d4bcca9bbe438e0cefeee351b7",
+      "focused_budget_cap_tests": 14,
+      "bounded_budget_cost_funding_tests": 44,
+      "private_full_suite_passed": 2975,
+      "private_full_suite_warnings": 68,
+      "private_full_suite_seconds": 1103.8,
+      "diff_check": "green",
+      "private_write_set_exact": true,
+      "privacy_secret_scan": "green",
+      "privacy_secret_scan_notes": "intentional deny-list literals only; no secret material detected",
+      "source_mutation": false,
+      "worker_write_set_files": 3,
+      "worker_profile_files": 1,
+      "worker_source_files": 1,
+      "worker_test_files": 1,
+      "budget_profile_file_sha256": "cfe8b31328b705a09d720f9b0f2a3e958fd68a2875c14d950cceaf8eab55e0c5",
+      "budget_profile_canonical_sha256": "065a79c66443f7ecdf5805e0d9a5d5c9b779481b25d6ec80393c0d601c6c22a0",
+      "previous_cost_provider_profile_canonical_sha256": "ea49aa68922b483925bbcf86b2d67a854103cf2d87f93ac17e6a4098de414aa1",
+      "dataset_sha256": "20d4a28d97c5f195df0e421c8449cfcf8825e33940e12fcbd5b7a66650535080",
+      "hard_cap_count": 10,
+      "budget_cap_breach_count": 0,
+      "round_trip_execution_cost_bps": 48.0,
+      "provider_cost_headroom_bps": 12.0,
+      "minimum_free_disk_headroom_bytes": 2147483648.0,
+      "validation_receipt_outcome": "BUDGET_HARD_CAPS_PASS",
+      "validation_receipt_payload_sha256": "be9eb3400f05c2c8020cfc88e0488107555d0a3b3385a9fa676d691c166655d3",
+      "scientific_outcome_applied": false,
+      "public_budget_payload_in_public_repo": false,
+      "network_during_validation_or_tests": false,
+      "dependency_adoption": false,
+      "frozen_contract_edit": false,
+      "public_source_mutation": false,
+      "private_owner_checkout_mutated": false,
+      "declares_market_pre_soak_green": false,
+      "live_or_connected_authority": false,
+      "private_exact_head_ci": "local-green-withheld"
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29609625241",
+    "integration_commit_sha": "498e21ee2518997771ec2e3834548ad8a26dd9ce"
+  },
+  "integrity": {
+    "payload_sha256": "0b8f687ee63630d8160d8006c7f7bdbdef316e38a1c3eb98c6c9e2dac606662b",
+    "parent_refs": [
+      "git:0f2eff1f9acde1d4bcca9bbe438e0cefeee351b7",
+      "git:498e21ee2518997771ec2e3834548ad8a26dd9ce",
+      "ci:29609625241",
+      "ci:private-local-green-withheld",
+      "integration:integration-s2-market-budget-hard-caps-authority-20260717",
+      "source-freeze:source-freeze-market-s2-budget-hard-caps-20260717",
+      "reuse:reuse-s2-market-budget-hard-caps-20260717"
+    ]
+  }
+}
