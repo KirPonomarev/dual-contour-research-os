@@ -1,0 +1,70 @@
+{
+  "stage_id": "s1-market-base-authority",
+  "agent_id": "agent-0",
+  "objective": "Refresh the sanitized Market source freeze and select one private, pinned, no-public-copy reuse mode for repairing the exact frozen source CI before any Stage 1 Market adapter work.",
+  "executable_blocker": "The public Bridge reference vertical is green, but the selected Market source head has deterministic red CI because a fail-closed CLI prerequisite is absent from its clean-checkout smoke sequence; no domain worker may start from that unreceipted base.",
+  "base_sha": "653bee1ade357efa045610ef60f649ba6fa0537f",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "main",
+  "worktree": "canonical-main-worktree",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "docs/receipts/source-freeze/s0b-market.json",
+    "inventory/market/reusable-capabilities.json",
+    "docs/receipts/integration/s1-reference-vertical.json",
+    "market-domain:frozen-git-tree@636d0b56d13ba919d4af7c4bcd0718ac7fb92945",
+    "market-domain:sanitized-ci-failure-evidence@sha256:f2d19112224bb2c8d33394715f74d7eed2ad6dffc35c248cabf9e2e2d46a277d"
+  ],
+  "write_set": [
+    "docs/receipts/source-freeze/s1-market-base-repair.json",
+    "docs/receipts/reuse/s1-market-base-repair.json",
+    "stages/s1-market-base-authority/stage-envelope.json",
+    "stages/s1-market-base-authority/ownership-lease.json",
+    "tests/test_stage1_authority.py"
+  ],
+  "forbidden_scope": [
+    "private-source-code-copy-into-public-repository",
+    "dirty-market-source-checkout-mutation",
+    "market-dataset-strategy-evidence-or-scientific-payload-publication",
+    "market-validator-or-domain-registry-writer-implementation",
+    "validation-bypass-continue-on-error-or-gate-weakening",
+    "external-dependency-adoption",
+    "d2-or-d3-payload",
+    "live-trading-order-private-api-or-external-mutation",
+    "deployment-or-ui",
+    "frozen-contract-edit"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "prior_market_source_freeze": "6de45dbbfebddb732ab8e166cc1b1ac31a3c1371561f03f348f9c66cb918ab34",
+    "market_capability_inventory": "e57e15b8854640022e2cb5238b6b9fb531b24feab6a712a457ffa969bb9372b7",
+    "public_reference_vertical_receipt": "9cf99cc4dc882a036fd046062134f8e935291d4ea3b200c73e8348743cc66997",
+    "market_ci_failure_evidence": "f2d19112224bb2c8d33394715f74d7eed2ad6dffc35c248cabf9e2e2d46a277d",
+    "last_green_lineage_evidence": "7e68ce55835e57117956e49070a1c7fe4b9e3fcbbc562c7ca4ce23acbadd38c4",
+    "canonical_main_lineage_evidence": "5a4fd1035dd0be2458954f578f8ec0c8af59b2da52f72187efb69a3e016f7b66",
+    "external_dependencies": "none"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest tests.test_stage1_authority -v",
+    "make test",
+    "git diff --check",
+    "public privacy, secret, private-locator, private-URL and exact write-set scan"
+  ],
+  "risk_class": "private-market-source-authority-and-public-sanitization",
+  "stop_conditions": [
+    "source-head-or-upstream-mismatch",
+    "dirty-source-checkout-mutation",
+    "private-path-url-data-or-code-detected-in-public-write-set",
+    "validation-weakening-required",
+    "external-dependency-required",
+    "contract-drift",
+    "write-set-collision",
+    "before-equals-after-without-removing-ci-blocker"
+  ],
+  "expected_receipt": "docs/receipts/integration/s1-market-base-authority.json",
+  "rollback": "Revert the scoped public authority commit before the private Market worker base is issued. No private source checkout, domain state, dataset, runtime, deployment or external system is mutated by this authority stage.",
+  "commit_authority": "agent-0-one-scoped-commit",
+  "push_authority": true
+}

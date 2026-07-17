@@ -50,6 +50,7 @@ class Stage1AuthorityTests(unittest.TestCase):
             "s1-trusted-storage.json": "clean-room-stdlib-owned-cas-ingestor",
             "s1-offline-execution.json": "clean-room-stdlib-inprocess-frozen-l0-and-researchd-finalizer",
             "s1-validation-boundary.json": "clean-room-stdlib-pure-receipt-verifier",
+            "s1-market-base-repair.json": "pinned-private-domain-ci-repair-no-public-code-copy",
         }
         schema = load(ROOT / "contracts" / "v1" / "ReuseDecisionReceipt.schema.json")
         allowed = set(schema["properties"])
@@ -74,6 +75,49 @@ class Stage1AuthorityTests(unittest.TestCase):
         self.assertEqual(envelope["write_set"], lease["write_set"])
         self.assertTrue(envelope["executable_blocker"])
         self.assertTrue(envelope["acceptance_commands"])
+        self.assertTrue(envelope["rollback"])
+        self.assertFalse(lease["delegation_allowed"])
+
+    def test_market_base_authority_refresh_is_sanitized_pinned_and_reversible(self) -> None:
+        envelope = load(ROOT / "stages" / "s1-market-base-authority" / "stage-envelope.json")
+        lease = load(ROOT / "stages" / "s1-market-base-authority" / "ownership-lease.json")
+        source = load(SOURCE_RECEIPTS / "s1-market-base-repair.json")
+        reuse = load(REUSE_RECEIPTS / "s1-market-base-repair.json")
+
+        self.assertEqual(envelope["base_sha"], "653bee1ade357efa045610ef60f649ba6fa0537f")
+        self.assertEqual(envelope["write_set"], lease["write_set"])
+        self.assertEqual(source["payload"]["head_sha"], source["payload"]["upstream_sha"])
+        self.assertEqual(source["payload"]["head_sha"], source["payload"]["selected_source_sha"])
+        self.assertEqual(sum(item["count"] for item in source["payload"]["path_dispositions"]), 31)
+        self.assertTrue(
+            all(item["disposition"] == "parked-not-selected" for item in source["payload"]["path_dispositions"])
+        )
+        self.assertEqual(source["integrity"]["payload_sha256"], payload_sha256(source))
+        self.assertEqual(reuse["integrity"]["payload_sha256"], payload_sha256(reuse))
+        self.assertEqual(reuse["payload"]["code_sha256"], EMPTY_SHA256)
+        dispositions = {
+            item["candidate"]: item["disposition"]
+            for item in reuse["payload"]["candidates"]
+        }
+        self.assertEqual(
+            dispositions["market-runtime-source"],
+            "rejected-public-copy-no-license",
+        )
+        self.assertEqual(
+            dispositions["validation-bypass-or-continue-on-error"],
+            "rejected-validation-weakening",
+        )
+        public_text = "\n".join(
+            (
+                (SOURCE_RECEIPTS / "s1-market-base-repair.json").read_text(),
+                (REUSE_RECEIPTS / "s1-market-base-repair.json").read_text(),
+                (ROOT / "stages" / "s1-market-base-authority" / "stage-envelope.json").read_text(),
+                (ROOT / "stages" / "s1-market-base-authority" / "ownership-lease.json").read_text(),
+            )
+        )
+        self.assertNotIn("/Users/", public_text)
+        self.assertNotIn("/Volumes/", public_text)
+        self.assertNotIn("github.com/KirPonomarev/crypto-market-lab", public_text)
         self.assertTrue(envelope["rollback"])
         self.assertFalse(lease["delegation_allowed"])
 

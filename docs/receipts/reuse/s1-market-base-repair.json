@@ -1,0 +1,74 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-s1-market-base-repair-20260717",
+  "issued_at": "2026-07-17T05:50:24Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "reuse-freeze-authority"
+  },
+  "contour": "market",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "stage1-market-domain-ci-base-repair-prerequisite",
+    "candidates": [
+      {
+        "candidate": "frozen-market-domain-source-at-pinned-commit",
+        "disposition": "selected-private-source-base-no-public-copy"
+      },
+      {
+        "candidate": "public-contract-interface",
+        "disposition": "selected-interface"
+      },
+      {
+        "candidate": "stdlib-json-pathlib-unittest-temporary-files",
+        "disposition": "selected"
+      },
+      {
+        "candidate": "market-runtime-source",
+        "disposition": "rejected-public-copy-no-license"
+      },
+      {
+        "candidate": "older-canonical-market-main",
+        "disposition": "parked-green-but-capability-stale"
+      },
+      {
+        "candidate": "older-feature-line-green-commit",
+        "disposition": "parked-green-but-181-commits-stale"
+      },
+      {
+        "candidate": "validation-bypass-or-continue-on-error",
+        "disposition": "rejected-validation-weakening"
+      },
+      {
+        "candidate": "external-dependency",
+        "disposition": "rejected-unnecessary"
+      }
+    ],
+    "selected_mode": "pinned-private-domain-ci-repair-no-public-code-copy",
+    "source_ref": "source-freeze:source-freeze-market-s1-base-repair-20260717;git:636d0b56d13ba919d4af7c4bcd0718ac7fb92945",
+    "code_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "license_spdx": "NOASSERTION",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "clean-checkout-prerequisite-aware-paper-reality-cli-conformance",
+      "missing-unified-context-remains-fail-closed",
+      "synthetic-context-never-grants-live-or-trading-authority",
+      "no-network-order-private-key-or-canonical-domain-write",
+      "existing-full-market-test-suite",
+      "exact-head-private-remote-ci"
+    ],
+    "canonical_owner": "market-domain-with-agent0-ci-integration",
+    "rollback": "Revert the scoped private conformance and CI commits and delete the isolated stage branch. The dirty source checkout, domain ledgers, datasets, reports, external services and public Bridge runtime remain unchanged."
+  },
+  "integrity": {
+    "payload_sha256": "a9e45c427d1bfb30fe119e61e154ae82d0041c48e10bffbc8ec944bd2f15a911",
+    "parent_refs": [
+      "git:653bee1ade357efa045610ef60f649ba6fa0537f",
+      "source-freeze:source-freeze-market-s1-base-repair-20260717",
+      "sha256:f2d19112224bb2c8d33394715f74d7eed2ad6dffc35c248cabf9e2e2d46a277d",
+      "sha256:7e68ce55835e57117956e49070a1c7fe4b9e3fcbbc562c7ca4ce23acbadd38c4",
+      "sha256:5a4fd1035dd0be2458954f578f8ec0c8af59b2da52f72187efb69a3e016f7b66"
+    ]
+  }
+}

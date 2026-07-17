@@ -1,0 +1,20 @@
+{
+  "lease_id": "lease-s1-market-base-authority-agent-0-20260717",
+  "stage_id": "s1-market-base-authority",
+  "agent_id": "agent-0",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-17T05:50:24Z",
+  "expires_at": "2026-07-17T11:50:24Z",
+  "base_sha": "653bee1ade357efa045610ef60f649ba6fa0537f",
+  "branch": "main",
+  "worktree": "canonical-main-worktree",
+  "write_set": [
+    "docs/receipts/source-freeze/s1-market-base-repair.json",
+    "docs/receipts/reuse/s1-market-base-repair.json",
+    "stages/s1-market-base-authority/stage-envelope.json",
+    "stages/s1-market-base-authority/ownership-lease.json",
+    "tests/test_stage1_authority.py"
+  ],
+  "delegation_allowed": false,
+  "state": "active"
+}
