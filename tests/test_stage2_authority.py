@@ -950,6 +950,45 @@ class Stage2AuthorityTests(unittest.TestCase):
         self.assertNotIn("/Users/", text)
         self.assertNotIn("/Volumes/", text)
 
+    def test_market_pre_soak_green_gate_is_complete_but_not_deployment_gate(self) -> None:
+        receipt = load(INTEGRATION_RECEIPTS / "s2-market-pre-soak-green.json")
+        envelope = load(STAGES / "s2-market-pre-soak-green" / "stage-envelope.json")
+        lease = load(STAGES / "s2-market-pre-soak-green" / "ownership-lease.json")
+
+        self.assertEqual(receipt["integrity"]["payload_sha256"], payload_sha256(receipt))
+        self.assertEqual(envelope["write_set"], lease["write_set"])
+        self.assertFalse(lease["delegation_allowed"])
+        audit = receipt["payload"]["audit_results"]
+        self.assertEqual(audit["required_capability_count"], 9)
+        self.assertEqual(audit["accepted_slice_receipt_count"], 7)
+        self.assertEqual(len(audit["capabilities"]), 9)
+        self.assertTrue(all(audit["capabilities"].values()))
+        self.assertEqual(audit["stage_exit"], "MARKET_PRE_SOAK_GREEN")
+        self.assertTrue(audit["declares_market_pre_soak_green"])
+        self.assertEqual(audit["next_stage"], "Stage-3-Security-local-lab-contour")
+        self.assertFalse(audit["declares_dual_contour_pre_soak_green"])
+        self.assertFalse(audit["declares_ready_for_72h_soak"])
+        self.assertFalse(audit["encrypted_off_host_backup_claimed"])
+        self.assertFalse(audit["deployment_authority"])
+        self.assertFalse(audit["scientific_outcome_applied"])
+        self.assertFalse(audit["public_private_payload_in_public_repo"])
+
+        expected_receipts = {
+            "dataset_temporal_integrity": "s2-market-public-dataset-temporal-integrity.json",
+            "cost_provider_accounting": "s2-market-cost-provider-accounting.json",
+            "budget_hard_caps": "s2-market-budget-hard-caps.json",
+            "sealed_holdout": "s2-market-sealed-holdout.json",
+            "crash_resume": "s2-market-crash-resume.json",
+            "corrupt_checkpoint": "s2-market-corrupt-checkpoint.json",
+            "backup_restore": "s2-market-backup-restore.json",
+        }
+        for key, name in expected_receipts.items():
+            child = load(INTEGRATION_RECEIPTS / name)
+            self.assertEqual(
+                audit["slice_receipt_payload_sha256"][key],
+                child["integrity"]["payload_sha256"],
+            )
+
 
 if __name__ == "__main__":
     unittest.main()

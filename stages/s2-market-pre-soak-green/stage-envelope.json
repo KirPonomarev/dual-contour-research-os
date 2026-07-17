@@ -1,0 +1,74 @@
+{
+  "stage_id": "s2-market-pre-soak-green",
+  "agent_id": "agent-0",
+  "objective": "Audit all frozen Market Stage 2 slices and declare MARKET_PRE_SOAK_GREEN without claiming deployment or 72-hour soak readiness.",
+  "executable_blocker": "All required Market pre-soak slices have green integration receipts and the final backup/restore integration head has exact-head CI, but the canonical Stage 2 exit gate has not yet been issued.",
+  "base_sha": "0cdb14bec659a2a8970da96d7ee2825593d3d170",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "main",
+  "worktree": "canonical-public-worktree",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "master plan Stage 2 exit requirements",
+    "docs/receipts/integration/s2-market-public-dataset-temporal-integrity.json",
+    "docs/receipts/integration/s2-market-cost-provider-accounting.json",
+    "docs/receipts/integration/s2-market-budget-hard-caps.json",
+    "docs/receipts/integration/s2-market-sealed-holdout.json",
+    "docs/receipts/integration/s2-market-crash-resume.json",
+    "docs/receipts/integration/s2-market-corrupt-checkpoint.json",
+    "docs/receipts/integration/s2-market-backup-restore.json"
+  ],
+  "write_set": [
+    "docs/receipts/integration/s2-market-pre-soak-green.json",
+    "stages/s2-market-pre-soak-green/stage-envelope.json",
+    "stages/s2-market-pre-soak-green/ownership-lease.json",
+    "tests/test_stage2_authority.py"
+  ],
+  "gate_contract": {
+    "required_market_pre_soak_capabilities": [
+      "real-frozen-public-dataset",
+      "temporal-integrity",
+      "fees-slippage-funding",
+      "provider-accounting",
+      "budget-hard-caps",
+      "sealed-holdout",
+      "crash-resume",
+      "corrupt-checkpoint-handling",
+      "backup-restore"
+    ],
+    "exit_status": "MARKET_PRE_SOAK_GREEN",
+    "next_stage": "Stage-3-Security-local-lab-contour",
+    "declares_ready_for_72h_soak": false,
+    "declares_dual_contour_pre_soak_green": false,
+    "encrypted_off_host_backup_claimed": false,
+    "deployment_authority": false
+  },
+  "forbidden_scope": [
+    "new-runtime-domain-component-private-payload-or-scientific-truth",
+    "claim-READY_FOR_72H_SOAK-DUAL_CONTOUR_PRE_SOAK_GREEN-or-soak-start",
+    "claim-encrypted-off-host-backup-release-image-deployment-rollback-or-reboot-readiness",
+    "contract-schema-dependency-config-workflow-lockfile-migration-or-registry-edit",
+    "live-paper-order-exchange-publication-deployment-or-UI-authority"
+  ],
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest tests.test_stage2_authority -v",
+    "make test",
+    "git diff --check",
+    "exact public write-set integrity privacy and premature-gate scan",
+    "non-force push and exact-head public CI"
+  ],
+  "risk_class": "canonical-market-pre-soak-exit-gate",
+  "stop_conditions": [
+    "any-required-Stage2-integration-receipt-missing-or-payload-hash-mismatch",
+    "final-backup-restore-integration-head-exact-CI-not-green",
+    "private-runtime-payload-path-secret-or-domain-truth-enters-public-repository",
+    "gate-claims-deployment-encrypted-off-host-backup-DUAL_CONTOUR_PRE_SOAK_GREEN-or-READY_FOR_72H_SOAK",
+    "before-equals-after-or-MARKET_PRE_SOAK_GREEN-remains-undeclared"
+  ],
+  "expected_receipt": "docs/receipts/integration/s2-market-pre-soak-green.json",
+  "rollback": "Revert only the gate receipt and tests; all accepted Stage 2 slice receipts remain intact.",
+  "commit_authority": "agent-0-only",
+  "push_authority": "agent-0-only"
+}
