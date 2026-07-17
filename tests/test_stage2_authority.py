@@ -629,6 +629,59 @@ class Stage2AuthorityTests(unittest.TestCase):
             envelope["stop_conditions"],
         )
 
+    def test_market_crash_resume_worker_receipt_is_sanitized_slice_only(self) -> None:
+        receipt = load(INTEGRATION_RECEIPTS / "s2-market-crash-resume.json")
+
+        self.assertEqual(receipt["schema_id"], "IntegrationReceipt")
+        self.assertEqual(receipt["integrity"]["payload_sha256"], payload_sha256(receipt))
+        self.assertEqual(
+            receipt["payload"]["head_sha"],
+            "b53361cc5c505f5867176810d8ea8a210e8135eb",
+        )
+        audit = receipt["payload"]["audit_results"]
+        self.assertEqual(audit["focused_crash_resume_tests"], 17)
+        self.assertEqual(audit["bounded_crash_resume_regression_tests"], 51)
+        self.assertFalse(audit["private_full_suite_run"])
+        self.assertEqual(
+            audit["crash_resume_profile_file_sha256"],
+            "5795fc6b9a092164457782c7df894713689b8f401d387f850c8d862ff22ac414",
+        )
+        self.assertEqual(
+            audit["result_sha256"],
+            "5318870017fb15a6cc91147dff8b8dee6485c80ba0c67c06927df63f8a4e9fc0",
+        )
+        self.assertEqual(audit["total_chunk_count"], 4)
+        self.assertEqual(audit["checkpoint_count_before_crash"], 2)
+        self.assertEqual(audit["resumed_chunk_count"], 2)
+        self.assertEqual(audit["new_chunk_count"], 2)
+        self.assertEqual(audit["first_fencing_token"], 1)
+        self.assertEqual(audit["resumed_fencing_token"], 2)
+        self.assertTrue(audit["crash_injected"])
+        self.assertTrue(audit["resume_pending_observed"])
+        self.assertTrue(audit["stale_fencing_rejected"])
+        self.assertTrue(audit["duplicate_completion_rejected"])
+        self.assertTrue(audit["event_chains_verified"])
+        self.assertEqual(audit["runtime_payload_bytes_exported"], 0)
+        self.assertEqual(
+            audit["validation_receipt_outcome"],
+            "CRASH_RESUME_EQUIVALENCE_PASS",
+        )
+        self.assertFalse(audit["scientific_outcome_applied"])
+        self.assertFalse(audit["public_runtime_checkpoint_payload_in_public_repo"])
+        self.assertFalse(audit["public_result_payload_in_public_repo"])
+        self.assertFalse(audit["corrupt_checkpoint_scope_included"])
+        self.assertFalse(audit["backup_restore_scope_included"])
+        self.assertFalse(audit["network_during_validation_or_tests"])
+        self.assertFalse(audit["declares_market_pre_soak_green"])
+
+        text = (INTEGRATION_RECEIPTS / "s2-market-crash-resume.json").read_text()
+        self.assertNotIn("domain-vault:market", text)
+        self.assertNotIn('"checkpoint_payload":', text)
+        self.assertNotIn('"result_payload":', text)
+        self.assertNotIn("ledger.sqlite3", text)
+        self.assertNotIn("/Users/", text)
+        self.assertNotIn("/Volumes/", text)
+
 
 if __name__ == "__main__":
     unittest.main()
