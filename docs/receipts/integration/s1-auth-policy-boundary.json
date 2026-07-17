@@ -1,0 +1,68 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s1-auth-policy-boundary-20260717",
+  "issued_at": "2026-07-17T09:48:19Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "bridge",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s1-auth-policy-boundary",
+    "agent_id": "agent-1",
+    "ownership_lease_ref": "stages/s1-auth-policy-boundary/ownership-lease-amendment-1.json",
+    "base_sha": "2b756ccbbb9541b98594d5247c2f02c938e17bce",
+    "head_sha": "c52a6368d0dfb2969f504842f35a79f19a6571b8",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "src/research_bridge/authority.py",
+      "src/research_bridge/admission.py",
+      "src/research_bridge/kernel.py",
+      "src/research_bridge/control.py",
+      "tests/test_stage1_authority_policy.py",
+      "tests/test_stage1_admission.py",
+      "tests/test_stage1_assurance.py",
+      "tests/test_stage1_execution_assurance.py",
+      "tests/test_stage1_reference_vertical.py",
+      "tests/test_stage1_control.py",
+      "tests/test_stage1_control_assurance.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "focused_tests": 10,
+      "compatibility_tests": 61,
+      "stage1_tests": 190,
+      "connected_tests": 222,
+      "stage0b_tests": 25,
+      "skipped_tests": 0,
+      "diff_check": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "dependency_adoption": false,
+      "frozen_contract_edit": false,
+      "ledger_or_ipc_edit": false,
+      "pinned_offline_issuer_boundary": "green",
+      "policy_snapshot_resolution_and_binding": "green",
+      "approval_resolution_action_policy_expiry_and_revocation": "green",
+      "missing_verifier_or_resolution_fails_before_backend_mutation": true,
+      "cryptographic_authenticity": false,
+      "approval_nonce_consumed": false,
+      "live_or_connected_authority": false,
+      "global_stage1_gate_declared_green": false,
+      "exact_head_remote_ci": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29571163423"
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29571163423",
+    "integration_commit_sha": "fc95c19f009af66f7e2396ce8766465d892a5017"
+  },
+  "integrity": {
+    "payload_sha256": "99d8e0f7e5cfd8b85c7eb8bc9237d60e91f614d99337ef3ff58532db228129ed",
+    "parent_refs": [
+      "git:c52a6368d0dfb2969f504842f35a79f19a6571b8",
+      "git:fc95c19f009af66f7e2396ce8766465d892a5017",
+      "ci:29571163423",
+      "reuse:reuse-s1-authority-policy-boundary-20260717"
+    ]
+  }
+}
