@@ -1,0 +1,46 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-s3-security-boundary-gate-20260718",
+  "issued_at": "2026-07-18T02:10:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-freeze-authority"},
+  "contour": "security",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "dual-contour-cross-contour-denial-and-no-live-target-authority-conformance-gate",
+    "candidates": [
+      {"candidate": "existing-Bridge-execution-JobSpec-Permit-Lease-staging-artifact-and-terminal-contour-bindings", "disposition": "selected-existing-enforcement"},
+      {"candidate": "existing-Bridge-validation-execution-validation-domain-link-shared-contour-binding", "disposition": "selected-existing-enforcement"},
+      {"candidate": "existing-Bridge-D0-D1-only-execution-ingestion-validation-boundaries", "disposition": "selected-confidential-payload-denial"},
+      {"candidate": "existing-Bridge-static-no-external-live-or-domain-writer-authority-assurance", "disposition": "selected-static-boundary"},
+      {"candidate": "integrated-Stage3-Security-local-lab-zero-network-registry-write-and-cross-contour-read-receipt", "disposition": "selected-private-contour-proof"},
+      {"candidate": "new-contour-router-store-or-live-action-executor", "disposition": "rejected-unnecessary-and-authority-expanding"},
+      {"candidate": "network-live-target-scan-exploit-publication-report-submission-or-Market-payload-read", "disposition": "rejected-forbidden"}
+    ],
+    "selected_mode": "existing-Bridge-contour-and-classification-bindings-plus-new-public-conformance-tests-and-static-live-authority-denial-no-runtime-change",
+    "source_ref": "git:82061197b2d27b81b0493ad9635756f164bcf1b0;git:83a22cf4eaf013bbd07cccd5a289bf12088982f6;integration:integration-s3-security-local-lab-evidence-20260718",
+    "code_sha256": "bbe31177e7525f4084f72b329d6be4e9f8f8c7afe02d3f124c5c810f54bbd10f",
+    "license_spdx": "Proprietary-Internal-Owned",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "security-to-market and market-to-security receipt-chain contour mismatch returns no ValidationProjection",
+      "mixed JobSpec Permit and Lease contours stop before runner checkpoint staging ingestion completion and receipt publication",
+      "D2 and D3 receipt payloads fail before Bridge projection",
+      "core public Bridge modules expose no external network live-target scan exploit finding publication report submission or domain registry writer surface",
+      "contract catalog contains no live-target action or finding-publication authority contract",
+      "bind final proof to the integrated Security local-lab receipt with zero network registry writes and cross-contour reads"
+    ],
+    "canonical_owner": "Agent0-public-Bridge-boundary-conformance-and-final-Stage3-gate",
+    "rollback": "Revert only the public conformance test authority and gate receipts. Existing runtime enforcement, private domain repositories, registries and external systems remain unchanged."
+  },
+  "integrity": {
+    "payload_sha256": "3391ccb6ab79760c737b8ab59df33a487806a16488320929e49c07e913b2b4a4",
+    "parent_refs": [
+      "git:82061197b2d27b81b0493ad9635756f164bcf1b0",
+      "git:83a22cf4eaf013bbd07cccd5a289bf12088982f6",
+      "integration:integration-s3-security-local-lab-evidence-20260718",
+      "integration:integration-s3-security-ingestion-safe-map-20260718",
+      "integration:integration-s2-market-pre-soak-green-20260718"
+    ]
+  }
+}

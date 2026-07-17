@@ -1,0 +1,93 @@
+{
+  "stage_id": "s3-security-boundary-gate",
+  "agent_id": "agent-0",
+  "objective": "Prove existing cross-contour denial and absence of live-target authority, closing the final two Security Stage 3 capabilities without runtime expansion.",
+  "executable_blocker": "Seven Stage 3 capabilities are integrated, but no stage-level conformance receipt binds both contour-mismatch directions, pre-run denial, D2-D3 projection denial and static absence of live-target authority.",
+  "base_sha": "82061197b2d27b81b0493ad9635756f164bcf1b0",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "main",
+  "worktree": "canonical-public-worktree",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "docs/TRUST_BOUNDARIES.md",
+    "docs/receipts/integration/s2-market-pre-soak-green.json",
+    "docs/receipts/integration/s3-security-ingestion-safe-map.json",
+    "docs/receipts/integration/s3-security-local-lab-evidence.json",
+    "src/research_bridge/execution.py",
+    "src/research_bridge/validation.py",
+    "tests/test_stage1_execution.py",
+    "tests/test_stage1_validation.py",
+    "tests/test_stage1_assurance.py"
+  ],
+  "write_set": [
+    "docs/receipts/reuse/s3-security-boundary-gate.json",
+    "stages/s3-security-boundary-gate/stage-envelope.json",
+    "stages/s3-security-boundary-gate/ownership-lease.json",
+    "tests/test_stage3_boundary_gate.py"
+  ],
+  "boundary_contract": {
+    "cross_contour": "deny-before-runner-input-read-checkpoint-staging-ingestion-completion-receipt-or-projection",
+    "confidential_payload": "D2-D3-deny-before-Bridge-projection-or-payload-read",
+    "live_target": "no-external-network-live-target-scan-exploit-publication-report-submission-or-authority-escalation-surface",
+    "domain_writer": "validator-and-Bridge-have-no-domain-registry-write-authority",
+    "required_directions": ["security-to-market", "market-to-security"],
+    "stage_exit_authorized": "boundary-proof-then-Agent0-gate-only",
+    "declares_dual_contour_pre_soak_green": false,
+    "declares_ready_for_72h_soak": false
+  },
+  "preservation_contract": [
+    "existing-runtime-contracts-config-workflows-and-domain-adapters-remain-unmodified",
+    "new-work-is-public-conformance-tests-and-hash-only-authority-evidence-only",
+    "private-Security-and-Market-repositories-outcome-registries-and-owner-checkouts-remain-unmodified",
+    "no-new-dependency-store-router-executor-network-path-or-live-authority",
+    "final-DUAL_CONTOUR_PRE_SOAK_GREEN-requires-exact-head-CI-on-this-conformance-stage",
+    "READY_FOR_72H_SOAK-remains-deferred-to-immutable-deploy-gate"
+  ],
+  "forbidden_scope": [
+    "runtime-source-contract-schema-lockfile-dependency-config-workflow-migration-or-domain-repository-edit",
+    "network-live-target-account-device-request-scan-exploit-payload-publication-report-submission-or-deployment",
+    "cross-contour-D2-D3-read-Market-or-Security-payload-access-or-new-shared-store",
+    "validator-domain-registry-write-scientific-outcome-application-or-Bridge-domain-truth",
+    "private-path-secret-cookie-token-target-identity-raw-evidence-safe-map-body-lab-summary-or-domain-payload-in-public-receipt",
+    "claim-READY_FOR_72H_SOAK-encrypted-off-host-backup-deployment-or-soak-start",
+    "skip-xfail-continue-on-error-optional-gate-or-validation-weakening",
+    "force-push-or-deploy"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "reuse_decision": "3391ccb6ab79760c737b8ab59df33a487806a16488320929e49c07e913b2b4a4",
+    "execution_component": "de5e659332ab4f38174f50cc0a21557d2fe8398424e1378bebfe44928a5aee1a",
+    "validation_component": "bbe31177e7525f4084f72b329d6be4e9f8f8c7afe02d3f124c5c810f54bbd10f",
+    "execution_tests": "e9c46ffb5732095d9a79c145c04feb2bdf0d6dd52be77f05111b0434ecee463c",
+    "validation_tests": "d91eabb94880f74ec71901c974c759ce6f1849c6fbae19f312bac2d22dccd2af",
+    "static_assurance_tests": "52b8f7d064db0ff88f69b5fca66cea7c36affd812f14dbfab71b08797014f54f",
+    "trust_boundaries": "e2cd55a45cc452d086e087141af1d8664c96ee52e7f848d0c082f3181cce9444",
+    "security_local_lab_receipt": "7f4e616718b4fbceae438b583dcad6e2d1e292968c9384ae24ef484786d979aa",
+    "private_security_head": "83a22cf4eaf013bbd07cccd5a289bf12088982f6",
+    "public_head": "82061197b2d27b81b0493ad9635756f164bcf1b0",
+    "external_dependencies": "none"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest tests.test_stage3_boundary_gate -v",
+    "python3 -m unittest tests.test_stage3_authority -v",
+    "make test",
+    "git diff --check",
+    "exact write-set privacy secret runtime-mutation dependency network live-authority cross-contour registry-write deployment-claim and weakening scans",
+    "exact-head public CI before final Stage3 exit declaration"
+  ],
+  "risk_class": "public-dual-contour-boundary-conformance-gate",
+  "stop_conditions": [
+    "public-base-contract-reuse-component-test-trust-boundary-or-prior-integration-receipt-hash-mismatch",
+    "existing-enforcement-does-not-deny-both-contour-mismatch-directions-before-runner-or-projection",
+    "D2-D3-payload-can-reach-Bridge-projection-or-private-Stage3-receipt-claims-nonzero-cross-contour-read",
+    "external-network-live-target-scan-exploit-publication-report-submission-or-domain-writer-authority-surface-is-found",
+    "runtime-change-new-dependency-private-repository-edit-or-READY_FOR_72H_SOAK-claim-is-required",
+    "before-equals-after-or-Security-boundary-gate-blocker-remains"
+  ],
+  "expected_receipt": "docs/receipts/integration/s3-security-boundary-gate.json",
+  "rollback": "Revert this test authority and later gate receipts only; runtime private repositories registries and external systems remain unchanged.",
+  "commit_authority": "agent-0-only",
+  "push_authority": "agent-0-only"
+}

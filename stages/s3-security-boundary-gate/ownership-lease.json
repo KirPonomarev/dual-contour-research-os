@@ -1,0 +1,19 @@
+{
+  "lease_id": "lease-s3-security-boundary-gate-agent-0-20260718",
+  "stage_id": "s3-security-boundary-gate",
+  "agent_id": "agent-0",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-18T02:10:00Z",
+  "expires_at": "2026-07-18T08:10:00Z",
+  "base_sha": "82061197b2d27b81b0493ad9635756f164bcf1b0",
+  "branch": "main",
+  "worktree": "canonical-public-worktree",
+  "write_set": [
+    "docs/receipts/reuse/s3-security-boundary-gate.json",
+    "stages/s3-security-boundary-gate/stage-envelope.json",
+    "stages/s3-security-boundary-gate/ownership-lease.json",
+    "tests/test_stage3_boundary_gate.py"
+  ],
+  "delegation_allowed": false,
+  "state": "active"
+}
