@@ -1,0 +1,71 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-s1-budget-profile-20260717",
+  "issued_at": "2026-07-17T11:27:31Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "reuse-freeze-authority"
+  },
+  "contour": "bridge",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "stage1-exact-offline-fixed-charge-budget-profile",
+    "candidates": [
+      {
+        "candidate": "existing-admission-and-frozen-l0-runtime-profile-boundaries",
+        "disposition": "selected"
+      },
+      {
+        "candidate": "frozen-permit-quotas-job-resource-limits-and-budget-receipt-contracts",
+        "disposition": "selected-preserve-contract"
+      },
+      {
+        "candidate": "signed-content-addressed-fixed-full-reservation-accounting-policy",
+        "disposition": "selected"
+      },
+      {
+        "candidate": "arbitrary-generic-json-budget-shapes",
+        "disposition": "rejected-fail-open"
+      },
+      {
+        "candidate": "untrusted-runner-usage-as-provider-cost",
+        "disposition": "rejected-unverified-meter"
+      },
+      {
+        "candidate": "parallel-budget-table-or-ledger",
+        "disposition": "rejected-dual-source-of-truth"
+      },
+      {
+        "candidate": "external-dependency",
+        "disposition": "rejected-unnecessary"
+      }
+    ],
+    "selected_mode": "owned-stdlib-exact-fixed-charge-budget-profile-single-ledger-ready",
+    "source_ref": "git:f6701d92bc02ada31dffd237ff1ef9720b828a02;contract:Permit-v1;contract:JobSpec-v1;contract:BudgetReservation-v1;contract:SettlementReceipt-v1",
+    "code_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "license_spdx": "NOASSERTION",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "exact Permit quota and JobSpec resource profiles reject missing extra and mistyped values",
+      "positive integer reservation is bounded by the signed scope capacity",
+      "Permit claim count remains exactly one and provider matches the admitted runner profile",
+      "immutable AdmissionGrant carries every receipt binding without granting execution authority",
+      "standalone frozen L0 rejects non-profile resource shapes",
+      "full Stage 1 and repository test gates"
+    ],
+    "canonical_owner": "bridge-admission-budget-profile-with-agent0-integration",
+    "rollback": "Revert the scoped admission-profile worker commit and discard its synthetic fixtures. No runtime database, provider action, domain outcome, public source payload or external system is changed."
+  },
+  "integrity": {
+    "payload_sha256": "39768f3f3029d728809c8622e10331af2ca6948c3d5d9c7909e8776b79d5eea1",
+    "parent_refs": [
+      "git:f6701d92bc02ada31dffd237ff1ef9720b828a02",
+      "contract:Permit-v1",
+      "contract:JobSpec-v1",
+      "contract:BudgetReservation-v1",
+      "contract:SettlementReceipt-v1",
+      "reuse:reuse-s1-ledger-durability-20260716"
+    ]
+  }
+}

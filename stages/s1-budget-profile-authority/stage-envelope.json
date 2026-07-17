@@ -1,0 +1,121 @@
+{
+  "stage_id": "s1-budget-profile-authority",
+  "agent_id": "agent-0",
+  "objective": "Freeze the exact signed Stage 1 offline cost-unit profile and authorize Agent 1 to enforce it at admission and standalone L0 validation without touching the ledger.",
+  "executable_blocker": "The canonical runtime currently accepts arbitrary JSON objects for Permit quotas and JobSpec resource limits, including a job reservation larger than the signed Permit capacity, so the next atomic budget-ledger gate has no trustworthy input profile.",
+  "base_sha": "f6701d92bc02ada31dffd237ff1ef9720b828a02",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "main",
+  "worktree": "canonical-public-worktree",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "contracts/v1/Permit.schema.json",
+    "contracts/v1/JobSpec.schema.json",
+    "contracts/v1/BudgetReservation.schema.json",
+    "contracts/v1/SettlementReceipt.schema.json",
+    "src/research_bridge/admission.py",
+    "src/research_bridge/l0.py",
+    "independent budget profile ledger and execution pre-audits"
+  ],
+  "write_set": [
+    "docs/receipts/reuse/s1-budget-profile.json",
+    "stages/s1-budget-profile-authority/stage-envelope.json",
+    "stages/s1-budget-profile-authority/ownership-lease.json",
+    "tests/test_stage1_authority.py"
+  ],
+  "runtime_profile": {
+    "permit_quotas_exact": {
+      "accounting_policy_ref": "budget-policy:sha256:<lowercase-sha256>",
+      "budget_scope_ref": "budget-scope:sha256:<lowercase-sha256>",
+      "claims": 1,
+      "provider": "<exact-job-runner-profile>",
+      "scope_limit": {
+        "cost_units": "Q"
+      },
+      "trial_ref": "<nonempty-reference>"
+    },
+    "job_resource_limits_exact": {
+      "cost_units": "R"
+    },
+    "numeric_invariants": [
+      "type(R)-is-int-and-not-bool",
+      "type(Q)-is-int-and-not-bool",
+      "1<=R<=Q<=9007199254740991"
+    ],
+    "accounting_semantics": "The content-addressed accounting policy defines cost_units as a fixed full-reservation charge for one successfully completed owned offline invocation. It is not a monetary, token, CPU, RAM or provider-metered usage claim. Generic exceptions and incomplete attempts remain fully reserved for later reconciliation.",
+    "receipt_bindings_reserved_for_next_gate": [
+      "accounting_policy_ref",
+      "budget_scope_ref",
+      "scope_limit.cost_units",
+      "trial_ref",
+      "provider",
+      "job-idempotency-key",
+      "reservation-cost-units",
+      "permit-and-lease-expiry",
+      "job-contour-and-classification"
+    ]
+  },
+  "authorized_worker_stage": {
+    "stage_id": "s1-budget-profile",
+    "agent_id": "agent-1",
+    "branch": "codex/bridge-a1-s1-budget-profile",
+    "source_write_set": [
+      "src/research_bridge/admission.py",
+      "src/research_bridge/l0.py"
+    ],
+    "test_write_set": [
+      "tests/test_stage1_admission.py",
+      "tests/test_stage1_assurance.py",
+      "tests/test_stage1_authority_policy.py",
+      "tests/test_stage1_l0.py"
+    ],
+    "next_gate_exclusions": [
+      "kernel",
+      "ledger",
+      "execution",
+      "BudgetReservation-or-SettlementReceipt-emission",
+      "capacity-scan-or-settlement"
+    ]
+  },
+  "forbidden_scope": [
+    "worker-write-outside-two-runtime-and-four-test-files",
+    "frozen-contract-catalog-kernel-ledger-execution-validation-authority-control-cas-ingestion-config-lockfile-workflow-or-dependency-edit",
+    "BudgetReservation-SettlementReceipt-capacity-ledger-or-settlement-green-claim",
+    "arbitrary-extra-missing-floating-boolean-zero-negative-or-over-safe-integer-budget-value-acceptance",
+    "untrusted-resource-usage-conversion-to-cost-or-variable-release",
+    "second-table-ledger-event-type-migration-or-silent-legacy-backfill",
+    "test-deletion-relaxation-skip-xfail-continue-on-error-or-fallback",
+    "private-path-url-secret-account-dataset-strategy-or-d2-d3-payload",
+    "network-external-mutation-live-trading-live-target-testing-publication-deployment-or-ui",
+    "push-merge-or-canonical-main-write"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "reuse_decision": "39768f3f3029d728809c8622e10331af2ca6948c3d5d9c7909e8776b79d5eea1",
+    "external_dependencies": "none"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest tests.test_stage1_admission tests.test_stage1_assurance tests.test_stage1_authority_policy tests.test_stage1_l0 -v",
+    "python3 -m unittest discover -s tests -p 'test_stage1_*.py'",
+    "make test",
+    "git diff --check",
+    "exact write-set contract dependency ledger execution private-locator network live-authority and weakening scan",
+    "exact-head public remote CI"
+  ],
+  "risk_class": "bridge-sev1-exact-budget-profile-authority",
+  "stop_conditions": [
+    "base-contract-reuse-or-authority-hash-mismatch",
+    "profile-requires-frozen-contract-kernel-ledger-execution-dependency-or-seventh-worker-file",
+    "R-or-Q-is-not-an-exact-positive-safe-integer-or-R-exceeds-Q",
+    "claims-is-not-one-provider-does-not-match-runner-or-policy-scope-reference-is-not-content-addressed",
+    "standalone-L0-accepts-an-incompatible-resource-profile",
+    "worker-claims-ledger-capacity-settlement-or-receipt-green",
+    "before-equals-after-or-arbitrary-budget-shape-blocker-remains"
+  ],
+  "expected_receipt": "docs/receipts/integration/s1-budget-profile.json",
+  "rollback": "Agent 0 reverts only the scoped public authority commit if unused. If exercised, discard the isolated Agent 1 worker commit before integration; no runtime database or external state is authorized.",
+  "commit_authority": "agent-0-only",
+  "push_authority": "agent-0-only"
+}

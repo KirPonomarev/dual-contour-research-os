@@ -56,6 +56,7 @@ class Stage1AuthorityTests(unittest.TestCase):
             "s1-market-lineage-portability.json": "owner-local-manifest-derived-recursive-lineage-no-new-dependency",
             "s1-market-sanitized-count-fixture.json": "owner-private-sanitized-count-sufficient-statistics-no-public-payload",
             "s1-authority-policy-boundary.json": "owned-stdlib-pinned-authority-policy-fail-closed",
+            "s1-budget-profile.json": "owned-stdlib-exact-fixed-charge-budget-profile-single-ledger-ready",
             "s1-pause-epoch-fencing.json": "owned-stdlib-canonical-ledger-sequence-fence",
             "s1-market-ci-reality-loop-prerequisite.json": "existing-real-cli-synthetic-prerequisite-hard-gate-no-runtime-change",
             "s1-market-storage-accounting-portability.json": "owner-local-stdlib-conservative-byte-accounting-no-public-copy",
@@ -84,6 +85,59 @@ class Stage1AuthorityTests(unittest.TestCase):
         self.assertEqual(envelope["write_set"], lease["write_set"])
         self.assertTrue(envelope["executable_blocker"])
         self.assertTrue(envelope["acceptance_commands"])
+        self.assertTrue(envelope["rollback"])
+        self.assertFalse(lease["delegation_allowed"])
+
+    def test_budget_profile_authority_is_exact_and_ledger_excluding(self) -> None:
+        envelope = load(
+            ROOT / "stages" / "s1-budget-profile-authority" / "stage-envelope.json"
+        )
+        lease = load(
+            ROOT / "stages" / "s1-budget-profile-authority" / "ownership-lease.json"
+        )
+        reuse = load(REUSE_RECEIPTS / "s1-budget-profile.json")
+
+        self.assertEqual(envelope["write_set"], lease["write_set"])
+        worker = envelope["authorized_worker_stage"]
+        self.assertEqual(
+            worker["source_write_set"],
+            ["src/research_bridge/admission.py", "src/research_bridge/l0.py"],
+        )
+        self.assertEqual(len(worker["test_write_set"]), 4)
+        self.assertIn("ledger", worker["next_gate_exclusions"])
+        profile = envelope["runtime_profile"]
+        self.assertEqual(
+            set(profile["permit_quotas_exact"]),
+            {
+                "accounting_policy_ref",
+                "budget_scope_ref",
+                "claims",
+                "provider",
+                "scope_limit",
+                "trial_ref",
+            },
+        )
+        self.assertEqual(profile["job_resource_limits_exact"], {"cost_units": "R"})
+        self.assertEqual(reuse["integrity"]["payload_sha256"], payload_sha256(reuse))
+        public_text = "\n".join(
+            (
+                (REUSE_RECEIPTS / "s1-budget-profile.json").read_text(),
+                (
+                    ROOT
+                    / "stages"
+                    / "s1-budget-profile-authority"
+                    / "stage-envelope.json"
+                ).read_text(),
+                (
+                    ROOT
+                    / "stages"
+                    / "s1-budget-profile-authority"
+                    / "ownership-lease.json"
+                ).read_text(),
+            )
+        )
+        self.assertNotIn("/Users/", public_text)
+        self.assertNotIn("/Volumes/", public_text)
         self.assertTrue(envelope["rollback"])
         self.assertFalse(lease["delegation_allowed"])
 
