@@ -1,0 +1,99 @@
+{
+  "stage_id": "s1-permit-nonce-ledger",
+  "agent_id": "agent-1",
+  "objective": "Enforce one durable global use of each verified Permit nonce through the existing admission-to-canonical-ledger claim path.",
+  "executable_blocker": "The exact canonical baseline accepts concurrent and post-reopen claims for different jobs whose otherwise valid Permits share one nonce, despite Permit.max_uses being one.",
+  "base_sha": "ce6eb2265a0a51422c296e6bdea2888c1ccdfdee",
+  "public_authority_sha": "ce6eb2265a0a51422c296e6bdea2888c1ccdfdee",
+  "public_authority_ci": "29574243984",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a1-s1-permit-nonce-ledger",
+  "worktree": "ephemeral-public-worktree:s1-permit-nonce-ledger",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "contracts/v1/Permit.schema.json",
+    "docs/receipts/reuse/s1-permit-nonce-ledger.json",
+    "docs/receipts/integration/s1-permit-nonce-authority.json",
+    "stages/s1-permit-nonce-authority/stage-envelope.json",
+    "src/research_bridge/admission.py",
+    "src/research_bridge/kernel.py",
+    "src/research_bridge/ledger.py",
+    "src/research_bridge/execution.py",
+    "authorized connected test modules"
+  ],
+  "write_set": [
+    "src/research_bridge/admission.py",
+    "src/research_bridge/kernel.py",
+    "src/research_bridge/ledger.py",
+    "src/research_bridge/execution.py",
+    "tests/test_stage1_admission.py",
+    "tests/test_stage1_ledger.py",
+    "tests/test_stage1_assurance.py",
+    "tests/test_stage1_execution.py",
+    "tests/test_stage1_execution_assurance.py",
+    "tests/test_stage1_control_assurance.py",
+    "tests/test_stage1_pause_epoch_fencing.py"
+  ],
+  "preservation_contract": {
+    "required": [
+      "derive a lowercase SHA-256 digest from the verified Permit nonce and never persist the raw nonce",
+      "pass the digest through immutable AdmissionGrant and BridgeKernel into the sole canonical JobLedger claim",
+      "validate the digest and reject legacy or duplicate claim digests inside the existing BEGIN IMMEDIATE transaction before append",
+      "add exactly one partial unique expression index over claim payload permit_nonce_sha256",
+      "execution validates exact claim shape and digest binding before runner checkpoint CAS or receipt mutation",
+      "all existing authority pause fencing durability and offline reference paths remain green"
+    ],
+    "forbidden": [
+      "contract table column event type second ledger checkpoint store authority control IPC domain or dependency change",
+      "raw nonce persistence logging or receipt",
+      "silent legacy backfill null digest acceptance in-memory-only cache or non-atomic check",
+      "default allow assertion relaxation skip xfail continue-on-error network or live authority"
+    ]
+  },
+  "forbidden_scope": [
+    "unlisted-source-test-doc-config-workflow-lockfile-migration-or-contract-edit",
+    "new-table-column-event-type-second-ledger-or-checkpoint-store",
+    "raw-permit-nonce-persistence-log-or-receipt",
+    "legacy-null-or-malformed-digest-acceptance-or-backfill",
+    "duplicate-check-outside-existing-begin-immediate-transaction",
+    "authority-policy-control-ipc-cas-validation-ingestion-l0-or-domain-edit",
+    "existing-test-deletion-relaxation-skip-xfail-or-continue-on-error",
+    "external-dependency-network-deployment-publication-live-trading-live-target-testing-or-ui",
+    "private-path-url-secret-account-key-or-d2-d3-payload",
+    "push-merge-or-canonical-main-write"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "reuse_decision": "9f72763eab66fcdb7861e8d38f663526d5b9ab2d58b94cb06a395f1a8133571e",
+    "authority_receipt": "65890f9adfe740207e3e0d4972e1603da716eaf0153968f4a28cb515f2ce5177",
+    "external_dependencies": "none"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest tests.test_stage1_admission tests.test_stage1_ledger tests.test_stage1_assurance tests.test_stage1_execution tests.test_stage1_execution_assurance tests.test_stage1_control_assurance tests.test_stage1_pause_epoch_fencing -v",
+    "python3 -m unittest discover -s tests -p 'test_stage1_*.py'",
+    "make test",
+    "git diff --check",
+    "exact write-set raw-nonce dependency private-locator network live-authority skip and weakening scan"
+  ],
+  "risk_class": "bridge-sev0-durable-permit-nonce-single-use",
+  "stop_conditions": [
+    "base-authority-contract-or-reuse-hash-mismatch",
+    "write-set-expansion-contract-table-column-event-type-second-ledger-or-dependency-required",
+    "raw-nonce-is-persisted-or-digest-is-not-bound-to-the-supplied-permit",
+    "legacy-claim-without-valid-digest-does-not-block-new-claim-with-zero-write",
+    "sequential-eight-way-concurrent-or-reopen-duplicate-probe-has-more-than-one-winner",
+    "different-nonce-valid-reference-path-regresses",
+    "execution-reaches-runner-checkpoint-store-or-receipt-before-digest-validation",
+    "before-equals-after-or-durable-replay-blocker-remains"
+  ],
+  "expected_receipt": "docs/receipts/integration/s1-permit-nonce-ledger.json",
+  "rollback": "Before runtime use, Agent 0 discards the single worker commit and deletes the isolated branch/worktree. After nonce-bound claim events exist, an in-place downgrade is forbidden; recreate the offline runtime database from trusted references.",
+  "commit_authority": "one-scoped-worker-commit",
+  "push_authority": false,
+  "expected_handoff_status": [
+    "ready_for_agent0_audit",
+    "blocked_validation_failed"
+  ]
+}

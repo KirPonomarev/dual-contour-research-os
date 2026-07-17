@@ -687,6 +687,44 @@ class Stage1AuthorityTests(unittest.TestCase):
         self.assertTrue(envelope["rollback"])
         self.assertFalse(lease["delegation_allowed"])
 
+    def test_permit_nonce_worker_lease_is_exact_and_contract_preserving(self) -> None:
+        envelope = load(
+            ROOT / "stages" / "s1-permit-nonce-ledger" / "stage-envelope.json"
+        )
+        lease = load(
+            ROOT / "stages" / "s1-permit-nonce-ledger" / "ownership-lease.json"
+        )
+        expected = [
+            "src/research_bridge/admission.py",
+            "src/research_bridge/kernel.py",
+            "src/research_bridge/ledger.py",
+            "src/research_bridge/execution.py",
+            "tests/test_stage1_admission.py",
+            "tests/test_stage1_ledger.py",
+            "tests/test_stage1_assurance.py",
+            "tests/test_stage1_execution.py",
+            "tests/test_stage1_execution_assurance.py",
+            "tests/test_stage1_control_assurance.py",
+            "tests/test_stage1_pause_epoch_fencing.py",
+        ]
+
+        self.assertEqual(
+            envelope["base_sha"],
+            "ce6eb2265a0a51422c296e6bdea2888c1ccdfdee",
+        )
+        self.assertEqual(envelope["public_authority_sha"], envelope["base_sha"])
+        self.assertEqual(envelope["public_authority_ci"], "29574243984")
+        self.assertEqual(envelope["write_set"], expected)
+        self.assertEqual(lease["write_set"], expected)
+        self.assertFalse(any(path.startswith("contracts/") for path in expected))
+        self.assertEqual(envelope["dependency_hashes"]["external_dependencies"], "none")
+        self.assertIn(
+            "new-table-column-event-type-second-ledger-or-checkpoint-store",
+            envelope["forbidden_scope"],
+        )
+        self.assertFalse(envelope["push_authority"])
+        self.assertFalse(lease["delegation_allowed"])
+
     def test_control_authority_is_pinned_and_reversible(self) -> None:
         envelope = load(ROOT / "stages" / "s1-control-authority" / "stage-envelope.json")
         lease = load(ROOT / "stages" / "s1-control-authority" / "ownership-lease.json")
