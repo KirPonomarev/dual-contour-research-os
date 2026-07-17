@@ -1,0 +1,79 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s2-market-cost-provider-accounting-20260717",
+  "issued_at": "2026-07-17T19:48:00Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "market",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s2-market-cost-provider-accounting",
+    "agent_id": "agent-3",
+    "ownership_lease_ref": "stages/s2-market-cost-provider-accounting/ownership-lease.json",
+    "base_sha": "d6bb05269e2f421383ecb350abf3d02eef0cdb68",
+    "head_sha": "13f24633c4371dcd47737f62dc667fc6b35b0122",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "data/bridge_pre_soak/provider_accounting/binance_btcusdt_cost_provider_profile.json",
+      "src/market_lab/bridge_pre_soak_cost_provider_accounting.py",
+      "tests/test_bridge_pre_soak_cost_provider_accounting.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "public_bridge_sha": "d6bb05269e2f421383ecb350abf3d02eef0cdb68",
+      "public_exact_head_ci": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29607447236",
+      "private_base_sha": "b9fd2b8af8d3ab9405dd0f432d2a39bbb6e3bb94",
+      "private_worker_commit_sha": "13f24633c4371dcd47737f62dc667fc6b35b0122",
+      "focused_cost_provider_tests": 9,
+      "bounded_cost_funding_tests": 30,
+      "private_full_suite_passed": 2961,
+      "private_full_suite_warnings": 68,
+      "private_full_suite_seconds": 949.24,
+      "diff_check": "green",
+      "private_write_set_exact": true,
+      "privacy_secret_scan": "green",
+      "privacy_secret_scan_notes": "intentional deny-list literals only; no secret material detected",
+      "source_mutation": false,
+      "worker_write_set_files": 3,
+      "worker_profile_files": 1,
+      "worker_source_files": 1,
+      "worker_test_files": 1,
+      "provider_profile_file_sha256": "8a9152ea7971aa251319dcbda5f3db75b923e255ff8977aa8d6007e9646a930c",
+      "provider_profile_canonical_sha256": "ea49aa68922b483925bbcf86b2d67a854103cf2d87f93ac17e6a4098de414aa1",
+      "dataset_sha256": "20d4a28d97c5f195df0e421c8449cfcf8825e33940e12fcbd5b7a66650535080",
+      "dataset_manifest_sha256": "02f2ed05f594fa9019110419ab48b87fc9cd0a3cda2eec2bd56b9df504bc7453",
+      "round_trip_execution_cost_bps": 48.0,
+      "funding_credit_bps": 3.75,
+      "net_cost_after_funding_bps": 44.25,
+      "validation_receipt_outcome": "COST_PROVIDER_ACCOUNTING_PASS",
+      "validation_receipt_payload_sha256": "26b4a5790f8b64d3274601dfec8749b139a92e9665ab2b688dffc6fe0e8cd0d9",
+      "scientific_outcome_applied": false,
+      "public_provider_payload_in_public_repo": false,
+      "network_during_validation_or_tests": false,
+      "dependency_adoption": false,
+      "frozen_contract_edit": false,
+      "public_source_mutation": false,
+      "private_owner_checkout_mutated": false,
+      "declares_market_pre_soak_green": false,
+      "live_or_connected_authority": false,
+      "private_exact_head_ci": "local-green-withheld"
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29607447236",
+    "integration_commit_sha": "d6bb05269e2f421383ecb350abf3d02eef0cdb68"
+  },
+  "integrity": {
+    "payload_sha256": "deb7f0556fdc905d414a11b41bb2bc620150a6e5deb9f4880b80cee5b48410a5",
+    "parent_refs": [
+      "git:13f24633c4371dcd47737f62dc667fc6b35b0122",
+      "git:d6bb05269e2f421383ecb350abf3d02eef0cdb68",
+      "ci:29607447236",
+      "ci:private-local-green-withheld",
+      "integration:integration-s2-market-cost-provider-accounting-authority-20260717",
+      "source-freeze:source-freeze-market-s2-cost-provider-accounting-20260717",
+      "reuse:reuse-s2-market-cost-provider-accounting-20260717"
+    ]
+  }
+}

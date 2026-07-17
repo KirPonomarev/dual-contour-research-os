@@ -254,6 +254,32 @@ class Stage2AuthorityTests(unittest.TestCase):
             envelope["stop_conditions"],
         )
 
+    def test_market_cost_provider_worker_receipt_is_sanitized_slice_only(self) -> None:
+        receipt = load(INTEGRATION_RECEIPTS / "s2-market-cost-provider-accounting.json")
+
+        self.assertEqual(receipt["schema_id"], "IntegrationReceipt")
+        self.assertEqual(receipt["integrity"]["payload_sha256"], payload_sha256(receipt))
+        self.assertEqual(receipt["payload"]["head_sha"], "13f24633c4371dcd47737f62dc667fc6b35b0122")
+        audit = receipt["payload"]["audit_results"]
+        self.assertEqual(audit["focused_cost_provider_tests"], 9)
+        self.assertEqual(audit["bounded_cost_funding_tests"], 30)
+        self.assertEqual(audit["private_full_suite_passed"], 2961)
+        self.assertEqual(audit["provider_profile_file_sha256"], "8a9152ea7971aa251319dcbda5f3db75b923e255ff8977aa8d6007e9646a930c")
+        self.assertEqual(audit["round_trip_execution_cost_bps"], 48.0)
+        self.assertEqual(audit["funding_credit_bps"], 3.75)
+        self.assertEqual(audit["net_cost_after_funding_bps"], 44.25)
+        self.assertEqual(audit["validation_receipt_outcome"], "COST_PROVIDER_ACCOUNTING_PASS")
+        self.assertFalse(audit["scientific_outcome_applied"])
+        self.assertFalse(audit["public_provider_payload_in_public_repo"])
+        self.assertFalse(audit["network_during_validation_or_tests"])
+        self.assertFalse(audit["declares_market_pre_soak_green"])
+
+        text = (INTEGRATION_RECEIPTS / "s2-market-cost-provider-accounting.json").read_text()
+        self.assertNotIn("binance_spot_public", text)
+        self.assertNotIn("fee_bps_per_side", text)
+        self.assertNotIn("/Users/", text)
+        self.assertNotIn("/Volumes/", text)
+
 
 if __name__ == "__main__":
     unittest.main()
