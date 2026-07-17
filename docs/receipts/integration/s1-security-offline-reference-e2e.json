@@ -1,0 +1,83 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s1-security-offline-reference-e2e-20260717",
+  "issued_at": "2026-07-17T18:42:00Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "security",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s1-security-offline-reference-e2e",
+    "agent_id": "agent-4",
+    "ownership_lease_ref": "stages/s1-security-offline-reference-e2e/ownership-lease-amendment-2.json",
+    "base_sha": "b4a8b3fc98f2649301ba422856fe59cbd51af3c5",
+    "head_sha": "abc45b938ddef24aa9d2cb874dfa7f6bd7273ae8",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "tools/security_bridge_reference_adapter.py",
+      "tools/security_bridge_reference_registry.py",
+      "tests/test_security_bridge_reference_adapter.py",
+      "tests/test_security_bridge_reference_e2e.py",
+      "research-os/evolution/active-core-inventory-v1.json",
+      "tests/test_core_doctor.py",
+      "tests/test_crypto_kb_adapter_probe.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "public_bridge_sha": "b4a8b3fc98f2649301ba422856fe59cbd51af3c5",
+      "public_exact_head_ci": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29604201623",
+      "private_repaired_base_sha": "1f0b9deaa84c2feba6f361e3684ff858a65b3d10",
+      "private_worker_commit_sha": "abc45b938ddef24aa9d2cb874dfa7f6bd7273ae8",
+      "focused_adapter_tests": 6,
+      "focused_bridge_e2e_tests": 5,
+      "private_tests": 1655,
+      "private_skipped_tests": 0,
+      "private_full_suite_seconds": 149.11,
+      "private_core_doctor": "green",
+      "crypto_kb_clean_checkout_smoke": "green",
+      "diff_check": "green",
+      "private_write_set_exact": true,
+      "worker_write_set_files": 7,
+      "worker_source_files": 2,
+      "worker_test_files": 4,
+      "worker_governance_files": 1,
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "dependency_adoption": false,
+      "frozen_contract_edit": false,
+      "public_source_mutation": false,
+      "private_owner_checkout_mutated": false,
+      "single_security_outcome_ledger": true,
+      "validator_registry_write_authorized": false,
+      "domain_payload_public_copy": false,
+      "synthetic_d0_only": true,
+      "exact_replay_single_row": "green",
+      "conflicting_replay_zero_write": "green",
+      "validation_boundary_projection": "green",
+      "private_exact_head_ci": "local-green-withheld-locator",
+      "private_ci_locator_disclosed": false,
+      "combined_against_post_terminal_public_bridge_sha": "b4a8b3fc98f2649301ba422856fe59cbd51af3c5",
+      "live_or_connected_authority": false
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29604201623",
+    "integration_commit_sha": "b4a8b3fc98f2649301ba422856fe59cbd51af3c5"
+  },
+  "integrity": {
+    "payload_sha256": "897172cdc21158e006da56517e28688ee784d22b2a6ed6282344cd0dce110b8d",
+    "parent_refs": [
+      "git:abc45b938ddef24aa9d2cb874dfa7f6bd7273ae8",
+      "git:1f0b9deaa84c2feba6f361e3684ff858a65b3d10",
+      "git:b4a8b3fc98f2649301ba422856fe59cbd51af3c5",
+      "ci:29604201623",
+      "ci:private-local-exact-head-green-withheld",
+      "integration:integration-s1-security-offline-reference-e2e-authority-20260717",
+      "stage-amendment:s1-security-offline-reference-e2e-amendment-1",
+      "stage-amendment:s1-security-offline-reference-e2e-amendment-2",
+      "source-freeze:source-freeze-security-s0b-20260716",
+      "reuse:reuse-s1-security-offline-reference-e2e-20260717"
+    ]
+  }
+}
