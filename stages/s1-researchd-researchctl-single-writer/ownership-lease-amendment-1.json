@@ -1,0 +1,26 @@
+{
+  "lease_id": "lease-s1-researchd-researchctl-single-writer-agent-1-amendment-1-20260717",
+  "stage_id": "s1-researchd-researchctl-single-writer",
+  "amendment_id": "s1-researchd-researchctl-single-writer-amendment-1",
+  "agent_id": "agent-1",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-17T15:49:00Z",
+  "expires_at": "2026-07-17T21:49:00Z",
+  "base_sha": "c436f32e24dff8da4f8b6689c16dcabb38d41fd4",
+  "public_authority_sha": "c436f32e24dff8da4f8b6689c16dcabb38d41fd4",
+  "branch": "codex/bridge-a1-s1-researchd-researchctl-single-writer",
+  "worktree": "ephemeral-public-worktree:s1-researchd-researchctl-single-writer",
+  "write_set": [
+    "src/research_bridge/control.py",
+    "src/research_bridge/ipc.py",
+    "src/research_bridge/researchd.py",
+    "src/research_bridge/researchctl.py",
+    "tests/test_stage1_control.py",
+    "tests/test_stage1_control_assurance.py",
+    "tests/test_stage1_researchd.py",
+    "tests/test_stage1_researchctl.py",
+    "tests/test_stage1_authority_policy.py"
+  ],
+  "delegation_allowed": false,
+  "state": "active"
+}

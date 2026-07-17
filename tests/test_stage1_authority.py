@@ -453,6 +453,50 @@ class Stage1AuthorityTests(unittest.TestCase):
         self.assertFalse(envelope["push_authority"])
         self.assertFalse(lease["delegation_allowed"])
 
+    def test_researchd_researchctl_fixture_amendment_is_one_literal_only(self) -> None:
+        original = load(
+            ROOT
+            / "stages"
+            / "s1-researchd-researchctl-single-writer"
+            / "stage-envelope.json"
+        )
+        amendment = load(
+            ROOT
+            / "stages"
+            / "s1-researchd-researchctl-single-writer"
+            / "stage-envelope-amendment-1.json"
+        )
+        lease = load(
+            ROOT
+            / "stages"
+            / "s1-researchd-researchctl-single-writer"
+            / "ownership-lease-amendment-1.json"
+        )
+
+        self.assertEqual(
+            amendment["added_write_set"],
+            ["tests/test_stage1_authority_policy.py"],
+        )
+        self.assertEqual(
+            lease["write_set"],
+            original["write_set"] + amendment["added_write_set"],
+        )
+        self.assertEqual(len(lease["write_set"]), 9)
+        self.assertEqual(
+            amendment["public_authority_sha"], original["public_authority_sha"]
+        )
+        self.assertEqual(
+            amendment["contract_sha256"], original["contract_sha256"]
+        )
+        self.assertTrue(
+            any("1.0 to 1.1" in rule for rule in amendment["preservation_contract"])
+        )
+        self.assertTrue(
+            any("fallback" in rule for rule in amendment["stop_conditions"])
+        )
+        self.assertFalse(amendment["push_authority"])
+        self.assertFalse(lease["delegation_allowed"])
+
     def test_budget_attempt_lifecycle_semantic_amendment_is_exact_and_non_expansive(self) -> None:
         original = load(
             ROOT / "stages" / "s1-budget-attempt-lifecycle" / "stage-envelope.json"

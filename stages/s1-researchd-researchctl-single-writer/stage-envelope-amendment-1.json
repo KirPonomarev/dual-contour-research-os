@@ -1,0 +1,45 @@
+{
+  "stage_id": "s1-researchd-researchctl-single-writer-amendment-1",
+  "amends_stage_id": "s1-researchd-researchctl-single-writer",
+  "agent_id": "agent-1",
+  "objective": "Align the one connected resume-authority fixture with the already frozen control protocol 1.1 without adding legacy fallback or changing its assertions.",
+  "executable_blocker": "The full Stage 1 gate deterministically fails because tests/test_stage1_authority_policy.py still constructs its positive resume request with protocol 1.0, while the authorized runtime must reject protocol 1.0 without fallback.",
+  "base_sha": "c436f32e24dff8da4f8b6689c16dcabb38d41fd4",
+  "public_authority_sha": "c436f32e24dff8da4f8b6689c16dcabb38d41fd4",
+  "public_authority_ci": "29591401575",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a1-s1-researchd-researchctl-single-writer",
+  "worktree": "ephemeral-public-worktree:s1-researchd-researchctl-single-writer",
+  "prior_envelope_ref": "stages/s1-researchd-researchctl-single-writer/stage-envelope.json",
+  "authority_receipt_ref": "docs/receipts/integration/s1-researchd-researchctl-single-writer-authority.json",
+  "added_write_set": [
+    "tests/test_stage1_authority_policy.py"
+  ],
+  "full_write_set_ref": "stages/s1-researchd-researchctl-single-writer/ownership-lease-amendment-1.json",
+  "preservation_contract": [
+    "all original envelope constraints acceptance commands stop conditions and protocol-1.0 rejection remain active",
+    "the added file receives only the positive resume fixture protocol literal change from 1.0 to 1.1",
+    "no assertion expected value test scenario authority binding or mutation-count requirement is deleted relaxed skipped or changed",
+    "no protocol fallback alias compatibility branch or production-source change is authorized by this amendment"
+  ],
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest tests.test_stage1_authority_policy -v",
+    "python3 -m unittest tests.test_stage1_control tests.test_stage1_control_assurance tests.test_stage1_researchd tests.test_stage1_researchctl -v",
+    "python3 -m unittest discover -s tests -p 'test_stage1_*.py'",
+    "make test",
+    "git diff --check",
+    "exact nine-file write-set protocol fallback assertion weakening privacy dependency network and live-authority scan"
+  ],
+  "stop_conditions": [
+    "protocol-1.0 compatibility fallback alias or source weakening is introduced",
+    "the added fixture requires any change beyond its protocol version literal",
+    "any assertion scenario authority binding or mutation count changes",
+    "write-set expands beyond the exact nine files or any dependency contract schema config workflow ledger CAS runner or domain edit is required",
+    "full Stage 1 or repository gate remains red after the fixture alignment"
+  ],
+  "expected_receipt": "docs/receipts/integration/s1-researchd-researchctl-single-writer.json",
+  "rollback": "Agent 0 discards the worker commit and branch. The one test-only authority amendment can be reverted independently; no runtime database artifact contract domain registry or external system is mutated.",
+  "commit_authority": "one-scoped-worker-commit",
+  "push_authority": false
+}
