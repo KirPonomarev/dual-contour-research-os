@@ -401,6 +401,75 @@ class Stage2AuthorityTests(unittest.TestCase):
         self.assertNotIn("/Users/", text)
         self.assertNotIn("/Volumes/", text)
 
+    def test_market_sealed_holdout_source_reuse_and_authority_are_exact(self) -> None:
+        source = load(SOURCE_RECEIPTS / "s2-market-sealed-holdout.json")
+        reuse = load(REUSE_RECEIPTS / "s2-market-sealed-holdout.json")
+        envelope = load(
+            STAGES / "s2-market-sealed-holdout-authority" / "stage-envelope.json"
+        )
+        lease = load(
+            STAGES / "s2-market-sealed-holdout-authority" / "ownership-lease.json"
+        )
+
+        self.assertEqual(source["schema_id"], "SourceFreezeReceipt")
+        self.assertEqual(reuse["schema_id"], "ReuseDecisionReceipt")
+        self.assertEqual(source["integrity"]["payload_sha256"], payload_sha256(source))
+        self.assertEqual(reuse["integrity"]["payload_sha256"], payload_sha256(reuse))
+        self.assertEqual(
+            source["payload"]["selected_source_sha"],
+            "0f2eff1f9acde1d4bcca9bbe438e0cefeee351b7",
+        )
+        self.assertEqual(
+            reuse["payload"]["selected_mode"],
+            "existing-holdout-access-contracts-plus-market-blind-holdout-patterns-owner-stdlib-validator-no-public-payload",
+        )
+        self.assertEqual(reuse["payload"]["code_sha256"], EMPTY_SHA256)
+        self.assertEqual(envelope["base_sha"], "309344bea5d5eb432f9e21dc5e05202ca00dd43f")
+        self.assertEqual(envelope["write_set"], lease["write_set"])
+        self.assertFalse(lease["delegation_allowed"])
+        self.assertFalse(envelope["sealed_holdout_contract"]["declares_market_pre_soak_green"])
+        self.assertEqual(envelope["sealed_holdout_contract"]["holdout_payload_classification"], "D3_RESTRICTED")
+        self.assertIn(
+            "D3-holdout-bytes-never-enter-Bridge-public-repository-or-validator-receipt",
+            envelope["sealed_holdout_contract"]["holdout_invariants"],
+        )
+        self.assertEqual(
+            envelope["authorized_worker_stage"]["write_set"],
+            [
+                "data/bridge_pre_soak/sealed_holdout/market_pre_soak_sealed_holdout_profile.json",
+                "src/market_lab/bridge_pre_soak_sealed_holdout.py",
+                "tests/test_bridge_pre_soak_sealed_holdout.py",
+            ],
+        )
+        self.assertFalse(envelope["authorized_worker_stage"]["push_authority"])
+
+    def test_market_sealed_holdout_authority_is_sanitized_and_non_live(self) -> None:
+        public_text = "\n".join(
+            [
+                (SOURCE_RECEIPTS / "s2-market-sealed-holdout.json").read_text(),
+                (REUSE_RECEIPTS / "s2-market-sealed-holdout.json").read_text(),
+                (
+                    STAGES
+                    / "s2-market-sealed-holdout-authority"
+                    / "stage-envelope.json"
+                ).read_text(),
+                (
+                    STAGES
+                    / "s2-market-sealed-holdout-authority"
+                    / "ownership-lease.json"
+                ).read_text(),
+            ]
+        )
+        self.assertNotIn("/Users/", public_text)
+        self.assertNotIn("/Volumes/", public_text)
+        self.assertNotIn("api_key", public_text.lower())
+        self.assertNotIn("secret_key", public_text.lower())
+        self.assertNotIn("access_token", public_text.lower())
+        self.assertIn("no-live-paper-or-order-authority", public_text)
+        self.assertIn("worker-needs-network-capture-during-tests-or-validation", public_text)
+        self.assertIn("raw_egress-false", public_text)
+        self.assertIn("D3-holdout-bytes-never-enter-Bridge-public-repository-or-validator-receipt", public_text)
+
 
 if __name__ == "__main__":
     unittest.main()

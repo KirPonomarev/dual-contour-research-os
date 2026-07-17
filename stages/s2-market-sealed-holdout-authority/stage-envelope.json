@@ -1,0 +1,129 @@
+{
+  "stage_id": "s2-market-sealed-holdout-authority",
+  "agent_id": "agent-0",
+  "objective": "Authorize the next Market pre-soak slice: sealed holdout boundary and manifest-only access proof bound to previous Stage 2 lineage.",
+  "executable_blocker": "Stage 2 has dataset integrity, provider accounting and hard budget caps, but no hermetic sealed-holdout boundary proves D3 holdout bytes stay in the Market domain vault while validators consume only manifest refs through single-use holdout access receipts.",
+  "base_sha": "309344bea5d5eb432f9e21dc5e05202ca00dd43f",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "main",
+  "worktree": "canonical-public-worktree",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "docs/receipts/integration/s1-skeleton-green-audit.json",
+    "docs/receipts/integration/s2-market-public-dataset-temporal-integrity.json",
+    "docs/receipts/integration/s2-market-cost-provider-accounting.json",
+    "docs/receipts/integration/s2-market-budget-hard-caps.json",
+    "docs/receipts/source-freeze/s2-market-sealed-holdout.json",
+    "docs/receipts/reuse/s2-market-sealed-holdout.json",
+    "contracts/v1/HoldoutAccessGrant.schema.json",
+    "contracts/v1/HoldoutAccessReceipt.schema.json",
+    "contracts/v1/ValidationReceipt.schema.json",
+    "private Market blind-window forward-holdout and preregistration gate patterns"
+  ],
+  "write_set": [
+    "docs/receipts/source-freeze/s2-market-sealed-holdout.json",
+    "docs/receipts/reuse/s2-market-sealed-holdout.json",
+    "stages/s2-market-sealed-holdout-authority/stage-envelope.json",
+    "stages/s2-market-sealed-holdout-authority/ownership-lease.json",
+    "tests/test_stage2_authority.py"
+  ],
+  "authorized_worker_stage": {
+    "stage_id": "s2-market-sealed-holdout",
+    "agent_id": "agent-3",
+    "private_base_sha": "0f2eff1f9acde1d4bcca9bbe438e0cefeee351b7",
+    "public_development_sha": "309344bea5d5eb432f9e21dc5e05202ca00dd43f",
+    "branch": "codex/bridge-a3-s2-market-sealed-holdout",
+    "worktree": "ephemeral-private-domain-worktree:s2-market-sealed-holdout",
+    "write_set": [
+      "data/bridge_pre_soak/sealed_holdout/market_pre_soak_sealed_holdout_profile.json",
+      "src/market_lab/bridge_pre_soak_sealed_holdout.py",
+      "tests/test_bridge_pre_soak_sealed_holdout.py"
+    ],
+    "commit_authority": "one-scoped-worker-commit",
+    "push_authority": false
+  },
+  "sealed_holdout_contract": {
+    "profile_classification": "D1_INTERNAL_SANITIZED",
+    "holdout_payload_classification": "D3_RESTRICTED",
+    "scope": "sealed-holdout-boundary-only",
+    "required_refs": [
+      "holdout_manifest_sha256",
+      "domain_vault_ref",
+      "dataset_sha256",
+      "previous_temporal_integrity_receipt_ref",
+      "previous_cost_provider_accounting_receipt_ref",
+      "previous_budget_hard_caps_receipt_ref",
+      "single_use_holdout_access_grant",
+      "manifest_only_holdout_access_receipt"
+    ],
+    "holdout_invariants": [
+      "D3-holdout-bytes-never-enter-Bridge-public-repository-or-validator-receipt",
+      "grant-is-single-use-protocol-bound-and-manifest-only",
+      "access-receipt-has-consumed-true-and-raw_egress-false",
+      "query-limits-allow-zero-raw-rows-labels-features-prices-and-returns",
+      "validation-receipt-holdout_access_ref-points-to-access-receipt-not-raw-payload",
+      "no-private-account-or-order-fields",
+      "no-live-paper-or-order-authority",
+      "sealed-holdout-receipt-shaped-but-not-scientific-outcome"
+    ],
+    "stage_exit_authorized": "slice-only",
+    "declares_market_pre_soak_green": false
+  },
+  "preservation_contract": [
+    "Stage 2 dataset integrity provider accounting and budget hard caps remain pinned and unexpanded",
+    "public repository stores only sanitized authority receipts and hashes, never holdout payloads labels features rows or Market scientific truth",
+    "private Market remains the owner of holdout payloads access grants validators and domain semantics",
+    "validator emits immutable sealed-holdout boundary receipt material and does not apply any scientific outcome",
+    "holdout validation is hermetic; tests must not fetch network data",
+    "no live order trading exchange account deployment publication or autonomous paper/live authority is introduced"
+  ],
+  "forbidden_scope": [
+    "public-copy-of-holdout-payload-labels-features-raw-market-rows-private-Market-source-results-strategy-or-scientific-payload",
+    "worker-write-outside-one-private-sealed-holdout-profile-one-private-source-file-and-one-private-test-file",
+    "network-capture-inside-validator-tests-or-Bridge-runtime",
+    "new-public-Bridge-runtime-store-ledger-contract-schema-event-dependency-workflow-lockfile-or-migration",
+    "crash-resume-corrupt-checkpoint-or-backup-restore-implementation-in-this-slice",
+    "ValidationReceipt-use-to-apply-SUPPORTED-REFUTED-INCONCLUSIVE-INVALID-or-any-domain-truth",
+    "exchange-order-key-account-secret-D2-D3-payload-live-trading-paper-trading-publication-deployment-or-UI-authority",
+    "test-skip-xfail-continue-on-error-optional-gate-or-validation-weakening",
+    "dirty-owner-checkout-mutation",
+    "worker-push-merge-deploy-or-public-repository-write"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "source_freeze": "95067089a2660301768fcf62080191ecacac6e416956145ca9cf841b0539e3f4",
+    "reuse_decision": "8414a1b014d68cc44aa7e8c5d44e9b2d79f6fc69f538913f8ed5d053cd811adb",
+    "dataset_integrity_receipt": "3cbe4376094ac8dee30da02aa2a280dd2e2b1dfd8ee57624beb3301135479938",
+    "cost_provider_accounting_receipt": "deb7f0556fdc905d414a11b41bb2bc620150a6e5deb9f4880b80cee5b48410a5",
+    "budget_hard_caps_receipt": "0b8f687ee63630d8160d8006c7f7bdbdef316e38a1c3eb98c6c9e2dac606662b",
+    "private_market_head": "0f2eff1f9acde1d4bcca9bbe438e0cefeee351b7",
+    "external_dependencies": "none"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest tests.test_stage2_authority -v",
+    "make test",
+    "private focused sealed-holdout tests with PYTHONDONTWRITEBYTECODE=1 and no pytest cache",
+    "private bounded existing holdout access budget and preregistration boundary tests against exact pinned public Bridge source",
+    "git diff --check in both repositories",
+    "exact public and private write-set privacy dependency network live-authority and weakening scans",
+    "exact-head public CI and withheld-locator private focused CI"
+  ],
+  "risk_class": "cross-repository-market-pre-soak-sealed-holdout-slice",
+  "stop_conditions": [
+    "public-base-private-head-contract-source-freeze-reuse-budget-hard-caps-or-holdout-contract-hash-mismatch",
+    "worker-write-set-collision-or-private-owner-checkout-mutation",
+    "sealed-holdout-profile-cannot-be-bound-to-previous-Stage-2-lineage",
+    "holdout-verifier-accepts-raw-egress-unconsumed-grant-stale-access-wrong-query-wrong-grant-ref-label-feature-price-return-row-payload-private-account-order-live-paper-authority-or-D3-public-copy",
+    "holdout-payload-or-domain-scientific-truth-would-enter-the-public-repository",
+    "worker-needs-network-capture-during-tests-or-validation",
+    "any-recovery-or-backup-scope-is-required-before-this-slice-can-land",
+    "any-live-network-order-exchange-target-publication-or-deployment-authority-appears",
+    "before-equals-after-or-Market-pre-soak-sealed-holdout-blocker-remains"
+  ],
+  "expected_receipt": "docs/receipts/integration/s2-market-sealed-holdout.json",
+  "rollback": "Agent 0 rejects or reverts only this public authority and the isolated private worker commit. Existing Stage 2 dataset integrity, provider accounting, budget hard caps, public Bridge runtime, Market Trial Ledger, external systems and owner checkout remain unchanged.",
+  "commit_authority": "agent-0-only",
+  "push_authority": "agent-0-only"
+}

@@ -1,0 +1,69 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-s2-market-sealed-holdout-20260717",
+  "issued_at": "2026-07-17T21:00:00Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "reuse-freeze-authority"
+  },
+  "contour": "market",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "market-pre-soak-sealed-holdout-boundary-over-private-domain-runtime-and-public-HoldoutAccess-contracts",
+    "candidates": [
+      {
+        "candidate": "existing-public-Bridge-HoldoutAccessGrant-and-HoldoutAccessReceipt-contracts",
+        "disposition": "selected-contract-boundary"
+      },
+      {
+        "candidate": "existing-public-Bridge-ValidationReceipt-holdout_access_ref-binding",
+        "disposition": "selected"
+      },
+      {
+        "candidate": "existing-private-Market-blind-window-forward-holdout-and-preregistration-gate-patterns",
+        "disposition": "selected-pattern-only"
+      },
+      {
+        "candidate": "existing-private-Market-budget-hard-cap-profile-and-receipt-lineage",
+        "disposition": "selected-lineage"
+      },
+      {
+        "candidate": "owner-local-stdlib-sealed-holdout-profile-validator-and-tests",
+        "disposition": "selected-minimal-glue"
+      },
+      {
+        "candidate": "copy-private-holdout-rows-labels-features-or-D3-bytes-to-public-Bridge",
+        "disposition": "rejected-boundary"
+      },
+      {
+        "candidate": "new-external-dependency-or-live-provider-holdout-fetch",
+        "disposition": "rejected-unnecessary-and-non-hermetic"
+      }
+    ],
+    "selected_mode": "existing-holdout-access-contracts-plus-market-blind-holdout-patterns-owner-stdlib-validator-no-public-payload",
+    "source_ref": "source-freeze:source-freeze-market-s2-sealed-holdout-20260717;git:0f2eff1f9acde1d4bcca9bbe438e0cefeee351b7;git:309344bea5d5eb432f9e21dc5e05202ca00dd43f",
+    "code_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "license_spdx": "NOASSERTION",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "sealed holdout profile binds previous dataset cost-provider and budget-hard-cap receipts without copying D3 holdout bytes to public repo",
+      "validator accepts only manifest-hash access through single-use HoldoutAccessGrant and HoldoutAccessReceipt with raw_egress false",
+      "validator rejects raw rows labels features prices returns secrets private account fields consumed false wrong grant refs and stale access windows",
+      "accepted sealed holdout emits ValidationReceipt-shaped SEALED_HOLDOUT_BOUNDARY_PASS only, not SUPPORTED REFUTED INCONCLUSIVE or INVALID",
+      "no network exchange order live trading paper deployment publication domain-truth or holdout payload authority is introduced",
+      "focused private tests plus bounded existing holdout/preregistration budget tests run against exact pinned public Bridge source"
+    ],
+    "canonical_owner": "private-Market-sealed-holdout-validator-and-Agent0-cross-repository-integration",
+    "rollback": "Discard or revert only the isolated private sealed holdout profile adapter and tests. No public holdout payload, Market scientific outcome, live system, or Bridge runtime state is changed."
+  },
+  "integrity": {
+    "payload_sha256": "8414a1b014d68cc44aa7e8c5d44e9b2d79f6fc69f538913f8ed5d053cd811adb",
+    "parent_refs": [
+      "source-freeze:source-freeze-market-s2-sealed-holdout-20260717",
+      "sha256:95067089a2660301768fcf62080191ecacac6e416956145ca9cf841b0539e3f4",
+      "git:0f2eff1f9acde1d4bcca9bbe438e0cefeee351b7",
+      "git:309344bea5d5eb432f9e21dc5e05202ca00dd43f"
+    ]
+  }
+}
