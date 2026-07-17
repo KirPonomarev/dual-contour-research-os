@@ -1,0 +1,36 @@
+{
+  "schema_version": "dual-contour.tool-provenance.v1",
+  "name": "restic",
+  "version": "0.19.0",
+  "upstream": "https://github.com/restic/restic",
+  "source": {
+    "url": "https://github.com/restic/restic/archive/refs/tags/v0.19.0.tar.gz",
+    "sha256": "800779b6c4c2396971c0567b09ccdd435e03155e1a0ec94e8bbf3d98641a8bc2"
+  },
+  "homebrew_bottle_arm64_tahoe": {
+    "formula": "restic",
+    "sha256": "b69c21f735a13de6c74d6a097199fc6e98fd794c48e287a035dbff434bfcae41"
+  },
+  "license": {
+    "spdx": "BSD-2-Clause",
+    "path": "LICENSES/restic-BSD-2-Clause.txt",
+    "sha256": "6f08a01a9fab5b24e139a09f15cc24a73087c7bc09e3bacf099fdf2d767bf897"
+  },
+  "selection": {
+    "reuse_receipt": "reuse-s4-restic-backup-restore-20260718",
+    "mode": "pinned external operations tool; no vendored source or binary",
+    "required_runtime_identity": "restic 0.19.0",
+    "credential_transport": "owner-only executable password command",
+    "repository_transport": "owner-only repository file",
+    "network_behavior": "only an operator-provisioned remote backend uses network access; separate-device local mode does not",
+    "repository_boundary": "operator-provisioned remote backend or canonical non-symlink local repository on a separately verified device; controller exposes no locator in receipts",
+    "rollback": "remove controller and metadata only; external repositories and snapshots remain untouched"
+  },
+  "review": {
+    "license_approved": true,
+    "source_pinned": true,
+    "distribution_pinned": true,
+    "sbom_path": "docs/receipts/release/restic-tool-sbom.spdx.json",
+    "known_authority": "backup and restore only"
+  }
+}

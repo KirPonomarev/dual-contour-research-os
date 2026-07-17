@@ -1,0 +1,60 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "dual-contour-research-os-restic-operations-tool-0.19.0",
+  "documentNamespace": "https://github.com/KirPonomarev/dual-contour-research-os/sbom/tools/restic/0.19.0/800779b6c4c2396971c0567b09ccdd435e03155e1a0ec94e8bbf3d98641a8bc2",
+  "creationInfo": {
+    "created": "2026-07-17T23:09:36Z",
+    "creators": [
+      "Tool: Agent5 deterministic SPDX assembler"
+    ]
+  },
+  "documentDescribes": [
+    "SPDXRef-Package-restic"
+  ],
+  "packages": [
+    {
+      "SPDXID": "SPDXRef-Package-restic",
+      "name": "restic",
+      "versionInfo": "0.19.0",
+      "packageFileName": "restic-0.19.0.tar.gz",
+      "supplier": "Organization: restic contributors",
+      "originator": "Person: Alexander Neumann",
+      "downloadLocation": "https://github.com/restic/restic/archive/refs/tags/v0.19.0.tar.gz",
+      "filesAnalyzed": false,
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "800779b6c4c2396971c0567b09ccdd435e03155e1a0ec94e8bbf3d98641a8bc2"
+        }
+      ],
+      "licenseConcluded": "BSD-2-Clause",
+      "licenseDeclared": "BSD-2-Clause",
+      "licenseComments": "Exact license at LICENSES/restic-BSD-2-Clause.txt with SHA-256 6f08a01a9fab5b24e139a09f15cc24a73087c7bc09e3bacf099fdf2d767bf897.",
+      "copyrightText": "Copyright (c) 2014, Alexander Neumann and restic contributors",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:github/restic/restic@0.19.0"
+        }
+      ],
+      "annotations": [
+        {
+          "annotationType": "OTHER",
+          "annotator": "Tool: Agent5 deterministic SPDX assembler",
+          "annotationDate": "2026-07-17T23:09:36Z",
+          "comment": "Pinned Homebrew arm64 Tahoe bottle SHA-256: b69c21f735a13de6c74d6a097199fc6e98fd794c48e287a035dbff434bfcae41. The bottle is not vendored."
+        }
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relationshipType": "DESCRIBES",
+      "relatedSpdxElement": "SPDXRef-Package-restic"
+    }
+  ]
+}

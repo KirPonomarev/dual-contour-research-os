@@ -1,0 +1,29 @@
+schema_version: dual-contour.third-party-manifest.v1
+dependencies:
+  - name: restic
+    version: 0.19.0
+    purpose: encrypted immutable backup, full repository read verification, and clean restore
+    integration: separately-installed-command-line-tool
+    vendored: false
+    runtime_required: operations-only
+    source_url: https://github.com/restic/restic/archive/refs/tags/v0.19.0.tar.gz
+    source_sha256: 800779b6c4c2396971c0567b09ccdd435e03155e1a0ec94e8bbf3d98641a8bc2
+    distribution:
+      kind: homebrew-bottle
+      platform: arm64_tahoe
+      sha256: b69c21f735a13de6c74d6a097199fc6e98fd794c48e287a035dbff434bfcae41
+    license_spdx: BSD-2-Clause
+    license_file: LICENSES/restic-BSD-2-Clause.txt
+    license_sha256: 6f08a01a9fab5b24e139a09f15cc24a73087c7bc09e3bacf099fdf2d767bf897
+    controller_guards:
+      exact_version_required: 0.19.0
+      password_command_only: true
+      repository_must_preexist: true
+      remote_repository_allowed: true
+      separate_device_local_repository_allowed: true
+      same_device_local_repository_allowed: false
+      repository_source_or_restore_path_overlap_allowed: false
+      repository_retention_mutation_surface: false
+      full_read_verification_required: true
+      clean_restore_required: true
+      canonical_byte_manifest_equality_required: true
