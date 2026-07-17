@@ -1,0 +1,65 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s1-security-offline-reference-e2e-authority-20260717",
+  "issued_at": "2026-07-17T17:53:00Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "security",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s1-security-offline-reference-e2e-authority",
+    "agent_id": "agent-0",
+    "ownership_lease_ref": "stages/s1-security-offline-reference-e2e-authority/ownership-lease.json",
+    "base_sha": "a0c78487e24fa65d23ea20c1ef64ec827c728c40",
+    "head_sha": "fd56b90cfb24def7c604970ef6a9ac4359a27930",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "docs/receipts/reuse/s1-security-offline-reference-e2e.json",
+      "stages/s1-security-offline-reference-e2e-authority/stage-envelope.json",
+      "stages/s1-security-offline-reference-e2e-authority/ownership-lease.json",
+      "stages/s1-security-offline-reference-e2e/stage-envelope.json",
+      "stages/s1-security-offline-reference-e2e/ownership-lease.json",
+      "tests/test_stage1_authority.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "focused_tests": 45,
+      "canonical_tests": 304,
+      "stage0b_tests": 25,
+      "skipped_tests": 0,
+      "diff_check": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "public_source_mutation": false,
+      "private_source_mutation": false,
+      "dependency_adoption": false,
+      "frozen_contract_edit": false,
+      "selected_private_head_clean_tracked": true,
+      "selected_private_head": "c88ffdb3e90971f1b2369f11ebe3a44d46d20470",
+      "private_worker_source_files": 2,
+      "private_worker_test_files": 2,
+      "single_security_outcome_ledger": true,
+      "validator_registry_write_authorized": false,
+      "public_private_code_target_evidence_or_fixture_copy_authorized": false,
+      "combined_ci_required": true,
+      "live_or_connected_authority": false,
+      "source_freeze_payload_sha256": "ba5f9bd40076080b4fee31d293a080c24c7182e615d2fd2ca92b32f61ce5fbf9",
+      "reuse_payload_sha256": "ec11788ac44c87238e4e197e1a92f3356b351589a41929f4b7ad03b7b482d9a8",
+      "public_exact_head_ci": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29601626495"
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29601626495",
+    "integration_commit_sha": "fd56b90cfb24def7c604970ef6a9ac4359a27930"
+  },
+  "integrity": {
+    "payload_sha256": "546ecc77015203dbaee70eea033218b86abf0586fff4873dccdc4ab90a7dba8b",
+    "parent_refs": [
+      "git:fd56b90cfb24def7c604970ef6a9ac4359a27930",
+      "ci:29601626495",
+      "source-freeze:source-freeze-security-s0b-20260716",
+      "reuse:reuse-s1-security-offline-reference-e2e-20260717"
+    ]
+  }
+}
