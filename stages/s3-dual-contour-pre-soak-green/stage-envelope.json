@@ -1,0 +1,85 @@
+{
+  "stage_id": "s3-dual-contour-pre-soak-green",
+  "agent_id": "agent-0",
+  "objective": "Declare DUAL_CONTOUR_PRE_SOAK_GREEN after all nine Security local-lab capabilities and the prior Market pre-soak gate are receipt-bound and exact-head CI green.",
+  "executable_blocker": "No blocker remains for Stage 3 after exact-head CI 29617684385; the remaining action is the canonical non-deployment exit declaration.",
+  "base_sha": "5ea32adc30e4e8bb1980a52c900b551f0cf72e6a",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "main",
+  "worktree": "canonical-public-worktree",
+  "read_set": [
+    "docs/receipts/integration/s2-market-pre-soak-green.json",
+    "docs/receipts/integration/s3-security-ingestion-safe-map.json",
+    "docs/receipts/integration/s3-security-local-lab-evidence.json",
+    "docs/receipts/integration/s3-security-boundary-gate.json",
+    "exact-head CI 29617684385"
+  ],
+  "write_set": [
+    "docs/receipts/integration/s3-security-boundary-gate.json",
+    "docs/receipts/integration/s3-dual-contour-pre-soak-green.json",
+    "stages/s3-dual-contour-pre-soak-green/stage-envelope.json",
+    "stages/s3-dual-contour-pre-soak-green/ownership-lease.json",
+    "tests/test_stage3_boundary_gate.py"
+  ],
+  "gate_contract": {
+    "required_capabilities": [
+      "public_source_ingestion",
+      "safe_map",
+      "hypothesis_card",
+      "owned_local_lab",
+      "invariant_validator",
+      "evidence_manifest",
+      "redaction",
+      "cross_contour_denial",
+      "no_live_target_authority"
+    ],
+    "required_prior_gate": "MARKET_PRE_SOAK_GREEN",
+    "stage_exit": "DUAL_CONTOUR_PRE_SOAK_GREEN",
+    "next_stage": "Immutable-pre-soak-deploy-gate",
+    "declares_ready_for_72h_soak": false
+  },
+  "preservation_contract": [
+    "this-stage-declares-a-pre-soak-software-gate-not-deployment-or-soak-readiness",
+    "exact-release-image-config-policy-schema-backup-reboot-rollback-and-approval-remain-next-gate-work",
+    "no-runtime-private-repository-contract-config-workflow-dependency-or-domain-registry-mutation",
+    "no-scientific-outcome-live-target-trading-publication-deployment-or-authority-escalation"
+  ],
+  "forbidden_scope": [
+    "claim-READY_FOR_72H_SOAK-or-start-soak",
+    "claim-exact-image-config-policy-schema-off-host-backup-reboot-recovery-rollback-or-consumed-deployment-approval",
+    "runtime-contract-schema-lockfile-dependency-config-workflow-private-repository-or-domain-registry-edit",
+    "network-live-target-scan-exploit-trading-publication-report-submission-or-deployment",
+    "private-D2-D3-payload-secret-target-evidence-safe-map-body-or-lab-summary-in-public-repository",
+    "skip-xfail-continue-on-error-optional-gate-force-push-or-validation-weakening"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "market_pre_soak_green": "8d164629d3f2e23d6318b19f22804a6d05f6a5d8cf15f7a8f5066d872914edab",
+    "ingestion_safe_map": "0fe39bc61f47920530e8f12fe04ddf2dc859fde4c5ac0555d41a7616821cc060",
+    "local_lab_evidence": "7f4e616718b4fbceae438b583dcad6e2d1e292968c9384ae24ef484786d979aa",
+    "boundary_gate": "25ef0ac4daf69e516d25d79fd0eb86c647d28e0730cc9c3fbe758af9496879bd",
+    "exact_head_ci": "29617684385",
+    "public_head": "5ea32adc30e4e8bb1980a52c900b551f0cf72e6a",
+    "private_security_head": "83a22cf4eaf013bbd07cccd5a289bf12088982f6"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest tests.test_stage3_boundary_gate -v",
+    "python3 -m unittest tests.test_stage3_authority -v",
+    "make test",
+    "git diff --check",
+    "exact public write-set privacy secret deployment-claim receipt-hash and weakening scans",
+    "exact-head CI on the final gate commit"
+  ],
+  "risk_class": "dual-contour-pre-soak-exit-declaration",
+  "stop_conditions": [
+    "any-required-capability-prior-gate-receipt-hash-or-exact-head-CI-is-not-green",
+    "any-nonzero-cross-contour-external-action-registry-write-D2-D3-public-payload-or-unreceipted-mutation-result",
+    "gate-would-claim-READY_FOR_72H_SOAK-deployment-readiness-or-unproven-deploy-capability",
+    "runtime-private-repository-contract-config-workflow-dependency-or-domain-registry-mutation-is-required"
+  ],
+  "expected_receipt": "docs/receipts/integration/s3-dual-contour-pre-soak-green.json",
+  "rollback": "Revert only the exit declaration commit; completed tested Stage 2 and Stage 3 slices remain integrated and no deployment or external system changes exist.",
+  "commit_authority": "agent-0-only",
+  "push_authority": "agent-0-only"
+}

@@ -1,0 +1,70 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s3-security-boundary-gate-20260718",
+  "issued_at": "2026-07-18T02:25:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "security",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s3-security-boundary-gate",
+    "agent_id": "agent-0",
+    "ownership_lease_ref": "stages/s3-security-boundary-gate/ownership-lease.json",
+    "base_sha": "82061197b2d27b81b0493ad9635756f164bcf1b0",
+    "head_sha": "5ea32adc30e4e8bb1980a52c900b551f0cf72e6a",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "docs/receipts/reuse/s3-security-boundary-gate.json",
+      "stages/s3-security-boundary-gate/stage-envelope.json",
+      "stages/s3-security-boundary-gate/ownership-lease.json",
+      "tests/test_stage3_boundary_gate.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "focused_boundary_tests": 6,
+      "stage3_authority_tests": 9,
+      "canonical_tests": 354,
+      "stage0b_tests": 25,
+      "skipped_tests": 0,
+      "diff_check": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "runtime_source_mutation": false,
+      "dependency_adoption": false,
+      "frozen_contract_edit": false,
+      "private_repository_mutation": false,
+      "security_to_market_receipt_projection_denied": true,
+      "market_to_security_receipt_projection_denied": true,
+      "mixed_execution_contour_denied_before_kernel_claim": true,
+      "runner_calls_after_mixed_contour_denial": 0,
+      "checkpoint_or_artifact_access_after_mixed_contour_denial": 0,
+      "d2_d3_projection_denied": true,
+      "external_network_live_target_authority_surface": false,
+      "live_target_authority_contract": false,
+      "validator_registry_write_authorized": false,
+      "private_stage3_network_calls": 0,
+      "private_stage3_registry_writes": 0,
+      "private_stage3_cross_contour_reads": 0,
+      "public_private_payload_in_public_repo": false,
+      "completes_stage3_cross_contour_denial": true,
+      "completes_stage3_no_live_target_authority": true,
+      "completes_all_stage3_required_capabilities": true,
+      "declares_dual_contour_pre_soak_green": false,
+      "declares_ready_for_72h_soak": false,
+      "public_exact_head_ci": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29617684385"
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29617684385",
+    "integration_commit_sha": "5ea32adc30e4e8bb1980a52c900b551f0cf72e6a"
+  },
+  "integrity": {
+    "payload_sha256": "25ef0ac4daf69e516d25d79fd0eb86c647d28e0730cc9c3fbe758af9496879bd",
+    "parent_refs": [
+      "git:5ea32adc30e4e8bb1980a52c900b551f0cf72e6a",
+      "ci:29617684385",
+      "reuse:reuse-s3-security-boundary-gate-20260718",
+      "integration:integration-s3-security-local-lab-evidence-20260718",
+      "integration:integration-s3-security-ingestion-safe-map-20260718",
+      "integration:integration-s2-market-pre-soak-green-20260718"
+    ]
+  }
+}

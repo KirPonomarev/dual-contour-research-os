@@ -1,0 +1,87 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s3-dual-contour-pre-soak-green-20260718",
+  "issued_at": "2026-07-18T02:30:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s3-dual-contour-pre-soak-green",
+    "agent_id": "agent-0",
+    "ownership_lease_ref": "stages/s3-dual-contour-pre-soak-green/ownership-lease.json",
+    "base_sha": "5ea32adc30e4e8bb1980a52c900b551f0cf72e6a",
+    "head_sha": "5ea32adc30e4e8bb1980a52c900b551f0cf72e6a",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "docs/receipts/integration/s3-security-boundary-gate.json",
+      "docs/receipts/integration/s3-dual-contour-pre-soak-green.json",
+      "stages/s3-dual-contour-pre-soak-green/stage-envelope.json",
+      "stages/s3-dual-contour-pre-soak-green/ownership-lease.json",
+      "tests/test_stage3_boundary_gate.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "final_stage3_public_head": "5ea32adc30e4e8bb1980a52c900b551f0cf72e6a",
+      "final_stage3_private_head": "83a22cf4eaf013bbd07cccd5a289bf12088982f6",
+      "final_stage3_exact_head_ci": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29617684385",
+      "market_pre_soak_green_receipt_sha256": "8d164629d3f2e23d6318b19f22804a6d05f6a5d8cf15f7a8f5066d872914edab",
+      "required_capability_count": 9,
+      "accepted_stage3_slice_receipt_count": 3,
+      "capabilities": {
+        "public_source_ingestion": true,
+        "safe_map": true,
+        "hypothesis_card": true,
+        "owned_local_lab": true,
+        "invariant_validator": true,
+        "evidence_manifest": true,
+        "redaction": true,
+        "cross_contour_denial": true,
+        "no_live_target_authority": true
+      },
+      "slice_receipt_payload_sha256": {
+        "ingestion_safe_map": "0fe39bc61f47920530e8f12fe04ddf2dc859fde4c5ac0555d41a7616821cc060",
+        "local_lab_evidence": "7f4e616718b4fbceae438b583dcad6e2d1e292968c9384ae24ef484786d979aa",
+        "boundary_gate": "25ef0ac4daf69e516d25d79fd0eb86c647d28e0730cc9c3fbe758af9496879bd"
+      },
+      "zero_tolerance_results": {
+        "unauthorized_external_actions": 0,
+        "cross_contour_reads": 0,
+        "validator_registry_writes": 0,
+        "public_D2_D3_payloads": 0,
+        "unreceipted_canonical_mutations": 0
+      },
+      "stage_exit": "DUAL_CONTOUR_PRE_SOAK_GREEN",
+      "declares_market_pre_soak_green": true,
+      "declares_dual_contour_pre_soak_green": true,
+      "next_stage": "Immutable-pre-soak-deploy-gate",
+      "declares_ready_for_72h_soak": false,
+      "exact_release_sha_frozen": false,
+      "exact_image_digest_frozen": false,
+      "encrypted_off_host_backup_claimed": false,
+      "reboot_recovery_claimed": false,
+      "rollback_drill_claimed": false,
+      "deployment_approval_consumed": false,
+      "deployment_authority": false,
+      "scientific_outcome_applied": false,
+      "public_private_payload_in_public_repo": false,
+      "live_or_connected_authority": false
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29617684385",
+    "integration_commit_sha": "5ea32adc30e4e8bb1980a52c900b551f0cf72e6a"
+  },
+  "integrity": {
+    "payload_sha256": "17a1968352b7d285e23ee277e1bab0ffc2ce86ba048230700100f5d37bd0f8bc",
+    "parent_refs": [
+      "git:5ea32adc30e4e8bb1980a52c900b551f0cf72e6a",
+      "git:83a22cf4eaf013bbd07cccd5a289bf12088982f6",
+      "ci:29617684385",
+      "integration:integration-s2-market-pre-soak-green-20260718",
+      "integration:integration-s3-security-ingestion-safe-map-20260718",
+      "integration:integration-s3-security-local-lab-evidence-20260718",
+      "integration:integration-s3-security-boundary-gate-20260718"
+    ]
+  }
+}

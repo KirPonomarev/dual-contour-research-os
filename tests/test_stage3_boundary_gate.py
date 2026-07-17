@@ -28,6 +28,9 @@ from tests.test_stage1_validation import (
 SRC = ROOT / "src" / "research_bridge"
 CONTRACTS = ROOT / "contracts" / "v1"
 LOCAL_LAB_RECEIPT = ROOT / "docs" / "receipts" / "integration" / "s3-security-local-lab-evidence.json"
+BOUNDARY_RECEIPT = ROOT / "docs" / "receipts" / "integration" / "s3-security-boundary-gate.json"
+STAGE3_GATE_RECEIPT = ROOT / "docs" / "receipts" / "integration" / "s3-dual-contour-pre-soak-green.json"
+STAGE3_GATE = ROOT / "stages" / "s3-dual-contour-pre-soak-green"
 BOUNDARY_REUSE = ROOT / "docs" / "receipts" / "reuse" / "s3-security-boundary-gate.json"
 BOUNDARY_STAGE = ROOT / "stages" / "s3-security-boundary-gate"
 
@@ -130,6 +133,30 @@ class Stage3BoundaryGateTests(unittest.TestCase):
         self.assertEqual(audit["cross_contour_reads"], 0)
         self.assertFalse(audit["live_or_connected_authority"])
         self.assertFalse(audit["scientific_outcome_applied"])
+
+    def test_boundary_receipt_and_final_stage3_gate_are_integrity_bound(self) -> None:
+        boundary = json.loads(BOUNDARY_RECEIPT.read_text())
+        gate = json.loads(STAGE3_GATE_RECEIPT.read_text())
+        envelope = json.loads((STAGE3_GATE / "stage-envelope.json").read_text())
+        lease = json.loads((STAGE3_GATE / "ownership-lease.json").read_text())
+        for receipt in (boundary, gate):
+            payload = json.dumps(receipt["payload"], sort_keys=True, separators=(",", ":")).encode()
+            self.assertEqual(receipt["integrity"]["payload_sha256"], hashlib.sha256(payload).hexdigest())
+        self.assertTrue(boundary["payload"]["audit_results"]["completes_all_stage3_required_capabilities"])
+        audit = gate["payload"]["audit_results"]
+        self.assertEqual(audit["required_capability_count"], 9)
+        self.assertTrue(all(audit["capabilities"].values()))
+        self.assertEqual(audit["stage_exit"], "DUAL_CONTOUR_PRE_SOAK_GREEN")
+        self.assertTrue(audit["declares_market_pre_soak_green"])
+        self.assertTrue(audit["declares_dual_contour_pre_soak_green"])
+        self.assertFalse(audit["declares_ready_for_72h_soak"])
+        self.assertFalse(audit["exact_image_digest_frozen"])
+        self.assertFalse(audit["encrypted_off_host_backup_claimed"])
+        self.assertFalse(audit["deployment_authority"])
+        self.assertFalse(audit["live_or_connected_authority"])
+        self.assertEqual(envelope["write_set"], lease["write_set"])
+        self.assertFalse(envelope["gate_contract"]["declares_ready_for_72h_soak"])
+        self.assertFalse(lease["delegation_allowed"])
 
 
 if __name__ == "__main__":

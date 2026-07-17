@@ -1,0 +1,20 @@
+{
+  "lease_id": "lease-s3-dual-contour-pre-soak-green-agent-0-20260718",
+  "stage_id": "s3-dual-contour-pre-soak-green",
+  "agent_id": "agent-0",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-18T02:30:00Z",
+  "expires_at": "2026-07-18T08:30:00Z",
+  "base_sha": "5ea32adc30e4e8bb1980a52c900b551f0cf72e6a",
+  "branch": "main",
+  "worktree": "canonical-public-worktree",
+  "write_set": [
+    "docs/receipts/integration/s3-security-boundary-gate.json",
+    "docs/receipts/integration/s3-dual-contour-pre-soak-green.json",
+    "stages/s3-dual-contour-pre-soak-green/stage-envelope.json",
+    "stages/s3-dual-contour-pre-soak-green/ownership-lease.json",
+    "tests/test_stage3_boundary_gate.py"
+  ],
+  "delegation_allowed": false,
+  "state": "active"
+}
