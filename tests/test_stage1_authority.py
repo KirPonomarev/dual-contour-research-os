@@ -233,6 +233,64 @@ class Stage1AuthorityTests(unittest.TestCase):
             envelope["forbidden_scope"],
         )
 
+    def test_budget_attempt_lifecycle_semantic_amendment_is_exact_and_non_expansive(self) -> None:
+        original = load(
+            ROOT / "stages" / "s1-budget-attempt-lifecycle" / "stage-envelope.json"
+        )
+        amendment = load(
+            ROOT
+            / "stages"
+            / "s1-budget-attempt-lifecycle"
+            / "stage-envelope-amendment-1.json"
+        )
+        lease = load(
+            ROOT
+            / "stages"
+            / "s1-budget-attempt-lifecycle"
+            / "ownership-lease-amendment-1.json"
+        )
+
+        self.assertEqual(amendment["amends_stage_id"], original["stage_id"])
+        self.assertEqual(amendment["write_set_expansion"], [])
+        self.assertEqual(lease["write_set"], original["write_set"])
+        self.assertEqual(
+            amendment["semantic_freeze"]["ledger_versions"],
+            {
+                "reservation_ledger_version_before": "global-event-chain-head-sequence-before-claim-append-or-zero-at-genesis",
+                "settlement_ledger_version_after": "sequence-assigned-to-the-same-atomic-complete-event",
+                "database_user_version": "SQLite-schema-version-only-and-equals-one",
+            },
+        )
+        self.assertEqual(
+            len(amendment["semantic_freeze"]["replay"]["exact_caller_projection"]),
+            17,
+        )
+        self.assertEqual(
+            len(
+                amendment["semantic_freeze"]["provider_accounting_attestation"][
+                    "exact_keys"
+                ]
+            ),
+            11,
+        )
+        self.assertTrue(
+            amendment["semantic_freeze"]["provider_accounting_attestation"][
+                "provider_unknown"
+            ]
+        )
+        self.assertEqual(
+            amendment["semantic_freeze"]["provider_accounting_attestation"][
+                "released_amount"
+            ],
+            0,
+        )
+        self.assertIn(
+            "cumulative-lifetime-scope-cap",
+            amendment["semantic_freeze"]["capacity_semantics"],
+        )
+        self.assertFalse(amendment["push_authority"])
+        self.assertFalse(lease["delegation_allowed"])
+
     def test_budget_profile_worker_lease_is_exact_and_non_expansive(self) -> None:
         envelope = load(ROOT / "stages" / "s1-budget-profile" / "stage-envelope.json")
         lease = load(ROOT / "stages" / "s1-budget-profile" / "ownership-lease.json")

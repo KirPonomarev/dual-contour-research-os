@@ -1,0 +1,121 @@
+{
+  "stage_id": "s1-budget-attempt-lifecycle-amendment-1",
+  "amends_stage_id": "s1-budget-attempt-lifecycle",
+  "agent_id": "agent-2",
+  "objective": "Freeze exact lifecycle semantics identified by independent assurance review without expanding the worker write-set or authorized capability.",
+  "executable_blocker": "The original authority requires atomic receipts, exact schema identity and exact replay but leaves chain-version fields, replay equivalence, attestation shape and the post-complete boundary semantically ambiguous.",
+  "base_sha": "19ceba5b67e0cc36964fe817206f73a1bc8747ce",
+  "public_authority_sha": "641f18ab1f0d9f6ef385ccd286220e0007dcde69",
+  "public_authority_ci": "29579070098",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a2-s1-budget-attempt-lifecycle",
+  "worktree": "ephemeral-public-worktree:s1-budget-attempt-lifecycle",
+  "prior_envelope_ref": "stages/s1-budget-attempt-lifecycle/stage-envelope.json",
+  "authority_receipt_ref": "docs/receipts/integration/s1-budget-attempt-lifecycle-authority.json",
+  "write_set_expansion": [],
+  "full_write_set_ref": "stages/s1-budget-attempt-lifecycle/ownership-lease-amendment-1.json",
+  "semantic_freeze": {
+    "ledger_versions": {
+      "reservation_ledger_version_before": "global-event-chain-head-sequence-before-claim-append-or-zero-at-genesis",
+      "settlement_ledger_version_after": "sequence-assigned-to-the-same-atomic-complete-event",
+      "database_user_version": "SQLite-schema-version-only-and-equals-one"
+    },
+    "schema_fingerprint": {
+      "identity_fields": [
+        "type",
+        "name",
+        "tbl_name",
+        "sql"
+      ],
+      "comparison": "exact-canonical-strings-and-object-names-without-semantic-normalization",
+      "v1_manifest": "exact-existing-legacy-DDL-plus-exact-three-authorized-unique-expression-index-DDL-constants-plus-user-version-one",
+      "extra_missing_lookalike_policy": "reject-before-WAL-or-DDL-mutation"
+    },
+    "replay": {
+      "global_key": "BudgetReservation.payload.idempotency_key",
+      "validation_order": [
+        "validate-entire-persisted-budget-projection",
+        "lookup-and-compare-idempotent-replay",
+        "for-a-new-claim-only-enforce-unused-Permit-nonce-and-capacity",
+        "append"
+      ],
+      "exact_caller_projection": [
+        "job_id",
+        "attempt_id",
+        "permit_id",
+        "permit_nonce_sha256",
+        "runner_identity",
+        "fencing_epoch",
+        "fencing_token_sha256",
+        "admitted_at",
+        "admission_digest",
+        "provider",
+        "accounting_policy_ref",
+        "budget_scope_ref",
+        "trial_ref",
+        "reserved_cost_units",
+        "scope_cost_units",
+        "reservation_expires_at",
+        "idempotency_key"
+      ],
+      "result": "exact-match-returns-original-event-with-zero-write-and-no-capacity-change-otherwise-reject"
+    },
+    "provider_accounting_attestation": {
+      "exact_keys": [
+        "schema_id",
+        "schema_version",
+        "accounting_policy_ref",
+        "budget_scope_ref",
+        "provider",
+        "reservation_ref",
+        "actual_usage",
+        "actual_cost",
+        "released_amount",
+        "provider_unknown",
+        "settled_at"
+      ],
+      "schema_id": "OwnedOfflineAccountingAttestation",
+      "schema_version": "1.0.0",
+      "actual_usage": "exact-object-cost_units-equals-reserved-cost-units",
+      "actual_cost": "reserved-cost-units",
+      "released_amount": 0,
+      "provider_unknown": true,
+      "provider_receipt_ref": "embedded:sha256-of-canonical-retained-attestation"
+    },
+    "completion_boundary": {
+      "pre_append": "construct-and-validate-attestation-full-SettlementReceipt-and-complete-payload-inside-the-complete-transaction",
+      "failure_before_commit": "rollback-with-reservation-unmatched-and-fully-counted-and-no-settlement-or-ExecutionReceipt",
+      "after_commit": "durable-complete-is-authoritative-and-deterministic-receipt-last-ExecutionReceipt-binds-settlement-object-id",
+      "post_commit_local_assembly_failure": "critical-invariant-error-not-capacity-rollback"
+    },
+    "capacity_semantics": "cumulative-lifetime-scope-cap-under-fixed-charge-released-zero-until-a-separate-authorized-recovery-release-gate"
+  },
+  "preservation_contract": [
+    "all original envelope constraints acceptance commands and stop conditions remain active",
+    "the worker write-set remains exactly three source and eight existing test files",
+    "no second schema implementation is maintained in execution when the canonical ledger validator can be reused",
+    "no release recovery retry expiry release multi-attempt or provider-metered accounting is introduced",
+    "no frozen contract dependency configuration workflow migration or event-type change is introduced"
+  ],
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest tests.test_stage1_admission tests.test_stage1_assurance tests.test_stage1_authority_policy tests.test_stage1_control_assurance tests.test_stage1_execution tests.test_stage1_execution_assurance tests.test_stage1_ledger tests.test_stage1_pause_epoch_fencing -v",
+    "python3 -m unittest discover -s tests -p 'test_stage1_*.py'",
+    "make test",
+    "git diff --check",
+    "exact eleven-file write-set semantic-freeze schema-object replay-projection attestation-shape completion-boundary private-locator network live-authority and weakening scan"
+  ],
+  "stop_conditions": [
+    "implementation-uses-SQLite-user-version-as-receipt-ledger-version",
+    "replay-omits-a-caller-authority-or-budget-binding-or-runs-after-nonce-rejection",
+    "attestation-key-set-cost-release-unknown-or-hash-binding-differs",
+    "fallible-complete-validation-occurs-after-append-or-failed-transaction-emits-settlement",
+    "schema-comparison-normalizes-or-accepts-extra-missing-lookalike-objects",
+    "write-set-scope-contract-dependency-event-type-table-or-column-expands",
+    "before-equals-after-or-original-hard-budget-blocker-remains"
+  ],
+  "expected_receipt": "docs/receipts/integration/s1-budget-attempt-lifecycle-amendment-1.json",
+  "rollback": "Agent 0 discards the worker commit and reverts this semantic clarification. No runtime database, domain state, external system or authority outside the original stage is changed.",
+  "commit_authority": "one-scoped-worker-commit",
+  "push_authority": false
+}
