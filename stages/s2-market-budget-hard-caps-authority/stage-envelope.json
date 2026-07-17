@@ -1,0 +1,135 @@
+{
+  "stage_id": "s2-market-budget-hard-caps-authority",
+  "agent_id": "agent-0",
+  "objective": "Authorize the next Market pre-soak slice: deterministic hard budget caps bound to the frozen dataset and cost-provider accounting lineage.",
+  "executable_blocker": "Stage 2 has frozen dataset integrity and provider accounting, but no hermetic hard-cap validator proves planned Market pre-soak usage cannot exceed model, trial-family, provider-cost, WIP, CAS, staging or disk-safety caps without live authority.",
+  "base_sha": "f238fd4fd51730e49e1ae363507bd6af2189cc1f",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "main",
+  "worktree": "canonical-public-worktree",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "docs/receipts/integration/s1-skeleton-green-audit.json",
+    "docs/receipts/integration/s1-budget-profile.json",
+    "docs/receipts/integration/s1-budget-attempt-lifecycle.json",
+    "docs/receipts/integration/s2-market-public-dataset-temporal-integrity.json",
+    "docs/receipts/integration/s2-market-cost-provider-accounting.json",
+    "docs/receipts/source-freeze/s2-market-budget-hard-caps.json",
+    "docs/receipts/reuse/s2-market-budget-hard-caps.json",
+    "contracts/v1/BudgetReservation.schema.json",
+    "contracts/v1/SettlementReceipt.schema.json",
+    "contracts/v1/ValidationReceipt.schema.json",
+    "private Market bridge_pre_soak_cost_provider_accounting.py",
+    "private Market funding paper watcher cost and settlement tests"
+  ],
+  "write_set": [
+    "docs/receipts/source-freeze/s2-market-budget-hard-caps.json",
+    "docs/receipts/reuse/s2-market-budget-hard-caps.json",
+    "stages/s2-market-budget-hard-caps-authority/stage-envelope.json",
+    "stages/s2-market-budget-hard-caps-authority/ownership-lease.json",
+    "tests/test_stage2_authority.py"
+  ],
+  "authorized_worker_stage": {
+    "stage_id": "s2-market-budget-hard-caps",
+    "agent_id": "agent-3",
+    "private_base_sha": "13f24633c4371dcd47737f62dc667fc6b35b0122",
+    "public_development_sha": "f238fd4fd51730e49e1ae363507bd6af2189cc1f",
+    "branch": "codex/bridge-a3-s2-market-budget-hard-caps",
+    "worktree": "ephemeral-private-domain-worktree:s2-market-budget-hard-caps",
+    "write_set": [
+      "data/bridge_pre_soak/budget_caps/market_pre_soak_budget_caps_profile.json",
+      "src/market_lab/bridge_pre_soak_budget_caps.py",
+      "tests/test_bridge_pre_soak_budget_caps.py"
+    ],
+    "commit_authority": "one-scoped-worker-commit",
+    "push_authority": false
+  },
+  "budget_hard_cap_contract": {
+    "classification": "D0_PUBLIC",
+    "scope": "budget-hard-caps-only",
+    "required_caps": [
+      "model_daily_usd_cap",
+      "trial_family_usd_cap",
+      "max_provider_round_trip_cost_bps",
+      "heavy_job_wip_limit",
+      "model_call_concurrency_limit",
+      "bridge_cas_bytes_cap",
+      "staging_bytes_cap",
+      "minimum_free_disk_bytes",
+      "max_funding_settlement_count",
+      "max_profile_count"
+    ],
+    "cap_invariants": [
+      "all-caps-explicit-hard-and-finite",
+      "planned-usage-less-than-or-equal-to-each-cap",
+      "provider-cost-caps-bound-to-previous-cost-provider-accounting-receipt",
+      "dataset-sha-bound-to-previous-stage",
+      "no-soft-cap-warn-only-mode",
+      "no-private-account-or-order-fields",
+      "no-live-paper-or-order-authority",
+      "budget-hard-caps-receipt-shaped-but-not-scientific-outcome",
+      "hard-budget-cap-cannot-be-exceeded"
+    ],
+    "stage_exit_authorized": "slice-only",
+    "declares_market_pre_soak_green": false
+  },
+  "preservation_contract": [
+    "Stage 2 dataset temporal integrity and provider accounting remain pinned and unexpanded",
+    "public repository stores only sanitized authority receipts and hashes, never budget profile payloads or Market scientific truth",
+    "private Market remains the owner of budget profile payloads validators and domain semantics",
+    "validator emits immutable hard-budget-cap receipt material and does not apply any scientific outcome",
+    "budget validation is hermetic; tests must not fetch network data",
+    "no live order trading exchange account deployment publication or autonomous paper/live authority is introduced"
+  ],
+  "forbidden_scope": [
+    "public-copy-of-budget-profile-provider-profile-raw-market-rows-private-Market-source-results-strategy-or-scientific-payload",
+    "worker-write-outside-one-private-budget-profile-one-private-source-file-and-one-private-test-file",
+    "network-capture-inside-validator-tests-or-Bridge-runtime",
+    "new-public-Bridge-runtime-store-ledger-contract-schema-event-dependency-workflow-lockfile-or-migration",
+    "sealed-holdout-crash-resume-corrupt-checkpoint-or-backup-restore-implementation-in-this-slice",
+    "ValidationReceipt-use-to-apply-SUPPORTED-REFUTED-INCONCLUSIVE-INVALID-or-any-domain-truth",
+    "exchange-order-key-account-secret-D2-D3-payload-live-trading-paper-trading-publication-deployment-or-UI-authority",
+    "test-skip-xfail-continue-on-error-optional-gate-or-validation-weakening",
+    "dirty-owner-checkout-mutation",
+    "worker-push-merge-deploy-or-public-repository-write"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "source_freeze": "7b98ad9356ce9d08316a1f3f0b525aa0084d36f714ece412d0540c07910b705f",
+    "reuse_decision": "ffcad2225b3008e96e307b6eb2adb74ba14c68e42bb6efc75fbfc83f95b39a41",
+    "skeleton_green_receipt": "4e98f8fc204e281446f64a11ca091060f1d9a4dfb78394b8d9822a55e7a48967",
+    "budget_profile_receipt": "b363f06578d715629a37dfdde3891ce072737c79a63a1d2040f767c44b44c5a6",
+    "budget_attempt_lifecycle_receipt": "313a55f202ea6490bca15321e018f11ee0c835ab8698565c0b4830e05f90692b",
+    "dataset_integrity_receipt": "3cbe4376094ac8dee30da02aa2a280dd2e2b1dfd8ee57624beb3301135479938",
+    "cost_provider_accounting_receipt": "deb7f0556fdc905d414a11b41bb2bc620150a6e5deb9f4880b80cee5b48410a5",
+    "private_market_head": "13f24633c4371dcd47737f62dc667fc6b35b0122",
+    "external_dependencies": "none"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest tests.test_stage2_authority -v",
+    "make test",
+    "private focused budget hard-cap tests with PYTHONDONTWRITEBYTECODE=1 and no pytest cache",
+    "private bounded existing cost-provider funding and public Bridge budget-pattern tests against exact pinned public Bridge source",
+    "git diff --check in both repositories",
+    "exact public and private write-set privacy dependency network live-authority and weakening scans",
+    "exact-head public CI and withheld-locator private combined CI"
+  ],
+  "risk_class": "cross-repository-market-pre-soak-budget-hard-caps-slice",
+  "stop_conditions": [
+    "public-base-private-head-contract-source-freeze-reuse-cost-provider-or-budget-receipt-hash-mismatch",
+    "worker-write-set-collision-or-private-owner-checkout-mutation",
+    "budget-cap-profile-cannot-be-bound-to-the-frozen-dataset-sha-and-cost-provider-receipt",
+    "budget-verifier-accepts-soft-cap-warn-only-mode-nonfinite-caps-over-cap-planned-usage-private-account-order-live-paper-authority-or-manifest-mismatched-data",
+    "budget-profile-payload-or-domain-scientific-truth-would-enter-the-public-repository",
+    "worker-needs-network-capture-during-tests-or-validation",
+    "any-sealed-holdout-recovery-or-backup-scope-is-required-before-this-slice-can-land",
+    "any-live-network-order-exchange-target-publication-or-deployment-authority-appears",
+    "before-equals-after-or-Market-pre-soak-budget-hard-caps-blocker-remains"
+  ],
+  "expected_receipt": "docs/receipts/integration/s2-market-budget-hard-caps.json",
+  "rollback": "Agent 0 rejects or reverts only this public authority and the isolated private worker commit. Existing Stage 2 dataset integrity, provider accounting, public Bridge runtime, Market Trial Ledger, external systems and owner checkout remain unchanged.",
+  "commit_authority": "agent-0-only",
+  "push_authority": "agent-0-only"
+}

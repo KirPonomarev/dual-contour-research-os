@@ -1,0 +1,69 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-s2-market-budget-hard-caps-20260717",
+  "issued_at": "2026-07-17T20:05:00Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "reuse-freeze-authority"
+  },
+  "contour": "market",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "market-pre-soak-hard-budget-caps-over-private-domain-runtime-and-public-Bridge-budget-receipt-patterns",
+    "candidates": [
+      {
+        "candidate": "existing-public-Bridge-BudgetReservation-SettlementReceipt-hard-cap-ledger-semantics",
+        "disposition": "selected-pattern-and-contract-boundary"
+      },
+      {
+        "candidate": "existing-public-Bridge-admission-budget-profile-cap-validation",
+        "disposition": "selected-pattern-only"
+      },
+      {
+        "candidate": "existing-private-Market-cost-provider-accounting-profile-and-receipt-binding",
+        "disposition": "selected"
+      },
+      {
+        "candidate": "owner-local-stdlib-budget-hard-cap-profile-validator-and-tests",
+        "disposition": "selected-minimal-glue"
+      },
+      {
+        "candidate": "new-provider-metered-live-budget-or-exchange-account-integration",
+        "disposition": "rejected-live-non-hermetic-and-authority-expansive"
+      },
+      {
+        "candidate": "public-copy-of-private-Market-budget-profile-provider-payload-or-domain-results",
+        "disposition": "rejected-boundary"
+      },
+      {
+        "candidate": "external-dependency",
+        "disposition": "rejected-unnecessary"
+      }
+    ],
+    "selected_mode": "existing-bridge-hard-budget-semantics-plus-market-cost-profile-owner-stdlib-validator-no-public-payload",
+    "source_ref": "source-freeze:source-freeze-market-s2-budget-hard-caps-20260717;git:13f24633c4371dcd47737f62dc667fc6b35b0122;git:f238fd4fd51730e49e1ae363507bd6af2189cc1f",
+    "code_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "license_spdx": "NOASSERTION",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "budget cap profile binds frozen dataset sha previous temporal integrity receipt and previous cost provider accounting receipt without copying private payload to public repo",
+      "validator rejects planned usage that exceeds model daily trial-family provider-cost WIP concurrency CAS staging or minimum-free-disk hard caps",
+      "validator rejects missing negative non-finite soft-cap-only and private account order live paper authority fields",
+      "accepted cap profile emits ValidationReceipt-shaped BUDGET_HARD_CAPS_PASS only, not SUPPORTED REFUTED INCONCLUSIVE or INVALID",
+      "no network exchange order live trading paper deployment publication or domain-truth authority is introduced",
+      "focused private tests plus bounded existing cost provider funding and Bridge budget-pattern tests run against the exact pinned public Bridge source"
+    ],
+    "canonical_owner": "private-Market-budget-hard-cap-validator-and-Agent0-cross-repository-integration",
+    "rollback": "Discard or revert only the isolated private budget cap profile adapter and tests. No public budget payload, Market scientific outcome, live system, or Bridge runtime state is changed."
+  },
+  "integrity": {
+    "payload_sha256": "ffcad2225b3008e96e307b6eb2adb74ba14c68e42bb6efc75fbfc83f95b39a41",
+    "parent_refs": [
+      "source-freeze:source-freeze-market-s2-budget-hard-caps-20260717",
+      "sha256:7b98ad9356ce9d08316a1f3f0b525aa0084d36f714ece412d0540c07910b705f",
+      "git:13f24633c4371dcd47737f62dc667fc6b35b0122",
+      "git:f238fd4fd51730e49e1ae363507bd6af2189cc1f"
+    ]
+  }
+}

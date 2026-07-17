@@ -280,6 +280,73 @@ class Stage2AuthorityTests(unittest.TestCase):
         self.assertNotIn("/Users/", text)
         self.assertNotIn("/Volumes/", text)
 
+    def test_market_budget_hard_caps_source_reuse_and_authority_are_exact(self) -> None:
+        source = load(SOURCE_RECEIPTS / "s2-market-budget-hard-caps.json")
+        reuse = load(REUSE_RECEIPTS / "s2-market-budget-hard-caps.json")
+        envelope = load(
+            STAGES / "s2-market-budget-hard-caps-authority" / "stage-envelope.json"
+        )
+        lease = load(
+            STAGES / "s2-market-budget-hard-caps-authority" / "ownership-lease.json"
+        )
+
+        self.assertEqual(source["schema_id"], "SourceFreezeReceipt")
+        self.assertEqual(reuse["schema_id"], "ReuseDecisionReceipt")
+        self.assertEqual(source["integrity"]["payload_sha256"], payload_sha256(source))
+        self.assertEqual(reuse["integrity"]["payload_sha256"], payload_sha256(reuse))
+        self.assertEqual(
+            source["payload"]["selected_source_sha"],
+            "13f24633c4371dcd47737f62dc667fc6b35b0122",
+        )
+        self.assertEqual(
+            reuse["payload"]["selected_mode"],
+            "existing-bridge-hard-budget-semantics-plus-market-cost-profile-owner-stdlib-validator-no-public-payload",
+        )
+        self.assertEqual(reuse["payload"]["code_sha256"], EMPTY_SHA256)
+        self.assertEqual(envelope["base_sha"], "f238fd4fd51730e49e1ae363507bd6af2189cc1f")
+        self.assertEqual(envelope["write_set"], lease["write_set"])
+        self.assertFalse(lease["delegation_allowed"])
+        self.assertFalse(envelope["budget_hard_cap_contract"]["declares_market_pre_soak_green"])
+        self.assertIn(
+            "hard-budget-cap-cannot-be-exceeded",
+            envelope["budget_hard_cap_contract"]["cap_invariants"],
+        )
+        self.assertEqual(
+            envelope["authorized_worker_stage"]["write_set"],
+            [
+                "data/bridge_pre_soak/budget_caps/market_pre_soak_budget_caps_profile.json",
+                "src/market_lab/bridge_pre_soak_budget_caps.py",
+                "tests/test_bridge_pre_soak_budget_caps.py",
+            ],
+        )
+        self.assertFalse(envelope["authorized_worker_stage"]["push_authority"])
+
+    def test_market_budget_hard_caps_authority_is_sanitized_and_non_live(self) -> None:
+        public_text = "\n".join(
+            [
+                (SOURCE_RECEIPTS / "s2-market-budget-hard-caps.json").read_text(),
+                (REUSE_RECEIPTS / "s2-market-budget-hard-caps.json").read_text(),
+                (
+                    STAGES
+                    / "s2-market-budget-hard-caps-authority"
+                    / "stage-envelope.json"
+                ).read_text(),
+                (
+                    STAGES
+                    / "s2-market-budget-hard-caps-authority"
+                    / "ownership-lease.json"
+                ).read_text(),
+            ]
+        )
+        self.assertNotIn("/Users/", public_text)
+        self.assertNotIn("/Volumes/", public_text)
+        self.assertNotIn("api_key", public_text.lower())
+        self.assertNotIn("secret_key", public_text.lower())
+        self.assertNotIn("access_token", public_text.lower())
+        self.assertIn("no-live-paper-or-order-authority", public_text)
+        self.assertIn("worker-needs-network-capture-during-tests-or-validation", public_text)
+        self.assertIn("hard-budget-cap-cannot-be-exceeded", public_text)
+
 
 if __name__ == "__main__":
     unittest.main()
