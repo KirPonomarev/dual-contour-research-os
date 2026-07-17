@@ -1,0 +1,59 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s1-market-count-fixture-authority-20260717",
+  "issued_at": "2026-07-17T07:51:08Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "bridge",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s1-market-count-fixture-authority",
+    "agent_id": "agent-0",
+    "ownership_lease_ref": "stages/s1-market-count-fixture-authority/ownership-lease.json",
+    "base_sha": "0169161ce428fd6b77762766e7e508a208b8edd2",
+    "head_sha": "ad81b7ba88605406354d911cd1a0008d869463a9",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "docs/receipts/reuse/s1-market-sanitized-count-fixture.json",
+      "stages/s1-market-count-fixture-authority/ownership-lease.json",
+      "stages/s1-market-count-fixture-authority/stage-envelope.json",
+      "tests/test_stage1_authority.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "focused_tests": 13,
+      "connected_tests": 207,
+      "stage0b_tests": 25,
+      "skipped_tests": 0,
+      "diff_check": "green",
+      "privacy_secret_scan": "green",
+      "privacy_secret_fixture_value_scan": "green",
+      "source_artifact_hash_verified": true,
+      "source_artifact_rows_verified": 260,
+      "source_mutation": false,
+      "dependency_adoption": false,
+      "private_source_code_copied": false,
+      "private_fixture_values_published": false,
+      "raw_event_symbol_price_return_or_timestamp_copy_authorized": false,
+      "exact_expected_value_preservation_required": true,
+      "full_recursive_reproduction_required": true,
+      "validation_bypass_authorized": false,
+      "live_or_trading_authority": false,
+      "selected_mode": "owner-private-sanitized-count-sufficient-statistics-no-public-payload"
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29564393339",
+    "integration_commit_sha": "ad81b7ba88605406354d911cd1a0008d869463a9"
+  },
+  "integrity": {
+    "payload_sha256": "0d6f0449f52811d05f2b06696e37b735bec325d4d8904eb544b3166b1741aaf0",
+    "parent_refs": [
+      "git:ad81b7ba88605406354d911cd1a0008d869463a9",
+      "ci:29564393339",
+      "source-freeze:source-freeze-market-s1-base-repair-20260717",
+      "reuse:reuse-s1-market-sanitized-count-fixture-20260717"
+    ]
+  }
+}
