@@ -1,0 +1,114 @@
+{
+  "stage_id": "s3-security-ingestion-safe-map-authority",
+  "agent_id": "agent-0",
+  "objective": "Authorize the first Security local-lab slice: deterministic public-source ingestion into a quarantined invariant-first safe map with hash-only Bridge evidence.",
+  "executable_blocker": "Security Stage 1 proves a synthetic offline trial, but no strict frozen intake boundary converts a public source into a provenance-bound safe map while denying operational or live-target material.",
+  "base_sha": "c3d6f215ad653db358e7875474de3c436bcf6e4c",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "main",
+  "worktree": "canonical-public-worktree",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "docs/receipts/integration/s2-market-pre-soak-green.json",
+    "docs/receipts/integration/s1-security-offline-reference-e2e.json",
+    "docs/receipts/source-freeze/s3-security-ingestion-safe-map.json",
+    "docs/receipts/reuse/s3-security-ingestion-safe-map.json",
+    "private research-os/sources/source-intake-policy.md",
+    "private research-os/superbrain/quarantine-and-lab-policy.md",
+    "private research-os/idea-bank/ingestion/from-safe-maps.py",
+    "private tools/security_bridge_reference_adapter.py"
+  ],
+  "write_set": [
+    "docs/receipts/source-freeze/s3-security-ingestion-safe-map.json",
+    "docs/receipts/reuse/s3-security-ingestion-safe-map.json",
+    "stages/s3-security-ingestion-safe-map-authority/stage-envelope.json",
+    "stages/s3-security-ingestion-safe-map-authority/ownership-lease.json",
+    "tests/test_stage3_authority.py"
+  ],
+  "authorized_worker_stage": {
+    "stage_id": "s3-security-ingestion-safe-map",
+    "agent_id": "agent-4",
+    "private_base_sha": "abc45b938ddef24aa9d2cb874dfa7f6bd7273ae8",
+    "public_development_sha": "c3d6f215ad653db358e7875474de3c436bcf6e4c",
+    "branch": "codex/bridge-a4-s3-security-ingestion-safe-map",
+    "worktree": "ephemeral-private-domain-worktree:s3-security-ingestion-safe-map",
+    "write_set": [
+      "research-os/evolution/fixtures/stage3-public-source-safe-map-v1.json",
+      "tools/security_bridge_stage3_intake.py",
+      "tests/test_security_bridge_stage3_intake.py"
+    ],
+    "commit_authority": "one-scoped-worker-commit",
+    "push_authority": false
+  },
+  "security_intake_contract": {
+    "source_classification": "D0_PUBLIC",
+    "safe_map_classification": "D1_INTERNAL_SANITIZED",
+    "scope": "offline-frozen-public-source-envelope-to-invariant-safe-map-only",
+    "invariants": [
+      "source-content-sha-origin-license-and-retrieved-at-are-explicitly-bound",
+      "accepted-atoms-map-to-invariant-posture-allowed-context-safe-artifact-stop-condition-and-source-ref",
+      "red-or-operational-atoms-remain-quarantined-and-produce-no-live-action",
+      "secret-like-target-specific-D2-D3-and-unknown-fields-fail-closed",
+      "exact-replay-is-deterministic-and-writes-no-domain-registry",
+      "Bridge-observes-hashes-refs-counts-classifications-and-validation-status-only",
+      "no-network-fetch-scan-exploit-publication-or-authority-escalation"
+    ],
+    "stage_exit_authorized": "slice-only",
+    "declares_dual_contour_pre_soak_green": false,
+    "declares_ready_for_72h_soak": false
+  },
+  "preservation_contract": [
+    "completed Market and Security stages remain pinned and unexpanded",
+    "private Security remains owner of source content safe-map semantics and validation",
+    "public Bridge stores authority and later hash-only integration evidence",
+    "no existing source corpus idea bank outcome ledger contract config workflow or dependency is modified",
+    "tests are hermetic D0 synthetic or frozen-public-metadata only",
+    "HypothesisCard lab evidence redaction and cross-contour slices remain separate later stages"
+  ],
+  "forbidden_scope": [
+    "public-copy-of-source-body-private-source-target-program-evidence-exploit-payload-or-scientific-truth",
+    "worker-write-outside-one-private-fixture-one-private-source-file-and-one-private-test-file",
+    "network-fetch-crawl-scan-live-target-test-exploit-payload-publication-or-report-submission",
+    "direct-HypothesisCard-execution-evidence-vault-domain-registry-or-scientific-outcome-write",
+    "contract-schema-lockfile-dependency-config-workflow-migration-or-existing-ingestion-script-edit",
+    "cross-contour-D2-D3-read-or-Market-data-access",
+    "secret-account-cookie-token-private-URL-or-target-identity",
+    "skip-xfail-continue-on-error-optional-gate-or-validation-weakening",
+    "dirty-owner-checkout-mutation-or-worker-push-merge-deploy-public-write"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "source_freeze": "c378e7be0fb2c1a5dee16e327302cb19ec314a0f23845ba0ed523d0157bedab2",
+    "reuse_decision": "3e2e50ba3be144c9aa65bd703c9a1e9f35fd575e7fefb0efd7b357ad90b74d59",
+    "source_intake_policy": "4599272a9223ab42855499ef8e502850a2f39daea8008e57b4c29dbbb5f18599",
+    "quarantine_policy": "04e7883e8720811ad7ad728a693da95b2cd4b915bc34d2c2f792dfd475cbaba9",
+    "safe_map_ingestion_pattern": "77f907b54cecc8e2dcbadb28b2907e953dd1b005994c10713900c30ee0cc8de7",
+    "stage1_security_adapter": "cf54ed87b73f0053a2711861f1a625e143492a6f52dcdae62b0f18c2a2c1e53d",
+    "private_security_head": "abc45b938ddef24aa9d2cb874dfa7f6bd7273ae8",
+    "external_dependencies": "none"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest tests.test_stage3_authority -v",
+    "make test",
+    "private focused Security Stage3 intake tests with PYTHONDONTWRITEBYTECODE=1 and no pytest cache",
+    "private bounded Stage1 adapter plus Stage3 intake tests against exact pinned public Bridge source",
+    "git diff --check in both repositories",
+    "exact public and private write-set privacy secret dependency network live-authority cross-contour and weakening scans",
+    "exact-head public CI and withheld-locator private focused CI"
+  ],
+  "risk_class": "cross-repository-security-public-intake-safe-map-slice",
+  "stop_conditions": [
+    "public-base-private-head-contract-source-freeze-reuse-or-selected-component-hash-mismatch",
+    "worker-write-set-collision-dirty-owner-checkout-mutation-or-fourth-file-required",
+    "adapter-cannot-bind-source-content-provenance-license-atoms-safe-map-and-validation-status",
+    "validator-accepts-operational-live-target-secret-target-specific-D2-D3-unknown-field-or-hash-drift-content",
+    "network-new-dependency-cross-contour-read-registry-write-live-authority-or-scientific-outcome-is-required",
+    "before-equals-after-or-Security-ingestion-safe-map-blocker-remains"
+  ],
+  "expected_receipt": "docs/receipts/integration/s3-security-ingestion-safe-map.json",
+  "rollback": "Agent 0 rejects or reverts only this authority and isolated worker commit; completed stages source corpus owner checkout public Bridge and external systems remain unchanged.",
+  "commit_authority": "agent-0-only",
+  "push_authority": "agent-0-only"
+}

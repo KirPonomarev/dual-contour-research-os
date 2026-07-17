@@ -1,0 +1,46 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-s3-security-ingestion-safe-map-20260718",
+  "issued_at": "2026-07-18T00:25:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-freeze-authority"},
+  "contour": "security",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "security-public-source-ingestion-to-quarantined-safe-map-with-hash-only-Bridge-projection",
+    "candidates": [
+      {"candidate": "existing-private-Security-source-intake-policy", "disposition": "selected-policy-boundary"},
+      {"candidate": "existing-private-Security-quarantine-and-lab-policy", "disposition": "selected-safety-boundary"},
+      {"candidate": "existing-private-Security-safe-map-ingestion-semantics", "disposition": "selected-internal-adapter-pattern"},
+      {"candidate": "existing-Stage1-Security-canonical-receipt-and-hash-projection-helpers", "disposition": "selected-lineage-and-contract-pattern"},
+      {"candidate": "owner-local-stdlib-strict-source-envelope-safe-map-validator-and-tests", "disposition": "selected-minimal-missing-glue"},
+      {"candidate": "new-network-fetcher-crawler-scanner-or-external-dependency", "disposition": "rejected-unnecessary-and-authority-expanding"},
+      {"candidate": "public-copy-of-source-body-target-evidence-payload-or-domain-truth", "disposition": "rejected-boundary"},
+      {"candidate": "direct-live-hypothesis-generation-or-execution", "disposition": "deferred-and-forbidden-in-this-slice"}
+    ],
+    "selected_mode": "existing-private-Security-intake-quarantine-and-safe-map-semantics-plus-owner-stdlib-strict-adapter-no-network-no-public-payload",
+    "source_ref": "source-freeze:source-freeze-security-s3-ingestion-safe-map-20260718;git:abc45b938ddef24aa9d2cb874dfa7f6bd7273ae8;git:c3d6f215ad653db358e7875474de3c436bcf6e4c",
+    "code_sha256": "77f907b54cecc8e2dcbadb28b2907e953dd1b005994c10713900c30ee0cc8de7",
+    "license_spdx": "Proprietary-Internal-Owned",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "ingest one frozen D0 public source envelope without network access and bind canonical content SHA origin and license metadata",
+      "map every accepted atom to one invariant posture allowed context safe artifact stop condition and source reference",
+      "quarantine red operational atoms so they cannot produce a live hypothesis command payload or execution request",
+      "reject hash drift unknown fields unsupported classification missing provenance duplicate atom IDs secret-like fields target identity and D2-D3 content",
+      "emit source and safe-map manifest projections containing hashes refs counts classifications and pass-fail only",
+      "prove deterministic exact replay and zero Bridge registry or scientific outcome writes"
+    ],
+    "canonical_owner": "private-Security-source-intake-safe-map-validator-and-Agent0-cross-repository-integration",
+    "rollback": "Discard only the isolated private adapter fixture and tests. The Security owner checkout, public Bridge, source corpus, domain registry and external systems remain unchanged."
+  },
+  "integrity": {
+    "payload_sha256": "3e2e50ba3be144c9aa65bd703c9a1e9f35fd575e7fefb0efd7b357ad90b74d59",
+    "parent_refs": [
+      "source-freeze:source-freeze-security-s3-ingestion-safe-map-20260718",
+      "sha256:c378e7be0fb2c1a5dee16e327302cb19ec314a0f23845ba0ed523d0157bedab2",
+      "git:abc45b938ddef24aa9d2cb874dfa7f6bd7273ae8",
+      "git:c3d6f215ad653db358e7875474de3c436bcf6e4c"
+    ]
+  }
+}

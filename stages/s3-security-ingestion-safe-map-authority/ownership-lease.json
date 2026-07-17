@@ -1,0 +1,20 @@
+{
+  "lease_id": "lease-s3-security-ingestion-safe-map-authority-agent-0-20260718",
+  "stage_id": "s3-security-ingestion-safe-map-authority",
+  "agent_id": "agent-0",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-18T00:25:00Z",
+  "expires_at": "2026-07-18T06:25:00Z",
+  "base_sha": "c3d6f215ad653db358e7875474de3c436bcf6e4c",
+  "branch": "main",
+  "worktree": "canonical-public-worktree",
+  "write_set": [
+    "docs/receipts/source-freeze/s3-security-ingestion-safe-map.json",
+    "docs/receipts/reuse/s3-security-ingestion-safe-map.json",
+    "stages/s3-security-ingestion-safe-map-authority/stage-envelope.json",
+    "stages/s3-security-ingestion-safe-map-authority/ownership-lease.json",
+    "tests/test_stage3_authority.py"
+  ],
+  "delegation_allowed": false,
+  "state": "active"
+}
