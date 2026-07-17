@@ -1,0 +1,55 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s1-budget-profile-amendment-1-20260717",
+  "issued_at": "2026-07-17T11:44:34Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "bridge",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s1-budget-profile-amendment-1",
+    "agent_id": "agent-0",
+    "ownership_lease_ref": "stages/s1-budget-profile/ownership-lease-amendment-1.json",
+    "base_sha": "48074b1cf4ecc238764b3aa49e83602bcd55369a",
+    "head_sha": "bf0f22ec3701bc4c3787076d778324720a9828d6",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "stages/s1-budget-profile/stage-envelope-amendment-1.json",
+      "stages/s1-budget-profile/ownership-lease-amendment-1.json",
+      "tests/test_stage1_authority.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "focused_tests": 27,
+      "connected_tests": 238,
+      "stage0b_tests": 25,
+      "skipped_tests": 0,
+      "diff_check": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "dependency_adoption": false,
+      "frozen_contract_edit": false,
+      "added_worker_files": 2,
+      "added_worker_source_files": 0,
+      "added_worker_test_files": 2,
+      "assertion_or_behavior_change_authorized": false,
+      "compatibility_fallback_authorized": false,
+      "live_or_connected_authority": false,
+      "amendment_scope": "connected-synthetic-budget-profile-fixtures-only"
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29577809292",
+    "integration_commit_sha": "bf0f22ec3701bc4c3787076d778324720a9828d6"
+  },
+  "integrity": {
+    "payload_sha256": "c613526d5d18eaee11f68cddd90bf5bf6e1b5caaeb7e51e704f854c9b1e095b9",
+    "parent_refs": [
+      "git:bf0f22ec3701bc4c3787076d778324720a9828d6",
+      "ci:29577809292",
+      "integration:integration-s1-budget-profile-authority-20260717",
+      "reuse:reuse-s1-budget-profile-20260717"
+    ]
+  }
+}
