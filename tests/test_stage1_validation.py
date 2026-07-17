@@ -28,6 +28,7 @@ POLICY_REF = "policy:synthetic-v1"
 ARTIFACT_REFS = [f"cas:sha256:{'1' * 64}", f"cas:sha256:{'2' * 64}"]
 EVENT_CHAIN_HEAD = "3" * 64
 CHECKPOINT_PARENT = f"checkpoint-manifest-{'4' * 64}"
+SETTLEMENT_PARENT = f"settlement-receipt-{'7' * 64}"
 COMMON_KEYS = {
     "schema_id",
     "schema_version",
@@ -97,7 +98,12 @@ def execution_receipt(
     }
     return seal(
         document,
-        [CHECKPOINT_PARENT, *ARTIFACT_REFS, f"ledger:{EVENT_CHAIN_HEAD}"],
+        [
+            CHECKPOINT_PARENT,
+            *ARTIFACT_REFS,
+            SETTLEMENT_PARENT,
+            f"ledger:{EVENT_CHAIN_HEAD}",
+        ],
     )
 
 
@@ -332,11 +338,46 @@ class ValidationBoundaryTests(unittest.TestCase):
         execution["object_id"] = "execution-receipt-replayed"
         cases.append((execution, validation, link))
         for parents in (
-            [*ARTIFACT_REFS, f"ledger:{EVENT_CHAIN_HEAD}"],
-            [CHECKPOINT_PARENT, ARTIFACT_REFS[1], ARTIFACT_REFS[0], f"ledger:{EVENT_CHAIN_HEAD}"],
-            [CHECKPOINT_PARENT, *ARTIFACT_REFS],
-            [f"checkpoint-manifest-{'x' * 64}", *ARTIFACT_REFS, f"ledger:{EVENT_CHAIN_HEAD}"],
-            [CHECKPOINT_PARENT, *ARTIFACT_REFS, f"ledger:{'9' * 64}"],
+            [*ARTIFACT_REFS, SETTLEMENT_PARENT, f"ledger:{EVENT_CHAIN_HEAD}"],
+            [
+                CHECKPOINT_PARENT,
+                ARTIFACT_REFS[1],
+                ARTIFACT_REFS[0],
+                SETTLEMENT_PARENT,
+                f"ledger:{EVENT_CHAIN_HEAD}",
+            ],
+            [CHECKPOINT_PARENT, *ARTIFACT_REFS, f"ledger:{EVENT_CHAIN_HEAD}"],
+            [
+                f"checkpoint-manifest-{'x' * 64}",
+                *ARTIFACT_REFS,
+                SETTLEMENT_PARENT,
+                f"ledger:{EVENT_CHAIN_HEAD}",
+            ],
+            [
+                CHECKPOINT_PARENT,
+                *ARTIFACT_REFS,
+                SETTLEMENT_PARENT,
+                f"ledger:{'9' * 64}",
+            ],
+            [
+                CHECKPOINT_PARENT,
+                *ARTIFACT_REFS,
+                "settlement-receipt-short",
+                f"ledger:{EVENT_CHAIN_HEAD}",
+            ],
+            [
+                CHECKPOINT_PARENT,
+                *ARTIFACT_REFS,
+                f"ledger:{EVENT_CHAIN_HEAD}",
+                SETTLEMENT_PARENT,
+            ],
+            [
+                CHECKPOINT_PARENT,
+                *ARTIFACT_REFS,
+                SETTLEMENT_PARENT,
+                SETTLEMENT_PARENT,
+                f"ledger:{EVENT_CHAIN_HEAD}",
+            ],
         ):
             execution, validation, link = chain()
             execution["integrity"]["parent_refs"] = parents  # type: ignore[index]

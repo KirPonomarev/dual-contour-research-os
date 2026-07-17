@@ -395,6 +395,106 @@ def _plain(value: object) -> object:
     return value
 
 
+def _budget_reservation(
+    job_spec: Mapping[str, object],
+    permit: Mapping[str, object],
+    lease: Mapping[str, object],
+    *,
+    admission_digest: str,
+) -> dict[str, object]:
+    job_payload = job_spec["payload"]
+    permit_payload = permit["payload"]
+    lease_payload = lease["payload"]
+    quotas = permit_payload["quotas"]
+    payload = {
+        "trial_ref": quotas["trial_ref"],
+        "job_ref": job_spec["object_id"],
+        "provider": quotas["provider"],
+        "idempotency_key": job_payload["idempotency_key"],
+        "hard_limits": job_payload["resource_limits"],
+        "ledger_version_before": 0,
+        "expires_at": lease_payload["expires_at"],
+    }
+    payload_sha256 = canonical_json_sha256(payload)
+    return {
+        "schema_id": "BudgetReservation",
+        "schema_version": "1.0.0",
+        "object_id": f"budget-reservation:sha256:{payload_sha256}",
+        "issued_at": _timestamp(NOW),
+        "issuer": {"id": "bridge-budget-ledger", "authority_class": "budget-ledger"},
+        "contour": job_spec["contour"],
+        "classification": job_spec["classification"],
+        "payload": payload,
+        "integrity": {
+            "payload_sha256": payload_sha256,
+            "parent_refs": [
+                job_spec["object_id"],
+                permit["object_id"],
+                f"attempt:{lease_payload['attempt_id']}",
+                f"admission:sha256:{admission_digest}",
+                quotas["accounting_policy_ref"],
+                quotas["budget_scope_ref"],
+            ],
+        },
+    }
+
+
+def _completion_budget(
+    reservation: Mapping[str, object],
+    *,
+    event_at: str,
+    result_sha256: str,
+) -> tuple[dict[str, object], dict[str, object]]:
+    reservation_payload = reservation["payload"]
+    reservation_ref = reservation["object_id"]
+    actual_usage = reservation_payload["hard_limits"]
+    actual_cost = actual_usage["cost_units"]
+    attestation = {
+        "schema_id": "OwnedOfflineAccountingAttestation",
+        "schema_version": "1.0.0",
+        "accounting_policy_ref": ACCOUNTING_POLICY_REF,
+        "budget_scope_ref": BUDGET_SCOPE_REF,
+        "provider": reservation_payload["provider"],
+        "reservation_ref": reservation_ref,
+        "actual_usage": actual_usage,
+        "actual_cost": actual_cost,
+        "released_amount": 0,
+        "provider_unknown": True,
+        "settled_at": event_at,
+    }
+    provider_ref = f"embedded:sha256:{canonical_json_sha256(attestation)}"
+    payload = {
+        "reservation_ref": reservation_ref,
+        "actual_usage": actual_usage,
+        "actual_cost": actual_cost,
+        "provider_receipt_ref": provider_ref,
+        "released_amount": 0,
+        "provider_unknown": True,
+        "ledger_version_after": 3,
+    }
+    payload_sha256 = canonical_json_sha256(payload)
+    settlement = {
+        "schema_id": "SettlementReceipt",
+        "schema_version": "1.0.0",
+        "object_id": f"settlement-receipt-{payload_sha256}",
+        "issued_at": event_at,
+        "issuer": {"id": "bridge-budget-ledger", "authority_class": "budget-ledger"},
+        "contour": reservation["contour"],
+        "classification": reservation["classification"],
+        "payload": payload,
+        "integrity": {
+            "payload_sha256": payload_sha256,
+            "parent_refs": [
+                reservation_ref,
+                ACCOUNTING_POLICY_REF,
+                provider_ref,
+                f"result:sha256:{result_sha256}",
+            ],
+        },
+    }
+    return attestation, settlement
+
+
 def _claim_event(
     job_spec: Mapping[str, object],
     permit: Mapping[str, object],
@@ -405,10 +505,19 @@ def _claim_event(
     token_sha256 = hashlib.sha256(
         lease_payload["fencing_token"].encode("utf-8")
     ).hexdigest()
+    admission_digest = "a" * 64
     payload = {
-        "admission_digest": "a" * 64,
+        "accounting_policy_ref": ACCOUNTING_POLICY_REF,
+        "admission_digest": admission_digest,
         "admitted_at": _timestamp(NOW),
         "attempt_id": lease_payload["attempt_id"],
+        "budget_reservation": _budget_reservation(
+            job_spec,
+            permit,
+            lease,
+            admission_digest=admission_digest,
+        ),
+        "budget_scope_ref": BUDGET_SCOPE_REF,
         "fencing_epoch": lease_payload["fencing_epoch"],
         "fencing_token_sha256": token_sha256,
         "job_id": job_spec["object_id"],
@@ -417,6 +526,7 @@ def _claim_event(
             permit_payload["nonce"].encode("utf-8")
         ).hexdigest(),
         "runner_identity": permit_payload["subject"],
+        "scope_limit": permit_payload["quotas"]["scope_limit"],
     }
     return SimpleNamespace(
         sequence=1,
@@ -510,10 +620,12 @@ class _LedgerSpy:
         self,
         event_log: list[str],
         *,
+        claim_reservation: Mapping[str, object],
         checkpoint_error: Exception | None = None,
         completion_error: Exception | None = None,
     ) -> None:
         self.event_log = event_log
+        self._claim_reservation = claim_reservation
         self.checkpoint_error = checkpoint_error
         self.completion_error = completion_error
         self.checkpoint_calls: list[dict[str, object]] = []
@@ -570,13 +682,20 @@ class _LedgerSpy:
         fencing_token_sha256 = hashlib.sha256(
             keywords["fencing_token"].encode("utf-8")
         ).hexdigest()
+        attestation, settlement = _completion_budget(
+            self._claim_reservation,
+            event_at=keywords["event_at"],
+            result_sha256=keywords["result_sha256"],
+        )
         self.completion_event.payload = {
             "attempt_id": keywords["attempt_id"],
             "event_at": keywords["event_at"],
             "fencing_epoch": keywords["fencing_epoch"],
             "fencing_token_sha256": fencing_token_sha256,
             "job_id": keywords["job_id"],
+            "provider_accounting_attestation": attestation,
             "result_sha256": keywords["result_sha256"],
+            "settlement_receipt": settlement,
         }
         self.completion_event.event_at = keywords["event_at"]
         return self.completion_event
@@ -665,14 +784,15 @@ class OfflineExecutionCoordinatorAssuranceTests(unittest.TestCase):
         _IngestorSpy,
     ]:
         event_log: list[str] = []
-        kernel = _KernelSpy(
-            event_log,
-            claim_event or _claim_event(self.job_spec, self.permit, self.lease),
+        selected_claim = claim_event or _claim_event(
+            self.job_spec, self.permit, self.lease
         )
+        kernel = _KernelSpy(event_log, selected_claim)
         runner = _RunnerSpy(event_log, result or self.prepared_result)
         store = _CheckpointStoreSpy(event_log, store_error)
         ledger = _LedgerSpy(
             event_log,
+            claim_reservation=selected_claim.payload["budget_reservation"],
             checkpoint_error=checkpoint_error,
             completion_error=completion_error,
         )
@@ -881,6 +1001,63 @@ class OfflineExecutionCoordinatorAssuranceTests(unittest.TestCase):
                 self.assertEqual(constructions, [])
                 self.assertEqual(receipt_constructor.call_count, 0)
                 self.assertNotIn("receipt", event_log)
+
+    def test_post_completion_assembly_failure_is_a_critical_invariant(self) -> None:
+        for target in ("_construct_execution_receipt", "ExecutionRecord"):
+            with self.subTest(target=target):
+                coordinator, event_log, _, _, ledger, _ = self._components()
+                with mock.patch.object(
+                    execution_module,
+                    target,
+                    side_effect=RuntimeError("synthetic post-commit assembly failure"),
+                ):
+                    with self.assertRaisesRegex(
+                        ExecutionError,
+                        "critical post-completion receipt invariant failed",
+                    ):
+                        coordinator.execute(
+                            self.job_spec,
+                            self.permit,
+                            self.lease,
+                            self.prepared_root,
+                            now=NOW,
+                        )
+                self.assertEqual(len(ledger.complete_calls), 1)
+                self.assertEqual(event_log[-1], "completion")
+
+    def test_producer_rejects_valid_pattern_settlement_substitution(self) -> None:
+        coordinator, _, _, _, ledger, _ = self._components()
+        real_complete = ledger.complete
+
+        def substituted_complete(**keywords: object) -> object:
+            event = real_complete(**keywords)
+            payload = dict(event.payload)
+            settlement = dict(payload["settlement_receipt"])
+            settlement["object_id"] = f"settlement-receipt-{'f' * 64}"
+            payload["settlement_receipt"] = settlement
+            values = vars(event).copy()
+            values["payload"] = payload
+            return SimpleNamespace(**values)
+
+        ledger.complete = substituted_complete  # type: ignore[method-assign]
+        with mock.patch.object(
+            execution_module,
+            "_construct_execution_receipt",
+            wraps=execution_module._construct_execution_receipt,
+        ) as receipt_constructor:
+            with self.assertRaisesRegex(
+                ExecutionError,
+                "critical post-completion receipt invariant failed",
+            ):
+                coordinator.execute(
+                    self.job_spec,
+                    self.permit,
+                    self.lease,
+                    self.prepared_root,
+                    now=NOW,
+                )
+        self.assertEqual(len(ledger.complete_calls), 1)
+        self.assertEqual(receipt_constructor.call_count, 0)
 
     def test_d2_and_d3_are_denied_before_claim_or_runner(self) -> None:
         for classification in ("D2_DOMAIN_CONFIDENTIAL", "D3_RESTRICTED"):
@@ -1173,6 +1350,19 @@ class OfflineExecutionCoordinatorAssuranceTests(unittest.TestCase):
                 receipt["integrity"]["payload_sha256"],
                 canonical_json_sha256(receipt_payload),
             )
+            settlement_ref = logging_ledger.completion_event.payload[
+                "settlement_receipt"
+            ]["object_id"]
+            self.assertRegex(settlement_ref, r"^settlement-receipt-[a-f0-9]{64}$")
+            self.assertEqual(
+                list(receipt["integrity"]["parent_refs"]),
+                [
+                    checkpoint_manifest["object_id"],
+                    *(item.artifact_ref for item in record.artifact_records),
+                    settlement_ref,
+                    f"ledger:{logging_ledger.completion_event.event_sha256}",
+                ],
+            )
             self.assertTrue(
                 all(ref.startswith("cas:sha256:") for ref in receipt_payload["artifact_refs"])
             )
@@ -1317,6 +1507,7 @@ class Stage1ExecutionStaticBoundaryTests(unittest.TestCase):
         imported_roots: set[str] = set()
         identifiers: set[str] = set()
         calls: set[str] = set()
+        execution_ledger_imports: set[str] = set()
 
         for filename in ("l0.py", "execution.py"):
             tree = ast.parse((SRC / "research_bridge" / filename).read_text())
@@ -1331,6 +1522,13 @@ class Stage1ExecutionStaticBoundaryTests(unittest.TestCase):
                         self.fail("execution.py must use only injected structural boundaries")
                 elif isinstance(node, ast.ImportFrom) and node.module:
                     imported_roots.add(node.module.split(".")[0])
+                    if (
+                        filename == "execution.py"
+                        and node.module == "research_bridge.ledger"
+                    ):
+                        execution_ledger_imports.update(
+                            alias.name for alias in node.names
+                        )
                 elif isinstance(node, ast.Name):
                     identifiers.add(node.id.lower())
                 elif isinstance(node, ast.Attribute):
@@ -1346,6 +1544,7 @@ class Stage1ExecutionStaticBoundaryTests(unittest.TestCase):
             if root not in sys.stdlib_module_names and root != "research_bridge"
         }
         self.assertEqual(non_stdlib, set())
+        self.assertEqual(execution_ledger_imports, {"JobLedger", "LedgerError"})
         self.assertTrue(imported_roots.isdisjoint(forbidden_imports))
         self.assertTrue(calls.isdisjoint(forbidden_calls))
         violations = {

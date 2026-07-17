@@ -61,6 +61,9 @@ CHECKPOINT_BYTES = (
     + "\n"
 ).encode("utf-8")
 CHECKPOINT_FILE_SHA = hashlib.sha256(CHECKPOINT_BYTES).hexdigest()
+ACCOUNTING_POLICY_REF = f"budget-policy:sha256:{'a' * 64}"
+BUDGET_SCOPE_REF = f"budget-scope:sha256:{'b' * 64}"
+RESERVATION_EXPIRES_AT = "2026-01-02T04:04:05Z"
 
 
 @dataclass(frozen=True, slots=True)
@@ -115,6 +118,92 @@ def event_sha(label: str) -> str:
     return hashlib.sha256(label.encode("ascii")).hexdigest()
 
 
+def budget_reservation(
+    *, job_id: str, attempt_id: str, permit_id: str, admitted_at: str
+) -> dict[str, object]:
+    payload = {
+        "trial_ref": "trial:synthetic-execution",
+        "job_ref": job_id,
+        "provider": "owned-offline-runner",
+        "idempotency_key": "idempotency:synthetic-execution",
+        "hard_limits": {"cost_units": 1},
+        "ledger_version_before": 0,
+        "expires_at": RESERVATION_EXPIRES_AT,
+    }
+    payload_sha256 = canonical_json_sha256(payload)
+    return {
+        "schema_id": "BudgetReservation",
+        "schema_version": "1.0.0",
+        "object_id": f"budget-reservation:sha256:{payload_sha256}",
+        "issued_at": admitted_at,
+        "issuer": {"id": "bridge-budget-ledger", "authority_class": "budget-ledger"},
+        "contour": "bridge",
+        "classification": "D1_INTERNAL_SANITIZED",
+        "payload": payload,
+        "integrity": {
+            "payload_sha256": payload_sha256,
+            "parent_refs": [
+                job_id,
+                permit_id,
+                f"attempt:{attempt_id}",
+                f"admission:sha256:{event_sha('admission')}",
+                ACCOUNTING_POLICY_REF,
+                BUDGET_SCOPE_REF,
+            ],
+        },
+    }
+
+
+def completion_budget(
+    *, reservation: Mapping[str, object], event_at: str, result_sha256: str
+) -> tuple[dict[str, object], dict[str, object]]:
+    reservation_ref = reservation["object_id"]
+    attestation = {
+        "schema_id": "OwnedOfflineAccountingAttestation",
+        "schema_version": "1.0.0",
+        "accounting_policy_ref": ACCOUNTING_POLICY_REF,
+        "budget_scope_ref": BUDGET_SCOPE_REF,
+        "provider": "owned-offline-runner",
+        "reservation_ref": reservation_ref,
+        "actual_usage": {"cost_units": 1},
+        "actual_cost": 1,
+        "released_amount": 0,
+        "provider_unknown": True,
+        "settled_at": event_at,
+    }
+    provider_ref = f"embedded:sha256:{canonical_json_sha256(attestation)}"
+    payload = {
+        "reservation_ref": reservation_ref,
+        "actual_usage": {"cost_units": 1},
+        "actual_cost": 1,
+        "provider_receipt_ref": provider_ref,
+        "released_amount": 0,
+        "provider_unknown": True,
+        "ledger_version_after": 3,
+    }
+    payload_sha256 = canonical_json_sha256(payload)
+    settlement = {
+        "schema_id": "SettlementReceipt",
+        "schema_version": "1.0.0",
+        "object_id": f"settlement-receipt-{payload_sha256}",
+        "issued_at": event_at,
+        "issuer": {"id": "bridge-budget-ledger", "authority_class": "budget-ledger"},
+        "contour": "bridge",
+        "classification": "D1_INTERNAL_SANITIZED",
+        "payload": payload,
+        "integrity": {
+            "payload_sha256": payload_sha256,
+            "parent_refs": [
+                reservation_ref,
+                ACCOUNTING_POLICY_REF,
+                provider_ref,
+                f"result:sha256:{result_sha256}",
+            ],
+        },
+    }
+    return attestation, settlement
+
+
 class Fixture:
     def __init__(self, root: Path, *, failure: str | None = None) -> None:
         self.root = root
@@ -127,6 +216,9 @@ class Fixture:
             "payload": {
                 "image_digest": ENVIRONMENT,
                 "input_refs": [dict(INPUT_REFS[0])],
+                "runner_profile": "owned-offline-runner",
+                "resource_limits": {"cost_units": 1},
+                "idempotency_key": "idempotency:synthetic-execution",
             },
         }
         self.permit = {
@@ -137,6 +229,16 @@ class Fixture:
                 "code_sha256": CODE_SHA,
                 "input_sha256": INPUT_SHA,
                 "nonce": "synthetic-execution-permit-nonce",
+                "max_uses": 1,
+                "expires_at": RESERVATION_EXPIRES_AT,
+                "quotas": {
+                    "accounting_policy_ref": ACCOUNTING_POLICY_REF,
+                    "budget_scope_ref": BUDGET_SCOPE_REF,
+                    "claims": 1,
+                    "provider": "owned-offline-runner",
+                    "scope_limit": {"cost_units": 3},
+                    "trial_ref": "trial:synthetic-execution",
+                },
             },
         }
         self.lease = {
@@ -150,8 +252,15 @@ class Fixture:
                 "fencing_epoch": 3,
                 "fencing_token": TOKEN,
                 "runner_identity": "owned-offline-runner",
+                "expires_at": RESERVATION_EXPIRES_AT,
             },
         }
+        reservation = budget_reservation(
+            job_id=self.job["object_id"],
+            attempt_id=self.lease["payload"]["attempt_id"],
+            permit_id=self.permit["object_id"],
+            admitted_at=AT,
+        )
         self.claim_event = Event(
             sequence=1,
             event_type="claim",
@@ -161,9 +270,12 @@ class Fixture:
             event_at=AT,
             payload=MappingProxyType(
                 {
+                    "accounting_policy_ref": ACCOUNTING_POLICY_REF,
                     "admission_digest": event_sha("admission"),
                     "admitted_at": AT,
                     "attempt_id": self.lease["payload"]["attempt_id"],
+                    "budget_reservation": reservation,
+                    "budget_scope_ref": BUDGET_SCOPE_REF,
                     "fencing_epoch": self.lease["payload"]["fencing_epoch"],
                     "fencing_token_sha256": TOKEN_SHA,
                     "job_id": self.job["object_id"],
@@ -172,6 +284,7 @@ class Fixture:
                         self.permit["payload"]["nonce"].encode("utf-8")
                     ).hexdigest(),
                     "runner_identity": self.lease["payload"]["runner_identity"],
+                    "scope_limit": {"cost_units": 3},
                 }
             ),
             previous_sha256=ZERO_SHA,
@@ -383,6 +496,11 @@ class _Ledger:
         self.fixture.completion_arguments = dict(arguments)
         if self.fixture.failure == "ledger.complete":
             raise RuntimeError("synthetic completion append failure")
+        attestation, settlement = completion_budget(
+            reservation=self.fixture.claim_event.payload["budget_reservation"],
+            event_at=arguments["event_at"],
+            result_sha256=arguments["result_sha256"],
+        )
         return Event(
             sequence=3,
             event_type="complete",
@@ -397,7 +515,9 @@ class _Ledger:
                     "fencing_epoch": arguments["fencing_epoch"],
                     "fencing_token_sha256": TOKEN_SHA,
                     "job_id": arguments["job_id"],
+                    "provider_accounting_attestation": attestation,
                     "result_sha256": arguments["result_sha256"],
+                    "settlement_receipt": settlement,
                 }
             ),
             previous_sha256=event_sha("checkpoint"),
@@ -505,6 +625,20 @@ class OfflineExecutionCoordinatorTests(unittest.TestCase):
         self.assertEqual(
             record.execution_receipt["integrity"]["payload_sha256"],
             canonical_json_sha256(receipt_payload),
+        )
+        _, settlement = completion_budget(
+            reservation=fixture.claim_event.payload["budget_reservation"],
+            event_at=ENDED_AT,
+            result_sha256=fixture.completion_arguments["result_sha256"],
+        )
+        self.assertEqual(
+            list(record.execution_receipt["integrity"]["parent_refs"]),
+            [
+                record.checkpoint_manifest["object_id"],
+                *(artifact.artifact_ref for artifact in fixture.artifacts),
+                settlement["object_id"],
+                f"ledger:{event_sha('complete')}",
+            ],
         )
 
         with self.assertRaises(TypeError):

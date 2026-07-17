@@ -33,6 +33,7 @@ HOLDOUT_REF = f"cas:sha256:{hashlib.sha256(b'synthetic-holdout-reference').hexdi
 OUTCOME_REF = f"cas:sha256:{hashlib.sha256(b'synthetic-outcome-reference').hexdigest()}"
 CHECKPOINT_SHA256 = hashlib.sha256(b"synthetic-checkpoint-manifest").hexdigest()
 EVENT_CHAIN_HEAD = hashlib.sha256(b"synthetic-event-chain-head").hexdigest()
+SETTLEMENT_PARENT = f"settlement-receipt-{'7' * 64}"
 PROJECTION_FIELDS = (
     "execution_ref",
     "validation_ref",
@@ -107,6 +108,7 @@ def _chain(
                 "parent_refs": [
                     f"checkpoint-manifest-{CHECKPOINT_SHA256}",
                     *ARTIFACT_REFS,
+                    SETTLEMENT_PARENT,
                     f"ledger:{EVENT_CHAIN_HEAD}",
                 ],
             },
@@ -309,21 +311,48 @@ class ValidationBoundaryConformanceTests(unittest.TestCase):
 
         parent_mutations = (
             [],
-            [*ARTIFACT_REFS, f"ledger:{EVENT_CHAIN_HEAD}"],
+            [*ARTIFACT_REFS, SETTLEMENT_PARENT, f"ledger:{EVENT_CHAIN_HEAD}"],
             [
                 f"checkpoint-manifest-{CHECKPOINT_SHA256}",
                 *reversed(ARTIFACT_REFS),
+                SETTLEMENT_PARENT,
                 f"ledger:{EVENT_CHAIN_HEAD}",
             ],
             [
                 "checkpoint-manifest-short",
                 *ARTIFACT_REFS,
+                SETTLEMENT_PARENT,
                 f"ledger:{EVENT_CHAIN_HEAD}",
             ],
             [
                 f"checkpoint-manifest-{CHECKPOINT_SHA256}",
                 *ARTIFACT_REFS,
+                SETTLEMENT_PARENT,
                 f"ledger:{'f' * 64}",
+            ],
+            [
+                f"checkpoint-manifest-{CHECKPOINT_SHA256}",
+                *ARTIFACT_REFS,
+                f"ledger:{EVENT_CHAIN_HEAD}",
+            ],
+            [
+                f"checkpoint-manifest-{CHECKPOINT_SHA256}",
+                *ARTIFACT_REFS,
+                "settlement-receipt-short",
+                f"ledger:{EVENT_CHAIN_HEAD}",
+            ],
+            [
+                f"checkpoint-manifest-{CHECKPOINT_SHA256}",
+                *ARTIFACT_REFS,
+                f"ledger:{EVENT_CHAIN_HEAD}",
+                SETTLEMENT_PARENT,
+            ],
+            [
+                f"checkpoint-manifest-{CHECKPOINT_SHA256}",
+                *ARTIFACT_REFS,
+                SETTLEMENT_PARENT,
+                SETTLEMENT_PARENT,
+                f"ledger:{EVENT_CHAIN_HEAD}",
             ],
         )
         for parent_refs in parent_mutations:
@@ -464,6 +493,7 @@ class ValidationBoundaryConformanceTests(unittest.TestCase):
             f"checkpoint-manifest-{CHECKPOINT_SHA256}",
             file_ref,
             ARTIFACT_REFS[1],
+            SETTLEMENT_PARENT,
             f"ledger:{EVENT_CHAIN_HEAD}",
         ]
         validation_integrity["parent_refs"] = [
