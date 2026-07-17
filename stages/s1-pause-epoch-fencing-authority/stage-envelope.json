@@ -1,0 +1,71 @@
+{
+  "stage_id": "s1-pause-epoch-fencing-authority",
+  "agent_id": "agent-0",
+  "objective": "Authorize one narrow canonical-ledger guard that permanently fences attempts claimed before a durable global pause, including after resume and reopen.",
+  "executable_blocker": "A read-only conformance probe showed that a pre-pause attempt can append a checkpoint during active pause and complete after resume and ledger reopen with its old fence.",
+  "base_sha": "b263d387510cc74cb159144f1725957989938731",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "main",
+  "worktree": "canonical-main-worktree",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "docs/receipts/reuse/s1-ledger-durability.json",
+    "src/research_bridge/ledger.py",
+    "tests/test_stage1_ledger.py",
+    "tests/test_stage1_control.py",
+    "agent2-read-only-pause-ordering-probe"
+  ],
+  "write_set": [
+    "docs/receipts/reuse/s1-pause-epoch-fencing.json",
+    "stages/s1-pause-epoch-fencing-authority/stage-envelope.json",
+    "stages/s1-pause-epoch-fencing-authority/ownership-lease.json",
+    "tests/test_stage1_authority.py"
+  ],
+  "authorized_worker_stage": {
+    "stage_id": "s1-pause-epoch-fencing",
+    "agent_id": "agent-2",
+    "branch": "codex/bridge-a2-s1-pause-epoch-fencing",
+    "write_set": [
+      "src/research_bridge/ledger.py",
+      "tests/test_stage1_pause_epoch_fencing.py"
+    ],
+    "preservation_rule": "Use the existing canonical ledger sequence under the existing immediate transaction. Add no event type table migration second ledger in-memory generation or control/admission change."
+  },
+  "forbidden_scope": [
+    "frozen-contract-schema-generated-artifact-root-config-workflow-lockfile-or-migration-edit",
+    "new-event-type-table-trigger-index-second-ledger-or-destructive-database-change",
+    "admission-kernel-control-ipc-cas-execution-validation-domain-or-budget-edit",
+    "in-memory-only-generation-active-pause-only-check-or-resume-revival",
+    "existing-test-deletion-relaxation-skip-xfail-or-continue-on-error",
+    "dependency-network-deployment-publication-live-market-live-target-or-authority-expansion"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "prior_ledger_reuse": "ae59c9c3a7d6cc1db0b2b110145b33c32347196ead6c3d8c2c3c474914e45d56",
+    "new_reuse_decision": "08db3b5eb94a941f668033c57c77a56ff018155498191db6a526e0816634a1ad",
+    "external_dependencies": "none"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest tests.test_stage1_pause_epoch_fencing -v",
+    "python3 -m unittest tests.test_stage1_ledger tests.test_stage1_control -v",
+    "python3 -m unittest discover -s tests -p 'test_stage1_*.py'",
+    "make test",
+    "git diff --check",
+    "exact write-set schema dependency skip privacy network and live-authority scan"
+  ],
+  "risk_class": "bridge-sev0-durable-pause-epoch-fencing",
+  "stop_conditions": [
+    "schema-migration-new-event-type-second-ledger-or-write-set-expansion-required",
+    "pre-pause-attempt-can-write-during-or-after-pause-resume-reopen",
+    "post-resume-new-attempt-cannot-progress",
+    "rejected-transition-adds-an-event-or-breaks-chain",
+    "contract-dependency-domain-network-or-live-authority-enters-scope",
+    "before-equals-after-or-pause-fencing-blocker-remains"
+  ],
+  "expected_receipt": "docs/receipts/integration/s1-pause-epoch-fencing-authority.json",
+  "rollback": "Revert the scoped public authority commit before worker lease issuance. No runtime database contract domain registry deployment or external system is mutated.",
+  "commit_authority": "agent-0-one-scoped-commit",
+  "push_authority": true
+}

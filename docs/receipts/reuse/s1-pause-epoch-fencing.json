@@ -1,0 +1,60 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-s1-pause-epoch-fencing-20260717",
+  "issued_at": "2026-07-17T09:33:20Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "reuse-freeze-authority"
+  },
+  "contour": "bridge",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "durable-global-pause-epoch-fencing-in-canonical-ledger",
+    "candidates": [
+      {
+        "candidate": "existing-append-only-ledger-sequence-and-immediate-transaction",
+        "disposition": "selected"
+      },
+      {
+        "candidate": "claim-sequence-versus-latest-pause-sequence-check",
+        "disposition": "selected"
+      },
+      {
+        "candidate": "schema-migration-or-second-ledger",
+        "disposition": "rejected-unnecessary"
+      },
+      {
+        "candidate": "active-pause-only-check",
+        "disposition": "rejected-old-attempt-revives-after-resume"
+      },
+      {
+        "candidate": "in-memory-pause-generation",
+        "disposition": "rejected-not-durable-across-reopen"
+      }
+    ],
+    "selected_mode": "owned-stdlib-canonical-ledger-sequence-fence",
+    "source_ref": "reuse:reuse-s1-ledger-durability-20260716;git:b263d387510cc74cb159144f1725957989938731",
+    "code_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "license_spdx": "NOASSERTION",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "attempt claimed before pause cannot checkpoint during active pause",
+      "attempt claimed before pause cannot checkpoint or complete after resume",
+      "pause fence persists across ledger reopen",
+      "attempt claimed after verified resume can checkpoint and complete",
+      "rejected transitions append zero events and preserve the hash chain",
+      "concurrent pause and checkpoint ordering remains atomic"
+    ],
+    "canonical_owner": "bridge-job-ledger-agent2-with-agent0-integration",
+    "rollback": "Revert the scoped ledger guard and its synthetic tests. No schema migration, runtime database rewrite, domain registry mutation, deployment or external action is authorized."
+  },
+  "integrity": {
+    "payload_sha256": "08db3b5eb94a941f668033c57c77a56ff018155498191db6a526e0816634a1ad",
+    "parent_refs": [
+      "reuse:reuse-s1-ledger-durability-20260716",
+      "git:b263d387510cc74cb159144f1725957989938731",
+      "ci:29569975076"
+    ]
+  }
+}

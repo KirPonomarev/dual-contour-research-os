@@ -1,0 +1,19 @@
+{
+  "lease_id": "lease-s1-pause-epoch-fencing-authority-agent-0-20260717",
+  "stage_id": "s1-pause-epoch-fencing-authority",
+  "agent_id": "agent-0",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-17T09:33:20Z",
+  "expires_at": "2026-07-17T15:33:20Z",
+  "base_sha": "b263d387510cc74cb159144f1725957989938731",
+  "branch": "main",
+  "worktree": "canonical-main-worktree",
+  "write_set": [
+    "docs/receipts/reuse/s1-pause-epoch-fencing.json",
+    "stages/s1-pause-epoch-fencing-authority/stage-envelope.json",
+    "stages/s1-pause-epoch-fencing-authority/ownership-lease.json",
+    "tests/test_stage1_authority.py"
+  ],
+  "delegation_allowed": false,
+  "state": "active"
+}

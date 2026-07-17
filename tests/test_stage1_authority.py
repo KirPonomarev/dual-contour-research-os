@@ -56,6 +56,7 @@ class Stage1AuthorityTests(unittest.TestCase):
             "s1-market-lineage-portability.json": "owner-local-manifest-derived-recursive-lineage-no-new-dependency",
             "s1-market-sanitized-count-fixture.json": "owner-private-sanitized-count-sufficient-statistics-no-public-payload",
             "s1-authority-policy-boundary.json": "owned-stdlib-pinned-authority-policy-fail-closed",
+            "s1-pause-epoch-fencing.json": "owned-stdlib-canonical-ledger-sequence-fence",
         }
         schema = load(ROOT / "contracts" / "v1" / "ReuseDecisionReceipt.schema.json")
         allowed = set(schema["properties"])
@@ -479,6 +480,40 @@ class Stage1AuthorityTests(unittest.TestCase):
         self.assertEqual(lease["write_set"][-len(added) :], added)
         self.assertTrue(all(path.startswith("tests/") for path in added))
         self.assertFalse(any(path.startswith("contracts/") for path in lease["write_set"]))
+        self.assertFalse(lease["delegation_allowed"])
+
+    def test_pause_epoch_fencing_authority_reuses_the_canonical_ledger(self) -> None:
+        envelope = load(
+            ROOT
+            / "stages"
+            / "s1-pause-epoch-fencing-authority"
+            / "stage-envelope.json"
+        )
+        lease = load(
+            ROOT
+            / "stages"
+            / "s1-pause-epoch-fencing-authority"
+            / "ownership-lease.json"
+        )
+        reuse = load(REUSE_RECEIPTS / "s1-pause-epoch-fencing.json")
+        worker = envelope["authorized_worker_stage"]
+
+        self.assertEqual(envelope["base_sha"], "b263d387510cc74cb159144f1725957989938731")
+        self.assertEqual(envelope["write_set"], lease["write_set"])
+        self.assertEqual(reuse["integrity"]["payload_sha256"], payload_sha256(reuse))
+        self.assertEqual(
+            worker["write_set"],
+            [
+                "src/research_bridge/ledger.py",
+                "tests/test_stage1_pause_epoch_fencing.py",
+            ],
+        )
+        self.assertNotIn("src/research_bridge/kernel.py", worker["write_set"])
+        self.assertFalse(any(path.startswith("contracts/") for path in worker["write_set"]))
+        self.assertIn(
+            "new-event-type-table-trigger-index-second-ledger-or-destructive-database-change",
+            envelope["forbidden_scope"],
+        )
         self.assertFalse(lease["delegation_allowed"])
 
     def test_control_authority_is_pinned_and_reversible(self) -> None:
