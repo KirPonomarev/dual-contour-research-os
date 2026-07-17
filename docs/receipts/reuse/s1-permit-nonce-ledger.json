@@ -1,0 +1,75 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-s1-permit-nonce-ledger-20260717",
+  "issued_at": "2026-07-17T10:34:37Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "reuse-freeze-authority"
+  },
+  "contour": "bridge",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "durable-global-single-use-permit-nonce-enforcement",
+    "candidates": [
+      {
+        "candidate": "existing-admission-kernel-canonical-ledger-claim-path",
+        "disposition": "selected"
+      },
+      {
+        "candidate": "frozen-permit-nonce-and-max-uses-contract-fields",
+        "disposition": "selected-preserve-contract"
+      },
+      {
+        "candidate": "sha256-nonce-digest-in-canonical-claim-plus-partial-unique-index",
+        "disposition": "selected"
+      },
+      {
+        "candidate": "raw-permit-nonce-persistence",
+        "disposition": "rejected-unnecessary-sensitive-value"
+      },
+      {
+        "candidate": "in-memory-used-nonce-cache",
+        "disposition": "rejected-not-durable-or-atomic"
+      },
+      {
+        "candidate": "second-ledger-or-permit-use-table",
+        "disposition": "rejected-dual-source-of-truth"
+      },
+      {
+        "candidate": "silent-legacy-claim-backfill",
+        "disposition": "rejected-source-nonce-unrecoverable"
+      },
+      {
+        "candidate": "external-dependency",
+        "disposition": "rejected-unnecessary"
+      }
+    ],
+    "selected_mode": "owned-stdlib-canonical-ledger-permit-nonce-digest-unique-index",
+    "source_ref": "git:edb23da71826a201cb47109dedf9739697ab67d6;contract:Permit-v1",
+    "code_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "license_spdx": "NOASSERTION",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "sequential duplicate nonce across different jobs commits exactly once",
+      "eight-way separate-connection duplicate race has exactly one winner",
+      "duplicate remains denied after close and reopen without a write",
+      "different nonces remain independently admissible",
+      "malformed digest and legacy claims without a digest fail closed",
+      "raw nonce is absent from the database while the digest and unique index are durable",
+      "execution validates the claim digest binding before downstream mutation",
+      "full Stage 1 and repository test gates"
+    ],
+    "canonical_owner": "bridge-canonical-job-ledger-with-agent0-integration",
+    "rollback": "Before runtime use, revert the scoped implementation commit and discard its branch. After nonce-bound claims exist, do not downgrade in place; quarantine and recreate the offline runtime database from trusted references."
+  },
+  "integrity": {
+    "payload_sha256": "9f72763eab66fcdb7861e8d38f663526d5b9ab2d58b94cb06a395f1a8133571e",
+    "parent_refs": [
+      "git:edb23da71826a201cb47109dedf9739697ab67d6",
+      "contract:Permit-v1",
+      "reuse:reuse-s1-ledger-durability-20260716",
+      "reuse:reuse-s1-authority-policy-boundary-20260717"
+    ]
+  }
+}

@@ -58,6 +58,7 @@ class Stage1AuthorityTests(unittest.TestCase):
             "s1-authority-policy-boundary.json": "owned-stdlib-pinned-authority-policy-fail-closed",
             "s1-pause-epoch-fencing.json": "owned-stdlib-canonical-ledger-sequence-fence",
             "s1-market-ci-reality-loop-prerequisite.json": "existing-real-cli-synthetic-prerequisite-hard-gate-no-runtime-change",
+            "s1-permit-nonce-ledger.json": "owned-stdlib-canonical-ledger-permit-nonce-digest-unique-index",
         }
         schema = load(ROOT / "contracts" / "v1" / "ReuseDecisionReceipt.schema.json")
         allowed = set(schema["properties"])
@@ -636,6 +637,54 @@ class Stage1AuthorityTests(unittest.TestCase):
         self.assertEqual(envelope["write_set"], expected)
         self.assertEqual(lease["write_set"], expected)
         self.assertFalse(envelope["push_authority"])
+        self.assertFalse(lease["delegation_allowed"])
+
+    def test_permit_nonce_authority_is_one_ledger_hash_only_and_atomic(self) -> None:
+        envelope = load(
+            ROOT / "stages" / "s1-permit-nonce-authority" / "stage-envelope.json"
+        )
+        lease = load(
+            ROOT / "stages" / "s1-permit-nonce-authority" / "ownership-lease.json"
+        )
+        reuse = load(REUSE_RECEIPTS / "s1-permit-nonce-ledger.json")
+        worker = envelope["authorized_worker_stage"]
+
+        self.assertEqual(
+            envelope["base_sha"],
+            "edb23da71826a201cb47109dedf9739697ab67d6",
+        )
+        self.assertEqual(envelope["write_set"], lease["write_set"])
+        self.assertEqual(reuse["integrity"]["payload_sha256"], payload_sha256(reuse))
+        self.assertEqual(worker["agent_id"], "agent-1")
+        self.assertEqual(len(worker["write_set"]), 11)
+        self.assertFalse(any(path.startswith("contracts/") for path in worker["write_set"]))
+        dispositions = {
+            item["candidate"]: item["disposition"]
+            for item in reuse["payload"]["candidates"]
+        }
+        self.assertEqual(
+            dispositions[
+                "sha256-nonce-digest-in-canonical-claim-plus-partial-unique-index"
+            ],
+            "selected",
+        )
+        self.assertEqual(
+            dispositions["second-ledger-or-permit-use-table"],
+            "rejected-dual-source-of-truth",
+        )
+        self.assertEqual(
+            dispositions["silent-legacy-claim-backfill"],
+            "rejected-source-nonce-unrecoverable",
+        )
+        self.assertIn(
+            "new-table-column-ledger-event-type-second-ledger-or-checkpoint-store",
+            envelope["forbidden_scope"],
+        )
+        self.assertIn(
+            "raw-permit-nonce-persistence-log-or-receipt",
+            envelope["forbidden_scope"],
+        )
+        self.assertTrue(envelope["rollback"])
         self.assertFalse(lease["delegation_allowed"])
 
     def test_control_authority_is_pinned_and_reversible(self) -> None:
