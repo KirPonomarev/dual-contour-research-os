@@ -1,0 +1,110 @@
+{
+  "stage_id": "s1-terminal-execution-receipt-lookup",
+  "agent_id": "agent-2",
+  "objective": "Implement bounded versioned terminal material and zero-write post-reopen reconstruction of the exact completed ExecutionReceipt.",
+  "executable_blocker": "A caller that loses the successful response after durable completion cannot recover the canonical ExecutionReceipt without rerunning the job.",
+  "base_sha": "4ce89039eaae0f191f5864e6866f83ebc9608a6d",
+  "public_authority_sha": "4ce89039eaae0f191f5864e6866f83ebc9608a6d",
+  "public_authority_ci": "29588876791",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a2-s1-terminal-execution-receipt-lookup",
+  "worktree": "ephemeral-public-worktree:s1-terminal-execution-receipt-lookup",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "docs/receipts/reuse/s1-terminal-execution-receipt-lookup.json",
+    "docs/receipts/integration/s1-terminal-execution-receipt-lookup-authority.json",
+    "docs/receipts/integration/s1-final-checkpoint-reopen-recovery.json",
+    "stages/s1-terminal-execution-receipt-lookup-authority/stage-envelope.json",
+    "contracts/v1/ExecutionReceipt.schema.json",
+    "contracts/v1/CheckpointManifest.schema.json",
+    "existing authorized runtime and connected test files"
+  ],
+  "write_set": [
+    "src/research_bridge/cas.py",
+    "src/research_bridge/ledger.py",
+    "src/research_bridge/execution.py",
+    "tests/test_stage1_cas.py",
+    "tests/test_stage1_storage_assurance.py",
+    "tests/test_stage1_ledger.py",
+    "tests/test_stage1_assurance.py",
+    "tests/test_stage1_execution.py",
+    "tests/test_stage1_execution_assurance.py",
+    "tests/test_stage1_reference_vertical.py",
+    "tests/test_stage1_recovery.py",
+    "tests/test_stage1_terminal_lookup.py"
+  ],
+  "semantic_freeze": {
+    "terminal_material": {
+      "schema_id": "OwnedExecutionTerminalMaterial",
+      "schema_version": "1.0.0",
+      "maximum_bytes": 65536,
+      "strict_object": "exact-nineteen-fields-no-duplicate-keys-nonfinite-values-unknown-fields-or-noncanonical-encoding",
+      "store": "existing-checkpoint-content-addressed-store-only",
+      "complete_binding": "result_sha256-equals-sha256-of-exact-terminal-material-bytes",
+      "publication_order": "terminal-material-publication-and-verification-must-complete-before-ledger-complete"
+    },
+    "lookup": {
+      "entrypoint": "OfflineExecutionCoordinator.lookup_execution_receipt(job_spec_ref)",
+      "ledger": "fully-validate-chain-budget-checkpoint-projection-and-single-completion-before-material-read",
+      "material": "derive-cas-ref-from-complete-result_sha256-and-read-bounded-no-follow-hash-verified-bytes",
+      "receipt": "normal-execution-and-lookup-use-one-shared-constructor-and-produce-byte-identical-canonical-ExecutionReceipt",
+      "zero_write": "no-runner-ingestor-publish-staging-ledger-budget-reservation-settlement-or-CAS-count-delta",
+      "legacy": "explicit-unavailable-without-rerun-repair-backfill-or-fabrication"
+    },
+    "failure_policy": "missing-duplicate-conflicting-oversize-malformed-tampered-or-any-binding-mismatch-rejects-zero-write"
+  },
+  "preservation_contract": [
+    "database-user-version-one-and-exact-schema-fingerprint-unchanged",
+    "one-canonical-ledger-one-existing-checkpoint-CAS-and-existing-event-vocabulary-only",
+    "recovery-budget-pause-fence-nonce-settlement-and-reference-semantics-unchanged",
+    "no-domain-outcome-registry-scientific-payload-or-live-authority",
+    "legacy-completions-are-never-mutated-or-silently-repaired"
+  ],
+  "forbidden_scope": [
+    "unlisted-source-test-doc-config-workflow-lockfile-migration-contract-or-dependency-edit",
+    "ingestion-L0-admission-authority-control-validation-or-kernel-source-edit",
+    "second-ledger-store-new-table-column-index-trigger-event-type-or-schema-version",
+    "lookup-rerun-reingest-republish-staging-write-ledger-write-budget-write-or-receipt-fabrication",
+    "multi-attempt-arbitrary-chunk-resume-scheduler-queue-GC-release-refund-or-legacy-backfill",
+    "raw-fence-permit-nonce-path-private-domain-D2-or-D3-material-in-terminal-object",
+    "silent-fallback-test-relaxation-skip-xfail-or-continue-on-error",
+    "private-path-url-secret-account-dataset-strategy-or-confidential-payload",
+    "network-external-mutation-live-operation-publication-deployment-or-UI",
+    "push-merge-or-canonical-main-write"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "reuse_decision": "5a79e766f56bd6a5a1181aa840791998ac7de4f81d701071f10df897d06067b5",
+    "authority_receipt": "3f809b3154629dd25e5344965eb16a5acb779769c140d6e58dac139eb1908fd7",
+    "recovery_receipt": "3899b964348af5f4c1b77d8910dc8b9168ad7ca98a2bbaac560ebb05c8f15762",
+    "external_dependencies": "none"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest tests.test_stage1_cas tests.test_stage1_storage_assurance tests.test_stage1_ledger tests.test_stage1_assurance tests.test_stage1_execution tests.test_stage1_execution_assurance tests.test_stage1_reference_vertical tests.test_stage1_recovery tests.test_stage1_terminal_lookup -v",
+    "python3 -m unittest discover -s tests -p 'test_stage1_*.py'",
+    "make test",
+    "git diff --check",
+    "exact twelve-file write-set normal-lookup byte identity and zero-write mutation matrix plus schema contract dependency private-locator network live-authority and weakening scan"
+  ],
+  "risk_class": "bridge-sev1-durable-terminal-reconstruction",
+  "stop_conditions": [
+    "base-authority-contract-reuse-or-receipt-hash-mismatch",
+    "write-set-schema-event-vocabulary-store-ledger-or-dependency-expands",
+    "terminal-material-is-not-durable-and-verified-before-complete",
+    "normal-and-lookup-receipt-canonical-bytes-object-id-payload-hash-or-parent-order-differ",
+    "lookup-success-or-failure-causes-any-execution-ingestion-publication-staging-ledger-budget-or-CAS-mutation",
+    "malformed-missing-tampered-legacy-or-mismatched-material-reaches-a-receipt",
+    "raw-fence-path-private-domain-or-D2-D3-material-enters-terminal-object",
+    "before-equals-after-or-lost-response-terminal-reconstruction-blocker-remains"
+  ],
+  "expected_receipt": "docs/receipts/integration/s1-terminal-execution-receipt-lookup.json",
+  "rollback": "Agent 0 discards the worker commit and branch. No schema, contract, domain state, external system or live authority changed; synthetic offline roots may be discarded.",
+  "commit_authority": "one-scoped-worker-commit",
+  "push_authority": false,
+  "expected_handoff_status": [
+    "ready_for_agent0_audit",
+    "blocked_validation_failed"
+  ]
+}

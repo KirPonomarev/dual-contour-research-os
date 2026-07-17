@@ -354,6 +354,38 @@ class Stage1AuthorityTests(unittest.TestCase):
         self.assertTrue(envelope["rollback"])
         self.assertFalse(lease["delegation_allowed"])
 
+    def test_terminal_execution_receipt_lookup_worker_lease_is_exact(self) -> None:
+        envelope = load(
+            ROOT
+            / "stages"
+            / "s1-terminal-execution-receipt-lookup"
+            / "stage-envelope.json"
+        )
+        lease = load(
+            ROOT
+            / "stages"
+            / "s1-terminal-execution-receipt-lookup"
+            / "ownership-lease.json"
+        )
+
+        self.assertEqual(envelope["write_set"], lease["write_set"])
+        self.assertEqual(len(envelope["write_set"]), 12)
+        self.assertEqual(
+            envelope["write_set"][:3],
+            [
+                "src/research_bridge/cas.py",
+                "src/research_bridge/ledger.py",
+                "src/research_bridge/execution.py",
+            ],
+        )
+        self.assertEqual(
+            envelope["dependency_hashes"]["authority_receipt"],
+            "3f809b3154629dd25e5344965eb16a5acb779769c140d6e58dac139eb1908fd7",
+        )
+        self.assertIn("zero_write", envelope["semantic_freeze"]["lookup"])
+        self.assertFalse(envelope["push_authority"])
+        self.assertFalse(lease["delegation_allowed"])
+
     def test_budget_attempt_lifecycle_semantic_amendment_is_exact_and_non_expansive(self) -> None:
         original = load(
             ROOT / "stages" / "s1-budget-attempt-lifecycle" / "stage-envelope.json"
