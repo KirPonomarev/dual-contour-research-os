@@ -1,0 +1,88 @@
+{
+  "stage_id": "s1-market-lineage-portability-amendment-1",
+  "amends_stage_id": "s1-market-lineage-portability",
+  "agent_id": "agent-3",
+  "objective": "Add one private allowlisted count-only fixture to unblock full recursive reproduction while preserving the original lineage-portability constraints and exact expected values.",
+  "executable_blocker": "The original stage proved that exact historical per-cluster sufficient statistics are necessary for reproduction and cannot be reconstructed from published aggregates; an owner-authorized sanitized derivative is now frozen.",
+  "base_sha": "6299f65f92d8bc6964c423775a5cce1f2fdef58a",
+  "public_authority_sha": "b8e7132915a9de027ec2fe3d32c36b5980fafffa",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a3-s1-market-lineage-portability",
+  "worktree": "ephemeral-private-domain-worktree:s1-market-lineage-portability",
+  "prior_envelope_ref": "stages/s1-market-lineage-portability/stage-envelope.json",
+  "authority_receipt_ref": "docs/receipts/integration/s1-market-count-fixture-authority.json",
+  "added_read_set": [
+    "market-domain:frozen-count-source@sha256:fec6a11809bc1c9ec672ff0ddae38a5a7f7845bc32e0b06bb97dc1a4ad50ecc3"
+  ],
+  "added_write_set": [
+    "tests/fixtures/ban_local_eventness_nonlinear_candidate_cluster_counts.json"
+  ],
+  "full_write_set_ref": "stages/s1-market-lineage-portability/ownership-lease-amendment-1.json",
+  "fixture_contract": {
+    "classification": "D1_INTERNAL_SANITIZED",
+    "row_count": 260,
+    "allowed_fields": [
+      "cluster_index",
+      "fold_id",
+      "event_count",
+      "analysis_count",
+      "low_count",
+      "neutral_count",
+      "high_count",
+      "selected_event_count",
+      "selected_analysis_count",
+      "selected_low_count",
+      "selected_neutral_count",
+      "selected_high_count"
+    ],
+    "required_properties": [
+      "all values are nonnegative integers",
+      "cluster identity is sequential and contains no source locator",
+      "event rows and timestamps are synthesized independently under temporary roots",
+      "source artifact is read only after exact SHA-256 verification"
+    ],
+    "forbidden_properties": [
+      "symbol price return or source timestamp",
+      "private path URL report path manifest or registry reference",
+      "floating derived rate influence effect or outcome metric",
+      "raw event row or strategy parameter"
+    ]
+  },
+  "preservation_contract": [
+    "all constraints and stop conditions from the prior envelope remain active",
+    "every existing expected value and assertion remains unchanged",
+    "every portable validator performs full reproduction after content and recursive-parent verification",
+    "default pinned production validation remains unchanged and fail closed",
+    "fixture values remain private to the Market test repository"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "lineage_reuse_decision": "a49e6caabf213121f896a04d41adbbbc2b15a33c8f90eadaadb2726f43aec587",
+    "lineage_authority_receipt": "a14cb2cd246d8d475bacce0acdef14fa622081daccb23aee75b682cfa8e045fc",
+    "fixture_reuse_decision": "0b834a4504b56a73a492250ea9a4eb0cc3d042920863b984abd855a4bb98ad68",
+    "fixture_authority_receipt": "0d6f0449f52811d05f2b06696e37b735bec325d4d8904eb544b3166b1741aaf0",
+    "frozen_count_source": "fec6a11809bc1c9ec672ff0ddae38a5a7f7845bc32e0b06bb97dc1a4ad50ecc3",
+    "external_dependencies": "none"
+  },
+  "acceptance_commands": [
+    "verify frozen count source SHA-256 and 260-row allowlisted integer shape before one-time read",
+    "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src python -m pytest -q -p no:cacheprovider seven authorized BAN test modules",
+    "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src python -m pytest -q -p no:cacheprovider with no failures outside the two-file sibling portable-fixtures stage",
+    "git diff --check",
+    "exact write-set, fixture allowlist, assertion-preservation, reproduction, skip, bypass, private-locator, network and live-authority scan",
+    "original dirty checkout HEAD upstream tracked-diff and untracked-manifest hashes unchanged"
+  ],
+  "stop_conditions": [
+    "source-hash-row-count-or-allowlisted-shape-mismatch",
+    "nonallowlisted-field-floating-derived-value-or-private-locator-required",
+    "full-recursive-reproduction-still-impossible",
+    "expected-value-change-integrity-only-mode-result-injection-or-bypass-required",
+    "write-set-expansion-new-dependency-network-or-live-authority-required",
+    "dirty-source-checkout-changed",
+    "before-equals-after-or-two-entrypoint-blocker-remains"
+  ],
+  "expected_receipt": "docs/receipts/integration/s1-market-lineage-portability.json",
+  "rollback": "Agent 0 discards the single worker commit and isolated branch/worktree, including the private count-only fixture. The read-only source artifact, original dirty checkout, pinned lineage, public Bridge and external systems remain unchanged.",
+  "commit_authority": "one-scoped-worker-commit",
+  "push_authority": false
+}
