@@ -173,6 +173,19 @@ _COMPLETE_PAYLOAD_FIELDS = frozenset(
         "settlement_receipt",
     }
 )
+_CHECKPOINT_PAYLOAD_FIELDS = frozenset(
+    {
+        "attempt_id",
+        "event_at",
+        "fencing_epoch",
+        "fencing_token_sha256",
+        "job_id",
+        "payload_ref",
+        "payload_stored_in_domain_vault",
+        "sequence",
+        "state_sha256",
+    }
+)
 _RECEIPT_FIELDS = frozenset(
     {
         "schema_id",
@@ -687,6 +700,20 @@ class JobLedger:
             self._ensure_open()
             self._begin_immediate()
             try:
+                self._budget_projection_in_transaction()
+                replay = self._idempotent_checkpoint(
+                    job_id=job_id,
+                    attempt_id=attempt_id,
+                    fencing_epoch=fencing_epoch,
+                    fencing_token_sha256=fencing_token_sha256,
+                    checkpoint_sequence=sequence,
+                    state_sha256=state_sha256,
+                    payload_ref=payload_ref,
+                    payload_stored_in_domain_vault=payload_stored_in_domain_vault,
+                )
+                if replay is not None:
+                    self._connection.execute("COMMIT")
+                    return replay
                 self._require_current_fence(
                     job_id=job_id,
                     attempt_id=attempt_id,
@@ -705,6 +732,18 @@ class JobLedger:
                 expected = 0 if row["last_sequence"] is None else row["last_sequence"] + 1
                 if sequence != expected:
                     raise LedgerError(f"checkpoint sequence must be {expected}")
+                claim_row = self._connection.execute(
+                    """
+                    SELECT event_at
+                    FROM bridge_job_ledger
+                    WHERE job_id = ? AND event_type = 'claim'
+                    """,
+                    (job_id,),
+                ).fetchone()
+                if claim_row is None or _timestamp_datetime(event_at) < _timestamp_datetime(
+                    claim_row["event_at"]
+                ):
+                    raise LedgerError("checkpoint event_at precedes its claim")
                 event = self._append(
                     event_type="checkpoint",
                     job_id=job_id,
@@ -744,6 +783,18 @@ class JobLedger:
             self._ensure_open()
             self._begin_immediate()
             try:
+                projections = self._budget_projection_in_transaction()
+                replay = self._idempotent_completion(
+                    job_id=job_id,
+                    attempt_id=attempt_id,
+                    fencing_epoch=fencing_epoch,
+                    fencing_token_sha256=fencing_token_sha256,
+                    result_sha256=result_sha256,
+                    event_at=event_at,
+                )
+                if replay is not None:
+                    self._connection.execute("COMMIT")
+                    return replay
                 self._require_current_fence(
                     job_id=job_id,
                     attempt_id=attempt_id,
@@ -751,7 +802,6 @@ class JobLedger:
                     fencing_token=fencing_token,
                 )
                 self._require_not_completed(job_id)
-                projections = self._budget_projection_in_transaction()
                 projection = next(
                     (item for item in projections if item.event.job_id == job_id),
                     None,
@@ -760,6 +810,11 @@ class JobLedger:
                     raise LedgerError("job claim lacks an exact budget reservation")
                 if projection.settlement is not None:
                     raise LedgerError("job budget reservation is already settled")
+                self._require_completion_after_checkpoints(
+                    job_id=job_id,
+                    attempt_id=attempt_id,
+                    event_at=event_at,
+                )
                 ledger_version_after = self._ledger_tail_sequence() + 1
                 attestation = self._construct_provider_accounting_attestation(
                     projection=projection,
@@ -1118,6 +1173,24 @@ class JobLedger:
                 raise LedgerError("persisted job has duplicate claims")
             by_job[event.job_id] = projection
 
+        checkpoints_by_job: dict[str, list[LedgerEvent]] = {}
+        next_checkpoint: dict[tuple[str, str], int] = {}
+        for event in events:
+            if event.event_type != "checkpoint":
+                continue
+            projection = by_job.get(event.job_id)
+            if projection is None:
+                raise LedgerError("persisted checkpoint lacks a claim")
+            key = (event.job_id, event.attempt_id)
+            expected_sequence = next_checkpoint.get(key, 0)
+            self._validate_checkpoint_event(
+                event,
+                projection,
+                expected_sequence=expected_sequence,
+            )
+            next_checkpoint[key] = expected_sequence + 1
+            checkpoints_by_job.setdefault(event.job_id, []).append(event)
+
         for event in events:
             if event.event_type != "complete":
                 continue
@@ -1126,11 +1199,169 @@ class JobLedger:
                 raise LedgerError("persisted completion lacks a budgeted claim")
             if projection.settlement is not None:
                 raise LedgerError("persisted reservation has duplicate settlements")
+            for checkpoint_event in checkpoints_by_job.get(event.job_id, []):
+                if (
+                    checkpoint_event.sequence >= event.sequence
+                    or _timestamp_datetime(checkpoint_event.event_at)
+                    > _timestamp_datetime(event.event_at)
+                ):
+                    raise LedgerError(
+                        "persisted completion does not follow every checkpoint"
+                    )
             settlement = self._validate_budget_completion_event(event, projection)
             by_job[event.job_id] = replace(projection, settlement=settlement)
         projections = sorted(by_job.values(), key=lambda item: item.event.sequence)
         self._validate_budget_aggregate_invariants(projections)
         return projections
+
+    @staticmethod
+    def _validate_checkpoint_event(
+        event: LedgerEvent,
+        projection: _BudgetProjection,
+        *,
+        expected_sequence: int,
+    ) -> None:
+        if (
+            event.sequence <= projection.event.sequence
+            or _timestamp_datetime(event.event_at)
+            < _timestamp_datetime(projection.event.event_at)
+        ):
+            raise LedgerError("persisted checkpoint does not follow its claim")
+        payload = _exact_object(
+            "persisted checkpoint payload",
+            event.payload,
+            _CHECKPOINT_PAYLOAD_FIELDS,
+        )
+        checkpoint_sequence = _nonnegative_integer(
+            "persisted checkpoint sequence", payload["sequence"]
+        )
+        if (
+            payload["job_id"] != event.job_id
+            or payload["attempt_id"] != event.attempt_id
+            or payload["fencing_epoch"] != event.fencing_epoch
+            or payload["event_at"] != event.event_at
+            or event.attempt_id != projection.event.attempt_id
+            or event.fencing_epoch != projection.event.fencing_epoch
+            or checkpoint_sequence != expected_sequence
+        ):
+            raise LedgerError("persisted checkpoint bindings are invalid")
+        fencing_digest = _sha256(
+            "persisted checkpoint fencing_token_sha256",
+            payload["fencing_token_sha256"],
+        )
+        if not _constant_time_equal(
+            fencing_digest,
+            projection.event.payload["fencing_token_sha256"],
+        ):
+            raise LedgerError("persisted checkpoint fencing digest is invalid")
+        _sha256("persisted checkpoint state_sha256", payload["state_sha256"])
+        payload_ref = _payload_ref(payload["payload_ref"])
+        in_vault = payload["payload_stored_in_domain_vault"]
+        if not isinstance(in_vault, bool):
+            raise LedgerError("persisted checkpoint vault flag must be boolean")
+        if payload_ref.startswith("vault:") != in_vault:
+            raise LedgerError("persisted checkpoint vault binding is invalid")
+        _timestamp("persisted checkpoint event_at", payload["event_at"])
+
+    def _idempotent_checkpoint(
+        self,
+        *,
+        job_id: str,
+        attempt_id: str,
+        fencing_epoch: int,
+        fencing_token_sha256: str,
+        checkpoint_sequence: int,
+        state_sha256: str,
+        payload_ref: str,
+        payload_stored_in_domain_vault: bool,
+    ) -> LedgerEvent | None:
+        row = self._connection.execute(
+            """
+            SELECT *
+            FROM bridge_job_ledger
+            WHERE job_id = ? AND attempt_id = ?
+                AND event_type = 'checkpoint' AND checkpoint_sequence = ?
+            """,
+            (job_id, attempt_id, checkpoint_sequence),
+        ).fetchone()
+        if row is None:
+            return None
+        event = self._ledger_event_from_row(row)
+        payload = event.payload
+        exact = (
+            event.job_id == job_id
+            and event.attempt_id == attempt_id
+            and event.fencing_epoch == fencing_epoch
+            and payload["sequence"] == checkpoint_sequence
+            and payload["state_sha256"] == state_sha256
+            and payload["payload_ref"] == payload_ref
+            and payload["payload_stored_in_domain_vault"]
+            is payload_stored_in_domain_vault
+            and _constant_time_equal(
+                payload["fencing_token_sha256"], fencing_token_sha256
+            )
+        )
+        if not exact:
+            raise LedgerError("checkpoint replay conflicts with persisted event")
+        return event
+
+    def _idempotent_completion(
+        self,
+        *,
+        job_id: str,
+        attempt_id: str,
+        fencing_epoch: int,
+        fencing_token_sha256: str,
+        result_sha256: str,
+        event_at: str,
+    ) -> LedgerEvent | None:
+        row = self._connection.execute(
+            """
+            SELECT *
+            FROM bridge_job_ledger
+            WHERE job_id = ? AND event_type = 'complete'
+            """,
+            (job_id,),
+        ).fetchone()
+        if row is None:
+            return None
+        event = self._ledger_event_from_row(row)
+        payload = event.payload
+        exact = (
+            event.job_id == job_id
+            and event.attempt_id == attempt_id
+            and event.fencing_epoch == fencing_epoch
+            and event.event_at == event_at
+            and payload["result_sha256"] == result_sha256
+            and _constant_time_equal(
+                payload["fencing_token_sha256"], fencing_token_sha256
+            )
+        )
+        if not exact:
+            raise LedgerError("completion replay conflicts with persisted event")
+        return event
+
+    def _require_completion_after_checkpoints(
+        self,
+        *,
+        job_id: str,
+        attempt_id: str,
+        event_at: str,
+    ) -> None:
+        row = self._connection.execute(
+            """
+            SELECT event_at
+            FROM bridge_job_ledger
+            WHERE job_id = ? AND attempt_id = ? AND event_type = 'checkpoint'
+            ORDER BY sequence DESC
+            LIMIT 1
+            """,
+            (job_id, attempt_id),
+        ).fetchone()
+        if row is not None and _timestamp_datetime(event_at) < _timestamp_datetime(
+            row["event_at"]
+        ):
+            raise LedgerError("completion event_at precedes its latest checkpoint")
 
     @staticmethod
     def _validate_budget_claim_event(event: LedgerEvent) -> _BudgetProjection:
@@ -1470,6 +1701,17 @@ class JobLedger:
             "persisted previous_sha256", row["previous_sha256"]
         )
         event_sha256 = _sha256("persisted event_sha256", row["event_sha256"])
+        checkpoint_sequence = row["checkpoint_sequence"]
+        if event_type == "checkpoint":
+            persisted_checkpoint_sequence = _nonnegative_integer(
+                "persisted checkpoint_sequence", checkpoint_sequence
+            )
+            if payload.get("sequence") != persisted_checkpoint_sequence:
+                raise LedgerError(
+                    "persisted checkpoint column does not match payload"
+                )
+        elif checkpoint_sequence is not None:
+            raise LedgerError("non-checkpoint event has a checkpoint sequence")
         material = self._hash_material(
             sequence=sequence,
             event_type=event_type,

@@ -472,11 +472,17 @@ class Stage1LedgerAssuranceTests(unittest.TestCase):
                     )
                 self.assertEqual(ledger.event_count(), 1)
 
-                ledger.checkpoint(**_checkpoint_keywords())
+                first = ledger.checkpoint(**_checkpoint_keywords())
+                self.assertEqual(ledger.event_count(), 2)
+
+                replay = ledger.checkpoint(**_checkpoint_keywords())
+                self.assertEqual(replay, first)
                 self.assertEqual(ledger.event_count(), 2)
 
                 with self.assertRaises(LedgerError):
-                    ledger.checkpoint(**_checkpoint_keywords())
+                    ledger.checkpoint(
+                        **_checkpoint_keywords(state_sha256="9" * 64)
+                    )
                 self.assertEqual(ledger.event_count(), 2)
 
                 with self.assertRaises(LedgerError):

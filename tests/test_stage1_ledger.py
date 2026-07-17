@@ -608,8 +608,19 @@ class JobLedgerTests(unittest.TestCase):
             self.assertEqual(self.ledger.event_count(), before)
 
         checkpoint(self.ledger, sequence=0)
+        replay = checkpoint(self.ledger, sequence=0)
+        self.assertEqual(replay.sequence, 2)
+        self.assertEqual(replay.event_at, AT)
+        self.ledger.close()
+        self.ledger = JobLedger(self.database)
+        reopened_replay = checkpoint(self.ledger, sequence=0)
+        self.assertEqual(reopened_replay.event_sha256, replay.event_sha256)
         with self.assertRaises(LedgerError):
-            checkpoint(self.ledger, sequence=0)
+            checkpoint(
+                self.ledger,
+                sequence=0,
+                payload_ref="cas:conflicting-synthetic-state",
+            )
         with self.assertRaises(LedgerError):
             checkpoint(self.ledger, sequence=2)
         self.assertEqual(self.ledger.event_count(), 2)
@@ -660,7 +671,7 @@ class JobLedgerTests(unittest.TestCase):
 
     def test_completion_is_terminal_and_inspection_fails_after_close(self) -> None:
         claim(self.ledger)
-        self.ledger.complete(
+        completed = self.ledger.complete(
             job_id="job-a",
             attempt_id="attempt-a",
             fencing_epoch=7,
@@ -670,13 +681,33 @@ class JobLedgerTests(unittest.TestCase):
         )
         with self.assertRaises(LedgerError):
             checkpoint(self.ledger)
+        replay = self.ledger.complete(
+            job_id="job-a",
+            attempt_id="attempt-a",
+            fencing_epoch=7,
+            fencing_token="fence-a",
+            result_sha256=RESULT_SHA,
+            event_at=AT,
+        )
+        self.assertEqual(replay.event_sha256, completed.event_sha256)
+        self.ledger.close()
+        self.ledger = JobLedger(self.database)
+        reopened_replay = self.ledger.complete(
+            job_id="job-a",
+            attempt_id="attempt-a",
+            fencing_epoch=7,
+            fencing_token="fence-a",
+            result_sha256=RESULT_SHA,
+            event_at=AT,
+        )
+        self.assertEqual(reopened_replay.event_sha256, completed.event_sha256)
         with self.assertRaises(LedgerError):
             self.ledger.complete(
                 job_id="job-a",
                 attempt_id="attempt-a",
                 fencing_epoch=7,
                 fencing_token="fence-a",
-                result_sha256=RESULT_SHA,
+                result_sha256=hashlib.sha256(b"conflict").hexdigest(),
                 event_at=AT,
             )
         self.assertEqual(self.ledger.event_count(), 2)

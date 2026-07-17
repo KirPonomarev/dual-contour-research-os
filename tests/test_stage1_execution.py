@@ -386,6 +386,7 @@ class Fixture:
             ),
         )
         self.checkpoint_arguments: dict[str, Any] | None = None
+        self.persisted_checkpoint_event_at: str | None = None
         self.completion_arguments: dict[str, Any] | None = None
         self.publication_arguments: dict[str, Any] | None = None
         self.ingestor_envelope: Mapping[str, Any] | None = None
@@ -465,17 +466,20 @@ class _Ledger:
         self.fixture.checkpoint_arguments = dict(arguments)
         if self.fixture.failure == "ledger.checkpoint":
             raise RuntimeError("synthetic checkpoint append failure")
+        persisted_event_at = (
+            self.fixture.persisted_checkpoint_event_at or arguments["event_at"]
+        )
         return Event(
             sequence=2,
             event_type="checkpoint",
             job_id=arguments["job_id"],
             attempt_id=arguments["attempt_id"],
             fencing_epoch=arguments["fencing_epoch"],
-            event_at=arguments["event_at"],
+            event_at=persisted_event_at,
             payload=MappingProxyType(
                 {
                     "attempt_id": arguments["attempt_id"],
-                    "event_at": arguments["event_at"],
+                    "event_at": persisted_event_at,
                     "fencing_epoch": arguments["fencing_epoch"],
                     "fencing_token_sha256": TOKEN_SHA,
                     "job_id": arguments["job_id"],
@@ -654,6 +658,28 @@ class OfflineExecutionCoordinatorTests(unittest.TestCase):
         fixture.artifact_payload["size_bytes"] = 999
         self.assertEqual(receipt_payload["resource_usage"]["nested"]["cpu_units"], 2)
         self.assertEqual(record.artifact_records[0].manifest["payload"]["size_bytes"], 18)
+
+    def test_replayed_checkpoint_uses_original_persisted_event_time(self) -> None:
+        fixture = Fixture(self.root)
+        fixture.persisted_checkpoint_event_at = AT
+
+        record = fixture.execute()
+
+        self.assertEqual(fixture.checkpoint_arguments["event_at"], ENDED_AT)
+        self.assertEqual(record.checkpoint_manifest["issued_at"], AT)
+        self.assertEqual(fixture.completion_arguments["event_at"], ENDED_AT)
+        completion_binding = {
+            "artifact_refs": [
+                artifact.artifact_ref for artifact in record.artifact_records
+            ],
+            "checkpoint_manifest_sha256": canonical_json_sha256(
+                record.checkpoint_manifest
+            ),
+        }
+        self.assertEqual(
+            fixture.completion_arguments["result_sha256"],
+            canonical_json_sha256(completion_binding),
+        )
 
     def test_every_dependency_failure_has_no_receipt_and_stops_later_calls(self) -> None:
         expected_calls = {
