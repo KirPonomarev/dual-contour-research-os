@@ -1,0 +1,20 @@
+{
+  "lease_id": "lease-s3-security-local-lab-evidence-authority-agent-0-20260718",
+  "stage_id": "s3-security-local-lab-evidence-authority",
+  "agent_id": "agent-0",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-18T01:15:00Z",
+  "expires_at": "2026-07-18T07:15:00Z",
+  "base_sha": "9b154571d5fcdfdda745c0f4b89ef0e6043c207c",
+  "branch": "main",
+  "worktree": "canonical-public-worktree",
+  "write_set": [
+    "docs/receipts/source-freeze/s3-security-local-lab-evidence.json",
+    "docs/receipts/reuse/s3-security-local-lab-evidence.json",
+    "stages/s3-security-local-lab-evidence-authority/stage-envelope.json",
+    "stages/s3-security-local-lab-evidence-authority/ownership-lease.json",
+    "tests/test_stage3_authority.py"
+  ],
+  "delegation_allowed": false,
+  "state": "active"
+}

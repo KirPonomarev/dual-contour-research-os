@@ -11,6 +11,9 @@ STAGE = ROOT / "stages" / "s3-security-ingestion-safe-map-authority"
 WORKER_STAGE = ROOT / "stages" / "s3-security-ingestion-safe-map"
 AUTHORITY_RECEIPT = ROOT / "docs" / "receipts" / "integration" / "s3-security-ingestion-safe-map-authority.json"
 WORKER_RECEIPT = ROOT / "docs" / "receipts" / "integration" / "s3-security-ingestion-safe-map.json"
+LOCAL_LAB_SOURCE = ROOT / "docs" / "receipts" / "source-freeze" / "s3-security-local-lab-evidence.json"
+LOCAL_LAB_REUSE = ROOT / "docs" / "receipts" / "reuse" / "s3-security-local-lab-evidence.json"
+LOCAL_LAB_AUTHORITY = ROOT / "stages" / "s3-security-local-lab-evidence-authority"
 
 
 def load(path: Path) -> dict:
@@ -110,6 +113,25 @@ class Stage3AuthorityTests(unittest.TestCase):
         self.assertNotIn("Every protected object operation", text)
         self.assertNotIn("/Users/", text)
         self.assertNotIn("/Volumes/", text)
+
+    def test_local_lab_evidence_authority_is_integrity_bound_and_narrow(self) -> None:
+        source = load(LOCAL_LAB_SOURCE)
+        reuse = load(LOCAL_LAB_REUSE)
+        envelope = load(LOCAL_LAB_AUTHORITY / "stage-envelope.json")
+        lease = load(LOCAL_LAB_AUTHORITY / "ownership-lease.json")
+        self.assertEqual(source["integrity"]["payload_sha256"], payload_sha256(source))
+        self.assertEqual(reuse["integrity"]["payload_sha256"], payload_sha256(reuse))
+        self.assertEqual(source["payload"]["selected_source_sha"], "b86de273bc1fd5b1816b4fb31b7ab45a1c652e07")
+        self.assertEqual(envelope["base_sha"], "9b154571d5fcdfdda745c0f4b89ef0e6043c207c")
+        self.assertEqual(envelope["write_set"], lease["write_set"])
+        self.assertEqual(envelope["authorized_worker_stage"]["write_set"], [
+            "tools/security_bridge_stage3_local_lab.py",
+            "tests/test_security_bridge_stage3_local_lab.py",
+        ])
+        self.assertFalse(envelope["authorized_worker_stage"]["push_authority"])
+        self.assertFalse(envelope["local_lab_contract"]["declares_dual_contour_pre_soak_green"])
+        self.assertIn("validator-writes-no-domain-registry-and-execution-failure-is-not-REFUTED", envelope["local_lab_contract"]["invariants"])
+        self.assertFalse(lease["delegation_allowed"])
 
 
 if __name__ == "__main__":

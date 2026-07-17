@@ -1,0 +1,34 @@
+{
+  "schema_id": "SourceFreezeReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "source-freeze-security-s3-local-lab-evidence-20260718",
+  "issued_at": "2026-07-18T01:15:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "source-freeze-authority"},
+  "contour": "security",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "source_repo": "security-domain-runtime-source",
+    "remote": "withheld-by-sanitization-policy",
+    "branch": "sha256:17c601deef657eb56d00ccb2e398fe9d1bd557c9fb1ee222978550a189b991cd",
+    "head_sha": "b86de273bc1fd5b1816b4fb31b7ab45a1c652e07",
+    "tree_sha": "eea046de84e12b24e529f6f2b12de2a5580cf77f",
+    "upstream_sha": "withheld-worker-lineage",
+    "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "untracked_manifest_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "path_dispositions": [
+      {"category": "tracked_worktree_changes", "count": 0, "disposition": "none-clean-selected-security-ingestion-safe-map-head"},
+      {"category": "untracked_worktree_entries", "count": 0, "disposition": "none-clean-selected-security-ingestion-safe-map-head"},
+      {"category": "raw-lab-evidence", "count": 0, "disposition": "generated-in-memory-synthetic-and-never-committed-or-public"},
+      {"category": "target-evidence-operational-payload-or-domain-truth", "count": 0, "disposition": "forbidden"}
+    ],
+    "selected_source_sha": "b86de273bc1fd5b1816b4fb31b7ab45a1c652e07"
+  },
+  "integrity": {
+    "payload_sha256": "5e68a9480894f8f50cb1e863fddd2dcc9f1762bdae340e55c00c7e866d5a1aec",
+    "parent_refs": [
+      "git:b86de273bc1fd5b1816b4fb31b7ab45a1c652e07",
+      "integration:integration-s3-security-ingestion-safe-map-20260718",
+      "integration:integration-s1-security-offline-reference-e2e-20260717"
+    ]
+  }
+}

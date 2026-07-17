@@ -1,0 +1,46 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-s3-security-local-lab-evidence-20260718",
+  "issued_at": "2026-07-18T01:15:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-freeze-authority"},
+  "contour": "security",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "security-safe-map-bound-HypothesisCard-owned-local-lab-invariant-validation-redacted-evidence-manifest",
+    "candidates": [
+      {"candidate": "existing-Stage3-Security-public-intake-and-safe-map-adapter", "disposition": "selected-input-and-lineage"},
+      {"candidate": "existing-Stage1-Security-HypothesisCard-synthetic-owned-object-lab-and-receipt-patterns", "disposition": "selected-domain-adapter-pattern"},
+      {"candidate": "existing-private-Security-evidence-vault-manifest-hash-sensitivity-and-no-raw-output-boundary", "disposition": "selected-manifest-pattern"},
+      {"candidate": "existing-private-Security-HTTP-redaction-patterns", "disposition": "selected-redaction-pattern"},
+      {"candidate": "owner-local-stdlib-safe-map-binding-invariant-validator-and-evidence-projection", "disposition": "selected-minimal-missing-glue"},
+      {"candidate": "existing-domain-outcome-registry-writer", "disposition": "rejected-not-required-validator-must-not-write"},
+      {"candidate": "new-external-lab-evidence-redaction-or-validation-dependency", "disposition": "rejected-unnecessary"},
+      {"candidate": "live-target-evidence-network-test-report-publication-or-public-raw-evidence", "disposition": "rejected-forbidden-authority-and-boundary"}
+    ],
+    "selected_mode": "existing-Stage3-safe-map-plus-Stage1-owned-lab-and-existing-evidence-redaction-patterns-with-owner-stdlib-binding-no-network-no-registry-write",
+    "source_ref": "source-freeze:source-freeze-security-s3-local-lab-evidence-20260718;git:b86de273bc1fd5b1816b4fb31b7ab45a1c652e07;git:9b154571d5fcdfdda745c0f4b89ef0e6043c207c",
+    "code_sha256": "8d8eea4947f92dfcce4b8f52c331812ef7c63f6519b34e2f236bd8988483f151",
+    "license_spdx": "Proprietary-Internal-Owned",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "bind one SAFE_MAP_READY invariant to one canonical HypothesisCard and ProtocolSnapshot",
+      "execute one deterministic owned-object local lab with synthetic identities objects and zero network calls",
+      "validate invariant result without writing a domain registry or turning execution failure into scientific refutation",
+      "hash raw in-memory evidence redact secret-like fields and emit manifest plus sanitized summary with no raw values",
+      "reject quarantined safe-map atoms tampered lineage malformed lab results evidence hash drift incomplete redaction and registry-write claims",
+      "emit Bridge-shaped ExecutionReceipt and ValidationReceipt plus evidence hash references only"
+    ],
+    "canonical_owner": "private-Security-local-lab-invariant-validator-evidence-curator-and-Agent0-cross-repository-integration",
+    "rollback": "Discard only the isolated private local-lab adapter and tests. Existing source intake safe map Stage1 adapter evidence tooling owner checkout public Bridge registry and external systems remain unchanged."
+  },
+  "integrity": {
+    "payload_sha256": "c89d5bfa66fd79e89633c916f4821a2c449f4979c928e70d089c9161fad32c76",
+    "parent_refs": [
+      "source-freeze:source-freeze-security-s3-local-lab-evidence-20260718",
+      "sha256:5e68a9480894f8f50cb1e863fddd2dcc9f1762bdae340e55c00c7e866d5a1aec",
+      "git:b86de273bc1fd5b1816b4fb31b7ab45a1c652e07",
+      "git:9b154571d5fcdfdda745c0f4b89ef0e6043c207c"
+    ]
+  }
+}

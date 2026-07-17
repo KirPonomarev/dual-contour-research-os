@@ -1,0 +1,112 @@
+{
+  "stage_id": "s3-security-local-lab-evidence-authority",
+  "agent_id": "agent-0",
+  "objective": "Authorize a Security vertical from the frozen safe map through HypothesisCard, owned local lab, invariant validation, redacted evidence manifest and hash-only Bridge receipts.",
+  "executable_blocker": "Public-source intake and safe mapping are integrated, but Stage 3 lacks one receipt chain proving that a safe-map invariant can run in an owned local lab and yield redacted manifest-first evidence without live or registry-write authority.",
+  "base_sha": "9b154571d5fcdfdda745c0f4b89ef0e6043c207c",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "main",
+  "worktree": "canonical-public-worktree",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "docs/receipts/integration/s3-security-ingestion-safe-map.json",
+    "docs/receipts/integration/s1-security-offline-reference-e2e.json",
+    "docs/receipts/source-freeze/s3-security-local-lab-evidence.json",
+    "docs/receipts/reuse/s3-security-local-lab-evidence.json",
+    "private tools/security_bridge_stage3_intake.py",
+    "private tools/security_bridge_reference_adapter.py",
+    "private tools/evidence_vault_manifest.py",
+    "private tools/parsers/redact-http-text.py"
+  ],
+  "write_set": [
+    "docs/receipts/source-freeze/s3-security-local-lab-evidence.json",
+    "docs/receipts/reuse/s3-security-local-lab-evidence.json",
+    "stages/s3-security-local-lab-evidence-authority/stage-envelope.json",
+    "stages/s3-security-local-lab-evidence-authority/ownership-lease.json",
+    "tests/test_stage3_authority.py"
+  ],
+  "authorized_worker_stage": {
+    "stage_id": "s3-security-local-lab-evidence",
+    "agent_id": "agent-4",
+    "private_base_sha": "b86de273bc1fd5b1816b4fb31b7ab45a1c652e07",
+    "public_development_sha": "9b154571d5fcdfdda745c0f4b89ef0e6043c207c",
+    "branch": "codex/bridge-a4-s3-security-local-lab-evidence",
+    "worktree": "ephemeral-private-domain-worktree:s3-security-local-lab-evidence",
+    "write_set": ["tools/security_bridge_stage3_local_lab.py", "tests/test_security_bridge_stage3_local_lab.py"],
+    "commit_authority": "one-scoped-worker-commit",
+    "push_authority": false
+  },
+  "local_lab_contract": {
+    "input": "one-SAFE_MAP_READY-domain-neutral-invariant",
+    "hypothesis": "canonical-HypothesisCard-bound-to-safe-map-manifest-and-owned-synthetic-fixture",
+    "lab": "offline-deterministic-owned-object-only",
+    "validator": "pure-invariant-validator-proposes-outcome-and-never-writes-registry",
+    "evidence": "raw-in-memory-hash-plus-redacted-summary-and-evidence-manifest-no-raw-values",
+    "public_projection": "hashes-refs-counts-classifications-validation-status-only",
+    "invariants": [
+      "quarantined-safe-map-entry-cannot-create-HypothesisCard",
+      "HypothesisCard-ProtocolSnapshot-fixture-execution-evidence-and-validation-are-hash-bound",
+      "lab-uses-synthetic-owned-objects-and-zero-network-calls",
+      "validator-writes-no-domain-registry-and-execution-failure-is-not-REFUTED",
+      "raw-evidence-secret-like-values-are-absent-from-summary-manifest-and-Bridge-projection",
+      "no-live-target-cross-contour-publication-or-authority-escalation"
+    ],
+    "stage_exit_authorized": "slice-only",
+    "declares_dual_contour_pre_soak_green": false,
+    "declares_ready_for_72h_soak": false
+  },
+  "preservation_contract": [
+    "integrated-Stage3-intake-safe-map-and-Stage1-reference-adapters-remain-unmodified",
+    "existing-evidence-manifest-redaction-tools-source-corpus-registry-and-idea-bank-remain-unmodified",
+    "private-Security-owns-lab-evidence-validator-and-domain-outcomes",
+    "public-Bridge-stores-only-authority-and-later-hash-only-integration-evidence",
+    "tests-are-hermetic-synthetic-offline-and-create-only-ephemeral-test-data",
+    "cross-contour-denial-and-final-no-live-authority-gate-remain-a-separate-final-Stage3-slice"
+  ],
+  "forbidden_scope": [
+    "public-copy-of-private-source-safe-map-body-lab-observations-raw-evidence-redacted-summary-target-program-or-domain-truth",
+    "worker-write-outside-one-private-source-file-and-one-private-test-file",
+    "network-live-target-account-device-request-scan-exploit-payload-publication-or-report-submission",
+    "validator-domain-registry-write-scientific-outcome-application-or-execution-failure-as-REFUTED",
+    "cross-contour-D2-D3-read-or-Market-data-access",
+    "existing-adapter-evidence-tool-redactor-registry-contract-schema-lockfile-dependency-config-workflow-or-migration-edit",
+    "secret-cookie-token-private-URL-target-identity-or-raw-evidence-in-receipt",
+    "skip-xfail-continue-on-error-optional-gate-or-validation-weakening",
+    "dirty-owner-checkout-mutation-or-worker-push-merge-deploy-public-write"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "source_freeze": "5e68a9480894f8f50cb1e863fddd2dcc9f1762bdae340e55c00c7e866d5a1aec",
+    "reuse_decision": "c89d5bfa66fd79e89633c916f4821a2c449f4979c928e70d089c9161fad32c76",
+    "stage3_intake_adapter": "5a0fd95df6e7aca4bdf26f98bd84483a4bef4f19d98cb13e15975f5a2aad9b5a",
+    "stage1_security_adapter": "cf54ed87b73f0053a2711861f1a625e143492a6f52dcdae62b0f18c2a2c1e53d",
+    "evidence_manifest_component": "8d8eea4947f92dfcce4b8f52c331812ef7c63f6519b34e2f236bd8988483f151",
+    "redaction_component": "137da720ba4c9d5bc240498320a40d6e6d8968c1dbc28299decd3f365e5be42d",
+    "private_security_head": "b86de273bc1fd5b1816b4fb31b7ab45a1c652e07",
+    "external_dependencies": "none"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest tests.test_stage3_authority -v",
+    "make test",
+    "private focused Stage3 local-lab evidence tests with PYTHONDONTWRITEBYTECODE=1 and no pytest cache",
+    "private bounded Stage1 Stage3 intake evidence manifest and local-lab tests against exact pinned public Bridge source",
+    "git diff --check in both repositories",
+    "exact public and private write-set privacy secret raw-evidence dependency network live-authority registry-write cross-contour and weakening scans",
+    "exact-head public CI and withheld-locator private focused CI"
+  ],
+  "risk_class": "cross-repository-security-local-lab-evidence-slice",
+  "stop_conditions": [
+    "public-base-private-head-contract-source-freeze-reuse-or-selected-component-hash-mismatch",
+    "worker-write-set-collision-dirty-owner-checkout-mutation-or-third-file-required",
+    "HypothesisCard-lab-execution-evidence-manifest-validation-or-safe-map-lineage-cannot-be-exactly-bound",
+    "validator-accepts-quarantined-entry-unauthorized-grant-tampered-evidence-incomplete-redaction-registry-write-or-false-refutation",
+    "network-new-dependency-live-target-cross-contour-read-publication-or-authority-escalation-is-required",
+    "before-equals-after-or-Security-local-lab-evidence-blocker-remains"
+  ],
+  "expected_receipt": "docs/receipts/integration/s3-security-local-lab-evidence.json",
+  "rollback": "Agent 0 rejects or reverts only this authority and isolated worker commit; completed stages owner checkout public Bridge registry source corpus evidence vault and external systems remain unchanged.",
+  "commit_authority": "agent-0-only",
+  "push_authority": "agent-0-only"
+}
