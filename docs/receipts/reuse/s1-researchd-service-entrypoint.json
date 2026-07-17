@@ -1,0 +1,64 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-s1-researchd-service-entrypoint-20260717",
+  "issued_at": "2026-07-17T16:00:00Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "reuse-freeze-authority"
+  },
+  "contour": "bridge",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "owner-only-researchd-module-entrypoint-strict-config-and-graceful-service-shutdown",
+    "candidates": [
+      {
+        "candidate": "existing-ResearchDaemon-PinnedOfflineAuthority-and-AF_UNIX-runtime",
+        "disposition": "selected"
+      },
+      {
+        "candidate": "stdlib-argparse-json-signal-and-nofollow-owner-mode-file-validation",
+        "disposition": "selected-minimal-glue"
+      },
+      {
+        "candidate": "systemd-unit-packaging-host-installation-and-credential-provisioning",
+        "disposition": "parked-for-separate-deployment-stage"
+      },
+      {
+        "candidate": "environment-variable-authority-secret-or-inline-private-policy-loading",
+        "disposition": "rejected-ambient-authority-and-secret-risk"
+      },
+      {
+        "candidate": "HTTP-TCP-remote-admin-config-reload-or-second-service-database",
+        "disposition": "rejected-scope-and-duplicate-authority"
+      },
+      {
+        "candidate": "external-CLI-config-signal-or-daemon-framework",
+        "disposition": "rejected-unnecessary"
+      }
+    ],
+    "selected_mode": "existing-daemon-plus-stdlib-owner-only-strict-config-module-entrypoint",
+    "source_ref": "git:9bf3e59df0c1cc92f631ec64968f33a04d3541ac;integration:integration-s1-researchd-researchctl-single-writer-20260717;reuse:reuse-s1-researchd-researchctl-single-writer-20260717",
+    "code_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "license_spdx": "NOASSERTION",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "python -m research_bridge.researchd starts the existing single-writer daemon from one strict regular owner-only config file",
+      "config symlink wrong owner wrong mode oversized duplicate-key malformed unknown-key D2-D3 and incomplete authority cases fail before runtime-root mutation",
+      "allowed UID is exactly the effective service UID and all quotas and deadlines remain bounded",
+      "SIGTERM SIGINT and KeyboardInterrupt close the owned socket ledger and runtime lock without stale-socket deletion on startup",
+      "no environment authority secret echo dynamic reload subprocess network second ledger deployment or domain authority",
+      "full Stage 1 and repository gates"
+    ],
+    "canonical_owner": "bridge-researchd-service-entrypoint-and-agent0-integration",
+    "rollback": "Revert only the scoped researchd entrypoint and tests. The integrated ResearchDaemon protocol ledger CAS receipts and runtime data remain unchanged; no systemd unit or host installation is created by this stage."
+  },
+  "integrity": {
+    "payload_sha256": "d194834c975d479acb5c8fab7d6861ce9f5a4abd8b2817d24cc0a24814cd1fb4",
+    "parent_refs": [
+      "git:9bf3e59df0c1cc92f631ec64968f33a04d3541ac",
+      "integration:integration-s1-researchd-researchctl-single-writer-20260717",
+      "reuse:reuse-s1-researchd-researchctl-single-writer-20260717"
+    ]
+  }
+}

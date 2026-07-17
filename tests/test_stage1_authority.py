@@ -497,6 +497,52 @@ class Stage1AuthorityTests(unittest.TestCase):
         self.assertFalse(amendment["push_authority"])
         self.assertFalse(lease["delegation_allowed"])
 
+    def test_researchd_service_entrypoint_authority_is_owner_only_and_narrow(self) -> None:
+        envelope = load(
+            ROOT
+            / "stages"
+            / "s1-researchd-service-entrypoint-authority"
+            / "stage-envelope.json"
+        )
+        lease = load(
+            ROOT
+            / "stages"
+            / "s1-researchd-service-entrypoint-authority"
+            / "ownership-lease.json"
+        )
+        reuse = load(REUSE_RECEIPTS / "s1-researchd-service-entrypoint.json")
+
+        self.assertEqual(envelope["write_set"], lease["write_set"])
+        self.assertEqual(len(envelope["write_set"]), 4)
+        worker = envelope["authorized_worker_stage"]
+        self.assertEqual(worker["source_write_set"], ["src/research_bridge/researchd.py"])
+        self.assertEqual(
+            worker["test_write_set"],
+            [
+                "tests/test_stage1_researchd.py",
+                "tests/test_stage1_control_assurance.py",
+            ],
+        )
+        service = envelope["service_contract"]
+        self.assertIn("python3 -m research_bridge.researchd", service["entrypoint"])
+        self.assertEqual(len(service["config_fields"]), 13)
+        self.assertIn("0600", service["config_file"])
+        self.assertIn("effective-uid", service["effective_uid"])
+        self.assertEqual(
+            service["exit_codes"],
+            {
+                "clean_shutdown": 0,
+                "configuration_rejected": 2,
+                "runtime_failed": 3,
+            },
+        )
+        self.assertEqual(reuse["integrity"]["payload_sha256"], payload_sha256(reuse))
+        self.assertEqual(
+            envelope["dependency_hashes"]["reuse_decision"],
+            reuse["integrity"]["payload_sha256"],
+        )
+        self.assertFalse(lease["delegation_allowed"])
+
     def test_budget_attempt_lifecycle_semantic_amendment_is_exact_and_non_expansive(self) -> None:
         original = load(
             ROOT / "stages" / "s1-budget-attempt-lifecycle" / "stage-envelope.json"
