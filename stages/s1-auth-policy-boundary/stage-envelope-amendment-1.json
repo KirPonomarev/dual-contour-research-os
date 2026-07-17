@@ -1,0 +1,51 @@
+{
+  "stage_id": "s1-auth-policy-boundary-amendment-1",
+  "amends_stage_id": "s1-auth-policy-boundary",
+  "agent_id": "agent-1",
+  "objective": "Extend the test-only write-set so every existing positive kernel and control fixture can inject the same explicit trusted offline authority verifier required by the implementation stage.",
+  "executable_blocker": "Six existing positive test modules construct BridgeKernel or ControlRouter without an explicit verifier. A source-only compatibility path would create implicit trust and violate the original fail-closed stage contract.",
+  "base_sha": "2b756ccbbb9541b98594d5247c2f02c938e17bce",
+  "public_authority_sha": "75141fbe67ff007d671822143205fd20bf839786",
+  "public_authority_ci": "29568288986",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a1-s1-auth-policy-boundary",
+  "worktree": "ephemeral-public-worktree:s1-auth-policy-boundary",
+  "prior_envelope_ref": "stages/s1-auth-policy-boundary/stage-envelope.json",
+  "authority_receipt_ref": "docs/receipts/integration/s1-auth-policy-authority.json",
+  "added_write_set": [
+    "tests/test_stage1_admission.py",
+    "tests/test_stage1_assurance.py",
+    "tests/test_stage1_execution_assurance.py",
+    "tests/test_stage1_reference_vertical.py",
+    "tests/test_stage1_control.py",
+    "tests/test_stage1_control_assurance.py"
+  ],
+  "full_write_set_ref": "stages/s1-auth-policy-boundary/ownership-lease-amendment-1.json",
+  "preservation_contract": [
+    "all original envelope constraints acceptance commands and stop conditions remain active",
+    "added files receive only explicit synthetic trusted-verifier fixture construction and call-site injection",
+    "no assertion expected value test scenario or mutation-count requirement is deleted relaxed skipped or changed",
+    "missing verifier resolver trust policy or approval remains fail closed in production source and dedicated negative-path tests",
+    "no compatibility default allow self-issued trust or test-only branch enters production source"
+  ],
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest tests.test_stage1_authority_policy -v",
+    "python3 -m unittest tests.test_stage1_admission tests.test_stage1_assurance tests.test_stage1_execution_assurance tests.test_stage1_reference_vertical tests.test_stage1_control tests.test_stage1_control_assurance -v",
+    "python3 -m unittest discover -s tests -p 'test_stage1_*.py'",
+    "make test",
+    "git diff --check",
+    "exact write-set test-assertion skip dependency private-locator network and live-authority scan"
+  ],
+  "stop_conditions": [
+    "source compatibility default allow or caller self-asserted trust is introduced",
+    "any added test file changes assertions expected values scenarios or mutation counts beyond verifier fixture injection",
+    "write-set expansion contract edit new dependency or ledger domain IPC transport edit is required",
+    "missing-trust forged-issuer unresolved-policy or fabricated-approval negative path reaches mutation",
+    "before-equals-after-or-original-sev0-blocker-remains"
+  ],
+  "expected_receipt": "docs/receipts/integration/s1-auth-policy-boundary.json",
+  "rollback": "Agent 0 discards the worker commit and deletes the isolated branch/worktree. The public authority amendment can be reverted independently; no runtime database contract policy source domain registry or external system is mutated.",
+  "commit_authority": "one-scoped-worker-commit",
+  "push_authority": false
+}

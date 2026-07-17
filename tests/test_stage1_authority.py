@@ -451,6 +451,36 @@ class Stage1AuthorityTests(unittest.TestCase):
         self.assertFalse(envelope["push_authority"])
         self.assertFalse(lease["delegation_allowed"])
 
+    def test_auth_policy_worker_amendment_is_test_fixture_only(self) -> None:
+        envelope = load(
+            ROOT
+            / "stages"
+            / "s1-auth-policy-boundary"
+            / "stage-envelope-amendment-1.json"
+        )
+        lease = load(
+            ROOT
+            / "stages"
+            / "s1-auth-policy-boundary"
+            / "ownership-lease-amendment-1.json"
+        )
+        added = [
+            "tests/test_stage1_admission.py",
+            "tests/test_stage1_assurance.py",
+            "tests/test_stage1_execution_assurance.py",
+            "tests/test_stage1_reference_vertical.py",
+            "tests/test_stage1_control.py",
+            "tests/test_stage1_control_assurance.py",
+        ]
+
+        self.assertEqual(envelope["amends_stage_id"], "s1-auth-policy-boundary")
+        self.assertEqual(envelope["public_authority_sha"], "75141fbe67ff007d671822143205fd20bf839786")
+        self.assertEqual(envelope["added_write_set"], added)
+        self.assertEqual(lease["write_set"][-len(added) :], added)
+        self.assertTrue(all(path.startswith("tests/") for path in added))
+        self.assertFalse(any(path.startswith("contracts/") for path in lease["write_set"]))
+        self.assertFalse(lease["delegation_allowed"])
+
     def test_control_authority_is_pinned_and_reversible(self) -> None:
         envelope = load(ROOT / "stages" / "s1-control-authority" / "stage-envelope.json")
         lease = load(ROOT / "stages" / "s1-control-authority" / "ownership-lease.json")
