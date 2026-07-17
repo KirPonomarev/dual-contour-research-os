@@ -1,0 +1,115 @@
+{
+  "stage_id": "s1-budget-profile",
+  "agent_id": "agent-1",
+  "objective": "Enforce the exact signed fixed-charge cost-unit profile in admission and standalone frozen L0 validation, carrying immutable receipt bindings but leaving ledger lifecycle to the next gate.",
+  "executable_blocker": "Arbitrary Permit quota and JobSpec resource objects, including reservation above signed scope capacity, are accepted on the exact canonical base.",
+  "base_sha": "4cc95d80d23e36ffdb20250f6203510299de8faf",
+  "public_authority_sha": "4cc95d80d23e36ffdb20250f6203510299de8faf",
+  "public_authority_ci": "29577238175",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a1-s1-budget-profile",
+  "worktree": "ephemeral-public-worktree:s1-budget-profile",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "contracts/v1/Permit.schema.json",
+    "contracts/v1/JobSpec.schema.json",
+    "contracts/v1/BudgetReservation.schema.json",
+    "contracts/v1/SettlementReceipt.schema.json",
+    "docs/receipts/reuse/s1-budget-profile.json",
+    "docs/receipts/integration/s1-budget-profile-authority.json",
+    "stages/s1-budget-profile-authority/stage-envelope.json",
+    "authorized runtime and test files"
+  ],
+  "write_set": [
+    "src/research_bridge/admission.py",
+    "src/research_bridge/l0.py",
+    "tests/test_stage1_admission.py",
+    "tests/test_stage1_assurance.py",
+    "tests/test_stage1_authority_policy.py",
+    "tests/test_stage1_l0.py"
+  ],
+  "runtime_profile": {
+    "permit_quotas_keys": [
+      "accounting_policy_ref",
+      "budget_scope_ref",
+      "claims",
+      "provider",
+      "scope_limit",
+      "trial_ref"
+    ],
+    "scope_limit_keys": [
+      "cost_units"
+    ],
+    "job_resource_limit_keys": [
+      "cost_units"
+    ],
+    "numeric_rule": "exact-int-not-bool-and-1<=reserved<=scope<=9007199254740991",
+    "binding_rules": [
+      "claims-equals-Permit-max_uses-equals-one",
+      "provider-equals-JobSpec-runner_profile",
+      "accounting_policy_ref-matches-budget-policy-sha256-reference",
+      "budget_scope_ref-matches-budget-scope-sha256-reference",
+      "trial_ref-is-nonempty",
+      "reservation-expiry-is-minimum-of-Permit-and-Lease-expiry",
+      "job-idempotency-contour-classification-and-all-budget-fields-are-deeply-immutable-in-AdmissionGrant"
+    ]
+  },
+  "preservation_contract": {
+    "required": [
+      "verify the existing frozen outer contracts authority integrity time and job-permit-lease bindings before returning a grant",
+      "reject every missing extra malformed non-integer unsafe or over-capacity budget value before the kernel ledger call",
+      "return a deeply immutable grant carrying the exact next-gate reservation bindings",
+      "standalone frozen L0 validates the exact JobSpec resource profile without inventing actual provider cost",
+      "retain all Permit nonce authority pause fencing and offline reference behavior"
+    ],
+    "forbidden": [
+      "kernel ledger execution validation authority control CAS ingestion contract catalog config workflow dependency or migration edit",
+      "capacity scan reservation settlement receipt emission or budget-green declaration",
+      "untrusted resource_usage conversion variable release or monetary/provider-metered claim",
+      "network external mutation live authority or UI"
+    ]
+  },
+  "forbidden_scope": [
+    "unlisted-source-test-doc-config-workflow-lockfile-migration-contract-or-dependency-edit",
+    "kernel-ledger-execution-validation-authority-control-cas-or-ingestion-edit",
+    "BudgetReservation-SettlementReceipt-capacity-scan-reserve-settle-release-or-recovery-implementation",
+    "floating-boolean-string-zero-negative-extra-missing-unsafe-integer-or-reservation-over-scope-acceptance",
+    "mutable-grant-budget-object-or-untrusted-meter-cost",
+    "existing-test-deletion-relaxation-skip-xfail-continue-on-error-or-fallback",
+    "private-path-url-secret-account-dataset-strategy-or-d2-d3-payload",
+    "network-deployment-publication-live-trading-live-target-testing-external-mutation-or-ui",
+    "push-merge-or-canonical-main-write"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "reuse_decision": "39768f3f3029d728809c8622e10331af2ca6948c3d5d9c7909e8776b79d5eea1",
+    "authority_receipt": "f7f1e75d0debc2c04182c1a87199a3e0d10b8db3700c0556f04f9042195c1be8",
+    "external_dependencies": "none"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest tests.test_stage1_admission tests.test_stage1_assurance tests.test_stage1_authority_policy tests.test_stage1_l0 -v",
+    "python3 -m unittest discover -s tests -p 'test_stage1_*.py'",
+    "make test",
+    "git diff --check",
+    "exact write-set contract dependency kernel ledger execution private-locator network live-authority and weakening scan"
+  ],
+  "risk_class": "bridge-sev1-exact-budget-profile",
+  "stop_conditions": [
+    "base-authority-contract-reuse-or-receipt-hash-mismatch",
+    "write-set-expansion-kernel-ledger-execution-contract-or-dependency-required",
+    "invalid-profile-reaches-kernel-ledger-or-standalone-L0-accepts-it",
+    "AdmissionGrant-budget-bindings-are-incomplete-or-mutable",
+    "worker-implements-or-claims-budget-capacity-settlement-receipt-or-recovery-green",
+    "before-equals-after-or-arbitrary-budget-profile-blocker-remains"
+  ],
+  "expected_receipt": "docs/receipts/integration/s1-budget-profile.json",
+  "rollback": "Agent 0 discards the single worker commit and deletes its isolated branch/worktree. No runtime database, provider action, domain state or external system is changed.",
+  "commit_authority": "one-scoped-worker-commit",
+  "push_authority": false,
+  "expected_handoff_status": [
+    "ready_for_agent0_audit",
+    "blocked_validation_failed"
+  ]
+}

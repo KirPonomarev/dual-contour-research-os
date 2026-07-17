@@ -141,6 +141,27 @@ class Stage1AuthorityTests(unittest.TestCase):
         self.assertTrue(envelope["rollback"])
         self.assertFalse(lease["delegation_allowed"])
 
+    def test_budget_profile_worker_lease_is_exact_and_non_expansive(self) -> None:
+        envelope = load(ROOT / "stages" / "s1-budget-profile" / "stage-envelope.json")
+        lease = load(ROOT / "stages" / "s1-budget-profile" / "ownership-lease.json")
+
+        self.assertEqual(
+            envelope["public_authority_sha"],
+            "4cc95d80d23e36ffdb20250f6203510299de8faf",
+        )
+        self.assertEqual(envelope["write_set"], lease["write_set"])
+        self.assertEqual(len(envelope["write_set"]), 6)
+        self.assertEqual(
+            envelope["write_set"][:2],
+            ["src/research_bridge/admission.py", "src/research_bridge/l0.py"],
+        )
+        self.assertFalse(envelope["push_authority"])
+        self.assertFalse(lease["delegation_allowed"])
+        self.assertIn(
+            "BudgetReservation-SettlementReceipt-capacity-scan-reserve-settle-release-or-recovery-implementation",
+            envelope["forbidden_scope"],
+        )
+
     def test_market_storage_accounting_authority_is_two_file_and_nonweakening(self) -> None:
         envelope = load(
             ROOT
