@@ -1,0 +1,133 @@
+{
+  "stage_id": "s1-budget-attempt-lifecycle-authority",
+  "agent_id": "agent-0",
+  "objective": "Authorize one atomic fixed-charge budget attempt lifecycle in the existing canonical append-only job ledger, including full frozen receipts, hard-cap races, schema identity and fail-closed parked uncertainty.",
+  "executable_blocker": "The exact canonical profile now supplies trusted budget inputs, but JobLedger claim and complete persist no reservation or settlement, enforce no scope capacity, accept ambiguous schema lookalikes, and cannot prove the Skeleton hard-budget gate.",
+  "base_sha": "d75a2ce31764d03ed1472bfa60c7d9fef2fbbea2",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "main",
+  "worktree": "canonical-public-worktree",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "contracts/v1/BudgetReservation.schema.json",
+    "contracts/v1/SettlementReceipt.schema.json",
+    "contracts/v1/ExecutionReceipt.schema.json",
+    "docs/receipts/reuse/s1-budget-profile.json",
+    "docs/receipts/integration/s1-budget-profile.json",
+    "src/research_bridge/kernel.py",
+    "src/research_bridge/ledger.py",
+    "src/research_bridge/execution.py",
+    "independent schema capacity settlement and failure-ordering probes"
+  ],
+  "write_set": [
+    "docs/receipts/reuse/s1-budget-attempt-lifecycle.json",
+    "stages/s1-budget-attempt-lifecycle-authority/stage-envelope.json",
+    "stages/s1-budget-attempt-lifecycle-authority/ownership-lease.json",
+    "tests/test_stage1_authority.py"
+  ],
+  "authorized_worker_stage": {
+    "stage_id": "s1-budget-attempt-lifecycle",
+    "agent_id": "agent-2",
+    "branch": "codex/bridge-a2-s1-budget-attempt-lifecycle",
+    "source_write_set": [
+      "src/research_bridge/kernel.py",
+      "src/research_bridge/ledger.py",
+      "src/research_bridge/execution.py"
+    ],
+    "test_write_set": [
+      "tests/test_stage1_admission.py",
+      "tests/test_stage1_assurance.py",
+      "tests/test_stage1_authority_policy.py",
+      "tests/test_stage1_control_assurance.py",
+      "tests/test_stage1_execution.py",
+      "tests/test_stage1_execution_assurance.py",
+      "tests/test_stage1_ledger.py",
+      "tests/test_stage1_pause_epoch_fencing.py"
+    ]
+  },
+  "ledger_contract": {
+    "database_user_version": 1,
+    "event_types_unchanged": [
+      "claim",
+      "checkpoint",
+      "complete",
+      "pause",
+      "resume"
+    ],
+    "new_tables": 0,
+    "new_columns": 0,
+    "new_unique_expression_indexes": [
+      "claim-budget-reservation-object-id",
+      "claim-budget-reservation-idempotency-key",
+      "complete-settlement-reservation-ref"
+    ],
+    "open_policy": [
+      "version0-with-no-application-objects-creates-exact-version1",
+      "version0-with-exact-legacy-schema-and-zero-rows-adds-only-three-indexes-and-version-atomically",
+      "version0-with-any-row-rejects-without-mutation",
+      "version1-with-exact-fingerprint-reopens-without-DDL",
+      "every-other-version-or-fingerprint-or-extra-missing-lookalike-object-rejects-before-WAL-or-DDL-mutation"
+    ]
+  },
+  "budget_contract": {
+    "reservation_location": "claim.payload.budget_reservation",
+    "settlement_location": "complete.payload.settlement_receipt",
+    "attestation_location": "complete.payload.provider_accounting_attestation",
+    "accounting_semantics": "For the content-addressed Stage 1 owned-offline accounting policy, a successfully completed invocation consumes the full reserved cost_units; released_amount is zero. Units are synthetic fixed-charge accounting units, not monetary, token, CPU, RAM or provider-metered usage.",
+    "unknown_semantics": "Any runner exception, invalid result, checkpoint, CAS, ingestion or completion failure leaves the claim unmatched and the full reservation counted. Expiry never auto-releases. Recovery release retry and multi-attempt are excluded.",
+    "cap_rule": "Under the claim BEGIN IMMEDIATE transaction, validate every persisted budget projection globally; for the exact scope and policy sum each unmatched reservation as R and each settlement as R-released, require actual_cost+released=R, then admit only when sum+new_R<=Q.",
+    "replay_rule": "Validate the full projection first; exact global job idempotency replay returns the persisted claim without another append or capacity use, and any conflicting replay rejects with zero write.",
+    "receipt_rules": [
+      "BudgetReservation-is-a-full-frozen-1.0.0-object-sealed-inside-claim-transaction",
+      "SettlementReceipt-is-a-full-frozen-1.0.0-object-sealed-inside-complete-transaction",
+      "provider_receipt_ref-is-embedded:sha256-of-the-retained-owned-offline-accounting-attestation",
+      "ExecutionReceipt-integrity-parent-refs-bind-the-settlement-object-id",
+      "all-nested-returned-payloads-are-deeply-immutable"
+    ]
+  },
+  "forbidden_scope": [
+    "worker-write-outside-three-source-and-eight-test-files",
+    "admission-l0-authority-control-cas-ingestion-validation-contract-catalog-config-workflow-lockfile-or-dependency-edit",
+    "second-table-second-ledger-new-event-type-new-column-or-table-rebuild",
+    "nonempty-legacy-migration-silent-backfill-fabricated-receipt-or-auto-release",
+    "untrusted-resource-usage-monetary-token-CPU-RAM-or-provider-metered-cost-claim",
+    "release-recovery-retry-fresh-attempt-multi-attempt-or-checkpoint-resume-implementation",
+    "default-allow-schema-repair-IF-NOT-EXISTS-lookalike-acceptance-or-fingerprint-bypass",
+    "test-deletion-relaxation-skip-xfail-continue-on-error-or-fallback",
+    "private-path-url-secret-account-dataset-strategy-or-d2-d3-payload",
+    "network-external-mutation-live-trading-live-target-testing-publication-deployment-or-ui",
+    "push-merge-or-canonical-main-write"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "reuse_decision": "5feb123017f8fd36ec3bd4d7822442e5ddf1033620febfa891b2a47c76e47495",
+    "budget_profile_receipt": "b363f06578d715629a37dfdde3891ce072737c79a63a1d2040f767c44b44c5a6",
+    "external_dependencies": "none"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest tests.test_stage1_admission tests.test_stage1_assurance tests.test_stage1_authority_policy tests.test_stage1_control_assurance tests.test_stage1_execution tests.test_stage1_execution_assurance tests.test_stage1_ledger tests.test_stage1_pause_epoch_fencing -v",
+    "python3 -m unittest discover -s tests -p 'test_stage1_*.py'",
+    "make test",
+    "git diff --check",
+    "exact write-set schema object fingerprint contract dependency private-locator network live-authority and weakening scan",
+    "exact-head public remote CI"
+  ],
+  "risk_class": "bridge-sev1-atomic-hard-budget-attempt-lifecycle",
+  "stop_conditions": [
+    "base-contract-reuse-profile-or-receipt-hash-mismatch",
+    "write-set-expansion-contract-dependency-table-column-event-type-or-rebuild-required",
+    "reserve-and-claim-or-settle-and-complete-can-partially-commit",
+    "concurrent-scope-reservations-can-exceed-Q-or-idempotent-replay-consumes-twice",
+    "full-frozen-reservation-settlement-or-attestation-binding-is-missing-or-mutable",
+    "legacy-malformed-ambiguous-or-lookalike-ledger-is-repaired-accepted-or-written",
+    "failure-expiry-or-unknown-outcome-releases-capacity-or-produces-settlement-execution-receipt",
+    "pause-fencing-nonce-chain-reference-vertical-or-reopen-regresses",
+    "before-equals-after-or-hard-budget-blocker-remains"
+  ],
+  "expected_receipt": "docs/receipts/integration/s1-budget-attempt-lifecycle.json",
+  "rollback": "Before a version-1 ledger exists, Agent 0 discards or reverts the scoped worker commit. After version-1 creation, old unversioned code is forbidden; restore a verified pre-version backup or keep version-1-capable code. Synthetic databases may be discarded.",
+  "commit_authority": "agent-0-only",
+  "push_authority": "agent-0-only"
+}

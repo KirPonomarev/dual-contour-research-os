@@ -1,0 +1,76 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-s1-budget-attempt-lifecycle-20260717",
+  "issued_at": "2026-07-17T12:00:56Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "reuse-freeze-authority"
+  },
+  "contour": "bridge",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "atomic-single-ledger-budget-reserve-claim-settle-complete",
+    "candidates": [
+      {
+        "candidate": "existing-append-only-canonical-job-ledger-claim-and-complete-events",
+        "disposition": "selected"
+      },
+      {
+        "candidate": "frozen-BudgetReservation-and-SettlementReceipt-contracts",
+        "disposition": "selected-preserve-contract"
+      },
+      {
+        "candidate": "embedded-full-budget-receipts-and-owned-offline-accounting-attestation",
+        "disposition": "selected"
+      },
+      {
+        "candidate": "new-budget-event-types-with-table-rebuild",
+        "disposition": "parked-for-recovery-release-multi-attempt-gate"
+      },
+      {
+        "candidate": "second-budget-table-or-ledger",
+        "disposition": "rejected-dual-source-of-truth"
+      },
+      {
+        "candidate": "untrusted-runner-resource-usage-as-cost-meter",
+        "disposition": "rejected-unverified-meter"
+      },
+      {
+        "candidate": "silent-legacy-budget-backfill-or-auto-release",
+        "disposition": "rejected-fabricated-accounting"
+      },
+      {
+        "candidate": "external-dependency",
+        "disposition": "rejected-unnecessary"
+      }
+    ],
+    "selected_mode": "owned-stdlib-single-ledger-embedded-budget-receipts-fixed-charge",
+    "source_ref": "git:d75a2ce31764d03ed1472bfa60c7d9fef2fbbea2;reuse:reuse-s1-budget-profile-20260717;reuse:reuse-s1-ledger-durability-20260716",
+    "code_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "license_spdx": "NOASSERTION",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "reserve and claim are one append under one BEGIN IMMEDIATE transaction",
+      "settle and complete are one append under one BEGIN IMMEDIATE transaction",
+      "concurrent reservations cannot exceed the immutable scope hard cap",
+      "exact idempotent replay does not consume capacity twice and conflicting replay is zero-write denied",
+      "full BudgetReservation and SettlementReceipt shapes integrity and bindings survive reopen",
+      "legacy malformed ambiguous or unexpected ledger schema fails closed without repair or fabricated budget truth",
+      "runner and downstream failures leave the reservation unmatched and fully counted",
+      "full Stage 1 reference and repository gates"
+    ],
+    "canonical_owner": "bridge-canonical-job-ledger-with-agent0-integration",
+    "rollback": "Before a version-1 ledger exists, revert the scoped implementation commit. After version-1 creation, never run the old unversioned binary; restore a verified pre-change backup or keep version-1-capable code. Synthetic offline databases may be discarded."
+  },
+  "integrity": {
+    "payload_sha256": "5feb123017f8fd36ec3bd4d7822442e5ddf1033620febfa891b2a47c76e47495",
+    "parent_refs": [
+      "git:d75a2ce31764d03ed1472bfa60c7d9fef2fbbea2",
+      "contract:BudgetReservation-v1",
+      "contract:SettlementReceipt-v1",
+      "reuse:reuse-s1-budget-profile-20260717",
+      "reuse:reuse-s1-ledger-durability-20260716"
+    ]
+  }
+}

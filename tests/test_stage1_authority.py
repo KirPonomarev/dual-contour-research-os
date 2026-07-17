@@ -57,6 +57,7 @@ class Stage1AuthorityTests(unittest.TestCase):
             "s1-market-sanitized-count-fixture.json": "owner-private-sanitized-count-sufficient-statistics-no-public-payload",
             "s1-authority-policy-boundary.json": "owned-stdlib-pinned-authority-policy-fail-closed",
             "s1-budget-profile.json": "owned-stdlib-exact-fixed-charge-budget-profile-single-ledger-ready",
+            "s1-budget-attempt-lifecycle.json": "owned-stdlib-single-ledger-embedded-budget-receipts-fixed-charge",
             "s1-pause-epoch-fencing.json": "owned-stdlib-canonical-ledger-sequence-fence",
             "s1-market-ci-reality-loop-prerequisite.json": "existing-real-cli-synthetic-prerequisite-hard-gate-no-runtime-change",
             "s1-market-storage-accounting-portability.json": "owner-local-stdlib-conservative-byte-accounting-no-public-copy",
@@ -132,6 +133,68 @@ class Stage1AuthorityTests(unittest.TestCase):
                     ROOT
                     / "stages"
                     / "s1-budget-profile-authority"
+                    / "ownership-lease.json"
+                ).read_text(),
+            )
+        )
+        self.assertNotIn("/Users/", public_text)
+        self.assertNotIn("/Volumes/", public_text)
+        self.assertTrue(envelope["rollback"])
+        self.assertFalse(lease["delegation_allowed"])
+
+    def test_budget_attempt_lifecycle_authority_is_single_ledger_and_atomic(self) -> None:
+        envelope = load(
+            ROOT
+            / "stages"
+            / "s1-budget-attempt-lifecycle-authority"
+            / "stage-envelope.json"
+        )
+        lease = load(
+            ROOT
+            / "stages"
+            / "s1-budget-attempt-lifecycle-authority"
+            / "ownership-lease.json"
+        )
+        reuse = load(REUSE_RECEIPTS / "s1-budget-attempt-lifecycle.json")
+
+        self.assertEqual(envelope["write_set"], lease["write_set"])
+        worker = envelope["authorized_worker_stage"]
+        self.assertEqual(
+            worker["source_write_set"],
+            [
+                "src/research_bridge/kernel.py",
+                "src/research_bridge/ledger.py",
+                "src/research_bridge/execution.py",
+            ],
+        )
+        self.assertEqual(len(worker["test_write_set"]), 8)
+        ledger = envelope["ledger_contract"]
+        self.assertEqual(ledger["database_user_version"], 1)
+        self.assertEqual(ledger["new_tables"], 0)
+        self.assertEqual(ledger["new_columns"], 0)
+        self.assertEqual(len(ledger["new_unique_expression_indexes"]), 3)
+        self.assertEqual(
+            envelope["budget_contract"]["reservation_location"],
+            "claim.payload.budget_reservation",
+        )
+        self.assertEqual(
+            envelope["budget_contract"]["settlement_location"],
+            "complete.payload.settlement_receipt",
+        )
+        self.assertEqual(reuse["integrity"]["payload_sha256"], payload_sha256(reuse))
+        public_text = "\n".join(
+            (
+                (REUSE_RECEIPTS / "s1-budget-attempt-lifecycle.json").read_text(),
+                (
+                    ROOT
+                    / "stages"
+                    / "s1-budget-attempt-lifecycle-authority"
+                    / "stage-envelope.json"
+                ).read_text(),
+                (
+                    ROOT
+                    / "stages"
+                    / "s1-budget-attempt-lifecycle-authority"
                     / "ownership-lease.json"
                 ).read_text(),
             )

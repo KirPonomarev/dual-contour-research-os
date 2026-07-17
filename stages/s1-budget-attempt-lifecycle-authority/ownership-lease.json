@@ -1,0 +1,19 @@
+{
+  "lease_id": "lease-s1-budget-attempt-lifecycle-authority-agent-0-20260717",
+  "stage_id": "s1-budget-attempt-lifecycle-authority",
+  "agent_id": "agent-0",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-17T12:00:56Z",
+  "expires_at": "2026-07-17T18:00:56Z",
+  "base_sha": "d75a2ce31764d03ed1472bfa60c7d9fef2fbbea2",
+  "branch": "main",
+  "worktree": "canonical-public-worktree",
+  "write_set": [
+    "docs/receipts/reuse/s1-budget-attempt-lifecycle.json",
+    "stages/s1-budget-attempt-lifecycle-authority/stage-envelope.json",
+    "stages/s1-budget-attempt-lifecycle-authority/ownership-lease.json",
+    "tests/test_stage1_authority.py"
+  ],
+  "delegation_allowed": false,
+  "state": "active"
+}
