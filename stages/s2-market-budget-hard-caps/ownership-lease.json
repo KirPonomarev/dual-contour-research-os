@@ -1,0 +1,19 @@
+{
+  "lease_id": "lease-s2-market-budget-hard-caps-agent-3-20260717",
+  "stage_id": "s2-market-budget-hard-caps",
+  "agent_id": "agent-3",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-17T20:13:00Z",
+  "expires_at": "2026-07-18T02:13:00Z",
+  "base_sha": "13f24633c4371dcd47737f62dc667fc6b35b0122",
+  "public_authority_sha": "a849bec5e3c58cbec31c26ca56e097a423a8da0a",
+  "branch": "codex/bridge-a3-s2-market-budget-hard-caps",
+  "worktree": "ephemeral-private-domain-worktree:s2-market-budget-hard-caps",
+  "write_set": [
+    "data/bridge_pre_soak/budget_caps/market_pre_soak_budget_caps_profile.json",
+    "src/market_lab/bridge_pre_soak_budget_caps.py",
+    "tests/test_bridge_pre_soak_budget_caps.py"
+  ],
+  "delegation_allowed": false,
+  "state": "active"
+}

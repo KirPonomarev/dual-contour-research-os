@@ -347,6 +347,31 @@ class Stage2AuthorityTests(unittest.TestCase):
         self.assertIn("worker-needs-network-capture-during-tests-or-validation", public_text)
         self.assertIn("hard-budget-cap-cannot-be-exceeded", public_text)
 
+    def test_market_budget_hard_caps_worker_lease_is_exact_and_receipt_bound(self) -> None:
+        receipt = load(INTEGRATION_RECEIPTS / "s2-market-budget-hard-caps-authority.json")
+        envelope = load(
+            STAGES / "s2-market-budget-hard-caps" / "stage-envelope.json"
+        )
+        lease = load(
+            STAGES / "s2-market-budget-hard-caps" / "ownership-lease.json"
+        )
+
+        self.assertEqual(receipt["schema_id"], "IntegrationReceipt")
+        self.assertEqual(receipt["integrity"]["payload_sha256"], payload_sha256(receipt))
+        self.assertEqual(receipt["payload"]["head_sha"], "a849bec5e3c58cbec31c26ca56e097a423a8da0a")
+        self.assertFalse(receipt["payload"]["audit_results"]["declares_market_pre_soak_green"])
+        self.assertFalse(receipt["payload"]["audit_results"]["public_budget_payload_in_public_repo"])
+        self.assertEqual(envelope["public_authority_sha"], receipt["payload"]["head_sha"])
+        self.assertEqual(envelope["public_authority_ci"], "29609193185")
+        self.assertEqual(envelope["dependency_hashes"]["authority_receipt"], receipt["integrity"]["payload_sha256"])
+        self.assertEqual(envelope["write_set"], lease["write_set"])
+        self.assertFalse(lease["delegation_allowed"])
+        self.assertFalse(envelope["push_authority"])
+        self.assertIn(
+            "budget-verifier-accepts-soft-cap-warn-only-mode-nonfinite-caps-over-cap-planned-usage-private-account-order-live-paper-authority-or-manifest-mismatched-data",
+            envelope["stop_conditions"],
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

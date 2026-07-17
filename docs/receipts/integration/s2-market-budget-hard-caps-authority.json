@@ -1,0 +1,61 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s2-market-budget-hard-caps-authority-20260717",
+  "issued_at": "2026-07-17T20:12:00Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "market",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s2-market-budget-hard-caps-authority",
+    "agent_id": "agent-0",
+    "ownership_lease_ref": "stages/s2-market-budget-hard-caps-authority/ownership-lease.json",
+    "base_sha": "f238fd4fd51730e49e1ae363507bd6af2189cc1f",
+    "head_sha": "a849bec5e3c58cbec31c26ca56e097a423a8da0a",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "docs/receipts/source-freeze/s2-market-budget-hard-caps.json",
+      "docs/receipts/reuse/s2-market-budget-hard-caps.json",
+      "stages/s2-market-budget-hard-caps-authority/stage-envelope.json",
+      "stages/s2-market-budget-hard-caps-authority/ownership-lease.json",
+      "tests/test_stage2_authority.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "focused_stage2_authority_tests": 11,
+      "canonical_tests": 320,
+      "stage0b_tests": 25,
+      "skipped_tests": 0,
+      "diff_check": "green",
+      "privacy_secret_scan": "green",
+      "privacy_secret_scan_notes": "intentional deny-list literals only; no secret material detected",
+      "source_mutation": false,
+      "public_source_mutation": false,
+      "private_source_mutation": false,
+      "dependency_adoption": false,
+      "frozen_contract_edit": false,
+      "selected_private_head_clean": true,
+      "selected_private_head": "13f24633c4371dcd47737f62dc667fc6b35b0122",
+      "authorized_worker_files": 3,
+      "public_budget_payload_in_public_repo": false,
+      "declares_market_pre_soak_green": false,
+      "live_or_connected_authority": false,
+      "exact_head_remote_ci": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29609193185"
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29609193185",
+    "integration_commit_sha": "a849bec5e3c58cbec31c26ca56e097a423a8da0a"
+  },
+  "integrity": {
+    "payload_sha256": "c3a680eaf22186407268f12db6fd32529af4c28754e0a3233ea1355fde408f73",
+    "parent_refs": [
+      "git:a849bec5e3c58cbec31c26ca56e097a423a8da0a",
+      "git:13f24633c4371dcd47737f62dc667fc6b35b0122",
+      "ci:29609193185",
+      "source-freeze:source-freeze-market-s2-budget-hard-caps-20260717",
+      "reuse:reuse-s2-market-budget-hard-caps-20260717"
+    ]
+  }
+}
