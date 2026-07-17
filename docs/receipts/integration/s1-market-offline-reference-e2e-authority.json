@@ -31,6 +31,7 @@
       "skipped_tests": 0,
       "diff_check": "green",
       "privacy_secret_scan": "green",
+      "source_mutation": false,
       "public_source_mutation": false,
       "private_source_mutation": false,
       "dependency_adoption": false,
@@ -53,7 +54,7 @@
     "integration_commit_sha": "e457ac12832e6a684b89fbc20b09155bd27aaef4"
   },
   "integrity": {
-    "payload_sha256": "10b78b8924bb0843c062ddc8f7f40dd2f4be96720c6e6303ec48bcc0bc4cd407",
+    "payload_sha256": "69e681ab93813d0b309682d7508c242467e71a1e1ce32a8f0990fc13dbd62667",
     "parent_refs": [
       "git:e457ac12832e6a684b89fbc20b09155bd27aaef4",
       "git:c4c697ef3dc8532321349917a65e1afb379e0ae2",
