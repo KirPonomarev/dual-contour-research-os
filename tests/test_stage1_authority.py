@@ -162,6 +162,35 @@ class Stage1AuthorityTests(unittest.TestCase):
             envelope["forbidden_scope"],
         )
 
+    def test_budget_profile_worker_amendment_is_two_fixture_files_only(self) -> None:
+        amendment = load(
+            ROOT / "stages" / "s1-budget-profile" / "stage-envelope-amendment-1.json"
+        )
+        lease = load(
+            ROOT
+            / "stages"
+            / "s1-budget-profile"
+            / "ownership-lease-amendment-1.json"
+        )
+        original = load(ROOT / "stages" / "s1-budget-profile" / "stage-envelope.json")
+
+        self.assertEqual(amendment["amends_stage_id"], original["stage_id"])
+        self.assertEqual(
+            amendment["added_write_set"],
+            [
+                "tests/test_stage1_execution_assurance.py",
+                "tests/test_stage1_reference_vertical.py",
+            ],
+        )
+        self.assertEqual(
+            set(lease["write_set"]),
+            set(original["write_set"]) | set(amendment["added_write_set"]),
+        )
+        self.assertEqual(len(lease["write_set"]), 8)
+        self.assertTrue(all(path.startswith("tests/") for path in amendment["added_write_set"]))
+        self.assertFalse(amendment["push_authority"])
+        self.assertFalse(lease["delegation_allowed"])
+
     def test_market_storage_accounting_authority_is_two_file_and_nonweakening(self) -> None:
         envelope = load(
             ROOT

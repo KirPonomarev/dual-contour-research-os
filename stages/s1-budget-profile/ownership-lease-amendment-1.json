@@ -1,0 +1,25 @@
+{
+  "lease_id": "lease-s1-budget-profile-agent-1-amendment-1-20260717",
+  "stage_id": "s1-budget-profile",
+  "amendment_id": "s1-budget-profile-amendment-1",
+  "agent_id": "agent-1",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-17T11:42:04Z",
+  "expires_at": "2026-07-17T17:42:04Z",
+  "base_sha": "48074b1cf4ecc238764b3aa49e83602bcd55369a",
+  "public_authority_sha": "4cc95d80d23e36ffdb20250f6203510299de8faf",
+  "branch": "codex/bridge-a1-s1-budget-profile",
+  "worktree": "ephemeral-public-worktree:s1-budget-profile",
+  "write_set": [
+    "src/research_bridge/admission.py",
+    "src/research_bridge/l0.py",
+    "tests/test_stage1_admission.py",
+    "tests/test_stage1_assurance.py",
+    "tests/test_stage1_authority_policy.py",
+    "tests/test_stage1_l0.py",
+    "tests/test_stage1_execution_assurance.py",
+    "tests/test_stage1_reference_vertical.py"
+  ],
+  "delegation_allowed": false,
+  "state": "active"
+}

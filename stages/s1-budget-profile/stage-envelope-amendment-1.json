@@ -1,0 +1,46 @@
+{
+  "stage_id": "s1-budget-profile-amendment-1",
+  "amends_stage_id": "s1-budget-profile",
+  "agent_id": "agent-1",
+  "objective": "Extend the budget-profile worker write-set by exactly two connected test fixtures that exercise the real kernel and reference vertical with the same newly frozen exact profile.",
+  "executable_blocker": "The authorized admission profile intentionally rejects the old max_input_bytes and claims-only fixture shapes still used by two connected positive modules, so full Stage 1 cannot pass without resealing those synthetic authority documents.",
+  "base_sha": "48074b1cf4ecc238764b3aa49e83602bcd55369a",
+  "public_authority_sha": "4cc95d80d23e36ffdb20250f6203510299de8faf",
+  "public_authority_ci": "29577238175",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a1-s1-budget-profile",
+  "worktree": "ephemeral-public-worktree:s1-budget-profile",
+  "prior_envelope_ref": "stages/s1-budget-profile/stage-envelope.json",
+  "authority_receipt_ref": "docs/receipts/integration/s1-budget-profile-authority.json",
+  "added_write_set": [
+    "tests/test_stage1_execution_assurance.py",
+    "tests/test_stage1_reference_vertical.py"
+  ],
+  "full_write_set_ref": "stages/s1-budget-profile/ownership-lease-amendment-1.json",
+  "preservation_contract": [
+    "all original envelope constraints acceptance commands and stop conditions remain active",
+    "added files receive only synthetic JobSpec resource_limits and Permit quotas profile replacement plus required resealing",
+    "no assertion expected value scenario ordering mutation count ledger call or receipt behavior changes",
+    "the connected L0 execution and D0/D1 reference vertical continue to run through the real admission kernel ledger and execution boundaries",
+    "no source compatibility path default allow or old-profile fallback is introduced"
+  ],
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest tests.test_stage1_admission tests.test_stage1_assurance tests.test_stage1_authority_policy tests.test_stage1_l0 tests.test_stage1_execution_assurance tests.test_stage1_reference_vertical -v",
+    "python3 -m unittest discover -s tests -p 'test_stage1_*.py'",
+    "make test",
+    "git diff --check",
+    "exact eight-file write-set fixture-only amendment assertion skip dependency private-locator network and live-authority scan"
+  ],
+  "stop_conditions": [
+    "added-file-change-exceeds-authority-profile-fixture-replacement-and-resealing",
+    "any-assertion-expected-value-scenario-ordering-ledger-call-or-receipt-behavior-change",
+    "source-write-set-expansion-contract-edit-new-dependency-or-compatibility-fallback-required",
+    "connected-real-kernel-or-reference-vertical-does-not-pass-the-exact-new-profile",
+    "before-equals-after-or-full-Stage1-remains-red"
+  ],
+  "expected_receipt": "docs/receipts/integration/s1-budget-profile-amendment-1.json",
+  "rollback": "Agent 0 discards the worker commit and deletes the isolated branch/worktree. This public test-fixture authority amendment can be reverted independently; no runtime database, domain state or external system is changed.",
+  "commit_authority": "one-scoped-worker-commit",
+  "push_authority": false
+}
