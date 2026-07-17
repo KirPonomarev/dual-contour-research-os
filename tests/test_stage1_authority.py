@@ -453,6 +453,36 @@ class Stage1AuthorityTests(unittest.TestCase):
         self.assertTrue(envelope["rollback"])
         self.assertFalse(lease["delegation_allowed"])
 
+    def test_market_ci_reality_loop_worker_lease_is_exact(self) -> None:
+        envelope = load(
+            ROOT / "stages" / "s1-market-ci-reality-loop" / "stage-envelope.json"
+        )
+        lease = load(
+            ROOT / "stages" / "s1-market-ci-reality-loop" / "ownership-lease.json"
+        )
+
+        self.assertEqual(
+            envelope["base_sha"],
+            "0d188866cbcd8ad86db049fd250d5490bedcc6d5",
+        )
+        self.assertEqual(
+            envelope["public_authority_sha"],
+            "ce91ae309380869ed1d7eea59ddef3980273e162",
+        )
+        self.assertEqual(envelope["public_authority_ci"], "29573139853")
+        self.assertEqual(envelope["write_set"], [".github/workflows/ci.yml"])
+        self.assertEqual(lease["write_set"], envelope["write_set"])
+        self.assertEqual(
+            envelope["dependency_hashes"]["candidate_market_tree"],
+            "776b5124e53a7dbc3b38fed0bef135fc035db74c",
+        )
+        self.assertIn(
+            "skip-xfail-continue-on-error-shell-fallback-conditional-or-validation-bypass",
+            envelope["forbidden_scope"],
+        )
+        self.assertFalse(envelope["push_authority"])
+        self.assertFalse(lease["delegation_allowed"])
+
     def test_auth_policy_authority_is_fail_closed_pinned_and_contract_preserving(self) -> None:
         envelope = load(
             ROOT / "stages" / "s1-auth-policy-authority" / "stage-envelope.json"

@@ -1,0 +1,17 @@
+{
+  "lease_id": "lease-s1-market-ci-reality-loop-agent-5-20260717",
+  "stage_id": "s1-market-ci-reality-loop",
+  "agent_id": "agent-5",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-17T10:21:16Z",
+  "expires_at": "2026-07-17T16:21:16Z",
+  "base_sha": "0d188866cbcd8ad86db049fd250d5490bedcc6d5",
+  "public_authority_sha": "ce91ae309380869ed1d7eea59ddef3980273e162",
+  "branch": "codex/bridge-a5-s1-market-ci-reality-loop",
+  "worktree": "ephemeral-private-domain-worktree:s1-market-ci-reality-loop",
+  "write_set": [
+    ".github/workflows/ci.yml"
+  ],
+  "delegation_allowed": false,
+  "state": "active"
+}

@@ -1,0 +1,80 @@
+{
+  "stage_id": "s1-market-ci-reality-loop",
+  "agent_id": "agent-5",
+  "objective": "Replace one clean-checkout-impossible Market CI command with the existing hard real-CLI prerequisite conformance module and make no other change.",
+  "executable_blocker": "The composed private Market tree is 2933-tests green, but exact CI deterministically stops before pytest because the default reality-loop dry-run requires runtime prerequisite state absent by design from a clean checkout.",
+  "base_sha": "0d188866cbcd8ad86db049fd250d5490bedcc6d5",
+  "public_authority_sha": "ce91ae309380869ed1d7eea59ddef3980273e162",
+  "public_authority_ci": "29573139853",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a5-s1-market-ci-reality-loop",
+  "worktree": "ephemeral-private-domain-worktree:s1-market-ci-reality-loop",
+  "read_set": [
+    "market-domain:candidate-clean-tree@0d188866cbcd8ad86db049fd250d5490bedcc6d5",
+    "market-domain:ci-workflow-and-existing-real-cli-conformance-module",
+    "docs/receipts/reuse/s1-market-ci-reality-loop-prerequisite.json",
+    "docs/receipts/integration/s1-market-ci-reality-loop-authority.json"
+  ],
+  "write_set": [
+    ".github/workflows/ci.yml"
+  ],
+  "preservation_contract": {
+    "required": [
+      "replace only the reality-loop clean-checkout invocation and its display name",
+      "run the existing focused real-CLI prerequisite conformance module as a hard gate",
+      "retain all other workflow triggers permissions actions environments commands and ordering",
+      "retain full-suite pytest as a later independent hard gate",
+      "retain the exact composed Market source and test tree"
+    ],
+    "forbidden": [
+      "runtime test script config lockfile dependency contract or other workflow edit",
+      "skip xfail continue-on-error shell fallback conditional bypass or advisory conversion",
+      "new fixture prerequisite state report ledger dataset private payload or generated artifact",
+      "network external mutation live authority or deployment"
+    ]
+  },
+  "forbidden_scope": [
+    "unlisted-file-or-other-workflow-step-edit",
+    "runtime-test-script-config-lockfile-migration-contract-or-dependency-edit",
+    "assertion-expected-value-fixture-cli-behavior-or-full-pytest-gate-change",
+    "skip-xfail-continue-on-error-shell-fallback-conditional-or-validation-bypass",
+    "runtime-state-report-ledger-dataset-private-path-url-secret-or-d2-d3-payload",
+    "network-download-exchange-order-private-api-or-external-mutation",
+    "live-trading-publication-deployment-or-ui",
+    "dirty-source-checkout-mutation",
+    "push-merge-deploy-or-public-repository-write"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "reuse_decision": "1d83f5486d58c418f54f4589970f97b62f938331473609a3621925b197d66eb1",
+    "authority_receipt": "50b05515fc10a181279d0115fc25a6f5222734d19db276c78f56c0a2d506ea3e",
+    "candidate_market_tree": "776b5124e53a7dbc3b38fed0bef135fc035db74c",
+    "external_dependencies": "none"
+  },
+  "acceptance_commands": [
+    "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src python -m pytest -q -p no:cacheprovider tests/test_paper_reality_loop_cli.py",
+    "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src python -m pytest -q -p no:cacheprovider",
+    "git diff --check",
+    "git status --porcelain=v1 --untracked-files=all",
+    "exact one-file one-step diff plus no skip fallback continue-on-error private-locator network or live-authority scan",
+    "exact-head private remote CI"
+  ],
+  "risk_class": "private-market-one-step-workflow-conformance-repair",
+  "stop_conditions": [
+    "candidate-base-tree-public-authority-or-contract-mismatch",
+    "focused-module-does-not-run-the-real-cli-or-five-tests-do-not-pass",
+    "full-suite-regression-or-new-failure",
+    "other-workflow-step-runtime-test-dependency-or-fixture-change-required",
+    "skip-fallback-continue-on-error-or-validation-weakening-required",
+    "dirty-source-checkout-changed",
+    "before-equals-after-or-exact-ci-blocker-remains"
+  ],
+  "expected_receipt": "docs/receipts/integration/s1-market-ci-reality-loop.json",
+  "rollback": "Agent 0 discards the single workflow-only worker commit and deletes the isolated branch/worktree. The composed Market source and test tree, original dirty checkout, runtime state, scientific artifacts, public Bridge and external systems remain unchanged.",
+  "commit_authority": "one-scoped-worker-commit",
+  "push_authority": false,
+  "expected_handoff_status": [
+    "ready_for_agent0_audit",
+    "blocked_validation_failed"
+  ]
+}
