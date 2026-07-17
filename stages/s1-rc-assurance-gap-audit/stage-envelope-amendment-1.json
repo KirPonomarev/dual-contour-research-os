@@ -1,0 +1,23 @@
+{
+  "stage_id": "s1-rc-assurance-gap-audit-amendment-1",
+  "amends_stage_id": "s1-rc-assurance-gap-audit",
+  "agent_id": "agent-5",
+  "objective": "Pin the read-only assurance audit worktree to the exact green public authority commit.",
+  "base_sha": "1b6551b791c3f4c53fa304e6f7df0a9586504fb8",
+  "public_authority_sha": "1b6551b791c3f4c53fa304e6f7df0a9586504fb8",
+  "public_authority_ci": "29566855819",
+  "branch": "codex/bridge-a5-s1-rc-assurance-gap-audit",
+  "worktree": "ephemeral-public-audit-worktree:s1-rc-assurance-gap-audit",
+  "write_set": [],
+  "preservation_rule": "All read-set, required-output, forbidden-scope, acceptance and stop conditions from the original envelope remain active except that exact HEAD is the green authority commit and no upstream equality is required for the isolated local branch.",
+  "acceptance_commands": [
+    "test exact HEAD equals 1b6551b791c3f4c53fa304e6f7df0a9586504fb8",
+    "git status --porcelain=v1 --untracked-files=all returns empty",
+    "make contracts",
+    "make test",
+    "return read-only assurance audit with no repository diff"
+  ],
+  "rollback": "Delete the clean local audit branch/worktree. No repository or external state is mutated.",
+  "commit_authority": "none-read-only",
+  "push_authority": false
+}
