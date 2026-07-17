@@ -1,0 +1,67 @@
+{
+  "stage_id": "s1-budget-attempt-lifecycle-amendment-2",
+  "amends_stage_id": "s1-budget-attempt-lifecycle",
+  "agent_id": "agent-2",
+  "objective": "Extend the worker write-set by exactly one read-only receipt validator and three connected test modules so the mandatory settlement parent is enforced end to end.",
+  "executable_blocker": "The lifecycle authority requires SettlementReceipt.object_id in ExecutionReceipt parent refs, while the canonical validation boundary rejects every parent chain beyond checkpoint, artifacts and ledger; the original worker write-set cannot close the connected gate.",
+  "base_sha": "19ceba5b67e0cc36964fe817206f73a1bc8747ce",
+  "public_authority_sha": "342d4428281f399f01a8230f63d1c9477b6f3c9a",
+  "public_authority_ci": "29580801409",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a2-s1-budget-attempt-lifecycle",
+  "worktree": "ephemeral-public-worktree:s1-budget-attempt-lifecycle",
+  "prior_envelope_ref": "stages/s1-budget-attempt-lifecycle/stage-envelope.json",
+  "prior_amendment_ref": "stages/s1-budget-attempt-lifecycle/stage-envelope-amendment-1.json",
+  "semantic_authority_receipt_ref": "docs/receipts/integration/s1-budget-attempt-lifecycle-amendment-1.json",
+  "added_write_set": [
+    "src/research_bridge/validation.py",
+    "tests/test_stage1_validation.py",
+    "tests/test_stage1_validation_assurance.py",
+    "tests/test_stage1_reference_vertical.py"
+  ],
+  "full_write_set_ref": "stages/s1-budget-attempt-lifecycle/ownership-lease-amendment-2.json",
+  "compatibility_contract": {
+    "execution_parent_order": [
+      "CheckpointManifest.object_id",
+      "ExecutionReceipt.payload.artifact_refs-in-order",
+      "SettlementReceipt.object_id",
+      "ledger:ExecutionReceipt.payload.event_chain_head"
+    ],
+    "settlement_parent_pattern": "^settlement-receipt-[a-f0-9]{64}$",
+    "validator_policy": "require-exact-new-parent-chain-with-no-optional-legacy-or-reordered-form",
+    "reference_vertical_policy": "exercise-the-real-kernel-ledger-execution-validation-chain-and-assert-the-exact-settlement-parent",
+    "source_change_limit": "validation.py may only recognize and enforce the exact settlement parent between ordered artifact refs and the final ledger parent"
+  },
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "semantic_authority_receipt": "3597f82186339263c3c18700d1c4cca0d7b2760523cc35810b0ae5b4c490d227",
+    "external_dependencies": "none"
+  },
+  "preservation_contract": [
+    "all original envelope and semantic amendment constraints acceptance commands and stop conditions remain active",
+    "added source performs read-only structural and integrity validation and never writes a registry ledger or domain outcome",
+    "all prior invalid missing reordered duplicate forged settlement and ledger parent cases remain fail closed",
+    "no backward-compatible parent shape optional settlement bypass default or fallback is added",
+    "no payload schema contract event table column dependency config workflow or domain source changes"
+  ],
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest tests.test_stage1_admission tests.test_stage1_assurance tests.test_stage1_authority_policy tests.test_stage1_control_assurance tests.test_stage1_execution tests.test_stage1_execution_assurance tests.test_stage1_ledger tests.test_stage1_pause_epoch_fencing tests.test_stage1_validation tests.test_stage1_validation_assurance tests.test_stage1_reference_vertical -v",
+    "python3 -m unittest discover -s tests -p 'test_stage1_*.py'",
+    "make test",
+    "git diff --check",
+    "exact fifteen-file write-set settlement-parent order missing forged reordered duplicate parent negative scan plus contract dependency private-locator network live-authority and weakening scan"
+  ],
+  "stop_conditions": [
+    "added-source-change-exceeds-exact-settlement-parent-validation",
+    "old-parent-shape-or-optional-missing-settlement-remains-accepted",
+    "settlement-parent-can-be-reordered-forged-duplicated-or-detached-from-the-complete-event",
+    "reference-vertical-does-not-exercise-real-budget-lifecycle-and-validation",
+    "write-set-expands-beyond-the-four-added-files-or-contract-dependency-domain-source-config-workflow-edit-is-required",
+    "before-equals-after-or-connected-lifecycle-validation-remains-red"
+  ],
+  "expected_receipt": "docs/receipts/integration/s1-budget-attempt-lifecycle-amendment-2.json",
+  "rollback": "Agent 0 discards the worker commit and reverts this four-file compatibility authority. No runtime database, domain registry, scientific outcome, external system or live authority is changed.",
+  "commit_authority": "one-scoped-worker-commit",
+  "push_authority": false
+}

@@ -291,6 +291,49 @@ class Stage1AuthorityTests(unittest.TestCase):
         self.assertFalse(amendment["push_authority"])
         self.assertFalse(lease["delegation_allowed"])
 
+    def test_budget_attempt_lifecycle_validation_amendment_is_exact_and_fail_closed(self) -> None:
+        original = load(
+            ROOT / "stages" / "s1-budget-attempt-lifecycle" / "stage-envelope.json"
+        )
+        amendment = load(
+            ROOT
+            / "stages"
+            / "s1-budget-attempt-lifecycle"
+            / "stage-envelope-amendment-2.json"
+        )
+        lease = load(
+            ROOT
+            / "stages"
+            / "s1-budget-attempt-lifecycle"
+            / "ownership-lease-amendment-2.json"
+        )
+
+        added = [
+            "src/research_bridge/validation.py",
+            "tests/test_stage1_validation.py",
+            "tests/test_stage1_validation_assurance.py",
+            "tests/test_stage1_reference_vertical.py",
+        ]
+        self.assertEqual(amendment["amends_stage_id"], original["stage_id"])
+        self.assertEqual(amendment["added_write_set"], added)
+        self.assertEqual(lease["write_set"], original["write_set"] + added)
+        self.assertEqual(len(lease["write_set"]), 15)
+        self.assertEqual(
+            amendment["compatibility_contract"]["execution_parent_order"],
+            [
+                "CheckpointManifest.object_id",
+                "ExecutionReceipt.payload.artifact_refs-in-order",
+                "SettlementReceipt.object_id",
+                "ledger:ExecutionReceipt.payload.event_chain_head",
+            ],
+        )
+        self.assertEqual(
+            amendment["compatibility_contract"]["validator_policy"],
+            "require-exact-new-parent-chain-with-no-optional-legacy-or-reordered-form",
+        )
+        self.assertFalse(amendment["push_authority"])
+        self.assertFalse(lease["delegation_allowed"])
+
     def test_budget_profile_worker_lease_is_exact_and_non_expansive(self) -> None:
         envelope = load(ROOT / "stages" / "s1-budget-profile" / "stage-envelope.json")
         lease = load(ROOT / "stages" / "s1-budget-profile" / "ownership-lease.json")
