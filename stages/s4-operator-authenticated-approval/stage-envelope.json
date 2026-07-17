@@ -1,0 +1,21 @@
+{
+  "stage_id": "s4-operator-authenticated-approval",
+  "agent_id": "agent-1",
+  "objective": "Require and issue cryptographically authenticated, exact-bound, short-lived DeploymentApprovalReceipts before durable nonce consumption.",
+  "executable_blocker": "The current consumer accepts any non-empty issuer id/class and therefore does not prove operator authority.",
+  "base_sha": "46d89a26a78a386f6ecf874da6dc301a9612037d",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a1-s4-operator-authenticated-approval",
+  "worktree": "/private/tmp/dcros-s4-operator-approval",
+  "read_set": ["AGENTS.md", "docs/DEVELOPMENT_AGENT_CONTRACT.md", "contracts/v1/DeploymentApprovalReceipt.schema.json", "src/research_bridge/deployment.py", "tests/test_deployment_gate.py"],
+  "write_set": ["src/research_bridge/deployment.py", "tools/issue_deployment_approval.py", "tests/test_deployment_gate.py", "tests/test_deployment_approval_issuer.py"],
+  "forbidden_scope": ["contracts-catalog-config-policy-lock-workflow-migration-or-domain-repository-edit", "key-secret-nonce-value-in-source-test-log-or-receipt", "network-deploy-backup-restore-reboot-rollback-or-READY-claim", "unsigned-approval-acceptance-or-expiry-over-five-minutes"],
+  "dependency_hashes": {"contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50", "reuse_decision": "6c10fe72d31c6612bc537528302521f72a7327768ac4d51fa2438551a999620e", "public_head": "46d89a26a78a386f6ecf874da6dc301a9612037d", "owner_pattern_commit": "6a687bf974fe6a7658a7638f96001cc5b0695960", "external_dependencies": "none"},
+  "acceptance_commands": ["make contracts", "python3 -m unittest tests.test_deployment_gate tests.test_deployment_approval_issuer -v", "make test", "git diff --check", "secret-key-output-network-authority-and-write-set scans"],
+  "risk_class": "operator-deployment-authority-authentication",
+  "stop_conditions": ["base-contract-reuse-or-owner-pattern-mismatch", "valid-MAC-can-be-forged-replayed-or-used-with-different-bindings", "secret-persistence-or-external-action-required", "before-equals-after-or-blocker-remains"],
+  "expected_receipt": "docs/receipts/integration/s4-operator-authenticated-approval.json",
+  "rollback": "Revert worker commit; unsigned approvals remain unusable.",
+  "commit_authority": "worker-a1-audited-commit-only",
+  "push_authority": false
+}

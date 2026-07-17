@@ -1,0 +1,21 @@
+{
+  "stage_id": "s4-rootless-deploy-recovery",
+  "agent_id": "agent-2",
+  "objective": "Implement the bounded exact-image rootless deploy, user-systemd, reboot verification, rollback and redeploy state machine.",
+  "executable_blocker": "The runtime policy is only declarative; no launcher enforces it and no operational reboot or rollback proof exists.",
+  "base_sha": "46d89a26a78a386f6ecf874da6dc301a9612037d",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a2-s4-rootless-deploy-recovery",
+  "worktree": "/private/tmp/dcros-s4-deploy-recovery",
+  "read_set": ["AGENTS.md", "docs/DEVELOPMENT_AGENT_CONTRACT.md", "ops/release/Containerfile", "ops/release/runtime-policy.json", "docs/receipts/release/s4-release-manifest.json", "src/research_bridge/researchd.py"],
+  "write_set": ["tools/pre_soak_deploy.py", "ops/deploy/research-os-bridge.service", "ops/deploy/host-profile.json", "tests/test_release_deploy_recovery.py"],
+  "forbidden_scope": ["contracts-catalog-runtime-source-release-manifest-config-policy-lock-workflow-migration-or-domain-repository-edit", "hardcoded-host-IP-user-private-path-secret-or-D2-D3-payload", "rootful-Docker-public-port-network-enabled-container-or-domain-service-mutation", "automatic-host-reboot-sudo-bypass-backup-delete-approval-issuance-consumption-or-READY-claim"],
+  "dependency_hashes": {"contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50", "reuse_decision": "f5a0ff605cbd10a57ca97570d1ebe9269b801313a9cb455e7d3789116fffc79c", "release_sha": "5c2bd7c090fada6e5b65dc955e80b256d88252de", "image_digest": "36069ee7a9db78af747d7fad65f9e33073824f27be898cdc0b7dd3b77ac5c235", "public_head": "46d89a26a78a386f6ecf874da6dc301a9612037d", "external_dependencies": "existing-ssh-systemd-rootless-Docker-only"},
+  "acceptance_commands": ["make contracts", "python3 -m unittest tests.test_release_deploy_recovery -v", "make test", "git diff --check", "host-locator-secret-network-rootful-destructive-operation-deployment-claim-and-write-set scans"],
+  "risk_class": "rootless-exact-release-deploy-reboot-rollback",
+  "stop_conditions": ["base-contract-reuse-release-image-or-policy-mismatch", "rootless-prerequisite-needs-sudo-without-operator-interaction", "unit-does-not-enforce-every-frozen-runtime-policy-field", "rollback-or-redeploy-is-not-atomic-and-receipted", "external-action-required-during-unit-tests", "before-equals-after-or-blocker-remains"],
+  "expected_receipt": "docs/receipts/integration/s4-rootless-deploy-recovery.json",
+  "rollback": "Stop/remove only the Bridge user unit and restore stopped prior state; preserve state and external backups.",
+  "commit_authority": "worker-a2-audited-commit-only",
+  "push_authority": false
+}

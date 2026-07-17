@@ -1,0 +1,27 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-s4-restic-backup-restore-20260718",
+  "issued_at": "2026-07-17T23:09:36Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-freeze-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "encrypted-off-host-release-and-state-backup-with-read-data-check-clean-restore-and-byte-manifest-proof",
+    "candidates": [
+      {"candidate": "Market-receipt-last-backup-pattern-at-88703d0018528bf4c4258d707ae8a7e0e1c7431a", "disposition": "selected-owned-durability-pattern"},
+      {"candidate": "Security-clean-SQLite-restore-pattern-at-f70d59d24b471a9970cc36a4f12b551c16de6e93", "disposition": "selected-owned-restore-pattern"},
+      {"candidate": "restic-v0.19.0", "disposition": "selected-pinned-BSD-2-Clause-dependency"},
+      {"candidate": "unencrypted-rsync-T7-or-synthetic-rosenc-copy", "disposition": "rejected-noncompliant"}
+    ],
+    "selected_mode": "pinned-restic-0.19.0-password-command-only-backup-check-read-data-clean-restore-canonical-tree-manifest-and-contract-shaped-receipts",
+    "source_ref": "https://github.com/restic/restic/archive/refs/tags/v0.19.0.tar.gz#sha256=800779b6c4c2396971c0567b09ccdd435e03155e1a0ec94e8bbf3d98641a8bc2;homebrew-bottle-arm64-tahoe:sha256:b69c21f735a13de6c74d6a097199fc6e98fd794c48e287a035dbff434bfcae41",
+    "code_sha256": "800779b6c4c2396971c0567b09ccdd435e03155e1a0ec94e8bbf3d98641a8bc2",
+    "license_spdx": "BSD-2-Clause",
+    "license_sha256": "6f08a01a9fab5b24e139a09f15cc24a73087c7bc09e3bacf099fdf2d767bf897",
+    "tests": ["exact restic version and repository identity", "password-command-only with no secret in argv-env-output", "encrypted snapshot plus check-read-data", "nonexistent clean target only", "restored canonical manifest byte equality", "tamper symlink traversal partial restore and wrong snapshot rejection", "BackupReceipt and RestoreReceipt emitted receipt-last"],
+    "canonical_owner": "Agent0-backup-and-recovery",
+    "rollback": "Remove the controller and pinned operational dependency metadata; real repositories and snapshots are never deleted by rollback."
+  },
+  "integrity": {"payload_sha256": "26339cc057eb9248bc65986ef8f11ae4797840925a4f8f95987ac886cefed04d", "parent_refs": ["git:46d89a26a78a386f6ecf874da6dc301a9612037d", "owner-pattern:88703d0018528bf4c4258d707ae8a7e0e1c7431a", "owner-pattern:f70d59d24b471a9970cc36a4f12b551c16de6e93", "dependency:restic@0.19.0"]}
+}

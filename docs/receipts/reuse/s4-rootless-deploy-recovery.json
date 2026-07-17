@@ -1,0 +1,27 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-s4-rootless-deploy-recovery-20260718",
+  "issued_at": "2026-07-17T23:09:36Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-freeze-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "exact-image-rootless-user-systemd-deploy-reboot-proof-rollback-and-redeploy-controller",
+    "candidates": [
+      {"candidate": "Security-durable-vps-deploy-runtime-sync-patterns-b4b79f9-7727fee-d54ffb8", "disposition": "selected-owned-transaction-patterns"},
+      {"candidate": "Market-atomic-deploy-systemd-hardening-patterns-17f84fa-9e84c14-dce235b", "disposition": "selected-owned-service-patterns"},
+      {"candidate": "registry-push-or-Kubernetes", "disposition": "rejected-unnecessary"},
+      {"candidate": "exact-image-archive-SSH-docker-load-rootless-user-systemd", "disposition": "selected-minimal-glue"}
+    ],
+    "selected_mode": "strict-SSH-alias-preflight-content-addressed-archive-stage-rootless-docker-load-exact-inspect-atomic-user-unit-boot-id-proof-none-service-stopped-rollback-and-redeploy",
+    "source_ref": "git:46d89a26a78a386f6ecf874da6dc301a9612037d;owner-patterns:b4b79f9bb0ce59aef768664f7eba4779829c6ce4,7727feef02fb79e1d486bf452b788c1ac476d754,d54ffb8408ced0a1f8a88c552aa26b6071f02c6c,17f84fa27b48e65880d7d4dde15ef8e4004e3ba6,9e84c1434db9d23b6cc93fdb874be94374371cf1,dce235b981a7eb765049754f094557b48133a290",
+    "code_sha256": "2b8a4a0da11c69f9600e31678aacef1b6bf2095416c3ee9a2d59d62ccb42c579",
+    "license_spdx": "Proprietary-Internal-Owned",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": ["strict alias host-key and prerequisite preflight", "archive remote SHA docker-load and exact image inspection", "unit enforces no-network read-only cap-drop resource limits and AF_UNIX", "failed activation atomic rollback", "boot-id change plus exact service image config and pause-state recovery", "executed none-service-stopped rollback and exact redeploy"],
+    "canonical_owner": "Agent0-release-deployment",
+    "rollback": "Stop only the staged Bridge user unit, restore prior stopped state and preserve all state/backups; never alter domain services."
+  },
+  "integrity": {"payload_sha256": "f5a0ff605cbd10a57ca97570d1ebe9269b801313a9cb455e7d3789116fffc79c", "parent_refs": ["git:46d89a26a78a386f6ecf874da6dc301a9612037d", "integration:integration-s4-rootless-release-blueprint-20260718", "owner-pattern:b4b79f9bb0ce59aef768664f7eba4779829c6ce4", "owner-pattern:17f84fa27b48e65880d7d4dde15ef8e4004e3ba6"]}
+}

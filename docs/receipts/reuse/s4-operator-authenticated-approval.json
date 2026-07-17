@@ -1,0 +1,27 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-s4-operator-authenticated-approval-20260718",
+  "issued_at": "2026-07-17T23:09:36Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-freeze-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "cryptographically-authenticated-short-lived-deployment-approval-issuance-and-single-use-consumption",
+    "candidates": [
+      {"candidate": "Security-owner-operator-authority-HMAC-pattern-at-6a687bf974fe6a7658a7638f96001cc5b0695960", "disposition": "selected-owned-design-pattern"},
+      {"candidate": "existing-DeploymentApprovalReceipt-contract-and-durable-consumer", "disposition": "selected-existing-boundary"},
+      {"candidate": "new-PKI-KMS-or-network-signing-service", "disposition": "rejected-unnecessary-for-single-operator-MVP"},
+      {"candidate": "unsigned-nonempty-issuer-string", "disposition": "rejected-current-authentication-gap"}
+    ],
+    "selected_mode": "domain-separated-HMAC-SHA256-over-exact-receipt-material-with-key-id-exact-issuer-five-minute-maximum-expiry-and-existing-durable-nonce-consumption",
+    "source_ref": "git:46d89a26a78a386f6ecf874da6dc301a9612037d;owner-pattern:6a687bf974fe6a7658a7638f96001cc5b0695960",
+    "code_sha256": "af9eaee8a3452379cfd602abe24d185650018fc04ca35d80a2b91e6fa6008e84",
+    "license_spdx": "Proprietary-Internal-Owned",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": ["valid exact operator MAC accepted", "missing wrong duplicate or malformed MAC rejected", "issuer key-id purpose expiry and parent chain bound", "nonce replay remains atomically denied", "key and nonce never printed or persisted in public artifacts"],
+    "canonical_owner": "Agent0-deployment-authority",
+    "rollback": "Revert issuer/verifier adaptation and tests; existing unsigned approvals remain rejected and no external system is mutated."
+  },
+  "integrity": {"payload_sha256": "6c10fe72d31c6612bc537528302521f72a7327768ac4d51fa2438551a999620e", "parent_refs": ["git:46d89a26a78a386f6ecf874da6dc301a9612037d", "integration:integration-s4-deployment-approval-consumer-20260718", "owner-pattern:6a687bf974fe6a7658a7638f96001cc5b0695960"]}
+}

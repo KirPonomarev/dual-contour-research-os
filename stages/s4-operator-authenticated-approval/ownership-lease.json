@@ -1,0 +1,14 @@
+{
+  "lease_id": "lease-s4-operator-authenticated-approval-a1-20260718",
+  "stage_id": "s4-operator-authenticated-approval",
+  "agent_id": "agent-1",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-17T23:09:36Z",
+  "expires_at": "2026-07-18T05:09:36Z",
+  "base_sha": "46d89a26a78a386f6ecf874da6dc301a9612037d",
+  "branch": "codex/bridge-a1-s4-operator-authenticated-approval",
+  "worktree": "/private/tmp/dcros-s4-operator-approval",
+  "write_set": ["src/research_bridge/deployment.py", "tools/issue_deployment_approval.py", "tests/test_deployment_gate.py", "tests/test_deployment_approval_issuer.py"],
+  "delegation_allowed": false,
+  "state": "active"
+}

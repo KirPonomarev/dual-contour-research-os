@@ -1,0 +1,21 @@
+{
+  "stage_id": "s4-restic-backup-restore",
+  "agent_id": "agent-5",
+  "objective": "Implement a fail-closed restic controller that produces real encrypted BackupReceipt and clean RestoreReceipt evidence.",
+  "executable_blocker": "No compliant encrypted off-host backup destination, restic controller, real BackupReceipt, or clean RestoreReceipt exists.",
+  "base_sha": "46d89a26a78a386f6ecf874da6dc301a9612037d",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a5-s4-restic-backup-restore",
+  "worktree": "/private/tmp/dcros-s4-restic-backup",
+  "read_set": ["AGENTS.md", "docs/DEVELOPMENT_AGENT_CONTRACT.md", "contracts/v1/BackupReceipt.schema.json", "contracts/v1/RestoreReceipt.schema.json", "docs/receipts/release/s4-release-manifest.json"],
+  "write_set": ["tools/release_backup_restore.py", "tests/test_release_backup_restore.py", "THIRD_PARTY_NOTICES.md", "LICENSES/restic-BSD-2-Clause.txt", "third_party/manifest.yaml", "provenance/restic-0.19.0.json", "docs/receipts/release/restic-tool-sbom.spdx.json"],
+  "forbidden_scope": ["contracts-catalog-runtime-source-config-policy-lock-workflow-migration-or-domain-repository-edit", "secret-password-repository-locator-private-path-or-D2-D3-data-in-public-output", "repository-snapshot-delete-forget-prune-or-destructive-restore", "network-host-deploy-reboot-rollback-approval-consumption-or-READY-claim"],
+  "dependency_hashes": {"contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50", "reuse_decision": "26339cc057eb9248bc65986ef8f11ae4797840925a4f8f95987ac886cefed04d", "restic_source": "800779b6c4c2396971c0567b09ccdd435e03155e1a0ec94e8bbf3d98641a8bc2", "restic_bottle": "b69c21f735a13de6c74d6a097199fc6e98fd794c48e287a035dbff434bfcae41", "restic_license": "6f08a01a9fab5b24e139a09f15cc24a73087c7bc09e3bacf099fdf2d767bf897", "public_head": "46d89a26a78a386f6ecf874da6dc301a9612037d"},
+  "acceptance_commands": ["make contracts", "python3 -m unittest tests.test_release_backup_restore -v", "make test", "git diff --check", "secret-locator-destructive-operation-dependency-and-write-set scans"],
+  "risk_class": "encrypted-off-host-backup-clean-restore",
+  "stop_conditions": ["base-contract-reuse-or-restic-provenance-mismatch", "secret-or-private-locator-enters-public-artifact", "clean-restore-manifest-equality-or-check-read-data-not-proven", "destructive-repository-operation-or-external-host-action-required", "before-equals-after-or-blocker-remains"],
+  "expected_receipt": "docs/receipts/integration/s4-restic-backup-restore.json",
+  "rollback": "Revert controller and metadata only; never delete an external repository or snapshot.",
+  "commit_authority": "worker-a5-audited-commit-only",
+  "push_authority": false
+}

@@ -1,0 +1,14 @@
+{
+  "lease_id": "lease-s4-rootless-deploy-recovery-a2-20260718",
+  "stage_id": "s4-rootless-deploy-recovery",
+  "agent_id": "agent-2",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-17T23:09:36Z",
+  "expires_at": "2026-07-18T05:09:36Z",
+  "base_sha": "46d89a26a78a386f6ecf874da6dc301a9612037d",
+  "branch": "codex/bridge-a2-s4-rootless-deploy-recovery",
+  "worktree": "/private/tmp/dcros-s4-deploy-recovery",
+  "write_set": ["tools/pre_soak_deploy.py", "ops/deploy/research-os-bridge.service", "ops/deploy/host-profile.json", "tests/test_release_deploy_recovery.py"],
+  "delegation_allowed": false,
+  "state": "active"
+}
