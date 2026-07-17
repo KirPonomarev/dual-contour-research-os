@@ -1,0 +1,14 @@
+{
+  "lease_id": "lease-s4-frozen-soak-capsule-a1-20260718",
+  "stage_id": "s4-frozen-soak-capsule",
+  "agent_id": "agent-1",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-17T23:34:00Z",
+  "expires_at": "2026-07-18T05:34:00Z",
+  "base_sha": "287bace2500a6c9fcbf59a3a9b546b1ac51f77b6",
+  "branch": "codex/bridge-a1-s4-frozen-soak-capsule",
+  "worktree": "/private/tmp/dcros-s4-soak-capsule",
+  "write_set": ["tools/build_pre_soak_capsule.py", "tools/issue_l0_job_bundle.py", "tests/test_pre_soak_capsule.py", "tests/test_l0_job_bundle_issuer.py"],
+  "delegation_allowed": false,
+  "state": "active"
+}

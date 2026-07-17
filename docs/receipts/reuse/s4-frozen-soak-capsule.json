@@ -1,0 +1,27 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-s4-frozen-soak-capsule-20260718",
+  "issued_at": "2026-07-17T23:34:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-freeze-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "functional-sanitized-frozen-pre-soak-runtime-capsule-and-short-lived-l0-job-bundle-issuance",
+    "candidates": [
+      {"candidate": "existing-PinnedOfflineAuthority-researchd-config-parser-CAS-L0-and-researchctl-boundaries-at-287bace2500a6c9fcbf59a3a9b546b1ac51f77b6", "disposition": "selected-internal-adapters"},
+      {"candidate": "existing-public-reference-vertical-authority-shape-tests", "disposition": "selected-shape-oracle-only"},
+      {"candidate": "private-Market-or-Security-domain-adapter-copy", "disposition": "rejected-domain-ownership-boundary"},
+      {"candidate": "new-scheduler-signing-service-or-third-party-package", "disposition": "rejected-unnecessary-for-frozen-L0-soak"}
+    ],
+    "selected_mode": "stdlib-only-owner-local-builder-using-existing-authority-CAS-and-L0-contracts-with-caller-supplied-D0-D1-inputs-nonempty-pinned-policy-resume-approval-and-five-minute-attempt-bundles",
+    "source_ref": "git:287bace2500a6c9fcbf59a3a9b546b1ac51f77b6;internal-tree:src/research_bridge/{authority,admission,cas,l0,researchd,researchctl}.py",
+    "code_sha256": "52245151672585ffb1c031006de4f7e4f8487de05455bf9985438c37ae231b31",
+    "license_spdx": "Proprietary-Internal-Owned",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": ["capsule contains exact owner-only config and nonempty active policy and resume authority", "caller-supplied market and security D0-D1 bytes enter CAS without entering public output", "capsule manifest binds release image config policy inputs and every file byte", "job permit and lease satisfy existing admission and L0 boundaries", "issuer contour input image policy idempotency quota and five-minute lifetime are exact", "private classifications paths secrets malformed time windows and overwrite attempts fail closed"],
+    "canonical_owner": "Agent0-release-capsule-with-Agent1-control-plane-implementation",
+    "rollback": "Revert builder and tests; the empty blueprint remains explicitly non-ready and no runtime or external host is mutated."
+  },
+  "integrity": {"payload_sha256": "3c0c92b940efdec1b7a875740f2a3f88d0afaae85ea5eee91481edbe96876ae1", "parent_refs": ["git:287bace2500a6c9fcbf59a3a9b546b1ac51f77b6", "integration:integration-s4-operator-authenticated-approval-20260718", "integration:integration-s1-researchd-service-entrypoint-20260717", "integration:integration-s1-reference-vertical-20260717"]}
+}

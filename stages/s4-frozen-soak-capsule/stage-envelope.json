@@ -1,0 +1,21 @@
+{
+  "stage_id": "s4-frozen-soak-capsule",
+  "agent_id": "agent-1",
+  "objective": "Build a functional sanitized frozen runtime capsule and exact short-lived L0 authority bundles without contacting a runtime or domain system.",
+  "executable_blocker": "The frozen release currently binds an empty authority resolver config and cannot admit even one soak workload.",
+  "base_sha": "287bace2500a6c9fcbf59a3a9b546b1ac51f77b6",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a1-s4-frozen-soak-capsule",
+  "worktree": "/private/tmp/dcros-s4-soak-capsule",
+  "read_set": ["AGENTS.md", "docs/DEVELOPMENT_AGENT_CONTRACT.md", "contracts/v1/JobSpec.schema.json", "contracts/v1/Permit.schema.json", "contracts/v1/AttemptLease.schema.json", "src/research_bridge/authority.py", "src/research_bridge/admission.py", "src/research_bridge/cas.py", "src/research_bridge/l0.py", "src/research_bridge/researchd.py", "src/research_bridge/researchctl.py", "docs/receipts/release/s4-release-manifest.json"],
+  "write_set": ["tools/build_pre_soak_capsule.py", "tools/issue_l0_job_bundle.py", "tests/test_pre_soak_capsule.py", "tests/test_l0_job_bundle_issuer.py"],
+  "forbidden_scope": ["contracts-src-root-config-policy-release-manifest-lock-workflow-migration-or-domain-repository-edit", "D2-D3-payload-domain-scientific-truth-private-path-host-locator-secret-key-or-account-material", "network-host-deploy-backup-restore-reboot-rollback-or-READY-claim", "job-or-permit-execution-domain-registry-write-or-authority-beyond-frozen-offline-L0", "empty-policy-resolver-lease-over-five-minutes-overwrite-or-unbound-output"],
+  "dependency_hashes": {"contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50", "reuse_decision": "3c0c92b940efdec1b7a875740f2a3f88d0afaae85ea5eee91481edbe96876ae1", "public_head": "287bace2500a6c9fcbf59a3a9b546b1ac51f77b6", "internal_boundary_tree": "52245151672585ffb1c031006de4f7e4f8487de05455bf9985438c37ae231b31", "l0_template_sha256": "53e75c79888c60b304c0e7e5392a53c0ef508146dfd51c5dcb195a648a54f0c6", "external_dependencies": "none"},
+  "acceptance_commands": ["make contracts", "python3 -m unittest tests.test_pre_soak_capsule tests.test_l0_job_bundle_issuer -v", "make test", "git diff --check", "private-data-secret-path-network-authority-overwrite-lifetime-and-write-set scans"],
+  "risk_class": "functional-frozen-soak-authority-capsule",
+  "stop_conditions": ["base-contract-reuse-or-L0-template-mismatch", "generated-config-is-empty-inactive-or-not-accepted-by-exact-researchd-parser", "job-bundle-fails-existing-admission-or-L0-validation", "private-data-path-secret-or-external-action-required", "before-equals-after-or-blocker-remains"],
+  "expected_receipt": "docs/receipts/integration/s4-frozen-soak-capsule.json",
+  "rollback": "Revert worker commit and generated local capsules; no external runtime has been touched.",
+  "commit_authority": "worker-a1-audited-commit-only",
+  "push_authority": false
+}
