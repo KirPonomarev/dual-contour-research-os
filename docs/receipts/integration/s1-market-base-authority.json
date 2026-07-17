@@ -1,0 +1,55 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s1-market-base-authority-20260717",
+  "issued_at": "2026-07-17T05:54:23Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "bridge",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s1-market-base-authority",
+    "agent_id": "agent-0",
+    "ownership_lease_ref": "stages/s1-market-base-authority/ownership-lease.json",
+    "base_sha": "653bee1ade357efa045610ef60f649ba6fa0537f",
+    "head_sha": "45dadb85f24b7d33d7c4782ee835d401584e5f45",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "docs/receipts/reuse/s1-market-base-repair.json",
+      "docs/receipts/source-freeze/s1-market-base-repair.json",
+      "stages/s1-market-base-authority/ownership-lease.json",
+      "stages/s1-market-base-authority/stage-envelope.json",
+      "tests/test_stage1_authority.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "focused_tests": 9,
+      "connected_tests": 203,
+      "stage0b_tests": 25,
+      "skipped_tests": 0,
+      "diff_check": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "dependency_adoption": false,
+      "private_source_code_copied": false,
+      "market_source_head_matches_upstream": true,
+      "dirty_source_entries_selected": 0,
+      "validation_weakening_authorized": false,
+      "live_or_trading_authority": false,
+      "selected_mode": "pinned-private-domain-ci-repair-no-public-code-copy"
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29558530109",
+    "integration_commit_sha": "45dadb85f24b7d33d7c4782ee835d401584e5f45"
+  },
+  "integrity": {
+    "payload_sha256": "8a795bba07e6278976111b638c135a628a5e9b79d4066cbd718def326f8defcb",
+    "parent_refs": [
+      "git:45dadb85f24b7d33d7c4782ee835d401584e5f45",
+      "ci:29558530109",
+      "source-freeze:source-freeze-market-s1-base-repair-20260717",
+      "reuse:reuse-s1-market-base-repair-20260717"
+    ]
+  }
+}
