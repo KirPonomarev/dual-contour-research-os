@@ -1,0 +1,24 @@
+{
+  "lease_id": "lease-s1-security-offline-reference-e2e-agent-4-amendment-2-20260717",
+  "stage_id": "s1-security-offline-reference-e2e",
+  "amendment_id": "s1-security-offline-reference-e2e-amendment-2",
+  "agent_id": "agent-4",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-17T18:33:00Z",
+  "expires_at": "2026-07-18T00:33:00Z",
+  "base_sha": "1f0b9deaa84c2feba6f361e3684ff858a65b3d10",
+  "public_authority_sha": "131c537660c65d441b21c9f657ffc0260aa2d410",
+  "branch": "codex/bridge-a4-s1-security-offline-reference-e2e",
+  "worktree": "ephemeral-private-domain-worktree:s1-security-offline-reference-e2e",
+  "write_set": [
+    "tools/security_bridge_reference_adapter.py",
+    "tools/security_bridge_reference_registry.py",
+    "tests/test_security_bridge_reference_adapter.py",
+    "tests/test_security_bridge_reference_e2e.py",
+    "research-os/evolution/active-core-inventory-v1.json",
+    "tests/test_core_doctor.py",
+    "tests/test_crypto_kb_adapter_probe.py"
+  ],
+  "delegation_allowed": false,
+  "state": "active"
+}

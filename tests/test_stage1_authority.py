@@ -1034,6 +1034,48 @@ class Stage1AuthorityTests(unittest.TestCase):
         self.assertNotIn("programs/max/", public_text)
         self.assertNotIn("programs/ozon/", public_text)
 
+    def test_security_offline_reference_e2e_validation_amendment_is_exact_and_sanitized(self) -> None:
+        original = load(
+            ROOT
+            / "stages"
+            / "s1-security-offline-reference-e2e"
+            / "stage-envelope.json"
+        )
+        amendment = load(
+            ROOT
+            / "stages"
+            / "s1-security-offline-reference-e2e"
+            / "stage-envelope-amendment-2.json"
+        )
+        lease = load(
+            ROOT
+            / "stages"
+            / "s1-security-offline-reference-e2e"
+            / "ownership-lease-amendment-2.json"
+        )
+
+        added = [
+            "research-os/evolution/active-core-inventory-v1.json",
+            "tests/test_core_doctor.py",
+            "tests/test_crypto_kb_adapter_probe.py",
+        ]
+        self.assertEqual(amendment["amends_stage_id"], original["stage_id"])
+        self.assertEqual(amendment["added_write_set"], added)
+        self.assertEqual(lease["write_set"], original["write_set"] + added)
+        self.assertFalse(amendment["push_authority"])
+        self.assertFalse(lease["delegation_allowed"])
+        self.assertTrue(
+            any("no-unclassified" in item for item in amendment["preservation_contract"])
+        )
+        self.assertTrue(
+            any("incomplete real inventory" in item for item in amendment["stop_conditions"])
+        )
+        public_text = json.dumps([amendment, lease], sort_keys=True)
+        self.assertNotIn("/Users/", public_text)
+        self.assertNotIn("/Volumes/", public_text)
+        self.assertNotIn("programs/max/", public_text)
+        self.assertNotIn("programs/ozon/", public_text)
+
     def test_market_base_authority_refresh_is_sanitized_pinned_and_reversible(self) -> None:
         envelope = load(ROOT / "stages" / "s1-market-base-authority" / "stage-envelope.json")
         lease = load(ROOT / "stages" / "s1-market-base-authority" / "ownership-lease.json")
