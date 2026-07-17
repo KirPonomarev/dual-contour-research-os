@@ -1,0 +1,60 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s4-operator-authenticated-approval-20260718",
+  "issued_at": "2026-07-17T23:31:30Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s4-operator-authenticated-approval",
+    "agent_id": "agent-1",
+    "ownership_lease_ref": "stages/s4-operator-authenticated-approval/ownership-lease.json",
+    "base_sha": "46d89a26a78a386f6ecf874da6dc301a9612037d",
+    "head_sha": "21e049022010e6ec5d96628a84d965fc363b4402",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "src/research_bridge/deployment.py",
+      "tools/issue_deployment_approval.py",
+      "tests/test_deployment_gate.py",
+      "tests/test_deployment_approval_issuer.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "focused_test_count": 21,
+      "full_core_test_count": 385,
+      "full_inventory_test_count": 25,
+      "worker_commit_sha": "f3233995b67087c3bcb3ca8e719853af93296e6b",
+      "worker_base_exact": true,
+      "worker_write_set_exact": true,
+      "domain_separated_hmac_sha256": true,
+      "complete_receipt_and_parent_binding": true,
+      "trusted_issuer_id_exact": true,
+      "trusted_key_id_exact": true,
+      "maximum_approval_lifetime_seconds": 300,
+      "unsigned_malformed_wrong_key_wrong_issuer_and_tamper_rejected": true,
+      "durable_nonce_replay_denied": true,
+      "issuer_key_via_file_descriptor": true,
+      "key_or_nonce_logged_or_persisted": false,
+      "external_action_performed": false,
+      "deployment_approval_issued": false,
+      "deployment_approval_consumed": false,
+      "declares_ready_for_72h_soak": false,
+      "next_stage": "s4-functional-frozen-soak-capsule"
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29620892305",
+    "integration_commit_sha": "21e049022010e6ec5d96628a84d965fc363b4402"
+  },
+  "integrity": {
+    "payload_sha256": "9f3316ae9955f474c6a31cdcbb188f6296a8c64e42ac7ba0aeddb5b1b734ce7d",
+    "parent_refs": [
+      "git:21e049022010e6ec5d96628a84d965fc363b4402",
+      "git:f3233995b67087c3bcb3ca8e719853af93296e6b",
+      "ci:29620892305",
+      "integration:integration-s4-deployment-approval-consumer-20260718",
+      "reuse:reuse-s4-operator-authenticated-approval-20260718"
+    ]
+  }
+}
