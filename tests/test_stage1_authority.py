@@ -334,6 +334,38 @@ class Stage1AuthorityTests(unittest.TestCase):
         self.assertFalse(amendment["push_authority"])
         self.assertFalse(lease["delegation_allowed"])
 
+    def test_budget_attempt_lifecycle_replay_projection_correction_is_complete(self) -> None:
+        amendment = load(
+            ROOT
+            / "stages"
+            / "s1-budget-attempt-lifecycle"
+            / "stage-envelope-amendment-3.json"
+        )
+        lease = load(
+            ROOT
+            / "stages"
+            / "s1-budget-attempt-lifecycle"
+            / "ownership-lease-amendment-3.json"
+        )
+        projection = amendment["semantic_correction"]["exact_caller_projection"]
+
+        self.assertEqual(len(projection), 19)
+        self.assertEqual(projection[-2:], ["contour", "classification"])
+        self.assertEqual(len(projection), len(set(projection)))
+        self.assertEqual(amendment["write_set_expansion"], [])
+        self.assertEqual(len(lease["write_set"]), 15)
+        assurance_limit = amendment["validator_assurance_limit"]
+        self.assertIn(
+            "syntactically-valid-settlement-object-id",
+            assurance_limit["not_proven"],
+        )
+        self.assertIn(
+            "versioned-contract-and-interface-change",
+            assurance_limit["future_authority_required"],
+        )
+        self.assertFalse(amendment["push_authority"])
+        self.assertFalse(lease["delegation_allowed"])
+
     def test_budget_profile_worker_lease_is_exact_and_non_expansive(self) -> None:
         envelope = load(ROOT / "stages" / "s1-budget-profile" / "stage-envelope.json")
         lease = load(ROOT / "stages" / "s1-budget-profile" / "ownership-lease.json")

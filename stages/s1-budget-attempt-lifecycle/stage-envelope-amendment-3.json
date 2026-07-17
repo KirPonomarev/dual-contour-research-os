@@ -1,0 +1,85 @@
+{
+  "stage_id": "s1-budget-attempt-lifecycle-amendment-3",
+  "amends_stage_id": "s1-budget-attempt-lifecycle",
+  "agent_id": "agent-2",
+  "objective": "Correct the exact replay projection to include the two outer authority bindings contour and classification, with no write-set or capability expansion.",
+  "executable_blocker": "The first semantic amendment says no caller authority field may be ignored but its enumerated replay projection accidentally omits contour and classification, allowing authority text to diverge from the required fail-closed implementation.",
+  "base_sha": "19ceba5b67e0cc36964fe817206f73a1bc8747ce",
+  "public_authority_sha": "a238fa9c97062263154d63aa6271d7ab10488050",
+  "public_authority_ci": "29581768997",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a2-s1-budget-attempt-lifecycle",
+  "worktree": "ephemeral-public-worktree:s1-budget-attempt-lifecycle",
+  "prior_envelope_ref": "stages/s1-budget-attempt-lifecycle/stage-envelope.json",
+  "prior_semantic_amendment_ref": "stages/s1-budget-attempt-lifecycle/stage-envelope-amendment-1.json",
+  "prior_validation_amendment_ref": "stages/s1-budget-attempt-lifecycle/stage-envelope-amendment-2.json",
+  "write_set_expansion": [],
+  "full_write_set_ref": "stages/s1-budget-attempt-lifecycle/ownership-lease-amendment-3.json",
+  "semantic_correction": {
+    "supersedes": "stage-envelope-amendment-1.semantic_freeze.replay.exact_caller_projection",
+    "exact_caller_projection": [
+      "job_id",
+      "attempt_id",
+      "permit_id",
+      "permit_nonce_sha256",
+      "runner_identity",
+      "fencing_epoch",
+      "fencing_token_sha256",
+      "admitted_at",
+      "admission_digest",
+      "provider",
+      "accounting_policy_ref",
+      "budget_scope_ref",
+      "trial_ref",
+      "reserved_cost_units",
+      "scope_cost_units",
+      "reservation_expires_at",
+      "idempotency_key",
+      "contour",
+      "classification"
+    ],
+    "result": "any-change-to-any-of-the-nineteen-bindings-rejects-with-zero-write; exact-match-returns-the-original-claim-event"
+  },
+  "validator_assurance_limit": {
+    "supersedes": "stage-envelope-amendment-2.stop_conditions.settlement-parent-can-be-forged-duplicated-or-detached-from-the-complete-event",
+    "producer_boundary": "execution-must-derive-and-bind-the-exact-settlement-object-id-from-the-returned-validated-complete-event",
+    "standalone_validation_boundary": "enforce-exact-parent-count-order-and-settlement-receipt-64hex-pattern-and-reject-missing-reordered-duplicate-or-malformed-refs",
+    "not_proven": "standalone-detection-of-substitution-by-another-syntactically-valid-settlement-object-id",
+    "reason": "the-frozen-ExecutionReceipt-payload-does-not-carry-settlement-ref-and-the-standalone-validator-does-not-receive-the-complete-event-or-SettlementReceipt",
+    "future_authority_required": "versioned-contract-and-interface-change-with-migration-and-conformance-tests"
+  },
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "semantic_authority_receipt": "3597f82186339263c3c18700d1c4cca0d7b2760523cc35810b0ae5b4c490d227",
+    "validation_authority_receipt": "fbf03d9892d4a00776fb2ef42cba185ed745329f75cc2c93424ebfd70247e7ff",
+    "external_dependencies": "none"
+  },
+  "preservation_contract": [
+    "all original envelope and prior amendment constraints acceptance commands and stop conditions remain active",
+    "the full worker write-set remains exactly fifteen files",
+    "no replay compatibility fallback optional authority binding or default is added",
+    "no claim is made that standalone validation cryptographically links an unavailable SettlementReceipt",
+    "no contract dependency event schema table column index configuration workflow or domain source changes"
+  ],
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest tests.test_stage1_ledger tests.test_stage1_execution tests.test_stage1_execution_assurance tests.test_stage1_reference_vertical tests.test_stage1_validation tests.test_stage1_validation_assurance -v",
+    "python3 -m unittest discover -s tests -p 'test_stage1_*.py'",
+    "make test",
+    "git diff --check",
+    "exact fifteen-file write-set nineteen-field replay mutation matrix plus contract dependency private-locator network live-authority and weakening scan"
+  ],
+  "stop_conditions": [
+    "contour-or-classification-change-is-accepted-as-exact-replay",
+    "any-of-the-nineteen-caller-bindings-is-omitted-defaulted-or-normalized-across-a-conflict",
+    "producer-execution-does-not-bind-the-exact-settlement-object-returned-by-the-complete-event",
+    "standalone-validation-accepts-a-missing-reordered-duplicate-or-malformed-settlement-parent",
+    "worker-claims-standalone-valid-pattern-substitution-detection-without-a-versioned-contract-change",
+    "write-set-contract-dependency-event-schema-or-capability-expands",
+    "before-equals-after-or-exact-replay-authority-remains-ambiguous"
+  ],
+  "expected_receipt": "docs/receipts/integration/s1-budget-attempt-lifecycle-amendment-3.json",
+  "rollback": "Agent 0 discards the worker commit and reverts this replay projection correction. No runtime database, domain state, external system or live authority is changed.",
+  "commit_authority": "one-scoped-worker-commit",
+  "push_authority": false
+}
