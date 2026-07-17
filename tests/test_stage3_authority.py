@@ -10,6 +10,7 @@ REUSE = ROOT / "docs" / "receipts" / "reuse" / "s3-security-ingestion-safe-map.j
 STAGE = ROOT / "stages" / "s3-security-ingestion-safe-map-authority"
 WORKER_STAGE = ROOT / "stages" / "s3-security-ingestion-safe-map"
 AUTHORITY_RECEIPT = ROOT / "docs" / "receipts" / "integration" / "s3-security-ingestion-safe-map-authority.json"
+WORKER_RECEIPT = ROOT / "docs" / "receipts" / "integration" / "s3-security-ingestion-safe-map.json"
 
 
 def load(path: Path) -> dict:
@@ -81,6 +82,34 @@ class Stage3AuthorityTests(unittest.TestCase):
         self.assertEqual(envelope["write_set"], lease["write_set"])
         self.assertFalse(envelope["push_authority"])
         self.assertFalse(lease["delegation_allowed"])
+
+    def test_worker_receipt_proves_ingestion_and_safe_map_without_expansion(self) -> None:
+        receipt = load(WORKER_RECEIPT)
+        self.assertEqual(receipt["integrity"]["payload_sha256"], payload_sha256(receipt))
+        self.assertEqual(receipt["payload"]["head_sha"], "b86de273bc1fd5b1816b4fb31b7ab45a1c652e07")
+        audit = receipt["payload"]["audit_results"]
+        self.assertEqual(audit["focused_stage3_intake_tests"], 16)
+        self.assertEqual(audit["bounded_stage1_stage3_regression_tests"], 22)
+        self.assertEqual(audit["safe_map_entry_count"], 3)
+        self.assertEqual(audit["safe_map_ready_count"], 2)
+        self.assertEqual(audit["safe_map_quarantine_count"], 1)
+        self.assertEqual(audit["red_atoms_eligible_for_live_action"], 0)
+        self.assertEqual(audit["red_atoms_eligible_for_hypothesis"], 0)
+        self.assertEqual(audit["network_calls"], 0)
+        self.assertEqual(audit["registry_writes"], 0)
+        self.assertEqual(audit["cross_contour_reads"], 0)
+        self.assertTrue(audit["exact_replay_deterministic"])
+        self.assertTrue(audit["completes_stage3_public_source_ingestion"])
+        self.assertTrue(audit["completes_stage3_safe_map"])
+        self.assertFalse(audit["scientific_outcome_applied"])
+        self.assertFalse(audit["public_source_body_or_safe_map_payload_in_public_repo"])
+        self.assertFalse(audit["declares_dual_contour_pre_soak_green"])
+        self.assertFalse(audit["live_or_connected_authority"])
+
+        text = WORKER_RECEIPT.read_text()
+        self.assertNotIn("Every protected object operation", text)
+        self.assertNotIn("/Users/", text)
+        self.assertNotIn("/Volumes/", text)
 
 
 if __name__ == "__main__":
