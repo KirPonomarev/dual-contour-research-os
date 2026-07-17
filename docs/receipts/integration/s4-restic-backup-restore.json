@@ -1,0 +1,70 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s4-restic-backup-restore-20260718",
+  "issued_at": "2026-07-17T23:54:19Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s4-restic-backup-restore",
+    "agent_id": "agent-5",
+    "ownership_lease_ref": "stages/s4-restic-backup-restore/ownership-lease.json",
+    "base_sha": "46d89a26a78a386f6ecf874da6dc301a9612037d",
+    "head_sha": "4ba4d34790e800ce660020644bc47947fb27ffce",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "tools/release_backup_restore.py",
+      "tests/test_release_backup_restore.py",
+      "THIRD_PARTY_NOTICES.md",
+      "LICENSES/restic-BSD-2-Clause.txt",
+      "third_party/manifest.yaml",
+      "provenance/restic-0.19.0.json",
+      "docs/receipts/release/restic-tool-sbom.spdx.json"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "focused_test_count": 18,
+      "full_core_test_count": 414,
+      "full_inventory_test_count": 25,
+      "worker_commit_sha": "ef4ea26f59cfc7fdbe2d5f315ca5fbe4594dfc0d",
+      "worker_base_exact": true,
+      "worker_write_set_exact": true,
+      "restic_version": "0.19.0",
+      "restic_source_sha256": "800779b6c4c2396971c0567b09ccdd435e03155e1a0ec94e8bbf3d98641a8bc2",
+      "restic_bottle_sha256": "b69c21f735a13de6c74d6a097199fc6e98fd794c48e287a035dbff434bfcae41",
+      "restic_license_sha256": "6f08a01a9fab5b24e139a09f15cc24a73087c7bc09e3bacf099fdf2d767bf897",
+      "operations_tool_sbom_present": true,
+      "password_command_only": true,
+      "repository_locator_owner_only_and_redacted": true,
+      "repository_init_delete_forget_or_prune_surface": false,
+      "backup_check_read_data_required": true,
+      "clean_nonexistent_restore_target_required": true,
+      "restored_byte_tree_manifest_equality_required": true,
+      "receipt_last_and_exclusive": true,
+      "remote_backend_allowlist": true,
+      "local_repository_requires_nonoverlap_and_separate_device": true,
+      "available_work_and_T7_devices_proven_distinct": true,
+      "control_host_restic_installed_and_version_verified": true,
+      "real_backup_receipt_emitted": false,
+      "real_restore_receipt_emitted": false,
+      "external_repository_mutated": false,
+      "declares_ready_for_72h_soak": false,
+      "next_stage": "s4-functional-capsule-encrypted-T7-drill"
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29621836402",
+    "integration_commit_sha": "4ba4d34790e800ce660020644bc47947fb27ffce"
+  },
+  "integrity": {
+    "payload_sha256": "84d444cb55002bb65fc2fa7946fb82e048d2f3101b83276d6b54e53fcf6c8597",
+    "parent_refs": [
+      "git:4ba4d34790e800ce660020644bc47947fb27ffce",
+      "git:ef4ea26f59cfc7fdbe2d5f315ca5fbe4594dfc0d",
+      "ci:29621836402",
+      "reuse:reuse-s4-restic-backup-restore-20260718",
+      "dependency:restic@0.19.0"
+    ]
+  }
+}
