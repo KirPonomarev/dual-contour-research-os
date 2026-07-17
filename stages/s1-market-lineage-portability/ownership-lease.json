@@ -1,0 +1,33 @@
+{
+  "lease_id": "lease-s1-market-lineage-portability-agent-3-20260717",
+  "stage_id": "s1-market-lineage-portability",
+  "agent_id": "agent-3",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-17T07:29:00Z",
+  "expires_at": "2026-07-17T13:29:00Z",
+  "base_sha": "6299f65f92d8bc6964c423775a5cce1f2fdef58a",
+  "public_authority_sha": "a46e1b076cb098af1f9dccf34ab18a327e46a59b",
+  "branch": "codex/bridge-a3-s1-market-lineage-portability",
+  "worktree": "ephemeral-private-domain-worktree:s1-market-lineage-portability",
+  "write_set": [
+    "src/market_lab/ban_local_eventness_nonlinear_candidate_independent_coverage_expansion_feasibility.py",
+    "src/market_lab/ban_local_eventness_nonlinear_mechanism_cross_asset_transfer_power_design.py",
+    "src/market_lab/ban_local_eventness_nonlinear_mechanism_cross_asset_transfer_preregistration.py",
+    "src/market_lab/ban_local_eventness_nonlinear_candidate_event_clustered_power_design.py",
+    "src/market_lab/ban_local_eventness_nonlinear_candidate_experimental_unit_preregistration.py",
+    "src/market_lab/ban_local_eventness_nonlinear_candidate_blind_window_design.py",
+    "src/market_lab/ban_local_eventness_nonlinear_candidate_power_design.py",
+    "src/market_lab/ban_local_eventness_nonlinear_candidate_preregistration.py",
+    "src/market_lab/ban_timeframe_foundation.py",
+    "tests/ban_clean_checkout_fixtures.py",
+    "tests/test_ban_local_eventness_nonlinear_candidate_blind_window_design.py",
+    "tests/test_ban_local_eventness_nonlinear_candidate_event_clustered_power_design.py",
+    "tests/test_ban_local_eventness_nonlinear_candidate_experimental_unit_preregistration.py",
+    "tests/test_ban_local_eventness_nonlinear_candidate_independent_coverage_expansion_feasibility.py",
+    "tests/test_ban_local_eventness_nonlinear_candidate_power_design.py",
+    "tests/test_ban_local_eventness_nonlinear_mechanism_cross_asset_transfer_preregistration.py",
+    "tests/test_ban_local_eventness_nonlinear_mechanism_cross_asset_transfer_power_design.py"
+  ],
+  "delegation_allowed": false,
+  "state": "active"
+}

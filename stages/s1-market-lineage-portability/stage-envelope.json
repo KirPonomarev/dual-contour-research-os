@@ -1,0 +1,99 @@
+{
+  "stage_id": "s1-market-lineage-portability",
+  "agent_id": "agent-3",
+  "objective": "Implement a content-addressed portable lineage policy so two real production entrypoints can be conformance-tested with sanitized recursive manifests while the default production lineage remains pinned and fail closed.",
+  "executable_blocker": "Clean-checkout conformance is 59 passed and 2 failed because the two production entrypoints recursively require private historical content hashes; test-result substitution, private artifact copy and validator bypass were rejected.",
+  "base_sha": "6299f65f92d8bc6964c423775a5cce1f2fdef58a",
+  "public_authority_sha": "a46e1b076cb098af1f9dccf34ab18a327e46a59b",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a3-s1-market-lineage-portability",
+  "worktree": "ephemeral-private-domain-worktree:s1-market-lineage-portability",
+  "read_set": [
+    "market-domain:candidate-clean-tree@6299f65f92d8bc6964c423775a5cce1f2fdef58a",
+    "market-domain:authorized-recursive-validator-source-and-test-graph",
+    "docs/receipts/reuse/s1-market-lineage-portability.json",
+    "docs/receipts/integration/s1-market-lineage-portability-authority.json"
+  ],
+  "write_set": [
+    "src/market_lab/ban_local_eventness_nonlinear_candidate_independent_coverage_expansion_feasibility.py",
+    "src/market_lab/ban_local_eventness_nonlinear_mechanism_cross_asset_transfer_power_design.py",
+    "src/market_lab/ban_local_eventness_nonlinear_mechanism_cross_asset_transfer_preregistration.py",
+    "src/market_lab/ban_local_eventness_nonlinear_candidate_event_clustered_power_design.py",
+    "src/market_lab/ban_local_eventness_nonlinear_candidate_experimental_unit_preregistration.py",
+    "src/market_lab/ban_local_eventness_nonlinear_candidate_blind_window_design.py",
+    "src/market_lab/ban_local_eventness_nonlinear_candidate_power_design.py",
+    "src/market_lab/ban_local_eventness_nonlinear_candidate_preregistration.py",
+    "src/market_lab/ban_timeframe_foundation.py",
+    "tests/ban_clean_checkout_fixtures.py",
+    "tests/test_ban_local_eventness_nonlinear_candidate_blind_window_design.py",
+    "tests/test_ban_local_eventness_nonlinear_candidate_event_clustered_power_design.py",
+    "tests/test_ban_local_eventness_nonlinear_candidate_experimental_unit_preregistration.py",
+    "tests/test_ban_local_eventness_nonlinear_candidate_independent_coverage_expansion_feasibility.py",
+    "tests/test_ban_local_eventness_nonlinear_candidate_power_design.py",
+    "tests/test_ban_local_eventness_nonlinear_mechanism_cross_asset_transfer_preregistration.py",
+    "tests/test_ban_local_eventness_nonlinear_mechanism_cross_asset_transfer_power_design.py"
+  ],
+  "preservation_contract": {
+    "required": [
+      "default production lineage remains pinned to the existing historical fingerprints",
+      "default production validators remain fail closed on missing or drifted content",
+      "portable lineage is derived only from manifests whose source output and implementation records are verified",
+      "recursive parents are verified before an entrypoint consumes their outputs",
+      "all existing positive numeric lineage safety and zero-prohibited-operation assertions remain unchanged",
+      "real compute_feasibility and compute_power_design entrypoints have positive sanitized conformance"
+    ],
+    "forbidden": [
+      "callback mock monkeypatch or prevalidated-result injection",
+      "caller-supplied expected fingerprint without manifest derivation",
+      "content-record implementation-binding or recursive-validation bypass",
+      "private historical artifact or raw data copy",
+      "assertion removal relaxation expected-value change skip or xfail"
+    ]
+  },
+  "forbidden_scope": [
+    "unlisted-source-test-script-config-workflow-lockfile-or-migration-edit",
+    "pinned-default-lineage-relaxation",
+    "callback-mock-monkeypatch-prevalidated-result-or-arbitrary-fingerprint-injection",
+    "content-record-implementation-binding-or-recursive-validation-bypass",
+    "real-domain-data-report-evidence-ledger-registry-or-strategy-copy",
+    "private-path-url-secret-account-key-or-d2-d3-payload",
+    "network-download-exchange-order-private-api-or-external-mutation",
+    "external-dependency-adoption",
+    "dirty-source-checkout-mutation",
+    "push-merge-deploy-or-public-repository-write"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "reuse_decision": "a49e6caabf213121f896a04d41adbbbc2b15a33c8f90eadaadb2726f43aec587",
+    "authority_receipt": "a14cb2cd246d8d475bacce0acdef14fa622081daccb23aee75b682cfa8e045fc",
+    "candidate_market_tree": "a355545f90e43f64b6525ec5d839b59975c408bc",
+    "external_dependencies": "none"
+  },
+  "acceptance_commands": [
+    "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src python -m pytest -q -p no:cacheprovider seven authorized BAN test modules",
+    "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src python -m pytest -q -p no:cacheprovider with no failures outside the two-file sibling portable-fixtures stage",
+    "git diff --check",
+    "git status --porcelain=v1 --untracked-files=all",
+    "exact write-set, assertion-preservation, skip, callback, monkeypatch, private-locator, network and live-authority scan"
+  ],
+  "risk_class": "private-market-recursive-lineage-runtime-portability",
+  "stop_conditions": [
+    "candidate-base-or-public-authority-mismatch",
+    "write-set-expansion-required",
+    "default-pinned-lineage-no-longer-fails-closed",
+    "callback-mock-arbitrary-fingerprint-or-validation-bypass-required",
+    "existing-assertion-removal-relaxation-or-value-change-required",
+    "real-domain-payload-private-locator-network-or-new-dependency-required",
+    "focused-test-failure-or-full-suite-new-failure",
+    "dirty-source-checkout-changed",
+    "before-equals-after-or-two-entrypoint-blocker-remains"
+  ],
+  "expected_receipt": "docs/receipts/integration/s1-market-lineage-portability.json",
+  "rollback": "Agent 0 discards the single worker commit and deletes the isolated branch/worktree. The candidate base, pinned default lineage, original dirty checkout, scientific artifacts, domain state and external systems remain unchanged.",
+  "commit_authority": "one-scoped-worker-commit",
+  "push_authority": false,
+  "expected_handoff_status": [
+    "ready_for_agent0_audit",
+    "blocked_validation_failed"
+  ]
+}
