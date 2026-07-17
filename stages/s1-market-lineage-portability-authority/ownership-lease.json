@@ -1,0 +1,19 @@
+{
+  "lease_id": "lease-s1-market-lineage-portability-authority-agent-0-20260717",
+  "stage_id": "s1-market-lineage-portability-authority",
+  "agent_id": "agent-0",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-17T07:22:55Z",
+  "expires_at": "2026-07-17T13:22:55Z",
+  "base_sha": "635370ed2daba6073594289f0be29db61cbecf25",
+  "branch": "main",
+  "worktree": "canonical-main-worktree",
+  "write_set": [
+    "docs/receipts/reuse/s1-market-lineage-portability.json",
+    "stages/s1-market-lineage-portability-authority/stage-envelope.json",
+    "stages/s1-market-lineage-portability-authority/ownership-lease.json",
+    "tests/test_stage1_authority.py"
+  ],
+  "delegation_allowed": false,
+  "state": "active"
+}

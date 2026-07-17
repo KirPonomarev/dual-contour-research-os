@@ -1,0 +1,65 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-s1-market-lineage-portability-20260717",
+  "issued_at": "2026-07-17T07:22:55Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "reuse-freeze-authority"
+  },
+  "contour": "market",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "content-addressed-portable-scientific-lineage-validation",
+    "candidates": [
+      {
+        "candidate": "owned-manifest-derived-recursive-lineage-policy",
+        "disposition": "selected"
+      },
+      {
+        "candidate": "existing-pinned-default-lineage-policy",
+        "disposition": "selected-preserve-default"
+      },
+      {
+        "candidate": "external-dependency",
+        "disposition": "rejected-unnecessary"
+      },
+      {
+        "candidate": "private-historical-artifact-copy",
+        "disposition": "rejected-classification-boundary"
+      },
+      {
+        "candidate": "validator-callback-mock-or-prevalidated-result-injection",
+        "disposition": "rejected-validation-bypass"
+      },
+      {
+        "candidate": "skip-xfail-or-negative-only-production-coverage",
+        "disposition": "rejected-validation-weakening"
+      }
+    ],
+    "selected_mode": "owner-local-manifest-derived-recursive-lineage-no-new-dependency",
+    "source_ref": "source-freeze:source-freeze-market-s1-base-repair-20260717;git:6299f65f92d8bc6964c423775a5cce1f2fdef58a",
+    "code_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "license_spdx": "NOASSERTION",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "default production validation retains pinned historical lineage and fail-closed behavior",
+      "synthetic lineage is accepted only through recursively verified manifests and exact content records",
+      "arbitrary callback mock prevalidated-result and fingerprint override paths do not exist",
+      "all existing numeric lineage safety and zero-prohibited-operation assertions remain unchanged",
+      "full clean-checkout Market test suite",
+      "exact-head private remote CI"
+    ],
+    "canonical_owner": "market-domain-runtime-with-agent0-integration",
+    "rollback": "Revert the scoped lineage-policy commit and discard its isolated branch. The pinned default lineage, scientific artifacts, datasets, registries, external services and public Bridge remain unchanged."
+  },
+  "integrity": {
+    "payload_sha256": "a49e6caabf213121f896a04d41adbbbc2b15a33c8f90eadaadb2726f43aec587",
+    "parent_refs": [
+      "git:635370ed2daba6073594289f0be29db61cbecf25",
+      "git:6299f65f92d8bc6964c423775a5cce1f2fdef58a",
+      "source-freeze:source-freeze-market-s1-base-repair-20260717",
+      "reuse:reuse-s1-market-clean-checkout-fixtures-20260717"
+    ]
+  }
+}

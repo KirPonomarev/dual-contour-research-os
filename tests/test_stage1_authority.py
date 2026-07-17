@@ -53,6 +53,7 @@ class Stage1AuthorityTests(unittest.TestCase):
             "s1-market-base-repair.json": "pinned-private-domain-ci-repair-no-public-code-copy",
             "s1-market-base-symlink-fix.json": "owner-local-minimal-fail-closed-glue-no-public-copy",
             "s1-market-clean-checkout-fixtures.json": "owner-local-synthetic-clean-checkout-fixtures-no-new-dependency",
+            "s1-market-lineage-portability.json": "owner-local-manifest-derived-recursive-lineage-no-new-dependency",
         }
         schema = load(ROOT / "contracts" / "v1" / "ReuseDecisionReceipt.schema.json")
         allowed = set(schema["properties"])
@@ -246,6 +247,72 @@ class Stage1AuthorityTests(unittest.TestCase):
             "existing-assertion-deletion-relaxation-or-value-change",
             envelope["forbidden_scope"],
         )
+        self.assertTrue(envelope["rollback"])
+        self.assertFalse(lease["delegation_allowed"])
+
+    def test_market_lineage_portability_authority_is_recursive_and_nonbypassable(self) -> None:
+        envelope = load(
+            ROOT
+            / "stages"
+            / "s1-market-lineage-portability-authority"
+            / "stage-envelope.json"
+        )
+        lease = load(
+            ROOT
+            / "stages"
+            / "s1-market-lineage-portability-authority"
+            / "ownership-lease.json"
+        )
+        reuse = load(REUSE_RECEIPTS / "s1-market-lineage-portability.json")
+
+        self.assertEqual(envelope["base_sha"], "635370ed2daba6073594289f0be29db61cbecf25")
+        self.assertEqual(
+            envelope["candidate_market_base_sha"],
+            "6299f65f92d8bc6964c423775a5cce1f2fdef58a",
+        )
+        self.assertEqual(envelope["write_set"], lease["write_set"])
+        worker = envelope["authorized_worker_stage"]
+        self.assertEqual(worker["agent_id"], "agent-3")
+        self.assertEqual(len(worker["source_write_set"]), 9)
+        self.assertEqual(len(worker["test_write_set"]), 8)
+        self.assertFalse(set(worker["source_write_set"]) & set(worker["test_write_set"]))
+        self.assertEqual(reuse["integrity"]["payload_sha256"], payload_sha256(reuse))
+        dispositions = {
+            item["candidate"]: item["disposition"]
+            for item in reuse["payload"]["candidates"]
+        }
+        self.assertEqual(
+            dispositions["owned-manifest-derived-recursive-lineage-policy"],
+            "selected",
+        )
+        self.assertEqual(
+            dispositions["validator-callback-mock-or-prevalidated-result-injection"],
+            "rejected-validation-bypass",
+        )
+        self.assertIn(
+            "pinned-default-lineage-relaxation",
+            envelope["forbidden_scope"],
+        )
+        public_text = "\n".join(
+            (
+                (REUSE_RECEIPTS / "s1-market-lineage-portability.json").read_text(),
+                (
+                    ROOT
+                    / "stages"
+                    / "s1-market-lineage-portability-authority"
+                    / "stage-envelope.json"
+                ).read_text(),
+                (
+                    ROOT
+                    / "stages"
+                    / "s1-market-lineage-portability-authority"
+                    / "ownership-lease.json"
+                ).read_text(),
+            )
+        )
+        self.assertNotIn("/Users/", public_text)
+        self.assertNotIn("/Volumes/", public_text)
+        self.assertNotIn("github.com/KirPonomarev/crypto-market-lab", public_text)
         self.assertTrue(envelope["rollback"])
         self.assertFalse(lease["delegation_allowed"])
 
