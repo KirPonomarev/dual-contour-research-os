@@ -1,0 +1,19 @@
+{
+  "lease_id": "lease-s2-market-cost-provider-accounting-agent-3-20260717",
+  "stage_id": "s2-market-cost-provider-accounting",
+  "agent_id": "agent-3",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-17T19:25:00Z",
+  "expires_at": "2026-07-18T01:25:00Z",
+  "base_sha": "b9fd2b8af8d3ab9405dd0f432d2a39bbb6e3bb94",
+  "public_authority_sha": "90eaf04f39aa6ffb1835ac726b98b73d112ebf82",
+  "branch": "codex/bridge-a3-s2-market-cost-provider-accounting",
+  "worktree": "ephemeral-private-domain-worktree:s2-market-cost-provider-accounting",
+  "write_set": [
+    "data/bridge_pre_soak/provider_accounting/binance_btcusdt_cost_provider_profile.json",
+    "src/market_lab/bridge_pre_soak_cost_provider_accounting.py",
+    "tests/test_bridge_pre_soak_cost_provider_accounting.py"
+  ],
+  "delegation_allowed": false,
+  "state": "active"
+}

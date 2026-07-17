@@ -226,6 +226,34 @@ class Stage2AuthorityTests(unittest.TestCase):
         self.assertIn("no-live-paper-or-order-authority", public_text)
         self.assertIn("worker-needs-network-capture-during-tests-or-validation", public_text)
 
+    def test_market_cost_provider_worker_lease_is_exact_and_receipt_bound(self) -> None:
+        receipt = load(
+            INTEGRATION_RECEIPTS
+            / "s2-market-cost-provider-accounting-authority.json"
+        )
+        envelope = load(
+            STAGES / "s2-market-cost-provider-accounting" / "stage-envelope.json"
+        )
+        lease = load(
+            STAGES / "s2-market-cost-provider-accounting" / "ownership-lease.json"
+        )
+
+        self.assertEqual(receipt["schema_id"], "IntegrationReceipt")
+        self.assertEqual(receipt["integrity"]["payload_sha256"], payload_sha256(receipt))
+        self.assertEqual(receipt["payload"]["head_sha"], "90eaf04f39aa6ffb1835ac726b98b73d112ebf82")
+        self.assertFalse(receipt["payload"]["audit_results"]["declares_market_pre_soak_green"])
+        self.assertFalse(receipt["payload"]["audit_results"]["public_provider_payload_in_public_repo"])
+        self.assertEqual(envelope["public_authority_sha"], receipt["payload"]["head_sha"])
+        self.assertEqual(envelope["public_authority_ci"], "29607312212")
+        self.assertEqual(envelope["dependency_hashes"]["authority_receipt"], receipt["integrity"]["payload_sha256"])
+        self.assertEqual(envelope["write_set"], lease["write_set"])
+        self.assertFalse(lease["delegation_allowed"])
+        self.assertFalse(envelope["push_authority"])
+        self.assertIn(
+            "accounting-verifier-accepts-private-account-order-live-paper-authority-or-nonfinite-cost-terms",
+            envelope["stop_conditions"],
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
