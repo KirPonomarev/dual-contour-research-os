@@ -1,0 +1,57 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s1-market-storage-accounting-authority-20260717",
+  "issued_at": "2026-07-17T11:13:20Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "bridge",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s1-market-storage-accounting-authority",
+    "agent_id": "agent-0",
+    "ownership_lease_ref": "stages/s1-market-storage-accounting-authority/ownership-lease.json",
+    "base_sha": "a6b2fce8f47f89c697f60f2443ee91e5987e9b33",
+    "head_sha": "9691eb4b4f50a8fa55665fbe6c5f5bd66169c974",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "docs/receipts/reuse/s1-market-storage-accounting-portability.json",
+      "stages/s1-market-storage-accounting-authority/stage-envelope.json",
+      "stages/s1-market-storage-accounting-authority/ownership-lease.json",
+      "tests/test_stage1_authority.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "focused_tests": 23,
+      "connected_tests": 234,
+      "stage0b_tests": 25,
+      "skipped_tests": 0,
+      "diff_check": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "dependency_adoption": false,
+      "private_source_code_copied": false,
+      "exact_private_ci_reality_loop_prerequisite_step": "green",
+      "exact_private_full_suite_failure_count": 1,
+      "failure_class": "portable-reserved-filesystem-block-accounting",
+      "snapshot_validator_relaxation_authorized": false,
+      "platform_skip_or_xfail_authorized": false,
+      "worker_write_set_files": 2,
+      "live_or_trading_authority": false,
+      "selected_mode": "owner-local-stdlib-conservative-byte-accounting-no-public-copy"
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29575970767",
+    "integration_commit_sha": "9691eb4b4f50a8fa55665fbe6c5f5bd66169c974"
+  },
+  "integrity": {
+    "payload_sha256": "2e2eb88c15c2302fa11e148ba4be22e8255c1f4536eb9eed71f2ead9cd39b317",
+    "parent_refs": [
+      "git:9691eb4b4f50a8fa55665fbe6c5f5bd66169c974",
+      "ci:29575970767",
+      "source-freeze:source-freeze-market-s1-base-repair-20260717",
+      "reuse:reuse-s1-market-storage-accounting-portability-20260717"
+    ]
+  }
+}
