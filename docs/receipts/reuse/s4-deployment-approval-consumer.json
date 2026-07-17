@@ -1,0 +1,46 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-s4-deployment-approval-consumer-20260718",
+  "issued_at": "2026-07-17T22:32:21Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-freeze-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "immutable-pre-soak-release-backup-restore-and-operator-approval-binding-with-durable-nonce-consumption",
+    "candidates": [
+      {"candidate": "frozen-ReleaseManifest-BackupReceipt-RestoreReceipt-and-DeploymentApprovalReceipt-contracts", "disposition": "selected-contract-boundary"},
+      {"candidate": "existing-Bridge-SQLite-WAL-FULL-append-only-hash-chain-and-single-use-nonce-pattern", "disposition": "selected-owned-durability-pattern"},
+      {"candidate": "existing-domain-owner-receipt-backed-release-recovery-and-encrypted-backup-drill-patterns", "disposition": "selected-owned-design-reference-without-private-payload-copy"},
+      {"candidate": "pinned-third-party-deployment-or-workflow-engine", "disposition": "rejected-unnecessary-for-local-gate"},
+      {"candidate": "new-network-client-SSH-Docker-systemd-backup-runner-or-live-deployment-executor", "disposition": "rejected-authority-expanding-and-outside-this-stage"},
+      {"candidate": "minimal-governance-receipt-validator-and-durable-consumption-ledger", "disposition": "selected-minimal-missing-glue"}
+    ],
+    "selected_mode": "strict-contract-shaped-hash-and-causal-binding-validation-plus-owned-SQLite-append-only-single-use-nonce-consumption-no-external-action",
+    "source_ref": "git:285f884c0508a88e15763b8bd9a9dfa28d9223d7;contracts:ReleaseManifest,BackupReceipt,RestoreReceipt,DeploymentApprovalReceipt;component:research_bridge.ledger",
+    "code_sha256": "3108bc0381dcddd470c6053ab712b3f30143929e9328bb132d3883f34e7e70c8",
+    "license_spdx": "Proprietary-Internal-Owned",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "exact release SHA image digest policy config schema and remote CI bindings",
+      "encrypted verified backup and clean byte-manifest-equivalent restore causal chain",
+      "approval issued-at expiry environment restore and rollback-target validation",
+      "atomic append-only single-use approval object and nonce consumption",
+      "schema chain payload tamper private-classification and cross-contour rejection",
+      "static absence of network host container service or deployment execution authority"
+    ],
+    "canonical_owner": "Agent0-governance-deployment-gate",
+    "rollback": "Revert the local deployment approval consumer, its tests and receipts. No image, host, backup destination, service, domain repository or external environment is mutated by this stage."
+  },
+  "integrity": {
+    "payload_sha256": "305deb3e580a0e9882b55dc04806015a133a089021c64d38b8d4dc1256747986",
+    "parent_refs": [
+      "git:285f884c0508a88e15763b8bd9a9dfa28d9223d7",
+      "integration:integration-s3-dual-contour-pre-soak-green-20260718",
+      "contract:ReleaseManifest@1.0.0",
+      "contract:BackupReceipt@1.0.0",
+      "contract:RestoreReceipt@1.0.0",
+      "contract:DeploymentApprovalReceipt@1.0.0"
+    ]
+  }
+}

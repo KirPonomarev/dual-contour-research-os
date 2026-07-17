@@ -1,0 +1,20 @@
+{
+  "lease_id": "lease-s4-deployment-approval-consumer-agent-0-20260718",
+  "stage_id": "s4-deployment-approval-consumer",
+  "agent_id": "agent-0",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-17T22:32:21Z",
+  "expires_at": "2026-07-18T04:32:21Z",
+  "base_sha": "285f884c0508a88e15763b8bd9a9dfa28d9223d7",
+  "branch": "main",
+  "worktree": "canonical-public-worktree",
+  "write_set": [
+    "docs/receipts/reuse/s4-deployment-approval-consumer.json",
+    "stages/s4-deployment-approval-consumer/stage-envelope.json",
+    "stages/s4-deployment-approval-consumer/ownership-lease.json",
+    "src/research_bridge/deployment.py",
+    "tests/test_deployment_gate.py"
+  ],
+  "delegation_allowed": false,
+  "state": "active"
+}
