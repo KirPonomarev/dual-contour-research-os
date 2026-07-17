@@ -1,0 +1,55 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s1-market-clean-checkout-authority-20260717",
+  "issued_at": "2026-07-17T06:48:37Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "bridge",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s1-market-clean-checkout-authority",
+    "agent_id": "agent-0",
+    "ownership_lease_ref": "stages/s1-market-clean-checkout-authority/ownership-lease.json",
+    "base_sha": "0afc73836136df0e12cbb6ca3dbe9429ffdfd0df",
+    "head_sha": "d43576cffb75e4d56cface97885ad193eaa40416",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "docs/receipts/reuse/s1-market-clean-checkout-fixtures.json",
+      "stages/s1-market-clean-checkout-authority/ownership-lease.json",
+      "stages/s1-market-clean-checkout-authority/stage-envelope.json",
+      "tests/test_stage1_authority.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "focused_tests": 11,
+      "connected_tests": 205,
+      "stage0b_tests": 25,
+      "skipped_tests": 0,
+      "diff_check": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "dependency_adoption": false,
+      "private_source_code_copied": false,
+      "worker_write_sets_disjoint": true,
+      "runtime_or_domain_edit_authorized": false,
+      "assertion_weakening_authorized": false,
+      "skip_or_xfail_authorized": false,
+      "live_or_trading_authority": false,
+      "selected_mode": "owner-local-synthetic-clean-checkout-fixtures-no-new-dependency"
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29561093748",
+    "integration_commit_sha": "d43576cffb75e4d56cface97885ad193eaa40416"
+  },
+  "integrity": {
+    "payload_sha256": "0f4b82699e51d934185214c037193bf4ca8228dd19c1f775122fba961cfd3b2d",
+    "parent_refs": [
+      "git:d43576cffb75e4d56cface97885ad193eaa40416",
+      "ci:29561093748",
+      "source-freeze:source-freeze-market-s1-base-repair-20260717",
+      "reuse:reuse-s1-market-clean-checkout-fixtures-20260717"
+    ]
+  }
+}
