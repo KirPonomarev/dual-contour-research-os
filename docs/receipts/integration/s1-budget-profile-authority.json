@@ -1,0 +1,60 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s1-budget-profile-authority-20260717",
+  "issued_at": "2026-07-17T11:31:10Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "bridge",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s1-budget-profile-authority",
+    "agent_id": "agent-0",
+    "ownership_lease_ref": "stages/s1-budget-profile-authority/ownership-lease.json",
+    "base_sha": "f6701d92bc02ada31dffd237ff1ef9720b828a02",
+    "head_sha": "ef6a262a165031c5957e1783e879aa3fd949a806",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "docs/receipts/reuse/s1-budget-profile.json",
+      "stages/s1-budget-profile-authority/stage-envelope.json",
+      "stages/s1-budget-profile-authority/ownership-lease.json",
+      "tests/test_stage1_authority.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "focused_tests": 25,
+      "connected_tests": 236,
+      "stage0b_tests": 25,
+      "skipped_tests": 0,
+      "diff_check": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "dependency_adoption": false,
+      "frozen_contract_edit": false,
+      "arbitrary_budget_shape_admission_before": true,
+      "job_reservation_above_permit_capacity_admission_before": true,
+      "exact_signed_runtime_profile_frozen": true,
+      "fixed_full_reservation_accounting_policy_frozen": true,
+      "untrusted_runner_meter_authorized": false,
+      "ledger_capacity_or_settlement_authorized": false,
+      "worker_source_files": 2,
+      "worker_test_files": 4,
+      "live_or_connected_authority": false,
+      "selected_mode": "owned-stdlib-exact-fixed-charge-budget-profile-single-ledger-ready"
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29577056701",
+    "integration_commit_sha": "ef6a262a165031c5957e1783e879aa3fd949a806"
+  },
+  "integrity": {
+    "payload_sha256": "f7f1e75d0debc2c04182c1a87199a3e0d10b8db3700c0556f04f9042195c1be8",
+    "parent_refs": [
+      "git:ef6a262a165031c5957e1783e879aa3fd949a806",
+      "ci:29577056701",
+      "contract:Permit-v1",
+      "contract:JobSpec-v1",
+      "reuse:reuse-s1-budget-profile-20260717"
+    ]
+  }
+}
