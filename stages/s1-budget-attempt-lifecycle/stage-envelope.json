@@ -1,0 +1,102 @@
+{
+  "stage_id": "s1-budget-attempt-lifecycle",
+  "agent_id": "agent-2",
+  "objective": "Implement atomic hard-cap reserve/claim and fixed-charge settle/complete with full frozen receipts inside the single canonical job ledger.",
+  "executable_blocker": "The canonical budget profile is exact and receipt-ready, but the ledger still records no reservation or settlement, performs no scope capacity check, and accepts unversioned schema lookalikes.",
+  "base_sha": "641f18ab1f0d9f6ef385ccd286220e0007dcde69",
+  "public_authority_sha": "641f18ab1f0d9f6ef385ccd286220e0007dcde69",
+  "public_authority_ci": "29579070098",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a2-s1-budget-attempt-lifecycle",
+  "worktree": "ephemeral-public-worktree:s1-budget-attempt-lifecycle",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "contracts/v1/BudgetReservation.schema.json",
+    "contracts/v1/SettlementReceipt.schema.json",
+    "contracts/v1/ExecutionReceipt.schema.json",
+    "docs/receipts/reuse/s1-budget-attempt-lifecycle.json",
+    "docs/receipts/integration/s1-budget-attempt-lifecycle-authority.json",
+    "stages/s1-budget-attempt-lifecycle-authority/stage-envelope.json",
+    "stages/s1-budget-profile/stage-envelope.json",
+    "authorized runtime and test files"
+  ],
+  "write_set": [
+    "src/research_bridge/kernel.py",
+    "src/research_bridge/ledger.py",
+    "src/research_bridge/execution.py",
+    "tests/test_stage1_admission.py",
+    "tests/test_stage1_assurance.py",
+    "tests/test_stage1_authority_policy.py",
+    "tests/test_stage1_control_assurance.py",
+    "tests/test_stage1_execution.py",
+    "tests/test_stage1_execution_assurance.py",
+    "tests/test_stage1_ledger.py",
+    "tests/test_stage1_pause_epoch_fencing.py"
+  ],
+  "preservation_contract": {
+    "required": [
+      "forward every frozen AdmissionGrant budget binding explicitly through BridgeKernel to JobLedger.claim",
+      "construct and seal one full BudgetReservation inside the same claim BEGIN IMMEDIATE transaction",
+      "validate the entire persisted budget projection and serialize hard-cap plus global idempotency before append",
+      "construct retained owned-offline accounting attestation and one full SettlementReceipt inside the same complete transaction",
+      "bind settlement into ExecutionReceipt integrity parent refs while keeping receipt-last ordering",
+      "use explicit database user_version and exact schema fingerprint before any repair or WAL mutation",
+      "retain one table existing event types append-only chain pause fencing nonce uniqueness and reference behavior"
+    ],
+    "forbidden": [
+      "admission L0 contract authority control CAS ingestion validation config workflow lockfile dependency or unlisted test edit",
+      "second table ledger new event type column table rebuild or nonempty legacy migration",
+      "untrusted usage metering variable release auto-expiry release retry recovery or multi-attempt",
+      "silent schema repair backfill compatibility default skip fallback network live authority or UI"
+    ]
+  },
+  "implementation_contract_ref": "stages/s1-budget-attempt-lifecycle-authority/stage-envelope.json",
+  "forbidden_scope": [
+    "unlisted-source-test-doc-config-workflow-lockfile-migration-contract-or-dependency-edit",
+    "admission-l0-authority-control-cas-ingestion-or-validation-source-edit",
+    "second-table-second-ledger-new-event-type-new-column-table-rebuild-or-nonempty-legacy-migration",
+    "partial-reserve-claim-or-partial-settle-complete-commit",
+    "untrusted-resource-usage-provider-metered-monetary-token-CPU-or-RAM-cost-claim",
+    "release-recovery-retry-fresh-attempt-multi-attempt-checkpoint-resume-or-expiry-release",
+    "IF-NOT-EXISTS-schema-repair-lookalike-acceptance-silent-backfill-or-fabricated-receipt",
+    "existing-test-deletion-relaxation-skip-xfail-continue-on-error-or-fallback",
+    "private-path-url-secret-account-dataset-strategy-or-d2-d3-payload",
+    "network-external-mutation-live-trading-live-target-testing-publication-deployment-or-ui",
+    "push-merge-or-canonical-main-write"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "reuse_decision": "5feb123017f8fd36ec3bd4d7822442e5ddf1033620febfa891b2a47c76e47495",
+    "authority_receipt": "c274e57ff9c571c07d41d7e01af2c75a4dc1747ad24dabe9718584ec5edb2f12",
+    "budget_profile_receipt": "b363f06578d715629a37dfdde3891ce072737c79a63a1d2040f767c44b44c5a6",
+    "external_dependencies": "none"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest tests.test_stage1_admission tests.test_stage1_assurance tests.test_stage1_authority_policy tests.test_stage1_control_assurance tests.test_stage1_execution tests.test_stage1_execution_assurance tests.test_stage1_ledger tests.test_stage1_pause_epoch_fencing -v",
+    "python3 -m unittest discover -s tests -p 'test_stage1_*.py'",
+    "make test",
+    "git diff --check",
+    "exact 11-file write-set schema object fingerprint contract dependency private-locator network live-authority and weakening scan"
+  ],
+  "risk_class": "bridge-sev1-atomic-hard-budget-attempt-lifecycle",
+  "stop_conditions": [
+    "base-authority-contract-reuse-profile-or-receipt-hash-mismatch",
+    "write-set-expansion-contract-dependency-table-column-event-type-rebuild-or-new-test-file-required",
+    "reserve-claim-or-settle-complete-is-not-one-transaction-and-one-event",
+    "concurrent-cap-idempotent-replay-reopen-or-full-receipt-binding-fails",
+    "legacy-malformed-ambiguous-lookalike-or-unknown-budget-projection-is-written-or-accepted",
+    "failure-or-expiry-releases-capacity-or-emits-settlement-or-ExecutionReceipt",
+    "pause-fence-nonce-chain-execution-reference-or-full-suite-regresses",
+    "before-equals-after-or-hard-budget-blocker-remains"
+  ],
+  "expected_receipt": "docs/receipts/integration/s1-budget-attempt-lifecycle.json",
+  "rollback": "Before any version-1 ledger exists, Agent 0 discards the worker commit and branch. After version-1 creation, restore a verified pre-version backup or retain version-1-capable code; old unversioned code is forbidden. Synthetic databases may be discarded.",
+  "commit_authority": "one-scoped-worker-commit",
+  "push_authority": false,
+  "expected_handoff_status": [
+    "ready_for_agent0_audit",
+    "blocked_validation_failed"
+  ]
+}

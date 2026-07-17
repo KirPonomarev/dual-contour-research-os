@@ -1,0 +1,27 @@
+{
+  "lease_id": "lease-s1-budget-attempt-lifecycle-agent-2-20260717",
+  "stage_id": "s1-budget-attempt-lifecycle",
+  "agent_id": "agent-2",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-17T12:06:30Z",
+  "expires_at": "2026-07-17T18:06:30Z",
+  "base_sha": "641f18ab1f0d9f6ef385ccd286220e0007dcde69",
+  "public_authority_sha": "641f18ab1f0d9f6ef385ccd286220e0007dcde69",
+  "branch": "codex/bridge-a2-s1-budget-attempt-lifecycle",
+  "worktree": "ephemeral-public-worktree:s1-budget-attempt-lifecycle",
+  "write_set": [
+    "src/research_bridge/kernel.py",
+    "src/research_bridge/ledger.py",
+    "src/research_bridge/execution.py",
+    "tests/test_stage1_admission.py",
+    "tests/test_stage1_assurance.py",
+    "tests/test_stage1_authority_policy.py",
+    "tests/test_stage1_control_assurance.py",
+    "tests/test_stage1_execution.py",
+    "tests/test_stage1_execution_assurance.py",
+    "tests/test_stage1_ledger.py",
+    "tests/test_stage1_pause_epoch_fencing.py"
+  ],
+  "delegation_allowed": false,
+  "state": "active"
+}

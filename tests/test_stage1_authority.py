@@ -204,6 +204,35 @@ class Stage1AuthorityTests(unittest.TestCase):
         self.assertTrue(envelope["rollback"])
         self.assertFalse(lease["delegation_allowed"])
 
+    def test_budget_attempt_lifecycle_worker_lease_is_exact(self) -> None:
+        envelope = load(
+            ROOT / "stages" / "s1-budget-attempt-lifecycle" / "stage-envelope.json"
+        )
+        lease = load(
+            ROOT / "stages" / "s1-budget-attempt-lifecycle" / "ownership-lease.json"
+        )
+
+        self.assertEqual(
+            envelope["public_authority_sha"],
+            "641f18ab1f0d9f6ef385ccd286220e0007dcde69",
+        )
+        self.assertEqual(envelope["write_set"], lease["write_set"])
+        self.assertEqual(len(envelope["write_set"]), 11)
+        self.assertEqual(
+            envelope["write_set"][:3],
+            [
+                "src/research_bridge/kernel.py",
+                "src/research_bridge/ledger.py",
+                "src/research_bridge/execution.py",
+            ],
+        )
+        self.assertFalse(envelope["push_authority"])
+        self.assertFalse(lease["delegation_allowed"])
+        self.assertIn(
+            "second-table-second-ledger-new-event-type-new-column-table-rebuild-or-nonempty-legacy-migration",
+            envelope["forbidden_scope"],
+        )
+
     def test_budget_profile_worker_lease_is_exact_and_non_expansive(self) -> None:
         envelope = load(ROOT / "stages" / "s1-budget-profile" / "stage-envelope.json")
         lease = load(ROOT / "stages" / "s1-budget-profile" / "ownership-lease.json")
