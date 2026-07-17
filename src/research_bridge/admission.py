@@ -61,6 +61,16 @@ _PERMIT_PAYLOAD_KEYS = {
     "max_uses",
     "nonce",
 }
+_PERMIT_QUOTA_KEYS = {
+    "accounting_policy_ref",
+    "budget_scope_ref",
+    "claims",
+    "provider",
+    "scope_limit",
+    "trial_ref",
+}
+_SCOPE_LIMIT_KEYS = {"cost_units"}
+_JOB_RESOURCE_LIMIT_KEYS = {"cost_units"}
 _LEASE_PAYLOAD_KEYS = {
     "attempt_id",
     "permit_ref",
@@ -80,9 +90,12 @@ _CLASSIFICATIONS = {
     "D3_RESTRICTED",
 }
 _SHA256 = re.compile(r"^[a-f0-9]{64}$")
+_ACCOUNTING_POLICY_REF = re.compile(r"^budget-policy:sha256:[a-f0-9]{64}$")
+_BUDGET_SCOPE_REF = re.compile(r"^budget-scope:sha256:[a-f0-9]{64}$")
 _RFC3339 = re.compile(
     r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$"
 )
+_MAX_SAFE_INTEGER = 9_007_199_254_740_991
 
 
 class AdmissionError(ValueError):
@@ -97,6 +110,17 @@ class AdmissionGrant:
     attempt_id: str
     permit_id: str
     permit_nonce_sha256: str
+    accounting_policy_ref: str
+    budget_scope_ref: str
+    claims: int
+    provider: str
+    scope_limit_cost_units: int
+    trial_ref: str
+    reservation_cost_units: int
+    reservation_expires_at: str
+    job_idempotency_key: str
+    contour: str
+    classification: str
     runner_identity: str
     fencing_epoch: int
     fencing_token: str
@@ -201,8 +225,17 @@ def admit(
         raise AdmissionError("permit input digest does not match ordered job inputs")
     if permit_payload["image_digest"] != job_payload["image_digest"]:
         raise AdmissionError("permit image digest does not match job")
-    if permit_payload["max_uses"] != 1:
+    quotas = permit_payload["quotas"]
+    resource_limits = job_payload["resource_limits"]
+    claims = quotas["claims"]
+    scope_limit_cost_units = quotas["scope_limit"]["cost_units"]
+    reservation_cost_units = resource_limits["cost_units"]
+    if permit_payload["max_uses"] != 1 or claims != permit_payload["max_uses"]:
         raise AdmissionError("permit must authorize exactly one use")
+    if quotas["provider"] != job_payload["runner_profile"]:
+        raise AdmissionError("permit budget provider does not match job runner profile")
+    if reservation_cost_units > scope_limit_cost_units:
+        raise AdmissionError("job reservation exceeds Permit budget scope")
     if job_payload["network_policy"] != "offline":
         raise AdmissionError("job network policy is not offline")
     if permit_payload["network_class"] != "offline":
@@ -214,6 +247,7 @@ def admit(
         raise AdmissionError("lease does not bind the supplied permit")
 
     admitted_at = _format_timestamp(admitted_time)
+    reservation_expires_at = _format_timestamp(min(permit_expires, lease_expires))
     admission_digest = canonical_json_sha256(
         {
             "admitted_at": admitted_at,
@@ -227,6 +261,17 @@ def admit(
         attempt_id=lease_payload["attempt_id"],
         permit_id=permit_id,
         permit_nonce_sha256=permit_nonce_sha256,
+        accounting_policy_ref=quotas["accounting_policy_ref"],
+        budget_scope_ref=quotas["budget_scope_ref"],
+        claims=claims,
+        provider=quotas["provider"],
+        scope_limit_cost_units=scope_limit_cost_units,
+        trial_ref=quotas["trial_ref"],
+        reservation_cost_units=reservation_cost_units,
+        reservation_expires_at=reservation_expires_at,
+        job_idempotency_key=job_payload["idempotency_key"],
+        contour=job_spec["contour"],
+        classification=job_spec["classification"],
         runner_identity=lease_payload["runner_identity"],
         fencing_epoch=lease_payload["fencing_epoch"],
         fencing_token=lease_payload["fencing_token"],
@@ -286,8 +331,17 @@ def _validate_job_payload(payload: dict[str, Any]) -> None:
     for field in _JOB_PAYLOAD_KEYS - {"input_refs", "resource_limits"}:
         _expect_nonempty_string(payload[field], f"job_spec.payload.{field}")
     _expect_string_list(payload["input_refs"], "job_spec.payload.input_refs")
-    _expect_object(payload["resource_limits"], "job_spec.payload.resource_limits")
-    _ensure_json_value(payload["resource_limits"], "job_spec.payload.resource_limits")
+    resource_limits = payload["resource_limits"]
+    _expect_object(resource_limits, "job_spec.payload.resource_limits")
+    _expect_exact_keys(
+        resource_limits,
+        _JOB_RESOURCE_LIMIT_KEYS,
+        "job_spec.payload.resource_limits",
+    )
+    _expect_positive_safe_integer(
+        resource_limits["cost_units"],
+        "job_spec.payload.resource_limits.cost_units",
+    )
 
 
 def _validate_permit_payload(payload: dict[str, Any]) -> None:
@@ -308,8 +362,33 @@ def _validate_permit_payload(payload: dict[str, Any]) -> None:
         "input_sha256",
     }:
         _expect_sha256(payload[field], f"permit.payload.{field}")
-    _expect_object(payload["quotas"], "permit.payload.quotas")
-    _ensure_json_value(payload["quotas"], "permit.payload.quotas")
+    quotas = payload["quotas"]
+    _expect_object(quotas, "permit.payload.quotas")
+    _expect_exact_keys(quotas, _PERMIT_QUOTA_KEYS, "permit.payload.quotas")
+    _expect_content_addressed_reference(
+        quotas["accounting_policy_ref"],
+        _ACCOUNTING_POLICY_REF,
+        "permit.payload.quotas.accounting_policy_ref",
+    )
+    _expect_content_addressed_reference(
+        quotas["budget_scope_ref"],
+        _BUDGET_SCOPE_REF,
+        "permit.payload.quotas.budget_scope_ref",
+    )
+    _expect_positive_safe_integer(quotas["claims"], "permit.payload.quotas.claims")
+    _expect_nonempty_string(quotas["provider"], "permit.payload.quotas.provider")
+    _expect_nonempty_string(quotas["trial_ref"], "permit.payload.quotas.trial_ref")
+    scope_limit = quotas["scope_limit"]
+    _expect_object(scope_limit, "permit.payload.quotas.scope_limit")
+    _expect_exact_keys(
+        scope_limit,
+        _SCOPE_LIMIT_KEYS,
+        "permit.payload.quotas.scope_limit",
+    )
+    _expect_positive_safe_integer(
+        scope_limit["cost_units"],
+        "permit.payload.quotas.scope_limit.cost_units",
+    )
     _expect_nonnegative_integer(payload["max_uses"], "permit.payload.max_uses")
     _parse_timestamp(payload["not_before"], "permit.payload.not_before")
     _parse_timestamp(payload["expires_at"], "permit.payload.expires_at")
@@ -362,6 +441,20 @@ def _expect_string_list(value: Any, path: str) -> None:
 def _expect_nonnegative_integer(value: Any, path: str) -> None:
     if isinstance(value, bool) or not isinstance(value, int) or value < 0:
         raise AdmissionError(f"{path} must be a non-negative integer")
+
+
+def _expect_positive_safe_integer(value: Any, path: str) -> None:
+    if type(value) is not int or value < 1 or value > _MAX_SAFE_INTEGER:
+        raise AdmissionError(f"{path} must be a positive safe integer")
+
+
+def _expect_content_addressed_reference(
+    value: Any,
+    pattern: re.Pattern[str],
+    path: str,
+) -> None:
+    if not isinstance(value, str) or pattern.fullmatch(value) is None:
+        raise AdmissionError(f"{path} must be a content-addressed budget reference")
 
 
 def _parse_now(value: datetime | str) -> datetime:

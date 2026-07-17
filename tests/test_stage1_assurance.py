@@ -35,6 +35,9 @@ STATE_SHA256 = "5" * 64
 RESULT_SHA256 = "6" * 64
 ADMISSION_SHA256 = "7" * 64
 PERMIT_NONCE_SHA256 = hashlib.sha256(b"synthetic-permit-nonce-001").hexdigest()
+MAX_SAFE_INTEGER = 9_007_199_254_740_991
+ACCOUNTING_POLICY_REF = f"budget-policy:sha256:{'a' * 64}"
+BUDGET_SCOPE_REF = f"budget-scope:sha256:{'b' * 64}"
 
 
 def _authority_verifier():
@@ -70,7 +73,7 @@ def _valid_authority() -> tuple[dict, dict, dict]:
                 "image_digest": f"sha256:{IMAGE_SHA256}",
                 "runner_profile": "offline-synthetic-runner",
                 "network_policy": "offline",
-                "resource_limits": {"cpu_seconds": 1, "memory_mb": 64},
+                "resource_limits": {"cost_units": 2},
                 "checkpoint_strategy": "append-only",
                 "expected_output_contract": "ValidationReceipt",
                 "idempotency_key": "synthetic-idempotency-001",
@@ -99,7 +102,14 @@ def _valid_authority() -> tuple[dict, dict, dict]:
                     job_spec["payload"]["input_refs"]
                 ),
                 "image_digest": f"sha256:{IMAGE_SHA256}",
-                "quotas": {"claims": 1},
+                "quotas": {
+                    "accounting_policy_ref": ACCOUNTING_POLICY_REF,
+                    "budget_scope_ref": BUDGET_SCOPE_REF,
+                    "claims": 1,
+                    "provider": job_spec["payload"]["runner_profile"],
+                    "scope_limit": {"cost_units": 3},
+                    "trial_ref": "trial:synthetic-assurance-001",
+                },
                 "network_class": "offline",
                 "not_before": _timestamp(NOW - timedelta(seconds=30)),
                 "expires_at": _timestamp(NOW + timedelta(minutes=10)),
@@ -249,6 +259,44 @@ class Stage1AdmissionAssuranceTests(unittest.TestCase):
         mutations.append(("lease top-level", job_spec, permit, lease))
 
         for label, candidate_job, candidate_permit, candidate_lease in mutations:
+            with self.subTest(label=label):
+                self.assert_denied_without_ledger_write(
+                    candidate_job, candidate_permit, candidate_lease
+                )
+
+    def test_invalid_budget_profiles_are_fail_closed_before_the_ledger(self) -> None:
+        candidates = []
+
+        job_spec, permit, lease = _valid_authority()
+        job_spec["payload"]["resource_limits"] = {"cost_units": True}
+        _seal(job_spec)
+        _rebind_permit_to_job(job_spec, permit)
+        candidates.append(("boolean reservation", job_spec, permit, lease))
+
+        job_spec, permit, lease = _valid_authority()
+        job_spec["payload"]["resource_limits"] = {
+            "cost_units": MAX_SAFE_INTEGER + 1
+        }
+        _seal(job_spec)
+        _rebind_permit_to_job(job_spec, permit)
+        candidates.append(("unsafe reservation", job_spec, permit, lease))
+
+        job_spec, permit, lease = _valid_authority()
+        permit["payload"]["quotas"]["scope_limit"]["cost_units"] = 1
+        _seal(permit)
+        candidates.append(("reservation over scope", job_spec, permit, lease))
+
+        job_spec, permit, lease = _valid_authority()
+        permit["payload"]["quotas"]["provider"] = "other-provider"
+        _seal(permit)
+        candidates.append(("provider mismatch", job_spec, permit, lease))
+
+        job_spec, permit, lease = _valid_authority()
+        permit["payload"]["quotas"]["scope_limit"]["extra"] = 1
+        _seal(permit)
+        candidates.append(("extra scope field", job_spec, permit, lease))
+
+        for label, candidate_job, candidate_permit, candidate_lease in candidates:
             with self.subTest(label=label):
                 self.assert_denied_without_ledger_write(
                     candidate_job, candidate_permit, candidate_lease

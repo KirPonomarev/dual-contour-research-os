@@ -27,6 +27,13 @@ NOW = datetime(2026, 7, 16, 12, 0, tzinfo=timezone.utc)
 ZERO = "0" * 64
 ONE = "1" * 64
 TWO = "2" * 64
+MAX_SAFE_INTEGER = 9_007_199_254_740_991
+ACCOUNTING_POLICY_REF = f"budget-policy:sha256:{'a' * 64}"
+BUDGET_SCOPE_REF = f"budget-scope:sha256:{'b' * 64}"
+
+
+class IntegerSubclass(int):
+    pass
 
 
 def trusted_authority():
@@ -62,7 +69,7 @@ def authority_documents() -> tuple[dict, dict, dict]:
                 "image_digest": "image:synthetic",
                 "runner_profile": "offline-test",
                 "network_policy": "offline",
-                "resource_limits": {"cpu_seconds": 1},
+                "resource_limits": {"cost_units": 2},
                 "checkpoint_strategy": "append-only",
                 "expected_output_contract": "SyntheticReceipt",
                 "idempotency_key": "synthetic-idempotency-1",
@@ -85,7 +92,14 @@ def authority_documents() -> tuple[dict, dict, dict]:
                 "code_sha256": ONE,
                 "input_sha256": canonical_json_sha256(job["payload"]["input_refs"]),
                 "image_digest": job["payload"]["image_digest"],
-                "quotas": {"claims": 1},
+                "quotas": {
+                    "accounting_policy_ref": ACCOUNTING_POLICY_REF,
+                    "budget_scope_ref": BUDGET_SCOPE_REF,
+                    "claims": 1,
+                    "provider": job["payload"]["runner_profile"],
+                    "scope_limit": {"cost_units": 3},
+                    "trial_ref": "trial:public-synthetic-1",
+                },
                 "network_class": "offline",
                 "not_before": "2026-07-16T11:00:00Z",
                 "expires_at": "2026-07-16T13:00:00Z",
@@ -146,6 +160,17 @@ class AdmissionTests(unittest.TestCase):
                 "attempt_id",
                 "permit_id",
                 "permit_nonce_sha256",
+                "accounting_policy_ref",
+                "budget_scope_ref",
+                "claims",
+                "provider",
+                "scope_limit_cost_units",
+                "trial_ref",
+                "reservation_cost_units",
+                "reservation_expires_at",
+                "job_idempotency_key",
+                "contour",
+                "classification",
                 "runner_identity",
                 "fencing_epoch",
                 "fencing_token",
@@ -160,9 +185,111 @@ class AdmissionTests(unittest.TestCase):
             hashlib.sha256(permit["payload"]["nonce"].encode("utf-8")).hexdigest(),
         )
         self.assertEqual(grant.attempt_id, lease["payload"]["attempt_id"])
+        self.assertEqual(grant.accounting_policy_ref, ACCOUNTING_POLICY_REF)
+        self.assertEqual(grant.budget_scope_ref, BUDGET_SCOPE_REF)
+        self.assertEqual(grant.claims, 1)
+        self.assertEqual(grant.provider, job["payload"]["runner_profile"])
+        self.assertEqual(grant.scope_limit_cost_units, 3)
+        self.assertEqual(grant.trial_ref, "trial:public-synthetic-1")
+        self.assertEqual(grant.reservation_cost_units, 2)
+        self.assertEqual(grant.reservation_expires_at, lease["payload"]["expires_at"])
+        self.assertEqual(grant.job_idempotency_key, job["payload"]["idempotency_key"])
+        self.assertEqual(grant.contour, job["contour"])
+        self.assertEqual(grant.classification, job["classification"])
         self.assertRegex(grant.admission_digest, r"^[a-f0-9]{64}$")
+        job["payload"]["resource_limits"]["cost_units"] = 99
+        permit["payload"]["quotas"]["scope_limit"]["cost_units"] = 99
+        self.assertEqual(grant.reservation_cost_units, 2)
+        self.assertEqual(grant.scope_limit_cost_units, 3)
         with self.assertRaises(FrozenInstanceError):
             grant.job_id = "changed"  # type: ignore[misc]
+
+    def test_budget_profile_shape_values_and_bindings_are_fail_closed(self) -> None:
+        invalid_resource_limits = (
+            [],
+            {},
+            {"cost_units": 0},
+            {"cost_units": -1},
+            {"cost_units": True},
+            {"cost_units": IntegerSubclass(1)},
+            {"cost_units": 1.0},
+            {"cost_units": "1"},
+            {"cost_units": MAX_SAFE_INTEGER + 1},
+            {"cost_units": 1, "extra": 1},
+        )
+        for resource_limits in invalid_resource_limits:
+            with self.subTest(resource_limits=resource_limits):
+                job, permit, lease = authority_documents()
+                job["payload"]["resource_limits"] = resource_limits
+                with_integrity(job)
+                permit["payload"]["job_spec_sha256"] = canonical_json_sha256(job)
+                with_integrity(permit)
+                with self.assertRaises(AdmissionError):
+                    admit(job, permit, lease, now=NOW, authority=trusted_authority())
+
+        invalid_quotas = (
+            [],
+            {},
+            {**authority_documents()[1]["payload"]["quotas"], "extra": 1},
+            {**authority_documents()[1]["payload"]["quotas"], "claims": 0},
+            {**authority_documents()[1]["payload"]["quotas"], "claims": 2},
+            {**authority_documents()[1]["payload"]["quotas"], "claims": True},
+            {
+                **authority_documents()[1]["payload"]["quotas"],
+                "claims": IntegerSubclass(1),
+            },
+            {**authority_documents()[1]["payload"]["quotas"], "provider": "other"},
+            {**authority_documents()[1]["payload"]["quotas"], "trial_ref": ""},
+            {
+                **authority_documents()[1]["payload"]["quotas"],
+                "accounting_policy_ref": f"budget-policy:sha256:{'A' * 64}",
+            },
+            {
+                **authority_documents()[1]["payload"]["quotas"],
+                "budget_scope_ref": f"budget-scope:sha256:{'b' * 63}",
+            },
+            {**authority_documents()[1]["payload"]["quotas"], "scope_limit": []},
+            {
+                **authority_documents()[1]["payload"]["quotas"],
+                "scope_limit": {"cost_units": 0},
+            },
+            {
+                **authority_documents()[1]["payload"]["quotas"],
+                "scope_limit": {"cost_units": True},
+            },
+            {
+                **authority_documents()[1]["payload"]["quotas"],
+                "scope_limit": {"cost_units": IntegerSubclass(1)},
+            },
+            {
+                **authority_documents()[1]["payload"]["quotas"],
+                "scope_limit": {"cost_units": MAX_SAFE_INTEGER + 1},
+            },
+            {
+                **authority_documents()[1]["payload"]["quotas"],
+                "scope_limit": {"cost_units": 1, "extra": 1},
+            },
+        )
+        for quotas in invalid_quotas:
+            with self.subTest(quotas=quotas):
+                job, permit, lease = authority_documents()
+                permit["payload"]["quotas"] = quotas
+                with_integrity(permit)
+                with self.assertRaises(AdmissionError):
+                    admit(job, permit, lease, now=NOW, authority=trusted_authority())
+
+        job, permit, lease = authority_documents()
+        permit["payload"]["quotas"]["scope_limit"]["cost_units"] = 1
+        with_integrity(permit)
+        with self.assertRaises(AdmissionError):
+            admit(job, permit, lease, now=NOW, authority=trusted_authority())
+
+    def test_reservation_expiry_is_the_earliest_authority_expiry(self) -> None:
+        job, permit, lease = authority_documents()
+        permit["payload"]["expires_at"] = "2026-07-16T12:15:00Z"
+        with_integrity(permit)
+        grant = admit(job, permit, lease, now=NOW, authority=trusted_authority())
+        self.assertEqual(grant.reservation_expires_at, "2026-07-16T12:15:00Z")
 
     def test_unknown_and_missing_fields_fail_closed(self) -> None:
         for document_index, location in ((0, None), (1, "payload"), (2, "issuer")):

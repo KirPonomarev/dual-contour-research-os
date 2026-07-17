@@ -52,6 +52,8 @@ INPUT_REFS = (
 )
 IMAGE_SHA256 = hashlib.sha256(b"synthetic-offline-environment").hexdigest()
 POLICY_SHA256 = SYNTHETIC_POLICY_SHA256
+ACCOUNTING_POLICY_REF = f"budget-policy:sha256:{'a' * 64}"
+BUDGET_SCOPE_REF = f"budget-scope:sha256:{'b' * 64}"
 
 
 def _authority_verifier():
@@ -90,7 +92,7 @@ def _authority(
                 "image_digest": f"sha256:{IMAGE_SHA256}",
                 "runner_profile": "L0",
                 "network_policy": "offline",
-                "resource_limits": {"max_input_bytes": 1_048_576},
+                "resource_limits": {"cost_units": 2},
                 "checkpoint_strategy": "single-final-checkpoint",
                 "expected_output_contract": "StagingEnvelope@1.0.0",
                 "idempotency_key": "synthetic-execution-idempotency-001",
@@ -117,7 +119,14 @@ def _authority(
                 "code_sha256": FROZEN_TEMPLATE_SHA256,
                 "input_sha256": admission_sha256(list(INPUT_REFS)),
                 "image_digest": f"sha256:{IMAGE_SHA256}",
-                "quotas": {"claims": 1},
+                "quotas": {
+                    "accounting_policy_ref": ACCOUNTING_POLICY_REF,
+                    "budget_scope_ref": BUDGET_SCOPE_REF,
+                    "claims": 1,
+                    "provider": job_spec["payload"]["runner_profile"],
+                    "scope_limit": {"cost_units": 3},
+                    "trial_ref": "trial:synthetic-execution-001",
+                },
                 "network_class": "offline",
                 "not_before": _timestamp(NOW - timedelta(seconds=30)),
                 "expires_at": _timestamp(NOW + timedelta(minutes=10)),

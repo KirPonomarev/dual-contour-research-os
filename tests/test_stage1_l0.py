@@ -32,6 +32,13 @@ INPUT_BYTES = [b"RAW-SYNTHETIC-INPUT-ONE", b"second-synthetic-input"]
 INPUT_REFS = [
     f"cas:sha256:{hashlib.sha256(value).hexdigest()}" for value in INPUT_BYTES
 ]
+MAX_SAFE_INTEGER = 9_007_199_254_740_991
+
+
+class IntegerSubclass(int):
+    pass
+
+
 COMMON_KEYS = {
     "schema_id",
     "schema_version",
@@ -114,7 +121,7 @@ def job_spec(*, classification: str = "D1_INTERNAL_SANITIZED") -> dict[str, obje
                 "image_digest": IMAGE_DIGEST,
                 "runner_profile": "L0",
                 "network_policy": "offline",
-                "resource_limits": {"synthetic_memory_bytes": 1_000_000},
+                "resource_limits": {"cost_units": 2},
                 "checkpoint_strategy": "single-final-checkpoint",
                 "expected_output_contract": "StagingEnvelope@1.0.0",
                 "idempotency_key": "idempotency-l0-synthetic",
@@ -522,6 +529,37 @@ class DeterministicL0RunnerTests(unittest.TestCase):
         for index, (job, lease) in enumerate(cases):
             with self.subTest(index=index):
                 self.assert_rejected_before_input(job, lease)
+
+    def test_resource_profile_is_exact_positive_safe_integer(self) -> None:
+        invalid_profiles = (
+            [],
+            {},
+            {"cost_units": 0},
+            {"cost_units": -1},
+            {"cost_units": True},
+            {"cost_units": IntegerSubclass(1)},
+            {"cost_units": 1.0},
+            {"cost_units": "1"},
+            {"cost_units": MAX_SAFE_INTEGER + 1},
+            {"cost_units": 1, "extra": 1},
+        )
+        for profile in invalid_profiles:
+            document = job_spec()
+            document["payload"]["resource_limits"] = profile  # type: ignore[index]
+            reseal(document)
+            with self.subTest(profile=profile):
+                self.assert_rejected_before_input(document, attempt_lease())
+
+        boundary_root = self.root / "safe-integer-boundary"
+        boundary_root.mkdir()
+        boundary = job_spec()
+        boundary["payload"]["resource_limits"] = {  # type: ignore[index]
+            "cost_units": MAX_SAFE_INTEGER
+        }
+        reseal(boundary)
+        self.runner()[0].run(boundary, attempt_lease(), boundary_root)
+        self.assertTrue((boundary_root / "checkpoint.json").is_file())
+        self.assertTrue((boundary_root / "result.json").is_file())
 
     def test_lease_job_runner_contour_classification_and_time_bindings_are_strict(self) -> None:
         cases = []

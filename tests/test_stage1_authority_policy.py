@@ -36,6 +36,8 @@ _DEFAULT_APPROVAL_REFS = (
     "approval:offline-a",
     "approval:synthetic-router-authority",
 )
+_ACCOUNTING_POLICY_REF = f"budget-policy:sha256:{'a' * 64}"
+_BUDGET_SCOPE_REF = f"budget-scope:sha256:{'b' * 64}"
 
 
 def _seal(document: dict[str, object]) -> dict[str, object]:
@@ -162,7 +164,7 @@ def _authority_documents() -> tuple[dict[str, object], ...]:
                 "image_digest": "image:synthetic",
                 "runner_profile": "offline-test",
                 "network_policy": "offline",
-                "resource_limits": {"cpu_seconds": 1},
+                "resource_limits": {"cost_units": 2},
                 "checkpoint_strategy": "append-only",
                 "expected_output_contract": "SyntheticReceipt",
                 "idempotency_key": "authority-policy-synthetic",
@@ -191,7 +193,14 @@ def _authority_documents() -> tuple[dict[str, object], ...]:
                     job["payload"]["input_refs"]  # type: ignore[index]
                 ),
                 "image_digest": "image:synthetic",
-                "quotas": {"claims": 1},
+                "quotas": {
+                    "accounting_policy_ref": _ACCOUNTING_POLICY_REF,
+                    "budget_scope_ref": _BUDGET_SCOPE_REF,
+                    "claims": 1,
+                    "provider": job["payload"]["runner_profile"],  # type: ignore[index]
+                    "scope_limit": {"cost_units": 3},
+                    "trial_ref": "trial:authority-policy-synthetic",
+                },
                 "network_class": "offline",
                 "not_before": "2026-07-16T11:00:00Z",
                 "expires_at": "2026-07-16T13:00:00Z",
