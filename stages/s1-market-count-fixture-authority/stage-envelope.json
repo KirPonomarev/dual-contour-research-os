@@ -1,0 +1,96 @@
+{
+  "stage_id": "s1-market-count-fixture-authority",
+  "agent_id": "agent-0",
+  "objective": "Authorize one private D1 count-only fixture derived read-only from a frozen Market artifact so recursive clean-checkout reproduction can retain the existing exact scientific assertions without copying raw events or weakening validation.",
+  "executable_blocker": "Strict recursive reproduction needs a 260-cluster sufficient-statistic allocation that cannot be derived from the published aggregates; integrity-only validation, expected-value changes and private raw payload copy are forbidden.",
+  "base_sha": "0169161ce428fd6b77762766e7e508a208b8edd2",
+  "candidate_market_base_sha": "6299f65f92d8bc6964c423775a5cce1f2fdef58a",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "main",
+  "worktree": "canonical-main-worktree",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "docs/receipts/source-freeze/s1-market-base-repair.json",
+    "docs/receipts/reuse/s1-market-lineage-portability.json",
+    "docs/receipts/integration/s1-market-lineage-portability-authority.json",
+    "stages/s1-market-lineage-portability/stage-envelope.json",
+    "market-domain:frozen-count-source@sha256:fec6a11809bc1c9ec672ff0ddae38a5a7f7845bc32e0b06bb97dc1a4ad50ecc3",
+    "market-domain:sanitized-blocker-analysis"
+  ],
+  "write_set": [
+    "docs/receipts/reuse/s1-market-sanitized-count-fixture.json",
+    "stages/s1-market-count-fixture-authority/stage-envelope.json",
+    "stages/s1-market-count-fixture-authority/ownership-lease.json",
+    "tests/test_stage1_authority.py"
+  ],
+  "authorized_worker_amendment": {
+    "stage_id": "s1-market-lineage-portability",
+    "agent_id": "agent-3",
+    "branch": "codex/bridge-a3-s1-market-lineage-portability",
+    "added_write_set": [
+      "tests/fixtures/ban_local_eventness_nonlinear_candidate_cluster_counts.json"
+    ],
+    "source_read": "market-domain:frozen-count-source@sha256:fec6a11809bc1c9ec672ff0ddae38a5a7f7845bc32e0b06bb97dc1a4ad50ecc3",
+    "allowed_fields": [
+      "cluster_index",
+      "fold_id",
+      "event_count",
+      "analysis_count",
+      "low_count",
+      "neutral_count",
+      "high_count",
+      "selected_event_count",
+      "selected_analysis_count",
+      "selected_low_count",
+      "selected_neutral_count",
+      "selected_high_count"
+    ],
+    "transformation_rule": "Verify the frozen source hash and exact 260-row shape read only; copy only the allowlisted nonnegative integer counts into the private fixture; synthesize all event rows and timestamps independently under temporary roots.",
+    "preservation_rule": "Keep every existing expected value and assertion; run full per-stage reproduction; retain the pinned default lineage; do not expose the fixture or its values in the public Bridge."
+  },
+  "forbidden_scope": [
+    "public-copy-of-private-fixture-or-values",
+    "symbol-price-return-timestamp-source-path-report-path-or-floating-derived-metric-copy",
+    "raw-event-row-report-manifest-evidence-registry-or-strategy-copy",
+    "source-artifact-or-original-dirty-checkout-mutation",
+    "fixture-specific-expected-value-or-assertion-change",
+    "integrity-only-validator-result-injection-mock-monkeypatch-or-bypass",
+    "private-path-url-secret-account-key-or-d2-d3-payload-in-public-repository",
+    "network-download-exchange-order-private-api-or-external-mutation",
+    "live-trading-publication-deployment-or-ui",
+    "external-dependency-adoption",
+    "frozen-contract-edit"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "source_freeze": "f6ac6b7ebd5920c89348c58f0ddf955b28a823c31bb676c92403fa45e761a0ce",
+    "prior_reuse_decision": "a49e6caabf213121f896a04d41adbbbc2b15a33c8f90eadaadb2726f43aec587",
+    "prior_authority_receipt": "a14cb2cd246d8d475bacce0acdef14fa622081daccb23aee75b682cfa8e045fc",
+    "candidate_market_tree": "a355545f90e43f64b6525ec5d839b59975c408bc",
+    "frozen_count_source": "fec6a11809bc1c9ec672ff0ddae38a5a7f7845bc32e0b06bb97dc1a4ad50ecc3",
+    "external_dependencies": "none"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest tests.test_stage1_authority -v",
+    "make test",
+    "git diff --check",
+    "public privacy, fixture-value, secret, private-locator, private-URL and exact write-set scan"
+  ],
+  "risk_class": "private-market-sanitized-count-fixture-authority",
+  "stop_conditions": [
+    "source-hash-or-row-shape-mismatch",
+    "nonallowlisted-field-or-noninteger-value-required",
+    "public-fixture-value-private-locator-or-raw-payload-copy",
+    "expected-value-change-or-validator-bypass-required",
+    "full-recursive-reproduction-still-impossible",
+    "dirty-source-checkout-changed",
+    "external-network-dependency-or-live-authority-required",
+    "before-equals-after-or-two-entrypoint-blocker-remains"
+  ],
+  "expected_receipt": "docs/receipts/integration/s1-market-count-fixture-authority.json",
+  "rollback": "Revert the scoped public authority commit before issuing the amended worker lease. No private source artifact, dirty checkout, runtime, scientific state, dataset, report, deployment or external system is mutated by this authority stage.",
+  "commit_authority": "agent-0-one-scoped-commit",
+  "push_authority": true
+}

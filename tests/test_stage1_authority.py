@@ -54,6 +54,7 @@ class Stage1AuthorityTests(unittest.TestCase):
             "s1-market-base-symlink-fix.json": "owner-local-minimal-fail-closed-glue-no-public-copy",
             "s1-market-clean-checkout-fixtures.json": "owner-local-synthetic-clean-checkout-fixtures-no-new-dependency",
             "s1-market-lineage-portability.json": "owner-local-manifest-derived-recursive-lineage-no-new-dependency",
+            "s1-market-sanitized-count-fixture.json": "owner-private-sanitized-count-sufficient-statistics-no-public-payload",
         }
         schema = load(ROOT / "contracts" / "v1" / "ReuseDecisionReceipt.schema.json")
         allowed = set(schema["properties"])
@@ -306,6 +307,67 @@ class Stage1AuthorityTests(unittest.TestCase):
                     ROOT
                     / "stages"
                     / "s1-market-lineage-portability-authority"
+                    / "ownership-lease.json"
+                ).read_text(),
+            )
+        )
+        self.assertNotIn("/Users/", public_text)
+        self.assertNotIn("/Volumes/", public_text)
+        self.assertNotIn("github.com/KirPonomarev/crypto-market-lab", public_text)
+        self.assertTrue(envelope["rollback"])
+        self.assertFalse(lease["delegation_allowed"])
+
+    def test_market_count_fixture_authority_is_private_allowlisted_and_nonweakening(self) -> None:
+        envelope = load(
+            ROOT
+            / "stages"
+            / "s1-market-count-fixture-authority"
+            / "stage-envelope.json"
+        )
+        lease = load(
+            ROOT
+            / "stages"
+            / "s1-market-count-fixture-authority"
+            / "ownership-lease.json"
+        )
+        reuse = load(REUSE_RECEIPTS / "s1-market-sanitized-count-fixture.json")
+
+        self.assertEqual(envelope["base_sha"], "0169161ce428fd6b77762766e7e508a208b8edd2")
+        self.assertEqual(envelope["write_set"], lease["write_set"])
+        amendment = envelope["authorized_worker_amendment"]
+        self.assertEqual(amendment["agent_id"], "agent-3")
+        self.assertEqual(
+            amendment["added_write_set"],
+            ["tests/fixtures/ban_local_eventness_nonlinear_candidate_cluster_counts.json"],
+        )
+        self.assertEqual(len(amendment["allowed_fields"]), 12)
+        self.assertNotIn("timestamp", amendment["allowed_fields"])
+        self.assertEqual(reuse["integrity"]["payload_sha256"], payload_sha256(reuse))
+        dispositions = {
+            item["candidate"]: item["disposition"]
+            for item in reuse["payload"]["candidates"]
+        }
+        self.assertEqual(
+            dispositions["owner-sanctioned-count-only-private-test-fixture"],
+            "selected",
+        )
+        self.assertEqual(
+            dispositions["fixture-specific-expected-value-change"],
+            "rejected-validation-weakening",
+        )
+        public_text = "\n".join(
+            (
+                (REUSE_RECEIPTS / "s1-market-sanitized-count-fixture.json").read_text(),
+                (
+                    ROOT
+                    / "stages"
+                    / "s1-market-count-fixture-authority"
+                    / "stage-envelope.json"
+                ).read_text(),
+                (
+                    ROOT
+                    / "stages"
+                    / "s1-market-count-fixture-authority"
                     / "ownership-lease.json"
                 ).read_text(),
             )

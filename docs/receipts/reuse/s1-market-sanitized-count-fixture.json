@@ -1,0 +1,66 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-s1-market-sanitized-count-fixture-20260717",
+  "issued_at": "2026-07-17T07:48:17Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "reuse-freeze-authority"
+  },
+  "contour": "market",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "exact-reproduction-from-sanitized-cluster-count-sufficient-statistics",
+    "candidates": [
+      {
+        "candidate": "owner-sanctioned-count-only-private-test-fixture",
+        "disposition": "selected"
+      },
+      {
+        "candidate": "existing-stdlib-csv-json-transform",
+        "disposition": "selected-no-new-dependency"
+      },
+      {
+        "candidate": "raw-event-price-return-symbol-or-timestamp-copy",
+        "disposition": "rejected-classification-boundary"
+      },
+      {
+        "candidate": "public-repository-fixture-copy",
+        "disposition": "rejected-domain-boundary"
+      },
+      {
+        "candidate": "fixture-specific-expected-value-change",
+        "disposition": "rejected-validation-weakening"
+      },
+      {
+        "candidate": "integrity-only-validator-or-result-injection",
+        "disposition": "rejected-validation-bypass"
+      }
+    ],
+    "selected_mode": "owner-private-sanitized-count-sufficient-statistics-no-public-payload",
+    "source_ref": "source-freeze:source-freeze-market-s1-base-repair-20260717;sha256:fec6a11809bc1c9ec672ff0ddae38a5a7f7845bc32e0b06bb97dc1a4ad50ecc3",
+    "code_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "license_spdx": "NOASSERTION",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "source artifact hash and row count are verified read only before transformation",
+      "fixture contains only sequential cluster identity fold identity and nonnegative integer counts",
+      "fixture contains no symbol price return timestamp source path report path or floating derived metric",
+      "synthetic event materialization reproduces every existing exact numeric assertion",
+      "recursive validators reproduce every output artifact and metric",
+      "original dirty checkout integrity is unchanged",
+      "fixture remains private Market test data and is never copied into the public Bridge"
+    ],
+    "canonical_owner": "market-domain-tests-with-agent0-integration",
+    "rollback": "Discard the private sanitized fixture and lineage worker commit. The read-only source artifact, original dirty checkout, scientific registries, public Bridge and external systems remain unchanged."
+  },
+  "integrity": {
+    "payload_sha256": "0b834a4504b56a73a492250ea9a4eb0cc3d042920863b984abd855a4bb98ad68",
+    "parent_refs": [
+      "git:0169161ce428fd6b77762766e7e508a208b8edd2",
+      "git:6299f65f92d8bc6964c423775a5cce1f2fdef58a",
+      "source-freeze:source-freeze-market-s1-base-repair-20260717",
+      "reuse:reuse-s1-market-lineage-portability-20260717"
+    ]
+  }
+}
