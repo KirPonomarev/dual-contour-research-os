@@ -1,0 +1,59 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s2-market-backup-restore-authority-20260717",
+  "issued_at": "2026-07-17T23:58:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "market",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s2-market-backup-restore-authority",
+    "agent_id": "agent-0",
+    "ownership_lease_ref": "stages/s2-market-backup-restore-authority/ownership-lease.json",
+    "base_sha": "007e13f21da5ac1da7f5d6bb2119d1b0ccfa9b6a",
+    "head_sha": "aabe140f527640556049953bbe60711daf9f1b2d",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "docs/receipts/source-freeze/s2-market-backup-restore.json",
+      "docs/receipts/reuse/s2-market-backup-restore.json",
+      "stages/s2-market-backup-restore-authority/stage-envelope.json",
+      "stages/s2-market-backup-restore-authority/ownership-lease.json",
+      "tests/test_stage2_authority.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "focused_stage2_authority_tests": 27,
+      "canonical_tests": 336,
+      "stage0b_tests": 25,
+      "skipped_tests": 0,
+      "diff_check": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "dependency_adoption": false,
+      "frozen_contract_edit": false,
+      "selected_private_head_clean": true,
+      "selected_private_head": "2aabfb89946b6f82a175f7787766d9118c18f229",
+      "owned_backup_component_sha256": "2690d3525abe2a390f9f0d181a891e8ab2d4d95a9ad0cbb14b8e705b11853a4b",
+      "authorized_worker_files": 3,
+      "public_backup_or_restore_payload_in_public_repo": false,
+      "encrypted_off_host_backup_claimed": false,
+      "declares_market_pre_soak_green": false,
+      "declares_ready_for_72h_soak": false,
+      "live_or_connected_authority": false,
+      "exact_head_remote_ci": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29614643806"
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29614643806",
+    "integration_commit_sha": "aabe140f527640556049953bbe60711daf9f1b2d"
+  },
+  "integrity": {
+    "payload_sha256": "394dba60021790eb6e2f45324326da0fd5a0b3471377fc81ae86e91cfa5fbc63",
+    "parent_refs": [
+      "git:aabe140f527640556049953bbe60711daf9f1b2d",
+      "git:2aabfb89946b6f82a175f7787766d9118c18f229",
+      "ci:29614643806",
+      "source-freeze:source-freeze-market-s2-backup-restore-20260717",
+      "reuse:reuse-s2-market-backup-restore-20260717",
+      "integration:integration-s2-market-corrupt-checkpoint-20260717"
+    ]
+  }
+}

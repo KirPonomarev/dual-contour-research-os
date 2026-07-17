@@ -884,6 +884,30 @@ class Stage2AuthorityTests(unittest.TestCase):
         self.assertIn("READY_FOR_72H_SOAK", public_text)
         self.assertIn("deferred-immutable-pre-soak-deploy-gate", public_text)
 
+    def test_market_backup_restore_worker_lease_is_exact_and_receipt_bound(self) -> None:
+        receipt = load(INTEGRATION_RECEIPTS / "s2-market-backup-restore-authority.json")
+        envelope = load(STAGES / "s2-market-backup-restore" / "stage-envelope.json")
+        lease = load(STAGES / "s2-market-backup-restore" / "ownership-lease.json")
+
+        self.assertEqual(receipt["integrity"]["payload_sha256"], payload_sha256(receipt))
+        self.assertEqual(
+            receipt["payload"]["head_sha"],
+            "aabe140f527640556049953bbe60711daf9f1b2d",
+        )
+        audit = receipt["payload"]["audit_results"]
+        self.assertFalse(audit["public_backup_or_restore_payload_in_public_repo"])
+        self.assertFalse(audit["encrypted_off_host_backup_claimed"])
+        self.assertFalse(audit["declares_market_pre_soak_green"])
+        self.assertFalse(audit["declares_ready_for_72h_soak"])
+        self.assertEqual(envelope["public_authority_ci"], "29614643806")
+        self.assertEqual(
+            envelope["dependency_hashes"]["authority_receipt"],
+            receipt["integrity"]["payload_sha256"],
+        )
+        self.assertEqual(envelope["write_set"], lease["write_set"])
+        self.assertFalse(lease["delegation_allowed"])
+        self.assertFalse(envelope["push_authority"])
+
 
 if __name__ == "__main__":
     unittest.main()

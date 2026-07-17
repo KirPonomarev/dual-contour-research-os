@@ -1,0 +1,94 @@
+{
+  "stage_id": "s2-market-backup-restore",
+  "agent_id": "agent-3",
+  "objective": "Implement the final Market pre-soak local immutable backup, clean restore and hash-equivalence validation slice.",
+  "executable_blocker": "All prior Stage 2 slices are frozen, but no hermetic proof binds a real owned backup run and clean restore to BackupReceipt, RestoreReceipt and ValidationReceipt hash-only evidence.",
+  "base_sha": "2aabfb89946b6f82a175f7787766d9118c18f229",
+  "public_authority_sha": "aabe140f527640556049953bbe60711daf9f1b2d",
+  "public_authority_ci": "29614643806",
+  "public_development_sha": "aabe140f527640556049953bbe60711daf9f1b2d",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a3-s2-market-backup-restore",
+  "worktree": "ephemeral-private-domain-worktree:s2-market-backup-restore",
+  "read_set": [
+    "public AGENTS.md and docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "public docs/receipts/source-freeze/s2-market-backup-restore.json",
+    "public docs/receipts/reuse/s2-market-backup-restore.json",
+    "public docs/receipts/integration/s2-market-backup-restore-authority.json",
+    "public contracts/v1/BackupReceipt.schema.json",
+    "public contracts/v1/RestoreReceipt.schema.json",
+    "public contracts/v1/ValidationReceipt.schema.json",
+    "private scripts/build_recovery_artifact_backup.py",
+    "private tests/test_build_recovery_artifact_backup.py",
+    "private data/bridge_pre_soak/corrupt_checkpoint/market_pre_soak_corrupt_checkpoint_profile.json",
+    "private src/market_lab/bridge_pre_soak_corrupt_checkpoint.py"
+  ],
+  "write_set": [
+    "data/bridge_pre_soak/backup_restore/market_pre_soak_backup_restore_profile.json",
+    "src/market_lab/bridge_pre_soak_backup_restore.py",
+    "tests/test_bridge_pre_soak_backup_restore.py"
+  ],
+  "semantic_freeze": {
+    "profile": "D1-sanitized-local-backup-restore-profile-private-Market-only",
+    "runtime_payload": "synthetic-private-drill-archive-backup-and-restored-files-never-public",
+    "lineage_binding": "must-match-corrupt-checkpoint-crash-resume-and-prior-Stage2-receipts",
+    "component_binding": "owned-build_recovery_artifact_backup-source-SHA-verified-before-load",
+    "backup": "real-immutable-receipt-last-idempotent-local-durable-drill",
+    "restore": "real-clean-ephemeral-restore-smoke-with-source-manifest-hash-equivalence",
+    "receipts": "BackupReceipt-RestoreReceipt-and-ValidationReceipt-contract-shapes-hash-only",
+    "deployment_boundary": "encrypted-off-host-backup-and-READY_FOR_72H_SOAK-not-claimed",
+    "public_boundary": "hashes-refs-counts-local-drill-classification-and-pass-fail-only"
+  },
+  "preservation_contract": [
+    "private-Market-remains-owner-of-artifact-backup-restore-bytes-storage-and-validator",
+    "existing-owned-backup-component-and-tests-remain-unmodified",
+    "existing-Bridge-contracts-ledger-CAS-registry-workflows-and-config-remain-unmodified",
+    "receipts-do-not-apply-scientific-outcomes-or-declare-deployment-readiness",
+    "tests-are-hermetic-synthetic-and-do-not-access-network-or-off-host-storage",
+    "no-external-dependency-live-paper-order-publication-deployment-or-UI-authority"
+  ],
+  "forbidden_scope": [
+    "write-outside-one-backup-restore-profile-one-source-file-and-one-test-file",
+    "public-copy-of-private-source-backup-archive-restored-file-checkpoint-database-result-strategy-or-scientific-payload",
+    "network-or-off-host-storage-access-inside-tests-validator-or-worker-runtime",
+    "claim-encrypted-off-host-backup-READY_FOR_72H_SOAK-soak-start-or-deployment-readiness",
+    "modify-owned-backup-component-existing-tests-contract-schema-lockfile-dependency-config-workflow-migration-or-registry",
+    "scientific-outcome-application-or-Market-Trial-Ledger-write",
+    "exchange-key-account-secret-live-paper-trading-publication-deployment-or-UI",
+    "skip-xfail-continue-on-error-optional-gate-or-validation-weakening",
+    "dirty-owner-checkout-mutation-or-push-merge-deploy-public-write"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "source_freeze": "884de7a21ad5b5fb496cedbc7a9b37bd4c9c5ef0fb3ae74e00e2ef03ef21f9aa",
+    "reuse_decision": "99c47db59bbb278a61f5869be0ad862727c15fd31aa84907c586162e5cd8254c",
+    "authority_receipt": "394dba60021790eb6e2f45324326da0fd5a0b3471377fc81ae86e91cfa5fbc63",
+    "corrupt_checkpoint_receipt": "ecd9a0209de8ee210845f95bb965324fa832222813ca8750bb0731336c8df12f",
+    "owned_backup_component": "2690d3525abe2a390f9f0d181a891e8ab2d4d95a9ad0cbb14b8e705b11853a4b",
+    "owned_backup_tests": "04a3481fdf782aa907eff4ec2b5f36814652c238d4c6df32854c67316b60b259",
+    "private_market_head": "2aabfb89946b6f82a175f7787766d9118c18f229",
+    "public_authority_head": "aabe140f527640556049953bbe60711daf9f1b2d",
+    "external_dependencies": "none"
+  },
+  "acceptance_commands": [
+    "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src python3 -m pytest -q -p no:cacheprovider tests/test_bridge_pre_soak_backup_restore.py",
+    "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src:<pinned-public-bridge>/src python3 -m pytest -q -p no:cacheprovider tests/test_bridge_pre_soak_backup_restore.py tests/test_build_recovery_artifact_backup.py tests/test_bridge_pre_soak_corrupt_checkpoint.py tests/test_bridge_pre_soak_crash_resume.py",
+    "git diff --check",
+    "exact three-file write-set privacy dependency network live-authority deployment-claim and weakening scan",
+    "after Agent0 CI binding exact-head private focused CI against final public SHA"
+  ],
+  "risk_class": "private-market-pre-soak-backup-restore-slice",
+  "stop_conditions": [
+    "private-base-public-authority-contract-source-freeze-reuse-receipt-or-owned-component-hash-mismatch",
+    "write-set-collision-dirty-owner-checkout-mutation-or-fourth-file-required",
+    "proof-cannot-bind-source-manifest-backup-receipt-restore-receipt-clean-target-and-Stage2-lineage",
+    "validator-accepts-source-restored-hash-mismatch-missing-restore-non-idempotent-backup-private-payload-public-copy-or-false-deployment-readiness",
+    "network-off-host-storage-new-dependency-live-authority-or-scientific-outcome-is-required",
+    "before-equals-after-or-backup-restore-blocker-remains"
+  ],
+  "expected_receipt": "public:docs/receipts/integration/s2-market-backup-restore.json",
+  "rollback": "Agent 0 discards the isolated worker commit and branch plus ephemeral drill artifacts; owner checkout, completed stages, public Bridge and external systems remain unchanged.",
+  "commit_authority": "one-scoped-worker-commit",
+  "push_authority": false,
+  "expected_handoff_status": ["ready_for_agent0_audit", "blocked_validation_failed"]
+}
