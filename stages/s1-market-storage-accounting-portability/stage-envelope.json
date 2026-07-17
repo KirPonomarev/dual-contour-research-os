@@ -1,0 +1,79 @@
+{
+  "stage_id": "s1-market-storage-accounting-portability",
+  "agent_id": "agent-5",
+  "objective": "Normalize one owner-local storage snapshot metric so strict content accounting remains portable on filesystems with reserved blocks.",
+  "executable_blocker": "Exact-head private CI passes the repaired reality-loop prerequisite gate, then full pytest fails because reserved filesystem blocks make the raw used plus available-free values smaller than total on Linux.",
+  "base_sha": "ddd80d06e5419113ede9fbce65dcb40b0c0bdc42",
+  "public_authority_sha": "d61f409ceac186370e889e4265e18d42ed333c9c",
+  "public_authority_ci": "29576184951",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a5-s1-market-storage-accounting-portability",
+  "worktree": "ephemeral-private-domain-worktree:s1-market-storage-accounting-portability",
+  "read_set": [
+    "market-domain:candidate-clean-tree@ddd80d06e5419113ede9fbce65dcb40b0c0bdc42",
+    "market-domain:storage-snapshot-source-and-tests",
+    "docs/receipts/reuse/s1-market-storage-accounting-portability.json",
+    "docs/receipts/integration/s1-market-storage-accounting-authority.json"
+  ],
+  "write_set": [
+    "src/market_lab/system_state.py",
+    "tests/test_system_state.py"
+  ],
+  "preservation_contract": {
+    "required": [
+      "retain the exact strict snapshot field set and total equals used plus free invariant",
+      "treat free bytes as available capacity and conservatively classify reserved blocks as used",
+      "derive normalized used bytes as total minus available free bytes on every platform",
+      "add one regression proving a raw reserved-block gap is normalized without changing free or total",
+      "retain content-addressed identity and all existing storage drift and tamper denials"
+    ],
+    "forbidden": [
+      "validator schema field content-identity workflow dependency config fixture or unrelated test change",
+      "platform conditional skip xfail tolerance fallback or assertion relaxation",
+      "runtime storage write dataset ledger scientific artifact or external mutation",
+      "network live authority deployment or public source copy"
+    ]
+  },
+  "forbidden_scope": [
+    "unlisted-source-test-workflow-config-lockfile-contract-dependency-or-fixture-edit",
+    "snapshot-field-validator-identity-tamper-drift-or-uuid-check-relaxation",
+    "platform-conditional-skip-xfail-continue-on-error-fallback-or-advisory-conversion",
+    "private-locator-secret-account-dataset-strategy-or-d2-d3-payload",
+    "network-exchange-order-external-mutation-live-trading-publication-deployment-or-ui",
+    "dirty-source-checkout-mutation",
+    "push-merge-deploy-or-public-repository-write"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "reuse_decision": "3b991a1214bae56a14190694cb84ff2da35ebf6f9e429166f8d8cd1c965be731",
+    "authority_receipt": "2e2eb88c15c2302fa11e148ba4be22e8255c1f4536eb9eed71f2ead9cd39b317",
+    "candidate_market_head": "ddd80d06e5419113ede9fbce65dcb40b0c0bdc42",
+    "external_dependencies": "none"
+  },
+  "acceptance_commands": [
+    "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src python -m pytest -q -p no:cacheprovider tests/test_system_state.py tests/test_capture_system_state_storage_snapshot.py",
+    "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src python -m pytest -q -p no:cacheprovider",
+    "git diff --check",
+    "git status --porcelain=v1 --untracked-files=all",
+    "exact two-file diff plus no validator weakening platform skip private locator network or live-authority scan",
+    "exact-head private remote CI"
+  ],
+  "risk_class": "private-market-two-file-storage-accounting-portability",
+  "stop_conditions": [
+    "candidate-base-public-authority-contract-reuse-or-receipt-hash-mismatch",
+    "repair-requires-third-file-validator-relaxation-platform-branch-schema-workflow-or-dependency",
+    "reserved-block-regression-does-not-fail-before-and-pass-after",
+    "total-used-free-invariant-content-identity-or-existing-storage-denials-regress",
+    "focused-full-suite-or-exact-head-CI-remains-red",
+    "dirty-source-checkout-changed",
+    "before-equals-after-or-executable-blocker-remains"
+  ],
+  "expected_receipt": "docs/receipts/integration/s1-market-storage-accounting-portability.json",
+  "rollback": "Agent 0 discards the isolated two-file worker commit and deletes its branch/worktree. The prior Market candidate, original dirty checkout, runtime state, scientific artifacts, public Bridge and external systems remain unchanged.",
+  "commit_authority": "one-scoped-worker-commit",
+  "push_authority": false,
+  "expected_handoff_status": [
+    "ready_for_agent0_audit",
+    "blocked_validation_failed"
+  ]
+}

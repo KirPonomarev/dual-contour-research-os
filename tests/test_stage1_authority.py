@@ -149,6 +149,33 @@ class Stage1AuthorityTests(unittest.TestCase):
         self.assertTrue(envelope["rollback"])
         self.assertFalse(lease["delegation_allowed"])
 
+    def test_market_storage_accounting_worker_lease_is_exact(self) -> None:
+        envelope = load(
+            ROOT
+            / "stages"
+            / "s1-market-storage-accounting-portability"
+            / "stage-envelope.json"
+        )
+        lease = load(
+            ROOT
+            / "stages"
+            / "s1-market-storage-accounting-portability"
+            / "ownership-lease.json"
+        )
+
+        self.assertEqual(
+            envelope["public_authority_sha"],
+            "d61f409ceac186370e889e4265e18d42ed333c9c",
+        )
+        self.assertEqual(envelope["write_set"], lease["write_set"])
+        self.assertEqual(
+            envelope["write_set"],
+            ["src/market_lab/system_state.py", "tests/test_system_state.py"],
+        )
+        self.assertFalse(lease["delegation_allowed"])
+        self.assertFalse(envelope["push_authority"])
+        self.assertIn("exact-head private remote CI", envelope["acceptance_commands"])
+
     def test_market_base_authority_refresh_is_sanitized_pinned_and_reversible(self) -> None:
         envelope = load(ROOT / "stages" / "s1-market-base-authority" / "stage-envelope.json")
         lease = load(ROOT / "stages" / "s1-market-base-authority" / "ownership-lease.json")

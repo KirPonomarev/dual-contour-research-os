@@ -1,0 +1,18 @@
+{
+  "lease_id": "lease-s1-market-storage-accounting-portability-agent-5-20260717",
+  "stage_id": "s1-market-storage-accounting-portability",
+  "agent_id": "agent-5",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-17T11:16:10Z",
+  "expires_at": "2026-07-17T17:16:10Z",
+  "base_sha": "ddd80d06e5419113ede9fbce65dcb40b0c0bdc42",
+  "public_authority_sha": "d61f409ceac186370e889e4265e18d42ed333c9c",
+  "branch": "codex/bridge-a5-s1-market-storage-accounting-portability",
+  "worktree": "ephemeral-private-domain-worktree:s1-market-storage-accounting-portability",
+  "write_set": [
+    "src/market_lab/system_state.py",
+    "tests/test_system_state.py"
+  ],
+  "delegation_allowed": false,
+  "state": "active"
+}
