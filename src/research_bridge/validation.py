@@ -88,6 +88,7 @@ _IDENTIFIER_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._:@+-]{0,255}$")
 _PORTABLE_REF_RE = re.compile(r"^[A-Za-z][A-Za-z0-9+.-]*:[^\s\\]{1,511}$")
 _CAS_REF_RE = re.compile(r"^cas:sha256:[a-f0-9]{64}$")
 _CHECKPOINT_MANIFEST_REF_RE = re.compile(r"^checkpoint-manifest-[a-f0-9]{64}$")
+_SETTLEMENT_RECEIPT_REF_RE = re.compile(r"^settlement-receipt-[a-f0-9]{64}$")
 _SHA256_RE = re.compile(r"^[a-f0-9]{64}$")
 _RFC3339_RE = re.compile(
     r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$"
@@ -413,9 +414,15 @@ def _verify_execution(execution: _Receipt) -> tuple[str, tuple[str, ...]]:
         execution.parent_refs[0]
     ) is None:
         raise ValidationBoundaryError("execution checkpoint parent is invalid")
+    if len(execution.parent_refs) != len(artifact_refs) + 3:
+        raise ValidationBoundaryError("execution parent chain mismatch")
+    settlement_parent = execution.parent_refs[-2]
+    if _SETTLEMENT_RECEIPT_REF_RE.fullmatch(settlement_parent) is None:
+        raise ValidationBoundaryError("execution settlement parent is invalid")
     expected_parents = (
         execution.parent_refs[0],
         *artifact_refs,
+        settlement_parent,
         f"ledger:{event_chain_head}",
     )
     if execution.parent_refs != expected_parents:

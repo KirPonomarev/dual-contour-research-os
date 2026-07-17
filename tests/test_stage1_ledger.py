@@ -6,13 +6,16 @@ import sys
 import tempfile
 import threading
 import unittest
+from collections.abc import Callable
 from contextlib import closing
 from pathlib import Path
+from unittest import mock
 
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
+import research_bridge.ledger as ledger_module
 from research_bridge.ledger import JobLedger, LedgerError, LedgerEvent
 
 
@@ -21,6 +24,68 @@ ADMISSION_SHA = hashlib.sha256(b"synthetic-admission").hexdigest()
 STATE_SHA = hashlib.sha256(b"synthetic-state").hexdigest()
 RESULT_SHA = hashlib.sha256(b"synthetic-result").hexdigest()
 PERMIT_NONCE_SHA = hashlib.sha256(b"synthetic-permit-nonce-a").hexdigest()
+ACCOUNTING_POLICY_REF = f"budget-policy:sha256:{'a' * 64}"
+BUDGET_SCOPE_REF = f"budget-scope:sha256:{'b' * 64}"
+
+
+def budget_keywords(
+    job_id: str,
+    *,
+    provider: str = "offline-runner-a",
+    idempotency_key: str | None = None,
+    reservation_cost_units: int = 1,
+    scope_limit_cost_units: int = 100,
+) -> dict[str, object]:
+    return {
+        "accounting_policy_ref": ACCOUNTING_POLICY_REF,
+        "budget_scope_ref": BUDGET_SCOPE_REF,
+        "scope_limit_cost_units": scope_limit_cost_units,
+        "trial_ref": "trial:synthetic-ledger",
+        "provider": provider,
+        "job_idempotency_key": idempotency_key or f"idempotency:{job_id}",
+        "reservation_cost_units": reservation_cost_units,
+        "reservation_expires_at": "2026-01-02T04:04:05Z",
+        "contour": "bridge",
+        "classification": "D0_PUBLIC",
+    }
+
+
+def claim_keywords(
+    job_id: str,
+    *,
+    attempt_id: str | None = None,
+    permit_id: str | None = None,
+    permit_nonce_sha256: str | None = None,
+    runner_identity: str = "offline-runner-a",
+    fencing_epoch: int = 7,
+    fencing_token: str | None = None,
+    admitted_at: str = AT,
+    admission_digest: str = ADMISSION_SHA,
+    job_idempotency_key: str | None = None,
+    **budget_overrides: object,
+) -> dict[str, object]:
+    resolved_attempt = attempt_id or f"attempt:{job_id}"
+    values = {
+        "job_id": job_id,
+        "attempt_id": resolved_attempt,
+        "permit_id": permit_id or f"permit:{job_id}",
+        "permit_nonce_sha256": permit_nonce_sha256
+        or hashlib.sha256(f"nonce:{job_id}".encode("utf-8")).hexdigest(),
+        "runner_identity": runner_identity,
+        "fencing_epoch": fencing_epoch,
+        "fencing_token": fencing_token or f"fence:{job_id}",
+        "admitted_at": admitted_at,
+        "admission_digest": admission_digest,
+    }
+    values.update(
+        budget_keywords(
+            job_id,
+            provider=runner_identity,
+            idempotency_key=job_idempotency_key,
+        )
+    )
+    values.update(budget_overrides)
+    return values
 
 
 def claim(
@@ -40,6 +105,7 @@ def claim(
         fencing_token=token,
         admitted_at=AT,
         admission_digest=ADMISSION_SHA,
+        **budget_keywords("job-a"),
     )
 
 
@@ -64,6 +130,156 @@ def checkpoint(
         payload_stored_in_domain_vault=in_vault,
         event_at=AT,
     )
+
+
+def rewrite_chain_payloads(
+    database: Path,
+    mutate: Callable[[int, dict[str, object]], dict[str, object]],
+) -> None:
+    no_update_trigger_sql = next(
+        statement
+        for object_type, name, statement in ledger_module._LEGACY_SCHEMA_OBJECTS
+        if object_type == "trigger" and name == "bridge_job_ledger_no_update"
+    )
+    with closing(sqlite3.connect(database)) as connection, connection:
+        connection.row_factory = sqlite3.Row
+        connection.execute("DROP TRIGGER bridge_job_ledger_no_update")
+        rows = connection.execute(
+            "SELECT * FROM bridge_job_ledger ORDER BY sequence"
+        ).fetchall()
+        previous_sha256 = "0" * 64
+        for row in rows:
+            payload = json.loads(row["payload_json"])
+            payload = mutate(row["sequence"], payload)
+            material = JobLedger._hash_material(
+                sequence=row["sequence"],
+                event_type=row["event_type"],
+                job_id=row["job_id"],
+                attempt_id=row["attempt_id"],
+                fencing_epoch=row["fencing_epoch"],
+                event_at=row["event_at"],
+                payload=payload,
+                previous_sha256=previous_sha256,
+            )
+            event_sha256 = hashlib.sha256(material).hexdigest()
+            connection.execute(
+                "UPDATE bridge_job_ledger SET payload_json = ?, previous_sha256 = ?, "
+                "event_sha256 = ? WHERE sequence = ?",
+                (
+                    ledger_module._canonical_json(payload),
+                    previous_sha256,
+                    event_sha256,
+                    row["sequence"],
+                ),
+            )
+            previous_sha256 = event_sha256
+        connection.execute(no_update_trigger_sql)
+
+
+def expire_first_reservation_at_admission(
+    sequence: int, payload: dict[str, object]
+) -> dict[str, object]:
+    if sequence != 1:
+        return payload
+    reservation = payload["budget_reservation"]
+    assert isinstance(reservation, dict)
+    reservation_payload = reservation["payload"]
+    assert isinstance(reservation_payload, dict)
+    reservation_payload["expires_at"] = payload["admitted_at"]
+    payload_sha256 = hashlib.sha256(
+        ledger_module._canonical_json(reservation_payload).encode("utf-8")
+    ).hexdigest()
+    reservation["object_id"] = f"budget-reservation:sha256:{payload_sha256}"
+    integrity = reservation["integrity"]
+    assert isinstance(integrity, dict)
+    integrity["payload_sha256"] = payload_sha256
+    return payload
+
+
+def invert_claim_completion_causality(database: Path) -> None:
+    no_update_trigger_sql = next(
+        statement
+        for object_type, name, statement in ledger_module._LEGACY_SCHEMA_OBJECTS
+        if object_type == "trigger" and name == "bridge_job_ledger_no_update"
+    )
+    with closing(sqlite3.connect(database)) as connection, connection:
+        connection.row_factory = sqlite3.Row
+        rows = {
+            row["event_type"]: row
+            for row in connection.execute(
+                "SELECT * FROM bridge_job_ledger ORDER BY sequence"
+            )
+        }
+        claim_row = rows["claim"]
+        complete_row = rows["complete"]
+        claim_payload = json.loads(claim_row["payload_json"])
+        complete_payload = json.loads(complete_row["payload_json"])
+
+        reservation = claim_payload["budget_reservation"]
+        reservation_payload = reservation["payload"]
+        reservation_payload["ledger_version_before"] = 1
+        reservation_sha256 = hashlib.sha256(
+            ledger_module._canonical_json(reservation_payload).encode("utf-8")
+        ).hexdigest()
+        reservation_ref = f"budget-reservation:sha256:{reservation_sha256}"
+        reservation["object_id"] = reservation_ref
+        reservation["integrity"]["payload_sha256"] = reservation_sha256
+
+        attestation = complete_payload["provider_accounting_attestation"]
+        attestation["reservation_ref"] = reservation_ref
+        provider_ref = "embedded:sha256:" + hashlib.sha256(
+            ledger_module._canonical_json(attestation).encode("utf-8")
+        ).hexdigest()
+        settlement = complete_payload["settlement_receipt"]
+        settlement_payload = settlement["payload"]
+        settlement_payload["reservation_ref"] = reservation_ref
+        settlement_payload["provider_receipt_ref"] = provider_ref
+        settlement_payload["ledger_version_after"] = 1
+        settlement_sha256 = hashlib.sha256(
+            ledger_module._canonical_json(settlement_payload).encode("utf-8")
+        ).hexdigest()
+        settlement["object_id"] = f"settlement-receipt-{settlement_sha256}"
+        settlement["integrity"]["payload_sha256"] = settlement_sha256
+        settlement["integrity"]["parent_refs"] = [
+            reservation_ref,
+            claim_payload["accounting_policy_ref"],
+            provider_ref,
+            f"result:sha256:{complete_payload['result_sha256']}",
+        ]
+
+        connection.execute("DROP TRIGGER bridge_job_ledger_no_update")
+        connection.execute(
+            "UPDATE bridge_job_ledger SET sequence = sequence + 100"
+        )
+        previous_sha256 = "0" * 64
+        for new_sequence, row, payload in (
+            (1, complete_row, complete_payload),
+            (2, claim_row, claim_payload),
+        ):
+            material = JobLedger._hash_material(
+                sequence=new_sequence,
+                event_type=row["event_type"],
+                job_id=row["job_id"],
+                attempt_id=row["attempt_id"],
+                fencing_epoch=row["fencing_epoch"],
+                event_at=row["event_at"],
+                payload=payload,
+                previous_sha256=previous_sha256,
+            )
+            event_sha256 = hashlib.sha256(material).hexdigest()
+            connection.execute(
+                "UPDATE bridge_job_ledger SET sequence = ?, payload_json = ?, "
+                "previous_sha256 = ?, event_sha256 = ? WHERE sequence = ?",
+                (
+                    new_sequence,
+                    ledger_module._canonical_json(payload),
+                    previous_sha256,
+                    event_sha256,
+                    row["sequence"] + 100,
+                ),
+            )
+            previous_sha256 = event_sha256
+        connection.execute(no_update_trigger_sql)
 
 
 class JobLedgerTests(unittest.TestCase):
@@ -176,6 +392,7 @@ class JobLedgerTests(unittest.TestCase):
                     fencing_token=f"fence-{index}",
                     admitted_at=AT,
                     admission_digest=ADMISSION_SHA,
+                    **budget_keywords("job-a", provider=f"offline-runner-{index}"),
                 )
                 return "winner"
             except LedgerError:
@@ -206,6 +423,7 @@ class JobLedgerTests(unittest.TestCase):
                 fencing_token="fence-b",
                 admitted_at=AT,
                 admission_digest=hashlib.sha256(b"admission-b").hexdigest(),
+                **budget_keywords("job-b", provider="offline-runner-b"),
             )
         self.assertEqual(self.ledger.event_count(), before)
 
@@ -220,6 +438,7 @@ class JobLedgerTests(unittest.TestCase):
             fencing_token="fence-b",
             admitted_at=AT,
             admission_digest=hashlib.sha256(b"admission-b").hexdigest(),
+            **budget_keywords("job-b", provider="offline-runner-b"),
         )
         self.assertEqual(accepted.sequence, 2)
         self.assertEqual(self.ledger.event_count("claim"), 2)
@@ -254,6 +473,10 @@ class JobLedgerTests(unittest.TestCase):
                     admission_digest=hashlib.sha256(
                         f"admission-nonce-race-{index}".encode("utf-8")
                     ).hexdigest(),
+                    **budget_keywords(
+                        f"job-nonce-race-{index}",
+                        provider=f"offline-runner-{index}",
+                    ),
                 )
                 return "winner"
             except LedgerError:
@@ -284,6 +507,10 @@ class JobLedgerTests(unittest.TestCase):
                 fencing_token="fence-nonce-after-reopen",
                 admitted_at=AT,
                 admission_digest=hashlib.sha256(b"admission-after-reopen").hexdigest(),
+                **budget_keywords(
+                    "job-nonce-after-reopen",
+                    provider="offline-runner-after-reopen",
+                ),
             )
         self.assertEqual(self.ledger.event_count(), before)
         self.assertTrue(self.ledger.verify_chain())
@@ -337,30 +564,10 @@ class JobLedgerTests(unittest.TestCase):
                         ),
                     )
 
-                reopened = JobLedger(database)
-                try:
-                    self.assertTrue(reopened.verify_chain())
-                    before = reopened.event_count()
-                    with self.assertRaises(LedgerError):
-                        reopened.claim(
-                            job_id=f"job-after-{label}-legacy",
-                            attempt_id=f"attempt-after-{label}-legacy",
-                            permit_id=f"permit-after-{label}-legacy",
-                            permit_nonce_sha256=hashlib.sha256(
-                                f"new-nonce-{label}".encode("utf-8")
-                            ).hexdigest(),
-                            runner_identity="offline-runner-legacy-probe",
-                            fencing_epoch=2,
-                            fencing_token="fence-legacy-probe",
-                            admitted_at=AT,
-                            admission_digest=hashlib.sha256(
-                                f"admission-{label}".encode("utf-8")
-                            ).hexdigest(),
-                        )
-                    self.assertEqual(reopened.event_count(), before)
-                    self.assertTrue(reopened.verify_chain())
-                finally:
-                    reopened.close()
+                with self.assertRaisesRegex(
+                    LedgerError, "schema fingerprint is not exact version 1"
+                ):
+                    JobLedger(database)
 
     def test_stale_fencing_authority_causes_zero_writes(self) -> None:
         claim(self.ledger)
@@ -421,6 +628,7 @@ class JobLedgerTests(unittest.TestCase):
                 fencing_token=b"not-text",
                 admitted_at=AT,
                 admission_digest=ADMISSION_SHA,
+                **budget_keywords("job-a"),
             )
         with self.assertRaises(LedgerError):
             self.ledger.claim(
@@ -433,6 +641,7 @@ class JobLedgerTests(unittest.TestCase):
                 fencing_token="fence-a",
                 admitted_at="2026-01-02T03:04:05",
                 admission_digest=ADMISSION_SHA,
+                **budget_keywords("job-a"),
             )
         with self.assertRaises(LedgerError):
             self.ledger.claim(
@@ -445,6 +654,7 @@ class JobLedgerTests(unittest.TestCase):
                 fencing_token="fence-a",
                 admitted_at=AT,
                 admission_digest="not-a-digest",
+                **budget_keywords("job-a"),
             )
         self.assertEqual(self.ledger.event_count(), before)
 
@@ -623,6 +833,500 @@ class JobLedgerTests(unittest.TestCase):
                 event_at=AT,
             )
         self.assertEqual(self.ledger.event_count(), before)
+        self.assertTrue(self.ledger.verify_chain())
+
+    def test_exact_v1_schema_and_empty_legacy_upgrade(self) -> None:
+        expected_names = {
+            name for _object_type, name, _sql in ledger_module._SCHEMA_V1_OBJECTS
+        }
+        version = self.ledger._connection.execute("PRAGMA user_version").fetchone()[0]
+        names = {
+            row[0]
+            for row in self.ledger._connection.execute(
+                "SELECT name FROM sqlite_master WHERE name NOT LIKE 'sqlite_%'"
+            )
+        }
+        self.assertEqual(version, 1)
+        self.assertEqual(names, expected_names)
+
+        database = Path(self.temporary_directory.name) / "empty-legacy.sqlite3"
+        with closing(sqlite3.connect(database)) as connection, connection:
+            for _object_type, _name, statement in ledger_module._LEGACY_SCHEMA_OBJECTS:
+                connection.execute(statement)
+            self.assertEqual(connection.execute("PRAGMA user_version").fetchone()[0], 0)
+
+        upgraded = JobLedger(database)
+        try:
+            self.assertEqual(
+                upgraded._connection.execute("PRAGMA user_version").fetchone()[0], 1
+            )
+            upgraded_names = {
+                row[0]
+                for row in upgraded._connection.execute(
+                    "SELECT name FROM sqlite_master WHERE name NOT LIKE 'sqlite_%'"
+                )
+            }
+            self.assertEqual(upgraded_names, expected_names)
+            self.assertEqual(upgraded.event_count(), 0)
+        finally:
+            upgraded.close()
+        JobLedger(database).close()
+
+    def test_schema_extra_missing_and_lookalike_are_rejected_without_repair(self) -> None:
+        def identity(database: Path) -> tuple[int, tuple[tuple[object, ...], ...]]:
+            with closing(sqlite3.connect(database)) as connection:
+                version = connection.execute("PRAGMA user_version").fetchone()[0]
+                objects = tuple(
+                    connection.execute(
+                        "SELECT type, name, tbl_name, sql FROM sqlite_master "
+                        "WHERE name NOT LIKE 'sqlite_%' ORDER BY type, name"
+                    )
+                )
+            return version, objects
+
+        mutations = {
+            "extra": "CREATE TABLE unauthorized_extra(value TEXT)",
+            "missing": "DROP INDEX bridge_claim_one_budget_reservation",
+            "lookalike": (
+                "DROP INDEX bridge_claim_one_budget_reservation;"
+                "CREATE UNIQUE INDEX bridge_claim_one_budget_reservation "
+                "ON bridge_job_ledger (json_extract(payload_json, "
+                "'$.budget_reservation.object_id')) WHERE event_type='claim'"
+            ),
+        }
+        for label, mutation in mutations.items():
+            with self.subTest(label=label):
+                database = Path(self.temporary_directory.name) / f"schema-{label}.sqlite3"
+                JobLedger(database).close()
+                with closing(sqlite3.connect(database)) as connection, connection:
+                    for statement in mutation.split(";"):
+                        connection.execute(statement)
+                before = identity(database)
+                with self.assertRaisesRegex(
+                    LedgerError, "schema fingerprint is not exact version 1"
+                ):
+                    JobLedger(database)
+                self.assertEqual(identity(database), before)
+
+    def test_nonempty_unversioned_legacy_ledger_is_quarantined_unchanged(self) -> None:
+        database = Path(self.temporary_directory.name) / "nonempty-legacy.sqlite3"
+        with closing(sqlite3.connect(database)) as connection, connection:
+            for _object_type, _name, statement in ledger_module._LEGACY_SCHEMA_OBJECTS:
+                connection.execute(statement)
+            connection.execute(
+                "INSERT INTO bridge_job_ledger VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                (
+                    1,
+                    "pause",
+                    "bridge-global-control",
+                    "legacy-pause",
+                    0,
+                    None,
+                    AT,
+                    "{}",
+                    "0" * 64,
+                    "1" * 64,
+                ),
+            )
+        before = database.read_bytes()
+        with self.assertRaisesRegex(
+            LedgerError, "nonempty unversioned ledger requires quarantine"
+        ):
+            JobLedger(database)
+        self.assertEqual(database.read_bytes(), before)
+        with closing(sqlite3.connect(database)) as connection:
+            self.assertEqual(connection.execute("PRAGMA user_version").fetchone()[0], 0)
+            names = {
+                row[0]
+                for row in connection.execute(
+                    "SELECT name FROM sqlite_master WHERE name NOT LIKE 'sqlite_%'"
+                )
+            }
+        self.assertTrue(
+            names.isdisjoint(
+                name for _kind, name, _sql in ledger_module._BUDGET_INDEX_OBJECTS
+            )
+        )
+
+    def test_global_budget_replay_requires_every_caller_binding(self) -> None:
+        original = claim_keywords(
+            "job-replay",
+            job_idempotency_key="idempotency:global-replay",
+            scope_limit_cost_units=100,
+        )
+        first = self.ledger.claim(**original)
+        replay = self.ledger.claim(**original)
+        self.assertEqual(replay.event_sha256, first.event_sha256)
+        self.assertEqual(self.ledger.event_count(), 1)
+
+        mutations = {
+            "job_id": "job-replay-conflict",
+            "attempt_id": "attempt:replay-conflict",
+            "permit_id": "permit:replay-conflict",
+            "permit_nonce_sha256": hashlib.sha256(b"nonce-conflict").hexdigest(),
+            "runner_identity": "offline-runner-conflict",
+            "fencing_epoch": 8,
+            "fencing_token": "fence:replay-conflict",
+            "admitted_at": "2026-01-02T03:05:05Z",
+            "admission_digest": hashlib.sha256(b"admission-conflict").hexdigest(),
+            "provider": "offline-provider-conflict",
+            "accounting_policy_ref": f"budget-policy:sha256:{'c' * 64}",
+            "budget_scope_ref": f"budget-scope:sha256:{'d' * 64}",
+            "trial_ref": "trial:replay-conflict",
+            "reservation_cost_units": 2,
+            "scope_limit_cost_units": 101,
+            "reservation_expires_at": "2026-01-02T05:04:05Z",
+            "contour": "market",
+            "classification": "D1_INTERNAL_SANITIZED",
+        }
+        self.assertEqual(len(original), 19)
+        self.assertEqual(
+            set(mutations), set(original) - {"job_idempotency_key"}
+        )
+        for field, value in mutations.items():
+            with self.subTest(field=field):
+                changed = dict(original)
+                changed[field] = value
+                with self.assertRaisesRegex(LedgerError, "idempotency key conflicts"):
+                    self.ledger.claim(**changed)
+                self.assertEqual(self.ledger.event_count(), 1)
+        self.assertTrue(self.ledger.verify_chain())
+
+    def test_invalid_persisted_expiry_blocks_replay_and_new_claim_zero_write(self) -> None:
+        original = claim_keywords("job-expiry-projection")
+        self.ledger.claim(**original)
+        self.ledger.close()
+        rewrite_chain_payloads(
+            self.database,
+            expire_first_reservation_at_admission,
+        )
+        self.ledger = JobLedger(self.database)
+        self.assertTrue(self.ledger.verify_chain())
+        before = self.ledger.event_count()
+        for label, arguments in (
+            ("exact-replay", original),
+            ("new-claim", claim_keywords("job-after-expiry-projection")),
+        ):
+            with self.subTest(label=label), self.assertRaisesRegex(
+                LedgerError, "expires at or before admission"
+            ):
+                self.ledger.claim(**arguments)
+            self.assertEqual(self.ledger.event_count(), before)
+            self.assertTrue(self.ledger.verify_chain())
+
+    def test_global_over_cap_projection_blocks_replay_and_unrelated_claim(self) -> None:
+        scope_a = f"budget-scope:sha256:{'a' * 64}"
+        scope_b = f"budget-scope:sha256:{'b' * 64}"
+        first = claim_keywords(
+            "job-projection-cap-a",
+            budget_scope_ref=scope_a,
+            reservation_cost_units=2,
+            scope_limit_cost_units=3,
+        )
+        second = claim_keywords(
+            "job-projection-cap-b",
+            budget_scope_ref=scope_b,
+            reservation_cost_units=2,
+            scope_limit_cost_units=3,
+        )
+        self.ledger.claim(**first)
+        self.ledger.claim(**second)
+        self.ledger.close()
+
+        def collapse_second_scope(
+            sequence: int, payload: dict[str, object]
+        ) -> dict[str, object]:
+            if sequence != 2:
+                return payload
+            payload["budget_scope_ref"] = scope_a
+            reservation = payload["budget_reservation"]
+            assert isinstance(reservation, dict)
+            integrity = reservation["integrity"]
+            assert isinstance(integrity, dict)
+            parent_refs = integrity["parent_refs"]
+            assert isinstance(parent_refs, list)
+            parent_refs[-1] = scope_a
+            return payload
+
+        rewrite_chain_payloads(self.database, collapse_second_scope)
+        self.ledger = JobLedger(self.database)
+        self.assertTrue(self.ledger.verify_chain())
+        before = self.ledger.event_count()
+        unrelated = claim_keywords(
+            "job-unrelated-after-over-cap",
+            budget_scope_ref=f"budget-scope:sha256:{'c' * 64}",
+        )
+        for label, arguments in (
+            ("exact-replay", first),
+            ("unrelated-new-claim", unrelated),
+        ):
+            with self.subTest(label=label), self.assertRaisesRegex(
+                LedgerError, "persisted budget scope exceeds its hard cap"
+            ):
+                self.ledger.claim(**arguments)
+            self.assertEqual(self.ledger.event_count(), before)
+            self.assertTrue(self.ledger.verify_chain())
+
+    def test_causally_inverted_completion_blocks_replay_and_new_claim(self) -> None:
+        original = claim_keywords("job-inverted-completion")
+        self.ledger.claim(**original)
+        self.ledger.complete(
+            job_id=original["job_id"],
+            attempt_id=original["attempt_id"],
+            fencing_epoch=original["fencing_epoch"],
+            fencing_token=original["fencing_token"],
+            result_sha256=RESULT_SHA,
+            event_at=AT,
+        )
+        self.ledger.close()
+        invert_claim_completion_causality(self.database)
+        self.ledger = JobLedger(self.database)
+        self.assertTrue(self.ledger.verify_chain())
+        before = self.ledger.event_count()
+        for label, arguments in (
+            ("exact-replay", original),
+            ("unrelated-new-claim", claim_keywords("job-after-inverted-completion")),
+        ):
+            with self.subTest(label=label), self.assertRaisesRegex(
+                LedgerError, "completion does not follow its claim"
+            ):
+                self.ledger.claim(**arguments)
+            self.assertEqual(self.ledger.event_count(), before)
+            self.assertTrue(self.ledger.verify_chain())
+
+    def test_completion_timestamp_cannot_precede_claim(self) -> None:
+        arguments = claim_keywords("job-inverted-completion-time")
+        self.ledger.claim(**arguments)
+        before = self.ledger.event_count()
+        with self.assertRaisesRegex(
+            LedgerError, "completion does not follow its claim"
+        ):
+            self.ledger.complete(
+                job_id=arguments["job_id"],
+                attempt_id=arguments["attempt_id"],
+                fencing_epoch=arguments["fencing_epoch"],
+                fencing_token=arguments["fencing_token"],
+                result_sha256=RESULT_SHA,
+                event_at="2026-01-02T03:04:04Z",
+            )
+        self.assertEqual(self.ledger.event_count(), before)
+        self.assertTrue(self.ledger.verify_chain())
+
+    def test_projection_precedes_replay_and_pause_blocks_only_new_claim(self) -> None:
+        malformed = claim_keywords("job-paused-malformed-projection")
+        self.ledger.claim(**malformed)
+        self.ledger.pause_global(
+            actor="uid:1000",
+            reason="synthetic projection ordering hold",
+            authority_ref="authority:synthetic-offline",
+            idempotency_key="pause-projection-ordering",
+            event_at=AT,
+        )
+        self.ledger.close()
+        rewrite_chain_payloads(
+            self.database,
+            expire_first_reservation_at_admission,
+        )
+        self.ledger = JobLedger(self.database)
+        self.assertTrue(self.ledger.is_globally_paused())
+        before = self.ledger.event_count()
+        with self.assertRaisesRegex(LedgerError, "expires at or before admission"):
+            self.ledger.claim(**malformed)
+        self.assertEqual(self.ledger.event_count(), before)
+
+        valid_database = Path(self.temporary_directory.name) / "valid-paused.sqlite3"
+        valid = JobLedger(valid_database)
+        valid_claim = claim_keywords("job-paused-valid-replay")
+        try:
+            original = valid.claim(**valid_claim)
+            valid.pause_global(
+                actor="uid:1000",
+                reason="synthetic valid replay hold",
+                authority_ref="authority:synthetic-offline",
+                idempotency_key="pause-valid-replay",
+                event_at=AT,
+            )
+            valid_before = valid.event_count()
+            replay = valid.claim(**valid_claim)
+            self.assertEqual(replay.sequence, original.sequence)
+            self.assertEqual(replay.event_sha256, original.event_sha256)
+            self.assertEqual(valid.event_count(), valid_before)
+            with self.assertRaisesRegex(LedgerError, "global pause blocks job claims"):
+                valid.claim(**claim_keywords("job-paused-new-claim"))
+            self.assertEqual(valid.event_count(), valid_before)
+            self.assertTrue(valid.verify_chain())
+        finally:
+            valid.close()
+
+    def test_fixed_charge_capacity_is_cumulative_and_atomic(self) -> None:
+        first = claim_keywords(
+            "job-cap-a",
+            reservation_cost_units=2,
+            scope_limit_cost_units=3,
+        )
+        first_event = self.ledger.claim(**first)
+        self.ledger.complete(
+            job_id=first["job_id"],
+            attempt_id=first["attempt_id"],
+            fencing_epoch=first["fencing_epoch"],
+            fencing_token=first["fencing_token"],
+            result_sha256=RESULT_SHA,
+            event_at=AT,
+        )
+        blocked = claim_keywords(
+            "job-cap-b",
+            reservation_cost_units=2,
+            scope_limit_cost_units=3,
+        )
+        with self.assertRaisesRegex(LedgerError, "hard cap exceeded"):
+            self.ledger.claim(**blocked)
+        self.assertEqual(self.ledger.event_count(), 2)
+        admitted = self.ledger.claim(
+            **claim_keywords(
+                "job-cap-c",
+                reservation_cost_units=1,
+                scope_limit_cost_units=3,
+            )
+        )
+        self.assertEqual(first_event.sequence, 1)
+        self.assertEqual(admitted.sequence, 3)
+
+        race_database = Path(self.temporary_directory.name) / "cap-race.sqlite3"
+        JobLedger(race_database).close()
+        barrier = threading.Barrier(2)
+
+        def contender(job_id: str) -> str:
+            ledger = JobLedger(race_database)
+            try:
+                barrier.wait(timeout=10)
+                ledger.claim(
+                    **claim_keywords(
+                        job_id,
+                        reservation_cost_units=2,
+                        scope_limit_cost_units=3,
+                    )
+                )
+                return "admitted"
+            except LedgerError:
+                return "denied"
+            finally:
+                ledger.close()
+
+        with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
+            outcomes = list(executor.map(contender, ("job-race-a", "job-race-b")))
+        self.assertEqual(outcomes.count("admitted"), 1)
+        self.assertEqual(outcomes.count("denied"), 1)
+        raced = JobLedger(race_database)
+        try:
+            self.assertEqual(raced.event_count(), 1)
+            self.assertTrue(raced.verify_chain())
+        finally:
+            raced.close()
+
+    def test_budget_receipts_are_exact_atomic_and_deeply_immutable(self) -> None:
+        arguments = claim_keywords(
+            "job-receipts",
+            reservation_cost_units=2,
+            scope_limit_cost_units=2,
+        )
+        claimed = self.ledger.claim(**arguments)
+        reservation = claimed.payload["budget_reservation"]
+        self.assertEqual(reservation["payload"]["ledger_version_before"], 0)
+        self.assertEqual(
+            set(reservation["payload"]),
+            {
+                "trial_ref",
+                "job_ref",
+                "provider",
+                "idempotency_key",
+                "hard_limits",
+                "ledger_version_before",
+                "expires_at",
+            },
+        )
+        completed = self.ledger.complete(
+            job_id=arguments["job_id"],
+            attempt_id=arguments["attempt_id"],
+            fencing_epoch=arguments["fencing_epoch"],
+            fencing_token=arguments["fencing_token"],
+            result_sha256=RESULT_SHA,
+            event_at=AT,
+        )
+        attestation = completed.payload["provider_accounting_attestation"]
+        settlement = completed.payload["settlement_receipt"]
+        self.assertEqual(
+            set(attestation),
+            {
+                "schema_id",
+                "schema_version",
+                "accounting_policy_ref",
+                "budget_scope_ref",
+                "provider",
+                "reservation_ref",
+                "actual_usage",
+                "actual_cost",
+                "released_amount",
+                "provider_unknown",
+                "settled_at",
+            },
+        )
+        self.assertEqual(attestation["actual_usage"], {"cost_units": 2})
+        self.assertEqual(attestation["actual_cost"], 2)
+        self.assertEqual(attestation["released_amount"], 0)
+        self.assertIs(attestation["provider_unknown"], True)
+        self.assertEqual(settlement["payload"]["ledger_version_after"], completed.sequence)
+        attestation_sha256 = hashlib.sha256(
+            ledger_module._canonical_json(attestation).encode("utf-8")
+        ).hexdigest()
+        self.assertEqual(
+            settlement["payload"]["provider_receipt_ref"],
+            f"embedded:sha256:{attestation_sha256}",
+        )
+        with self.assertRaises(TypeError):
+            reservation["payload"]["hard_limits"]["cost_units"] = 0
+        with self.assertRaises(TypeError):
+            attestation["actual_usage"]["cost_units"] = 0
+        with self.assertRaises(TypeError):
+            settlement["integrity"]["parent_refs"][0] = "changed"
+        self.ledger.close()
+        self.ledger = JobLedger(self.database)
+        replay = self.ledger.claim(**arguments)
+        self.assertEqual(replay.event_sha256, claimed.event_sha256)
+        self.assertEqual(self.ledger.event_count(), 2)
+        self.assertTrue(self.ledger.verify_chain())
+
+    def test_failed_precommit_settlement_validation_leaves_unmatched_charge(self) -> None:
+        arguments = claim_keywords(
+            "job-settlement-fault",
+            reservation_cost_units=1,
+            scope_limit_cost_units=1,
+        )
+        self.ledger.claim(**arguments)
+        with mock.patch.object(
+            JobLedger,
+            "_construct_settlement_receipt",
+            return_value={"schema_id": "SettlementReceipt"},
+        ):
+            with self.assertRaises(LedgerError):
+                self.ledger.complete(
+                    job_id=arguments["job_id"],
+                    attempt_id=arguments["attempt_id"],
+                    fencing_epoch=arguments["fencing_epoch"],
+                    fencing_token=arguments["fencing_token"],
+                    result_sha256=RESULT_SHA,
+                    event_at=AT,
+                )
+        self.assertEqual(self.ledger.event_count(), 1)
+        self.assertEqual(self.ledger.event_count("complete"), 0)
+        with self.assertRaisesRegex(LedgerError, "hard cap exceeded"):
+            self.ledger.claim(
+                **claim_keywords(
+                    "job-after-settlement-fault",
+                    reservation_cost_units=1,
+                    scope_limit_cost_units=1,
+                )
+            )
+        self.assertEqual(self.ledger.event_count(), 1)
         self.assertTrue(self.ledger.verify_chain())
 
 

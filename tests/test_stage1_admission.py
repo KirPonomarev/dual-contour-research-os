@@ -424,6 +424,16 @@ class KernelTests(unittest.TestCase):
                 "fencing_token",
                 "admitted_at",
                 "admission_digest",
+                "accounting_policy_ref",
+                "budget_scope_ref",
+                "scope_limit_cost_units",
+                "trial_ref",
+                "provider",
+                "job_idempotency_key",
+                "reservation_cost_units",
+                "reservation_expires_at",
+                "contour",
+                "classification",
             },
         )
 

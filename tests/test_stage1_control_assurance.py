@@ -54,6 +54,16 @@ def _claim(ledger: JobLedger, *, job_id: str = "job-control-synthetic") -> None:
         fencing_token="fence-control-synthetic",
         admitted_at=AT,
         admission_digest=ADMISSION_SHA256,
+        accounting_policy_ref=f"budget-policy:sha256:{'a' * 64}",
+        budget_scope_ref=f"budget-scope:sha256:{'b' * 64}",
+        scope_limit_cost_units=100,
+        trial_ref="trial:synthetic-control",
+        provider="offline-runner-synthetic",
+        job_idempotency_key=f"idempotency:{job_id}",
+        reservation_cost_units=1,
+        reservation_expires_at="2026-01-02T04:04:05Z",
+        contour="bridge",
+        classification="D0_PUBLIC",
     )
 
 

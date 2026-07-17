@@ -575,6 +575,24 @@ class Stage1ReferenceVerticalTests(unittest.TestCase):
                         receipt_payload["event_chain_head"],
                         environment.ledger.completion_event.event_sha256,  # type: ignore[union-attr]
                     )
+                    completion_event = environment.ledger.completion_event
+                    assert completion_event is not None
+                    settlement_parent = completion_event.payload[
+                        "settlement_receipt"
+                    ]["object_id"]
+                    self.assertRegex(
+                        settlement_parent,
+                        r"^settlement-receipt-[a-f0-9]{64}$",
+                    )
+                    self.assertEqual(
+                        tuple(receipt["integrity"]["parent_refs"]),
+                        (
+                            result.record.checkpoint_manifest["object_id"],
+                            *artifact_refs,
+                            settlement_parent,
+                            f"ledger:{completion_event.event_sha256}",
+                        ),
+                    )
 
                     projection = result.projection
                     self.assertEqual(

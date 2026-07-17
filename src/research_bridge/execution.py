@@ -1,7 +1,7 @@
 """Structural, offline execution finalizer for the Bridge control plane.
 
-This module composes injected boundaries only.  It intentionally does not
-import their implementations and grants no subprocess, network, domain, or
+This module composes injected boundaries and reuses the canonical ledger's
+budget projection validator.  It grants no subprocess, network, domain, or
 scientific-outcome authority.
 """
 
@@ -20,6 +20,8 @@ import stat
 from types import MappingProxyType
 from typing import Any, Mapping, Protocol
 
+from research_bridge.ledger import JobLedger, LedgerError
+
 
 __all__ = [
     "ExecutionError",
@@ -36,6 +38,9 @@ _RFC3339_RE = re.compile(
     r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$"
 )
 _CAS_REF_RE = re.compile(r"^cas:sha256:([a-f0-9]{64})$")
+_ACCOUNTING_POLICY_REF_RE = re.compile(r"^budget-policy:sha256:[a-f0-9]{64}$")
+_BUDGET_SCOPE_REF_RE = re.compile(r"^budget-scope:sha256:[a-f0-9]{64}$")
+_MAX_SAFE_INTEGER = 9_007_199_254_740_991
 _EVENT_FIELDS = frozenset(
     {
         "sequence",
@@ -47,19 +52,6 @@ _EVENT_FIELDS = frozenset(
         "payload",
         "previous_sha256",
         "event_sha256",
-    }
-)
-_CLAIM_PAYLOAD_FIELDS = frozenset(
-    {
-        "admission_digest",
-        "admitted_at",
-        "attempt_id",
-        "fencing_epoch",
-        "fencing_token_sha256",
-        "job_id",
-        "permit_id",
-        "permit_nonce_sha256",
-        "runner_identity",
     }
 )
 _RESULT_FIELDS = frozenset(
@@ -90,16 +82,6 @@ _CHECKPOINT_EVENT_PAYLOAD_FIELDS = frozenset(
         "payload_stored_in_domain_vault",
         "sequence",
         "state_sha256",
-    }
-)
-_COMPLETE_EVENT_PAYLOAD_FIELDS = frozenset(
-    {
-        "attempt_id",
-        "event_at",
-        "fencing_epoch",
-        "fencing_token_sha256",
-        "job_id",
-        "result_sha256",
     }
 )
 
@@ -136,6 +118,14 @@ class _Bindings:
     code_sha256: str
     input_sha256: str
     environment_digest: str
+    accounting_policy_ref: str
+    budget_scope_ref: str
+    scope_limit_cost_units: int
+    trial_ref: str
+    provider: str
+    job_idempotency_key: str
+    reservation_cost_units: int
+    reservation_expires_at: str
     contour: str
     classification: str
 
@@ -262,7 +252,7 @@ class OfflineExecutionCoordinator:
             claim_event = self._kernel.claim(job_spec, permit, lease, now=now)
         except Exception as exc:
             raise ExecutionError("kernel claim failed; runner was not called") from exc
-        _validate_claim_event(claim_event, bindings)
+        budget_claim = _validate_claim_event(claim_event, bindings)
 
         try:
             runner_result = self._runner.run(job_spec, lease, staging_root)
@@ -359,28 +349,34 @@ class OfflineExecutionCoordinator:
             )
         except Exception as exc:
             raise ExecutionError("durable completion ledger append failed") from exc
-        _validate_completion_event(
-            completion_event,
-            bindings,
-            result_sha256,
-            result.ended_at,
-        )
-
-        execution_receipt = _construct_execution_receipt(
-            bindings=bindings,
-            result=result,
-            artifact_refs=artifact_refs,
-            checkpoint_manifest=checkpoint_manifest,
-            completion_event_sha256=_event_sha256(
-                completion_event, "completion_event"
-            ),
-            issuer_id=self._issuer_id,
-        )
-        return ExecutionRecord(
-            checkpoint_manifest=checkpoint_manifest,
-            artifact_records=artifact_snapshots,
-            execution_receipt=execution_receipt,
-        )
+        try:
+            settlement_ref = _validate_completion_event(
+                completion_event,
+                bindings,
+                budget_claim,
+                result_sha256,
+                result.ended_at,
+            )
+            execution_receipt = _construct_execution_receipt(
+                bindings=bindings,
+                result=result,
+                artifact_refs=artifact_refs,
+                checkpoint_manifest=checkpoint_manifest,
+                completion_event_sha256=_event_sha256(
+                    completion_event, "completion_event"
+                ),
+                settlement_ref=settlement_ref,
+                issuer_id=self._issuer_id,
+            )
+            return ExecutionRecord(
+                checkpoint_manifest=checkpoint_manifest,
+                artifact_records=artifact_snapshots,
+                execution_receipt=execution_receipt,
+            )
+        except Exception as exc:
+            raise ExecutionError(
+                "critical post-completion receipt invariant failed"
+            ) from exc
 
 
 def _authority_bindings(
@@ -394,6 +390,30 @@ def _authority_bindings(
     job_payload = _mapping(job.get("payload"), "job_spec.payload")
     permit_payload = _mapping(permit_value.get("payload"), "permit.payload")
     lease_payload = _mapping(lease_value.get("payload"), "lease.payload")
+    quotas = _exact_mapping(
+        permit_payload.get("quotas"),
+        frozenset(
+            {
+                "accounting_policy_ref",
+                "budget_scope_ref",
+                "claims",
+                "provider",
+                "scope_limit",
+                "trial_ref",
+            }
+        ),
+        "permit.payload.quotas",
+    )
+    scope_limit = _exact_mapping(
+        quotas["scope_limit"],
+        frozenset({"cost_units"}),
+        "permit.payload.quotas.scope_limit",
+    )
+    resource_limits = _exact_mapping(
+        job_payload.get("resource_limits"),
+        frozenset({"cost_units"}),
+        "job_spec.payload.resource_limits",
+    )
 
     classifications = (
         job.get("classification"),
@@ -424,6 +444,28 @@ def _authority_bindings(
     )
     if canonical_json_sha256(input_refs) != input_sha256:
         raise ExecutionError("Permit input digest does not bind ordered JobSpec input_refs")
+    scope_limit_cost_units = _positive_safe_integer(
+        "permit.payload.quotas.scope_limit.cost_units", scope_limit["cost_units"]
+    )
+    reservation_cost_units = _positive_safe_integer(
+        "job_spec.payload.resource_limits.cost_units", resource_limits["cost_units"]
+    )
+    if reservation_cost_units > scope_limit_cost_units:
+        raise ExecutionError("job reservation exceeds Permit budget scope")
+    if quotas["claims"] != 1 or permit_payload.get("max_uses") != 1:
+        raise ExecutionError("Permit budget claim authority must be exactly one")
+    provider = _normalized_text("permit.payload.quotas.provider", quotas["provider"])
+    if provider != job_payload.get("runner_profile"):
+        raise ExecutionError("budget provider does not bind JobSpec runner profile")
+    permit_expires_at = _timestamp(
+        "permit.payload.expires_at", permit_payload.get("expires_at")
+    )
+    lease_expires_at = _timestamp(
+        "lease.payload.expires_at", lease_payload.get("expires_at")
+    )
+    reservation_expires_at = min(
+        (permit_expires_at, lease_expires_at), key=_parse_timestamp
+    )
 
     return _Bindings(
         job_id=job_id,
@@ -451,19 +493,43 @@ def _authority_bindings(
         environment_digest=_normalized_text(
             "job_spec.payload.image_digest", job_payload.get("image_digest")
         ),
+        accounting_policy_ref=_pattern_text(
+            "permit.payload.quotas.accounting_policy_ref",
+            quotas["accounting_policy_ref"],
+            _ACCOUNTING_POLICY_REF_RE,
+        ),
+        budget_scope_ref=_pattern_text(
+            "permit.payload.quotas.budget_scope_ref",
+            quotas["budget_scope_ref"],
+            _BUDGET_SCOPE_REF_RE,
+        ),
+        scope_limit_cost_units=scope_limit_cost_units,
+        trial_ref=_normalized_text(
+            "permit.payload.quotas.trial_ref", quotas["trial_ref"]
+        ),
+        provider=provider,
+        job_idempotency_key=_normalized_text(
+            "job_spec.payload.idempotency_key", job_payload.get("idempotency_key")
+        ),
+        reservation_cost_units=reservation_cost_units,
+        reservation_expires_at=reservation_expires_at,
         contour=_normalized_text("job_spec.contour", contours[0]),
         classification=classifications[0],
     )
 
 
-def _validate_claim_event(event: object, bindings: _Bindings) -> None:
+def _validate_claim_event(event: object, bindings: _Bindings) -> Any:
     values = _exact_attributes(event, _EVENT_FIELDS, "claim_event")
     _validate_event_columns(values, "claim", bindings, "claim_event")
-    payload = _exact_mapping(
-        values["payload"], _CLAIM_PAYLOAD_FIELDS, "claim_event.payload"
-    )
+    try:
+        projection = JobLedger._validate_budget_claim_event(event)
+    except LedgerError as exc:
+        raise ExecutionError("claim budget projection is invalid") from exc
+    payload = projection.event.payload
     expected = {
+        "accounting_policy_ref": bindings.accounting_policy_ref,
         "attempt_id": bindings.attempt_id,
+        "budget_scope_ref": bindings.budget_scope_ref,
         "fencing_epoch": bindings.fencing_epoch,
         "job_id": bindings.job_id,
         "permit_id": bindings.permit_id,
@@ -500,6 +566,25 @@ def _validate_claim_event(event: object, bindings: _Bindings) -> None:
         hashlib.sha256(bindings.fencing_token.encode("utf-8")).hexdigest(),
     ):
         raise ExecutionError("claim fencing token binding mismatch")
+    expected_projection = {
+        "accounting_policy_ref": bindings.accounting_policy_ref,
+        "budget_scope_ref": bindings.budget_scope_ref,
+        "scope_limit_cost_units": bindings.scope_limit_cost_units,
+        "trial_ref": bindings.trial_ref,
+        "provider": bindings.provider,
+        "idempotency_key": bindings.job_idempotency_key,
+        "reservation_cost_units": bindings.reservation_cost_units,
+        "expires_at": bindings.reservation_expires_at,
+    }
+    for key, expected_value in expected_projection.items():
+        if getattr(projection, key) != expected_value:
+            raise ExecutionError(f"claim budget {key} binding mismatch")
+    if (
+        projection.reservation["contour"] != bindings.contour
+        or projection.reservation["classification"] != bindings.classification
+    ):
+        raise ExecutionError("reservation outer authority binding mismatch")
+    return projection
 
 
 def _validate_runner_result(result: object, bindings: _Bindings) -> _ResultView:
@@ -745,16 +830,19 @@ def _validate_artifact_records(
 def _validate_completion_event(
     event: object,
     bindings: _Bindings,
+    budget_claim: Any,
     result_sha256: str,
     event_at: str,
-) -> None:
+) -> str:
     values = _exact_attributes(event, _EVENT_FIELDS, "completion_event")
     _validate_event_columns(values, "complete", bindings, "completion_event")
-    payload = _exact_mapping(
-        values["payload"],
-        _COMPLETE_EVENT_PAYLOAD_FIELDS,
-        "completion_event.payload",
-    )
+    try:
+        settlement = JobLedger._validate_budget_completion_event(
+            event, budget_claim
+        )
+    except LedgerError as exc:
+        raise ExecutionError("completion budget projection is invalid") from exc
+    payload = event.payload
     expected = {
         "attempt_id": bindings.attempt_id,
         "event_at": event_at,
@@ -772,6 +860,7 @@ def _validate_completion_event(
     ) != bindings.fencing_epoch:
         raise ExecutionError("completion event fencing epoch binding mismatch")
     _validate_fencing_digest(payload["fencing_token_sha256"], bindings)
+    return settlement["object_id"]
 
 
 def _construct_execution_receipt(
@@ -781,6 +870,7 @@ def _construct_execution_receipt(
     artifact_refs: tuple[str, ...],
     checkpoint_manifest: Mapping[str, Any],
     completion_event_sha256: str,
+    settlement_ref: str,
     issuer_id: str,
 ) -> Mapping[str, Any]:
     payload = {
@@ -811,6 +901,7 @@ def _construct_execution_receipt(
             "parent_refs": [
                 checkpoint_manifest["object_id"],
                 *artifact_refs,
+                settlement_ref,
                 f"ledger:{completion_event_sha256}",
             ],
         },
@@ -927,6 +1018,13 @@ def _sha256(label: str, value: object) -> str:
     return value
 
 
+def _pattern_text(label: str, value: object, pattern: re.Pattern[str]) -> str:
+    normalized = _normalized_text(label, value)
+    if pattern.fullmatch(normalized) is None:
+        raise ExecutionError(f"{label} has an invalid content-addressed format")
+    return normalized
+
+
 def _cas_ref(label: str, value: object) -> str:
     if not isinstance(value, str) or _CAS_REF_RE.fullmatch(value) is None:
         raise ExecutionError(f"{label} must be a portable CAS reference")
@@ -936,6 +1034,17 @@ def _cas_ref(label: str, value: object) -> str:
 def _nonnegative_integer(label: str, value: object) -> int:
     if isinstance(value, bool) or not isinstance(value, int) or value < 0:
         raise ExecutionError(f"{label} must be a non-negative integer")
+    return value
+
+
+def _positive_safe_integer(label: str, value: object) -> int:
+    if (
+        isinstance(value, bool)
+        or not isinstance(value, int)
+        or value < 1
+        or value > _MAX_SAFE_INTEGER
+    ):
+        raise ExecutionError(f"{label} must be a positive safe integer")
     return value
 
 

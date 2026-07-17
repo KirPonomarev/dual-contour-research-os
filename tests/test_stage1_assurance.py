@@ -170,6 +170,16 @@ def _claim_keywords() -> dict:
         "fencing_token": "fence-synthetic-ledger-007",
         "admitted_at": _timestamp(NOW),
         "admission_digest": ADMISSION_SHA256,
+        "accounting_policy_ref": ACCOUNTING_POLICY_REF,
+        "budget_scope_ref": BUDGET_SCOPE_REF,
+        "scope_limit_cost_units": 100,
+        "trial_ref": "trial:synthetic-ledger-001",
+        "provider": "runner-synthetic-ledger-001",
+        "job_idempotency_key": "idempotency:synthetic-ledger-001",
+        "reservation_cost_units": 1,
+        "reservation_expires_at": _timestamp(NOW + timedelta(minutes=10)),
+        "contour": "bridge",
+        "classification": "D0_PUBLIC",
     }
 
 
@@ -232,6 +242,16 @@ class Stage1AdmissionAssuranceTests(unittest.TestCase):
                 "fencing_token",
                 "admitted_at",
                 "admission_digest",
+                "accounting_policy_ref",
+                "budget_scope_ref",
+                "scope_limit_cost_units",
+                "trial_ref",
+                "provider",
+                "job_idempotency_key",
+                "reservation_cost_units",
+                "reservation_expires_at",
+                "contour",
+                "classification",
             },
         )
 
@@ -388,38 +408,34 @@ class Stage1AdmissionAssuranceTests(unittest.TestCase):
                     persisted_payload,
                 )
 
-                with self.assertRaises((AdmissionError, LedgerError)):
-                    kernel.claim(job_spec, permit, lease, now=NOW)
+                replay = kernel.claim(job_spec, permit, lease, now=NOW)
 
                 self.assertEqual(ledger.event_count(), 1)
+                self.assertEqual(replay.sequence, 1)
                 self.assertTrue(ledger.verify_chain())
             finally:
                 ledger.close()
 
 
 class Stage1LedgerAssuranceTests(unittest.TestCase):
-    def test_concurrent_claim_has_exactly_one_winner(self) -> None:
+    def test_concurrent_identical_claims_replay_one_append(self) -> None:
         with tempfile.TemporaryDirectory() as temporary_directory:
             database = Path(temporary_directory) / "synthetic-ledger.sqlite3"
             JobLedger(database).close()
             barrier = Barrier(8)
 
-            def claim_once() -> str:
+            def claim_once() -> int:
                 ledger = JobLedger(database)
                 try:
                     barrier.wait(timeout=10)
-                    ledger.claim(**_claim_keywords())
-                    return "winner"
-                except LedgerError:
-                    return "denied"
+                    return ledger.claim(**_claim_keywords()).sequence
                 finally:
                     ledger.close()
 
             with ThreadPoolExecutor(max_workers=8) as executor:
                 outcomes = list(executor.map(lambda _: claim_once(), range(8)))
 
-            self.assertEqual(outcomes.count("winner"), 1)
-            self.assertEqual(outcomes.count("denied"), 7)
+            self.assertEqual(outcomes, [1] * 8)
             ledger = JobLedger(database)
             try:
                 self.assertEqual(ledger.event_count(), 1)
