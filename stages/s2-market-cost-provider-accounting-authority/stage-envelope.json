@@ -1,0 +1,124 @@
+{
+  "stage_id": "s2-market-cost-provider-accounting-authority",
+  "agent_id": "agent-0",
+  "objective": "Authorize the next Market pre-soak slice: deterministic fees, slippage, funding and provider accounting over the frozen public dataset lineage.",
+  "executable_blocker": "Stage 2 has a frozen public dataset and temporal integrity, but no hermetic provider accounting layer proves fees, slippage and funding terms are bound, fail-closed, and receipt-shaped without live trading or scientific outcome authority.",
+  "base_sha": "79cdd4c45d5fdf79c9c5024ad50d379452793303",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "main",
+  "worktree": "canonical-public-worktree",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "docs/receipts/integration/s1-skeleton-green-audit.json",
+    "docs/receipts/integration/s2-market-public-dataset-temporal-integrity.json",
+    "docs/receipts/source-freeze/s2-market-cost-provider-accounting.json",
+    "docs/receipts/reuse/s2-market-cost-provider-accounting.json",
+    "contracts/v1/ValidationReceipt.schema.json",
+    "existing private Market funding_paper_watcher.py",
+    "existing private Market decision_kernel_cost_liquidity_inputs.py",
+    "existing private Market validation-court cost sensor boundaries"
+  ],
+  "write_set": [
+    "docs/receipts/source-freeze/s2-market-cost-provider-accounting.json",
+    "docs/receipts/reuse/s2-market-cost-provider-accounting.json",
+    "stages/s2-market-cost-provider-accounting-authority/stage-envelope.json",
+    "stages/s2-market-cost-provider-accounting-authority/ownership-lease.json",
+    "tests/test_stage2_authority.py"
+  ],
+  "authorized_worker_stage": {
+    "stage_id": "s2-market-cost-provider-accounting",
+    "agent_id": "agent-3",
+    "private_base_sha": "b9fd2b8af8d3ab9405dd0f432d2a39bbb6e3bb94",
+    "public_development_sha": "79cdd4c45d5fdf79c9c5024ad50d379452793303",
+    "branch": "codex/bridge-a3-s2-market-cost-provider-accounting",
+    "worktree": "ephemeral-private-domain-worktree:s2-market-cost-provider-accounting",
+    "write_set": [
+      "data/bridge_pre_soak/provider_accounting/binance_btcusdt_cost_provider_profile.json",
+      "src/market_lab/bridge_pre_soak_cost_provider_accounting.py",
+      "tests/test_bridge_pre_soak_cost_provider_accounting.py"
+    ],
+    "commit_authority": "one-scoped-worker-commit",
+    "push_authority": false
+  },
+  "cost_provider_contract": {
+    "classification": "D0_PUBLIC",
+    "scope": "provider-cost-accounting-only",
+    "required_terms": [
+      "spot_provider_id",
+      "perp_provider_id",
+      "fee_bps_per_side",
+      "slippage_bps_per_side",
+      "funding_rate_bps_per_settlement",
+      "funding_settlement_count",
+      "gross_two_leg_denominator",
+      "dataset_sha256",
+      "previous_temporal_integrity_receipt_ref"
+    ],
+    "accounting_invariants": [
+      "nonnegative-finite-fee-and-slippage-terms",
+      "finite-funding-terms",
+      "dataset-sha-bound-to-previous-stage",
+      "no-private-account-or-order-fields",
+      "no-live-paper-or-order-authority",
+      "provider-costs-receipt-shaped-but-not-scientific-outcome"
+    ],
+    "stage_exit_authorized": "slice-only",
+    "declares_market_pre_soak_green": false
+  },
+  "preservation_contract": [
+    "Stage 2 dataset temporal integrity remains pinned and unexpanded",
+    "public repository stores only sanitized authority receipts and hashes, never provider payloads or Market scientific truth",
+    "private Market remains the owner of provider profile payloads validators and domain semantics",
+    "validator emits immutable cost-provider accounting receipt material and does not apply any scientific outcome",
+    "accounting validation is hermetic; tests must not fetch network data",
+    "no live order trading exchange account deployment publication or autonomous paper/live authority is introduced"
+  ],
+  "forbidden_scope": [
+    "public-copy-of-provider-profile-raw-market-rows-private-Market-source-results-strategy-or-scientific-payload",
+    "worker-write-outside-one-private-provider-profile-one-private-source-file-and-one-private-test-file",
+    "network-capture-inside-validator-tests-or-Bridge-runtime",
+    "new-public-Bridge-runtime-store-ledger-contract-schema-event-dependency-workflow-lockfile-or-migration",
+    "budget-hard-caps-sealed-holdout-crash-resume-corrupt-checkpoint-or-backup-restore-implementation-in-this-slice",
+    "ValidationReceipt-use-to-apply-SUPPORTED-REFUTED-INCONCLUSIVE-INVALID-or-any-domain-truth",
+    "exchange-order-key-account-secret-D2-D3-payload-live-trading-paper-trading-publication-deployment-or-UI-authority",
+    "test-skip-xfail-continue-on-error-optional-gate-or-validation-weakening",
+    "dirty-owner-checkout-mutation",
+    "worker-push-merge-deploy-or-public-repository-write"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "source_freeze": "a4f14f87eaa910a33278b94766f299c8fe96862424f9fe0e67b422689ecfe0c8",
+    "reuse_decision": "252531c0d15b754ee3f5e13677850453dca7be57a9351bf3372494c2a2cddcf6",
+    "skeleton_green_receipt": "4e98f8fc204e281446f64a11ca091060f1d9a4dfb78394b8d9822a55e7a48967",
+    "dataset_integrity_receipt": "3cbe4376094ac8dee30da02aa2a280dd2e2b1dfd8ee57624beb3301135479938",
+    "private_market_head": "b9fd2b8af8d3ab9405dd0f432d2a39bbb6e3bb94",
+    "external_dependencies": "none"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest tests.test_stage2_authority -v",
+    "make test",
+    "private focused cost-provider accounting tests with PYTHONDONTWRITEBYTECODE=1 and no pytest cache",
+    "private bounded existing funding and cost-liquidity tests against exact pinned public Bridge source",
+    "git diff --check in both repositories",
+    "exact public and private write-set privacy dependency network live-authority and weakening scans",
+    "exact-head public CI and withheld-locator private combined CI"
+  ],
+  "risk_class": "cross-repository-market-pre-soak-cost-provider-accounting-slice",
+  "stop_conditions": [
+    "public-base-private-head-contract-source-freeze-reuse-or-dataset-integrity-receipt-hash-mismatch",
+    "worker-write-set-collision-or-private-owner-checkout-mutation",
+    "provider-cost-profile-cannot-be-bound-to-the-frozen-dataset-sha",
+    "accounting-verifier-accepts-private-account-order-live-paper-authority-or-manifest-mismatched-data",
+    "provider-payload-or-domain-scientific-truth-would-enter-the-public-repository",
+    "worker-needs-network-capture-during-tests-or-validation",
+    "any-budget-hard-cap-holdout-recovery-or-backup-scope-is-required-before-this-slice-can-land",
+    "any-live-network-order-exchange-target-publication-or-deployment-authority-appears",
+    "before-equals-after-or-Market-pre-soak-cost-provider-accounting-blocker-remains"
+  ],
+  "expected_receipt": "docs/receipts/integration/s2-market-cost-provider-accounting.json",
+  "rollback": "Agent 0 rejects or reverts only this public authority and the isolated private worker commit. Existing Stage 2 dataset integrity, public Bridge runtime, Market Trial Ledger, external systems and owner checkout remain unchanged.",
+  "commit_authority": "agent-0-only",
+  "push_authority": "agent-0-only"
+}

@@ -1,0 +1,47 @@
+{
+  "schema_id": "SourceFreezeReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "source-freeze-market-s2-cost-provider-accounting-20260717",
+  "issued_at": "2026-07-17T19:20:41Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "source-freeze-authority"
+  },
+  "contour": "market",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "source_repo": "crypto-market-lab",
+    "remote": "sha256:c4d97d3379ba70f130a546a4d44b646c935f33e3b1447e0aac185c0d38215815",
+    "branch": "sha256:496b118571b2bd3882f383e05c9a417b86f2381f8833d3223eb62b4097224ab4",
+    "head_sha": "b9fd2b8af8d3ab9405dd0f432d2a39bbb6e3bb94",
+    "upstream_sha": "b9fd2b8af8d3ab9405dd0f432d2a39bbb6e3bb94",
+    "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "untracked_manifest_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "path_dispositions": [
+      {
+        "category": "tracked_worktree_changes",
+        "count": 0,
+        "disposition": "none-clean-selected-market-dataset-integrity-head"
+      },
+      {
+        "category": "untracked_worktree_entries",
+        "count": 0,
+        "disposition": "none-clean-selected-market-dataset-integrity-head"
+      },
+      {
+        "category": "provider-cost-accounting-payload",
+        "count": 0,
+        "disposition": "not-copied-to-public-repository-private-worker-only"
+      }
+    ],
+    "selected_source_sha": "b9fd2b8af8d3ab9405dd0f432d2a39bbb6e3bb94"
+  },
+  "integrity": {
+    "payload_sha256": "a4f14f87eaa910a33278b94766f299c8fe96862424f9fe0e67b422689ecfe0c8",
+    "parent_refs": [
+      "git:b9fd2b8af8d3ab9405dd0f432d2a39bbb6e3bb94",
+      "integration:integration-s2-market-public-dataset-temporal-integrity-20260717",
+      "integration:integration-s1-skeleton-green-audit-20260717"
+    ]
+  }
+}

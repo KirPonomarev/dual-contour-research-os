@@ -1,0 +1,20 @@
+{
+  "lease_id": "lease-s2-market-cost-provider-accounting-authority-agent-0-20260717",
+  "stage_id": "s2-market-cost-provider-accounting-authority",
+  "agent_id": "agent-0",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-17T19:20:41Z",
+  "expires_at": "2026-07-18T01:20:41Z",
+  "base_sha": "79cdd4c45d5fdf79c9c5024ad50d379452793303",
+  "branch": "main",
+  "worktree": "canonical-public-worktree",
+  "write_set": [
+    "docs/receipts/source-freeze/s2-market-cost-provider-accounting.json",
+    "docs/receipts/reuse/s2-market-cost-provider-accounting.json",
+    "stages/s2-market-cost-provider-accounting-authority/stage-envelope.json",
+    "stages/s2-market-cost-provider-accounting-authority/ownership-lease.json",
+    "tests/test_stage2_authority.py"
+  ],
+  "delegation_allowed": false,
+  "state": "active"
+}

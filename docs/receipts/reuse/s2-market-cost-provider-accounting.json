@@ -1,0 +1,73 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-s2-market-cost-provider-accounting-20260717",
+  "issued_at": "2026-07-17T19:20:41Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "reuse-freeze-authority"
+  },
+  "contour": "market",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "market-pre-soak-fees-slippage-funding-provider-accounting-over-private-domain-runtime",
+    "candidates": [
+      {
+        "candidate": "existing-private-Market-funding_paper_watcher-cost-and-funding-accounting",
+        "disposition": "selected"
+      },
+      {
+        "candidate": "existing-private-Market-decision_kernel_cost_liquidity_inputs-fee-slippage-source-boundary",
+        "disposition": "selected-pattern-only"
+      },
+      {
+        "candidate": "existing-private-Market-validation-court-top-book-cost-sensor-read-model-boundaries",
+        "disposition": "selected-pattern-only"
+      },
+      {
+        "candidate": "existing-public-Bridge-ValidationReceipt-contract",
+        "disposition": "selected"
+      },
+      {
+        "candidate": "owner-local-stdlib-provider-cost-profile-adapter-and-tests",
+        "disposition": "selected-minimal-glue"
+      },
+      {
+        "candidate": "new-exchange-fee-or-funding-network-fetch-in-validator-tests",
+        "disposition": "rejected-live-unstable-and-non-hermetic"
+      },
+      {
+        "candidate": "public-copy-of-private-Market-provider-profile-dataset-source-results-or-scientific-payload",
+        "disposition": "rejected-boundary"
+      },
+      {
+        "candidate": "external-dependency",
+        "disposition": "rejected-unnecessary"
+      }
+    ],
+    "selected_mode": "existing-funding-cost-accounting-and-cost-liquidity-boundaries-owner-stdlib-adapter-no-public-payload",
+    "source_ref": "source-freeze:source-freeze-market-s2-cost-provider-accounting-20260717;git:b9fd2b8af8d3ab9405dd0f432d2a39bbb6e3bb94;git:79cdd4c45d5fdf79c9c5024ad50d379452793303",
+    "code_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "license_spdx": "NOASSERTION",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "provider cost profile binds frozen dataset sha and previous temporal integrity receipt without copying raw OHLCV to public repo",
+      "fee slippage and funding bps are computed deterministically with gross two-leg denominator semantics",
+      "provider accounting rejects private account fields order authority live flags negative or non-finite terms and manifest mismatch",
+      "accepted accounting emits ValidationReceipt-shaped COST_PROVIDER_ACCOUNTING_PASS only, not SUPPORTED REFUTED INCONCLUSIVE or INVALID",
+      "no network exchange order live trading paper deployment publication or domain-truth authority is introduced",
+      "focused private tests plus bounded existing cost funding tests run against the exact pinned public Bridge source"
+    ],
+    "canonical_owner": "private-Market-cost-provider-accounting-validator-and-Agent0-cross-repository-integration",
+    "rollback": "Discard or revert only the isolated private provider cost profile adapter and tests. No public provider payload, Market scientific outcome, live system, or Bridge runtime state is changed."
+  },
+  "integrity": {
+    "payload_sha256": "252531c0d15b754ee3f5e13677850453dca7be57a9351bf3372494c2a2cddcf6",
+    "parent_refs": [
+      "source-freeze:source-freeze-market-s2-cost-provider-accounting-20260717",
+      "sha256:a4f14f87eaa910a33278b94766f299c8fe96862424f9fe0e67b422689ecfe0c8",
+      "git:b9fd2b8af8d3ab9405dd0f432d2a39bbb6e3bb94",
+      "git:79cdd4c45d5fdf79c9c5024ad50d379452793303"
+    ]
+  }
+}
