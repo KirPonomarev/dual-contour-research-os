@@ -273,6 +273,47 @@ class Stage1AuthorityTests(unittest.TestCase):
         self.assertTrue(envelope["rollback"])
         self.assertFalse(lease["delegation_allowed"])
 
+    def test_final_checkpoint_reopen_amendment_is_one_test_and_session_neutral(self) -> None:
+        original = load(
+            ROOT
+            / "stages"
+            / "s1-final-checkpoint-reopen-recovery"
+            / "stage-envelope.json"
+        )
+        amendment = load(
+            ROOT
+            / "stages"
+            / "s1-final-checkpoint-reopen-recovery"
+            / "stage-envelope-amendment-1.json"
+        )
+        lease = load(
+            ROOT
+            / "stages"
+            / "s1-final-checkpoint-reopen-recovery"
+            / "ownership-lease-amendment-1.json"
+        )
+
+        self.assertEqual(amendment["amends_stage_id"], original["stage_id"])
+        self.assertEqual(
+            amendment["added_write_set"], ["tests/test_stage1_assurance.py"]
+        )
+        self.assertEqual(
+            set(lease["write_set"]),
+            set(original["write_set"]) | set(amendment["added_write_set"]),
+        )
+        self.assertEqual(len(lease["write_set"]), 8)
+        self.assertEqual(
+            amendment["semantic_correction"]["exact_replay_contexts"],
+            ["same-open-ledger-session", "after-close-and-reopen"],
+        )
+        self.assertIn(
+            "no persisted-reopen-boundary prerequisite",
+            amendment["semantic_correction"]["forbidden_compatibility_rule"],
+        )
+        self.assertTrue(amendment["rollback"])
+        self.assertFalse(amendment["push_authority"])
+        self.assertFalse(lease["delegation_allowed"])
+
     def test_budget_attempt_lifecycle_semantic_amendment_is_exact_and_non_expansive(self) -> None:
         original = load(
             ROOT / "stages" / "s1-budget-attempt-lifecycle" / "stage-envelope.json"

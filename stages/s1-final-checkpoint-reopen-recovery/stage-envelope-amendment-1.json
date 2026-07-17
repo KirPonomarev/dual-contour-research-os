@@ -1,0 +1,56 @@
+{
+  "stage_id": "s1-final-checkpoint-reopen-recovery-amendment-1",
+  "amends_stage_id": "s1-final-checkpoint-reopen-recovery",
+  "agent_id": "agent-2",
+  "objective": "Extend the recovery worker write-set by exactly one connected assurance test and freeze exact replay as zero-write both before and after ledger reopen.",
+  "executable_blocker": "The connected assurance test encodes the superseded rule that an identical same-session checkpoint delivery must fail, which directly contradicts the stage's exact zero-write replay contract.",
+  "base_sha": "4e4e5a8677f1c189d6cde2b86626186f36701aad",
+  "public_authority_sha": "e7829dad908dd48c6dc1f94e8a3eb3c5fc79982a",
+  "public_authority_ci": "29585871956",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a2-s1-final-checkpoint-reopen-recovery",
+  "worktree": "ephemeral-public-worktree:s1-final-checkpoint-reopen-recovery",
+  "prior_envelope_ref": "stages/s1-final-checkpoint-reopen-recovery/stage-envelope.json",
+  "authority_receipt_ref": "docs/receipts/integration/s1-final-checkpoint-reopen-recovery-authority.json",
+  "added_write_set": [
+    "tests/test_stage1_assurance.py"
+  ],
+  "full_write_set_ref": "stages/s1-final-checkpoint-reopen-recovery/ownership-lease-amendment-1.json",
+  "semantic_correction": {
+    "exact_replay_contexts": [
+      "same-open-ledger-session",
+      "after-close-and-reopen"
+    ],
+    "checkpoint_result": "the same original LedgerEvent is returned with zero new events for all eight exact bindings in either context",
+    "completion_result": "the same original LedgerEvent is returned with zero new events for all six exact bindings in either context",
+    "conflict_result": "any binding conflict is rejected with zero new events in either context",
+    "forbidden_compatibility_rule": "no persisted-reopen-boundary prerequisite or session-sensitive replay behavior"
+  },
+  "preservation_contract": [
+    "all original envelope constraints acceptance commands and stop conditions remain active",
+    "the added assurance file changes only the superseded identical-checkpoint expectation and connected zero-write assertions",
+    "portable-reference stale-fence sequence-conflict chain and append-only checks remain fail-closed",
+    "no test skip xfail broad exception reduced mutation matrix or removed negative case",
+    "no source contract schema event vocabulary dependency database or capability expansion"
+  ],
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest tests.test_stage1_ledger tests.test_stage1_assurance tests.test_stage1_execution tests.test_stage1_execution_assurance tests.test_stage1_reference_vertical tests.test_stage1_recovery -v",
+    "python3 -m unittest discover -s tests -p 'test_stage1_*.py'",
+    "make test",
+    "git diff --check",
+    "exact eight-file write-set same-session and reopen replay matrix plus assertion skip dependency private-locator network live-authority and weakening scan"
+  ],
+  "stop_conditions": [
+    "exact checkpoint or completion replay depends on process or connection reopen",
+    "same-session or reopened exact replay appends an event or returns a different event",
+    "same-session or reopened conflicting replay is accepted or mutates the ledger",
+    "added assurance edit changes any unrelated scenario assertion or portable-reference rule",
+    "write-set contract schema event dependency database or capability expands",
+    "before-equals-after-or-session-sensitive-replay-blocker-remains"
+  ],
+  "expected_receipt": "docs/receipts/integration/s1-final-checkpoint-reopen-recovery-amendment-1.json",
+  "rollback": "Agent 0 discards the worker commit and reverts this one-test authority amendment. No runtime database, domain state, external system or live authority is changed.",
+  "commit_authority": "one-scoped-worker-commit",
+  "push_authority": false
+}

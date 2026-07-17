@@ -1,0 +1,25 @@
+{
+  "lease_id": "lease-s1-final-checkpoint-reopen-recovery-agent-2-amendment-1-20260717",
+  "stage_id": "s1-final-checkpoint-reopen-recovery",
+  "amendment_id": "s1-final-checkpoint-reopen-recovery-amendment-1",
+  "agent_id": "agent-2",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-17T14:20:28Z",
+  "expires_at": "2026-07-17T20:20:28Z",
+  "base_sha": "4e4e5a8677f1c189d6cde2b86626186f36701aad",
+  "public_authority_sha": "e7829dad908dd48c6dc1f94e8a3eb3c5fc79982a",
+  "branch": "codex/bridge-a2-s1-final-checkpoint-reopen-recovery",
+  "worktree": "ephemeral-public-worktree:s1-final-checkpoint-reopen-recovery",
+  "write_set": [
+    "src/research_bridge/ledger.py",
+    "src/research_bridge/execution.py",
+    "tests/test_stage1_ledger.py",
+    "tests/test_stage1_execution.py",
+    "tests/test_stage1_execution_assurance.py",
+    "tests/test_stage1_reference_vertical.py",
+    "tests/test_stage1_recovery.py",
+    "tests/test_stage1_assurance.py"
+  ],
+  "delegation_allowed": false,
+  "state": "active"
+}
