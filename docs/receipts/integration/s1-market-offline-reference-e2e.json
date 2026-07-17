@@ -1,0 +1,75 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s1-market-offline-reference-e2e-20260717",
+  "issued_at": "2026-07-17T17:38:15Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "market",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s1-market-offline-reference-e2e",
+    "agent_id": "agent-3",
+    "ownership_lease_ref": "stages/s1-market-offline-reference-e2e/ownership-lease.json",
+    "base_sha": "194aed69bc21ed9c1f65658313e0357b33cfe224",
+    "head_sha": "96da40a62ef021a6bc5fbe4820e388ee961899a7",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "src/market_lab/bridge_reference_adapter.py",
+      "src/market_lab/bridge_reference_registry.py",
+      "tests/test_bridge_reference_adapter.py",
+      "tests/test_bridge_reference_e2e.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "public_bridge_sha": "194aed69bc21ed9c1f65658313e0357b33cfe224",
+      "public_exact_head_ci": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29597801884",
+      "private_base_sha": "c4c697ef3dc8532321349917a65e1afb379e0ae2",
+      "private_worker_commit_sha": "96da40a62ef021a6bc5fbe4820e388ee961899a7",
+      "focused_adapter_tests": 5,
+      "focused_bridge_e2e_tests": 4,
+      "private_tests": 2943,
+      "private_skipped_tests": 0,
+      "private_warnings": 592,
+      "private_full_suite_seconds": 881.1,
+      "diff_check": "green",
+      "private_write_set_exact": true,
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "worker_write_set_files": 4,
+      "worker_source_files": 2,
+      "worker_test_files": 2,
+      "dependency_adoption": false,
+      "frozen_contract_edit": false,
+      "public_source_mutation": false,
+      "private_owner_checkout_mutated": false,
+      "single_market_trial_ledger": true,
+      "validator_registry_write_authorized": false,
+      "domain_payload_public_copy": false,
+      "synthetic_d0_only": true,
+      "exact_replay_single_row": "green",
+      "conflicting_replay_zero_write": "green",
+      "validation_boundary_projection": "green",
+      "private_exact_head_ci": "local-green-withheld-locator",
+      "private_ci_locator_disclosed": false,
+      "combined_against_post_terminal_public_bridge_sha": "194aed69bc21ed9c1f65658313e0357b33cfe224",
+      "live_or_connected_authority": false
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29597801884",
+    "integration_commit_sha": "194aed69bc21ed9c1f65658313e0357b33cfe224"
+  },
+  "integrity": {
+    "payload_sha256": "274de6b3fdb77f47756dc42d3293cbf0b1a5c8e506732bf72c2679fc4609cecb",
+    "parent_refs": [
+      "git:96da40a62ef021a6bc5fbe4820e388ee961899a7",
+      "git:194aed69bc21ed9c1f65658313e0357b33cfe224",
+      "ci:29597801884",
+      "ci:private-local-exact-head-green-withheld",
+      "integration:integration-s1-market-offline-reference-e2e-authority-20260717",
+      "source-freeze:source-freeze-market-s1-offline-reference-e2e-20260717",
+      "reuse:reuse-s1-market-offline-reference-e2e-20260717"
+    ]
+  }
+}
