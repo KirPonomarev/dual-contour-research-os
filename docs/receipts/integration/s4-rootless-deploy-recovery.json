@@ -1,0 +1,66 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s4-rootless-deploy-recovery-20260718",
+  "issued_at": "2026-07-17T23:50:45Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s4-rootless-deploy-recovery",
+    "agent_id": "agent-2",
+    "ownership_lease_ref": "stages/s4-rootless-deploy-recovery/ownership-lease.json",
+    "base_sha": "46d89a26a78a386f6ecf874da6dc301a9612037d",
+    "head_sha": "d0bad80f107b16c4108228ec95a3dc1d60a1c4b7",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "tools/pre_soak_deploy.py",
+      "ops/deploy/research-os-bridge.service",
+      "ops/deploy/host-profile.json",
+      "tests/test_release_deploy_recovery.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "focused_test_count": 11,
+      "full_core_test_count": 396,
+      "full_inventory_test_count": 25,
+      "worker_commit_sha": "c06c7a39f2953a91820cf961acae5e68e73b0ec3",
+      "worker_base_exact": true,
+      "worker_write_set_exact": true,
+      "strict_ssh_alias_and_host_key": true,
+      "rootless_socket_and_non_root_identity_required": true,
+      "user_linger_and_enabled_docker_service_required": true,
+      "local_and_remote_archive_sha256_exact": true,
+      "loaded_image_identity_exact": true,
+      "runtime_policy_enforced_by_container_and_user_systemd": true,
+      "network_none_and_published_ports_zero": true,
+      "read_only_cap_drop_no_new_privileges_and_resource_limits": true,
+      "AF_UNIX_only_control": true,
+      "docker_systemd_boot_race_closed": true,
+      "operator_mediated_boot_id_change_required": true,
+      "pause_state_preserved_across_reboot_and_redeploy": true,
+      "first_release_rollback_target": "release:none-service-stopped",
+      "rollback_and_redeploy_state_machine_implemented": true,
+      "pass_and_fail_receipts_reserved_before_external_action": true,
+      "external_host_action_performed": false,
+      "actual_reboot_recovery_claimed": false,
+      "actual_rollback_drill_claimed": false,
+      "declares_ready_for_72h_soak": false,
+      "next_stage": "s4-functional-frozen-soak-capsule-and-real-host-drill"
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29621699180",
+    "integration_commit_sha": "d0bad80f107b16c4108228ec95a3dc1d60a1c4b7"
+  },
+  "integrity": {
+    "payload_sha256": "f0e176064da62c8f44da34804c71cecee32ecb34cad136ebea11fa21c2cc015e",
+    "parent_refs": [
+      "git:d0bad80f107b16c4108228ec95a3dc1d60a1c4b7",
+      "git:c06c7a39f2953a91820cf961acae5e68e73b0ec3",
+      "ci:29621699180",
+      "integration:integration-s4-rootless-release-blueprint-20260718",
+      "reuse:reuse-s4-rootless-deploy-recovery-20260718"
+    ]
+  }
+}
