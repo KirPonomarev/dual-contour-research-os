@@ -427,6 +427,30 @@ class Stage1AuthorityTests(unittest.TestCase):
         self.assertTrue(envelope["rollback"])
         self.assertFalse(lease["delegation_allowed"])
 
+    def test_auth_policy_worker_lease_is_exact_and_non_expansive(self) -> None:
+        envelope = load(
+            ROOT / "stages" / "s1-auth-policy-boundary" / "stage-envelope.json"
+        )
+        lease = load(
+            ROOT / "stages" / "s1-auth-policy-boundary" / "ownership-lease.json"
+        )
+        expected = [
+            "src/research_bridge/authority.py",
+            "src/research_bridge/admission.py",
+            "src/research_bridge/kernel.py",
+            "src/research_bridge/control.py",
+            "tests/test_stage1_authority_policy.py",
+        ]
+
+        self.assertEqual(envelope["base_sha"], "2b756ccbbb9541b98594d5247c2f02c938e17bce")
+        self.assertEqual(envelope["public_authority_sha"], envelope["base_sha"])
+        self.assertEqual(envelope["write_set"], expected)
+        self.assertEqual(lease["write_set"], expected)
+        self.assertFalse(any(path.startswith("contracts/") for path in expected))
+        self.assertEqual(envelope["dependency_hashes"]["external_dependencies"], "none")
+        self.assertFalse(envelope["push_authority"])
+        self.assertFalse(lease["delegation_allowed"])
+
     def test_control_authority_is_pinned_and_reversible(self) -> None:
         envelope = load(ROOT / "stages" / "s1-control-authority" / "stage-envelope.json")
         lease = load(ROOT / "stages" / "s1-control-authority" / "ownership-lease.json")

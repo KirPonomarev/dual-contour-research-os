@@ -1,0 +1,21 @@
+{
+  "lease_id": "lease-s1-auth-policy-boundary-agent-1-20260717",
+  "stage_id": "s1-auth-policy-boundary",
+  "agent_id": "agent-1",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-17T08:57:00Z",
+  "expires_at": "2026-07-17T14:57:00Z",
+  "base_sha": "2b756ccbbb9541b98594d5247c2f02c938e17bce",
+  "public_authority_sha": "2b756ccbbb9541b98594d5247c2f02c938e17bce",
+  "branch": "codex/bridge-a1-s1-auth-policy-boundary",
+  "worktree": "ephemeral-public-worktree:s1-auth-policy-boundary",
+  "write_set": [
+    "src/research_bridge/authority.py",
+    "src/research_bridge/admission.py",
+    "src/research_bridge/kernel.py",
+    "src/research_bridge/control.py",
+    "tests/test_stage1_authority_policy.py"
+  ],
+  "delegation_allowed": false,
+  "state": "active"
+}

@@ -1,0 +1,94 @@
+{
+  "stage_id": "s1-auth-policy-boundary",
+  "agent_id": "agent-1",
+  "objective": "Implement one owned stdlib-only fail-closed authority verifier that pins trusted issuer identities and classes and resolves complete PolicySnapshot and ApprovalReceipt objects before admission or resume can mutate the canonical backend.",
+  "executable_blocker": "Independent Agent 1 and Agent 5 probes accepted self-issued JobSpec Permit and AttemptLease objects, an unresolved arbitrary PolicySnapshot hash and a fabricated nonempty resume approval string at the last audited canonical head.",
+  "base_sha": "2b756ccbbb9541b98594d5247c2f02c938e17bce",
+  "public_authority_sha": "2b756ccbbb9541b98594d5247c2f02c938e17bce",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a1-s1-auth-policy-boundary",
+  "worktree": "ephemeral-public-worktree:s1-auth-policy-boundary",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "contracts/v1/JobSpec.schema.json",
+    "contracts/v1/Permit.schema.json",
+    "contracts/v1/AttemptLease.schema.json",
+    "contracts/v1/PolicySnapshot.schema.json",
+    "contracts/v1/ApprovalReceipt.schema.json",
+    "docs/receipts/reuse/s1-authority-policy-boundary.json",
+    "docs/receipts/integration/s1-auth-policy-authority.json",
+    "src/research_bridge/admission.py",
+    "src/research_bridge/kernel.py",
+    "src/research_bridge/control.py",
+    "tests/test_stage1_admission.py",
+    "tests/test_stage1_control.py",
+    "tests/test_stage1_reference_vertical.py"
+  ],
+  "write_set": [
+    "src/research_bridge/authority.py",
+    "src/research_bridge/admission.py",
+    "src/research_bridge/kernel.py",
+    "src/research_bridge/control.py",
+    "tests/test_stage1_authority_policy.py"
+  ],
+  "preservation_contract": {
+    "required": [
+      "one owned verifier boundary with explicit immutable trust configuration",
+      "missing verifier resolver trust record or resolved object fails closed before ledger or control backend mutation",
+      "JobSpec Permit AttemptLease PolicySnapshot and ApprovalReceipt issuer id and authority class are pinned",
+      "PolicySnapshot is fully resolved integrity checked active and exactly bound to Permit before claim",
+      "ApprovalReceipt is fully resolved integrity checked unexpired unrevoked action-bound and policy-bound before resume",
+      "the current valid synthetic offline reference semantics remain available through an explicit trusted fixture"
+    ],
+    "forbidden": [
+      "boolean callback prevalidated result default allow or caller self-asserted trust",
+      "unresolved policy or approval reference acceptance",
+      "cryptographic authenticity claim without a frozen key and signature contract",
+      "ledger contract schema domain registry runner or IPC transport change"
+    ]
+  },
+  "forbidden_scope": [
+    "unlisted-source-test-doc-config-workflow-lockfile-migration-or-contract-edit",
+    "boolean-callback-prevalidated-result-default-allow-or-self-asserted-issuer-path",
+    "unresolved-policy-or-approval-reference-acceptance",
+    "ledger-cas-execution-validation-ingestion-l0-ipc-or-domain-edit",
+    "second-kernel-ledger-policy-store-or-domain-registry-writer",
+    "external-dependency-signature-key-secret-or-private-policy-payload",
+    "existing-test-deletion-relaxation-skip-xfail-or-continue-on-error",
+    "network-deployment-publication-live-trading-live-target-testing-or-authority-expansion",
+    "push-merge-or-canonical-main-write"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "reuse_decision": "3584cedaba5ca8cc4426666f99e2076e301ac4694cf4225d2d02e566c3f4209f",
+    "authority_receipt": "904337ec4e026bfd4066c4e086a642ae5c8fbc9bedfe1ffd1fce13affd947e3f",
+    "external_dependencies": "none"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest tests.test_stage1_authority_policy -v",
+    "python3 -m unittest discover -s tests -p 'test_stage1_*.py'",
+    "make test",
+    "git diff --check",
+    "exact write-set dependency private-locator network live-authority skip and weakening scan"
+  ],
+  "risk_class": "bridge-sev0-authority-authenticity-policy-and-resume-boundary",
+  "stop_conditions": [
+    "base-authority-or-contract-hash-mismatch",
+    "write-set-expansion-contract-change-or-new-dependency-required",
+    "missing-verifier-resolver-or-trust-does-not-fail-closed-before-mutation",
+    "forged-issuer-unresolved-policy-or-fabricated-approval-probe-remains-accepted",
+    "existing-valid-offline-reference-path-regresses",
+    "ledger-ipc-domain-private-payload-network-or-live-authority-enters-scope",
+    "before-equals-after-or-sev0-blocker-remains"
+  ],
+  "expected_receipt": "docs/receipts/integration/s1-auth-policy-boundary.json",
+  "rollback": "Agent 0 discards the single worker commit and deletes the isolated branch/worktree. The canonical ledger, frozen contracts, policy sources, domain registries, runtime state and external systems remain unchanged.",
+  "commit_authority": "one-scoped-worker-commit",
+  "push_authority": false,
+  "expected_handoff_status": [
+    "ready_for_agent0_audit",
+    "blocked_validation_failed"
+  ]
+}
