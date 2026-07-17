@@ -2,12 +2,15 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 import hashlib
+import io
 import json
 import os
 from pathlib import Path
+import signal
 import socket
 import stat
 import tempfile
+import time
 import unittest
 
 
@@ -17,9 +20,15 @@ import sys
 sys.path.insert(0, str(ROOT / "src"))
 
 from research_bridge.cas import ContentAddressedStore  # noqa: E402
+from research_bridge.admission import canonical_json_sha256  # noqa: E402
 from research_bridge.researchd import (  # noqa: E402
     ResearchDaemon,
     ResearchdError,
+    run,
+)
+from tests.test_stage1_authority_policy import (  # noqa: E402
+    synthetic_approval,
+    synthetic_policy,
 )
 from tests.test_stage1_reference_vertical import (  # noqa: E402
     INPUT_A,
@@ -109,6 +118,71 @@ class ResearchDaemonTests(unittest.TestCase):
         )
         self.daemons.append(daemon)
         return daemon
+
+    def _service_config(self, *, runtime_root: Path | None = None) -> dict[str, object]:
+        policy = synthetic_policy()
+        policy_digest = canonical_json_sha256(policy)
+        return {
+            "schema_id": "ResearchdServiceConfig",
+            "schema_version": "1.0.0",
+            "runtime_root": str(runtime_root or self.runtime),
+            "runner_identity": self.runner_identity,
+            "allowed_uids": [os.geteuid()],
+            "input_quota_bytes": 1_048_576,
+            "checkpoint_quota_bytes": 1_048_576,
+            "artifact_quota_bytes": 1_048_576,
+            "maximum_input_bytes": 1_048_576,
+            "deadline_seconds": 0.25,
+            "trusted_issuers": {
+                "JobSpec": {
+                    "issuer_id": "synthetic-admission-controller",
+                    "authority_class": "admission-controller",
+                },
+                "Permit": {
+                    "issuer_id": "synthetic-permit-authority",
+                    "authority_class": "permit-authority",
+                },
+                "AttemptLease": {
+                    "issuer_id": "researchd",
+                    "authority_class": "researchd",
+                },
+                "PolicySnapshot": {
+                    "issuer_id": "synthetic-policy-authority",
+                    "authority_class": "policy-authority",
+                },
+                "ApprovalReceipt": {
+                    "issuer_id": "synthetic-operator-authority",
+                    "authority_class": "operator-authority",
+                },
+            },
+            "policy_snapshots": {policy_digest: policy},
+            "approval_receipts": {
+                "approval:synthetic-router-authority": synthetic_approval(
+                    "approval:synthetic-router-authority"
+                )
+            },
+        }
+
+    def _write_service_config(
+        self,
+        config: Mapping[str, object],
+        *,
+        path: Path | None = None,
+        mode: int = 0o600,
+    ) -> Path:
+        target = path or self.base / "researchd-service-config.json"
+        target.write_text(
+            json.dumps(
+                _plain(config),
+                sort_keys=True,
+                separators=(",", ":"),
+                ensure_ascii=False,
+                allow_nan=False,
+            ),
+            encoding="utf-8",
+        )
+        os.chmod(target, mode)
+        return target
 
     def _submit(self, daemon: ResearchDaemon) -> Mapping[str, object]:
         payload = self.job_spec["payload"]
@@ -252,6 +326,133 @@ class ResearchDaemonTests(unittest.TestCase):
         current = os.lstat(self.runtime / "researchd.sock")
         self.assertTrue(stat.S_ISSOCK(current.st_mode))
         self.assertEqual(current.st_ino, stale_inode)
+
+    def test_service_entrypoint_starts_and_stops_on_local_signals(self) -> None:
+        for signal_number in (signal.SIGTERM, signal.SIGINT):
+            with self.subTest(signal_number=signal_number):
+                config_path = self._write_service_config(self._service_config())
+                child = os.fork()
+                if child == 0:
+                    try:
+                        code = run(["--config", str(config_path)])
+                    except BaseException:
+                        os._exit(99)
+                    os._exit(code)
+                try:
+                    deadline = time.monotonic() + 5
+                    while time.monotonic() < deadline:
+                        if os.path.exists(self.runtime / "researchd.sock"):
+                            break
+                        waited, status = os.waitpid(child, os.WNOHANG)
+                        if waited:
+                            self.fail(f"researchd exited before signal: {status}")
+                        time.sleep(0.02)
+                    else:
+                        self.fail("researchd did not create its socket")
+
+                    os.kill(child, signal_number)
+                    waited, status = os.waitpid(child, 0)
+                    self.assertEqual(waited, child)
+                    self.assertTrue(os.WIFEXITED(status))
+                    self.assertEqual(os.WEXITSTATUS(status), 0)
+                    self.assertFalse(os.path.lexists(self.runtime / "researchd.sock"))
+
+                    daemon = self._daemon()
+                    daemon.start()
+                    daemon.close()
+                finally:
+                    try:
+                        os.kill(child, 0)
+                    except ProcessLookupError:
+                        pass
+                    else:
+                        os.kill(child, signal.SIGTERM)
+                        os.waitpid(child, 0)
+                config_path.unlink()
+
+    def test_service_config_rejections_are_redacted_and_prevent_runtime_mutation(self) -> None:
+        clean_runtime = self.base / "clean-runtime"
+        cases: list[tuple[str, Path]] = []
+
+        wrong_mode = self._write_service_config(
+            self._service_config(runtime_root=clean_runtime),
+            path=self.base / "wrong-mode.json",
+            mode=0o644,
+        )
+        cases.append(("wrong-mode", wrong_mode))
+
+        real_config = self._write_service_config(
+            self._service_config(runtime_root=clean_runtime),
+            path=self.base / "real-config.json",
+        )
+        symlink_config = self.base / "config-link.json"
+        symlink_config.symlink_to(real_config)
+        cases.append(("symlink", symlink_config))
+
+        duplicate_config = self.base / "duplicate.json"
+        duplicate_config.write_text(
+            '{"schema_id":"ResearchdServiceConfig","schema_id":"Other"}',
+            encoding="utf-8",
+        )
+        os.chmod(duplicate_config, 0o600)
+        cases.append(("duplicate", duplicate_config))
+
+        nonfinite_config = self.base / "nonfinite.json"
+        encoded = json.dumps(
+            _plain(self._service_config(runtime_root=clean_runtime)),
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=False,
+            allow_nan=False,
+        )
+        nonfinite_config.write_text(
+            encoded.replace('"deadline_seconds":0.25', '"deadline_seconds":1e999'),
+            encoding="utf-8",
+        )
+        os.chmod(nonfinite_config, 0o600)
+        cases.append(("nonfinite", nonfinite_config))
+
+        private_config_value = self._service_config(runtime_root=clean_runtime)
+        policy_map = private_config_value["policy_snapshots"]
+        assert isinstance(policy_map, dict)
+        policy = next(iter(policy_map.values()))
+        assert isinstance(policy, dict)
+        policy["classification"] = "D2_DOMAIN_CONFIDENTIAL"
+        private_config = self._write_service_config(
+            private_config_value,
+            path=self.base / "private-authority.json",
+        )
+        cases.append(("private-authority", private_config))
+
+        oversized_config = self.base / "oversized.json"
+        oversized_config.write_bytes(b" " * 262_145)
+        os.chmod(oversized_config, 0o600)
+        cases.append(("oversized", oversized_config))
+
+        for label, config_path in cases:
+            with self.subTest(label=label):
+                stream = io.StringIO()
+                self.assertEqual(run(["--config", str(config_path)], stderr=stream), 2)
+                self.assertEqual(stream.getvalue(), "researchd configuration rejected\n")
+                self.assertFalse(clean_runtime.exists())
+
+    def test_service_argument_and_runtime_failures_are_generic(self) -> None:
+        for arguments in ([], ["--config"], ["--config=inline"], ["--config", "a", "b"]):
+            with self.subTest(arguments=arguments):
+                stream = io.StringIO()
+                self.assertEqual(run(list(arguments), stderr=stream), 2)
+                self.assertEqual(stream.getvalue(), "researchd configuration rejected\n")
+
+        insecure_runtime = self.base / "runtime-mode-0755"
+        insecure_runtime.mkdir(mode=0o755)
+        config_path = self._write_service_config(
+            self._service_config(runtime_root=insecure_runtime),
+            path=self.base / "runtime-failure.json",
+        )
+        stream = io.StringIO()
+        self.assertEqual(run(["--config", str(config_path)], stderr=stream), 3)
+        self.assertEqual(stream.getvalue(), "researchd runtime failed\n")
+        self.assertFalse(os.path.lexists(insecure_runtime / "researchd.sock"))
 
 
 if __name__ == "__main__":

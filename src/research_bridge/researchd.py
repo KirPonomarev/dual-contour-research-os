@@ -8,22 +8,25 @@ read-write ``JobLedger`` is opened, and the AF_UNIX socket is bound last.
 
 from __future__ import annotations
 
-from collections.abc import Callable, Iterable, Mapping
+from collections.abc import Callable, Iterable, Mapping, Sequence
 from datetime import datetime, timezone
 import hashlib
 import json
+import math
 import os
 from pathlib import Path
+import signal
 import stat
+import sys
 import threading
-from typing import Any
+from typing import Any, TextIO
 
 try:
     import fcntl
 except ImportError:  # pragma: no cover - the runtime is explicitly Unix-only
     fcntl = None  # type: ignore[assignment]
 
-from .authority import PinnedOfflineAuthority
+from .authority import PinnedOfflineAuthority, TrustedIssuer
 from .cas import ContentAddressedStore
 from .control import ControlRouter
 from .execution import OfflineExecutionCoordinator
@@ -43,10 +46,115 @@ _ROOT_MODE = 0o700
 _LOCK_MODE = 0o600
 _DEFAULT_QUOTA_BYTES = 16 * 1024 * 1024
 _DEFAULT_MAXIMUM_INPUT_BYTES = 4 * 1024 * 1024
+_CONFIG_MODE = 0o600
+_MAX_CONFIG_BYTES = 262_144
+_MAX_CONFIG_QUOTA_BYTES = 1 << 40
+_SERVICE_SCHEMA_ID = "ResearchdServiceConfig"
+_SERVICE_SCHEMA_VERSION = "1.0.0"
+_CONFIG_KEYS = frozenset(
+    {
+        "schema_id",
+        "schema_version",
+        "runtime_root",
+        "runner_identity",
+        "allowed_uids",
+        "input_quota_bytes",
+        "checkpoint_quota_bytes",
+        "artifact_quota_bytes",
+        "maximum_input_bytes",
+        "deadline_seconds",
+        "trusted_issuers",
+        "policy_snapshots",
+        "approval_receipts",
+    }
+)
+_TRUSTED_SCHEMAS = frozenset(
+    {
+        "JobSpec",
+        "Permit",
+        "AttemptLease",
+        "PolicySnapshot",
+        "ApprovalReceipt",
+    }
+)
+_TRUSTED_ISSUER_KEYS = frozenset({"issuer_id", "authority_class"})
+_AUTHORITY_COMMON_KEYS = frozenset(
+    {
+        "schema_id",
+        "schema_version",
+        "object_id",
+        "issued_at",
+        "issuer",
+        "contour",
+        "classification",
+        "payload",
+        "integrity",
+    }
+)
+_AUTHORITY_ISSUER_KEYS = frozenset({"id", "authority_class"})
+_AUTHORITY_INTEGRITY_KEYS = frozenset({"payload_sha256", "parent_refs"})
+_POLICY_PAYLOAD_KEYS = frozenset(
+    {
+        "source_repo",
+        "commit_sha",
+        "aggregate_sha256",
+        "covered_action_classes",
+        "allow_rules",
+        "deny_rules",
+        "valid_from",
+        "valid_until",
+    }
+)
+_APPROVAL_PAYLOAD_KEYS = frozenset(
+    {
+        "action_class",
+        "job_spec_sha256",
+        "protocol_sha256",
+        "policy_sha256",
+        "quotas",
+        "stop_conditions",
+        "expires_at",
+        "nonce",
+        "revoked",
+    }
+)
+_PUBLIC_AUTHORITY_CLASSES = frozenset({"D0_PUBLIC", "D1_INTERNAL_SANITIZED"})
+_HEX_DIGITS = frozenset("0123456789abcdef")
+_CONFIG_ERROR_LINE = "researchd configuration rejected\n"
+_RUNTIME_ERROR_LINE = "researchd runtime failed\n"
 
 
 class ResearchdError(RuntimeError):
     """The owned offline runtime could not start or complete one operation."""
+
+
+class _ServiceConfigError(ValueError):
+    """A service configuration was rejected before daemon startup."""
+
+
+class _ServiceConfig:
+    def __init__(
+        self,
+        *,
+        runtime_root: str,
+        authority: PinnedOfflineAuthority,
+        allowed_uids: tuple[int, ...],
+        runner_identity: str,
+        input_quota_bytes: int,
+        checkpoint_quota_bytes: int,
+        artifact_quota_bytes: int,
+        maximum_input_bytes: int,
+        deadline_seconds: float,
+    ) -> None:
+        self.runtime_root = runtime_root
+        self.authority = authority
+        self.allowed_uids = allowed_uids
+        self.runner_identity = runner_identity
+        self.input_quota_bytes = input_quota_bytes
+        self.checkpoint_quota_bytes = checkpoint_quota_bytes
+        self.artifact_quota_bytes = artifact_quota_bytes
+        self.maximum_input_bytes = maximum_input_bytes
+        self.deadline_seconds = deadline_seconds
 
 
 class _CheckpointFenceLedger:
@@ -597,4 +705,414 @@ def _canonical_json_bytes(value: object) -> bytes:
         raise ResearchdError("receipt is not canonical JSON data") from exc
 
 
-__all__ = ["ResearchdError", "ResearchDaemon"]
+def _service_arguments(argv: Sequence[str] | None) -> _ServiceConfig:
+    arguments = list(sys.argv[1:] if argv is None else argv)
+    if len(arguments) != 2 or arguments[0] != "--config":
+        raise _ServiceConfigError("exactly one config path is required")
+    return _service_config_from_path(arguments[1])
+
+
+def _service_config_from_path(config_path: str) -> _ServiceConfig:
+    if not isinstance(config_path, str) or not config_path or "\x00" in config_path:
+        raise _ServiceConfigError("config path is invalid")
+    raw = _read_owner_only_config(config_path)
+    try:
+        text = raw.decode("utf-8", errors="strict")
+    except UnicodeDecodeError as exc:
+        raise _ServiceConfigError("config is not utf-8") from exc
+    try:
+        decoded = json.loads(
+            text,
+            object_pairs_hook=_strict_config_object,
+            parse_constant=_reject_config_constant,
+        )
+    except (json.JSONDecodeError, _ServiceConfigError) as exc:
+        raise _ServiceConfigError("config is not strict json") from exc
+    _ensure_finite_json(decoded)
+    if not isinstance(decoded, dict):
+        raise _ServiceConfigError("config must be an object")
+    _expect_config_keys(decoded, _CONFIG_KEYS, "config")
+    return _service_config_from_mapping(decoded)
+
+
+def _read_owner_only_config(config_path: str) -> bytes:
+    if not hasattr(os, "O_NOFOLLOW"):
+        raise _ServiceConfigError("platform cannot safely open config")
+    flags = os.O_RDONLY | os.O_NOFOLLOW
+    flags |= getattr(os, "O_CLOEXEC", 0)
+    try:
+        descriptor = os.open(config_path, flags)
+    except OSError as exc:
+        raise _ServiceConfigError("config cannot be opened safely") from exc
+    try:
+        identity = _verify_config_descriptor(config_path, descriptor)
+        chunks: list[bytes] = []
+        total = 0
+        while True:
+            chunk = os.read(descriptor, min(65_536, _MAX_CONFIG_BYTES + 1 - total))
+            if not chunk:
+                break
+            chunks.append(chunk)
+            total += len(chunk)
+            if total > _MAX_CONFIG_BYTES:
+                raise _ServiceConfigError("config is too large")
+        if total == 0:
+            raise _ServiceConfigError("config is empty")
+        if _verify_config_descriptor(config_path, descriptor) != identity:
+            raise _ServiceConfigError("config identity changed")
+        return b"".join(chunks)
+    finally:
+        os.close(descriptor)
+
+
+def _verify_config_descriptor(config_path: str, descriptor: int) -> tuple[int, int]:
+    try:
+        opened = os.fstat(descriptor)
+        current = os.lstat(config_path)
+    except OSError as exc:
+        raise _ServiceConfigError("config metadata is unavailable") from exc
+    identity = (opened.st_dev, opened.st_ino)
+    if (
+        identity != (current.st_dev, current.st_ino)
+        or not stat.S_ISREG(opened.st_mode)
+        or stat.S_ISLNK(current.st_mode)
+        or stat.S_IMODE(opened.st_mode) != _CONFIG_MODE
+        or opened.st_uid != os.geteuid()
+        or opened.st_nlink != 1
+    ):
+        raise _ServiceConfigError("config ownership or mode is invalid")
+    return identity
+
+
+def _strict_config_object(pairs: list[tuple[str, object]]) -> dict[str, object]:
+    result: dict[str, object] = {}
+    for key, value in pairs:
+        if key in result:
+            raise _ServiceConfigError("config contains a duplicate key")
+        result[key] = value
+    return result
+
+
+def _reject_config_constant(value: str) -> object:
+    raise _ServiceConfigError("config contains a non-finite number")
+
+
+def _ensure_finite_json(value: object) -> None:
+    if isinstance(value, float) and not math.isfinite(value):
+        raise _ServiceConfigError("config contains a non-finite number")
+    if isinstance(value, list):
+        for item in value:
+            _ensure_finite_json(item)
+    elif isinstance(value, dict):
+        for key, item in value.items():
+            if not isinstance(key, str):
+                raise _ServiceConfigError("config object key is not text")
+            _ensure_finite_json(item)
+
+
+def _service_config_from_mapping(config: Mapping[str, object]) -> _ServiceConfig:
+    if config.get("schema_id") != _SERVICE_SCHEMA_ID:
+        raise _ServiceConfigError("config schema id is invalid")
+    if config.get("schema_version") != _SERVICE_SCHEMA_VERSION:
+        raise _ServiceConfigError("config schema version is invalid")
+
+    runtime_root = _config_text(config.get("runtime_root"), "runtime_root", maximum=4096)
+    runner_identity = _config_text(
+        config.get("runner_identity"), "runner_identity", maximum=256
+    )
+    allowed_uids = _allowed_uids(config.get("allowed_uids"))
+    input_quota_bytes = _quota_bytes(config.get("input_quota_bytes"))
+    checkpoint_quota_bytes = _quota_bytes(config.get("checkpoint_quota_bytes"))
+    artifact_quota_bytes = _quota_bytes(config.get("artifact_quota_bytes"))
+    maximum_input_bytes = _quota_bytes(config.get("maximum_input_bytes"))
+    if maximum_input_bytes > input_quota_bytes:
+        raise _ServiceConfigError("maximum input exceeds input quota")
+    deadline_seconds = _deadline_seconds(config.get("deadline_seconds"))
+    authority = _authority_from_config(config)
+
+    return _ServiceConfig(
+        runtime_root=runtime_root,
+        authority=authority,
+        allowed_uids=allowed_uids,
+        runner_identity=runner_identity,
+        input_quota_bytes=input_quota_bytes,
+        checkpoint_quota_bytes=checkpoint_quota_bytes,
+        artifact_quota_bytes=artifact_quota_bytes,
+        maximum_input_bytes=maximum_input_bytes,
+        deadline_seconds=deadline_seconds,
+    )
+
+
+def _allowed_uids(value: object) -> tuple[int, ...]:
+    if not isinstance(value, list) or len(value) != 1:
+        raise _ServiceConfigError("allowed uid set is invalid")
+    uid = value[0]
+    if type(uid) is not int or uid != os.geteuid():
+        raise _ServiceConfigError("allowed uid set is invalid")
+    return (uid,)
+
+
+def _quota_bytes(value: object) -> int:
+    if type(value) is not int or value <= 0 or value > _MAX_CONFIG_QUOTA_BYTES:
+        raise _ServiceConfigError("quota is invalid")
+    return value
+
+
+def _deadline_seconds(value: object) -> float:
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise _ServiceConfigError("deadline is invalid")
+    deadline = float(value)
+    if not math.isfinite(deadline) or not 0 < deadline <= 5:
+        raise _ServiceConfigError("deadline is invalid")
+    return deadline
+
+
+def _authority_from_config(config: Mapping[str, object]) -> PinnedOfflineAuthority:
+    trusted = _trusted_issuers(config.get("trusted_issuers"))
+    policies = _authority_document_map(
+        config.get("policy_snapshots"),
+        schema_id="PolicySnapshot",
+        sha256_keys=True,
+    )
+    approvals = _authority_document_map(
+        config.get("approval_receipts"),
+        schema_id="ApprovalReceipt",
+        sha256_keys=False,
+    )
+    try:
+        return PinnedOfflineAuthority(
+            trusted_issuers=trusted,
+            policy_snapshots=policies,
+            approval_receipts=approvals,
+        )
+    except Exception as exc:
+        raise _ServiceConfigError("authority config is invalid") from exc
+
+
+def _trusted_issuers(value: object) -> dict[str, TrustedIssuer]:
+    if not isinstance(value, dict):
+        raise _ServiceConfigError("trusted issuers must be an object")
+    _expect_config_keys(value, _TRUSTED_SCHEMAS, "trusted_issuers")
+    trusted: dict[str, TrustedIssuer] = {}
+    for schema_id in sorted(_TRUSTED_SCHEMAS):
+        record = value[schema_id]
+        if not isinstance(record, dict):
+            raise _ServiceConfigError("trusted issuer record is invalid")
+        _expect_config_keys(record, _TRUSTED_ISSUER_KEYS, "trusted_issuer")
+        trusted[schema_id] = TrustedIssuer(
+            _config_text(record.get("issuer_id"), "issuer_id", maximum=256),
+            _config_text(
+                record.get("authority_class"), "authority_class", maximum=256
+            ),
+        )
+    return trusted
+
+
+def _authority_document_map(
+    value: object,
+    *,
+    schema_id: str,
+    sha256_keys: bool,
+) -> dict[str, Mapping[str, Any]]:
+    if not isinstance(value, dict):
+        raise _ServiceConfigError("authority resolver must be an object")
+    result: dict[str, Mapping[str, Any]] = {}
+    for key, document in value.items():
+        text_key = _config_text(key, "authority resolver key", maximum=256)
+        if sha256_keys and not _is_sha256(text_key):
+            raise _ServiceConfigError("authority resolver key is invalid")
+        result[text_key] = _authority_document(document, schema_id=schema_id)
+    return result
+
+
+def _authority_document(value: object, *, schema_id: str) -> Mapping[str, Any]:
+    if not isinstance(value, dict):
+        raise _ServiceConfigError("authority document must be an object")
+    _reject_private_classification(value)
+    _expect_config_keys(value, _AUTHORITY_COMMON_KEYS, "authority_document")
+    if value.get("schema_id") != schema_id or value.get("schema_version") != "1.0.0":
+        raise _ServiceConfigError("authority document schema is invalid")
+    _config_text(value.get("object_id"), "authority object_id", maximum=256)
+    _config_text(value.get("issued_at"), "authority issued_at", maximum=64)
+    issuer = value.get("issuer")
+    if not isinstance(issuer, dict):
+        raise _ServiceConfigError("authority issuer is invalid")
+    _expect_config_keys(issuer, _AUTHORITY_ISSUER_KEYS, "authority_issuer")
+    _config_text(issuer.get("id"), "authority issuer id", maximum=256)
+    _config_text(issuer.get("authority_class"), "authority class", maximum=256)
+    _config_text(value.get("contour"), "authority contour", maximum=64)
+    if value.get("classification") not in _PUBLIC_AUTHORITY_CLASSES:
+        raise _ServiceConfigError("authority classification is invalid")
+    payload = value.get("payload")
+    if not isinstance(payload, dict):
+        raise _ServiceConfigError("authority payload is invalid")
+    if schema_id == "PolicySnapshot":
+        _policy_payload(payload)
+    elif schema_id == "ApprovalReceipt":
+        _approval_payload(payload)
+    integrity = value.get("integrity")
+    if not isinstance(integrity, dict):
+        raise _ServiceConfigError("authority integrity is invalid")
+    _expect_config_keys(integrity, _AUTHORITY_INTEGRITY_KEYS, "authority_integrity")
+    if not _is_sha256(integrity.get("payload_sha256")):
+        raise _ServiceConfigError("authority payload digest is invalid")
+    parent_refs = integrity.get("parent_refs")
+    if not isinstance(parent_refs, list):
+        raise _ServiceConfigError("authority parent refs are invalid")
+    for parent_ref in parent_refs:
+        _config_text(parent_ref, "authority parent ref", maximum=256)
+    return value
+
+
+def _policy_payload(value: Mapping[str, object]) -> None:
+    _expect_config_keys(value, _POLICY_PAYLOAD_KEYS, "policy_payload")
+    for name in ("source_repo", "commit_sha", "valid_from", "valid_until"):
+        _config_text(value.get(name), name, maximum=256)
+    if not _is_sha256(value.get("aggregate_sha256")):
+        raise _ServiceConfigError("policy aggregate digest is invalid")
+    _text_list(value.get("covered_action_classes"), "covered action class")
+    for name in ("allow_rules", "deny_rules"):
+        if not isinstance(value.get(name), list):
+            raise _ServiceConfigError("policy rule list is invalid")
+
+
+def _approval_payload(value: Mapping[str, object]) -> None:
+    _expect_config_keys(value, _APPROVAL_PAYLOAD_KEYS, "approval_payload")
+    _config_text(value.get("action_class"), "approval action class", maximum=256)
+    for name in ("job_spec_sha256", "protocol_sha256", "policy_sha256"):
+        if not _is_sha256(value.get(name)):
+            raise _ServiceConfigError("approval digest is invalid")
+    if not isinstance(value.get("quotas"), dict):
+        raise _ServiceConfigError("approval quotas are invalid")
+    if not isinstance(value.get("stop_conditions"), list):
+        raise _ServiceConfigError("approval stop conditions are invalid")
+    _config_text(value.get("expires_at"), "approval expiration", maximum=64)
+    _config_text(value.get("nonce"), "approval nonce", maximum=256)
+    if type(value.get("revoked")) is not bool:
+        raise _ServiceConfigError("approval revoked flag is invalid")
+
+
+def _reject_private_classification(value: object) -> None:
+    if isinstance(value, dict):
+        if (
+            "classification" in value
+            and value.get("classification") not in _PUBLIC_AUTHORITY_CLASSES
+        ):
+            raise _ServiceConfigError("authority classification is invalid")
+        for item in value.values():
+            _reject_private_classification(item)
+    elif isinstance(value, list):
+        for item in value:
+            _reject_private_classification(item)
+
+
+def _text_list(value: object, label: str) -> None:
+    if not isinstance(value, list):
+        raise _ServiceConfigError("text list is invalid")
+    for item in value:
+        _config_text(item, label, maximum=256)
+
+
+def _expect_config_keys(
+    value: Mapping[str, object],
+    expected: frozenset[str],
+    label: str,
+) -> None:
+    if set(value) != expected:
+        raise _ServiceConfigError(f"{label} shape is invalid")
+
+
+def _config_text(value: object, label: str, *, maximum: int) -> str:
+    if (
+        not isinstance(value, str)
+        or not value
+        or value != value.strip()
+        or len(value) > maximum
+        or "\x00" in value
+        or any(ord(character) < 32 for character in value)
+    ):
+        raise _ServiceConfigError(f"{label} must be normalized text")
+    return value
+
+
+def _is_sha256(value: object) -> bool:
+    return (
+        isinstance(value, str)
+        and len(value) == 64
+        and all(character in _HEX_DIGITS for character in value)
+    )
+
+
+def _write_generic_error(stream: TextIO, line: str) -> None:
+    stream.write(line)
+    stream.flush()
+
+
+def run(argv: Sequence[str] | None = None, *, stderr: TextIO | None = None) -> int:
+    """Run ``ResearchDaemon`` from one owner-only service configuration."""
+
+    error_stream = sys.stderr if stderr is None else stderr
+    try:
+        service = _service_arguments(argv)
+        daemon = ResearchDaemon(
+            service.runtime_root,
+            authority=service.authority,
+            allowed_uids=service.allowed_uids,
+            runner_identity=service.runner_identity,
+            input_quota_bytes=service.input_quota_bytes,
+            checkpoint_quota_bytes=service.checkpoint_quota_bytes,
+            artifact_quota_bytes=service.artifact_quota_bytes,
+            maximum_input_bytes=service.maximum_input_bytes,
+            deadline_seconds=service.deadline_seconds,
+        )
+    except Exception:
+        _write_generic_error(error_stream, _CONFIG_ERROR_LINE)
+        return 2
+
+    stopping = False
+    prior_handlers: dict[int, Any] = {}
+
+    def request_stop(signum: int, frame: object) -> None:
+        del signum, frame
+        nonlocal stopping
+        stopping = True
+        daemon.close()
+
+    try:
+        prior_handlers[signal.SIGTERM] = signal.getsignal(signal.SIGTERM)
+        prior_handlers[signal.SIGINT] = signal.getsignal(signal.SIGINT)
+        signal.signal(signal.SIGTERM, request_stop)
+        signal.signal(signal.SIGINT, request_stop)
+        daemon.start()
+        try:
+            daemon.serve_forever()
+        except Exception:
+            if stopping:
+                return 0
+            raise
+        return 0
+    except KeyboardInterrupt:
+        return 0
+    except Exception:
+        if stopping:
+            return 0
+        _write_generic_error(error_stream, _RUNTIME_ERROR_LINE)
+        return 3
+    finally:
+        for signum, handler in prior_handlers.items():
+            try:
+                signal.signal(signum, handler)
+            except Exception:
+                pass
+        daemon.close()
+
+
+def main() -> None:
+    raise SystemExit(run())
+
+
+if __name__ == "__main__":
+    main()
+
+
+__all__ = ["ResearchdError", "ResearchDaemon", "run", "main"]

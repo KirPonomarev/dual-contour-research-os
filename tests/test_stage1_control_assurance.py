@@ -434,6 +434,8 @@ class Stage1ControlStaticBoundaryTests(unittest.TestCase):
             "researchd.py": {
                 "ResearchdError",
                 "ResearchDaemon",
+                "run",
+                "main",
             },
             "researchctl.py": {
                 "ResearchctlError",
@@ -524,6 +526,8 @@ class Stage1ControlStaticBoundaryTests(unittest.TestCase):
             and node.func.id == "JobLedger"
         ]
         self.assertEqual(len(ledger_constructors), 1)
+        self.assertNotIn("environ", identifiers)
+        self.assertNotIn("subprocess", imported_roots)
 
     def test_control_ledger_exposes_only_frozen_pause_interface(self) -> None:
         expected = {
