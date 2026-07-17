@@ -1,0 +1,21 @@
+{
+  "lease_id": "lease-s1-security-offline-reference-e2e-authority-agent-0-20260717",
+  "stage_id": "s1-security-offline-reference-e2e-authority",
+  "agent_id": "agent-0",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-17T17:47:00Z",
+  "expires_at": "2026-07-17T23:47:00Z",
+  "base_sha": "a0c78487e24fa65d23ea20c1ef64ec827c728c40",
+  "branch": "main",
+  "worktree": "canonical-public-worktree",
+  "write_set": [
+    "docs/receipts/reuse/s1-security-offline-reference-e2e.json",
+    "stages/s1-security-offline-reference-e2e-authority/stage-envelope.json",
+    "stages/s1-security-offline-reference-e2e-authority/ownership-lease.json",
+    "stages/s1-security-offline-reference-e2e/stage-envelope.json",
+    "stages/s1-security-offline-reference-e2e/ownership-lease.json",
+    "tests/test_stage1_authority.py"
+  ],
+  "delegation_allowed": false,
+  "state": "active"
+}

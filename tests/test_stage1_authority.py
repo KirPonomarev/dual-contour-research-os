@@ -65,6 +65,7 @@ class Stage1AuthorityTests(unittest.TestCase):
             "s1-market-ci-reality-loop-prerequisite.json": "existing-real-cli-synthetic-prerequisite-hard-gate-no-runtime-change",
             "s1-market-storage-accounting-portability.json": "owner-local-stdlib-conservative-byte-accounting-no-public-copy",
             "s1-market-offline-reference-e2e.json": "existing-bridge-injection-existing-market-trial-ledger-owner-stdlib-adapters",
+            "s1-security-offline-reference-e2e.json": "existing-bridge-injection-existing-security-outcome-ledger-owner-stdlib-adapters",
             "s1-permit-nonce-ledger.json": "owned-stdlib-canonical-ledger-permit-nonce-digest-unique-index",
         }
         schema = load(ROOT / "contracts" / "v1" / "ReuseDecisionReceipt.schema.json")
@@ -922,6 +923,73 @@ class Stage1AuthorityTests(unittest.TestCase):
         self.assertEqual(
             envelope["dependency_hashes"]["authority_receipt"],
             "69e681ab93813d0b309682d7508c242467e71a1e1ce32a8f0990fc13dbd62667",
+        )
+        self.assertIn("public_boundary", envelope["semantic_freeze"])
+        self.assertFalse(envelope["push_authority"])
+        self.assertFalse(lease["delegation_allowed"])
+
+    def test_security_offline_reference_e2e_authority_is_safe_synthetic_and_cross_pinned(self) -> None:
+        envelope = load(
+            ROOT
+            / "stages"
+            / "s1-security-offline-reference-e2e-authority"
+            / "stage-envelope.json"
+        )
+        lease = load(
+            ROOT
+            / "stages"
+            / "s1-security-offline-reference-e2e-authority"
+            / "ownership-lease.json"
+        )
+        source = load(SOURCE_RECEIPTS / "s0b-security.json")
+        reuse = load(REUSE_RECEIPTS / "s1-security-offline-reference-e2e.json")
+
+        self.assertEqual(envelope["write_set"], lease["write_set"])
+        self.assertEqual(source["payload"]["head_sha"], "c88ffdb3e90971f1b2369f11ebe3a44d46d20470")
+        self.assertEqual(source["payload"]["selected_source_sha"], source["payload"]["head_sha"])
+        self.assertEqual(reuse["integrity"]["payload_sha256"], payload_sha256(reuse))
+        worker = envelope["authorized_worker_stage"]
+        self.assertEqual(len(worker["write_set"]), 4)
+        self.assertTrue(all(path.startswith(("tools/", "tests/")) for path in worker["write_set"]))
+        self.assertEqual(
+            envelope["domain_vertical"]["registry"],
+            "existing-Security-safe-outcome-projection-ledger-only",
+        )
+        self.assertIn("no-live-target-exploit-scan-phishing-bruteforce", "-".join(envelope["preservation_contract"]))
+        public_text = json.dumps([source, reuse, envelope, lease], sort_keys=True)
+        self.assertNotIn("/Users/", public_text)
+        self.assertNotIn("/Volumes/", public_text)
+        self.assertNotIn("programs/max/", public_text)
+        self.assertNotIn("programs/ozon/", public_text)
+        self.assertFalse(lease["delegation_allowed"])
+
+    def test_security_offline_reference_e2e_worker_lease_is_four_file_private_only(self) -> None:
+        envelope = load(
+            ROOT
+            / "stages"
+            / "s1-security-offline-reference-e2e"
+            / "stage-envelope.json"
+        )
+        lease = load(
+            ROOT
+            / "stages"
+            / "s1-security-offline-reference-e2e"
+            / "ownership-lease.json"
+        )
+
+        self.assertEqual(envelope["write_set"], lease["write_set"])
+        self.assertEqual(
+            envelope["write_set"],
+            [
+                "tools/security_bridge_reference_adapter.py",
+                "tools/security_bridge_reference_registry.py",
+                "tests/test_security_bridge_reference_adapter.py",
+                "tests/test_security_bridge_reference_e2e.py",
+            ],
+        )
+        self.assertEqual(
+            envelope["dependency_hashes"]["reuse_decision"],
+            "ec11788ac44c87238e4e197e1a92f3356b351589a41929f4b7ad03b7b482d9a8",
         )
         self.assertIn("public_boundary", envelope["semantic_freeze"])
         self.assertFalse(envelope["push_authority"])

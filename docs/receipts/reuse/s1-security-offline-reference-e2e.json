@@ -1,0 +1,72 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-s1-security-offline-reference-e2e-20260717",
+  "issued_at": "2026-07-17T17:47:00Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "reuse-freeze-authority"
+  },
+  "contour": "security",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "domain-owned-synthetic-Security-offline-reference-E2E-through-canonical-Bridge-receipts",
+    "candidates": [
+      {
+        "candidate": "existing-Bridge-execution-and-validation-boundaries",
+        "disposition": "selected"
+      },
+      {
+        "candidate": "existing-Security-safe-outcome-projection-ledger-as-domain-registry",
+        "disposition": "selected"
+      },
+      {
+        "candidate": "owner-local-stdlib-HypothesisCard-ProtocolSnapshot-safe-lab-runner-validator-and-writer-adapters",
+        "disposition": "selected-minimal-glue"
+      },
+      {
+        "candidate": "public-copy-of-private-Security-source-targets-evidence-or-program-payload",
+        "disposition": "rejected-boundary-and-license"
+      },
+      {
+        "candidate": "live-target-security-validation-or-autonomous-exploitation",
+        "disposition": "rejected-forbidden-authority"
+      },
+      {
+        "candidate": "second-domain-registry-ledger-or-Bridge-scientific-writer",
+        "disposition": "rejected-duplicate-or-wrong-authority"
+      },
+      {
+        "candidate": "external-dependency",
+        "disposition": "rejected-unnecessary"
+      }
+    ],
+    "selected_mode": "existing-bridge-injection-existing-security-outcome-ledger-owner-stdlib-adapters",
+    "source_ref": "source-freeze:source-freeze-security-s0b-20260716;git:c88ffdb3e90971f1b2369f11ebe3a44d46d20470;git:a0c78487e24fa65d23ea20c1ef64ec827c728c40",
+    "code_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "license_spdx": "NOASSERTION",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "independently created synthetic owned-object authorization fixture enters only the private Security adapter",
+      "HypothesisCard and ProtocolSnapshot bind exact fixture code environment and execution references",
+      "domain-owned safe lab runner executes through the existing Bridge Runner injection boundary",
+      "safe lab result maps to one canonical ValidationReceipt outcome",
+      "only the Security writer applies a sanitized tracked outcome projection to the existing outcomes JSONL registry",
+      "valid exact replay returns the same DomainTrialLinkReceipt with one outcome row",
+      "tamper unknown outcome invalid binding and conflicting replay cause zero registry writes",
+      "Bridge observes D0 or D1 references only and never receives target evidence exploit payload or scientific truth",
+      "combined exact public and private head CI"
+    ],
+    "canonical_owner": "private-Security-safe-outcome-registry-writer-and-Agent0-cross-repository-integration",
+    "rollback": "Discard or revert only the isolated private adapter and writer commit plus its exact CI binding. The selected public Bridge head, Security owner checkout, existing outcome ledgers and external systems remain unchanged."
+  },
+  "integrity": {
+    "payload_sha256": "ec11788ac44c87238e4e197e1a92f3356b351589a41929f4b7ad03b7b482d9a8",
+    "parent_refs": [
+      "source-freeze:source-freeze-security-s0b-20260716",
+      "sha256:ba5f9bd40076080b4fee31d293a080c24c7182e615d2fd2ca92b32f61ce5fbf9",
+      "git:c88ffdb3e90971f1b2369f11ebe3a44d46d20470",
+      "git:a0c78487e24fa65d23ea20c1ef64ec827c728c40"
+    ]
+  }
+}
