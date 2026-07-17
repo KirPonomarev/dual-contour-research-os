@@ -1,0 +1,15 @@
+{
+  "lease_id": "lease-s3-security-local-lab-evidence-agent-4-20260718",
+  "stage_id": "s3-security-local-lab-evidence",
+  "agent_id": "agent-4",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-18T01:25:00Z",
+  "expires_at": "2026-07-18T07:25:00Z",
+  "base_sha": "b86de273bc1fd5b1816b4fb31b7ab45a1c652e07",
+  "public_authority_sha": "d79a1e9114204551161422ac7562127da73083ce",
+  "branch": "codex/bridge-a4-s3-security-local-lab-evidence",
+  "worktree": "ephemeral-private-domain-worktree:s3-security-local-lab-evidence",
+  "write_set": ["tools/security_bridge_stage3_local_lab.py", "tests/test_security_bridge_stage3_local_lab.py"],
+  "delegation_allowed": false,
+  "state": "active"
+}

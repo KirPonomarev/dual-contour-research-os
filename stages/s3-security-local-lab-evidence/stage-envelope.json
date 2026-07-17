@@ -1,0 +1,85 @@
+{
+  "stage_id": "s3-security-local-lab-evidence",
+  "agent_id": "agent-4",
+  "objective": "Bind one safe-map invariant to a canonical HypothesisCard, deterministic owned local lab, pure invariant validator, redacted evidence manifest and hash-only Bridge receipts.",
+  "executable_blocker": "The frozen safe map has no end-to-end local-lab evidence chain and therefore cannot yet prove Stage 3 hypothesis, lab, invariant validation, evidence manifest or redaction requirements.",
+  "base_sha": "b86de273bc1fd5b1816b4fb31b7ab45a1c652e07",
+  "public_authority_sha": "d79a1e9114204551161422ac7562127da73083ce",
+  "public_authority_ci": "29616668612",
+  "public_development_sha": "d79a1e9114204551161422ac7562127da73083ce",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a4-s3-security-local-lab-evidence",
+  "worktree": "ephemeral-private-domain-worktree:s3-security-local-lab-evidence",
+  "read_set": [
+    "private AGENTS.md and mandatory Security startup docs",
+    "public AGENTS.md and docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "public Stage3 source freeze reuse authority and ingestion integration receipts",
+    "private Stage3 public-source fixture and intake adapter",
+    "private Stage1 Security reference adapter and tests",
+    "private evidence vault manifest and redaction components and tests"
+  ],
+  "write_set": ["tools/security_bridge_stage3_local_lab.py", "tests/test_security_bridge_stage3_local_lab.py"],
+  "semantic_freeze": {
+    "safe_map_input": "exact-SAFE_MAP_READY-entry-and-manifest-SHA-from-integrated-Stage3-intake",
+    "hypothesis": "canonical-HypothesisCard-domain-neutral-invariant-and-owned-synthetic-fixture-only",
+    "protocol": "hash-bound-hypothesis-safe-map-fixture-validator-environment-seed-and-stopping-rule",
+    "lab": "deterministic-offline-owned-object-observations-no-network",
+    "validator": "pure-invariant-check-execution-failure-maps-INVALID-never-REFUTED-and-no-registry-write",
+    "evidence": "raw-in-memory-only-redacted-summary-manifest-hash-and-no-raw-secret-like-values",
+    "receipts": "ExecutionReceipt-and-ValidationReceipt-contract-shapes-plus-hash-only-evidence-refs",
+    "public_boundary": "hashes-refs-counts-classifications-and-pass-fail-only"
+  },
+  "preservation_contract": [
+    "existing-Stage1-and-Stage3-adapters-evidence-tools-redactor-and-tests-remain-unmodified",
+    "existing-source-corpus-safe-map-idea-bank-outcome-ledger-and-registry-remain-unmodified",
+    "tests-are-hermetic-synthetic-offline-and-create-only-ephemeral-test-data",
+    "validator-never-writes-a-registry-or-applies-a-scientific-outcome",
+    "raw-evidence-and-redacted-summary-remain-private-and-Bridge-observes-hashes-only",
+    "no-external-dependency-network-live-target-publication-deployment-or-UI-authority"
+  ],
+  "forbidden_scope": [
+    "write-outside-one-source-file-and-one-test-file",
+    "public-copy-of-private-source-safe-map-body-lab-observations-raw-evidence-redacted-summary-target-program-or-domain-truth",
+    "network-live-target-account-device-request-scan-exploit-payload-publication-or-report-submission",
+    "validator-domain-registry-write-scientific-outcome-application-or-execution-failure-as-REFUTED",
+    "cross-contour-D2-D3-read-or-Market-data-access",
+    "existing-adapter-evidence-tool-redactor-registry-contract-schema-lockfile-dependency-config-workflow-or-migration-edit",
+    "secret-cookie-token-private-URL-target-identity-or-raw-evidence-in-receipt",
+    "skip-xfail-continue-on-error-optional-gate-or-validation-weakening",
+    "dirty-owner-checkout-mutation-or-push-merge-deploy-public-write"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "source_freeze": "5e68a9480894f8f50cb1e863fddd2dcc9f1762bdae340e55c00c7e866d5a1aec",
+    "reuse_decision": "c89d5bfa66fd79e89633c916f4821a2c449f4979c928e70d089c9161fad32c76",
+    "authority_receipt": "90b07f9944fbc12115f2a2f9722d20e95d57d267ef65f7797ad8d56a6e1d5206",
+    "stage3_intake_adapter": "5a0fd95df6e7aca4bdf26f98bd84483a4bef4f19d98cb13e15975f5a2aad9b5a",
+    "stage1_security_adapter": "cf54ed87b73f0053a2711861f1a625e143492a6f52dcdae62b0f18c2a2c1e53d",
+    "evidence_manifest_component": "8d8eea4947f92dfcce4b8f52c331812ef7c63f6519b34e2f236bd8988483f151",
+    "redaction_component": "137da720ba4c9d5bc240498320a40d6e6d8968c1dbc28299decd3f365e5be42d",
+    "private_security_head": "b86de273bc1fd5b1816b4fb31b7ab45a1c652e07",
+    "public_authority_head": "d79a1e9114204551161422ac7562127da73083ce",
+    "external_dependencies": "none"
+  },
+  "acceptance_commands": [
+    "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. python3 -m pytest -q -p no:cacheprovider tests/test_security_bridge_stage3_local_lab.py",
+    "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=.:<pinned-public-bridge>/src python3 -m pytest -q -p no:cacheprovider tests/test_security_bridge_stage3_local_lab.py tests/test_security_bridge_stage3_intake.py tests/test_security_bridge_reference_adapter.py tests/test_evidence_vault_manifest.py",
+    "git diff --check",
+    "exact two-file write-set privacy secret raw-evidence dependency network live-authority registry-write cross-contour and weakening scan",
+    "after Agent0 CI binding exact-head private focused CI against final public SHA"
+  ],
+  "risk_class": "private-security-local-lab-evidence-slice",
+  "stop_conditions": [
+    "private-base-public-authority-contract-source-freeze-reuse-receipt-or-selected-component-hash-mismatch",
+    "write-set-collision-dirty-owner-checkout-mutation-or-third-file-required",
+    "HypothesisCard-lab-execution-evidence-manifest-validation-or-safe-map-lineage-cannot-be-exactly-bound",
+    "validator-accepts-quarantined-entry-unauthorized-grant-tampered-evidence-incomplete-redaction-registry-write-or-false-refutation",
+    "network-new-dependency-live-target-cross-contour-read-publication-or-authority-escalation-is-required",
+    "before-equals-after-or-Security-local-lab-evidence-blocker-remains"
+  ],
+  "expected_receipt": "public:docs/receipts/integration/s3-security-local-lab-evidence.json",
+  "rollback": "Agent 0 discards the isolated worker commit and branch; owner checkout completed stages public Bridge registry source corpus evidence vault and external systems remain unchanged.",
+  "commit_authority": "one-scoped-worker-commit",
+  "push_authority": false,
+  "expected_handoff_status": ["ready_for_agent0_audit", "blocked_validation_failed"]
+}

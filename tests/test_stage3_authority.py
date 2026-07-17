@@ -14,6 +14,8 @@ WORKER_RECEIPT = ROOT / "docs" / "receipts" / "integration" / "s3-security-inges
 LOCAL_LAB_SOURCE = ROOT / "docs" / "receipts" / "source-freeze" / "s3-security-local-lab-evidence.json"
 LOCAL_LAB_REUSE = ROOT / "docs" / "receipts" / "reuse" / "s3-security-local-lab-evidence.json"
 LOCAL_LAB_AUTHORITY = ROOT / "stages" / "s3-security-local-lab-evidence-authority"
+LOCAL_LAB_WORKER = ROOT / "stages" / "s3-security-local-lab-evidence"
+LOCAL_LAB_AUTHORITY_RECEIPT = ROOT / "docs" / "receipts" / "integration" / "s3-security-local-lab-evidence-authority.json"
 
 
 def load(path: Path) -> dict:
@@ -131,6 +133,19 @@ class Stage3AuthorityTests(unittest.TestCase):
         self.assertFalse(envelope["authorized_worker_stage"]["push_authority"])
         self.assertFalse(envelope["local_lab_contract"]["declares_dual_contour_pre_soak_green"])
         self.assertIn("validator-writes-no-domain-registry-and-execution-failure-is-not-REFUTED", envelope["local_lab_contract"]["invariants"])
+        self.assertFalse(lease["delegation_allowed"])
+
+    def test_local_lab_worker_lease_is_exact_head_ci_bound(self) -> None:
+        receipt = load(LOCAL_LAB_AUTHORITY_RECEIPT)
+        envelope = load(LOCAL_LAB_WORKER / "stage-envelope.json")
+        lease = load(LOCAL_LAB_WORKER / "ownership-lease.json")
+        self.assertEqual(receipt["integrity"]["payload_sha256"], payload_sha256(receipt))
+        self.assertEqual(receipt["payload"]["head_sha"], "d79a1e9114204551161422ac7562127da73083ce")
+        self.assertEqual(receipt["payload"]["audit_results"]["public_exact_head_ci"], "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29616668612")
+        self.assertFalse(receipt["payload"]["audit_results"]["validator_registry_write_authorized"])
+        self.assertEqual(envelope["public_authority_sha"], receipt["payload"]["head_sha"])
+        self.assertEqual(envelope["write_set"], lease["write_set"])
+        self.assertFalse(envelope["push_authority"])
         self.assertFalse(lease["delegation_allowed"])
 
 
