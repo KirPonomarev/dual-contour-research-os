@@ -1,0 +1,55 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s1-market-base-repair-authority-amendment-20260717",
+  "issued_at": "2026-07-17T06:18:15Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "bridge",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s1-market-base-repair-authority-amendment",
+    "agent_id": "agent-0",
+    "ownership_lease_ref": "stages/s1-market-base-repair-authority-amendment/ownership-lease.json",
+    "base_sha": "9ec7ece410bb5de64c912af2b8b4052b33b11fa4",
+    "head_sha": "edfb6b6110612bcc6354fd24d6a69f732dcf15b8",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "docs/receipts/reuse/s1-market-base-symlink-fix.json",
+      "stages/s1-market-base-repair-authority-amendment/ownership-lease.json",
+      "stages/s1-market-base-repair-authority-amendment/stage-envelope.json",
+      "tests/test_stage1_authority.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "focused_tests": 10,
+      "connected_tests": 204,
+      "stage0b_tests": 25,
+      "skipped_tests": 0,
+      "diff_check": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "dependency_adoption": false,
+      "private_source_code_copied": false,
+      "market_source_head_matches_upstream": true,
+      "dirty_source_integrity_matches_freeze": true,
+      "runtime_change_authorized_files": 1,
+      "validation_weakening_authorized": false,
+      "live_or_trading_authority": false,
+      "selected_mode": "owner-local-minimal-fail-closed-glue-no-public-copy"
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29559640192",
+    "integration_commit_sha": "edfb6b6110612bcc6354fd24d6a69f732dcf15b8"
+  },
+  "integrity": {
+    "payload_sha256": "45779b0d86e33dfaff6db853c8261810c883a4e1138044a76fdda90bd4b113bc",
+    "parent_refs": [
+      "git:edfb6b6110612bcc6354fd24d6a69f732dcf15b8",
+      "ci:29559640192",
+      "source-freeze:source-freeze-market-s1-base-repair-20260717",
+      "reuse:reuse-s1-market-base-symlink-fix-20260717"
+    ]
+  }
+}
