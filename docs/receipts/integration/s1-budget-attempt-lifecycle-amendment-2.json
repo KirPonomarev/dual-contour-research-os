@@ -1,0 +1,55 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s1-budget-attempt-lifecycle-amendment-2-20260717",
+  "issued_at": "2026-07-17T12:49:32Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "bridge",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s1-budget-attempt-lifecycle-amendment-2",
+    "agent_id": "agent-0",
+    "ownership_lease_ref": "stages/s1-budget-attempt-lifecycle/ownership-lease-amendment-2.json",
+    "base_sha": "342d4428281f399f01a8230f63d1c9477b6f3c9a",
+    "head_sha": "2a4f122ab5f46eebbd8474239cc8a297c0f5689b",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "stages/s1-budget-attempt-lifecycle/stage-envelope-amendment-2.json",
+      "stages/s1-budget-attempt-lifecycle/ownership-lease-amendment-2.json",
+      "tests/test_stage1_authority.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "focused_tests": 1,
+      "canonical_tests": 246,
+      "stage0b_tests": 25,
+      "skipped_tests": 0,
+      "diff_check": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "added_worker_files": 4,
+      "added_worker_source_files": 1,
+      "added_worker_test_files": 3,
+      "exact_execution_parent_order_frozen": true,
+      "optional_or_legacy_parent_shape_authorized": false,
+      "read_only_validation_boundary_preserved": true,
+      "frozen_contract_edit": false,
+      "dependency_adoption": false,
+      "live_or_connected_authority": false
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29581573853",
+    "integration_commit_sha": "2a4f122ab5f46eebbd8474239cc8a297c0f5689b"
+  },
+  "integrity": {
+    "payload_sha256": "fbf03d9892d4a00776fb2ef42cba185ed745329f75cc2c93424ebfd70247e7ff",
+    "parent_refs": [
+      "git:2a4f122ab5f46eebbd8474239cc8a297c0f5689b",
+      "ci:29581573853",
+      "integration:integration-s1-budget-attempt-lifecycle-amendment-1-20260717",
+      "integration:integration-s1-budget-attempt-lifecycle-authority-20260717"
+    ]
+  }
+}
