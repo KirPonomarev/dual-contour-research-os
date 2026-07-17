@@ -1,0 +1,61 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s1-terminal-execution-receipt-lookup-authority-20260717",
+  "issued_at": "2026-07-17T14:38:00Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "bridge",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s1-terminal-execution-receipt-lookup-authority",
+    "agent_id": "agent-0",
+    "ownership_lease_ref": "stages/s1-terminal-execution-receipt-lookup-authority/ownership-lease.json",
+    "base_sha": "9d20a780534d6cabb191ee2583835d3c161dc29f",
+    "head_sha": "d1bdd0f5c9367fb2f77e58c16bb92d99ba460aa9",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "docs/receipts/reuse/s1-terminal-execution-receipt-lookup.json",
+      "stages/s1-terminal-execution-receipt-lookup-authority/stage-envelope.json",
+      "stages/s1-terminal-execution-receipt-lookup-authority/ownership-lease.json",
+      "tests/test_stage1_authority.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "focused_tests": 35,
+      "canonical_tests": 270,
+      "stage0b_tests": 25,
+      "skipped_tests": 0,
+      "diff_check": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "dependency_adoption": false,
+      "frozen_contract_edit": false,
+      "worker_source_files": 3,
+      "worker_test_files": 9,
+      "bounded_terminal_material_bytes": 65536,
+      "existing_checkpoint_cas_only": true,
+      "new_ledger_store_table_or_event_authorized": false,
+      "lookup_write_or_rerun_authorized": false,
+      "legacy_backfill_or_fabrication_authorized": false,
+      "live_or_connected_authority": false,
+      "selected_mode": "owned-stdlib-existing-ledger-existing-checkpoint-cas-versioned-terminal-material",
+      "reuse_payload_sha256": "5a79e766f56bd6a5a1181aa840791998ac7de4f81d701071f10df897d06067b5",
+      "recovery_receipt_payload_sha256": "3899b964348af5f4c1b77d8910dc8b9168ad7ca98a2bbaac560ebb05c8f15762",
+      "exact_head_remote_ci": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29588710467"
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29588710467",
+    "integration_commit_sha": "d1bdd0f5c9367fb2f77e58c16bb92d99ba460aa9"
+  },
+  "integrity": {
+    "payload_sha256": "3f809b3154629dd25e5344965eb16a5acb779769c140d6e58dac139eb1908fd7",
+    "parent_refs": [
+      "git:d1bdd0f5c9367fb2f77e58c16bb92d99ba460aa9",
+      "ci:29588710467",
+      "integration:integration-s1-final-checkpoint-reopen-recovery-20260717",
+      "reuse:reuse-s1-terminal-execution-receipt-lookup-20260717"
+    ]
+  }
+}
