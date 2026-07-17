@@ -1,0 +1,102 @@
+{
+  "stage_id": "s2-market-public-dataset-temporal-integrity",
+  "agent_id": "agent-3",
+  "objective": "Implement the first private Market pre-soak slice: freeze one real public OHLCV fixture, bind it to a manifest, and emit fail-closed temporal integrity receipt material.",
+  "executable_blocker": "Market pre-soak has no hermetic real-public dataset fixture or validator proving strict chronology, closed candles, manifest hash binding, and no domain-outcome application.",
+  "base_sha": "96da40a62ef021a6bc5fbe4820e388ee961899a7",
+  "public_authority_sha": "999c033849a9e86887c4d348b1aec635b92ff22c",
+  "public_authority_ci": "29605160866",
+  "public_development_sha": "999c033849a9e86887c4d348b1aec635b92ff22c",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a3-s2-market-public-dataset-temporal-integrity",
+  "worktree": "ephemeral-private-domain-worktree:s2-market-public-dataset-temporal-integrity",
+  "read_set": [
+    "public AGENTS.md and docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "public docs/receipts/source-freeze/s2-market-public-dataset-temporal-integrity.json",
+    "public docs/receipts/reuse/s2-market-public-dataset-temporal-integrity.json",
+    "public docs/receipts/integration/s2-market-public-dataset-temporal-integrity-authority.json",
+    "public stages/s2-market-public-dataset-temporal-integrity-authority/stage-envelope.json",
+    "public contracts/v1/ValidationReceipt.schema.json",
+    "private src/market_lab/closed_candles.py",
+    "private src/market_lab/ban_dataset_integrity.py",
+    "private public OHLCV capture gate tests"
+  ],
+  "write_set": [
+    "data/bridge_pre_soak/public_ohlcv/binance_spot_btcusdt_1h_2024-01-01_2024-01-02.csv",
+    "data/bridge_pre_soak/public_ohlcv/binance_spot_btcusdt_1h_2024-01-01_2024-01-02.manifest.json",
+    "src/market_lab/bridge_pre_soak_dataset.py",
+    "tests/test_bridge_pre_soak_dataset.py"
+  ],
+  "semantic_freeze": {
+    "dataset": "small-real-D0-public-historical-OHLCV-fixture-private-Market-only",
+    "manifest": "provider-symbol-timeframe-source-url-capture-time-row-count-boundaries-and-sha256-bound",
+    "validator": "hermetic-fail-closed-temporal-integrity-only",
+    "temporal_invariants": [
+      "strictly-increasing-UTC-open-timestamps",
+      "exact-one-hour-cadence-no-gaps",
+      "closed-candles-only-at-as-of-boundary",
+      "finite-nonnegative-OHLCV",
+      "OHLC-envelope-valid",
+      "manifest-dataset-sha-row-count-and-boundaries-match"
+    ],
+    "receipt": "canonical-ValidationReceipt-shape-with-DATASET_INTEGRITY_PASS-not-scientific-outcome",
+    "public_boundary": "Bridge-observes-hashes-counts-and-receipt-refs-only-never-raw-OHLCV-rows-or-domain-truth"
+  },
+  "preservation_contract": [
+    "private-Market-remains-owner-of-dataset-payload-and-temporal-validator",
+    "public-Bridge-source-contracts-ledger-CAS-and-validator-remain-unmodified",
+    "validator-does-not-apply-SUPPORTED-REFUTED-INCONCLUSIVE-INVALID",
+    "tests-and-validator-do-not-fetch-network-data",
+    "no-external-dependency-workflow-config-lockfile-or-existing-registry-schema-edit",
+    "no-exchange-order-live-paper-trading-publication-deployment-or-UI-authority"
+  ],
+  "forbidden_scope": [
+    "write-outside-one-data-file-one-manifest-one-source-file-and-one-test-file",
+    "public-repository-write-or-copy-of-private-source-result-dataset-strategy-or-scientific-payload",
+    "network-fetch-inside-tests-validator-or-Bridge-runtime",
+    "contract-schema-lockfile-dependency-config-workflow-migration-or-existing-registry-schema-edit",
+    "fees-slippage-funding-provider-accounting-budget-hard-caps-holdout-crash-resume-corrupt-checkpoint-or-backup-restore-implementation",
+    "scientific-outcome-application-or-Market-Trial-Ledger-write",
+    "exchange-key-account-secret-D2-D3-payload-live-trading-paper-trading-publication-deployment-or-UI",
+    "skip-xfail-continue-on-error-optional-gate-or-validation-weakening",
+    "dirty-owner-checkout-mutation",
+    "push-merge-deploy-or-canonical-public-write"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "source_freeze": "e6e34e41eeb604d25de34c35421e43bfa989dd912d68b9d0590effe049373c6f",
+    "reuse_decision": "3e91a340c0be5836e41038b90b7fcbe2e8d6f2fc03af81edc59db7a4e816f410",
+    "authority_receipt": "b2725b3603f9ab29a44c06aaf97303094bafe82f1b16014c695515eee0a2d409",
+    "private_market_head": "96da40a62ef021a6bc5fbe4820e388ee961899a7",
+    "public_authority_head": "999c033849a9e86887c4d348b1aec635b92ff22c",
+    "external_dependencies": "none"
+  },
+  "acceptance_commands": [
+    "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src python -m pytest -q -p no:cacheprovider tests/test_bridge_pre_soak_dataset.py",
+    "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src:<pinned-public-bridge>/src python -m pytest -q -p no:cacheprovider tests/test_bridge_reference_adapter.py tests/test_bridge_reference_e2e.py tests/test_bridge_pre_soak_dataset.py tests/test_closed_candles.py tests/test_ban_dataset_integrity.py",
+    "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src:<pinned-public-bridge>/src python -m pytest -q -p no:cacheprovider",
+    "git diff --check",
+    "exact four-file write-set privacy dependency network live-authority and weakening scan",
+    "after Agent0 CI binding exact-head private combined CI against final public SHA"
+  ],
+  "risk_class": "private-market-pre-soak-dataset-integrity-slice",
+  "stop_conditions": [
+    "private-base-public-authority-contract-source-freeze-reuse-or-receipt-hash-mismatch",
+    "write-set-collision-dirty-owner-checkout-mutation-or-fifth-file-required",
+    "fixture-cannot-prove-public-provenance-or-manifest-hash-binding",
+    "temporal-verifier-accepts-duplicate-gap-out-of-order-unclosed-invalid-or-manifest-mismatched-data",
+    "validation-receipt-proposes-a-scientific-domain-outcome-or-writes-a-registry",
+    "raw-OHLCV-dataset-or-domain-truth-enters-public-repository",
+    "network-fetch-is-required-for-tests-or-validation",
+    "any-live-network-order-exchange-target-publication-or-deployment-authority-appears",
+    "before-equals-after-or-Market-pre-soak-dataset-integrity-blocker-remains"
+  ],
+  "expected_receipt": "public:docs/receipts/integration/s2-market-public-dataset-temporal-integrity.json",
+  "rollback": "Agent 0 discards the isolated worker commit and branch. The private owner checkout, existing registry data, public Bridge repository and external systems remain unchanged.",
+  "commit_authority": "one-scoped-worker-commit",
+  "push_authority": false,
+  "expected_handoff_status": [
+    "ready_for_agent0_audit",
+    "blocked_validation_failed"
+  ]
+}

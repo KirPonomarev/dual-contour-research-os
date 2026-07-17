@@ -1,0 +1,61 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s2-market-public-dataset-temporal-integrity-authority-20260717",
+  "issued_at": "2026-07-17T18:59:00Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "market",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s2-market-public-dataset-temporal-integrity-authority",
+    "agent_id": "agent-0",
+    "ownership_lease_ref": "stages/s2-market-public-dataset-temporal-integrity-authority/ownership-lease.json",
+    "base_sha": "9d7f4e1637ecc7000a235d1b33c8afb0edfb8ff9",
+    "head_sha": "999c033849a9e86887c4d348b1aec635b92ff22c",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "docs/receipts/source-freeze/s2-market-public-dataset-temporal-integrity.json",
+      "docs/receipts/reuse/s2-market-public-dataset-temporal-integrity.json",
+      "stages/s2-market-public-dataset-temporal-integrity-authority/stage-envelope.json",
+      "stages/s2-market-public-dataset-temporal-integrity-authority/ownership-lease.json",
+      "tests/test_stage2_authority.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "focused_stage2_authority_tests": 3,
+      "authority_regression_tests": 53,
+      "canonical_tests": 312,
+      "stage0b_tests": 25,
+      "skipped_tests": 0,
+      "diff_check": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "public_source_mutation": false,
+      "private_source_mutation": false,
+      "dependency_adoption": false,
+      "frozen_contract_edit": false,
+      "selected_private_head_clean": true,
+      "selected_private_head": "96da40a62ef021a6bc5fbe4820e388ee961899a7",
+      "authorized_worker_files": 4,
+      "public_dataset_payload_in_public_repo": false,
+      "declares_market_pre_soak_green": false,
+      "live_or_connected_authority": false,
+      "exact_head_remote_ci": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29605160866"
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29605160866",
+    "integration_commit_sha": "999c033849a9e86887c4d348b1aec635b92ff22c"
+  },
+  "integrity": {
+    "payload_sha256": "b2725b3603f9ab29a44c06aaf97303094bafe82f1b16014c695515eee0a2d409",
+    "parent_refs": [
+      "git:999c033849a9e86887c4d348b1aec635b92ff22c",
+      "git:96da40a62ef021a6bc5fbe4820e388ee961899a7",
+      "ci:29605160866",
+      "source-freeze:source-freeze-market-s2-public-dataset-temporal-integrity-20260717",
+      "reuse:reuse-s2-market-public-dataset-temporal-integrity-20260717"
+    ]
+  }
+}

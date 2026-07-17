@@ -8,6 +8,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SOURCE_RECEIPTS = ROOT / "docs" / "receipts" / "source-freeze"
 REUSE_RECEIPTS = ROOT / "docs" / "receipts" / "reuse"
 STAGES = ROOT / "stages"
+INTEGRATION_RECEIPTS = ROOT / "docs" / "receipts" / "integration"
 EMPTY_SHA256 = hashlib.sha256(b"").hexdigest()
 
 
@@ -108,6 +109,35 @@ class Stage2AuthorityTests(unittest.TestCase):
         self.assertNotIn("access_token", public_text.lower())
         self.assertIn("network-capture-inside-validator-tests-or-Bridge-runtime", public_text)
         self.assertIn("exchange-order-key-account-secret-D2-D3-payload-live-trading-paper-trading-publication-deployment-or-UI-authority", public_text)
+
+    def test_market_dataset_worker_lease_is_exact_and_receipt_bound(self) -> None:
+        receipt = load(
+            INTEGRATION_RECEIPTS
+            / "s2-market-public-dataset-temporal-integrity-authority.json"
+        )
+        envelope = load(
+            STAGES / "s2-market-public-dataset-temporal-integrity" / "stage-envelope.json"
+        )
+        lease = load(
+            STAGES / "s2-market-public-dataset-temporal-integrity" / "ownership-lease.json"
+        )
+
+        self.assertEqual(receipt["schema_id"], "IntegrationReceipt")
+        self.assertEqual(receipt["integrity"]["payload_sha256"], payload_sha256(receipt))
+        self.assertEqual(receipt["payload"]["head_sha"], "999c033849a9e86887c4d348b1aec635b92ff22c")
+        self.assertFalse(receipt["payload"]["audit_results"]["declares_market_pre_soak_green"])
+        self.assertFalse(receipt["payload"]["audit_results"]["public_dataset_payload_in_public_repo"])
+
+        self.assertEqual(envelope["public_authority_sha"], receipt["payload"]["head_sha"])
+        self.assertEqual(envelope["public_authority_ci"], "29605160866")
+        self.assertEqual(envelope["dependency_hashes"]["authority_receipt"], receipt["integrity"]["payload_sha256"])
+        self.assertEqual(envelope["write_set"], lease["write_set"])
+        self.assertFalse(lease["delegation_allowed"])
+        self.assertFalse(envelope["push_authority"])
+        self.assertIn(
+            "validation-receipt-proposes-a-scientific-domain-outcome-or-writes-a-registry",
+            envelope["stop_conditions"],
+        )
 
 
 if __name__ == "__main__":
