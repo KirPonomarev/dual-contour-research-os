@@ -96,6 +96,7 @@ class AdmissionGrant:
     job_id: str
     attempt_id: str
     permit_id: str
+    permit_nonce_sha256: str
     runner_identity: str
     fencing_epoch: int
     fencing_token: str
@@ -182,6 +183,9 @@ def admit(
 
     job_id = job_spec["object_id"]
     permit_id = permit["object_id"]
+    permit_nonce_sha256 = hashlib.sha256(
+        permit_payload["nonce"].encode("utf-8")
+    ).hexdigest()
     if permit_payload["subject"] != lease_payload["runner_identity"]:
         raise AdmissionError("permit subject does not match lease runner")
     if not hmac.compare_digest(
@@ -222,6 +226,7 @@ def admit(
         job_id=job_id,
         attempt_id=lease_payload["attempt_id"],
         permit_id=permit_id,
+        permit_nonce_sha256=permit_nonce_sha256,
         runner_identity=lease_payload["runner_identity"],
         fencing_epoch=lease_payload["fencing_epoch"],
         fencing_token=lease_payload["fencing_token"],

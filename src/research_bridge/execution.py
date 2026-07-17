@@ -58,6 +58,7 @@ _CLAIM_PAYLOAD_FIELDS = frozenset(
         "fencing_token_sha256",
         "job_id",
         "permit_id",
+        "permit_nonce_sha256",
         "runner_identity",
     }
 )
@@ -126,6 +127,7 @@ class ExecutionRecord:
 class _Bindings:
     job_id: str
     permit_id: str
+    permit_nonce_sha256: str
     lease_id: str
     attempt_id: str
     fencing_epoch: int
@@ -426,6 +428,11 @@ def _authority_bindings(
     return _Bindings(
         job_id=job_id,
         permit_id=permit_id,
+        permit_nonce_sha256=hashlib.sha256(
+            _normalized_text(
+                "permit.payload.nonce", permit_payload.get("nonce")
+            ).encode("utf-8")
+        ).hexdigest(),
         lease_id=_identifier("lease.object_id", lease_value.get("object_id")),
         attempt_id=_identifier("lease.payload.attempt_id", lease_payload.get("attempt_id")),
         fencing_epoch=_nonnegative_integer(
@@ -470,6 +477,15 @@ def _validate_claim_event(event: object, bindings: _Bindings) -> None:
     ) != bindings.fencing_epoch:
         raise ExecutionError("claim_event.payload.fencing_epoch binding mismatch")
     _sha256("claim_event.payload.admission_digest", payload["admission_digest"])
+    permit_nonce_sha256 = _sha256(
+        "claim_event.payload.permit_nonce_sha256",
+        payload["permit_nonce_sha256"],
+    )
+    if not hmac.compare_digest(
+        permit_nonce_sha256,
+        bindings.permit_nonce_sha256,
+    ):
+        raise ExecutionError("claim Permit nonce digest binding mismatch")
     admitted_at = _timestamp(
         "claim_event.payload.admitted_at", payload["admitted_at"]
     )

@@ -145,6 +145,7 @@ class AdmissionTests(unittest.TestCase):
                 "job_id",
                 "attempt_id",
                 "permit_id",
+                "permit_nonce_sha256",
                 "runner_identity",
                 "fencing_epoch",
                 "fencing_token",
@@ -154,6 +155,10 @@ class AdmissionTests(unittest.TestCase):
         )
         self.assertEqual(grant.job_id, job["object_id"])
         self.assertEqual(grant.permit_id, permit["object_id"])
+        self.assertEqual(
+            grant.permit_nonce_sha256,
+            hashlib.sha256(permit["payload"]["nonce"].encode("utf-8")).hexdigest(),
+        )
         self.assertEqual(grant.attempt_id, lease["payload"]["attempt_id"])
         self.assertRegex(grant.admission_digest, r"^[a-f0-9]{64}$")
         with self.assertRaises(FrozenInstanceError):
@@ -286,6 +291,7 @@ class KernelTests(unittest.TestCase):
                 "job_id",
                 "attempt_id",
                 "permit_id",
+                "permit_nonce_sha256",
                 "runner_identity",
                 "fencing_epoch",
                 "fencing_token",

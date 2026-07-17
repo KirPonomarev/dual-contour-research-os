@@ -1,9 +1,12 @@
 import concurrent.futures
 import hashlib
+import json
 import sqlite3
 import sys
 import tempfile
+import threading
 import unittest
+from contextlib import closing
 from pathlib import Path
 
 
@@ -17,13 +20,21 @@ AT = "2026-01-02T03:04:05Z"
 ADMISSION_SHA = hashlib.sha256(b"synthetic-admission").hexdigest()
 STATE_SHA = hashlib.sha256(b"synthetic-state").hexdigest()
 RESULT_SHA = hashlib.sha256(b"synthetic-result").hexdigest()
+PERMIT_NONCE_SHA = hashlib.sha256(b"synthetic-permit-nonce-a").hexdigest()
 
 
-def claim(ledger: JobLedger, *, attempt_id: str = "attempt-a", token: str = "fence-a") -> LedgerEvent:
+def claim(
+    ledger: JobLedger,
+    *,
+    attempt_id: str = "attempt-a",
+    token: str = "fence-a",
+    permit_nonce_sha256: str = PERMIT_NONCE_SHA,
+) -> LedgerEvent:
     return ledger.claim(
         job_id="job-a",
         attempt_id=attempt_id,
         permit_id="permit-a",
+        permit_nonce_sha256=permit_nonce_sha256,
         runner_identity="offline-runner-a",
         fencing_epoch=7,
         fencing_token=token,
@@ -117,6 +128,13 @@ class JobLedgerTests(unittest.TestCase):
         self.assertEqual(mode.lower(), "wal")
         self.assertEqual(synchronous, 2)
         self.assertEqual(tables, ["bridge_job_ledger"])
+        indexes = {
+            row[0]
+            for row in self.ledger._connection.execute(
+                "SELECT name FROM sqlite_master WHERE type = 'index'"
+            ).fetchall()
+        }
+        self.assertIn("bridge_claim_one_permit_nonce", indexes)
 
         with self.assertRaises(sqlite3.IntegrityError):
             self.ledger._connection.execute(
@@ -150,6 +168,9 @@ class JobLedgerTests(unittest.TestCase):
                     job_id="job-a",
                     attempt_id=f"attempt-{index}",
                     permit_id=f"permit-{index}",
+                    permit_nonce_sha256=hashlib.sha256(
+                        f"same-job-permit-nonce-{index}".encode("utf-8")
+                    ).hexdigest(),
                     runner_identity=f"offline-runner-{index}",
                     fencing_epoch=index,
                     fencing_token=f"fence-{index}",
@@ -170,6 +191,176 @@ class JobLedgerTests(unittest.TestCase):
         self.assertEqual(outcomes.count("rejected"), 7)
         self.assertEqual(self.ledger.event_count(), 1)
         self.assertTrue(self.ledger.verify_chain())
+
+    def test_sequential_duplicate_nonce_across_jobs_is_zero_write(self) -> None:
+        claim(self.ledger)
+        before = self.ledger.event_count()
+        with self.assertRaises(LedgerError):
+            self.ledger.claim(
+                job_id="job-b",
+                attempt_id="attempt-b",
+                permit_id="permit-b",
+                permit_nonce_sha256=PERMIT_NONCE_SHA,
+                runner_identity="offline-runner-b",
+                fencing_epoch=8,
+                fencing_token="fence-b",
+                admitted_at=AT,
+                admission_digest=hashlib.sha256(b"admission-b").hexdigest(),
+            )
+        self.assertEqual(self.ledger.event_count(), before)
+
+        distinct_digest = hashlib.sha256(b"synthetic-permit-nonce-b").hexdigest()
+        accepted = self.ledger.claim(
+            job_id="job-b",
+            attempt_id="attempt-b",
+            permit_id="permit-b",
+            permit_nonce_sha256=distinct_digest,
+            runner_identity="offline-runner-b",
+            fencing_epoch=8,
+            fencing_token="fence-b",
+            admitted_at=AT,
+            admission_digest=hashlib.sha256(b"admission-b").hexdigest(),
+        )
+        self.assertEqual(accepted.sequence, 2)
+        self.assertEqual(self.ledger.event_count("claim"), 2)
+        self.assertTrue(self.ledger.verify_chain())
+        serialized = "\n".join(
+            row[0]
+            for row in self.ledger._connection.execute(
+                "SELECT payload_json FROM bridge_job_ledger ORDER BY sequence"
+            ).fetchall()
+        )
+        self.assertNotIn("synthetic-permit-nonce", serialized)
+        self.assertIn(PERMIT_NONCE_SHA, serialized)
+        self.assertIn(distinct_digest, serialized)
+
+    def test_eight_way_nonce_race_has_one_winner_and_survives_reopen(self) -> None:
+        self.ledger.close()
+        barrier = threading.Barrier(8)
+
+        def contender(index: int) -> str:
+            contender_ledger = JobLedger(self.database, timeout=10)
+            try:
+                barrier.wait(timeout=10)
+                contender_ledger.claim(
+                    job_id=f"job-nonce-race-{index}",
+                    attempt_id=f"attempt-nonce-race-{index}",
+                    permit_id=f"permit-nonce-race-{index}",
+                    permit_nonce_sha256=PERMIT_NONCE_SHA,
+                    runner_identity=f"offline-runner-{index}",
+                    fencing_epoch=index,
+                    fencing_token=f"fence-nonce-race-{index}",
+                    admitted_at=AT,
+                    admission_digest=hashlib.sha256(
+                        f"admission-nonce-race-{index}".encode("utf-8")
+                    ).hexdigest(),
+                )
+                return "winner"
+            except LedgerError:
+                return "rejected"
+            finally:
+                contender_ledger.close()
+
+        with concurrent.futures.ThreadPoolExecutor(max_workers=8) as executor:
+            outcomes = list(executor.map(contender, range(8)))
+
+        self.ledger = JobLedger(self.database)
+        self.assertEqual(outcomes.count("winner"), 1)
+        self.assertEqual(outcomes.count("rejected"), 7)
+        self.assertEqual(self.ledger.event_count("claim"), 1)
+        self.assertTrue(self.ledger.verify_chain())
+
+        self.ledger.close()
+        self.ledger = JobLedger(self.database)
+        before = self.ledger.event_count()
+        with self.assertRaises(LedgerError):
+            self.ledger.claim(
+                job_id="job-nonce-after-reopen",
+                attempt_id="attempt-nonce-after-reopen",
+                permit_id="permit-nonce-after-reopen",
+                permit_nonce_sha256=PERMIT_NONCE_SHA,
+                runner_identity="offline-runner-after-reopen",
+                fencing_epoch=9,
+                fencing_token="fence-nonce-after-reopen",
+                admitted_at=AT,
+                admission_digest=hashlib.sha256(b"admission-after-reopen").hexdigest(),
+            )
+        self.assertEqual(self.ledger.event_count(), before)
+        self.assertTrue(self.ledger.verify_chain())
+
+    def test_malformed_nonce_digest_is_rejected_without_a_write(self) -> None:
+        before = self.ledger.event_count()
+        with self.assertRaises(LedgerError):
+            claim(self.ledger, permit_nonce_sha256="not-a-digest")
+        self.assertEqual(self.ledger.event_count(), before)
+
+    def test_legacy_missing_or_malformed_nonce_digest_blocks_new_claim(self) -> None:
+        missing = object()
+        for label, replacement in (("missing", missing), ("malformed", "bad")):
+            with self.subTest(label=label), tempfile.TemporaryDirectory() as temporary:
+                database = Path(temporary) / "legacy-ledger.sqlite3"
+                legacy = JobLedger(database)
+                claim(legacy)
+                legacy.close()
+
+                with closing(sqlite3.connect(database)) as connection, connection:
+                    connection.row_factory = sqlite3.Row
+                    connection.execute("DROP TRIGGER bridge_job_ledger_no_update")
+                    row = connection.execute(
+                        "SELECT * FROM bridge_job_ledger WHERE sequence = 1"
+                    ).fetchone()
+                    payload = json.loads(row["payload_json"])
+                    if replacement is missing:
+                        del payload["permit_nonce_sha256"]
+                    else:
+                        payload["permit_nonce_sha256"] = replacement
+                    material = JobLedger._hash_material(
+                        sequence=row["sequence"],
+                        event_type=row["event_type"],
+                        job_id=row["job_id"],
+                        attempt_id=row["attempt_id"],
+                        fencing_epoch=row["fencing_epoch"],
+                        event_at=row["event_at"],
+                        payload=payload,
+                        previous_sha256=row["previous_sha256"],
+                    )
+                    connection.execute(
+                        "UPDATE bridge_job_ledger SET payload_json = ?, event_sha256 = ? WHERE sequence = 1",
+                        (
+                            json.dumps(
+                                payload,
+                                sort_keys=True,
+                                separators=(",", ":"),
+                                ensure_ascii=True,
+                            ),
+                            hashlib.sha256(material).hexdigest(),
+                        ),
+                    )
+
+                reopened = JobLedger(database)
+                try:
+                    self.assertTrue(reopened.verify_chain())
+                    before = reopened.event_count()
+                    with self.assertRaises(LedgerError):
+                        reopened.claim(
+                            job_id=f"job-after-{label}-legacy",
+                            attempt_id=f"attempt-after-{label}-legacy",
+                            permit_id=f"permit-after-{label}-legacy",
+                            permit_nonce_sha256=hashlib.sha256(
+                                f"new-nonce-{label}".encode("utf-8")
+                            ).hexdigest(),
+                            runner_identity="offline-runner-legacy-probe",
+                            fencing_epoch=2,
+                            fencing_token="fence-legacy-probe",
+                            admitted_at=AT,
+                            admission_digest=hashlib.sha256(
+                                f"admission-{label}".encode("utf-8")
+                            ).hexdigest(),
+                        )
+                    self.assertEqual(reopened.event_count(), before)
+                    self.assertTrue(reopened.verify_chain())
+                finally:
+                    reopened.close()
 
     def test_stale_fencing_authority_causes_zero_writes(self) -> None:
         claim(self.ledger)
@@ -224,6 +415,7 @@ class JobLedgerTests(unittest.TestCase):
                 job_id="job-a",
                 attempt_id="attempt-a",
                 permit_id="permit-a",
+                permit_nonce_sha256=PERMIT_NONCE_SHA,
                 runner_identity="offline-runner-a",
                 fencing_epoch=7,
                 fencing_token=b"not-text",
@@ -235,6 +427,7 @@ class JobLedgerTests(unittest.TestCase):
                 job_id="job-a",
                 attempt_id="attempt-a",
                 permit_id="permit-a",
+                permit_nonce_sha256=PERMIT_NONCE_SHA,
                 runner_identity="offline-runner-a",
                 fencing_epoch=7,
                 fencing_token="fence-a",
@@ -246,6 +439,7 @@ class JobLedgerTests(unittest.TestCase):
                 job_id="job-a",
                 attempt_id="attempt-a",
                 permit_id="permit-a",
+                permit_nonce_sha256=PERMIT_NONCE_SHA,
                 runner_identity="offline-runner-a",
                 fencing_epoch=7,
                 fencing_token="fence-a",

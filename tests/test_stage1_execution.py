@@ -136,6 +136,7 @@ class Fixture:
             "payload": {
                 "code_sha256": CODE_SHA,
                 "input_sha256": INPUT_SHA,
+                "nonce": "synthetic-execution-permit-nonce",
             },
         }
         self.lease = {
@@ -167,6 +168,9 @@ class Fixture:
                     "fencing_token_sha256": TOKEN_SHA,
                     "job_id": self.job["object_id"],
                     "permit_id": self.permit["object_id"],
+                    "permit_nonce_sha256": hashlib.sha256(
+                        self.permit["payload"]["nonce"].encode("utf-8")
+                    ).hexdigest(),
                     "runner_identity": self.lease["payload"]["runner_identity"],
                 }
             ),
@@ -560,19 +564,26 @@ class OfflineExecutionCoordinatorTests(unittest.TestCase):
                 receipt_builder.assert_not_called()
 
     def test_malformed_claim_is_rejected_before_runner(self) -> None:
-        fixture = Fixture(self.root)
-        fixture.claim_event = Event(
-            **{
-                **{
+        for label in ("attempt", "permit nonce digest"):
+            with self.subTest(label=label):
+                fixture = Fixture(self.root)
+                values = {
                     field.name: getattr(fixture.claim_event, field.name)
                     for field in fields(Event)
-                },
-                "attempt_id": "stale-attempt",
-            }
-        )
-        with self.assertRaises(ExecutionError):
-            fixture.execute()
-        self.assertEqual(fixture.calls, ["kernel.claim"])
+                }
+                if label == "attempt":
+                    values["attempt_id"] = "stale-attempt"
+                else:
+                    values["payload"] = MappingProxyType(
+                        {
+                            **dict(fixture.claim_event.payload),
+                            "permit_nonce_sha256": "f" * 64,
+                        }
+                    )
+                fixture.claim_event = Event(**values)
+                with self.assertRaises(ExecutionError):
+                    fixture.execute()
+                self.assertEqual(fixture.calls, ["kernel.claim"])
 
     def test_authority_and_runner_binding_failures_stop_before_checkpoint_store(self) -> None:
         mutations = {

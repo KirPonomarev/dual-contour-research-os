@@ -46,6 +46,9 @@ def _claim(ledger: JobLedger, *, job_id: str = "job-control-synthetic") -> None:
         job_id=job_id,
         attempt_id="attempt-control-synthetic",
         permit_id="permit-control-synthetic",
+        permit_nonce_sha256=hashlib.sha256(
+            f"synthetic-control-permit-nonce:{job_id}".encode("utf-8")
+        ).hexdigest(),
         runner_identity="offline-runner-synthetic",
         fencing_epoch=1,
         fencing_token="fence-control-synthetic",

@@ -1,4 +1,5 @@
 import ast
+import hashlib
 import sqlite3
 import sys
 import tempfile
@@ -33,6 +34,7 @@ POLICY_SHA256 = SYNTHETIC_POLICY_SHA256
 STATE_SHA256 = "5" * 64
 RESULT_SHA256 = "6" * 64
 ADMISSION_SHA256 = "7" * 64
+PERMIT_NONCE_SHA256 = hashlib.sha256(b"synthetic-permit-nonce-001").hexdigest()
 
 
 def _authority_verifier():
@@ -152,6 +154,7 @@ def _claim_keywords() -> dict:
         "job_id": "job-synthetic-ledger-001",
         "attempt_id": "attempt-synthetic-ledger-001",
         "permit_id": "permit-synthetic-ledger-001",
+        "permit_nonce_sha256": PERMIT_NONCE_SHA256,
         "runner_identity": "runner-synthetic-ledger-001",
         "fencing_epoch": 7,
         "fencing_token": "fence-synthetic-ledger-007",
@@ -213,6 +216,7 @@ class Stage1AdmissionAssuranceTests(unittest.TestCase):
                 "job_id",
                 "attempt_id",
                 "permit_id",
+                "permit_nonce_sha256",
                 "runner_identity",
                 "fencing_epoch",
                 "fencing_token",
@@ -325,6 +329,16 @@ class Stage1AdmissionAssuranceTests(unittest.TestCase):
             try:
                 kernel.claim(job_spec, permit, lease, now=NOW)
                 self.assertEqual(ledger.event_count(), 1)
+                persisted_payload = ledger._connection.execute(
+                    "SELECT payload_json FROM bridge_job_ledger WHERE event_type = 'claim'"
+                ).fetchone()[0]
+                self.assertNotIn(permit["payload"]["nonce"], persisted_payload)
+                self.assertIn(
+                    hashlib.sha256(
+                        permit["payload"]["nonce"].encode("utf-8")
+                    ).hexdigest(),
+                    persisted_payload,
+                )
 
                 with self.assertRaises((AdmissionError, LedgerError)):
                     kernel.claim(job_spec, permit, lease, now=NOW)

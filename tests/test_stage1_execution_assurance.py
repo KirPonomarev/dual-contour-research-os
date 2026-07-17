@@ -404,6 +404,9 @@ def _claim_event(
         "fencing_token_sha256": token_sha256,
         "job_id": job_spec["object_id"],
         "permit_id": permit["object_id"],
+        "permit_nonce_sha256": hashlib.sha256(
+            permit_payload["nonce"].encode("utf-8")
+        ).hexdigest(),
         "runner_identity": permit_payload["subject"],
     }
     return SimpleNamespace(
@@ -727,6 +730,13 @@ class OfflineExecutionCoordinatorAssuranceTests(unittest.TestCase):
         token_values["payload"]["fencing_token_sha256"] = "f" * 64
         mismatches.append(("claim fence digest", SimpleNamespace(**token_values), self.prepared_result))
 
+        nonce_values = vars(base_claim).copy()
+        nonce_values["payload"] = dict(base_claim.payload)
+        nonce_values["payload"]["permit_nonce_sha256"] = "e" * 64
+        mismatches.append(
+            ("claim Permit nonce digest", SimpleNamespace(**nonce_values), self.prepared_result)
+        )
+
         for field, value in (
             ("code_sha256", "1" * 64),
             ("input_sha256", "2" * 64),
@@ -755,7 +765,7 @@ class OfflineExecutionCoordinatorAssuranceTests(unittest.TestCase):
 
         for label, claim_event, result in mismatches:
             with self.subTest(label=label):
-                coordinator, _, _, store, ledger, ingestor = self._components(
+                coordinator, _, runner, store, ledger, ingestor = self._components(
                     claim_event=claim_event,
                     result=result,
                 )
@@ -768,6 +778,10 @@ class OfflineExecutionCoordinatorAssuranceTests(unittest.TestCase):
                         now=NOW,
                     )
                 self.assertEqual(store.calls, [])
+                if label.startswith("claim "):
+                    self.assertEqual(runner.calls, [])
+                else:
+                    self.assertEqual(len(runner.calls), 1)
                 self.assertEqual(ledger.checkpoint_calls, [])
                 self.assertEqual(ingestor.calls, [])
 

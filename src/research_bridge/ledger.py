@@ -122,6 +122,12 @@ class JobLedger:
                 ON bridge_job_ledger(job_id)
                 WHERE event_type = 'claim';
 
+            CREATE UNIQUE INDEX IF NOT EXISTS bridge_claim_one_permit_nonce
+                ON bridge_job_ledger(
+                    json_extract(payload_json, '$.permit_nonce_sha256')
+                )
+                WHERE event_type = 'claim';
+
             CREATE UNIQUE INDEX IF NOT EXISTS bridge_job_one_completion
                 ON bridge_job_ledger(job_id)
                 WHERE event_type = 'complete';
@@ -154,6 +160,7 @@ class JobLedger:
         job_id: str,
         attempt_id: str,
         permit_id: str,
+        permit_nonce_sha256: str,
         runner_identity: str,
         fencing_epoch: int,
         fencing_token: str,
@@ -165,6 +172,9 @@ class JobLedger:
         job_id = _nonempty_text("job_id", job_id)
         attempt_id = _nonempty_text("attempt_id", attempt_id)
         permit_id = _nonempty_text("permit_id", permit_id)
+        permit_nonce_sha256 = _sha256(
+            "permit_nonce_sha256", permit_nonce_sha256
+        )
         runner_identity = _nonempty_text("runner_identity", runner_identity)
         fencing_epoch = _nonnegative_integer("fencing_epoch", fencing_epoch)
         fencing_token = _nonempty_text("fencing_token", fencing_token)
@@ -180,6 +190,7 @@ class JobLedger:
             "fencing_token_sha256": fencing_token_sha256,
             "job_id": job_id,
             "permit_id": permit_id,
+            "permit_nonce_sha256": permit_nonce_sha256,
             "runner_identity": runner_identity,
         }
         with self._lock:
@@ -188,6 +199,7 @@ class JobLedger:
             try:
                 if self._pause_snapshot_in_transaction()["paused"]:
                     raise LedgerError("global pause blocks job claims")
+                self._require_unused_permit_nonce(permit_nonce_sha256)
                 existing = self._connection.execute(
                     "SELECT 1 FROM bridge_job_ledger WHERE job_id = ? AND event_type = 'claim'",
                     (job_id,),
@@ -664,6 +676,31 @@ class JobLedger:
         ).fetchone()
         if latest_pause["sequence"] is not None and row["sequence"] <= latest_pause["sequence"]:
             raise LedgerError("attempt was claimed before the latest global pause")
+
+    def _require_unused_permit_nonce(self, permit_nonce_sha256: str) -> None:
+        rows = self._connection.execute(
+            """
+            SELECT payload_json
+            FROM bridge_job_ledger
+            WHERE event_type = 'claim'
+            ORDER BY sequence
+            """
+        ).fetchall()
+        for row in rows:
+            try:
+                payload = json.loads(row["payload_json"])
+                if not isinstance(payload, dict):
+                    raise TypeError("claim payload is not an object")
+                persisted_digest = _sha256(
+                    "persisted permit_nonce_sha256",
+                    payload["permit_nonce_sha256"],
+                )
+            except (json.JSONDecodeError, KeyError, TypeError, LedgerError) as exc:
+                raise LedgerError(
+                    "persisted claim lacks a valid Permit nonce digest"
+                ) from exc
+            if _constant_time_equal(persisted_digest, permit_nonce_sha256):
+                raise LedgerError("Permit nonce was already used")
 
     def _require_not_completed(self, job_id: str) -> None:
         row = self._connection.execute(

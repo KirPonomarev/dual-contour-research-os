@@ -31,6 +31,9 @@ def claim(
         job_id=job_id,
         attempt_id=attempt_id,
         permit_id=f"permit-{job_id}",
+        permit_nonce_sha256=hashlib.sha256(
+            f"synthetic-permit-nonce:{job_id}".encode("utf-8")
+        ).hexdigest(),
         runner_identity="offline-runner-a",
         fencing_epoch=7,
         fencing_token=token,

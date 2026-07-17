@@ -46,6 +46,7 @@ class BridgeKernel:
             job_id=grant.job_id,
             attempt_id=grant.attempt_id,
             permit_id=grant.permit_id,
+            permit_nonce_sha256=grant.permit_nonce_sha256,
             runner_identity=grant.runner_identity,
             fencing_epoch=grant.fencing_epoch,
             fencing_token=grant.fencing_token,
