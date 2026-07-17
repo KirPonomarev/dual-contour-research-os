@@ -299,12 +299,11 @@ class OfflineExecutionCoordinator:
             )
         except Exception as exc:
             raise ExecutionError("durable checkpoint ledger append failed") from exc
-        _validate_checkpoint_event(
+        checkpoint_event_at = _validate_checkpoint_event(
             checkpoint_event,
             bindings,
             checkpoint,
             checkpoint_ref,
-            result.ended_at,
         )
 
         checkpoint_manifest = _construct_checkpoint_manifest(
@@ -315,7 +314,7 @@ class OfflineExecutionCoordinator:
             checkpoint_event_sha256=_event_sha256(
                 checkpoint_event, "checkpoint_event"
             ),
-            issued_at=result.ended_at,
+            issued_at=checkpoint_event_at,
             issuer_id=self._issuer_id,
         )
 
@@ -694,8 +693,7 @@ def _validate_checkpoint_event(
     bindings: _Bindings,
     checkpoint: _CheckpointView,
     checkpoint_ref: str,
-    event_at: str,
-) -> None:
+) -> str:
     values = _exact_attributes(event, _EVENT_FIELDS, "checkpoint_event")
     _validate_event_columns(values, "checkpoint", bindings, "checkpoint_event")
     payload = _exact_mapping(
@@ -705,7 +703,6 @@ def _validate_checkpoint_event(
     )
     expected = {
         "attempt_id": bindings.attempt_id,
-        "event_at": event_at,
         "fencing_epoch": bindings.fencing_epoch,
         "job_id": bindings.job_id,
         "payload_ref": checkpoint_ref,
@@ -716,8 +713,9 @@ def _validate_checkpoint_event(
     for key, expected_value in expected.items():
         if payload[key] != expected_value:
             raise ExecutionError(f"checkpoint_event.payload.{key} binding mismatch")
-    if values["event_at"] != event_at:
-        raise ExecutionError("checkpoint event timestamp binding mismatch")
+    event_at = _timestamp("checkpoint_event.event_at", values["event_at"])
+    if payload["event_at"] != event_at:
+        raise ExecutionError("checkpoint event timestamp columns do not match payload")
     if payload["payload_stored_in_domain_vault"] is not False:
         raise ExecutionError("checkpoint event must record a non-vault CAS payload")
     if _nonnegative_integer(
@@ -729,6 +727,7 @@ def _validate_checkpoint_event(
     ) != bindings.fencing_epoch:
         raise ExecutionError("checkpoint event fencing epoch binding mismatch")
     _validate_fencing_digest(payload["fencing_token_sha256"], bindings)
+    return event_at
 
 
 def _construct_checkpoint_manifest(
