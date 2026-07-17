@@ -1,0 +1,65 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s4-deployment-approval-consumer-20260718",
+  "issued_at": "2026-07-17T22:38:29Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s4-deployment-approval-consumer",
+    "agent_id": "agent-0",
+    "ownership_lease_ref": "stages/s4-deployment-approval-consumer/ownership-lease.json",
+    "base_sha": "285f884c0508a88e15763b8bd9a9dfa28d9223d7",
+    "head_sha": "7b211719b4897aca8eba656e49645d4dfad7e3e0",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "docs/receipts/reuse/s4-deployment-approval-consumer.json",
+      "stages/s4-deployment-approval-consumer/stage-envelope.json",
+      "stages/s4-deployment-approval-consumer/ownership-lease.json",
+      "src/research_bridge/deployment.py",
+      "tests/test_deployment_gate.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "focused_test_count": 11,
+      "full_core_test_count": 366,
+      "full_inventory_test_count": 25,
+      "release_manifest_binding": "exact",
+      "encrypted_backup_required": true,
+      "clean_restore_required": true,
+      "backup_restore_manifest_equality_required": true,
+      "exact_head_remote_ci_binding_required": true,
+      "rollback_target_binding_required": true,
+      "approval_expiry_required": true,
+      "approval_parent_chain_required": true,
+      "approval_object_single_use": true,
+      "approval_nonce_single_use": true,
+      "append_only_hash_chain_verified": true,
+      "D2_D3_or_cross_contour_receipts_rejected": true,
+      "external_dependencies_added": 0,
+      "network_or_external_actions": 0,
+      "deployment_authority": false,
+      "approval_consumed_in_acceptance": false,
+      "real_backup_or_restore_claimed": false,
+      "declares_ready_for_72h_soak": false,
+      "component_sha256": "83e8a4904f52d722d66f30ed2cfa4d5c3e32cbf2036c14486ba21587d2ca999f",
+      "test_sha256": "9c9975f45674bf72e4561e6d85b4e49dc49bbd4071562464d0439828cde8e84d",
+      "reuse_receipt_file_sha256": "3a8eacb861e5349ddd9d38608ad6153bc6948d04d1836eb6483aa174bbe42b25",
+      "next_stage": "s4-immutable-release-build-identity"
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29618463927",
+    "integration_commit_sha": "7b211719b4897aca8eba656e49645d4dfad7e3e0"
+  },
+  "integrity": {
+    "payload_sha256": "780d9433b68aeef457819bd768897836e5944a6cf9c73fb6f6515e5ac00e6212",
+    "parent_refs": [
+      "git:7b211719b4897aca8eba656e49645d4dfad7e3e0",
+      "ci:29618463927",
+      "integration:integration-s3-dual-contour-pre-soak-green-20260718",
+      "reuse:reuse-s4-deployment-approval-consumer-20260718"
+    ]
+  }
+}
