@@ -1,0 +1,83 @@
+{
+  "stage_id": "s1-market-base-repair-authority-amendment",
+  "agent_id": "agent-0",
+  "objective": "Authorize one owner-local fail-closed fix for a proven resolve-before-symlink-check defect at the pinned private Market source, without copying source into the public repository or broadening domain authority.",
+  "executable_blocker": "A valid same-directory symlink can currently pass the Unified latest boundary because the path is resolved before the regular non-symlink file check, contradicting the already frozen negative conformance case and preventing an honest green base repair.",
+  "base_sha": "9ec7ece410bb5de64c912af2b8b4052b33b11fa4",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "main",
+  "worktree": "canonical-main-worktree",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "docs/receipts/source-freeze/s1-market-base-repair.json",
+    "docs/receipts/reuse/s1-market-base-repair.json",
+    "docs/receipts/integration/s1-market-base-authority.json",
+    "stages/s1-market-base-repair/stage-envelope.json",
+    "market-domain:pinned-clean-tree@636d0b56d13ba919d4af7c4bcd0718ac7fb92945",
+    "market-domain:sanitized-stop-evidence@sha256:120042597bdcacb128188d39a1e94369e4dbe50a30c383e23be911f9a60841d0"
+  ],
+  "write_set": [
+    "docs/receipts/reuse/s1-market-base-symlink-fix.json",
+    "stages/s1-market-base-repair-authority-amendment/stage-envelope.json",
+    "stages/s1-market-base-repair-authority-amendment/ownership-lease.json",
+    "tests/test_stage1_authority.py"
+  ],
+  "authorized_worker_stage": {
+    "stage_id": "s1-market-base-repair",
+    "agent_id": "agent-3",
+    "branch": "codex/bridge-a3-s1-market-base-repair",
+    "write_set": [
+      "src/market_lab/unified_product_access.py",
+      "tests/test_unified_product_access.py",
+      "tests/test_paper_reality_loop_cli.py"
+    ],
+    "integrator_write_set": [
+      ".github/workflows/ci.yml"
+    ],
+    "source_change_limit": "Preserve the caller-supplied latest path until the existing regular non-symlink check has accepted it; no other runtime or domain semantics change."
+  },
+  "forbidden_scope": [
+    "private-source-code-copy-into-public-repository",
+    "dirty-market-source-checkout-mutation",
+    "runtime-edit-outside-the-authorized-owner-boundary",
+    "domain-scientific-ledger-dataset-report-registry-or-evidence-mutation",
+    "existing-test-deletion-assertion-weakening-skip-xfail-or-bypass",
+    "external-dependency-lockfile-or-migration-change",
+    "network-exchange-order-private-api-key-or-external-mutation",
+    "live-trading-publication-deployment-or-ui",
+    "d2-or-d3-payload",
+    "frozen-contract-edit"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "source_freeze": "f6ac6b7ebd5920c89348c58f0ddf955b28a823c31bb676c92403fa45e761a0ce",
+    "prior_reuse_decision": "900833e203458bb84432341dd177372ce13f5b97f63c73b6e7bc8b103f8016eb",
+    "prior_worker_stage_envelope": "72a93fc3a4e77f173cf800cb678b20d352224bf54f7f428123d12ae754a9eef9",
+    "sanitized_stop_evidence": "120042597bdcacb128188d39a1e94369e4dbe50a30c383e23be911f9a60841d0",
+    "external_dependencies": "none"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest tests.test_stage1_authority -v",
+    "make test",
+    "git diff --check",
+    "public privacy, secret, private-locator, private-URL and exact write-set scan"
+  ],
+  "risk_class": "private-market-owner-boundary-fail-closed-authority",
+  "stop_conditions": [
+    "source-head-or-upstream-mismatch",
+    "dirty-source-checkout-mutation",
+    "private-path-url-data-or-code-detected-in-public-write-set",
+    "runtime-change-exceeds-authorized-owner-boundary",
+    "validation-weakening-required",
+    "external-dependency-required",
+    "contract-drift",
+    "write-set-collision",
+    "before-equals-after-or-symlink-remains-accepted"
+  ],
+  "expected_receipt": "docs/receipts/integration/s1-market-base-repair-authority-amendment.json",
+  "rollback": "Revert the scoped public authority amendment before issuing the amended worker lease. No private source checkout, domain state, dataset, runtime, deployment or external system is mutated by this authority stage.",
+  "commit_authority": "agent-0-one-scoped-commit",
+  "push_authority": true
+}

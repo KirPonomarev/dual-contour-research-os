@@ -1,0 +1,19 @@
+{
+  "lease_id": "lease-s1-market-base-repair-authority-amendment-agent-0-20260717",
+  "stage_id": "s1-market-base-repair-authority-amendment",
+  "agent_id": "agent-0",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-17T06:15:04Z",
+  "expires_at": "2026-07-17T12:15:04Z",
+  "base_sha": "9ec7ece410bb5de64c912af2b8b4052b33b11fa4",
+  "branch": "main",
+  "worktree": "canonical-main-worktree",
+  "write_set": [
+    "docs/receipts/reuse/s1-market-base-symlink-fix.json",
+    "stages/s1-market-base-repair-authority-amendment/stage-envelope.json",
+    "stages/s1-market-base-repair-authority-amendment/ownership-lease.json",
+    "tests/test_stage1_authority.py"
+  ],
+  "delegation_allowed": false,
+  "state": "active"
+}

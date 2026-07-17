@@ -51,6 +51,7 @@ class Stage1AuthorityTests(unittest.TestCase):
             "s1-offline-execution.json": "clean-room-stdlib-inprocess-frozen-l0-and-researchd-finalizer",
             "s1-validation-boundary.json": "clean-room-stdlib-pure-receipt-verifier",
             "s1-market-base-repair.json": "pinned-private-domain-ci-repair-no-public-code-copy",
+            "s1-market-base-symlink-fix.json": "owner-local-minimal-fail-closed-glue-no-public-copy",
         }
         schema = load(ROOT / "contracts" / "v1" / "ReuseDecisionReceipt.schema.json")
         allowed = set(schema["properties"])
@@ -118,6 +119,76 @@ class Stage1AuthorityTests(unittest.TestCase):
         self.assertNotIn("/Users/", public_text)
         self.assertNotIn("/Volumes/", public_text)
         self.assertNotIn("github.com/KirPonomarev/crypto-market-lab", public_text)
+        self.assertTrue(envelope["rollback"])
+        self.assertFalse(lease["delegation_allowed"])
+
+    def test_market_base_symlink_fix_authority_is_narrow_fail_closed_and_sanitized(self) -> None:
+        envelope = load(
+            ROOT
+            / "stages"
+            / "s1-market-base-repair-authority-amendment"
+            / "stage-envelope.json"
+        )
+        lease = load(
+            ROOT
+            / "stages"
+            / "s1-market-base-repair-authority-amendment"
+            / "ownership-lease.json"
+        )
+        reuse = load(REUSE_RECEIPTS / "s1-market-base-symlink-fix.json")
+
+        self.assertEqual(envelope["base_sha"], "9ec7ece410bb5de64c912af2b8b4052b33b11fa4")
+        self.assertEqual(envelope["write_set"], lease["write_set"])
+        self.assertEqual(
+            envelope["authorized_worker_stage"]["write_set"],
+            [
+                "src/market_lab/unified_product_access.py",
+                "tests/test_unified_product_access.py",
+                "tests/test_paper_reality_loop_cli.py",
+            ],
+        )
+        self.assertEqual(
+            envelope["authorized_worker_stage"]["integrator_write_set"],
+            [".github/workflows/ci.yml"],
+        )
+        self.assertEqual(reuse["integrity"]["payload_sha256"], payload_sha256(reuse))
+        self.assertEqual(reuse["payload"]["code_sha256"], EMPTY_SHA256)
+        dispositions = {
+            item["candidate"]: item["disposition"]
+            for item in reuse["payload"]["candidates"]
+        }
+        self.assertEqual(
+            dispositions["market-owned-unified-product-access-boundary"],
+            "selected",
+        )
+        self.assertEqual(
+            dispositions["validation-bypass-or-symlink-resolution-before-check"],
+            "rejected-fail-open",
+        )
+        public_text = "\n".join(
+            (
+                (REUSE_RECEIPTS / "s1-market-base-symlink-fix.json").read_text(),
+                (
+                    ROOT
+                    / "stages"
+                    / "s1-market-base-repair-authority-amendment"
+                    / "stage-envelope.json"
+                ).read_text(),
+                (
+                    ROOT
+                    / "stages"
+                    / "s1-market-base-repair-authority-amendment"
+                    / "ownership-lease.json"
+                ).read_text(),
+            )
+        )
+        self.assertNotIn("/Users/", public_text)
+        self.assertNotIn("/Volumes/", public_text)
+        self.assertNotIn("github.com/KirPonomarev/crypto-market-lab", public_text)
+        self.assertIn(
+            "runtime-edit-outside-the-authorized-owner-boundary",
+            envelope["forbidden_scope"],
+        )
         self.assertTrue(envelope["rollback"])
         self.assertFalse(lease["delegation_allowed"])
 

@@ -1,0 +1,65 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-s1-market-base-symlink-fix-20260717",
+  "issued_at": "2026-07-17T06:15:04Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "reuse-freeze-authority"
+  },
+  "contour": "market",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "fail-closed-non-symlink-unified-latest-boundary",
+    "candidates": [
+      {
+        "candidate": "market-owned-unified-product-access-boundary",
+        "disposition": "selected"
+      },
+      {
+        "candidate": "stdlib-pathlib-non-resolving-symlink-check",
+        "disposition": "selected"
+      },
+      {
+        "candidate": "clean-room-reimplementation",
+        "disposition": "rejected-duplicate-owner-boundary"
+      },
+      {
+        "candidate": "validation-bypass-or-symlink-resolution-before-check",
+        "disposition": "rejected-fail-open"
+      },
+      {
+        "candidate": "external-dependency",
+        "disposition": "rejected-unnecessary"
+      },
+      {
+        "candidate": "public-copy-of-private-market-source",
+        "disposition": "rejected-no-license"
+      }
+    ],
+    "selected_mode": "owner-local-minimal-fail-closed-glue-no-public-copy",
+    "source_ref": "source-freeze:source-freeze-market-s1-base-repair-20260717;git:636d0b56d13ba919d4af7c4bcd0718ac7fb92945",
+    "code_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "license_spdx": "NOASSERTION",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "regular Unified latest pointer remains accepted when its binding is valid",
+      "same-directory Unified latest symlink is rejected before resolution",
+      "paper-reality CLI reports exit 1 for a symlink pointer and writes no domain state",
+      "complete synthetic prerequisite chain remains dry-run green",
+      "existing full Market test suite",
+      "exact-head private remote CI"
+    ],
+    "canonical_owner": "market-domain-with-agent0-ci-integration",
+    "rollback": "Revert the scoped owner-local boundary, conformance-test and CI workflow commits and delete the isolated stage branch. The dirty source checkout, domain state, external services and public Bridge runtime remain unchanged."
+  },
+  "integrity": {
+    "payload_sha256": "fc8d4d9b9593338d5d687dc884fc4e72011d533bef8b255b52d81bfe23b19aa4",
+    "parent_refs": [
+      "git:9ec7ece410bb5de64c912af2b8b4052b33b11fa4",
+      "source-freeze:source-freeze-market-s1-base-repair-20260717",
+      "reuse:reuse-s1-market-base-repair-20260717",
+      "sha256:120042597bdcacb128188d39a1e94369e4dbe50a30c383e23be911f9a60841d0"
+    ]
+  }
+}
