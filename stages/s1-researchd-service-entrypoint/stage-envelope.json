@@ -1,0 +1,115 @@
+{
+  "stage_id": "s1-researchd-service-entrypoint",
+  "agent_id": "agent-1",
+  "objective": "Implement one strict owner-only module entrypoint that runs the integrated ResearchDaemon as a long-lived local service and shuts it down cleanly on local service signals.",
+  "executable_blocker": "python -m research_bridge.researchd currently imports and exits without loading a bounded authority configuration or starting the existing daemon.",
+  "base_sha": "20591bd9a85bdae087f4996aee93f39066133959",
+  "public_authority_sha": "20591bd9a85bdae087f4996aee93f39066133959",
+  "public_authority_ci": "29596006598",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a1-s1-researchd-service-entrypoint",
+  "worktree": "ephemeral-public-worktree:s1-researchd-service-entrypoint",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "docs/receipts/reuse/s1-researchd-service-entrypoint.json",
+    "docs/receipts/integration/s1-researchd-service-entrypoint-authority.json",
+    "docs/receipts/integration/s1-researchd-researchctl-single-writer.json",
+    "stages/s1-researchd-service-entrypoint-authority/stage-envelope.json",
+    "src/research_bridge/authority.py",
+    "src/research_bridge/ipc.py",
+    "existing ResearchDaemon and connected tests"
+  ],
+  "write_set": [
+    "src/research_bridge/researchd.py",
+    "tests/test_stage1_researchd.py",
+    "tests/test_stage1_control_assurance.py"
+  ],
+  "service_contract": {
+    "entrypoint": "python3 -m research_bridge.researchd --config <owner-only-json>",
+    "arguments": "exactly-one-required---config-path-no-inline-json-no-environment-fallback-no-unknown-options",
+    "config_open": "O_RDONLY-O_NOFOLLOW-O_CLOEXEC-regular-nonsymlink-effective-uid-owned-mode-0600-link-count-one-identity-stable",
+    "config_maximum_bytes": 262144,
+    "config_schema_id": "ResearchdServiceConfig",
+    "config_schema_version": "1.0.0",
+    "config_fields": [
+      "schema_id",
+      "schema_version",
+      "runtime_root",
+      "runner_identity",
+      "allowed_uids",
+      "input_quota_bytes",
+      "checkpoint_quota_bytes",
+      "artifact_quota_bytes",
+      "maximum_input_bytes",
+      "deadline_seconds",
+      "trusted_issuers",
+      "policy_snapshots",
+      "approval_receipts"
+    ],
+    "strict_json": "UTF-8-object-exact-keys-no-duplicates-no-nonfinite-values-no-trailing-data",
+    "allowed_uids": "exact-single-element-array-containing-current-effective-uid",
+    "quotas": "each-byte-value-is-exact-positive-int-at-most-1099511627776-and-maximum_input_bytes-does-not-exceed-input_quota_bytes",
+    "deadline_seconds": "exact-int-or-float-not-bool-finite-greater-than-zero-at-most-five",
+    "trusted_issuers": "exact-JobSpec-Permit-AttemptLease-PolicySnapshot-ApprovalReceipt-map-to-exact-issuer_id-authority_class-text-objects",
+    "authority_objects": "policy_snapshots-and-approval_receipts-are-complete-D0-or-D1-objects-only-and-PinnedOfflineAuthority-is-constructed-before-runtime-start",
+    "signals": "main-thread-SIGTERM-and-SIGINT-close-the-owned-daemon-then-restore-prior-handlers",
+    "exit_codes": {
+      "clean_shutdown": 0,
+      "configuration_rejected": 2,
+      "runtime_failed": 3
+    },
+    "error_output": "exactly-one-generic-line-with-no-config-path-runtime-path-authority-object-or-exception-detail"
+  },
+  "preservation_contract": [
+    "ResearchDaemon-construction-start-serve-close-and-all-existing-control-runtime-semantics-remain-the-single-owned-path",
+    "one-runtime-root-one-lock-one-read-write-JobLedger-and-one-serial-AF_UNIX-socket-only",
+    "config-and-PinnedOfflineAuthority-validation-complete-before-runtime-root-mutation",
+    "no-systemd-unit-host-installation-package-export-config-template-or-secret-provisioning",
+    "no-environment-authority-dynamic-reload-subprocess-container-network-second-database-deployment-or-domain-operation",
+    "no-D2-D3-object-path-secret-or-detailed-error-output"
+  ],
+  "forbidden_scope": [
+    "write-outside-one-source-and-two-test-files",
+    "ledger-CAS-ingestion-L0-execution-kernel-validation-admission-authority-control-IPC-or-package-source-edit",
+    "contract-schema-event-database-migration-root-config-workflow-lockfile-package-export-or-dependency-edit",
+    "systemd-unit-install-script-host-path-secret-credential-environment-authority-or-private-policy-payload",
+    "HTTP-TCP-remote-admin-config-reload-subprocess-worker-container-second-ledger-or-service-database",
+    "live-network-order-target-publication-deployment-domain-registry-or-scientific-outcome-authority",
+    "test-skip-xfail-continue-on-error-timeout-inflation-or-validation-weakening",
+    "push-merge-or-canonical-main-write"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "reuse_decision": "d194834c975d479acb5c8fab7d6861ce9f5a4abd8b2817d24cc0a24814cd1fb4",
+    "authority_receipt": "4475be65ee0f169b50c48ac02507e6405f33b3608a70bdb09320b2a9c0176de0",
+    "researchd_integration_receipt": "5d99b29801d76c4dbe52fe2f1d825087cd8a12128476a6014aab4f644d532ae9",
+    "external_dependencies": "none"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest tests.test_stage1_researchd tests.test_stage1_control_assurance -v",
+    "python3 -m unittest discover -s tests -p 'test_stage1_*.py'",
+    "make test",
+    "git diff --check",
+    "exact-three-file-write-set-real-process-SIGTERM-SIGINT-owner-mode-symlink-size-duplicate-key-classification-authority-before-mutation-error-redaction-dependency-network-and-weakening-scan"
+  ],
+  "risk_class": "bridge-sev1-local-service-entrypoint",
+  "stop_conditions": [
+    "base-authority-contract-reuse-or-researchd-receipt-hash-mismatch",
+    "write-set-runtime-semantics-config-root-package-workflow-or-dependency-expands",
+    "config-can-enter-through-environment-inline-JSON-symlink-wrong-owner-wrong-mode-or-D2-D3-object",
+    "runtime-root-can-mutate-before-complete-config-and-PinnedOfflineAuthority-validation",
+    "SIGTERM-SIGINT-or-KeyboardInterrupt-can-leave-owned-socket-ledger-or-lock-open",
+    "detailed-error-path-secret-network-deployment-domain-or-second-writer-surface-appears",
+    "before-equals-after-or-module-entrypoint-blocker-remains"
+  ],
+  "expected_receipt": "docs/receipts/integration/s1-researchd-service-entrypoint.json",
+  "rollback": "Agent 0 discards the worker commit and branch. Existing daemon protocol ledger CAS and runtime data remain unchanged; synthetic offline runtime roots may be discarded.",
+  "commit_authority": "one-scoped-worker-commit",
+  "push_authority": false,
+  "expected_handoff_status": [
+    "ready_for_agent0_audit",
+    "blocked_validation_failed"
+  ]
+}

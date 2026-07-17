@@ -543,6 +543,38 @@ class Stage1AuthorityTests(unittest.TestCase):
         )
         self.assertFalse(lease["delegation_allowed"])
 
+    def test_researchd_service_entrypoint_worker_lease_is_exact_and_fail_closed(self) -> None:
+        envelope = load(
+            ROOT / "stages" / "s1-researchd-service-entrypoint" / "stage-envelope.json"
+        )
+        lease = load(
+            ROOT
+            / "stages"
+            / "s1-researchd-service-entrypoint"
+            / "ownership-lease.json"
+        )
+
+        self.assertEqual(envelope["write_set"], lease["write_set"])
+        self.assertEqual(
+            envelope["write_set"],
+            [
+                "src/research_bridge/researchd.py",
+                "tests/test_stage1_researchd.py",
+                "tests/test_stage1_control_assurance.py",
+            ],
+        )
+        self.assertEqual(
+            envelope["dependency_hashes"]["authority_receipt"],
+            "4475be65ee0f169b50c48ac02507e6405f33b3608a70bdb09320b2a9c0176de0",
+        )
+        service = envelope["service_contract"]
+        self.assertEqual(service["config_maximum_bytes"], 262144)
+        self.assertEqual(service["config_schema_id"], "ResearchdServiceConfig")
+        self.assertIn("O_NOFOLLOW", service["config_open"])
+        self.assertIn("current-effective-uid", service["allowed_uids"])
+        self.assertFalse(envelope["push_authority"])
+        self.assertFalse(lease["delegation_allowed"])
+
     def test_budget_attempt_lifecycle_semantic_amendment_is_exact_and_non_expansive(self) -> None:
         original = load(
             ROOT / "stages" / "s1-budget-attempt-lifecycle" / "stage-envelope.json"

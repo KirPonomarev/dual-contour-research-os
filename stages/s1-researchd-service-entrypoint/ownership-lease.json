@@ -1,0 +1,19 @@
+{
+  "lease_id": "lease-s1-researchd-service-entrypoint-agent-1-20260717",
+  "stage_id": "s1-researchd-service-entrypoint",
+  "agent_id": "agent-1",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-17T16:05:00Z",
+  "expires_at": "2026-07-17T22:05:00Z",
+  "base_sha": "20591bd9a85bdae087f4996aee93f39066133959",
+  "public_authority_sha": "20591bd9a85bdae087f4996aee93f39066133959",
+  "branch": "codex/bridge-a1-s1-researchd-service-entrypoint",
+  "worktree": "ephemeral-public-worktree:s1-researchd-service-entrypoint",
+  "write_set": [
+    "src/research_bridge/researchd.py",
+    "tests/test_stage1_researchd.py",
+    "tests/test_stage1_control_assurance.py"
+  ],
+  "delegation_allowed": false,
+  "state": "active"
+}
