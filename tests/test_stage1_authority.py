@@ -58,6 +58,7 @@ class Stage1AuthorityTests(unittest.TestCase):
             "s1-authority-policy-boundary.json": "owned-stdlib-pinned-authority-policy-fail-closed",
             "s1-budget-profile.json": "owned-stdlib-exact-fixed-charge-budget-profile-single-ledger-ready",
             "s1-budget-attempt-lifecycle.json": "owned-stdlib-single-ledger-embedded-budget-receipts-fixed-charge",
+            "s1-final-checkpoint-reopen-recovery.json": "owned-stdlib-verified-final-checkpoint-same-attempt-replay-single-ledger",
             "s1-pause-epoch-fencing.json": "owned-stdlib-canonical-ledger-sequence-fence",
             "s1-market-ci-reality-loop-prerequisite.json": "existing-real-cli-synthetic-prerequisite-hard-gate-no-runtime-change",
             "s1-market-storage-accounting-portability.json": "owner-local-stdlib-conservative-byte-accounting-no-public-copy",
@@ -232,6 +233,45 @@ class Stage1AuthorityTests(unittest.TestCase):
             "second-table-second-ledger-new-event-type-new-column-table-rebuild-or-nonempty-legacy-migration",
             envelope["forbidden_scope"],
         )
+
+    def test_final_checkpoint_reopen_authority_is_narrow_and_reversible(self) -> None:
+        envelope = load(
+            ROOT
+            / "stages"
+            / "s1-final-checkpoint-reopen-recovery-authority"
+            / "stage-envelope.json"
+        )
+        lease = load(
+            ROOT
+            / "stages"
+            / "s1-final-checkpoint-reopen-recovery-authority"
+            / "ownership-lease.json"
+        )
+        reuse = load(
+            REUSE_RECEIPTS / "s1-final-checkpoint-reopen-recovery.json"
+        )
+
+        self.assertEqual(envelope["write_set"], lease["write_set"])
+        worker = envelope["authorized_worker_stage"]
+        self.assertEqual(
+            worker["source_write_set"],
+            ["src/research_bridge/ledger.py", "src/research_bridge/execution.py"],
+        )
+        self.assertEqual(len(worker["test_write_set"]), 5)
+        replay = envelope["replay_contract"]
+        self.assertEqual(
+            replay["scope"], "same-job-same-attempt-single-final-checkpoint-only"
+        )
+        self.assertEqual(len(replay["checkpoint_exact_bindings"]), 8)
+        self.assertEqual(len(replay["complete_exact_bindings"]), 6)
+        self.assertIn("persisted-checkpoint-event_at", replay["checkpoint_time_rule"])
+        self.assertEqual(reuse["integrity"]["payload_sha256"], payload_sha256(reuse))
+        self.assertIn(
+            "no-byte-for-byte-ExecutionReceipt-terminal-lookup-claim-in-this-stage",
+            envelope["preservation_contract"],
+        )
+        self.assertTrue(envelope["rollback"])
+        self.assertFalse(lease["delegation_allowed"])
 
     def test_budget_attempt_lifecycle_semantic_amendment_is_exact_and_non_expansive(self) -> None:
         original = load(

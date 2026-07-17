@@ -1,0 +1,137 @@
+{
+  "stage_id": "s1-final-checkpoint-reopen-recovery-authority",
+  "agent_id": "agent-0",
+  "objective": "Authorize one bounded same-attempt final-checkpoint reopen gate using the existing canonical ledger, CAS, deterministic L0 runner and receipt-last coordinator.",
+  "executable_blocker": "After a process restart the ledger rejects an exact checkpoint or completion replay, so a deterministic final-checkpoint attempt cannot prove the same artifact and ledger result without duplicate or conflicting durable transitions.",
+  "base_sha": "637f5043f00893d8af4a52203c3b76f1f0efd781",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "main",
+  "worktree": "canonical-public-worktree",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "contracts/v1/CheckpointManifest.schema.json",
+    "contracts/v1/ExecutionReceipt.schema.json",
+    "docs/receipts/reuse/s1-ledger-durability.json",
+    "docs/receipts/reuse/s1-offline-execution.json",
+    "docs/receipts/integration/s1-budget-attempt-lifecycle.json",
+    "src/research_bridge/ledger.py",
+    "src/research_bridge/execution.py",
+    "src/research_bridge/cas.py",
+    "src/research_bridge/l0.py",
+    "existing connected tests"
+  ],
+  "write_set": [
+    "docs/receipts/reuse/s1-final-checkpoint-reopen-recovery.json",
+    "stages/s1-final-checkpoint-reopen-recovery-authority/stage-envelope.json",
+    "stages/s1-final-checkpoint-reopen-recovery-authority/ownership-lease.json",
+    "tests/test_stage1_authority.py"
+  ],
+  "authorized_worker_stage": {
+    "stage_id": "s1-final-checkpoint-reopen-recovery",
+    "agent_id": "agent-2",
+    "branch": "codex/bridge-a2-s1-final-checkpoint-reopen-recovery",
+    "source_write_set": [
+      "src/research_bridge/ledger.py",
+      "src/research_bridge/execution.py"
+    ],
+    "test_write_set": [
+      "tests/test_stage1_ledger.py",
+      "tests/test_stage1_execution.py",
+      "tests/test_stage1_execution_assurance.py",
+      "tests/test_stage1_reference_vertical.py",
+      "tests/test_stage1_recovery.py"
+    ]
+  },
+  "replay_contract": {
+    "scope": "same-job-same-attempt-single-final-checkpoint-only",
+    "checkpoint_order": [
+      "validate-entire-persisted-ledger-and-budget-projection",
+      "lookup-existing-job-attempt-checkpoint-sequence",
+      "compare-exact-mechanical-bindings-excluding-presented-retry-time",
+      "return-original-event-zero-write-or-reject-conflict",
+      "for-new-checkpoint-only-enforce-current-fence-terminal-state-and-next-sequence",
+      "append"
+    ],
+    "checkpoint_exact_bindings": [
+      "job_id",
+      "attempt_id",
+      "fencing_epoch",
+      "fencing_token_sha256",
+      "checkpoint_sequence",
+      "state_sha256",
+      "payload_ref",
+      "payload_stored_in_domain_vault"
+    ],
+    "checkpoint_time_rule": "the-original-persisted-checkpoint-event_at-is-authoritative-for-an-exact-replay;-a-later-presented-retry-time-is-not-a-conflict",
+    "complete_order": [
+      "validate-entire-persisted-ledger-budget-and-checkpoint-projection",
+      "lookup-existing-job-completion",
+      "compare-exact-job-attempt-fence-result-and-original-completion-time-bindings",
+      "return-original-event-zero-write-or-reject-conflict",
+      "for-new-completion-only-enforce-current-fence-terminal-state-and-causality",
+      "append"
+    ],
+    "complete_exact_bindings": [
+      "job_id",
+      "attempt_id",
+      "fencing_epoch",
+      "fencing_token_sha256",
+      "result_sha256",
+      "event_at"
+    ],
+    "deterministic_acceptance": "after-close-and-reopen-an-exact-same-attempt-rerun-produces-the-same-raw-artifact-sha-and-the-same-complete-result_sha256-with-one-claim-one-checkpoint-one-complete-one-reservation-and-one-settlement",
+    "corrupt_policy": "reject-without-silent-fresh-attempt-fallback-or-additional-ledger-write",
+    "expired_authority_policy": "reject-before-runner-and-before-any-new-ledger-write"
+  },
+  "preservation_contract": [
+    "database-user-version-remains-one-and-exact-schema-fingerprint-is-unchanged",
+    "one-table-one-ledger-existing-event-types-columns-indexes-and-triggers-only",
+    "budget-cap-idempotency-pause-fence-nonce-and-settlement-semantics-remain-exact",
+    "existing-CAS-and-ingestion-implementations-are-reused-without-source-edit",
+    "no-domain-validator-registry-writer-or-scientific-outcome-authority",
+    "no-byte-for-byte-ExecutionReceipt-terminal-lookup-claim-in-this-stage"
+  ],
+  "forbidden_scope": [
+    "write-outside-two-source-and-five-test-files",
+    "contract-catalog-schema-config-workflow-lockfile-dependency-migration-or-package-export-edit",
+    "CAS-ingestion-L0-admission-authority-control-validation-or-kernel-source-edit",
+    "second-ledger-second-store-new-table-column-index-trigger-event-type-or-user-version",
+    "fresh-attempt-multi-attempt-arbitrary-chunk-resume-retry-scheduler-queue-release-or-refund",
+    "silent-corrupt-checkpoint-restart-fallback-skip-xfail-or-validation-weakening",
+    "private-path-url-secret-account-dataset-strategy-or-confidential-payload",
+    "network-external-mutation-live-operation-publication-deployment-or-UI",
+    "push-merge-or-canonical-main-write"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "reuse_decision": "f28c85b58ab081c446583e95f5c69985e61d3f88f86d59d6b8c278ad314b2856",
+    "budget_attempt_lifecycle_receipt": "313a55f202ea6490bca15321e018f11ee0c835ab8698565c0b4830e05f90692b",
+    "external_dependencies": "none"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest tests.test_stage1_ledger tests.test_stage1_execution tests.test_stage1_execution_assurance tests.test_stage1_reference_vertical tests.test_stage1_recovery -v",
+    "python3 -m unittest discover -s tests -p 'test_stage1_*.py'",
+    "make test",
+    "git diff --check",
+    "exact seven-file write-set replay mutation matrix schema contract dependency private-locator network live-authority and weakening scan",
+    "exact-head public remote CI"
+  ],
+  "risk_class": "bridge-sev1-durable-final-checkpoint-replay",
+  "stop_conditions": [
+    "base-contract-reuse-or-lifecycle-receipt-hash-mismatch",
+    "write-set-schema-event-vocabulary-store-ledger-or-dependency-expands",
+    "exact-replay-adds-an-event-consumes-budget-or-republishes-a-distinct-CAS-object",
+    "conflicting-replay-is-accepted-or-corrupt-material-reaches-a-new-append",
+    "raw-artifact-sha-or-ledger-result-sha-changes-after-process-reopen",
+    "claim-checkpoint-complete-reservation-or-settlement-duplicates",
+    "pause-fence-nonce-cap-chain-or-existing-reference-vertical-regresses",
+    "worker-claims-full-terminal-ExecutionReceipt-lookup-or-multi-attempt-resume",
+    "before-equals-after-or-final-checkpoint-reopen-blocker-remains"
+  ],
+  "expected_receipt": "docs/receipts/integration/s1-final-checkpoint-reopen-recovery.json",
+  "rollback": "Agent 0 discards or reverts only the scoped worker commit. No database schema, contract, domain state, external system or live authority changes; synthetic offline roots may be discarded.",
+  "commit_authority": "agent-0-only",
+  "push_authority": "agent-0-only"
+}

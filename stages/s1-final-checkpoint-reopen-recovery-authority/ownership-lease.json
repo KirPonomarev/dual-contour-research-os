@@ -1,0 +1,19 @@
+{
+  "lease_id": "lease-s1-final-checkpoint-reopen-recovery-authority-agent-0-20260717",
+  "stage_id": "s1-final-checkpoint-reopen-recovery-authority",
+  "agent_id": "agent-0",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-17T13:50:05Z",
+  "expires_at": "2026-07-17T19:50:05Z",
+  "base_sha": "637f5043f00893d8af4a52203c3b76f1f0efd781",
+  "branch": "main",
+  "worktree": "canonical-public-worktree",
+  "write_set": [
+    "docs/receipts/reuse/s1-final-checkpoint-reopen-recovery.json",
+    "stages/s1-final-checkpoint-reopen-recovery-authority/stage-envelope.json",
+    "stages/s1-final-checkpoint-reopen-recovery-authority/ownership-lease.json",
+    "tests/test_stage1_authority.py"
+  ],
+  "delegation_allowed": false,
+  "state": "active"
+}

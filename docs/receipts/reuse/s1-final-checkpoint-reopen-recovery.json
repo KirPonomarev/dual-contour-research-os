@@ -1,0 +1,80 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-s1-final-checkpoint-reopen-recovery-20260717",
+  "issued_at": "2026-07-17T13:50:05Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "reuse-freeze-authority"
+  },
+  "contour": "bridge",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "deterministic-final-checkpoint-reopen-and-same-attempt-ledger-replay",
+    "candidates": [
+      {
+        "candidate": "existing-canonical-job-ledger-checkpoint-and-complete-events",
+        "disposition": "selected"
+      },
+      {
+        "candidate": "existing-owned-content-addressed-store-idempotent-publication-and-verification",
+        "disposition": "selected"
+      },
+      {
+        "candidate": "existing-deterministic-L0-single-final-checkpoint-runner",
+        "disposition": "selected"
+      },
+      {
+        "candidate": "existing-offline-execution-coordinator-receipt-last-composition",
+        "disposition": "selected"
+      },
+      {
+        "candidate": "new-terminal-receipt-store-or-second-ledger",
+        "disposition": "rejected-duplicate-durable-authority"
+      },
+      {
+        "candidate": "new-event-type-table-column-or-schema-version",
+        "disposition": "rejected-unnecessary-for-final-checkpoint-replay"
+      },
+      {
+        "candidate": "multi-attempt-or-arbitrary-chunk-resume",
+        "disposition": "parked-for-separately-authorized-recovery-stage"
+      },
+      {
+        "candidate": "byte-for-byte-ExecutionReceipt-terminal-lookup",
+        "disposition": "parked-for-versioned-terminal-material-gate"
+      },
+      {
+        "candidate": "external-dependency",
+        "disposition": "rejected-unnecessary"
+      }
+    ],
+    "selected_mode": "owned-stdlib-verified-final-checkpoint-same-attempt-replay-single-ledger",
+    "source_ref": "git:637f5043f00893d8af4a52203c3b76f1f0efd781;reuse:reuse-s1-ledger-durability-20260716;reuse:reuse-s1-offline-execution-20260716;reuse:reuse-s1-budget-attempt-lifecycle-20260717",
+    "code_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "license_spdx": "NOASSERTION",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "exact checkpoint replay after process reopen returns the original event with zero writes",
+      "conflicting checkpoint replay rejects with zero writes",
+      "exact completion replay after process reopen returns the original event with zero writes",
+      "conflicting completion replay rejects with zero writes",
+      "same-attempt deterministic rerun preserves raw artifact SHA and ledger result SHA",
+      "claim checkpoint complete reservation settlement and CAS object counts do not duplicate",
+      "corrupt or mismatched checkpoint material fails closed without silent restart",
+      "expired authority reaches neither runner nor a new ledger append",
+      "full Stage 1 and repository gates"
+    ],
+    "canonical_owner": "bridge-canonical-job-ledger-existing-cas-and-agent0-integration",
+    "rollback": "Revert only the scoped replay implementation commit. Database schema and event vocabulary remain version 1 and unchanged; synthetic offline databases and staging roots may be discarded."
+  },
+  "integrity": {
+    "payload_sha256": "f28c85b58ab081c446583e95f5c69985e61d3f88f86d59d6b8c278ad314b2856",
+    "parent_refs": [
+      "git:637f5043f00893d8af4a52203c3b76f1f0efd781",
+      "reuse:reuse-s1-ledger-durability-20260716",
+      "reuse:reuse-s1-offline-execution-20260716",
+      "reuse:reuse-s1-budget-attempt-lifecycle-20260717"
+    ]
+  }
+}
