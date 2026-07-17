@@ -76,7 +76,7 @@ def _request(
 ) -> ControlRequest:
     return ControlRequest.from_mapping(
         {
-            "version": "1.0",
+            "version": "1.1",
             "request_id": request_id,
             "idempotency_key": idempotency_key,
             "command": command,
@@ -100,6 +100,14 @@ class _RecordingBackend:
     def resume_global(self, **keywords: object) -> object:
         self.calls.append(("resume_global", dict(keywords)))
         return object()
+
+    def submit(self, **keywords: object) -> dict[str, object]:
+        self.calls.append(("submit", dict(keywords)))
+        return {"execution_receipt": {"object_id": "execution-receipt-synthetic"}}
+
+    def lookup(self, **keywords: object) -> dict[str, object]:
+        self.calls.append(("lookup", dict(keywords)))
+        return {"execution_receipt": {"object_id": "execution-receipt-synthetic"}}
 
 
 class LocalControlFrontDoorAssuranceTests(unittest.TestCase):
@@ -163,7 +171,7 @@ class LocalControlFrontDoorAssuranceTests(unittest.TestCase):
             json.dumps(["not", "a", "mapping"]).encode("utf-8") + b"\n",
             json.dumps(
                 {
-                    "version": "1.0",
+                    "version": "1.1",
                     "request_id": "request-synthetic-001",
                     "idempotency_key": "control-synthetic-001",
                     "command": "status",
@@ -172,7 +180,7 @@ class LocalControlFrontDoorAssuranceTests(unittest.TestCase):
             + b"\n",
             json.dumps(
                 {
-                    "version": "1.0",
+                    "version": "1.1",
                     "request_id": "request-synthetic-001",
                     "idempotency_key": "control-synthetic-001",
                     "command": "status",
@@ -191,7 +199,7 @@ class LocalControlFrontDoorAssuranceTests(unittest.TestCase):
     def test_unknown_command_and_unauthorized_uid_make_zero_backend_calls(self) -> None:
         unknown = encode_message(
             {
-                "version": "1.0",
+                "version": "1.1",
                 "request_id": "request-synthetic-unknown",
                 "idempotency_key": "control-synthetic-unknown",
                 "command": "unsupported_synthetic_command",
@@ -202,7 +210,7 @@ class LocalControlFrontDoorAssuranceTests(unittest.TestCase):
 
         status = encode_message(
             {
-                "version": "1.0",
+                "version": "1.1",
                 "request_id": "request-synthetic-status",
                 "idempotency_key": "control-synthetic-status",
                 "command": "status",
@@ -423,6 +431,15 @@ class Stage1ControlStaticBoundaryTests(unittest.TestCase):
                 "decode_message",
                 "resolve_peer_credentials",
             },
+            "researchd.py": {
+                "ResearchdError",
+                "ResearchDaemon",
+            },
+            "researchctl.py": {
+                "ResearchctlError",
+                "run",
+                "main",
+            },
         }
         forbidden_imports = {
             "aiohttp",
@@ -451,6 +468,9 @@ class Stage1ControlStaticBoundaryTests(unittest.TestCase):
             "publish",
             "registry_writer",
             "target_scan",
+            "message_broker",
+            "scheduler",
+            "websocket",
         }
 
         identifiers: set[str] = set()
@@ -492,6 +512,18 @@ class Stage1ControlStaticBoundaryTests(unittest.TestCase):
             if any(fragment in identifier for fragment in forbidden_identifier_fragments)
         }
         self.assertEqual(violations, set())
+
+        researchd_tree = ast.parse(
+            (SRC / "research_bridge" / "researchd.py").read_text()
+        )
+        ledger_constructors = [
+            node
+            for node in ast.walk(researchd_tree)
+            if isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
+            and node.func.id == "JobLedger"
+        ]
+        self.assertEqual(len(ledger_constructors), 1)
 
     def test_control_ledger_exposes_only_frozen_pause_interface(self) -> None:
         expected = {

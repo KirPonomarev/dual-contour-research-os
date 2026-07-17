@@ -1,8 +1,9 @@
 """Typed, fail-closed local control routing for the offline bridge.
 
-The router deliberately exposes only persistent safety-state inspection,
-global pause, and approval-bound global resume.  Peer identity is supplied by
-the local IPC boundary after operating-system credential verification.
+The router exposes one closed offline protocol for persistent safety control,
+bounded L0 submission, and zero-write terminal receipt lookup.  Peer identity
+is supplied by the local IPC boundary after operating-system credential
+verification.
 """
 
 from __future__ import annotations
@@ -19,7 +20,7 @@ from .authority import (
 )
 
 
-_PROTOCOL_VERSION = "1.0"
+_PROTOCOL_VERSION = "1.1"
 _REQUEST_KEYS = frozenset(
     {"version", "request_id", "idempotency_key", "command", "payload"}
 )
@@ -27,6 +28,8 @@ _COMMAND_PAYLOAD_KEYS = {
     "status": frozenset(),
     "pause_global": frozenset({"reason", "authority_ref"}),
     "resume_global": frozenset({"approval_ref"}),
+    "submit": frozenset({"job_spec", "permit", "lease"}),
+    "lookup": frozenset({"job_spec_ref"}),
 }
 
 
@@ -55,6 +58,18 @@ class _ControlBackend(Protocol):
         idempotency_key: str,
         event_at: str | None = None,
     ) -> object: ...
+
+    def submit(
+        self,
+        *,
+        job_spec: Mapping[str, object],
+        permit: Mapping[str, object],
+        lease: Mapping[str, object],
+        idempotency_key: str,
+        now: str,
+    ) -> Mapping[str, object]: ...
+
+    def lookup(self, *, job_spec_ref: str) -> Mapping[str, object]: ...
 
 
 @dataclass(frozen=True, slots=True)
@@ -89,6 +104,16 @@ class ControlRequest:
             _normalized_text(
                 "approval_ref", copied_payload["approval_ref"], maximum=512
             )
+        elif self.command == "submit":
+            for name in ("job_spec", "permit", "lease"):
+                value = copied_payload[name]
+                if not isinstance(value, Mapping):
+                    raise ControlError(f"{name} must be an object")
+                copied_payload[name] = _json_copy(value)
+        elif self.command == "lookup":
+            _normalized_text(
+                "job_spec_ref", copied_payload["job_spec_ref"], maximum=256
+            )
         object.__setattr__(self, "payload", MappingProxyType(copied_payload))
 
     @classmethod
@@ -113,7 +138,7 @@ class ControlRequest:
             "request_id": self.request_id,
             "idempotency_key": self.idempotency_key,
             "command": self.command,
-            "payload": dict(self.payload),
+            "payload": _json_copy(self.payload),
         }
 
 
@@ -151,7 +176,7 @@ class ControlResponse:
             "request_id": self.request_id,
             "ok": True,
             "command": self.command,
-            "result": dict(self.result),
+            "result": _json_copy(self.result),
         }
 
 
@@ -213,6 +238,18 @@ class ControlRouter:
                     event_at=event_at,
                 )
                 result = self._backend.pause_snapshot()
+            elif request.command == "submit":
+                result = self._backend.submit(
+                    job_spec=request.payload["job_spec"],  # type: ignore[arg-type]
+                    permit=request.payload["permit"],  # type: ignore[arg-type]
+                    lease=request.payload["lease"],  # type: ignore[arg-type]
+                    idempotency_key=request.idempotency_key,
+                    now=self._event_at(),
+                )
+            elif request.command == "lookup":
+                result = self._backend.lookup(
+                    job_spec_ref=request.payload["job_spec_ref"],  # type: ignore[arg-type]
+                )
             else:  # pragma: no cover - ControlRequest enforces the closed command set.
                 raise ControlError("unsupported control command")
         except ControlError:
@@ -251,6 +288,14 @@ def _normalized_text(name: str, value: object, *, maximum: int) -> str:
         or any(ord(character) < 32 for character in value)
     ):
         raise ControlError(f"{name} must be normalized non-empty text")
+    return value
+
+
+def _json_copy(value: object) -> object:
+    if isinstance(value, Mapping):
+        return {key: _json_copy(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_json_copy(item) for item in value]
     return value
 
 

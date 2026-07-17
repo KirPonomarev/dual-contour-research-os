@@ -59,10 +59,18 @@ class RecordingBackend:
         self.reason = None
         return object()
 
+    def submit(self, **kwargs: object) -> dict[str, object]:
+        self.calls.append(("submit", dict(kwargs)))
+        return {"execution_receipt": {"object_id": "execution-receipt-synthetic"}}
+
+    def lookup(self, **kwargs: object) -> dict[str, object]:
+        self.calls.append(("lookup", dict(kwargs)))
+        return {"execution_receipt": {"object_id": "execution-receipt-synthetic"}}
+
 
 def request(command: str, payload: dict[str, object]) -> ControlRequest:
     return ControlRequest(
-        version="1.0",
+        version="1.1",
         request_id=f"request-{command}",
         idempotency_key=f"idempotency-{command}",
         command=command,
@@ -81,7 +89,7 @@ class ControlRouterTests(unittest.TestCase):
 
     def test_only_literal_commands_and_shapes_are_accepted_before_backend_calls(self) -> None:
         valid_status = {
-            "version": "1.0",
+            "version": "1.1",
             "request_id": "request-status",
             "idempotency_key": "idempotency-status",
             "command": "status",
@@ -92,7 +100,7 @@ class ControlRouterTests(unittest.TestCase):
 
         invalid = [
             {**valid_status, "actor": "uid:0"},
-            {**valid_status, "version": "1.0.0"},
+            {**valid_status, "version": "1.0"},
             {**valid_status, "command": "claim"},
             {**valid_status, "command": "pause_global", "payload": {}},
             {
@@ -182,11 +190,62 @@ class ControlRouterTests(unittest.TestCase):
             invalid_clock_router.dispatch(pause_request, peer_uid=1200)
         self.assertEqual(self.backend.calls, [])
 
+    def test_submit_and_lookup_preserve_closed_shapes_and_current_time(self) -> None:
+        documents = {
+            "job_spec": {"object_id": "job-synthetic"},
+            "permit": {"object_id": "permit-synthetic"},
+            "lease": {"object_id": "lease-synthetic"},
+        }
+        submitted = self.router.dispatch(
+            request("submit", documents),
+            peer_uid=1200,
+        )
+        self.assertEqual(
+            submitted.result["execution_receipt"],
+            {"object_id": "execution-receipt-synthetic"},
+        )
+        self.assertEqual(
+            self.backend.calls[-1],
+            (
+                "submit",
+                {
+                    **documents,
+                    "idempotency_key": "idempotency-submit",
+                    "now": "2026-01-02T03:04:05Z",
+                },
+            ),
+        )
+
+        looked_up = self.router.dispatch(
+            request("lookup", {"job_spec_ref": "job-synthetic"}),
+            peer_uid=1200,
+        )
+        self.assertEqual(
+            looked_up.result["execution_receipt"],
+            {"object_id": "execution-receipt-synthetic"},
+        )
+        self.assertEqual(
+            self.backend.calls[-1],
+            ("lookup", {"job_spec_ref": "job-synthetic"}),
+        )
+
+        invalid_payloads = (
+            ("submit", {"job_spec": {}, "permit": {}}),
+            ("submit", {"job_spec": {}, "permit": {}, "lease": "lease"}),
+            ("lookup", {"job_spec_ref": ""}),
+            ("lookup", {"job_spec_ref": "job", "extra": True}),
+        )
+        before = list(self.backend.calls)
+        for command, payload in invalid_payloads:
+            with self.subTest(command=command, payload=payload):
+                with self.assertRaises(ControlError):
+                    request(command, payload)
+        self.assertEqual(self.backend.calls, before)
 
 class IPCMessageTests(unittest.TestCase):
     def test_encoding_is_bounded_canonical_newline_json(self) -> None:
         response = ControlResponse(
-            version="1.0",
+            version="1.1",
             request_id="request-status",
             command="status",
             result={"paused": False},
@@ -197,7 +256,7 @@ class IPCMessageTests(unittest.TestCase):
         self.assertEqual(decode_message(encoded), response.to_mapping())
         self.assertEqual(
             json.loads(encoded),
-            {"command": "status", "ok": True, "request_id": "request-status", "result": {"paused": False}, "version": "1.0"},
+            {"command": "status", "ok": True, "request_id": "request-status", "result": {"paused": False}, "version": "1.1"},
         )
 
     def test_decoding_rejects_bad_framing_duplicates_constants_and_oversize(self) -> None:
@@ -216,6 +275,16 @@ class IPCMessageTests(unittest.TestCase):
                 decode_message(frame)
         with self.assertRaises(IPCError):
             encode_message({"value": "x" * 65_536})
+        response_sized = encode_message(
+            {"value": "x" * 70_000},
+            maximum_bytes=262_144,
+        )
+        self.assertEqual(
+            decode_message(response_sized, maximum_bytes=262_144)["value"],
+            "x" * 70_000,
+        )
+        with self.assertRaises(IPCError):
+            encode_message({}, maximum_bytes=262_145)
 
     def test_operating_system_peer_credentials_are_available_on_unix_pair(self) -> None:
         left, right = socket.socketpair(socket.AF_UNIX, socket.SOCK_STREAM)
@@ -311,10 +380,10 @@ class UnixControlServerTests(unittest.TestCase):
 
     def test_malformed_unknown_and_oversized_requests_cause_zero_backend_calls(self) -> None:
         frames = [
-            b'{"version":"1.0"}\n',
+            b'{"version":"1.1"}\n',
             encode_message(
                 {
-                    "version": "1.0",
+                    "version": "1.1",
                     "request_id": "request-unknown",
                     "idempotency_key": "idempotency-unknown",
                     "command": "runner",

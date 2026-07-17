@@ -264,7 +264,7 @@ class _RecordingBackend:
 
 def _resume_request(approval_ref: str) -> ControlRequest:
     return ControlRequest(
-        version="1.0",
+        version="1.1",
         request_id="request-authority-policy-resume",
         idempotency_key="idempotency-authority-policy-resume",
         command="resume_global",

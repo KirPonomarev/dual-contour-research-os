@@ -17,10 +17,11 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable, Iterable, Mapping
 
-from .control import ControlRequest, ControlResponse, ControlRouter
+from .control import ControlError, ControlRequest, ControlResponse, ControlRouter
 
 
 _MAX_REQUEST_BYTES = 65_536
+_MAX_RESPONSE_BYTES = 262_144
 _MAX_DEADLINE_SECONDS = 5.0
 _SOCKET_MODE = 0o660
 
@@ -83,9 +84,14 @@ def resolve_peer_credentials(connection: socket.socket) -> PeerCredentials:
     raise IPCError("this platform exposes no supported local peer credential API")
 
 
-def encode_message(message: ControlResponse | Mapping[str, object]) -> bytes:
+def encode_message(
+    message: ControlResponse | Mapping[str, object],
+    *,
+    maximum_bytes: int = _MAX_REQUEST_BYTES,
+) -> bytes:
     """Encode one canonical JSON object followed by exactly one newline."""
 
+    limit = _message_limit(maximum_bytes)
     if isinstance(message, ControlResponse):
         value: object = message.to_mapping()
     elif isinstance(message, Mapping):
@@ -102,17 +108,22 @@ def encode_message(message: ControlResponse | Mapping[str, object]) -> bytes:
         ).encode("ascii") + b"\n"
     except (TypeError, ValueError, UnicodeError) as exc:
         raise IPCError("IPC message is not canonical JSON data") from exc
-    if len(encoded) > _MAX_REQUEST_BYTES:
-        raise IPCError("IPC message exceeds 65536 bytes")
+    if len(encoded) > limit:
+        raise IPCError("IPC message exceeds its configured byte limit")
     return encoded
 
 
-def decode_message(data: bytes) -> dict[str, object]:
+def decode_message(
+    data: bytes,
+    *,
+    maximum_bytes: int = _MAX_REQUEST_BYTES,
+) -> dict[str, object]:
     """Strictly decode one size-bounded newline-terminated JSON object."""
 
+    limit = _message_limit(maximum_bytes)
     if not isinstance(data, bytes):
         raise IPCError("IPC frame must be bytes")
-    if not data or len(data) > _MAX_REQUEST_BYTES:
+    if not data or len(data) > limit:
         raise IPCError("IPC frame size is invalid")
     if not data.endswith(b"\n") or b"\n" in data[:-1] or b"\r" in data:
         raise IPCError("IPC frame must contain exactly one trailing newline")
@@ -223,6 +234,27 @@ class UnixControlServer:
         with connection:
             return self.handle_connection(connection)
 
+    def serve_forever(self) -> None:
+        """Serially serve local requests until another thread closes the server."""
+
+        if self._listener is None:
+            raise IPCError("Unix control server is not started")
+        while True:
+            listener = self._listener
+            if listener is None:
+                return
+            try:
+                connection, _ = listener.accept()
+            except OSError as exc:
+                if self._listener is None:
+                    return
+                raise IPCError("could not accept Unix control connection") from exc
+            with connection:
+                try:
+                    self.handle_connection(connection)
+                except (ControlError, IPCError):
+                    continue
+
     def handle_connection(self, connection: socket.socket) -> ControlResponse:
         """Authenticate before parsing and dispatch exactly one request."""
 
@@ -245,7 +277,7 @@ class UnixControlServer:
         decoded = decode_message(frame)
         request = ControlRequest.from_mapping(decoded)
         response = self._router.dispatch(request, peer_uid=credentials.uid)
-        encoded = encode_message(response)
+        encoded = encode_message(response, maximum_bytes=_MAX_RESPONSE_BYTES)
         self._set_remaining_timeout(connection, deadline)
         try:
             connection.sendall(encoded)
@@ -327,6 +359,15 @@ def _strict_object(pairs: list[tuple[str, object]]) -> dict[str, object]:
             raise IPCError("duplicate JSON object key")
         result[key] = value
     return result
+
+
+def _message_limit(value: object) -> int:
+    if type(value) is not int or value not in {
+        _MAX_REQUEST_BYTES,
+        _MAX_RESPONSE_BYTES,
+    }:
+        raise IPCError("IPC byte limit is not an authorized protocol bound")
+    return value
 
 
 def _reject_json_constant(value: str) -> object:
