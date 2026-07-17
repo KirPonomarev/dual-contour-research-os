@@ -602,6 +602,33 @@ class Stage2AuthorityTests(unittest.TestCase):
         self.assertIn("checkpoint-runtime-payload-never-enters-public-Bridge-repository-or-public-receipt", public_text)
         self.assertIn("corrupt-checkpoint-handling-or-backup-restore-implementation-in-this-slice", public_text)
 
+    def test_market_crash_resume_worker_lease_is_exact_and_receipt_bound(self) -> None:
+        receipt = load(INTEGRATION_RECEIPTS / "s2-market-crash-resume-authority.json")
+        envelope = load(
+            STAGES / "s2-market-crash-resume" / "stage-envelope.json"
+        )
+        lease = load(
+            STAGES / "s2-market-crash-resume" / "ownership-lease.json"
+        )
+
+        self.assertEqual(receipt["schema_id"], "IntegrationReceipt")
+        self.assertEqual(receipt["integrity"]["payload_sha256"], payload_sha256(receipt))
+        self.assertEqual(receipt["payload"]["head_sha"], "b3f432b576ee8a7e3bcc3ad7b074bbc28a748d9d")
+        self.assertFalse(receipt["payload"]["audit_results"]["declares_market_pre_soak_green"])
+        self.assertFalse(receipt["payload"]["audit_results"]["public_runtime_checkpoint_payload_in_public_repo"])
+        self.assertFalse(receipt["payload"]["audit_results"]["corrupt_checkpoint_scope_included"])
+        self.assertFalse(receipt["payload"]["audit_results"]["backup_restore_scope_included"])
+        self.assertEqual(envelope["public_authority_sha"], receipt["payload"]["head_sha"])
+        self.assertEqual(envelope["public_authority_ci"], "29612186144")
+        self.assertEqual(envelope["dependency_hashes"]["authority_receipt"], receipt["integrity"]["payload_sha256"])
+        self.assertEqual(envelope["write_set"], lease["write_set"])
+        self.assertFalse(lease["delegation_allowed"])
+        self.assertFalse(envelope["push_authority"])
+        self.assertIn(
+            "resume-verifier-accepts-result-sha-mismatch-no-checkpoint-before-crash-no-resumed-chunks-no-new-chunks-duplicate-completion-stale-fencing-accepted-private-account-order-live-paper-authority-or-runtime-payload-public-copy",
+            envelope["stop_conditions"],
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

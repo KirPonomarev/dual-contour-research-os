@@ -1,0 +1,19 @@
+{
+  "lease_id": "lease-s2-market-crash-resume-agent-3-20260717",
+  "stage_id": "s2-market-crash-resume",
+  "agent_id": "agent-3",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-17T22:09:00Z",
+  "expires_at": "2026-07-18T04:09:00Z",
+  "base_sha": "af8553df113fa1282638b00429a9966b0f76dbab",
+  "public_authority_sha": "b3f432b576ee8a7e3bcc3ad7b074bbc28a748d9d",
+  "branch": "codex/bridge-a3-s2-market-crash-resume",
+  "worktree": "ephemeral-private-domain-worktree:s2-market-crash-resume",
+  "write_set": [
+    "data/bridge_pre_soak/crash_resume/market_pre_soak_crash_resume_profile.json",
+    "src/market_lab/bridge_pre_soak_crash_resume.py",
+    "tests/test_bridge_pre_soak_crash_resume.py"
+  ],
+  "delegation_allowed": false,
+  "state": "active"
+}

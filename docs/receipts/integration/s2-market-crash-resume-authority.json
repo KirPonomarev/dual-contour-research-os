@@ -1,0 +1,63 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s2-market-crash-resume-authority-20260717",
+  "issued_at": "2026-07-17T22:08:00Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "market",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s2-market-crash-resume-authority",
+    "agent_id": "agent-0",
+    "ownership_lease_ref": "stages/s2-market-crash-resume-authority/ownership-lease.json",
+    "base_sha": "718623dd2f8258025960fa533b52de6903e670c2",
+    "head_sha": "b3f432b576ee8a7e3bcc3ad7b074bbc28a748d9d",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "docs/receipts/source-freeze/s2-market-crash-resume.json",
+      "docs/receipts/reuse/s2-market-crash-resume.json",
+      "stages/s2-market-crash-resume-authority/stage-envelope.json",
+      "stages/s2-market-crash-resume-authority/ownership-lease.json",
+      "tests/test_stage2_authority.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "focused_stage2_authority_tests": 19,
+      "canonical_tests": 328,
+      "stage0b_tests": 25,
+      "skipped_tests": 0,
+      "diff_check": "green",
+      "privacy_secret_scan": "green",
+      "privacy_secret_scan_notes": "intentional deny-list literals only; no secret material detected",
+      "source_mutation": false,
+      "public_source_mutation": false,
+      "private_source_mutation": false,
+      "dependency_adoption": false,
+      "frozen_contract_edit": false,
+      "selected_private_head_clean": true,
+      "selected_private_head": "af8553df113fa1282638b00429a9966b0f76dbab",
+      "authorized_worker_files": 3,
+      "public_runtime_checkpoint_payload_in_public_repo": false,
+      "declares_market_pre_soak_green": false,
+      "corrupt_checkpoint_scope_included": false,
+      "backup_restore_scope_included": false,
+      "live_or_connected_authority": false,
+      "exact_head_remote_ci": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29612186144"
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29612186144",
+    "integration_commit_sha": "b3f432b576ee8a7e3bcc3ad7b074bbc28a748d9d"
+  },
+  "integrity": {
+    "payload_sha256": "f4fc93652b9ba6c7a5c43e25380f70051d0f6e4784279f3370e099fa2b0a27a2",
+    "parent_refs": [
+      "git:b3f432b576ee8a7e3bcc3ad7b074bbc28a748d9d",
+      "git:af8553df113fa1282638b00429a9966b0f76dbab",
+      "ci:29612186144",
+      "source-freeze:source-freeze-market-s2-crash-resume-20260717",
+      "reuse:reuse-s2-market-crash-resume-20260717"
+    ]
+  }
+}
