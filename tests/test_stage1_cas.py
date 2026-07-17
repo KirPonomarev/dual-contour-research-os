@@ -73,6 +73,81 @@ class ContentAddressedStoreTests(unittest.TestCase):
         mode = os.lstat(self.root / "objects" / first.sha256).st_mode
         self.assertEqual(stat.S_IMODE(mode), 0o444)
 
+    def test_bounded_read_returns_exact_verified_bytes_without_store_mutation(self) -> None:
+        store = self.store()
+        payload = b"synthetic bounded terminal material"
+        published = self.publish(store, payload)
+        before = (store.object_count(), store.used_bytes())
+
+        self.assertEqual(
+            store.read_bytes(
+                published.ref,
+                maximum_size_bytes=len(payload),
+            ),
+            payload,
+        )
+        self.assertEqual((store.object_count(), store.used_bytes()), before)
+
+        for maximum in (len(payload) - 1, -1, True, 1.5):
+            with self.subTest(maximum=maximum), self.assertRaises(CASError):
+                store.read_bytes(  # type: ignore[arg-type]
+                    published.ref,
+                    maximum_size_bytes=maximum,
+                )
+        self.assertEqual((store.object_count(), store.used_bytes()), before)
+
+    def test_bounded_read_rejects_missing_symlink_wrong_mode_and_tampering(self) -> None:
+        store = self.store()
+        payload = b"trusted terminal"
+        published = self.publish(store, payload)
+        canonical = self.root / "objects" / published.sha256
+
+        with self.assertRaises(CASError):
+            store.read_bytes(
+                f"cas:sha256:{'0' * 64}",
+                maximum_size_bytes=1024,
+            )
+
+        canonical.chmod(0o644)
+        with self.assertRaises(CASError):
+            store.read_bytes(published.ref, maximum_size_bytes=1024)
+        canonical.write_bytes(b"tampered terminal")
+        canonical.chmod(0o444)
+        with self.assertRaises(CASError):
+            store.read_bytes(published.ref, maximum_size_bytes=1024)
+
+        canonical.chmod(0o600)
+        canonical.unlink()
+        external = self.base / "external-terminal"
+        external.write_bytes(payload)
+        canonical.symlink_to(external)
+        with self.assertRaises(CASError):
+            store.read_bytes(published.ref, maximum_size_bytes=1024)
+
+    def test_bounded_read_rejects_canonical_path_swap_during_streaming(self) -> None:
+        store = self.store(chunk_size=3)
+        payload = b"stable-terminal-material"
+        published = self.publish(store, payload)
+        canonical = self.root / "objects" / published.sha256
+        replacement = self.base / "replacement-terminal"
+        replacement.write_bytes(payload)
+        real_read = os.read
+        swapped = False
+
+        def swap_after_read(fd: int, size: int) -> bytes:
+            nonlocal swapped
+            block = real_read(fd, size)
+            if block and not swapped:
+                swapped = True
+                canonical.chmod(0o600)
+                canonical.unlink()
+                canonical.symlink_to(replacement)
+            return block
+
+        with mock.patch("research_bridge.cas.os.read", side_effect=swap_after_read):
+            with self.assertRaises(CASError):
+                store.read_bytes(published.ref, maximum_size_bytes=1024)
+
     def test_concurrent_same_digest_has_exactly_one_creator(self) -> None:
         payload = b"synthetic-concurrent-object"
         expected_digest, expected_size = self.write_source(payload)

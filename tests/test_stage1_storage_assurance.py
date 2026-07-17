@@ -527,6 +527,7 @@ class Stage1StorageStaticBoundaryTests(unittest.TestCase):
                 "publish",
                 "inspect",
                 "verify",
+                "read_bytes",
                 "used_bytes",
                 "object_count",
                 "reconcile_orphans",
@@ -563,6 +564,7 @@ class Stage1StorageStaticBoundaryTests(unittest.TestCase):
         for method_name, parameters in (
             ("inspect", ["self", "ref"]),
             ("verify", ["self", "ref"]),
+            ("read_bytes", ["self", "ref", "maximum_size_bytes"]),
             ("used_bytes", ["self"]),
             ("object_count", ["self"]),
         ):
@@ -574,6 +576,12 @@ class Stage1StorageStaticBoundaryTests(unittest.TestCase):
                 ),
                 parameters,
             )
+        self.assertEqual(
+            inspect.signature(ContentAddressedStore.read_bytes)
+            .parameters["maximum_size_bytes"]
+            .kind,
+            inspect.Parameter.KEYWORD_ONLY,
+        )
 
         ingestor_constructor = inspect.signature(TrustedIngestor)
         self.assertEqual(

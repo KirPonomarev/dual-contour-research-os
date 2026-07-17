@@ -388,7 +388,8 @@ class Fixture:
         self.checkpoint_arguments: dict[str, Any] | None = None
         self.persisted_checkpoint_event_at: str | None = None
         self.completion_arguments: dict[str, Any] | None = None
-        self.publication_arguments: dict[str, Any] | None = None
+        self.publication_arguments: list[dict[str, Any]] = []
+        self.terminal_bytes: bytes | None = None
         self.ingestor_envelope: Mapping[str, Any] | None = None
         self.kernel = _Kernel(self)
         self.runner = _Runner(self)
@@ -443,18 +444,36 @@ class _Store:
 
     def publish(self, source_path: object, **arguments: Any) -> Publication:
         self.fixture.calls.append("checkpoint_store.publish")
-        self.fixture.publication_arguments = {
+        publication_arguments = {
             "source_path": source_path,
             **arguments,
         }
-        if self.fixture.failure == "checkpoint_store.publish":
+        self.fixture.publication_arguments.append(publication_arguments)
+        source = Path(source_path)  # type: ignore[arg-type]
+        if source.name == "terminal.json":
+            self.fixture.terminal_bytes = source.read_bytes()
+        if self.fixture.failure == "checkpoint_store.publish" or (
+            self.fixture.failure == "terminal_store.publish"
+            and source.name == "terminal.json"
+        ):
             raise RuntimeError("synthetic publication failure")
         return Publication(
-            ref=f"cas:sha256:{CHECKPOINT_FILE_SHA}",
-            sha256=CHECKPOINT_FILE_SHA,
-            size_bytes=len(CHECKPOINT_BYTES),
+            ref=f"cas:sha256:{arguments['expected_sha256']}",
+            sha256=arguments["expected_sha256"],
+            size_bytes=arguments["expected_size_bytes"],
             created=True,
         )
+
+    def read_bytes(self, ref: str, *, maximum_size_bytes: int) -> bytes:
+        self.fixture.calls.append("checkpoint_store.read_bytes")
+        if self.fixture.failure == "checkpoint_store.read_bytes":
+            raise RuntimeError("synthetic bounded read failure")
+        if self.fixture.failure == "checkpoint_store.read_mismatch":
+            return b"synthetic-mismatch"
+        assert self.fixture.terminal_bytes is not None
+        if len(self.fixture.terminal_bytes) > maximum_size_bytes:
+            raise RuntimeError("synthetic bounded read overflow")
+        return self.fixture.terminal_bytes
 
 
 class _Ledger:
@@ -574,6 +593,8 @@ class OfflineExecutionCoordinatorTests(unittest.TestCase):
                 "checkpoint_store.publish",
                 "ledger.checkpoint",
                 "ingestor.ingest",
+                "checkpoint_store.publish",
+                "checkpoint_store.read_bytes",
                 "ledger.complete",
                 "execution_receipt.construct",
             ],
@@ -584,12 +605,26 @@ class OfflineExecutionCoordinatorTests(unittest.TestCase):
             ["checkpoint_manifest", "artifact_records", "execution_receipt"],
         )
         self.assertEqual(
-            fixture.publication_arguments,
+            fixture.publication_arguments[0],
             {
                 "source_path": self.root / "checkpoint.json",
                 "expected_sha256": CHECKPOINT_FILE_SHA,
                 "expected_size_bytes": len(CHECKPOINT_BYTES),
             },
+        )
+        terminal_publication = fixture.publication_arguments[1]
+        self.assertIsNotNone(fixture.terminal_bytes)
+        self.assertEqual(
+            terminal_publication["expected_size_bytes"],
+            len(fixture.terminal_bytes),
+        )
+        self.assertEqual(
+            terminal_publication["expected_sha256"],
+            hashlib.sha256(fixture.terminal_bytes).hexdigest(),
+        )
+        self.assertEqual(
+            fixture.completion_arguments["result_sha256"],
+            terminal_publication["expected_sha256"],
         )
         self.assertNotEqual(CHECKPOINT_FILE_SHA, STATE_SHA)
         self.assertEqual(fixture.checkpoint_arguments["state_sha256"], STATE_SHA)
@@ -668,17 +703,38 @@ class OfflineExecutionCoordinatorTests(unittest.TestCase):
         self.assertEqual(fixture.checkpoint_arguments["event_at"], ENDED_AT)
         self.assertEqual(record.checkpoint_manifest["issued_at"], AT)
         self.assertEqual(fixture.completion_arguments["event_at"], ENDED_AT)
-        completion_binding = {
-            "artifact_refs": [
-                artifact.artifact_ref for artifact in record.artifact_records
-            ],
-            "checkpoint_manifest_sha256": canonical_json_sha256(
-                record.checkpoint_manifest
-            ),
-        }
+        terminal_material = json.loads(fixture.terminal_bytes)
+        self.assertEqual(
+            set(terminal_material),
+            {
+                "schema_id",
+                "schema_version",
+                "job_spec_ref",
+                "permit_ref",
+                "lease_ref",
+                "attempt_id",
+                "issuer_id",
+                "contour",
+                "classification",
+                "code_sha256",
+                "input_sha256",
+                "environment_digest",
+                "started_at",
+                "ended_at",
+                "exit_classification",
+                "artifact_refs",
+                "resource_usage",
+                "checkpoint_manifest_object_id",
+                "checkpoint_manifest_sha256",
+            },
+        )
+        self.assertEqual(
+            terminal_material["checkpoint_manifest_sha256"],
+            canonical_json_sha256(record.checkpoint_manifest),
+        )
         self.assertEqual(
             fixture.completion_arguments["result_sha256"],
-            canonical_json_sha256(completion_binding),
+            hashlib.sha256(fixture.terminal_bytes).hexdigest(),
         )
 
     def test_every_dependency_failure_has_no_receipt_and_stops_later_calls(self) -> None:
@@ -703,13 +759,41 @@ class OfflineExecutionCoordinatorTests(unittest.TestCase):
                 "ledger.checkpoint",
                 "ingestor.ingest",
             ],
+            "terminal_store.publish": [
+                "kernel.claim",
+                "runner.run",
+                "checkpoint_store.publish",
+                "ledger.checkpoint",
+                "ingestor.ingest",
+                "checkpoint_store.publish",
+            ],
             "ledger.complete": [
                 "kernel.claim",
                 "runner.run",
                 "checkpoint_store.publish",
                 "ledger.checkpoint",
                 "ingestor.ingest",
+                "checkpoint_store.publish",
+                "checkpoint_store.read_bytes",
                 "ledger.complete",
+            ],
+            "checkpoint_store.read_bytes": [
+                "kernel.claim",
+                "runner.run",
+                "checkpoint_store.publish",
+                "ledger.checkpoint",
+                "ingestor.ingest",
+                "checkpoint_store.publish",
+                "checkpoint_store.read_bytes",
+            ],
+            "checkpoint_store.read_mismatch": [
+                "kernel.claim",
+                "runner.run",
+                "checkpoint_store.publish",
+                "ledger.checkpoint",
+                "ingestor.ingest",
+                "checkpoint_store.publish",
+                "checkpoint_store.read_bytes",
             ],
         }
         for failure, calls in expected_calls.items():
