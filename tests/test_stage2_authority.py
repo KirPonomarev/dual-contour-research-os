@@ -785,6 +785,50 @@ class Stage2AuthorityTests(unittest.TestCase):
             envelope["stop_conditions"],
         )
 
+    def test_market_corrupt_checkpoint_worker_receipt_is_sanitized_slice_only(self) -> None:
+        receipt = load(INTEGRATION_RECEIPTS / "s2-market-corrupt-checkpoint.json")
+
+        self.assertEqual(receipt["schema_id"], "IntegrationReceipt")
+        self.assertEqual(receipt["integrity"]["payload_sha256"], payload_sha256(receipt))
+        self.assertEqual(
+            receipt["payload"]["head_sha"],
+            "2aabfb89946b6f82a175f7787766d9118c18f229",
+        )
+        audit = receipt["payload"]["audit_results"]
+        self.assertEqual(audit["focused_corrupt_checkpoint_tests"], 20)
+        self.assertEqual(audit["bounded_corrupt_checkpoint_regression_tests"], 57)
+        self.assertFalse(audit["private_full_suite_run"])
+        self.assertEqual(
+            audit["corrupt_checkpoint_profile_file_sha256"],
+            "0be98e9efb9ca5da3bf7af91fcba99e75e3ea8204f90d79f9db9f47852709e94",
+        )
+        self.assertEqual(audit["supported_detection_kind_count"], 3)
+        self.assertEqual(audit["detection_kind"], "checkpoint_hash_drift")
+        self.assertEqual(audit["final_state"], "RECOVERY_REQUIRED")
+        self.assertEqual(audit["new_work_after_detection"], 0)
+        self.assertEqual(audit["completion_count"], 0)
+        self.assertEqual(audit["runtime_payload_bytes_exported"], 0)
+        self.assertEqual(
+            audit["validation_receipt_outcome"],
+            "CORRUPT_CHECKPOINT_FAIL_CLOSED_PASS",
+        )
+        self.assertFalse(audit["scientific_outcome_applied"])
+        self.assertFalse(audit["public_runtime_checkpoint_payload_in_public_repo"])
+        self.assertFalse(audit["public_result_payload_in_public_repo"])
+        self.assertFalse(audit["silent_repair_performed"])
+        self.assertFalse(audit["checkpoint_delete_or_overwrite_performed"])
+        self.assertFalse(audit["backup_restore_scope_included"])
+        self.assertFalse(audit["network_during_validation_or_tests"])
+        self.assertFalse(audit["declares_market_pre_soak_green"])
+
+        text = (INTEGRATION_RECEIPTS / "s2-market-corrupt-checkpoint.json").read_text()
+        self.assertNotIn("domain-vault:market", text)
+        self.assertNotIn('"checkpoint_payload":', text)
+        self.assertNotIn('"result_payload":', text)
+        self.assertNotIn("ledger.sqlite3", text)
+        self.assertNotIn("/Users/", text)
+        self.assertNotIn("/Volumes/", text)
+
 
 if __name__ == "__main__":
     unittest.main()
