@@ -1,0 +1,20 @@
+{
+  "lease_id": "lease-s2-market-backup-restore-authority-agent-0-20260717",
+  "stage_id": "s2-market-backup-restore-authority",
+  "agent_id": "agent-0",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-17T23:50:00Z",
+  "expires_at": "2026-07-18T05:50:00Z",
+  "base_sha": "007e13f21da5ac1da7f5d6bb2119d1b0ccfa9b6a",
+  "branch": "main",
+  "worktree": "canonical-public-worktree",
+  "write_set": [
+    "docs/receipts/source-freeze/s2-market-backup-restore.json",
+    "docs/receipts/reuse/s2-market-backup-restore.json",
+    "stages/s2-market-backup-restore-authority/stage-envelope.json",
+    "stages/s2-market-backup-restore-authority/ownership-lease.json",
+    "tests/test_stage2_authority.py"
+  ],
+  "delegation_allowed": false,
+  "state": "active"
+}

@@ -829,6 +829,61 @@ class Stage2AuthorityTests(unittest.TestCase):
         self.assertNotIn("/Users/", text)
         self.assertNotIn("/Volumes/", text)
 
+    def test_market_backup_restore_source_reuse_and_authority_are_exact(self) -> None:
+        source = load(SOURCE_RECEIPTS / "s2-market-backup-restore.json")
+        reuse = load(REUSE_RECEIPTS / "s2-market-backup-restore.json")
+        envelope = load(
+            STAGES / "s2-market-backup-restore-authority" / "stage-envelope.json"
+        )
+        lease = load(
+            STAGES / "s2-market-backup-restore-authority" / "ownership-lease.json"
+        )
+
+        self.assertEqual(source["integrity"]["payload_sha256"], payload_sha256(source))
+        self.assertEqual(reuse["integrity"]["payload_sha256"], payload_sha256(reuse))
+        self.assertEqual(
+            source["payload"]["selected_source_sha"],
+            "2aabfb89946b6f82a175f7787766d9118c18f229",
+        )
+        self.assertEqual(
+            reuse["payload"]["selected_mode"],
+            "existing-private-Market-immutable-receipt-last-backup-plus-clean-restore-smoke-owner-stdlib-adapter-no-public-payload",
+        )
+        self.assertEqual(
+            reuse["payload"]["code_sha256"],
+            "2690d3525abe2a390f9f0d181a891e8ab2d4d95a9ad0cbb14b8e705b11853a4b",
+        )
+        self.assertEqual(envelope["base_sha"], "007e13f21da5ac1da7f5d6bb2119d1b0ccfa9b6a")
+        self.assertEqual(envelope["write_set"], lease["write_set"])
+        self.assertFalse(lease["delegation_allowed"])
+        contract = envelope["backup_restore_contract"]
+        self.assertFalse(contract["declares_market_pre_soak_green"])
+        self.assertFalse(contract["declares_ready_for_72h_soak"])
+        self.assertIn(
+            "source-manifest-sha256-equals-restored-manifest-sha256",
+            contract["invariants"],
+        )
+        self.assertEqual(len(envelope["authorized_worker_stage"]["write_set"]), 3)
+        self.assertFalse(envelope["authorized_worker_stage"]["push_authority"])
+
+    def test_market_backup_restore_authority_is_local_hash_only_and_non_live(self) -> None:
+        public_text = "\n".join(
+            [
+                (SOURCE_RECEIPTS / "s2-market-backup-restore.json").read_text(),
+                (REUSE_RECEIPTS / "s2-market-backup-restore.json").read_text(),
+                (STAGES / "s2-market-backup-restore-authority" / "stage-envelope.json").read_text(),
+                (STAGES / "s2-market-backup-restore-authority" / "ownership-lease.json").read_text(),
+            ]
+        )
+        self.assertNotIn("/Users/", public_text)
+        self.assertNotIn("/Volumes/", public_text)
+        self.assertNotIn("api_key", public_text.lower())
+        self.assertNotIn("secret_key", public_text.lower())
+        self.assertNotIn("access_token", public_text.lower())
+        self.assertIn("local-durable-synthetic-pre-soak", public_text)
+        self.assertIn("READY_FOR_72H_SOAK", public_text)
+        self.assertIn("deferred-immutable-pre-soak-deploy-gate", public_text)
+
 
 if __name__ == "__main__":
     unittest.main()

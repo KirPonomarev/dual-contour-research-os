@@ -1,0 +1,46 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-s2-market-backup-restore-20260717",
+  "issued_at": "2026-07-17T23:50:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-freeze-authority"},
+  "contour": "market",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "market-pre-soak-local-durable-immutable-backup-clean-restore-and-hash-equivalence-drill",
+    "candidates": [
+      {"candidate": "existing-private-Market-build_recovery_artifact_backup-owned-stdlib-component", "disposition": "selected-internal-adapter"},
+      {"candidate": "existing-private-Market-receipt-last-immutable-publication-restore-smoke-and-idempotency-tests", "disposition": "selected-test-and-recovery-boundary"},
+      {"candidate": "existing-public-Bridge-BackupReceipt-RestoreReceipt-and-ValidationReceipt-contract-shapes", "disposition": "selected-contract-boundary"},
+      {"candidate": "existing-Stage2-corrupt-checkpoint-and-crash-resume-lineage", "disposition": "selected-lineage"},
+      {"candidate": "owner-local-stdlib-profile-adapter-contract-projection-and-tests", "disposition": "selected-minimal-glue"},
+      {"candidate": "restic-encrypted-off-host-deployment-backup", "disposition": "deferred-immutable-pre-soak-deploy-gate-not-claimed-by-local-stage2-drill"},
+      {"candidate": "new-external-backup-library-or-service", "disposition": "rejected-unnecessary-for-bounded-local-pre-soak-slice"},
+      {"candidate": "public-copy-of-backup-archive-restored-files-private-results-or-checkpoint-bytes", "disposition": "rejected-boundary"}
+    ],
+    "selected_mode": "existing-private-Market-immutable-receipt-last-backup-plus-clean-restore-smoke-owner-stdlib-adapter-no-public-payload",
+    "source_ref": "source-freeze:source-freeze-market-s2-backup-restore-20260717;git:2aabfb89946b6f82a175f7787766d9118c18f229;git:007e13f21da5ac1da7f5d6bb2119d1b0ccfa9b6a",
+    "code_sha256": "2690d3525abe2a390f9f0d181a891e8ab2d4d95a9ad0cbb14b8e705b11853a4b",
+    "license_spdx": "Proprietary-Internal-Owned",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "execute a real synthetic immutable backup and clean restore smoke using the frozen owned component",
+      "prove source manifest and restored manifest hashes match and receipt is published last",
+      "prove second identical backup is idempotent and corrupted archive checksum symlink drift and insufficient storage fail closed",
+      "emit BackupReceipt RestoreReceipt and ValidationReceipt shapes containing hashes refs counts and local-drill classification only",
+      "do not claim encrypted off-host backup READY_FOR_72H_SOAK or deployment readiness",
+      "no runtime archive restored bytes checkpoint database private path or domain truth enters public Bridge"
+    ],
+    "canonical_owner": "private-Market-backup-restore-validator-and-Agent0-cross-repository-integration",
+    "rollback": "Discard only the isolated private profile adapter tests and ephemeral local drill artifacts. No public payload, off-host system, Market truth, live runtime, or owner checkout is changed."
+  },
+  "integrity": {
+    "payload_sha256": "99c47db59bbb278a61f5869be0ad862727c15fd31aa84907c586162e5cd8254c",
+    "parent_refs": [
+      "source-freeze:source-freeze-market-s2-backup-restore-20260717",
+      "sha256:884de7a21ad5b5fb496cedbc7a9b37bd4c9c5ef0fb3ae74e00e2ef03ef21f9aa",
+      "git:2aabfb89946b6f82a175f7787766d9118c18f229",
+      "git:007e13f21da5ac1da7f5d6bb2119d1b0ccfa9b6a"
+    ]
+  }
+}

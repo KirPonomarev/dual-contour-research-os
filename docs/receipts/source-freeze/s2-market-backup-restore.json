@@ -1,0 +1,33 @@
+{
+  "schema_id": "SourceFreezeReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "source-freeze-market-s2-backup-restore-20260717",
+  "issued_at": "2026-07-17T23:50:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "source-freeze-authority"},
+  "contour": "market",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "source_repo": "crypto-market-lab",
+    "remote": "sha256:c4d97d3379ba70f130a546a4d44b646c935f33e3b1447e0aac185c0d38215815",
+    "branch": "sha256:06c6d546bd70182f932de85ca877afaf13189008d78f28b51145530a265c9c99",
+    "head_sha": "2aabfb89946b6f82a175f7787766d9118c18f229",
+    "upstream_sha": "2aabfb89946b6f82a175f7787766d9118c18f229",
+    "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "untracked_manifest_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "path_dispositions": [
+      {"category": "tracked_worktree_changes", "count": 0, "disposition": "none-clean-selected-market-corrupt-checkpoint-head"},
+      {"category": "untracked_worktree_entries", "count": 0, "disposition": "none-clean-selected-market-corrupt-checkpoint-head"},
+      {"category": "backup-restore-runtime-payload", "count": 0, "disposition": "not-copied-to-public-repository-private-ephemeral-drill-only"}
+    ],
+    "selected_source_sha": "2aabfb89946b6f82a175f7787766d9118c18f229"
+  },
+  "integrity": {
+    "payload_sha256": "884de7a21ad5b5fb496cedbc7a9b37bd4c9c5ef0fb3ae74e00e2ef03ef21f9aa",
+    "parent_refs": [
+      "git:2aabfb89946b6f82a175f7787766d9118c18f229",
+      "integration:integration-s2-market-corrupt-checkpoint-20260717",
+      "integration:integration-s2-market-crash-resume-20260717",
+      "integration:integration-s2-market-sealed-holdout-20260717"
+    ]
+  }
+}
