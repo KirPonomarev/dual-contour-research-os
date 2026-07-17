@@ -995,6 +995,45 @@ class Stage1AuthorityTests(unittest.TestCase):
         self.assertFalse(envelope["push_authority"])
         self.assertFalse(lease["delegation_allowed"])
 
+    def test_security_offline_reference_e2e_base_amendment_is_non_expansive_and_sanitized(self) -> None:
+        original = load(
+            ROOT
+            / "stages"
+            / "s1-security-offline-reference-e2e"
+            / "stage-envelope.json"
+        )
+        amendment = load(
+            ROOT
+            / "stages"
+            / "s1-security-offline-reference-e2e"
+            / "stage-envelope-amendment-1.json"
+        )
+        lease = load(
+            ROOT
+            / "stages"
+            / "s1-security-offline-reference-e2e"
+            / "ownership-lease-amendment-1.json"
+        )
+
+        self.assertEqual(amendment["amends_stage_id"], original["stage_id"])
+        self.assertEqual(
+            amendment["prior_base_sha"],
+            "c88ffdb3e90971f1b2369f11ebe3a44d46d20470",
+        )
+        self.assertEqual(
+            amendment["base_sha"],
+            "1f0b9deaa84c2feba6f361e3684ff858a65b3d10",
+        )
+        self.assertEqual(amendment["write_set_expansion"], [])
+        self.assertEqual(lease["write_set"], original["write_set"])
+        self.assertFalse(amendment["push_authority"])
+        self.assertFalse(lease["delegation_allowed"])
+        public_text = json.dumps([amendment, lease], sort_keys=True)
+        self.assertNotIn("/Users/", public_text)
+        self.assertNotIn("/Volumes/", public_text)
+        self.assertNotIn("programs/max/", public_text)
+        self.assertNotIn("programs/ozon/", public_text)
+
     def test_market_base_authority_refresh_is_sanitized_pinned_and_reversible(self) -> None:
         envelope = load(ROOT / "stages" / "s1-market-base-authority" / "stage-envelope.json")
         lease = load(ROOT / "stages" / "s1-market-base-authority" / "ownership-lease.json")
