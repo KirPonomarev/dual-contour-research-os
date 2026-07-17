@@ -908,6 +908,48 @@ class Stage2AuthorityTests(unittest.TestCase):
         self.assertFalse(lease["delegation_allowed"])
         self.assertFalse(envelope["push_authority"])
 
+    def test_market_backup_restore_worker_receipt_completes_slices_without_premature_gate(self) -> None:
+        receipt = load(INTEGRATION_RECEIPTS / "s2-market-backup-restore.json")
+
+        self.assertEqual(receipt["integrity"]["payload_sha256"], payload_sha256(receipt))
+        self.assertEqual(
+            receipt["payload"]["head_sha"],
+            "6aa2c0b9db0534c478466daf8a4ea32665f56c3f",
+        )
+        audit = receipt["payload"]["audit_results"]
+        self.assertEqual(audit["focused_backup_restore_tests"], 19)
+        self.assertEqual(audit["bounded_backup_restore_regression_tests"], 71)
+        self.assertEqual(audit["source_file_count"], 3)
+        self.assertEqual(audit["total_bytes"], 461)
+        self.assertEqual(
+            audit["source_manifest_sha256"], audit["restored_manifest_sha256"]
+        )
+        self.assertTrue(audit["restore_smoke"])
+        self.assertTrue(audit["idempotent_second_backup"])
+        self.assertFalse(audit["encrypted"])
+        self.assertFalse(audit["off_host"])
+        self.assertEqual(audit["runtime_payload_bytes_exported"], 0)
+        self.assertEqual(
+            audit["validation_receipt_outcome"], "BACKUP_RESTORE_LOCAL_DRILL_PASS"
+        )
+        self.assertTrue(audit["completes_stage2_required_slices"])
+        self.assertFalse(audit["declares_market_pre_soak_green"])
+        self.assertEqual(
+            audit["market_pre_soak_green_status"],
+            "pending-exact-head-public-integration-ci",
+        )
+        self.assertFalse(audit["declares_ready_for_72h_soak"])
+        self.assertFalse(audit["encrypted_off_host_backup_claimed"])
+        self.assertFalse(audit["public_backup_or_restore_payload_in_public_repo"])
+        self.assertFalse(audit["network_during_validation_or_tests"])
+
+        text = (INTEGRATION_RECEIPTS / "s2-market-backup-restore.json").read_text()
+        self.assertNotIn('"backup_path":', text)
+        self.assertNotIn('"restore_path":', text)
+        self.assertNotIn('"archive_bytes":', text)
+        self.assertNotIn("/Users/", text)
+        self.assertNotIn("/Volumes/", text)
+
 
 if __name__ == "__main__":
     unittest.main()
