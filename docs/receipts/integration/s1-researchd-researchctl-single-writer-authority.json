@@ -1,0 +1,63 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s1-researchd-researchctl-single-writer-authority-20260717",
+  "issued_at": "2026-07-17T15:15:00Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "bridge",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s1-researchd-researchctl-single-writer-authority",
+    "agent_id": "agent-0",
+    "ownership_lease_ref": "stages/s1-researchd-researchctl-single-writer-authority/ownership-lease.json",
+    "base_sha": "9a5923d41883447d06b17899734853f45f117e3a",
+    "head_sha": "12a9a5c354b0044c5bb03bf44c1ca28398fed6ea",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "docs/receipts/reuse/s1-researchd-researchctl-single-writer.json",
+      "stages/s1-researchd-researchctl-single-writer-authority/stage-envelope.json",
+      "stages/s1-researchd-researchctl-single-writer-authority/ownership-lease.json",
+      "tests/test_stage1_authority.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "focused_tests": 40,
+      "canonical_tests": 283,
+      "stage0b_tests": 25,
+      "skipped_tests": 0,
+      "diff_check": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "dependency_adoption": false,
+      "frozen_contract_edit": false,
+      "worker_source_files": 4,
+      "worker_test_files": 4,
+      "protocol_version": "1.1",
+      "single_writer_runtime_lock": true,
+      "single_canonical_ledger": true,
+      "request_maximum_bytes": 65536,
+      "response_maximum_bytes": 262144,
+      "HTTP_TCP_queue_scheduler_authorized": false,
+      "crash_repair_or_preemptive_cancel_authorized": false,
+      "live_or_connected_authority": false,
+      "selected_mode": "owned-stdlib-single-writer-af-unix-daemon-existing-runtime-boundaries",
+      "reuse_payload_sha256": "7d291631c2dd1d21d6822e83a4d73d5b21e83e8072105bca467630cb3b87a627",
+      "terminal_lookup_receipt_payload_sha256": "d5451aef0793a8384d4ae56912407eb4dc6e7083c1ad2bb32f9797f35c07a3ac",
+      "exact_head_remote_ci": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29591207151"
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29591207151",
+    "integration_commit_sha": "12a9a5c354b0044c5bb03bf44c1ca28398fed6ea"
+  },
+  "integrity": {
+    "payload_sha256": "f2576bd29e1bf5f563673778b4c2ef688f66079153fda68157b03cbb2ce40eb7",
+    "parent_refs": [
+      "git:12a9a5c354b0044c5bb03bf44c1ca28398fed6ea",
+      "ci:29591207151",
+      "integration:integration-s1-terminal-execution-receipt-lookup-20260717",
+      "reuse:reuse-s1-researchd-researchctl-single-writer-20260717"
+    ]
+  }
+}
