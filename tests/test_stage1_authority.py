@@ -420,6 +420,39 @@ class Stage1AuthorityTests(unittest.TestCase):
         self.assertTrue(envelope["rollback"])
         self.assertFalse(lease["delegation_allowed"])
 
+    def test_researchd_researchctl_worker_lease_is_exact_and_nonexpansive(self) -> None:
+        envelope = load(
+            ROOT
+            / "stages"
+            / "s1-researchd-researchctl-single-writer"
+            / "stage-envelope.json"
+        )
+        lease = load(
+            ROOT
+            / "stages"
+            / "s1-researchd-researchctl-single-writer"
+            / "ownership-lease.json"
+        )
+
+        self.assertEqual(envelope["write_set"], lease["write_set"])
+        self.assertEqual(len(envelope["write_set"]), 8)
+        self.assertEqual(
+            envelope["write_set"][:4],
+            [
+                "src/research_bridge/control.py",
+                "src/research_bridge/ipc.py",
+                "src/research_bridge/researchd.py",
+                "src/research_bridge/researchctl.py",
+            ],
+        )
+        self.assertEqual(
+            envelope["dependency_hashes"]["authority_receipt"],
+            "f2576bd29e1bf5f563673778b4c2ef688f66079153fda68157b03cbb2ce40eb7",
+        )
+        self.assertEqual(envelope["semantic_freeze"]["protocol"]["version"], "1.1")
+        self.assertFalse(envelope["push_authority"])
+        self.assertFalse(lease["delegation_allowed"])
+
     def test_budget_attempt_lifecycle_semantic_amendment_is_exact_and_non_expansive(self) -> None:
         original = load(
             ROOT / "stages" / "s1-budget-attempt-lifecycle" / "stage-envelope.json"
