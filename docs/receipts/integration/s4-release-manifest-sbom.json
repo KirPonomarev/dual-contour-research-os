@@ -1,0 +1,72 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s4-release-manifest-sbom-20260718",
+  "issued_at": "2026-07-17T22:55:28Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s4-release-manifest-sbom",
+    "agent_id": "agent-0",
+    "ownership_lease_ref": "stages/s4-release-manifest-sbom/ownership-lease.json",
+    "base_sha": "685267795fda8ecfaf3765a6a29bfdfc9d7fd42a",
+    "head_sha": "5d7ed558620f023efcefcb56ce4780967be742a7",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "docs/receipts/release/s4-release-sbom.spdx.json",
+      "docs/receipts/release/s4-release-manifest.json",
+      "tools/verify_release_identity.py",
+      "tests/test_release_identity.py",
+      "docs/receipts/reuse/s4-release-manifest-sbom.json",
+      "stages/s4-release-manifest-sbom/stage-envelope.json",
+      "stages/s4-release-manifest-sbom/ownership-lease.json"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "focused_test_count": 4,
+      "full_core_test_count": 375,
+      "full_inventory_test_count": 25,
+      "release_manifest_schema": "ReleaseManifest@1.0.0",
+      "release_manifest_payload_integrity": "green",
+      "exact_release_sha_frozen": true,
+      "release_sha": "5c2bd7c090fada6e5b65dc955e80b256d88252de",
+      "exact_image_digest_frozen": true,
+      "image_digest": "sha256:36069ee7a9db78af747d7fad65f9e33073824f27be898cdc0b7dd3b77ac5c235",
+      "release_exact_head_ci": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29618911213",
+      "policy_config_schema_dependency_lock_bound": true,
+      "previous_safe_state": "release:none-service-stopped",
+      "sbom_format": "SPDX-2.3",
+      "sbom_package_count": 107,
+      "sbom_sha256": "60f9261a9dad06a8723c5c17bb77d2e34e8608586c19bd28049921ea028d5c15",
+      "manifest_file_sha256": "9ceae0bda066cf52577cec0fdc1d7230e92b3e4010f65b81613abf6a0a8a90dd",
+      "reuse_receipt_file_sha256": "6f68a865312659e3bde22dd49f22338a062437a1dfbe1146d80bdfe9e68fb424",
+      "registry_push_performed": false,
+      "encrypted_off_host_backup_claimed": false,
+      "clean_restore_claimed": false,
+      "reboot_recovery_claimed": false,
+      "rollback_drill_claimed": false,
+      "deployment_approval_consumed": false,
+      "deployment_authority": false,
+      "declares_ready_for_72h_soak": false,
+      "next_stage": "s4-encrypted-off-host-backup-clean-restore"
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29619261317",
+    "integration_commit_sha": "5d7ed558620f023efcefcb56ce4780967be742a7"
+  },
+  "integrity": {
+    "payload_sha256": "af3ad57063ce7511b559c3e2cc75eead15a00ebf14420cd848bd174e65a3ca75",
+    "parent_refs": [
+      "git:5d7ed558620f023efcefcb56ce4780967be742a7",
+      "git:5c2bd7c090fada6e5b65dc955e80b256d88252de",
+      "ci:29619261317",
+      "ci:29618911213",
+      "integration:integration-s4-rootless-release-blueprint-20260718",
+      "release:release-dual-contour-pre-soak-5c2bd7c-20260718",
+      "image:sha256:36069ee7a9db78af747d7fad65f9e33073824f27be898cdc0b7dd3b77ac5c235",
+      "artifact:sha256:60f9261a9dad06a8723c5c17bb77d2e34e8608586c19bd28049921ea028d5c15"
+    ]
+  }
+}
