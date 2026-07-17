@@ -1,0 +1,87 @@
+{
+  "stage_id": "s1-market-base-repair",
+  "agent_id": "agent-3",
+  "objective": "Restore clean-checkout exact-head CI for the pinned private Market source by proving the fail-closed paper-reality CLI against a complete synthetic Unified ProductSnapshot prerequisite chain, without weakening validation or changing runtime/domain semantics.",
+  "executable_blocker": "The pinned Market source CI invokes a fail-closed CLI without first materializing its required product-context chain, so the frozen source cannot serve as an audited Stage 1 domain adapter base.",
+  "base_sha": "636d0b56d13ba919d4af7c4bcd0718ac7fb92945",
+  "public_authority_sha": "30a503f4ef95dbf2f2b9a4ae2533a9e591e5ee4d",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a3-s1-market-base-repair",
+  "worktree": "ephemeral-private-domain-clone:s1-market-base-repair",
+  "read_set": [
+    "market-domain:pinned-clean-tree@636d0b56d13ba919d4af7c4bcd0718ac7fb92945",
+    "market-domain:paper-reality-cli",
+    "market-domain:unified-product-access-boundary",
+    "market-domain:existing-paper-reality-and-product-access-tests",
+    "docs/receipts/source-freeze/s1-market-base-repair.json",
+    "docs/receipts/reuse/s1-market-base-repair.json",
+    "docs/receipts/integration/s1-market-base-authority.json"
+  ],
+  "write_set": [
+    ".github/workflows/ci.yml",
+    "tests/test_paper_reality_loop_cli.py"
+  ],
+  "worker_write_set": [
+    "tests/test_paper_reality_loop_cli.py"
+  ],
+  "integrator_write_set": [
+    ".github/workflows/ci.yml"
+  ],
+  "forbidden_scope": [
+    "runtime-source-or-domain-scientific-semantics-edit",
+    "existing-test-deletion-or-assertion-weakening",
+    "continue-on-error-skip-xfail-or-conditional-bypass",
+    "market-ledger-dataset-report-registry-or-evidence-mutation",
+    "network-exchange-order-private-api-or-key-access",
+    "live-trading-paper-order-publication-or-deployment",
+    "external-dependency-or-lockfile-change",
+    "dirty-source-checkout-mutation",
+    "public-copy-of-private-market-source",
+    "d2-or-d3-payload"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "authority_receipt": "8f23a7678feefed4d8c518339786a0cf4949f37664cb30a6c43874de7539922c",
+    "reuse_decision": "900833e203458bb84432341dd177372ce13f5b97f63c73b6e7bc8b103f8016eb",
+    "source_freeze": "f6ac6b7ebd5920c89348c58f0ddf955b28a823c31bb676c92403fa45e761a0ce",
+    "market_ci_failure_evidence": "f2d19112224bb2c8d33394715f74d7eed2ad6dffc35c248cabf9e2e2d46a277d",
+    "external_dependencies": "none"
+  },
+  "interface_contract": {
+    "positive_case": "A temporary synthetic project tree contains a complete internally consistent Unified latest pointer, Unified snapshot, exact core snapshot and recommendation; the real CLI returns status ok in dry-run and performs no canonical write.",
+    "negative_cases": [
+      "missing Unified latest pointer returns exit 1 and no domain mutation",
+      "symlink or malformed Unified pointer returns exit 1 and no domain mutation",
+      "binding drift returns exit 1 and no domain mutation"
+    ],
+    "ci_rule": "Replace the impossible clean-checkout smoke with the prerequisite-aware CLI conformance test; do not suppress, continue, skip or downgrade any failure.",
+    "authority_rule": "Synthetic fixtures grant no live, order, private API, registry writer, deployment or external mutation authority."
+  },
+  "acceptance_commands": [
+    "PYTHONDONTWRITEBYTECODE=1 python3 -m pytest -q -p no:cacheprovider tests/test_paper_reality_loop_cli.py tests/test_unified_product_access.py tests/test_paper_reality_loop.py",
+    "PYTHONDONTWRITEBYTECODE=1 python3 -m pytest -q -p no:cacheprovider",
+    "git diff --check",
+    "git status --porcelain=v1 --untracked-files=all",
+    "private secret, network, live-authority, skip and exact write-set scan"
+  ],
+  "risk_class": "private-market-clean-checkout-ci-conformance-repair",
+  "stop_conditions": [
+    "runtime-or-scientific-code-change-required",
+    "validation-bypass-or-existing-test-weakening-required",
+    "external-network-data-or-dependency-required",
+    "synthetic-fixture-can-mutate-domain-state",
+    "full-suite-regression",
+    "dirty-source-checkout-changed",
+    "private-data-enters-public-control-plane",
+    "write-set-collision",
+    "before-equals-after-or-ci-blocker-remains"
+  ],
+  "expected_receipt": "docs/receipts/integration/s1-market-base-repair.json",
+  "rollback": "Agent 0 reverts the scoped private test and CI workflow commits and deletes the isolated stage branch. The original dirty checkout, domain ledgers, reports, datasets, registries, external services and public Bridge runtime are unchanged.",
+  "commit_authority": "one-scoped-worker-commit-plus-one-agent0-ci-integration-commit",
+  "push_authority": false,
+  "expected_handoff_status": [
+    "ready_for_agent0_audit",
+    "blocked_validation_failed"
+  ]
+}

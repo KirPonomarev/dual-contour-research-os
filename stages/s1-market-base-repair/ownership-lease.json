@@ -1,0 +1,17 @@
+{
+  "lease_id": "lease-s1-market-base-repair-agent-3-20260717",
+  "stage_id": "s1-market-base-repair",
+  "agent_id": "agent-3",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-17T05:56:16Z",
+  "expires_at": "2026-07-17T11:56:16Z",
+  "base_sha": "636d0b56d13ba919d4af7c4bcd0718ac7fb92945",
+  "public_authority_sha": "30a503f4ef95dbf2f2b9a4ae2533a9e591e5ee4d",
+  "branch": "codex/bridge-a3-s1-market-base-repair",
+  "worktree": "ephemeral-private-domain-clone:s1-market-base-repair",
+  "write_set": [
+    "tests/test_paper_reality_loop_cli.py"
+  ],
+  "delegation_allowed": false,
+  "state": "active"
+}
