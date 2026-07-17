@@ -1,0 +1,127 @@
+{
+  "stage_id": "s1-final-checkpoint-reopen-recovery",
+  "agent_id": "agent-2",
+  "objective": "Implement bounded same-attempt final-checkpoint and completion replay after process reopen with exact artifact and ledger-result identity.",
+  "executable_blocker": "The canonical ledger currently rejects an exact repeated checkpoint sequence and an already completed attempt, preventing the deterministic Stage 1 reopen proof.",
+  "base_sha": "e7829dad908dd48c6dc1f94e8a3eb3c5fc79982a",
+  "public_authority_sha": "e7829dad908dd48c6dc1f94e8a3eb3c5fc79982a",
+  "public_authority_ci": "29585871956",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a2-s1-final-checkpoint-reopen-recovery",
+  "worktree": "ephemeral-public-worktree:s1-final-checkpoint-reopen-recovery",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "docs/receipts/reuse/s1-final-checkpoint-reopen-recovery.json",
+    "docs/receipts/integration/s1-final-checkpoint-reopen-recovery-authority.json",
+    "stages/s1-final-checkpoint-reopen-recovery-authority/stage-envelope.json",
+    "contracts/v1/CheckpointManifest.schema.json",
+    "contracts/v1/ExecutionReceipt.schema.json",
+    "existing authorized runtime and connected test files"
+  ],
+  "write_set": [
+    "src/research_bridge/ledger.py",
+    "src/research_bridge/execution.py",
+    "tests/test_stage1_ledger.py",
+    "tests/test_stage1_execution.py",
+    "tests/test_stage1_execution_assurance.py",
+    "tests/test_stage1_reference_vertical.py",
+    "tests/test_stage1_recovery.py"
+  ],
+  "semantic_freeze": {
+    "scope": "same-job-same-attempt-single-final-checkpoint-only",
+    "checkpoint_replay": {
+      "validation_order": [
+        "validate-full-persisted-chain-budget-and-checkpoint-projection",
+        "lookup-job-attempt-checkpoint-sequence",
+        "compare-eight-exact-mechanical-bindings",
+        "return-original-event-zero-write-or-reject-conflict",
+        "for-new-only-check-fence-terminal-state-next-sequence-and-append"
+      ],
+      "exact_bindings": [
+        "job_id",
+        "attempt_id",
+        "fencing_epoch",
+        "fencing_token_sha256",
+        "checkpoint_sequence",
+        "state_sha256",
+        "payload_ref",
+        "payload_stored_in_domain_vault"
+      ],
+      "time": "original-persisted-event_at-is-authoritative-on-exact-replay"
+    },
+    "completion_replay": {
+      "validation_order": [
+        "validate-full-persisted-chain-budget-and-checkpoint-projection",
+        "lookup-job-completion",
+        "compare-six-exact-terminal-bindings",
+        "return-original-event-zero-write-or-reject-conflict",
+        "for-new-only-check-fence-terminal-state-causality-and-append"
+      ],
+      "exact_bindings": [
+        "job_id",
+        "attempt_id",
+        "fencing_epoch",
+        "fencing_token_sha256",
+        "result_sha256",
+        "event_at"
+      ]
+    },
+    "reopen_result": "same-raw-artifact-sha-and-same-complete-result-sha-with-one-claim-checkpoint-complete-reservation-settlement",
+    "corrupt_checkpoint": "reject-zero-new-ledger-writes-no-silent-fallback",
+    "expired_authority": "reject-before-runner-and-before-new-ledger-write",
+    "explicit_limit": "byte-for-byte-ExecutionReceipt-terminal-lookup-is-not-proven-by-this-stage"
+  },
+  "preservation_contract": [
+    "database-user-version-one-and-exact-schema-fingerprint-unchanged",
+    "one-canonical-ledger-one-table-existing-event-vocabulary-only",
+    "existing-CAS-L0-ingestion-admission-control-validation-and-kernel-source-unchanged",
+    "budget-pause-fence-nonce-idempotency-settlement-and-reference-semantics-unchanged",
+    "no-domain-outcome-registry-or-live-authority"
+  ],
+  "forbidden_scope": [
+    "unlisted-source-test-doc-config-workflow-lockfile-migration-contract-or-dependency-edit",
+    "CAS-L0-ingestion-admission-authority-control-validation-or-kernel-source-edit",
+    "second-ledger-second-store-new-table-column-index-trigger-event-type-or-schema-version",
+    "fresh-attempt-multi-attempt-arbitrary-chunk-resume-retry-scheduler-queue-release-or-refund",
+    "silent-corrupt-checkpoint-restart-fallback-test-relaxation-skip-xfail-or-continue-on-error",
+    "private-path-url-secret-account-dataset-strategy-or-confidential-payload",
+    "network-external-mutation-live-operation-publication-deployment-or-UI",
+    "push-merge-or-canonical-main-write"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "reuse_decision": "f28c85b58ab081c446583e95f5c69985e61d3f88f86d59d6b8c278ad314b2856",
+    "authority_receipt": "2625cfa0d1d2fb8c7007ec5852fa25f25ed87ad52ba48ec2060ff8a690e2eca0",
+    "budget_attempt_lifecycle_receipt": "313a55f202ea6490bca15321e018f11ee0c835ab8698565c0b4830e05f90692b",
+    "external_dependencies": "none"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest tests.test_stage1_ledger tests.test_stage1_execution tests.test_stage1_execution_assurance tests.test_stage1_reference_vertical tests.test_stage1_recovery -v",
+    "python3 -m unittest discover -s tests -p 'test_stage1_*.py'",
+    "make test",
+    "git diff --check",
+    "exact seven-file write-set replay mutation matrix schema contract dependency private-locator network live-authority and weakening scan"
+  ],
+  "risk_class": "bridge-sev1-durable-final-checkpoint-replay",
+  "stop_conditions": [
+    "base-authority-contract-reuse-or-receipt-hash-mismatch",
+    "write-set-schema-event-vocabulary-store-ledger-or-dependency-expands",
+    "exact-replay-adds-an-event-consumes-capacity-or-returns-a-different-event",
+    "conflicting-replay-is-accepted-or-corrupt-material-reaches-a-new-append",
+    "raw-artifact-sha-or-complete-result-sha-changes-after-close-and-reopen",
+    "claim-checkpoint-complete-reservation-or-settlement-duplicates",
+    "pause-fence-nonce-cap-chain-execution-validation-or-reference-vertical-regresses",
+    "full-terminal-ExecutionReceipt-lookup-or-multi-attempt-resume-is-claimed",
+    "before-equals-after-or-final-checkpoint-reopen-blocker-remains"
+  ],
+  "expected_receipt": "docs/receipts/integration/s1-final-checkpoint-reopen-recovery.json",
+  "rollback": "Agent 0 discards the worker commit and branch. No schema, contract, domain state, external system or live authority changed; synthetic offline roots may be discarded.",
+  "commit_authority": "one-scoped-worker-commit",
+  "push_authority": false,
+  "expected_handoff_status": [
+    "ready_for_agent0_audit",
+    "blocked_validation_failed"
+  ]
+}
