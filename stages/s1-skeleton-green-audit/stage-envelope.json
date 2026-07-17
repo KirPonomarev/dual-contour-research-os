@@ -1,0 +1,82 @@
+{
+  "stage_id": "s1-skeleton-green-audit",
+  "agent_id": "agent-0",
+  "objective": "Declare Stage 1 SKELETON_GREEN only after auditing the integrated public Bridge receipts plus both domain-owned offline reference E2E receipts against the frozen contract catalog and exact-head CI evidence.",
+  "executable_blocker": "Market and Security domain-owned offline reference E2E receipts are now present, but older Stage 1 receipts still correctly predate them and report stale remaining gates. Agent 0 needs one explicit final audit receipt before Stage 2 routing.",
+  "base_sha": "e6d23ee29b0f7d99cb5715e3193f8dd99c8f5d02",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "main",
+  "worktree": "canonical-public-worktree",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "contracts/v1/*.schema.json",
+    "docs/receipts/integration/s1-admission-kernel.json",
+    "docs/receipts/integration/s1-ledger-durability.json",
+    "docs/receipts/integration/s1-control-ipc.json",
+    "docs/receipts/integration/s1-pause-ledger.json",
+    "docs/receipts/integration/s1-trusted-ingestion.json",
+    "docs/receipts/integration/s1-validation-boundary.json",
+    "docs/receipts/integration/s1-budget-profile.json",
+    "docs/receipts/integration/s1-budget-attempt-lifecycle.json",
+    "docs/receipts/integration/s1-final-checkpoint-reopen-recovery.json",
+    "docs/receipts/integration/s1-terminal-execution-receipt-lookup.json",
+    "docs/receipts/integration/s1-researchd-researchctl-single-writer.json",
+    "docs/receipts/integration/s1-researchd-service-entrypoint.json",
+    "docs/receipts/integration/s1-auth-policy-boundary.json",
+    "docs/receipts/integration/s1-permit-nonce-ledger.json",
+    "docs/receipts/integration/s1-pause-epoch-fencing.json",
+    "docs/receipts/integration/s1-market-offline-reference-e2e.json",
+    "docs/receipts/integration/s1-security-offline-reference-e2e.json",
+    "GitHub Actions exact-head CI run 29604377316"
+  ],
+  "write_set": [
+    "stages/s1-skeleton-green-audit/stage-envelope.json",
+    "stages/s1-skeleton-green-audit/ownership-lease.json",
+    "docs/receipts/integration/s1-skeleton-green-audit.json",
+    "tests/test_stage1_skeleton_green.py"
+  ],
+  "audit_scope": {
+    "declares": "SKELETON_GREEN",
+    "does_not_declare": [
+      "MARKET_PRE_SOAK_GREEN",
+      "DUAL_CONTOUR_PRE_SOAK_GREEN",
+      "READY_FOR_72H_SOAK",
+      "DUAL_CONTOUR_MVP_GREEN",
+      "deployment_approval",
+      "production_readiness"
+    ],
+    "required_domain_e2e": [
+      "s1-market-offline-reference-e2e",
+      "s1-security-offline-reference-e2e"
+    ]
+  },
+  "forbidden_scope": [
+    "runtime source code change",
+    "contract schema change",
+    "private domain payload path evidence report dataset or scientific truth disclosure",
+    "Stage 2 pre-soak deployment soak backup restore or production claim",
+    "live trading live security action publication deployment or UI authority",
+    "waiving failed CI missing receipt privacy scan or source mutation"
+  ],
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest tests.test_stage1_skeleton_green tests.test_integration_receipts -v",
+    "make test",
+    "git diff --check",
+    "exact-head public CI on the skeleton-green audit commit"
+  ],
+  "risk_class": "public-agent0-stage1-exit-audit",
+  "stop_conditions": [
+    "any required Stage 1 receipt is missing malformed not integrity-bound or not contract-green",
+    "Market or Security offline reference E2E receipt is missing or not green",
+    "privacy_secret_scan is not green or source_mutation is true on any required receipt",
+    "exact-head public CI for the audited base is not green",
+    "audit requires runtime source contract schema dependency workflow private payload or domain-truth changes",
+    "the receipt attempts to declare pre-soak deployment soak MVP production or live-authority readiness"
+  ],
+  "expected_receipt": "docs/receipts/integration/s1-skeleton-green-audit.json",
+  "rollback": "Revert only this public audit metadata and test. All integrated Stage 1 implementation receipts, domain branches, public Bridge runtime code and external systems remain unchanged.",
+  "commit_authority": "agent-0-only",
+  "push_authority": "agent-0-only"
+}

@@ -1,0 +1,19 @@
+{
+  "lease_id": "lease-s1-skeleton-green-audit-agent-0-20260717",
+  "stage_id": "s1-skeleton-green-audit",
+  "agent_id": "agent-0",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-17T18:50:00Z",
+  "expires_at": "2026-07-18T00:50:00Z",
+  "base_sha": "e6d23ee29b0f7d99cb5715e3193f8dd99c8f5d02",
+  "branch": "main",
+  "worktree": "canonical-public-worktree",
+  "write_set": [
+    "stages/s1-skeleton-green-audit/stage-envelope.json",
+    "stages/s1-skeleton-green-audit/ownership-lease.json",
+    "docs/receipts/integration/s1-skeleton-green-audit.json",
+    "tests/test_stage1_skeleton_green.py"
+  ],
+  "delegation_allowed": false,
+  "state": "active"
+}

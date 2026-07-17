@@ -1,0 +1,81 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s1-skeleton-green-audit-20260717",
+  "issued_at": "2026-07-17T18:50:00Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "bridge",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s1-skeleton-green-audit",
+    "agent_id": "agent-0",
+    "ownership_lease_ref": "stages/s1-skeleton-green-audit/ownership-lease.json",
+    "base_sha": "e6d23ee29b0f7d99cb5715e3193f8dd99c8f5d02",
+    "head_sha": "e6d23ee29b0f7d99cb5715e3193f8dd99c8f5d02",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "stages/s1-skeleton-green-audit/stage-envelope.json",
+      "stages/s1-skeleton-green-audit/ownership-lease.json",
+      "docs/receipts/integration/s1-skeleton-green-audit.json",
+      "tests/test_stage1_skeleton_green.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "stage1_skeleton_green": true,
+      "declared_exit": "SKELETON_GREEN",
+      "pre_soak_green": false,
+      "ready_for_72h_soak": false,
+      "mvp_green": false,
+      "deployment_authority": false,
+      "live_or_connected_authority": false,
+      "required_integration_receipts": [
+        "s1-admission-kernel",
+        "s1-ledger-durability",
+        "s1-control-ipc",
+        "s1-pause-ledger",
+        "s1-trusted-ingestion",
+        "s1-validation-boundary",
+        "s1-budget-profile",
+        "s1-budget-attempt-lifecycle",
+        "s1-final-checkpoint-reopen-recovery",
+        "s1-terminal-execution-receipt-lookup",
+        "s1-researchd-researchctl-single-writer",
+        "s1-researchd-service-entrypoint",
+        "s1-auth-policy-boundary",
+        "s1-permit-nonce-ledger",
+        "s1-pause-epoch-fencing",
+        "s1-market-offline-reference-e2e",
+        "s1-security-offline-reference-e2e"
+      ],
+      "domain_owned_market_reference_e2e": "green",
+      "domain_owned_security_reference_e2e": "green",
+      "bridge_reference_vertical": "green",
+      "single_writer_researchd": "green",
+      "terminal_receipt_lookup": "green",
+      "checkpoint_reopen_recovery": "green",
+      "permit_nonce_replay_rejection": "green",
+      "pause_epoch_fencing": "green",
+      "authority_policy_boundary": "green",
+      "public_exact_head_ci": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29604377316",
+      "audited_public_head": "e6d23ee29b0f7d99cb5715e3193f8dd99c8f5d02",
+      "remaining_stage1_gate": "none",
+      "next_stage_route": "Stage 2 Market pre-soak authority only; no deployment or soak authority granted by this receipt"
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29604377316",
+    "integration_commit_sha": "e6d23ee29b0f7d99cb5715e3193f8dd99c8f5d02"
+  },
+  "integrity": {
+    "payload_sha256": "4e98f8fc204e281446f64a11ca091060f1d9a4dfb78394b8d9822a55e7a48967",
+    "parent_refs": [
+      "git:e6d23ee29b0f7d99cb5715e3193f8dd99c8f5d02",
+      "ci:29604377316",
+      "integration:integration-s1-market-offline-reference-e2e-20260717",
+      "integration:integration-s1-security-offline-reference-e2e-20260717"
+    ]
+  }
+}
