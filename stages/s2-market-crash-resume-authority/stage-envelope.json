@@ -1,0 +1,135 @@
+{
+  "stage_id": "s2-market-crash-resume-authority",
+  "agent_id": "agent-0",
+  "objective": "Authorize the next Market pre-soak slice: deterministic crash/resume equivalence bound to previous Stage 2 lineage.",
+  "executable_blocker": "Stage 2 has dataset integrity, provider accounting, hard budget caps and sealed holdout boundary, but no bounded proof that an interrupted Market pre-soak execution can resume from checkpoint and produce the same result SHA as an uninterrupted execution.",
+  "base_sha": "718623dd2f8258025960fa533b52de6903e670c2",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "main",
+  "worktree": "canonical-public-worktree",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "docs/receipts/integration/s1-skeleton-green-audit.json",
+    "docs/receipts/integration/s2-market-public-dataset-temporal-integrity.json",
+    "docs/receipts/integration/s2-market-cost-provider-accounting.json",
+    "docs/receipts/integration/s2-market-budget-hard-caps.json",
+    "docs/receipts/integration/s2-market-sealed-holdout.json",
+    "docs/receipts/source-freeze/s2-market-crash-resume.json",
+    "docs/receipts/reuse/s2-market-crash-resume.json",
+    "contracts/v1/CheckpointManifest.schema.json",
+    "contracts/v1/ExecutionReceipt.schema.json",
+    "contracts/v1/ValidationReceipt.schema.json",
+    "private Market durable_jobs ledger checkpoint and fencing kernel",
+    "private Market durable_jump_reversal_v3 crash-resume equivalence tests"
+  ],
+  "write_set": [
+    "docs/receipts/source-freeze/s2-market-crash-resume.json",
+    "docs/receipts/reuse/s2-market-crash-resume.json",
+    "stages/s2-market-crash-resume-authority/stage-envelope.json",
+    "stages/s2-market-crash-resume-authority/ownership-lease.json",
+    "tests/test_stage2_authority.py"
+  ],
+  "authorized_worker_stage": {
+    "stage_id": "s2-market-crash-resume",
+    "agent_id": "agent-3",
+    "private_base_sha": "af8553df113fa1282638b00429a9966b0f76dbab",
+    "public_development_sha": "718623dd2f8258025960fa533b52de6903e670c2",
+    "branch": "codex/bridge-a3-s2-market-crash-resume",
+    "worktree": "ephemeral-private-domain-worktree:s2-market-crash-resume",
+    "write_set": [
+      "data/bridge_pre_soak/crash_resume/market_pre_soak_crash_resume_profile.json",
+      "src/market_lab/bridge_pre_soak_crash_resume.py",
+      "tests/test_bridge_pre_soak_crash_resume.py"
+    ],
+    "commit_authority": "one-scoped-worker-commit",
+    "push_authority": false
+  },
+  "crash_resume_contract": {
+    "profile_classification": "D1_INTERNAL_SANITIZED",
+    "runtime_payload_classification": "D2_DOMAIN_CONFIDENTIAL_OR_D3_RESTRICTED_PRIVATE_RUNTIME_ONLY",
+    "scope": "crash-resume-equivalence-only",
+    "required_refs": [
+      "dataset_sha256",
+      "previous_temporal_integrity_receipt_ref",
+      "previous_cost_provider_accounting_receipt_ref",
+      "previous_budget_hard_caps_receipt_ref",
+      "previous_sealed_holdout_receipt_ref",
+      "job_spec_sha256",
+      "checkpoint_manifest_sha256",
+      "uninterrupted_execution_receipt_ref",
+      "resumed_execution_receipt_ref"
+    ],
+    "crash_resume_invariants": [
+      "interrupted-run-records-checkpoints-before-injected-crash",
+      "resume-uses-last-valid-checkpoint-and-new-fencing-token",
+      "resumed-result-sha256-equals-uninterrupted-result-sha256",
+      "completion-receipt-is-published-once",
+      "stale-fencing-token-cannot-publish-checkpoint",
+      "checkpoint-runtime-payload-never-enters-public-Bridge-repository-or-public-receipt",
+      "no-corrupt-checkpoint-repair-in-this-slice",
+      "no-backup-restore-in-this-slice",
+      "no-live-paper-or-order-authority",
+      "crash-resume-receipt-shaped-but-not-scientific-outcome"
+    ],
+    "stage_exit_authorized": "slice-only",
+    "declares_market_pre_soak_green": false
+  },
+  "preservation_contract": [
+    "Stage 2 dataset integrity provider accounting budget hard caps and sealed holdout remain pinned and unexpanded",
+    "public repository stores only sanitized authority receipts and hashes, never runtime checkpoint payloads private Market results or scientific truth",
+    "private Market remains the owner of runtime checkpoint state, durable job execution and domain semantics",
+    "validator emits immutable crash-resume readiness receipt material and does not apply any scientific outcome",
+    "crash-resume validation is hermetic; tests must not fetch network data",
+    "no live order trading exchange account deployment publication autonomous paper/live authority backup restore or corrupt checkpoint repair is introduced"
+  ],
+  "forbidden_scope": [
+    "public-copy-of-runtime-checkpoint-database-checkpoint-payload-private-Market-source-results-strategy-or-scientific-payload",
+    "worker-write-outside-one-private-crash-resume-profile-one-private-source-file-and-one-private-test-file",
+    "network-capture-inside-validator-tests-or-Bridge-runtime",
+    "new-public-Bridge-runtime-store-ledger-contract-schema-event-dependency-workflow-lockfile-or-migration",
+    "corrupt-checkpoint-handling-or-backup-restore-implementation-in-this-slice",
+    "ValidationReceipt-use-to-apply-SUPPORTED-REFUTED-INCONCLUSIVE-INVALID-or-any-domain-truth",
+    "exchange-order-key-account-secret-D2-D3-payload-live-trading-paper-trading-publication-deployment-or-UI-authority",
+    "test-skip-xfail-continue-on-error-optional-gate-or-validation-weakening",
+    "dirty-owner-checkout-mutation",
+    "worker-push-merge-deploy-or-public-repository-write"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "source_freeze": "2f48096628ccca1f3ca19899ec0033e87de0bee195b06f4a01058de46bcec22a",
+    "reuse_decision": "4f0999f46e4ceb1ecd8c802732708c92f3a36b6256b9bc59df553dab1e537236",
+    "dataset_integrity_receipt": "3cbe4376094ac8dee30da02aa2a280dd2e2b1dfd8ee57624beb3301135479938",
+    "cost_provider_accounting_receipt": "deb7f0556fdc905d414a11b41bb2bc620150a6e5deb9f4880b80cee5b48410a5",
+    "budget_hard_caps_receipt": "0b8f687ee63630d8160d8006c7f7bdbdef316e38a1c3eb98c6c9e2dac606662b",
+    "sealed_holdout_receipt": "0f39659a007bf59bf57e3b7a7a3ae6dd7cb491eaf4016172cab9cc4836314476",
+    "private_market_head": "af8553df113fa1282638b00429a9966b0f76dbab",
+    "external_dependencies": "none"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest tests.test_stage2_authority -v",
+    "make test",
+    "private focused crash-resume tests with PYTHONDONTWRITEBYTECODE=1 and no pytest cache",
+    "private bounded existing durable job plus Stage 2 lineage tests against exact pinned public Bridge source",
+    "git diff --check in both repositories",
+    "exact public and private write-set privacy dependency network live-authority and weakening scans",
+    "exact-head public CI and withheld-locator private focused CI"
+  ],
+  "risk_class": "cross-repository-market-pre-soak-crash-resume-slice",
+  "stop_conditions": [
+    "public-base-private-head-contract-source-freeze-reuse-sealed-holdout-or-execution-contract-hash-mismatch",
+    "worker-write-set-collision-or-private-owner-checkout-mutation",
+    "crash-resume-profile-cannot-be-bound-to-previous-Stage-2-lineage",
+    "resume-verifier-accepts-result-sha-mismatch-no-checkpoint-before-crash-duplicate-completion-stale-fencing-checkpoint-runtime-payload-public-copy-private-account-order-live-paper-authority-or-domain-truth",
+    "runtime-checkpoint-payload-or-domain-scientific-truth-would-enter-the-public-repository",
+    "worker-needs-network-capture-during-tests-or-validation",
+    "corrupt-checkpoint-repair-or-backup-restore-scope-is-required-before-this-slice-can-land",
+    "any-live-network-order-exchange-target-publication-or-deployment-authority-appears",
+    "before-equals-after-or-Market-pre-soak-crash-resume-blocker-remains"
+  ],
+  "expected_receipt": "docs/receipts/integration/s2-market-crash-resume.json",
+  "rollback": "Agent 0 rejects or reverts only this public authority and the isolated private worker commit. Existing Stage 2 dataset integrity, provider accounting, budget hard caps, sealed holdout, public Bridge runtime, Market Trial Ledger, external systems and owner checkout remain unchanged.",
+  "commit_authority": "agent-0-only",
+  "push_authority": "agent-0-only"
+}

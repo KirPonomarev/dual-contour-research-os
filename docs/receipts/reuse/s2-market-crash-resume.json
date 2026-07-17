@@ -1,0 +1,69 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-s2-market-crash-resume-20260717",
+  "issued_at": "2026-07-17T22:00:00Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "reuse-freeze-authority"
+  },
+  "contour": "market",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "market-pre-soak-crash-resume-equivalence-over-private-domain-runtime-and-public-execution-receipt-contracts",
+    "candidates": [
+      {
+        "candidate": "existing-private-Market-durable_jobs-ledger-checkpoint-and-fencing-kernel",
+        "disposition": "selected-internal-adapter"
+      },
+      {
+        "candidate": "existing-private-Market-durable_jump_reversal_v3-crash-resume-equivalence-fixture",
+        "disposition": "selected-pattern-and-test-boundary"
+      },
+      {
+        "candidate": "existing-public-Bridge-ExecutionReceipt-CheckpointManifest-and-ValidationReceipt-contract-shapes",
+        "disposition": "selected-contract-boundary"
+      },
+      {
+        "candidate": "existing-Stage-2-dataset-cost-provider-budget-and-sealed-holdout-lineage",
+        "disposition": "selected-lineage"
+      },
+      {
+        "candidate": "owner-local-stdlib-crash-resume-profile-validator-and-tests",
+        "disposition": "selected-minimal-glue"
+      },
+      {
+        "candidate": "new-external-workflow-engine-or-database-dependency",
+        "disposition": "rejected-unnecessary-for-bounded-pre-soak-slice"
+      },
+      {
+        "candidate": "public-copy-of-runtime-checkpoint-database-private-results-or-domain-payload",
+        "disposition": "rejected-boundary"
+      }
+    ],
+    "selected_mode": "existing-private-Market-durable-job-checkpoint-runner-plus-bridge-execution-receipt-shape-owner-stdlib-validator-no-runtime-payload",
+    "source_ref": "source-freeze:source-freeze-market-s2-crash-resume-20260717;git:af8553df113fa1282638b00429a9966b0f76dbab;git:718623dd2f8258025960fa533b52de6903e670c2",
+    "code_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "license_spdx": "NOASSERTION",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "crash resume profile binds previous dataset cost-provider budget-hard-cap and sealed-holdout receipts without copying runtime checkpoint payload to public repo",
+      "validator proves interrupted execution checkpointed progress and resumed execution reaches the same result SHA as uninterrupted execution",
+      "validator rejects mismatched uninterrupted versus resumed result SHA checkpoint counts stale fencing acceptance completion duplication and live or paper authority",
+      "accepted crash resume emits ValidationReceipt-shaped CRASH_RESUME_EQUIVALENCE_PASS only, not SUPPORTED REFUTED INCONCLUSIVE or INVALID",
+      "no network exchange order live trading paper deployment publication domain-truth runtime database or checkpoint payload is introduced into public Bridge",
+      "focused private tests plus bounded existing durable job and Stage 2 lineage tests run against exact pinned public Bridge source"
+    ],
+    "canonical_owner": "private-Market-crash-resume-validator-and-Agent0-cross-repository-integration",
+    "rollback": "Discard or revert only the isolated private crash resume profile adapter and tests. No public runtime checkpoint payload, Market scientific outcome, live system, or Bridge runtime state is changed."
+  },
+  "integrity": {
+    "payload_sha256": "4f0999f46e4ceb1ecd8c802732708c92f3a36b6256b9bc59df553dab1e537236",
+    "parent_refs": [
+      "source-freeze:source-freeze-market-s2-crash-resume-20260717",
+      "sha256:2f48096628ccca1f3ca19899ec0033e87de0bee195b06f4a01058de46bcec22a",
+      "git:af8553df113fa1282638b00429a9966b0f76dbab",
+      "git:718623dd2f8258025960fa533b52de6903e670c2"
+    ]
+  }
+}

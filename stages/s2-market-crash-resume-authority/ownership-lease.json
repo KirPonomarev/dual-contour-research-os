@@ -1,0 +1,20 @@
+{
+  "lease_id": "lease-s2-market-crash-resume-authority-agent-0-20260717",
+  "stage_id": "s2-market-crash-resume-authority",
+  "agent_id": "agent-0",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-17T22:00:00Z",
+  "expires_at": "2026-07-18T04:00:00Z",
+  "base_sha": "718623dd2f8258025960fa533b52de6903e670c2",
+  "branch": "main",
+  "worktree": "canonical-public-worktree",
+  "write_set": [
+    "docs/receipts/source-freeze/s2-market-crash-resume.json",
+    "docs/receipts/reuse/s2-market-crash-resume.json",
+    "stages/s2-market-crash-resume-authority/stage-envelope.json",
+    "stages/s2-market-crash-resume-authority/ownership-lease.json",
+    "tests/test_stage2_authority.py"
+  ],
+  "delegation_allowed": false,
+  "state": "active"
+}

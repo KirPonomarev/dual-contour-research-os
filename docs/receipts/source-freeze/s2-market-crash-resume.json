@@ -1,0 +1,50 @@
+{
+  "schema_id": "SourceFreezeReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "source-freeze-market-s2-crash-resume-20260717",
+  "issued_at": "2026-07-17T22:00:00Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "source-freeze-authority"
+  },
+  "contour": "market",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "source_repo": "crypto-market-lab",
+    "remote": "sha256:c4d97d3379ba70f130a546a4d44b646c935f33e3b1447e0aac185c0d38215815",
+    "branch": "sha256:06c6d546bd70182f932de85ca877afaf13189008d78f28b51145530a265c9c99",
+    "head_sha": "af8553df113fa1282638b00429a9966b0f76dbab",
+    "upstream_sha": "af8553df113fa1282638b00429a9966b0f76dbab",
+    "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "untracked_manifest_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "path_dispositions": [
+      {
+        "category": "tracked_worktree_changes",
+        "count": 0,
+        "disposition": "none-clean-selected-market-sealed-holdout-head"
+      },
+      {
+        "category": "untracked_worktree_entries",
+        "count": 0,
+        "disposition": "none-clean-selected-market-sealed-holdout-head"
+      },
+      {
+        "category": "checkpoint-runtime-payload",
+        "count": 0,
+        "disposition": "not-copied-to-public-repository-private-ephemeral-runtime-only"
+      }
+    ],
+    "selected_source_sha": "af8553df113fa1282638b00429a9966b0f76dbab"
+  },
+  "integrity": {
+    "payload_sha256": "2f48096628ccca1f3ca19899ec0033e87de0bee195b06f4a01058de46bcec22a",
+    "parent_refs": [
+      "git:af8553df113fa1282638b00429a9966b0f76dbab",
+      "integration:integration-s2-market-sealed-holdout-20260717",
+      "integration:integration-s2-market-budget-hard-caps-20260717",
+      "integration:integration-s2-market-cost-provider-accounting-20260717",
+      "integration:integration-s2-market-public-dataset-temporal-integrity-20260717",
+      "integration:integration-s1-skeleton-green-audit-20260717"
+    ]
+  }
+}
