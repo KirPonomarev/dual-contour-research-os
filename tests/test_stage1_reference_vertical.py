@@ -252,6 +252,11 @@ class _LoggingCheckpointStore:
         self.event_log.append("checkpoint-cas")
         return publication
 
+    def read_bytes(self, *args: object, **keywords: object) -> bytes:
+        value = self.raw.read_bytes(*args, **keywords)  # type: ignore[arg-type]
+        self.event_log.append("checkpoint-cas-read")
+        return value
+
 
 class _LoggingIngestor:
     def __init__(self, raw: TrustedIngestor, event_log: list[str]) -> None:
@@ -538,13 +543,15 @@ class Stage1ReferenceVerticalTests(unittest.TestCase):
                             "ledger-checkpoint",
                             "checkpoint-manifest",
                             "artifact-ingestion",
+                            "checkpoint-cas",
+                            "checkpoint-cas-read",
                             "ledger-complete",
                             "execution-receipt",
                             "synthetic-external-receipts",
                             "reference-projection",
                         ],
                     )
-                    self.assertEqual(receipt_preconditions, [(3, True, 1, 1)])
+                    self.assertEqual(receipt_preconditions, [(3, True, 2, 1)])
                     self.assertIs(environment.ledger.raw, environment.raw_ledger)
                     self.assertEqual(environment.reader.calls, list(INPUT_REFS))
                     self.assertEqual(len(environment.fence_calls), 1)
@@ -562,7 +569,7 @@ class Stage1ReferenceVerticalTests(unittest.TestCase):
                         "payload_ref"
                     ]
                     self.assertTrue(environment.checkpoint_store.verify(checkpoint_ref))
-                    self.assertEqual(environment.checkpoint_store.object_count(), 1)
+                    self.assertEqual(environment.checkpoint_store.object_count(), 2)
                     artifact_refs = tuple(
                         item.artifact_ref for item in result.record.artifact_records
                     )
@@ -652,7 +659,7 @@ class Stage1ReferenceVerticalTests(unittest.TestCase):
                         environment.artifact_root,
                         quota_bytes=1_048_576,
                     )
-                    self.assertEqual(reopened_checkpoint_store.object_count(), 1)
+                    self.assertEqual(reopened_checkpoint_store.object_count(), 2)
                     self.assertTrue(reopened_checkpoint_store.verify(checkpoint_ref))
                     self.assertEqual(reopened_artifact_store.object_count(), 1)
                     self.assertTrue(

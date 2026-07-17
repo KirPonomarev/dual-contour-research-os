@@ -655,6 +655,7 @@ class Stage1StaticBoundaryTests(unittest.TestCase):
                 "claim",
                 "checkpoint",
                 "complete",
+                "completed_event",
                 "event_count",
                 "verify_chain",
                 "close",

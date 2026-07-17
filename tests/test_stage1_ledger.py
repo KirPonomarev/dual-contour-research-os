@@ -331,6 +331,44 @@ class JobLedgerTests(unittest.TestCase):
         self.assertEqual(self.ledger.event_count(), 4)
         self.assertTrue(self.ledger.verify_chain())
 
+    def test_completed_event_is_unique_validated_reopen_safe_and_read_only(self) -> None:
+        claim(self.ledger)
+        completed = self.ledger.complete(
+            job_id="job-a",
+            attempt_id="attempt-a",
+            fencing_epoch=7,
+            fencing_token="fence-a",
+            result_sha256=RESULT_SHA,
+            event_at=AT,
+        )
+        before = (
+            self.ledger.event_count(),
+            self.ledger.event_count("claim"),
+            self.ledger.event_count("complete"),
+        )
+
+        self.assertEqual(self.ledger.completed_event("job-a"), completed)
+        self.assertEqual(
+            (
+                self.ledger.event_count(),
+                self.ledger.event_count("claim"),
+                self.ledger.event_count("complete"),
+            ),
+            before,
+        )
+
+        self.ledger.close()
+        self.ledger = JobLedger(self.database)
+        self.assertEqual(self.ledger.completed_event("job-a"), completed)
+        self.assertEqual(self.ledger.event_count(), before[0])
+
+    def test_completed_event_fails_closed_when_job_is_not_complete(self) -> None:
+        claim(self.ledger)
+        for job_id in ("job-a", "job-missing", "", " padded "):
+            with self.subTest(job_id=job_id), self.assertRaises(LedgerError):
+                self.ledger.completed_event(job_id)
+        self.assertEqual(self.ledger.event_count(), 1)
+
     def test_sqlite_is_wal_full_and_table_denies_update_or_delete(self) -> None:
         claim(self.ledger)
         mode = self.ledger._connection.execute("PRAGMA journal_mode").fetchone()[0]

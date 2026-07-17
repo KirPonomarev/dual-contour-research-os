@@ -864,6 +864,41 @@ class JobLedger:
                 self._rollback()
                 self._raise_ledger_error(exc)
 
+    def completed_event(self, job_id: str) -> LedgerEvent:
+        """Return the unique validated completion event in a read snapshot."""
+
+        job_id = _nonempty_text("job_id", job_id)
+        with self._lock:
+            self._ensure_open()
+            try:
+                self._connection.execute("BEGIN")
+                projections = self._budget_projection_in_transaction()
+                projection = next(
+                    (item for item in projections if item.event.job_id == job_id),
+                    None,
+                )
+                if projection is None or projection.settlement is None:
+                    raise LedgerError("completed event is unavailable")
+                rows = self._connection.execute(
+                    """
+                    SELECT *
+                    FROM bridge_job_ledger
+                    WHERE job_id = ? AND event_type = 'complete'
+                    ORDER BY sequence
+                    """,
+                    (job_id,),
+                ).fetchall()
+                if len(rows) != 1:
+                    raise LedgerError("completed event is not unique")
+                event = self._ledger_event_from_row(rows[0])
+                if event.attempt_id != projection.event.attempt_id:
+                    raise LedgerError("completed event attempt binding is invalid")
+                self._connection.execute("COMMIT")
+                return event
+            except Exception as exc:
+                self._rollback()
+                self._raise_ledger_error(exc)
+
     def event_count(self, event_type: str | None = None) -> int:
         """Return the number of committed events, optionally for one event type."""
 

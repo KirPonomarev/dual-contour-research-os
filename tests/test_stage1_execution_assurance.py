@@ -589,6 +589,7 @@ class _CheckpointStoreSpy:
         self.event_log = event_log
         self.error = error
         self.calls: list[dict[str, object]] = []
+        self.objects: dict[str, bytes] = {}
 
     def publish(
         self,
@@ -607,12 +608,20 @@ class _CheckpointStoreSpy:
         if self.error is not None:
             raise self.error
         self.event_log.append("checkpoint_store")
+        self.objects[f"cas:sha256:{expected_sha256}"] = Path(source_path).read_bytes()
         return SimpleNamespace(
             ref=f"cas:sha256:{expected_sha256}",
             sha256=expected_sha256,
             size_bytes=expected_size_bytes,
             created=True,
         )
+
+    def read_bytes(self, ref: str, *, maximum_size_bytes: int) -> bytes:
+        self.event_log.append("checkpoint_store_read")
+        value = self.objects[ref]
+        if len(value) > maximum_size_bytes:
+            raise RuntimeError("bounded read exceeded")
+        return value
 
 
 class _LedgerSpy:
@@ -1134,6 +1143,11 @@ class OfflineExecutionCoordinatorAssuranceTests(unittest.TestCase):
                 event_log.append("checkpoint_store")
                 return publication
 
+            def read_bytes(self, *args: object, **keywords: object) -> bytes:
+                value = checkpoint_store.read_bytes(*args, **keywords)  # type: ignore[arg-type]
+                event_log.append("checkpoint_store_read")
+                return value
+
         fence_calls: list[dict[str, object]] = []
 
         def verify_fence(**keywords: object) -> bool:
@@ -1216,6 +1230,8 @@ class OfflineExecutionCoordinatorAssuranceTests(unittest.TestCase):
                     "ledger_checkpoint",
                     "checkpoint_manifest",
                     "artifacts",
+                    "checkpoint_store",
+                    "checkpoint_store_read",
                     "completion",
                     "execution_receipt",
                     "execution_record",
@@ -1224,7 +1240,7 @@ class OfflineExecutionCoordinatorAssuranceTests(unittest.TestCase):
             self.assertIsInstance(record, ExecutionRecord)
             self.assertEqual(raw_ledger.event_count(), 3)
             self.assertTrue(raw_ledger.verify_chain())
-            self.assertEqual(checkpoint_store.object_count(), 1)
+            self.assertEqual(checkpoint_store.object_count(), 2)
             self.assertEqual(artifact_store.object_count(), 1)
             self.assertEqual(len(fence_calls), 1)
             self.assertEqual(len(ingestor_inputs), 1)
@@ -1436,7 +1452,7 @@ class Stage1ExecutionStaticBoundaryTests(unittest.TestCase):
                 for name, value in OfflineExecutionCoordinator.__dict__.items()
                 if not name.startswith("_") and callable(value)
             },
-            {"execute"},
+            {"execute", "lookup_execution_receipt"},
         )
 
         l0_constructor = inspect.signature(DeterministicL0Runner)
@@ -1471,6 +1487,14 @@ class Stage1ExecutionStaticBoundaryTests(unittest.TestCase):
             ["self", "job_spec", "permit", "lease", "staging_root", "now"],
         )
         self.assertEqual(execute.parameters["now"].kind, inspect.Parameter.KEYWORD_ONLY)
+        self.assertEqual(
+            list(
+                inspect.signature(
+                    OfflineExecutionCoordinator.lookup_execution_receipt
+                ).parameters
+            ),
+            ["self", "job_spec_ref"],
+        )
         self.assertEqual(list(inspect.signature(canonical_json_sha256).parameters), ["value"])
 
     def test_modules_have_no_process_network_dynamic_code_or_domain_authority(self) -> None:

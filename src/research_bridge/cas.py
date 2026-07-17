@@ -171,6 +171,100 @@ class ContentAddressedStore:
         self.inspect(ref)
         return True
 
+    def read_bytes(self, ref: str, *, maximum_size_bytes: int) -> bytes:
+        """Return fully verified object bytes without following links.
+
+        The size ceiling is checked before allocation and while streaming so a
+        corrupt or racing object cannot turn a bounded read into an unbounded
+        one.
+        """
+
+        digest = self._digest_from_ref(ref)
+        if (
+            isinstance(maximum_size_bytes, bool)
+            or not isinstance(maximum_size_bytes, int)
+            or maximum_size_bytes < 0
+        ):
+            raise CASError("maximum_size_bytes must be a non-negative integer")
+        path = self._object_path(digest)
+        flags = (
+            os.O_RDONLY
+            | getattr(os, "O_CLOEXEC", 0)
+            | getattr(os, "O_NOFOLLOW", 0)
+        )
+        with self._exclusive_lock():
+            try:
+                path_stat = os.lstat(path)
+                if not stat.S_ISREG(path_stat.st_mode) or stat.S_ISLNK(
+                    path_stat.st_mode
+                ):
+                    raise CASError("CAS object is not a regular file")
+                fd = os.open(path, flags)
+            except CASError:
+                raise
+            except OSError as exc:
+                raise CASError("CAS object is unavailable") from exc
+            try:
+                opened_stat = os.fstat(fd)
+                if not stat.S_ISREG(opened_stat.st_mode):
+                    raise CASError("CAS object is not a regular file")
+                if stat.S_IMODE(opened_stat.st_mode) != 0o444:
+                    raise CASError("CAS object mode is not immutable")
+                if (path_stat.st_dev, path_stat.st_ino) != (
+                    opened_stat.st_dev,
+                    opened_stat.st_ino,
+                ):
+                    raise CASError("CAS object changed while it was opened")
+                if opened_stat.st_size > maximum_size_bytes:
+                    raise CASError("CAS object exceeds maximum_size_bytes")
+
+                hasher = hashlib.sha256()
+                total = 0
+                chunks: list[bytes] = []
+                while True:
+                    block = os.read(fd, self._chunk_size)
+                    if not block:
+                        break
+                    total += len(block)
+                    if total > maximum_size_bytes:
+                        raise CASError("CAS object exceeds maximum_size_bytes")
+                    hasher.update(block)
+                    chunks.append(block)
+
+                after_stat = os.fstat(fd)
+                after_path = os.lstat(path)
+                if (
+                    opened_stat.st_dev,
+                    opened_stat.st_ino,
+                    opened_stat.st_size,
+                    stat.S_IMODE(opened_stat.st_mode),
+                    getattr(opened_stat, "st_mtime_ns", None),
+                    getattr(opened_stat, "st_ctime_ns", None),
+                ) != (
+                    after_stat.st_dev,
+                    after_stat.st_ino,
+                    after_stat.st_size,
+                    stat.S_IMODE(after_stat.st_mode),
+                    getattr(after_stat, "st_mtime_ns", None),
+                    getattr(after_stat, "st_ctime_ns", None),
+                ):
+                    raise CASError("CAS object changed during bounded read")
+                if (
+                    not stat.S_ISREG(after_path.st_mode)
+                    or stat.S_ISLNK(after_path.st_mode)
+                    or stat.S_IMODE(after_path.st_mode) != 0o444
+                    or (after_path.st_dev, after_path.st_ino)
+                    != (after_stat.st_dev, after_stat.st_ino)
+                ):
+                    raise CASError("CAS object path changed during bounded read")
+                if total != opened_stat.st_size or hasher.hexdigest() != digest:
+                    raise CASError("CAS object integrity verification failed")
+                return b"".join(chunks)
+            except OSError as exc:
+                raise CASError("CAS object bounded read failed") from exc
+            finally:
+                os.close(fd)
+
     def used_bytes(self) -> int:
         """Return bytes occupied by canonical objects (temporary bytes excluded)."""
 

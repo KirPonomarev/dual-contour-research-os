@@ -17,6 +17,7 @@ import os
 from pathlib import Path, PurePosixPath
 import re
 import stat
+import tempfile
 from types import MappingProxyType
 from typing import Any, Mapping, Protocol
 
@@ -41,6 +42,57 @@ _CAS_REF_RE = re.compile(r"^cas:sha256:([a-f0-9]{64})$")
 _ACCOUNTING_POLICY_REF_RE = re.compile(r"^budget-policy:sha256:[a-f0-9]{64}$")
 _BUDGET_SCOPE_REF_RE = re.compile(r"^budget-scope:sha256:[a-f0-9]{64}$")
 _MAX_SAFE_INTEGER = 9_007_199_254_740_991
+_TERMINAL_MATERIAL_SCHEMA_ID = "OwnedExecutionTerminalMaterial"
+_TERMINAL_MATERIAL_SCHEMA_VERSION = "1.0.0"
+_MAX_TERMINAL_MATERIAL_BYTES = 65_536
+_TERMINAL_MATERIAL_FIELDS = frozenset(
+    {
+        "schema_id",
+        "schema_version",
+        "job_spec_ref",
+        "permit_ref",
+        "lease_ref",
+        "attempt_id",
+        "issuer_id",
+        "contour",
+        "classification",
+        "code_sha256",
+        "input_sha256",
+        "environment_digest",
+        "started_at",
+        "ended_at",
+        "exit_classification",
+        "artifact_refs",
+        "resource_usage",
+        "checkpoint_manifest_object_id",
+        "checkpoint_manifest_sha256",
+    }
+)
+_COMPLETE_EVENT_PAYLOAD_FIELDS = frozenset(
+    {
+        "attempt_id",
+        "event_at",
+        "fencing_epoch",
+        "fencing_token_sha256",
+        "job_id",
+        "provider_accounting_attestation",
+        "result_sha256",
+        "settlement_receipt",
+    }
+)
+_RECEIPT_FIELDS = frozenset(
+    {
+        "schema_id",
+        "schema_version",
+        "object_id",
+        "issued_at",
+        "issuer",
+        "contour",
+        "classification",
+        "payload",
+        "integrity",
+    }
+)
 _EVENT_FIELDS = frozenset(
     {
         "sequence",
@@ -180,6 +232,8 @@ class _Store(Protocol):
         expected_size_bytes: int,
     ) -> object: ...
 
+    def read_bytes(self, ref: str, *, maximum_size_bytes: int) -> bytes: ...
+
 
 class _Ingestor(Protocol):
     def ingest(
@@ -192,9 +246,13 @@ class _Ingestor(Protocol):
 def canonical_json_sha256(value: Any) -> str:
     """Return SHA-256 over strict deterministic UTF-8 JSON."""
 
+    return hashlib.sha256(_canonical_json_bytes(value)).hexdigest()
+
+
+def _canonical_json_bytes(value: Any) -> bytes:
     _ensure_json_value(value, "value")
     try:
-        encoded = json.dumps(
+        return json.dumps(
             _json_ready(value),
             sort_keys=True,
             separators=(",", ":"),
@@ -203,7 +261,6 @@ def canonical_json_sha256(value: Any) -> str:
         ).encode("utf-8")
     except (TypeError, ValueError, UnicodeError) as exc:
         raise ExecutionError("value is not canonical JSON") from exc
-    return hashlib.sha256(encoded).hexdigest()
 
 
 class OfflineExecutionCoordinator:
@@ -224,6 +281,7 @@ class OfflineExecutionCoordinator:
         _callable_method(ledger, "complete", "ledger")
         _callable_method(runner, "run", "runner")
         _callable_method(checkpoint_store, "publish", "checkpoint_store")
+        _callable_method(checkpoint_store, "read_bytes", "checkpoint_store")
         _callable_method(ingestor, "ingest", "ingestor")
         issuer = _identifier("issuer_id", issuer_id)
         _identifier("trusted ingestor issuer_id", f"{issuer}-trusted-ingestor")
@@ -332,11 +390,72 @@ class OfflineExecutionCoordinator:
         )
         artifact_refs = tuple(record.artifact_ref for record in artifact_snapshots)
 
-        completion_binding = {
-            "artifact_refs": list(artifact_refs),
-            "checkpoint_manifest_sha256": canonical_json_sha256(checkpoint_manifest),
-        }
-        result_sha256 = canonical_json_sha256(completion_binding)
+        terminal_material = _construct_terminal_material(
+            bindings=bindings,
+            result=result,
+            artifact_refs=artifact_refs,
+            checkpoint_manifest=checkpoint_manifest,
+            issuer_id=self._issuer_id,
+        )
+        terminal_bytes = _canonical_json_bytes(terminal_material)
+        if len(terminal_bytes) > _MAX_TERMINAL_MATERIAL_BYTES:
+            raise ExecutionError("terminal material exceeds its byte ceiling")
+        result_sha256 = hashlib.sha256(terminal_bytes).hexdigest()
+        terminal_ref = f"cas:sha256:{result_sha256}"
+        try:
+            with tempfile.TemporaryDirectory(prefix="bridge-terminal-") as directory:
+                terminal_path = Path(directory) / "terminal.json"
+                descriptor = os.open(
+                    terminal_path,
+                    os.O_WRONLY
+                    | os.O_CREAT
+                    | os.O_EXCL
+                    | getattr(os, "O_CLOEXEC", 0)
+                    | getattr(os, "O_NOFOLLOW", 0),
+                    0o600,
+                )
+                try:
+                    view = memoryview(terminal_bytes)
+                    while view:
+                        written = os.write(descriptor, view)
+                        if written <= 0:
+                            raise ExecutionError(
+                                "terminal material write made no progress"
+                            )
+                        view = view[written:]
+                    os.fsync(descriptor)
+                finally:
+                    os.close(descriptor)
+                terminal_publication = self._checkpoint_store.publish(
+                    terminal_path,
+                    expected_sha256=result_sha256,
+                    expected_size_bytes=len(terminal_bytes),
+                )
+        except ExecutionError:
+            raise
+        except Exception as exc:
+            raise ExecutionError("terminal material CAS publication failed") from exc
+        if (
+            _validate_checkpoint_publication(
+                terminal_publication,
+                result_sha256,
+                len(terminal_bytes),
+            )
+            != terminal_ref
+        ):
+            raise ExecutionError("terminal material CAS reference is invalid")
+        try:
+            verified_terminal_bytes = self._checkpoint_store.read_bytes(
+                terminal_ref,
+                maximum_size_bytes=_MAX_TERMINAL_MATERIAL_BYTES,
+            )
+        except Exception as exc:
+            raise ExecutionError("terminal material CAS verification failed") from exc
+        if type(verified_terminal_bytes) is not bytes or not hmac.compare_digest(
+            verified_terminal_bytes,
+            terminal_bytes,
+        ):
+            raise ExecutionError("terminal material CAS verification mismatch")
         try:
             completion_event = self._ledger.complete(
                 job_id=bindings.job_id,
@@ -357,15 +476,11 @@ class OfflineExecutionCoordinator:
                 result.ended_at,
             )
             execution_receipt = _construct_execution_receipt(
-                bindings=bindings,
-                result=result,
-                artifact_refs=artifact_refs,
-                checkpoint_manifest=checkpoint_manifest,
+                terminal_material=terminal_material,
                 completion_event_sha256=_event_sha256(
                     completion_event, "completion_event"
                 ),
                 settlement_ref=settlement_ref,
-                issuer_id=self._issuer_id,
             )
             return ExecutionRecord(
                 checkpoint_manifest=checkpoint_manifest,
@@ -376,6 +491,47 @@ class OfflineExecutionCoordinator:
             raise ExecutionError(
                 "critical post-completion receipt invariant failed"
             ) from exc
+
+    def lookup_execution_receipt(
+        self, job_spec_ref: str
+    ) -> Mapping[str, Any]:
+        """Reconstruct one terminal receipt without writes or execution."""
+
+        requested_job = _identifier("job_spec_ref", job_spec_ref)
+        _callable_method(self._ledger, "completed_event", "ledger")
+        _callable_method(self._checkpoint_store, "read_bytes", "checkpoint_store")
+        try:
+            completion_event = self._ledger.completed_event(requested_job)
+            completion = _validate_lookup_completion_event(
+                completion_event,
+                requested_job,
+            )
+            terminal_ref = f"cas:sha256:{completion['result_sha256']}"
+            terminal_bytes = self._checkpoint_store.read_bytes(
+                terminal_ref,
+                maximum_size_bytes=_MAX_TERMINAL_MATERIAL_BYTES,
+            )
+            terminal_material = _decode_terminal_material(
+                terminal_bytes,
+                expected_sha256=completion["result_sha256"],
+                expected_job_spec_ref=requested_job,
+                expected_attempt_id=completion["attempt_id"],
+                expected_ended_at=completion["event_at"],
+                expected_contour=completion["contour"],
+                expected_classification=completion["classification"],
+                expected_issuer_id=self._issuer_id,
+            )
+            return _construct_execution_receipt(
+                terminal_material=terminal_material,
+                completion_event_sha256=_event_sha256(
+                    completion_event, "completion_event"
+                ),
+                settlement_ref=completion["settlement_ref"],
+            )
+        except ExecutionError:
+            raise
+        except Exception as exc:
+            raise ExecutionError("terminal execution receipt is unavailable") from exc
 
 
 def _authority_bindings(
@@ -862,20 +1018,24 @@ def _validate_completion_event(
     return settlement["object_id"]
 
 
-def _construct_execution_receipt(
+def _construct_terminal_material(
     *,
     bindings: _Bindings,
     result: _ResultView,
     artifact_refs: tuple[str, ...],
     checkpoint_manifest: Mapping[str, Any],
-    completion_event_sha256: str,
-    settlement_ref: str,
     issuer_id: str,
 ) -> Mapping[str, Any]:
-    payload = {
+    material = {
+        "schema_id": _TERMINAL_MATERIAL_SCHEMA_ID,
+        "schema_version": _TERMINAL_MATERIAL_SCHEMA_VERSION,
+        "job_spec_ref": bindings.job_id,
         "permit_ref": bindings.permit_id,
         "lease_ref": bindings.lease_id,
-        "job_spec_ref": bindings.job_id,
+        "attempt_id": bindings.attempt_id,
+        "issuer_id": issuer_id,
+        "contour": bindings.contour,
+        "classification": bindings.classification,
         "code_sha256": result.code_sha256,
         "input_sha256": result.input_sha256,
         "environment_digest": result.environment_digest,
@@ -884,24 +1044,259 @@ def _construct_execution_receipt(
         "exit_classification": "mechanical-success",
         "artifact_refs": list(artifact_refs),
         "resource_usage": result.resource_usage,
-        "event_chain_head": completion_event_sha256,
+        "checkpoint_manifest_object_id": checkpoint_manifest["object_id"],
+        "checkpoint_manifest_sha256": canonical_json_sha256(checkpoint_manifest),
+    }
+    return _validate_terminal_material(
+        material,
+        expected_job_spec_ref=bindings.job_id,
+        expected_attempt_id=bindings.attempt_id,
+        expected_ended_at=result.ended_at,
+        expected_contour=bindings.contour,
+        expected_classification=bindings.classification,
+        expected_issuer_id=issuer_id,
+    )
+
+
+def _decode_terminal_material(
+    encoded: object,
+    *,
+    expected_sha256: str,
+    expected_job_spec_ref: str,
+    expected_attempt_id: str,
+    expected_ended_at: str,
+    expected_contour: str,
+    expected_classification: str,
+    expected_issuer_id: str,
+) -> Mapping[str, Any]:
+    if type(encoded) is not bytes or len(encoded) > _MAX_TERMINAL_MATERIAL_BYTES:
+        raise ExecutionError("terminal material bytes are invalid")
+
+    def reject_duplicates(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+        result: dict[str, Any] = {}
+        for key, value in pairs:
+            if key in result:
+                raise ExecutionError("terminal material contains duplicate keys")
+            result[key] = value
+        return result
+
+    def reject_constant(value: str) -> None:
+        raise ExecutionError(f"terminal material contains non-finite {value}")
+
+    try:
+        decoded = json.loads(
+            encoded.decode("utf-8", errors="strict"),
+            object_pairs_hook=reject_duplicates,
+            parse_constant=reject_constant,
+        )
+    except ExecutionError:
+        raise
+    except (UnicodeError, json.JSONDecodeError, TypeError, ValueError) as exc:
+        raise ExecutionError("terminal material is not strict JSON") from exc
+    if _canonical_json_bytes(decoded) != encoded:
+        raise ExecutionError("terminal material encoding is not canonical")
+    digest = hashlib.sha256(encoded).hexdigest()
+    if not hmac.compare_digest(digest, _sha256("expected_sha256", expected_sha256)):
+        raise ExecutionError("terminal material digest binding mismatch")
+    return _validate_terminal_material(
+        decoded,
+        expected_job_spec_ref=expected_job_spec_ref,
+        expected_attempt_id=expected_attempt_id,
+        expected_ended_at=expected_ended_at,
+        expected_contour=expected_contour,
+        expected_classification=expected_classification,
+        expected_issuer_id=expected_issuer_id,
+    )
+
+
+def _validate_terminal_material(
+    material: object,
+    *,
+    expected_job_spec_ref: str,
+    expected_attempt_id: str,
+    expected_ended_at: str,
+    expected_contour: str,
+    expected_classification: str,
+    expected_issuer_id: str,
+) -> Mapping[str, Any]:
+    value = _exact_mapping(
+        material,
+        _TERMINAL_MATERIAL_FIELDS,
+        "terminal_material",
+    )
+    if value["schema_id"] != _TERMINAL_MATERIAL_SCHEMA_ID:
+        raise ExecutionError("terminal material schema_id is invalid")
+    if value["schema_version"] != _TERMINAL_MATERIAL_SCHEMA_VERSION:
+        raise ExecutionError("terminal material schema_version is invalid")
+    if _identifier("terminal job_spec_ref", value["job_spec_ref"]) != expected_job_spec_ref:
+        raise ExecutionError("terminal material job binding mismatch")
+    _identifier("terminal permit_ref", value["permit_ref"])
+    _identifier("terminal lease_ref", value["lease_ref"])
+    if _identifier("terminal attempt_id", value["attempt_id"]) != expected_attempt_id:
+        raise ExecutionError("terminal material attempt binding mismatch")
+    if _identifier("terminal issuer_id", value["issuer_id"]) != expected_issuer_id:
+        raise ExecutionError("terminal material issuer binding mismatch")
+    if _identifier("terminal contour", value["contour"]) != expected_contour:
+        raise ExecutionError("terminal material contour binding mismatch")
+    classification = _normalized_text(
+        "terminal classification", value["classification"]
+    )
+    if classification not in _ALLOWED_CLASSIFICATIONS:
+        raise ExecutionError("terminal material classification is invalid")
+    if classification != expected_classification:
+        raise ExecutionError("terminal material classification binding mismatch")
+    _sha256("terminal code_sha256", value["code_sha256"])
+    _sha256("terminal input_sha256", value["input_sha256"])
+    _normalized_text("terminal environment_digest", value["environment_digest"])
+    started_at = _timestamp("terminal started_at", value["started_at"])
+    ended_at = _timestamp("terminal ended_at", value["ended_at"])
+    if _parse_timestamp(started_at) > _parse_timestamp(ended_at):
+        raise ExecutionError("terminal material time interval is invalid")
+    if ended_at != expected_ended_at:
+        raise ExecutionError("terminal material completion time binding mismatch")
+    if value["exit_classification"] != "mechanical-success":
+        raise ExecutionError("terminal material exit classification is invalid")
+    artifact_values = value["artifact_refs"]
+    if not isinstance(artifact_values, (list, tuple)) or not artifact_values:
+        raise ExecutionError("terminal material artifact_refs are invalid")
+    artifact_refs = tuple(
+        _cas_ref(f"terminal artifact_refs[{index}]", item)
+        for index, item in enumerate(artifact_values)
+    )
+    resource_usage = _mapping(value["resource_usage"], "terminal resource_usage")
+    _ensure_json_value(resource_usage, "terminal resource_usage")
+    checkpoint_manifest_object_id = _identifier(
+        "terminal checkpoint_manifest_object_id",
+        value["checkpoint_manifest_object_id"],
+    )
+    if not checkpoint_manifest_object_id.startswith("checkpoint-manifest-"):
+        raise ExecutionError("terminal checkpoint manifest object id is invalid")
+    _sha256(
+        "terminal checkpoint_manifest_sha256",
+        value["checkpoint_manifest_sha256"],
+    )
+    validated = dict(value)
+    validated["artifact_refs"] = list(artifact_refs)
+    validated["resource_usage"] = resource_usage
+    return _deep_freeze(validated)
+
+
+def _validate_lookup_completion_event(
+    event: object,
+    requested_job: str,
+) -> Mapping[str, Any]:
+    values = _exact_attributes(event, _EVENT_FIELDS, "completion_event")
+    if values["event_type"] != "complete":
+        raise ExecutionError("completion event type is invalid")
+    if _identifier("completion job_id", values["job_id"]) != requested_job:
+        raise ExecutionError("completion event job binding mismatch")
+    attempt_id = _identifier("completion attempt_id", values["attempt_id"])
+    fencing_epoch = _nonnegative_integer(
+        "completion fencing_epoch", values["fencing_epoch"]
+    )
+    event_at = _timestamp("completion event_at", values["event_at"])
+    if (
+        isinstance(values["sequence"], bool)
+        or not isinstance(values["sequence"], int)
+        or values["sequence"] <= 0
+    ):
+        raise ExecutionError("completion sequence is invalid")
+    _sha256("completion previous_sha256", values["previous_sha256"])
+    _sha256("completion event_sha256", values["event_sha256"])
+    payload = _exact_mapping(
+        values["payload"],
+        _COMPLETE_EVENT_PAYLOAD_FIELDS,
+        "completion_event.payload",
+    )
+    if (
+        payload["job_id"] != requested_job
+        or payload["attempt_id"] != attempt_id
+        or payload["fencing_epoch"] != fencing_epoch
+        or payload["event_at"] != event_at
+    ):
+        raise ExecutionError("completion payload column binding mismatch")
+    _sha256("completion fencing_token_sha256", payload["fencing_token_sha256"])
+    result_sha256 = _sha256(
+        "completion result_sha256", payload["result_sha256"]
+    )
+    settlement = _exact_mapping(
+        payload["settlement_receipt"],
+        _RECEIPT_FIELDS,
+        "completion settlement_receipt",
+    )
+    if settlement["schema_id"] != "SettlementReceipt" or settlement["schema_version"] != "1.0.0":
+        raise ExecutionError("completion settlement schema is invalid")
+    settlement_ref = _identifier(
+        "completion settlement object_id", settlement["object_id"]
+    )
+    if not settlement_ref.startswith("settlement-receipt-"):
+        raise ExecutionError("completion settlement object_id is invalid")
+    if _timestamp("completion settlement issued_at", settlement["issued_at"]) != event_at:
+        raise ExecutionError("completion settlement time binding mismatch")
+    contour = _identifier("completion settlement contour", settlement["contour"])
+    classification = _normalized_text(
+        "completion settlement classification", settlement["classification"]
+    )
+    if classification not in _ALLOWED_CLASSIFICATIONS:
+        raise ExecutionError("completion settlement classification is invalid")
+    return _deep_freeze(
+        {
+            "attempt_id": attempt_id,
+            "event_at": event_at,
+            "result_sha256": result_sha256,
+            "settlement_ref": settlement_ref,
+            "contour": contour,
+            "classification": classification,
+        }
+    )
+
+
+def _construct_execution_receipt(
+    *,
+    terminal_material: Mapping[str, Any],
+    completion_event_sha256: str,
+    settlement_ref: str,
+) -> Mapping[str, Any]:
+    material = _exact_mapping(
+        terminal_material,
+        _TERMINAL_MATERIAL_FIELDS,
+        "terminal_material",
+    )
+    completion_sha256 = _sha256(
+        "completion_event_sha256", completion_event_sha256
+    )
+    settlement_object_id = _identifier("settlement_ref", settlement_ref)
+    artifact_refs = tuple(material["artifact_refs"])
+    payload = {
+        "permit_ref": material["permit_ref"],
+        "lease_ref": material["lease_ref"],
+        "job_spec_ref": material["job_spec_ref"],
+        "code_sha256": material["code_sha256"],
+        "input_sha256": material["input_sha256"],
+        "environment_digest": material["environment_digest"],
+        "started_at": material["started_at"],
+        "ended_at": material["ended_at"],
+        "exit_classification": material["exit_classification"],
+        "artifact_refs": list(artifact_refs),
+        "resource_usage": material["resource_usage"],
+        "event_chain_head": completion_sha256,
     }
     receipt = {
         "schema_id": "ExecutionReceipt",
         "schema_version": "1.0.0",
         "object_id": f"execution-receipt-{canonical_json_sha256(payload)}",
-        "issued_at": result.ended_at,
-        "issuer": {"id": issuer_id, "authority_class": "researchd"},
-        "contour": bindings.contour,
-        "classification": bindings.classification,
+        "issued_at": material["ended_at"],
+        "issuer": {"id": material["issuer_id"], "authority_class": "researchd"},
+        "contour": material["contour"],
+        "classification": material["classification"],
         "payload": payload,
         "integrity": {
             "payload_sha256": canonical_json_sha256(payload),
             "parent_refs": [
-                checkpoint_manifest["object_id"],
+                material["checkpoint_manifest_object_id"],
                 *artifact_refs,
-                settlement_ref,
-                f"ledger:{completion_event_sha256}",
+                settlement_object_id,
+                f"ledger:{completion_sha256}",
             ],
         },
     }
