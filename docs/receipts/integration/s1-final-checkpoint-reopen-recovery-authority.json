@@ -1,0 +1,60 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s1-final-checkpoint-reopen-recovery-authority-20260717",
+  "issued_at": "2026-07-17T13:54:50Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "bridge",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s1-final-checkpoint-reopen-recovery-authority",
+    "agent_id": "agent-0",
+    "ownership_lease_ref": "stages/s1-final-checkpoint-reopen-recovery-authority/ownership-lease.json",
+    "base_sha": "637f5043f00893d8af4a52203c3b76f1f0efd781",
+    "head_sha": "9f6346022540acdefeae4c7f0aa4d425ec75faf4",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "docs/receipts/reuse/s1-final-checkpoint-reopen-recovery.json",
+      "stages/s1-final-checkpoint-reopen-recovery-authority/stage-envelope.json",
+      "stages/s1-final-checkpoint-reopen-recovery-authority/ownership-lease.json",
+      "tests/test_stage1_authority.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "focused_tests": 33,
+      "canonical_tests": 262,
+      "stage0b_tests": 25,
+      "skipped_tests": 0,
+      "diff_check": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "dependency_adoption": false,
+      "frozen_contract_edit": false,
+      "worker_source_files": 2,
+      "worker_test_files": 5,
+      "same_attempt_only": true,
+      "schema_or_event_vocabulary_change_authorized": false,
+      "second_ledger_or_store_authorized": false,
+      "multi_attempt_or_scheduler_authorized": false,
+      "byte_exact_execution_receipt_lookup_claimed": false,
+      "live_or_connected_authority": false,
+      "selected_mode": "owned-stdlib-verified-final-checkpoint-same-attempt-replay-single-ledger",
+      "reuse_payload_sha256": "f28c85b58ab081c446583e95f5c69985e61d3f88f86d59d6b8c278ad314b2856",
+      "exact_head_remote_ci": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29585774423"
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29585774423",
+    "integration_commit_sha": "9f6346022540acdefeae4c7f0aa4d425ec75faf4"
+  },
+  "integrity": {
+    "payload_sha256": "2625cfa0d1d2fb8c7007ec5852fa25f25ed87ad52ba48ec2060ff8a690e2eca0",
+    "parent_refs": [
+      "git:9f6346022540acdefeae4c7f0aa4d425ec75faf4",
+      "ci:29585774423",
+      "integration:integration-s1-budget-attempt-lifecycle-20260717",
+      "reuse:reuse-s1-final-checkpoint-reopen-recovery-20260717"
+    ]
+  }
+}
