@@ -1,0 +1,64 @@
+{
+  "stage_id": "s1-rc-assurance-gap-audit",
+  "agent_id": "agent-5",
+  "objective": "Independently audit adversarial assurance, recovery, supply-chain and release evidence required for SKELETON_GREEN and a bounded offline conditional RC without conflating them with 72-hour soak or 14-day production approval.",
+  "executable_blocker": "The Bridge has extensive unit and vertical evidence, but no current canonical gate distinguishes executable RC prerequisites from later soak and production requirements; Agent 0 needs a hostile read-only gap audit before release-stage authority is issued.",
+  "base_sha": "39bfa687be5b90a66671abe1ef8689b8a08142c4",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a5-s1-rc-assurance-gap-audit",
+  "worktree": "ephemeral-public-audit-worktree:s1-rc-assurance-gap-audit",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "README.md",
+    ".github/workflows/**",
+    "pyproject.toml",
+    "src/research_bridge/**",
+    "tests/test_stage1_*.py",
+    "docs/receipts/integration/s1-*.json",
+    "docs/receipts/reuse/s1-*.json",
+    "stages/s1-*/stage-envelope*.json",
+    "private-master-plan:v2.3@sha256:b0a586a75fae1c0dd72cb8589819c5e5bec27d7509c02dab7dc5cfc7c10220f6"
+  ],
+  "write_set": [],
+  "required_output": [
+    "adversarial evidence matrix for admission ledger CAS execution validation and reference vertical",
+    "missing crash replay reboot restore rollback supply-chain license packaging and release evidence",
+    "separate prerequisite sets for conditional offline RC 72-hour soak MVP and 14-day production approval",
+    "exact proposed assurance stage write-sets and acceptance commands",
+    "explicit severity and candidate-timer reset rules"
+  ],
+  "forbidden_scope": [
+    "repository-edit-commit-push-pr-or-external-mutation",
+    "self-approval-of-green-status",
+    "private-plan-source-fixture-or-payload-copy-into-public-repository",
+    "test-weakening-skip-xfail-or-continue-on-error-recommendation",
+    "live-trading-live-target-testing-deployment-publication-or-authority-expansion",
+    "treating-soak-or-burn-in-as-global-mainline-blocker"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "reference_vertical_receipt": "466eddcd6cd200e30c7fbe565c649b59c2c9afd2b6fae521ff76bbd46cf077eb",
+    "master_plan": "b0a586a75fae1c0dd72cb8589819c5e5bec27d7509c02dab7dc5cfc7c10220f6",
+    "external_dependencies": "none"
+  },
+  "acceptance_commands": [
+    "git status --short --branch",
+    "test exact HEAD and upstream equal 39bfa687be5b90a66671abe1ef8689b8a08142c4",
+    "make contracts",
+    "make test",
+    "map every release claim to exact source test and receipt evidence or mark missing",
+    "return read-only assurance audit to Agent 0 with no repository diff"
+  ],
+  "risk_class": "read-only-stage1-adversarial-recovery-and-release-gap-audit",
+  "stop_conditions": [
+    "base-upstream-contract-or-master-plan-hash-mismatch",
+    "dirty-audit-worktree",
+    "evidence-conflict-private-boundary-risk-or-green-self-approval",
+    "repository-write-required"
+  ],
+  "expected_receipt": "agent0-audit-handoff-no-integration-receipt-until-an-executable-stage-is-accepted",
+  "rollback": "Delete the clean read-only audit branch/worktree. No repository or external state is mutated.",
+  "commit_authority": "none-read-only",
+  "push_authority": false
+}

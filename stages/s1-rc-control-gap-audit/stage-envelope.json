@@ -1,0 +1,62 @@
+{
+  "stage_id": "s1-rc-control-gap-audit",
+  "agent_id": "agent-1",
+  "objective": "Independently identify the shortest evidence-backed path from the current integrated Bridge to SKELETON_GREEN and a bounded offline conditional RC, with exact next-stage files, dependencies and acceptance commands.",
+  "executable_blocker": "The implementation surface is broad and already integrated in many bounded stages, but the canonical reference receipt still reports global_skeleton_green=false and the public status is stale; Agent 0 needs an independent control-plane gap map before opening more implementation write-sets.",
+  "base_sha": "39bfa687be5b90a66671abe1ef8689b8a08142c4",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a1-s1-rc-control-gap-audit",
+  "worktree": "ephemeral-public-audit-worktree:s1-rc-control-gap-audit",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "README.md",
+    "contracts/catalog.json",
+    "src/research_bridge/**",
+    "tests/test_stage1_*.py",
+    "docs/receipts/integration/s1-*.json",
+    "stages/s1-*/stage-envelope*.json",
+    "private-master-plan:v2.3@sha256:b0a586a75fae1c0dd72cb8589819c5e5bec27d7509c02dab7dc5cfc7c10220f6"
+  ],
+  "write_set": [],
+  "required_output": [
+    "implemented-and-proven capability matrix",
+    "remaining mandatory SKELETON_GREEN and offline RC gaps ranked by criticality",
+    "exact proposed next bounded stages with agent owner and nonoverlapping write-set",
+    "license packaging deployment soak and production items clearly separated",
+    "explicit rejection of duplicate kernels ledgers or domain truth writers in Bridge"
+  ],
+  "forbidden_scope": [
+    "repository-edit-commit-push-pr-or-external-mutation",
+    "contract-status-or-green-declaration",
+    "private-plan-or-private-source-copy-into-public-repository",
+    "market-security-domain-feature-implementation",
+    "live-trading-live-target-testing-deployment-publication-or-authority-expansion",
+    "new-dependency-or-architecture-expansion-without-executable-blocker"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "reference_vertical_receipt": "466eddcd6cd200e30c7fbe565c649b59c2c9afd2b6fae521ff76bbd46cf077eb",
+    "master_plan": "b0a586a75fae1c0dd72cb8589819c5e5bec27d7509c02dab7dc5cfc7c10220f6",
+    "external_dependencies": "none"
+  },
+  "acceptance_commands": [
+    "git status --short --branch",
+    "test exact HEAD and upstream equal 39bfa687be5b90a66671abe1ef8689b8a08142c4",
+    "make contracts",
+    "make test",
+    "cross-check every claimed capability against source test and IntegrationReceipt evidence",
+    "return read-only audit to Agent 0 with no repository diff"
+  ],
+  "risk_class": "read-only-stage1-control-and-release-gap-audit",
+  "stop_conditions": [
+    "base-upstream-contract-or-master-plan-hash-mismatch",
+    "dirty-audit-worktree",
+    "evidence-conflict-or-private-boundary-risk",
+    "repository-write-required"
+  ],
+  "expected_receipt": "agent0-audit-handoff-no-integration-receipt-until-an-executable-stage-is-accepted",
+  "rollback": "Delete the clean read-only audit branch/worktree. No repository or external state is mutated.",
+  "commit_authority": "none-read-only",
+  "push_authority": false
+}

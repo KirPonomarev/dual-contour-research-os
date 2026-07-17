@@ -1,0 +1,14 @@
+{
+  "lease_id": "lease-s1-rc-control-gap-audit-agent-1-20260717",
+  "stage_id": "s1-rc-control-gap-audit",
+  "agent_id": "agent-1",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-17T08:32:18Z",
+  "expires_at": "2026-07-17T12:32:18Z",
+  "base_sha": "39bfa687be5b90a66671abe1ef8689b8a08142c4",
+  "branch": "codex/bridge-a1-s1-rc-control-gap-audit",
+  "worktree": "ephemeral-public-audit-worktree:s1-rc-control-gap-audit",
+  "write_set": [],
+  "delegation_allowed": false,
+  "state": "active"
+}
