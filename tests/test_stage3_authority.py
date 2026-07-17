@@ -16,6 +16,7 @@ LOCAL_LAB_REUSE = ROOT / "docs" / "receipts" / "reuse" / "s3-security-local-lab-
 LOCAL_LAB_AUTHORITY = ROOT / "stages" / "s3-security-local-lab-evidence-authority"
 LOCAL_LAB_WORKER = ROOT / "stages" / "s3-security-local-lab-evidence"
 LOCAL_LAB_AUTHORITY_RECEIPT = ROOT / "docs" / "receipts" / "integration" / "s3-security-local-lab-evidence-authority.json"
+LOCAL_LAB_WORKER_RECEIPT = ROOT / "docs" / "receipts" / "integration" / "s3-security-local-lab-evidence.json"
 
 
 def load(path: Path) -> dict:
@@ -147,6 +148,37 @@ class Stage3AuthorityTests(unittest.TestCase):
         self.assertEqual(envelope["write_set"], lease["write_set"])
         self.assertFalse(envelope["push_authority"])
         self.assertFalse(lease["delegation_allowed"])
+
+    def test_local_lab_worker_receipt_closes_five_stage3_capabilities(self) -> None:
+        receipt = load(LOCAL_LAB_WORKER_RECEIPT)
+        self.assertEqual(receipt["integrity"]["payload_sha256"], payload_sha256(receipt))
+        self.assertEqual(receipt["payload"]["head_sha"], "83a22cf4eaf013bbd07cccd5a289bf12088982f6")
+        audit = receipt["payload"]["audit_results"]
+        for key in [
+            "completes_stage3_hypothesis_card",
+            "completes_stage3_owned_local_lab",
+            "completes_stage3_invariant_validator",
+            "completes_stage3_evidence_manifest",
+            "completes_stage3_redaction",
+        ]:
+            self.assertTrue(audit[key])
+        self.assertEqual(audit["stage3_completed_capability_count"], 7)
+        self.assertEqual(audit["stage3_required_capability_count"], 9)
+        self.assertEqual(audit["network_calls"], 0)
+        self.assertEqual(audit["registry_writes"], 0)
+        self.assertEqual(audit["cross_contour_reads"], 0)
+        self.assertFalse(audit["raw_evidence_in_output"])
+        self.assertTrue(audit["execution_failure_maps_to_invalid"])
+        self.assertFalse(audit["execution_failure_maps_to_refuted"])
+        self.assertFalse(audit["scientific_outcome_applied"])
+        self.assertFalse(audit["declares_dual_contour_pre_soak_green"])
+        self.assertFalse(audit["live_or_connected_authority"])
+
+        text = LOCAL_LAB_WORKER_RECEIPT.read_text()
+        self.assertNotIn("synthetic-stage3-marker", text)
+        self.assertNotIn("Every protected object operation", text)
+        self.assertNotIn("/Users/", text)
+        self.assertNotIn("/Volumes/", text)
 
 
 if __name__ == "__main__":
