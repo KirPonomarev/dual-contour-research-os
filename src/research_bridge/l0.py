@@ -50,6 +50,7 @@ _JOB_PAYLOAD_KEYS = frozenset(
         "idempotency_key",
     }
 )
+_RESOURCE_LIMIT_KEYS = frozenset({"cost_units"})
 _LEASE_PAYLOAD_KEYS = frozenset(
     {
         "attempt_id",
@@ -74,6 +75,7 @@ _RFC3339_RE = re.compile(
 )
 _OUTPUT_NAMES = ("checkpoint.json", "result.json")
 _MAX_TEXT_LENGTH = 1024
+_MAX_SAFE_INTEGER = 9_007_199_254_740_991
 
 
 class L0Error(RuntimeError):
@@ -357,9 +359,15 @@ def _validate_job(document: Mapping[str, Any]) -> _ValidatedJob:
         "job_spec.payload.image_digest", payload["image_digest"]
     )
     _identifier("job_spec.payload.idempotency_key", payload["idempotency_key"])
-    if not isinstance(payload["resource_limits"], Mapping):
-        raise L0Error("job resource_limits must be an object")
-    _ensure_json(payload["resource_limits"], "job_spec.payload.resource_limits")
+    resource_limits = _exact_mapping(
+        payload["resource_limits"],
+        _RESOURCE_LIMIT_KEYS,
+        "job_spec.payload.resource_limits",
+    )
+    _positive_safe_integer(
+        "job_spec.payload.resource_limits.cost_units",
+        resource_limits["cost_units"],
+    )
     raw_refs = payload["input_refs"]
     if not isinstance(raw_refs, list):
         raise L0Error("job input_refs must be an array")
@@ -620,6 +628,12 @@ def _identifier(label: str, value: object) -> str:
     if _IDENTIFIER_RE.fullmatch(normalized) is None:
         raise L0Error(f"{label} must be a normalized identifier")
     return normalized
+
+
+def _positive_safe_integer(label: str, value: object) -> int:
+    if type(value) is not int or value < 1 or value > _MAX_SAFE_INTEGER:
+        raise L0Error(f"{label} must be a positive safe integer")
+    return value
 
 
 def _portable_ref(label: str, value: object) -> str:
