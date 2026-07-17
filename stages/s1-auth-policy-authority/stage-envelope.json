@@ -1,0 +1,83 @@
+{
+  "stage_id": "s1-auth-policy-authority",
+  "agent_id": "agent-0",
+  "objective": "Authorize a single fail-closed authority verification boundary for admission and resume control that pins issuer identities/classes and resolves exact PolicySnapshot and ApprovalReceipt objects before any ledger or backend mutation.",
+  "executable_blocker": "Independent Agent 1 and Agent 5 probes proved that self-issued JobSpec Permit AttemptLease, arbitrary unresolved policy hashes and fabricated resume approval strings are accepted at the current exact head, which is a SEV0 blocker for SKELETON_GREEN and any RC.",
+  "base_sha": "90620ec0dabc547bd36829cf70784ba4d300b242",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "main",
+  "worktree": "canonical-main-worktree",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "contracts/v1/JobSpec.schema.json",
+    "contracts/v1/Permit.schema.json",
+    "contracts/v1/AttemptLease.schema.json",
+    "contracts/v1/PolicySnapshot.schema.json",
+    "contracts/v1/ApprovalReceipt.schema.json",
+    "src/research_bridge/admission.py",
+    "src/research_bridge/kernel.py",
+    "src/research_bridge/control.py",
+    "tests/test_stage1_admission.py",
+    "tests/test_stage1_control.py",
+    "tests/test_stage1_reference_vertical.py",
+    "agent1-and-agent5-read-only-forged-authority-probes"
+  ],
+  "write_set": [
+    "docs/receipts/reuse/s1-authority-policy-boundary.json",
+    "stages/s1-auth-policy-authority/stage-envelope.json",
+    "stages/s1-auth-policy-authority/ownership-lease.json",
+    "tests/test_stage1_authority.py"
+  ],
+  "authorized_worker_stage": {
+    "stage_id": "s1-auth-policy-boundary",
+    "agent_id": "agent-1",
+    "branch": "codex/bridge-a1-s1-auth-policy-boundary",
+    "write_set": [
+      "src/research_bridge/authority.py",
+      "src/research_bridge/admission.py",
+      "src/research_bridge/kernel.py",
+      "src/research_bridge/control.py",
+      "tests/test_stage1_authority_policy.py"
+    ],
+    "preservation_rule": "Use one owned verifier boundary; fail closed when verifier resolver or pinned trust is missing; preserve existing valid offline semantics; make no ledger contract schema or domain change."
+  },
+  "forbidden_scope": [
+    "frozen-contract-catalog-schema-generated-artifact-or-version-edit",
+    "ledger-cas-execution-validation-ingestion-l0-or-ipc-edit",
+    "boolean-callback-prevalidated-result-default-allow-or-issuer-self-assertion",
+    "unresolved-policy-or-approval-reference-acceptance",
+    "cryptography-jsonschema-or-other-dependency-adoption",
+    "signature-key-secret-credential-or-private-policy-payload",
+    "second-kernel-ledger-policy-store-or-domain-registry-writer",
+    "live-trading-live-target-testing-network-deployment-publication-or-authority-expansion",
+    "existing-test-deletion-relaxation-skip-xfail-or-continue-on-error"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "prior_admission_reuse": "f5bc5676d00384639bff67df911fd0e18b16d67aa357f6965a4d56342fbb0487",
+    "control_authority_receipt": "32c1323e9bb2e7f10cc997ab413e21d56e6af972cce5e893d62af8c26e91d13b",
+    "external_dependencies": "none"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest tests.test_stage1_authority -v",
+    "make test",
+    "git diff --check",
+    "public privacy secret dependency contract and exact write-set scan"
+  ],
+  "risk_class": "bridge-sev0-authority-authenticity-and-resume-policy-boundary",
+  "stop_conditions": [
+    "contract-edit-or-new-dependency-required",
+    "boolean-callback-prevalidated-result-default-allow-or-self-asserted-issuer-path-remains",
+    "policy-or-approval-object-not-fully-resolved-and-verified",
+    "ledger-ipc-domain-or-unlisted-file-edit-required",
+    "existing-valid-offline-path-regression",
+    "live-or-connected-authority-enters-scope",
+    "before-equals-after-or-forged-authority-probe-still-passes"
+  ],
+  "expected_receipt": "docs/receipts/integration/s1-auth-policy-authority.json",
+  "rollback": "Revert the scoped public authority commit before worker lease issuance. No runtime database policy source contract domain registry deployment or external system is mutated.",
+  "commit_authority": "agent-0-one-scoped-commit",
+  "push_authority": true
+}

@@ -55,6 +55,7 @@ class Stage1AuthorityTests(unittest.TestCase):
             "s1-market-clean-checkout-fixtures.json": "owner-local-synthetic-clean-checkout-fixtures-no-new-dependency",
             "s1-market-lineage-portability.json": "owner-local-manifest-derived-recursive-lineage-no-new-dependency",
             "s1-market-sanitized-count-fixture.json": "owner-private-sanitized-count-sufficient-statistics-no-public-payload",
+            "s1-authority-policy-boundary.json": "owned-stdlib-pinned-authority-policy-fail-closed",
         }
         schema = load(ROOT / "contracts" / "v1" / "ReuseDecisionReceipt.schema.json")
         allowed = set(schema["properties"])
@@ -375,6 +376,54 @@ class Stage1AuthorityTests(unittest.TestCase):
         self.assertNotIn("/Users/", public_text)
         self.assertNotIn("/Volumes/", public_text)
         self.assertNotIn("github.com/KirPonomarev/crypto-market-lab", public_text)
+        self.assertTrue(envelope["rollback"])
+        self.assertFalse(lease["delegation_allowed"])
+
+    def test_auth_policy_authority_is_fail_closed_pinned_and_contract_preserving(self) -> None:
+        envelope = load(
+            ROOT / "stages" / "s1-auth-policy-authority" / "stage-envelope.json"
+        )
+        lease = load(
+            ROOT / "stages" / "s1-auth-policy-authority" / "ownership-lease.json"
+        )
+        reuse = load(REUSE_RECEIPTS / "s1-authority-policy-boundary.json")
+
+        self.assertEqual(envelope["base_sha"], "90620ec0dabc547bd36829cf70784ba4d300b242")
+        self.assertEqual(envelope["write_set"], lease["write_set"])
+        worker = envelope["authorized_worker_stage"]
+        self.assertEqual(worker["agent_id"], "agent-1")
+        self.assertEqual(
+            worker["write_set"],
+            [
+                "src/research_bridge/authority.py",
+                "src/research_bridge/admission.py",
+                "src/research_bridge/kernel.py",
+                "src/research_bridge/control.py",
+                "tests/test_stage1_authority_policy.py",
+            ],
+        )
+        self.assertFalse(any(path.startswith("contracts/") for path in worker["write_set"]))
+        self.assertEqual(reuse["integrity"]["payload_sha256"], payload_sha256(reuse))
+        dispositions = {
+            item["candidate"]: item["disposition"]
+            for item in reuse["payload"]["candidates"]
+        }
+        self.assertEqual(
+            dispositions["owned-stdlib-authority-policy-verifier"],
+            "selected",
+        )
+        self.assertEqual(
+            dispositions["self-hash-and-nonempty-issuer-only"],
+            "rejected-forged-authority-accepted",
+        )
+        self.assertEqual(
+            dispositions["boolean-callback-prevalidated-result-or-default-allow"],
+            "rejected-validation-bypass",
+        )
+        self.assertIn(
+            "second-kernel-ledger-policy-store-or-domain-registry-writer",
+            envelope["forbidden_scope"],
+        )
         self.assertTrue(envelope["rollback"])
         self.assertFalse(lease["delegation_allowed"])
 

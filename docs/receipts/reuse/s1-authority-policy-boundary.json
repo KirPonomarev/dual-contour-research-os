@@ -1,0 +1,71 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-s1-authority-policy-boundary-20260717",
+  "issued_at": "2026-07-17T08:49:37Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "reuse-freeze-authority"
+  },
+  "contour": "bridge",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "fail-closed-pinned-issuer-policy-and-approval-verification",
+    "candidates": [
+      {
+        "candidate": "owned-stdlib-authority-policy-verifier",
+        "disposition": "selected"
+      },
+      {
+        "candidate": "frozen-PolicySnapshot-and-ApprovalReceipt-contracts",
+        "disposition": "selected"
+      },
+      {
+        "candidate": "injected-read-only-object-resolver-with-full-local-verification",
+        "disposition": "selected"
+      },
+      {
+        "candidate": "self-hash-and-nonempty-issuer-only",
+        "disposition": "rejected-forged-authority-accepted"
+      },
+      {
+        "candidate": "boolean-callback-prevalidated-result-or-default-allow",
+        "disposition": "rejected-validation-bypass"
+      },
+      {
+        "candidate": "cryptography-or-external-identity-dependency",
+        "disposition": "parked-until-key-and-signature-contract-freeze"
+      },
+      {
+        "candidate": "frozen-contract-edit",
+        "disposition": "rejected-unnecessary-for-pinned-offline-stage1"
+      }
+    ],
+    "selected_mode": "owned-stdlib-pinned-authority-policy-fail-closed",
+    "source_ref": "contracts-catalog-sha256:13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50;git:90620ec0dabc547bd36829cf70784ba4d300b242",
+    "code_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "license_spdx": "NOASSERTION",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "missing authority verifier fails closed before ledger or control backend call",
+      "forged JobSpec Permit AttemptLease issuer identity or authority class is rejected",
+      "Permit binds an exact fully verified active PolicySnapshot from a trusted resolver",
+      "unknown changed expired or issuer-forged PolicySnapshot is rejected",
+      "resume resolves and fully verifies typed ApprovalReceipt integrity issuer action policy expiry nonce and revoked state",
+      "fabricated unknown expired revoked or wrong-action ApprovalReceipt is rejected before backend call",
+      "valid pinned offline authority preserves the existing reference path",
+      "no connected execution deployment live trading or live security authority"
+    ],
+    "canonical_owner": "bridge-control-plane-agent1-with-agent0-integration",
+    "rollback": "Revert the scoped verifier and caller-integration commit. Missing trust configuration remains fail closed; the ledger, contracts, policy source, domain registries and external systems remain unchanged."
+  },
+  "integrity": {
+    "payload_sha256": "3584cedaba5ca8cc4426666f99e2076e301ac4694cf4225d2d02e566c3f4209f",
+    "parent_refs": [
+      "git:90620ec0dabc547bd36829cf70784ba4d300b242",
+      "contracts-catalog:13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+      "integration:s1-admission-kernel",
+      "integration:s1-control-ipc"
+    ]
+  }
+}
