@@ -1,0 +1,89 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s1-budget-attempt-lifecycle-20260717",
+  "issued_at": "2026-07-17T13:45:00Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "bridge",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s1-budget-attempt-lifecycle",
+    "agent_id": "agent-2",
+    "ownership_lease_ref": "stages/s1-budget-attempt-lifecycle/ownership-lease-amendment-3.json",
+    "base_sha": "19ceba5b67e0cc36964fe817206f73a1bc8747ce",
+    "head_sha": "ee8691869d5c637e5be1dd5bc2af44fd1f46622d",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "src/research_bridge/execution.py",
+      "src/research_bridge/kernel.py",
+      "src/research_bridge/ledger.py",
+      "src/research_bridge/validation.py",
+      "tests/test_stage1_admission.py",
+      "tests/test_stage1_assurance.py",
+      "tests/test_stage1_control_assurance.py",
+      "tests/test_stage1_execution.py",
+      "tests/test_stage1_execution_assurance.py",
+      "tests/test_stage1_ledger.py",
+      "tests/test_stage1_pause_epoch_fencing.py",
+      "tests/test_stage1_reference_vertical.py",
+      "tests/test_stage1_validation.py",
+      "tests/test_stage1_validation_assurance.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "worker_focused_tests": 131,
+      "worker_stage1_tests": 228,
+      "worker_canonical_tests": 258,
+      "canonical_stage1_tests": 231,
+      "canonical_tests": 261,
+      "stage0b_tests": 25,
+      "skipped_tests": 0,
+      "diff_check": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "dependency_adoption": false,
+      "frozen_contract_edit": false,
+      "schema_version": 1,
+      "single_canonical_ledger": true,
+      "reserve_claim_atomic": "green",
+      "settle_complete_atomic": "green",
+      "cumulative_fixed_charge_hard_cap": "green",
+      "global_idempotent_replay_nineteen_bindings": "green",
+      "exact_replay_during_pause_zero_write": "green",
+      "new_claim_during_pause_zero_write_denied": "green",
+      "persisted_expiry_validation": "green",
+      "persisted_aggregate_cap_validation": "green",
+      "claim_completion_sequence_and_time_causality": "green",
+      "settlement_producer_binding": "green",
+      "standalone_valid_pattern_settlement_substitution": "not-proven-by-frozen-interface",
+      "release_or_refund_enabled": false,
+      "live_or_connected_authority": false,
+      "global_stage1_gate_declared_green": false,
+      "remaining_gate": "checkpoint-reopen-terminal-replay-single-writer-researchd-and-domain-owned-offline-reference-e2e",
+      "worker_exact_head_ci": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29585034227",
+      "canonical_exact_head_ci": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29585111420",
+      "authority_amendment_receipts": [
+        "3597f82186339263c3c18700d1c4cca0d7b2760523cc35810b0ae5b4c490d227",
+        "fbf03d9892d4a00776fb2ef42cba185ed745329f75cc2c93424ebfd70247e7ff",
+        "8afdc3536621d6c02932e2acdf8430e35289fa2e71d60e5a78ab38ac48bcdc96"
+      ]
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29585111420",
+    "integration_commit_sha": "a7420a5aae73351626f3f33f597e676fd0c70d2d"
+  },
+  "integrity": {
+    "payload_sha256": "313a55f202ea6490bca15321e018f11ee0c835ab8698565c0b4830e05f90692b",
+    "parent_refs": [
+      "git:ee8691869d5c637e5be1dd5bc2af44fd1f46622d",
+      "git:a7420a5aae73351626f3f33f597e676fd0c70d2d",
+      "ci:29585034227",
+      "ci:29585111420",
+      "integration:integration-s1-budget-attempt-lifecycle-amendment-1-20260717",
+      "integration:integration-s1-budget-attempt-lifecycle-amendment-2-20260717",
+      "integration:integration-s1-budget-attempt-lifecycle-amendment-3-20260717"
+    ]
+  }
+}
