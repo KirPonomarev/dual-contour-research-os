@@ -495,6 +495,41 @@ class Stage2AuthorityTests(unittest.TestCase):
             envelope["stop_conditions"],
         )
 
+    def test_market_sealed_holdout_worker_receipt_is_sanitized_slice_only(self) -> None:
+        receipt = load(INTEGRATION_RECEIPTS / "s2-market-sealed-holdout.json")
+
+        self.assertEqual(receipt["schema_id"], "IntegrationReceipt")
+        self.assertEqual(receipt["integrity"]["payload_sha256"], payload_sha256(receipt))
+        self.assertEqual(receipt["payload"]["head_sha"], "af8553df113fa1282638b00429a9966b0f76dbab")
+        audit = receipt["payload"]["audit_results"]
+        self.assertEqual(audit["focused_sealed_holdout_tests"], 15)
+        self.assertEqual(audit["bounded_holdout_budget_tests"], 56)
+        self.assertFalse(audit["private_full_suite_run"])
+        self.assertEqual(audit["sealed_holdout_profile_file_sha256"], "8f4cf6c72ef6a7c5a9ca51071f874369488e38144a89eb2297ac5c7ee6cfb6ad")
+        self.assertEqual(audit["holdout_manifest_sha256"], "1f32b2685cc3b8b98d6b7f430850e076780f60cefafe02dd065c1e7b72223b95")
+        self.assertEqual(audit["raw_payload_bytes_in_profile"], 0)
+        self.assertEqual(audit["raw_rows_allowed"], 0)
+        self.assertEqual(audit["label_rows_allowed"], 0)
+        self.assertEqual(audit["feature_rows_allowed"], 0)
+        self.assertEqual(audit["price_rows_allowed"], 0)
+        self.assertEqual(audit["return_rows_allowed"], 0)
+        self.assertFalse(audit["raw_egress"])
+        self.assertTrue(audit["holdout_access_consumed"])
+        self.assertEqual(audit["validation_receipt_outcome"], "SEALED_HOLDOUT_BOUNDARY_PASS")
+        self.assertFalse(audit["scientific_outcome_applied"])
+        self.assertFalse(audit["public_holdout_payload_in_public_repo"])
+        self.assertFalse(audit["network_during_validation_or_tests"])
+        self.assertFalse(audit["declares_market_pre_soak_green"])
+
+        text = (INTEGRATION_RECEIPTS / "s2-market-sealed-holdout.json").read_text()
+        self.assertNotIn("domain-vault:market", text)
+        self.assertNotIn("sealed-holdout-nonce", text)
+        self.assertNotIn("holdout_rows", text)
+        self.assertNotIn("label_values", text)
+        self.assertNotIn("feature_values", text)
+        self.assertNotIn("/Users/", text)
+        self.assertNotIn("/Volumes/", text)
+
 
 if __name__ == "__main__":
     unittest.main()
