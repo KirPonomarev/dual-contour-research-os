@@ -1,0 +1,76 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s1-market-lineage-portability-20260717",
+  "issued_at": "2026-07-17T12:15:31Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "market",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s1-market-lineage-portability",
+    "agent_id": "agent-3",
+    "ownership_lease_ref": "stages/s1-market-lineage-portability/ownership-lease-amendment-1.json",
+    "base_sha": "b8e7132915a9de027ec2fe3d32c36b5980fafffa",
+    "head_sha": "dc4b1c6b0863936402dd5d41ca38d36ec0af3e41",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "src/market_lab/ban_local_eventness_nonlinear_candidate_blind_window_design.py",
+      "src/market_lab/ban_local_eventness_nonlinear_candidate_event_clustered_power_design.py",
+      "src/market_lab/ban_local_eventness_nonlinear_candidate_experimental_unit_preregistration.py",
+      "src/market_lab/ban_local_eventness_nonlinear_candidate_independent_coverage_expansion_feasibility.py",
+      "src/market_lab/ban_local_eventness_nonlinear_candidate_power_design.py",
+      "src/market_lab/ban_local_eventness_nonlinear_candidate_preregistration.py",
+      "src/market_lab/ban_local_eventness_nonlinear_mechanism_cross_asset_transfer_power_design.py",
+      "src/market_lab/ban_local_eventness_nonlinear_mechanism_cross_asset_transfer_preregistration.py",
+      "src/market_lab/ban_timeframe_foundation.py",
+      "tests/ban_clean_checkout_fixtures.py",
+      "tests/fixtures/ban_local_eventness_nonlinear_candidate_cluster_counts.json",
+      "tests/test_ban_local_eventness_nonlinear_candidate_blind_window_design.py",
+      "tests/test_ban_local_eventness_nonlinear_candidate_event_clustered_power_design.py",
+      "tests/test_ban_local_eventness_nonlinear_candidate_experimental_unit_preregistration.py",
+      "tests/test_ban_local_eventness_nonlinear_candidate_independent_coverage_expansion_feasibility.py",
+      "tests/test_ban_local_eventness_nonlinear_candidate_power_design.py",
+      "tests/test_ban_local_eventness_nonlinear_mechanism_cross_asset_transfer_power_design.py",
+      "tests/test_ban_local_eventness_nonlinear_mechanism_cross_asset_transfer_preregistration.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "private_base_sha": "6299f65f92d8bc6964c423775a5cce1f2fdef58a",
+      "focused_tests": "green",
+      "composed_private_tests": 2934,
+      "composed_private_skipped_tests": 0,
+      "diff_check": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "full_recursive_reproduction": "green",
+      "content_and_parent_verification": "green",
+      "sanitized_count_fixture_shape": "green",
+      "expected_value_change": false,
+      "result_injection_or_integrity_only_mode": false,
+      "dependency_adoption": false,
+      "private_exact_head_ci": "green",
+      "private_exact_head_sha": "c4c697ef3dc8532321349917a65e1afb379e0ae2",
+      "private_ci_locator_disclosed": false,
+      "composed_descendant_validation": true,
+      "dirty_owner_checkout_mutated": false,
+      "live_or_connected_authority": false
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29579271906",
+    "integration_commit_sha": "19ceba5b67e0cc36964fe817206f73a1bc8747ce"
+  },
+  "integrity": {
+    "payload_sha256": "d1014dde80ae0b200a5707e19ad1cc1fcc1e7ed9309a1e2560c6f0d956a34186",
+    "parent_refs": [
+      "git:dc4b1c6b0863936402dd5d41ca38d36ec0af3e41",
+      "git:c4c697ef3dc8532321349917a65e1afb379e0ae2",
+      "git:19ceba5b67e0cc36964fe817206f73a1bc8747ce",
+      "ci:private-exact-head-green-withheld",
+      "ci:29579271906",
+      "reuse:reuse-s1-market-lineage-portability-20260717",
+      "reuse:reuse-s1-market-sanitized-count-fixture-20260717"
+    ]
+  }
+}

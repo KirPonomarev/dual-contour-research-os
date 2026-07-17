@@ -1,0 +1,60 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s1-market-base-repair-20260717",
+  "issued_at": "2026-07-17T12:15:30Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "market",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s1-market-base-repair",
+    "agent_id": "agent-3",
+    "ownership_lease_ref": "stages/s1-market-base-repair/ownership-lease-amendment-1.json",
+    "base_sha": "41fcec11587dc1e393d7e5adcc70b8cac4e5d902",
+    "head_sha": "6299f65f92d8bc6964c423775a5cce1f2fdef58a",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "src/market_lab/unified_product_access.py",
+      "tests/test_paper_reality_loop_cli.py",
+      "tests/test_unified_product_access.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "private_base_sha": "636d0b56d13ba919d4af7c4bcd0718ac7fb92945",
+      "focused_tests": "green",
+      "composed_private_tests": 2934,
+      "composed_private_skipped_tests": 0,
+      "diff_check": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "source_mutation_outside_isolated_checkout": false,
+      "dependency_adoption": false,
+      "frozen_contract_edit": false,
+      "symlink_pointer_admitted_after": false,
+      "valid_regular_pointer_admitted_after": true,
+      "validation_weakening": false,
+      "private_exact_head_ci": "green",
+      "private_exact_head_sha": "c4c697ef3dc8532321349917a65e1afb379e0ae2",
+      "private_ci_locator_disclosed": false,
+      "composed_descendant_validation": true,
+      "dirty_owner_checkout_mutated": false,
+      "live_or_connected_authority": false
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29579271906",
+    "integration_commit_sha": "19ceba5b67e0cc36964fe817206f73a1bc8747ce"
+  },
+  "integrity": {
+    "payload_sha256": "62655aedd0ab6d0bac35778f843792736309b2124796b2efd73f33d0bdc1adfc",
+    "parent_refs": [
+      "git:6299f65f92d8bc6964c423775a5cce1f2fdef58a",
+      "git:c4c697ef3dc8532321349917a65e1afb379e0ae2",
+      "git:19ceba5b67e0cc36964fe817206f73a1bc8747ce",
+      "ci:private-exact-head-green-withheld",
+      "ci:29579271906",
+      "reuse:reuse-s1-market-base-symlink-fix-20260717"
+    ]
+  }
+}

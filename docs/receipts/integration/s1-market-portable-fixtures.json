@@ -1,0 +1,59 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s1-market-portable-fixtures-20260717",
+  "issued_at": "2026-07-17T12:15:32Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "market",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s1-market-portable-fixtures",
+    "agent_id": "agent-5",
+    "ownership_lease_ref": "stages/s1-market-portable-fixtures/ownership-lease.json",
+    "base_sha": "f6791a65c56070c824a5ebe69bca26109aaaf739",
+    "head_sha": "551cbb63a22458d3a991a09e5124584819ec4810",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "tests/test_build_ban_workstream_observation.py",
+      "tests/test_durable_spread_canary_release.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "private_base_sha": "6299f65f92d8bc6964c423775a5cce1f2fdef58a",
+      "focused_tests": "green",
+      "composed_private_tests": 2934,
+      "composed_private_skipped_tests": 0,
+      "diff_check": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "runtime_or_workflow_edit": false,
+      "existing_assertion_relaxation": false,
+      "synthetic_temporary_fixture_boundary": "green",
+      "composed_commit_sha": "0d188866cbcd8ad86db049fd250d5490bedcc6d5",
+      "dependency_adoption": false,
+      "private_exact_head_ci": "green",
+      "private_exact_head_sha": "c4c697ef3dc8532321349917a65e1afb379e0ae2",
+      "private_ci_locator_disclosed": false,
+      "composed_descendant_validation": true,
+      "dirty_owner_checkout_mutated": false,
+      "live_or_connected_authority": false
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29579271906",
+    "integration_commit_sha": "19ceba5b67e0cc36964fe817206f73a1bc8747ce"
+  },
+  "integrity": {
+    "payload_sha256": "e6df6f342b4d8a12fd133ae78d6ff8a52d685a8e1f14c278adf0d4cc8da9a7c2",
+    "parent_refs": [
+      "git:551cbb63a22458d3a991a09e5124584819ec4810",
+      "git:0d188866cbcd8ad86db049fd250d5490bedcc6d5",
+      "git:c4c697ef3dc8532321349917a65e1afb379e0ae2",
+      "git:19ceba5b67e0cc36964fe817206f73a1bc8747ce",
+      "ci:private-exact-head-green-withheld",
+      "ci:29579271906",
+      "reuse:reuse-s1-market-clean-checkout-fixtures-20260717"
+    ]
+  }
+}
