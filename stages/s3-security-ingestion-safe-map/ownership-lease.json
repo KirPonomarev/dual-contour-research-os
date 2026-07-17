@@ -1,0 +1,19 @@
+{
+  "lease_id": "lease-s3-security-ingestion-safe-map-agent-4-20260718",
+  "stage_id": "s3-security-ingestion-safe-map",
+  "agent_id": "agent-4",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-18T00:35:00Z",
+  "expires_at": "2026-07-18T06:35:00Z",
+  "base_sha": "abc45b938ddef24aa9d2cb874dfa7f6bd7273ae8",
+  "public_authority_sha": "782f4efbcdfa0124fef3de59482d419624b6913c",
+  "branch": "codex/bridge-a4-s3-security-ingestion-safe-map",
+  "worktree": "ephemeral-private-domain-worktree:s3-security-ingestion-safe-map",
+  "write_set": [
+    "research-os/evolution/fixtures/stage3-public-source-safe-map-v1.json",
+    "tools/security_bridge_stage3_intake.py",
+    "tests/test_security_bridge_stage3_intake.py"
+  ],
+  "delegation_allowed": false,
+  "state": "active"
+}

@@ -8,6 +8,8 @@ ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "docs" / "receipts" / "source-freeze" / "s3-security-ingestion-safe-map.json"
 REUSE = ROOT / "docs" / "receipts" / "reuse" / "s3-security-ingestion-safe-map.json"
 STAGE = ROOT / "stages" / "s3-security-ingestion-safe-map-authority"
+WORKER_STAGE = ROOT / "stages" / "s3-security-ingestion-safe-map"
+AUTHORITY_RECEIPT = ROOT / "docs" / "receipts" / "integration" / "s3-security-ingestion-safe-map-authority.json"
 
 
 def load(path: Path) -> dict:
@@ -65,6 +67,20 @@ class Stage3AuthorityTests(unittest.TestCase):
         self.assertNotIn("cookie_value", text.lower())
         self.assertIn("network-fetch-crawl-scan-live-target-test", text)
         self.assertIn("cross-contour-D2-D3-read", text)
+
+    def test_exact_head_ci_receipt_binds_worker_lease(self) -> None:
+        receipt = load(AUTHORITY_RECEIPT)
+        envelope = load(WORKER_STAGE / "stage-envelope.json")
+        lease = load(WORKER_STAGE / "ownership-lease.json")
+        self.assertEqual(receipt["integrity"]["payload_sha256"], payload_sha256(receipt))
+        self.assertEqual(receipt["payload"]["head_sha"], "782f4efbcdfa0124fef3de59482d419624b6913c")
+        self.assertEqual(receipt["payload"]["audit_results"]["public_exact_head_ci"], "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29615959973")
+        self.assertFalse(receipt["payload"]["audit_results"]["live_or_connected_authority"])
+        self.assertFalse(receipt["payload"]["audit_results"]["cross_contour_read_authorized"])
+        self.assertEqual(envelope["public_authority_sha"], receipt["payload"]["head_sha"])
+        self.assertEqual(envelope["write_set"], lease["write_set"])
+        self.assertFalse(envelope["push_authority"])
+        self.assertFalse(lease["delegation_allowed"])
 
 
 if __name__ == "__main__":

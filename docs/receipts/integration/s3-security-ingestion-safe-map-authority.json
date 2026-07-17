@@ -1,0 +1,59 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s3-security-ingestion-safe-map-authority-20260718",
+  "issued_at": "2026-07-18T00:35:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "security",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s3-security-ingestion-safe-map-authority",
+    "agent_id": "agent-0",
+    "ownership_lease_ref": "stages/s3-security-ingestion-safe-map-authority/ownership-lease.json",
+    "base_sha": "c3d6f215ad653db358e7875474de3c436bcf6e4c",
+    "head_sha": "782f4efbcdfa0124fef3de59482d419624b6913c",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "docs/receipts/source-freeze/s3-security-ingestion-safe-map.json",
+      "docs/receipts/reuse/s3-security-ingestion-safe-map.json",
+      "stages/s3-security-ingestion-safe-map-authority/stage-envelope.json",
+      "stages/s3-security-ingestion-safe-map-authority/ownership-lease.json",
+      "tests/test_stage3_authority.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "focused_tests": 4,
+      "canonical_tests": 343,
+      "stage0b_tests": 25,
+      "skipped_tests": 0,
+      "diff_check": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "dependency_adoption": false,
+      "frozen_contract_edit": false,
+      "private_security_head_clean": true,
+      "private_security_head": "abc45b938ddef24aa9d2cb874dfa7f6bd7273ae8",
+      "private_security_tree": "c4f6d13100d7e52583cf7e9473b27a9e45ff3dab",
+      "worker_write_set_files": 3,
+      "public_source_payload_in_public_repo": false,
+      "live_or_connected_authority": false,
+      "cross_contour_read_authorized": false,
+      "domain_registry_write_authorized": false,
+      "declares_dual_contour_pre_soak_green": false,
+      "source_freeze_payload_sha256": "c378e7be0fb2c1a5dee16e327302cb19ec314a0f23845ba0ed523d0157bedab2",
+      "reuse_payload_sha256": "3e2e50ba3be144c9aa65bd703c9a1e9f35fd575e7fefb0efd7b357ad90b74d59",
+      "public_exact_head_ci": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29615959973"
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29615959973",
+    "integration_commit_sha": "782f4efbcdfa0124fef3de59482d419624b6913c"
+  },
+  "integrity": {
+    "payload_sha256": "b26a783a69b3a55436f7159ccbfd991f9cbffe60c5da3858e21e1c2f28296dd7",
+    "parent_refs": [
+      "git:782f4efbcdfa0124fef3de59482d419624b6913c",
+      "ci:29615959973",
+      "source-freeze:source-freeze-security-s3-ingestion-safe-map-20260718",
+      "reuse:reuse-s3-security-ingestion-safe-map-20260718"
+    ]
+  }
+}
