@@ -8,6 +8,7 @@ consumption.  It does not build images, contact a host, restore data, or deploy.
 from __future__ import annotations
 
 import hashlib
+import hmac
 import json
 import re
 import sqlite3
@@ -88,6 +89,13 @@ _IMAGE_DIGEST_RE = re.compile(r"^sha256:[a-f0-9]{64}$")
 _GIT_SHA_RE = re.compile(r"^[a-f0-9]{40}$")
 _GENESIS_SHA256 = "0" * 64
 _DATABASE_USER_VERSION = 1
+_APPROVAL_HMAC_DOMAIN = b"dual-contour-research-os/deployment-approval-receipt/v1\x00"
+_APPROVAL_AUTHORITY_PREFIX = "deployment-approval-hmac-sha256-v1"
+_APPROVAL_KEY_ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$")
+_APPROVAL_AUTHORITY_RE = re.compile(
+    rf"^{_APPROVAL_AUTHORITY_PREFIX};key-id=([A-Za-z0-9][A-Za-z0-9._-]{{0,63}});mac=([a-f0-9]{{64}})$"
+)
+_MAX_APPROVAL_LIFETIME_SECONDS = 300
 
 _TABLE_SQL = """CREATE TABLE deployment_approval_consumption (
                 sequence INTEGER PRIMARY KEY,
@@ -151,13 +159,24 @@ class DeploymentConsumption:
 class DeploymentApprovalConsumer:
     """Durably consume a fully-bound deployment approval exactly once."""
 
-    def __init__(self, database_path: str | Path, *, timeout: float = 5.0) -> None:
+    def __init__(
+        self,
+        database_path: str | Path,
+        *,
+        trusted_issuer_id: str,
+        trusted_key_id: str,
+        operator_key: bytes,
+        timeout: float = 5.0,
+    ) -> None:
         if isinstance(database_path, bytes) or not isinstance(database_path, (str, Path)):
             raise DeploymentGateError("database_path must be a text filesystem path")
         if str(database_path) == ":memory:":
             raise DeploymentGateError("a filesystem database is required")
         if isinstance(timeout, bool) or not isinstance(timeout, (int, float)) or timeout <= 0:
             raise DeploymentGateError("timeout must be positive")
+        self._trusted_issuer_id = _text(trusted_issuer_id, "trusted issuer id")
+        self._trusted_key_id = _approval_key_id(trusted_key_id)
+        self._operator_key = _approval_key(operator_key)
         self._lock = threading.RLock()
         self._closed = False
         try:
@@ -212,6 +231,9 @@ class DeploymentApprovalConsumer:
                 expected_environment=expected_environment,
                 exact_remote_ci_ref=exact_remote_ci_ref,
                 consumed_at=consumed_at,
+                trusted_issuer_id=self._trusted_issuer_id,
+                trusted_key_id=self._trusted_key_id,
+                operator_key=self._operator_key,
             )
             approval_id = str(approval_receipt["object_id"])
             approval_payload = approval_receipt["payload"]
@@ -381,6 +403,9 @@ def _validated_bindings(
     expected_environment: str,
     exact_remote_ci_ref: str,
     consumed_at: str,
+    trusted_issuer_id: str,
+    trusted_key_id: str,
+    operator_key: bytes,
 ) -> dict[str, object]:
     if not expected_environment or not exact_remote_ci_ref:
         raise DeploymentGateError("expected environment and exact CI reference are required")
@@ -389,6 +414,12 @@ def _validated_bindings(
     backup = _receipt(backup_receipt, "BackupReceipt", _BACKUP_FIELDS)
     restore = _receipt(restore_receipt, "RestoreReceipt", _RESTORE_FIELDS)
     approval = _receipt(approval_receipt, "DeploymentApprovalReceipt", _APPROVAL_FIELDS)
+    _verify_approval_authentication(
+        approval_receipt,
+        trusted_issuer_id=trusted_issuer_id,
+        trusted_key_id=trusted_key_id,
+        operator_key=operator_key,
+    )
 
     release_sha = _git_sha(release.get("release_sha"), "release_sha")
     image_digests = release.get("image_digests")
@@ -440,6 +471,9 @@ def _validated_bindings(
     _text(approval.get("nonce"), "approval nonce")
     expires = _timestamp(approval.get("expires_at"), "approval expires_at")
     issued = _timestamp(approval_receipt.get("issued_at"), "approval issued_at")
+    lifetime_seconds = (expires - issued).total_seconds()
+    if lifetime_seconds <= 0 or lifetime_seconds > _MAX_APPROVAL_LIFETIME_SECONDS:
+        raise DeploymentGateError("deployment approval lifetime must be at most five minutes")
     if issued > consumed or consumed >= expires:
         raise DeploymentGateError("deployment approval is not currently valid")
 
@@ -467,6 +501,183 @@ def _validated_bindings(
         "approval_expires_at": approval["expires_at"],
         "external_action_authorized": False,
     }
+
+
+def issue_deployment_approval(
+    *,
+    release_manifest: Mapping[str, object],
+    restore_receipt: Mapping[str, object],
+    environment: str,
+    exact_remote_ci_ref: str,
+    issuer_id: str,
+    key_id: str,
+    operator_key: bytes,
+    issued_at: str,
+    expires_at: str,
+    approval_object_id: str,
+    nonce: str,
+) -> dict[str, object]:
+    """Create one exact-bound, short-lived, authenticated approval receipt.
+
+    The caller owns key acquisition and durable receipt storage.  This function
+    keeps key material out of the returned object and binds the HMAC to the
+    complete receipt, including both causal parents and every deployment field.
+    """
+
+    release = _receipt(release_manifest, "ReleaseManifest", _RELEASE_FIELDS)
+    _receipt(restore_receipt, "RestoreReceipt", _RESTORE_FIELDS)
+    environment = _text(environment, "deployment environment")
+    exact_remote_ci_ref = _text(exact_remote_ci_ref, "exact CI reference")
+    issuer_id = _text(issuer_id, "operator issuer id")
+    key_id = _approval_key_id(key_id)
+    operator_key = _approval_key(operator_key)
+    approval_object_id = _text(approval_object_id, "approval object_id")
+    nonce = _text(nonce, "approval nonce")
+
+    issued = _timestamp(issued_at, "approval issued_at")
+    expires = _timestamp(expires_at, "approval expires_at")
+    lifetime_seconds = (expires - issued).total_seconds()
+    if lifetime_seconds <= 0 or lifetime_seconds > _MAX_APPROVAL_LIFETIME_SECONDS:
+        raise DeploymentGateError("deployment approval lifetime must be at most five minutes")
+
+    release_sha = _git_sha(release.get("release_sha"), "release_sha")
+    image_digests = release.get("image_digests")
+    if not isinstance(image_digests, list) or len(image_digests) != 1:
+        raise DeploymentGateError("release must bind exactly one image digest")
+    image_digest = _image_digest(image_digests[0], "release image digest")
+    for field in ("policy_sha256", "config_sha256", "schema_sha256"):
+        _sha256(release.get(field), f"release {field}")
+    rollback_target = _text(release.get("previous_release_ref"), "previous_release_ref")
+    release_ref = _text(release_manifest.get("object_id"), "release manifest object_id")
+    restore_ref = _text(restore_receipt.get("object_id"), "restore receipt object_id")
+
+    payload: dict[str, object] = {
+        "environment": environment,
+        "release_sha": release_sha,
+        "image_digest": image_digest,
+        "policy_sha256": release["policy_sha256"],
+        "config_sha256": release["config_sha256"],
+        "schema_sha256": release["schema_sha256"],
+        "remote_ci_ref": exact_remote_ci_ref,
+        "restore_receipt_ref": restore_ref,
+        "rollback_target": rollback_target,
+        "expires_at": expires_at,
+        "nonce": nonce,
+    }
+    receipt: dict[str, object] = {
+        "schema_id": "DeploymentApprovalReceipt",
+        "schema_version": "1.0.0",
+        "object_id": approval_object_id,
+        "issued_at": issued_at,
+        "issuer": {
+            "id": issuer_id,
+            "authority_class": _unsigned_approval_authority(key_id),
+        },
+        "contour": "governance",
+        "classification": "D1_INTERNAL_SANITIZED",
+        "payload": payload,
+        "integrity": {
+            "payload_sha256": hashlib.sha256(_canonical_json(payload).encode("utf-8")).hexdigest(),
+            "parent_refs": [release_ref, restore_ref],
+        },
+    }
+    return sign_deployment_approval(receipt, key_id=key_id, operator_key=operator_key)
+
+
+def sign_deployment_approval(
+    approval_receipt: Mapping[str, object],
+    *,
+    key_id: str,
+    operator_key: bytes,
+) -> dict[str, object]:
+    """Return a signed JSON copy of one structurally valid approval receipt."""
+
+    key_id = _approval_key_id(key_id)
+    operator_key = _approval_key(operator_key)
+    copied = _json_object_copy(approval_receipt, "deployment approval")
+    issuer = copied.get("issuer")
+    if not isinstance(issuer, dict) or set(issuer) != _ISSUER_FIELDS:
+        raise DeploymentGateError("DeploymentApprovalReceipt issuer is invalid")
+    _text(issuer.get("id"), "DeploymentApprovalReceipt issuer id")
+    issuer["authority_class"] = _unsigned_approval_authority(key_id)
+    _receipt(copied, "DeploymentApprovalReceipt", _APPROVAL_FIELDS)
+    mac = hmac.new(
+        operator_key,
+        _approval_authentication_material(copied),
+        hashlib.sha256,
+    ).hexdigest()
+    issuer["authority_class"] = (
+        f"{_unsigned_approval_authority(key_id)};mac={mac}"
+    )
+    return copied
+
+
+def _verify_approval_authentication(
+    approval_receipt: Mapping[str, object],
+    *,
+    trusted_issuer_id: str,
+    trusted_key_id: str,
+    operator_key: bytes,
+) -> None:
+    issuer = approval_receipt.get("issuer")
+    if not isinstance(issuer, Mapping) or set(issuer) != _ISSUER_FIELDS:
+        raise DeploymentGateError("DeploymentApprovalReceipt issuer is invalid")
+    actual_issuer_id = _text(issuer.get("id"), "DeploymentApprovalReceipt issuer id")
+    if not hmac.compare_digest(actual_issuer_id, trusted_issuer_id):
+        raise DeploymentGateError("deployment approval issuer is not trusted")
+    authority_class = _text(
+        issuer.get("authority_class"),
+        "DeploymentApprovalReceipt issuer class",
+    )
+    match = _APPROVAL_AUTHORITY_RE.fullmatch(authority_class)
+    if match is None:
+        raise DeploymentGateError("deployment approval authentication is missing or malformed")
+    actual_key_id, supplied_mac = match.groups()
+    if not hmac.compare_digest(actual_key_id, trusted_key_id):
+        raise DeploymentGateError("deployment approval key id is not trusted")
+
+    copied = _json_object_copy(approval_receipt, "deployment approval")
+    copied_issuer = copied["issuer"]
+    assert isinstance(copied_issuer, dict)
+    copied_issuer["authority_class"] = _unsigned_approval_authority(actual_key_id)
+    expected_mac = hmac.new(
+        operator_key,
+        _approval_authentication_material(copied),
+        hashlib.sha256,
+    ).hexdigest()
+    if not hmac.compare_digest(supplied_mac, expected_mac):
+        raise DeploymentGateError("deployment approval MAC is invalid")
+
+
+def _approval_authentication_material(approval_receipt: Mapping[str, object]) -> bytes:
+    return _APPROVAL_HMAC_DOMAIN + _canonical_json(approval_receipt).encode("utf-8")
+
+
+def _unsigned_approval_authority(key_id: str) -> str:
+    return f"{_APPROVAL_AUTHORITY_PREFIX};key-id={key_id}"
+
+
+def _approval_key_id(value: object) -> str:
+    text = _text(value, "deployment approval key id")
+    if _APPROVAL_KEY_ID_RE.fullmatch(text) is None:
+        raise DeploymentGateError("deployment approval key id is invalid")
+    return text
+
+
+def _approval_key(value: object) -> bytes:
+    if type(value) is not bytes or len(value) < 32:
+        raise DeploymentGateError("operator key must contain at least 32 bytes")
+    return value
+
+
+def _json_object_copy(value: object, label: str) -> dict[str, object]:
+    try:
+        decoded = json.loads(_canonical_json(value))
+    except json.JSONDecodeError as exc:  # Defensive tail after canonical encoding.
+        raise DeploymentGateError(f"{label} is not canonical JSON data") from exc
+    if not isinstance(decoded, dict):
+        raise DeploymentGateError(f"{label} must be an object")
+    return decoded
 
 
 def _receipt(value: Mapping[str, object], schema_id: str, payload_fields: frozenset[str]) -> Mapping[str, object]:
@@ -565,4 +776,6 @@ __all__ = [
     "DeploymentApprovalConsumer",
     "DeploymentConsumption",
     "DeploymentGateError",
+    "issue_deployment_approval",
+    "sign_deployment_approval",
 ]
