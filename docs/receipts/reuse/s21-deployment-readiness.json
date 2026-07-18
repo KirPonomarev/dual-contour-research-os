@@ -1,0 +1,23 @@
+{
+  "schema_id": "ReuseDecisionReceipt", "schema_version": "1.0.0",
+  "object_id": "reuse-s21-deployment-readiness-20260718", "issued_at": "2026-07-18T21:12:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-freeze-authority"},
+  "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "STRUCTURAL_DEPLOYMENT_READINESS_WITHOUT_EXTERNAL_ACTION",
+    "candidates": [
+      {"candidate": "reuse-S20-isolation-packet-release-manifest-restic-controller-deployment-gate-and-approval-issuer", "disposition": "selected"},
+      {"candidate": "minimal-exact-digest-readiness-packet-validator", "disposition": "selected-minimal-missing-glue"},
+      {"candidate": "fabricate-public-backup-or-restore-receipt", "disposition": "rejected-runtime-evidence-laundering"},
+      {"candidate": "store-repository-locator-password-or-host-in-Git", "disposition": "rejected-private-data-boundary"},
+      {"candidate": "deploy-reboot-restore-or-consume-approval", "disposition": "rejected-S21-readiness-only"}
+    ],
+    "selected_mode": "structural-pass-plus-explicit-WAIT_OPERATOR_RUNTIME_EVIDENCE-and-WAIT_HUMAN_AUTHORITY",
+    "source_ref": "git:94f203fc2e0fb85a6578d78a22b0f0bcefdf4c9b;integration:integration-s20-stage4-isolation-release-packet-20260718",
+    "code_sha256": "b718063f22471c0c26b00e34ee5921566af232c15aba0663c37f88dae4d400b9", "license_spdx": "NOASSERTION", "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": ["exact-head-CI", "release-and-isolation-digests", "backup-restore-drafts", "rollback-target", "human-authority", "overclaim-negative-probes"],
+    "canonical_owner": "agent-0-release-governance",
+    "rollback": "Remove the non-executing readiness packet, validator, tests and S21 metadata only."
+  },
+  "integrity": {"payload_sha256": "8a8c4919aa4eb8ef593ca9c9bdf95653e88097deb0e89f7a9af8b4bc17401f46", "parent_refs": ["git:94f203fc2e0fb85a6578d78a22b0f0bcefdf4c9b", "integration:integration-s20-stage4-isolation-release-packet-20260718", "ci:29659711260"]}
+}

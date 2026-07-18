@@ -1,0 +1,17 @@
+{
+  "stage_id": "s21-deployment-readiness", "agent_id": "agent-0",
+  "objective": "Prove exact-head structural deployability, backup/clean-restore plan, rollback target and human authority boundary without applying a production change.",
+  "executable_blocker": "S20 prepared isolation but no single machine-readable packet binds the release, CI, backup/restore controller, rollback and authority waits without fabricating runtime evidence.",
+  "base_sha": "94f203fc2e0fb85a6578d78a22b0f0bcefdf4c9b", "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a0-s21-deployment-readiness", "worktree": "/private/tmp/dcr-s21-deployment-readiness",
+  "read_set": ["ops/deploy/stage4-a1-isolation-release-packet.json", "docs/receipts/integration/s20-stage4-isolation-release-packet.json", "docs/receipts/release/s4-release-manifest.json", "tools/release_backup_restore.py", "tools/issue_deployment_approval.py", "src/research_bridge/deployment.py"],
+  "write_set": ["ops/deploy/deployment-readiness-packet.json", "tools/verify_deployment_readiness_packet.py", "tests/test_s21_deployment_readiness.py", "docs/receipts/reuse/s21-deployment-readiness.json", "stages/s21-deployment-readiness/stage-envelope.json", "stages/s21-deployment-readiness/ownership-lease.json"],
+  "forbidden_scope": ["deploy-reboot-backup-restore-rollback-or-approval-consumption", "fabricated-runtime-receipt-or-READY_TO_DEPLOY-claim", "secret-host-account-repository-locator-private-path-or-D2-D3", "frozen-release-contract-runtime-source-or-S20-packet-mutation", "canonical-domain-promotion-trading-security-execution-or-publication"],
+  "dependency_hashes": {"base_main": "94f203fc2e0fb85a6578d78a22b0f0bcefdf4c9b", "core_contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50", "a1_contract_catalog": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1", "s20_packet": "2038a4fe49e018d58832df5dd1028c5cd2e49e5075f98f805e393abbe14557f0", "release_manifest": "9ceae0bda066cf52577cec0fdc1d7230e92b3e4010f65b81613abf6a0a8a90dd", "external_dependencies": "none-stdlib-only"},
+  "acceptance_commands": ["make contracts", "python3 tools/verify_deployment_readiness_packet.py", "python3 -m unittest tests.test_s21_deployment_readiness tests.test_release_backup_restore tests.test_deployment_approval_issuer tests.test_deployment_gate -v", "make test", "git diff --check"],
+  "risk_class": "high-paper-readiness-and-runtime-evidence-overclaim",
+  "stop_conditions": ["exact-head-CI-or-release-isolation-tool-digest-mismatch", "backup-or-restore-runtime-evidence-fabricated", "rollback-target-not-predeclared", "human-authority-bypassed", "external-action-or-private-data-required"],
+  "expected_receipt": "docs/receipts/integration/s21-deployment-readiness.json",
+  "rollback": "Revert only the non-executing readiness packet/validator/tests/metadata.", "commit_authority": "one-scoped-agent-0-commit", "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent0_integration", "blocked_validation_failed"]
+}
