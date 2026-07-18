@@ -1,0 +1,14 @@
+{
+  "lease_id": "lease-e0-a1-contract-candidate-agent-0-20260718",
+  "stage_id": "e0-a1-contract-candidate",
+  "agent_id": "agent-0",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-18T10:25:05Z",
+  "expires_at": "2026-07-18T22:25:05Z",
+  "base_sha": "0014f2e2083415021f0de849f2b8a80cb0992e80",
+  "branch": "main",
+  "worktree": "canonical-main-worktree",
+  "write_set_ref": "stages/e0-a1-contract-candidate/stage-envelope.json",
+  "delegation_allowed": false,
+  "state": "active"
+}

@@ -1,0 +1,35 @@
+{
+  "profile_id": "environment-compatibility-v1",
+  "schema_version": "1.0.0",
+  "status": "freeze-candidate",
+  "environments": {
+    "macos-development": {
+      "purpose": "development and contract validation",
+      "required": ["python>=3.11", "git", "make"],
+      "not_proof_of": ["production-containment", "vps-service-health"]
+    },
+    "linux-ci": {
+      "purpose": "exact-head automated acceptance",
+      "required": ["python>=3.11", "git", "make"],
+      "not_proof_of": ["vps-runtime-health", "systemd-recovery"]
+    },
+    "linux-vps-shadow": {
+      "purpose": "bounded shadow-cycle and soak",
+      "required": ["systemd", "sqlite", "restricted-service-user", "atomic-release-layout"],
+      "not_proof_of": ["live-authority", "canonical-domain-promotion"]
+    }
+  },
+  "compatibility_dimensions": [
+    "os",
+    "architecture",
+    "python-runtime",
+    "filesystem-semantics",
+    "sqlite-version",
+    "service-manager",
+    "container-runtime",
+    "network-policy",
+    "clock-source"
+  ],
+  "proof_rule": "A CapabilityProofReceipt is PASS_FOR_FROZEN_SCOPE only for the exact declared environment dimensions and hashes.",
+  "drift_behavior": "STALE"
+}

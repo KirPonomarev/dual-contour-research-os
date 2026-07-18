@@ -1,0 +1,42 @@
+{
+  "profile_id": "a1-reason-codes-v1",
+  "schema_version": "1.0.0",
+  "status": "freeze-candidate",
+  "parser_bounds": {
+    "code_pattern": "^[A-Z][A-Z0-9_]{2,63}$",
+    "public_message_max_chars": 240,
+    "internal_detail_max_chars": 2048,
+    "max_codes_per_receipt": 16,
+    "unknown_code_behavior": "REJECT"
+  },
+  "disclosure_classes": [
+    "PUBLIC",
+    "OPERATOR",
+    "RESTRICTED"
+  ],
+  "codes": {
+    "ADMITTED_A1": {"decision": "ADMIT", "disclosure": "PUBLIC", "public_message": "Candidate admitted to the bounded A1 sandbox."},
+    "DUPLICATE_EXACT": {"decision": "ADMIT", "disclosure": "PUBLIC", "public_message": "Existing immutable admission result reused."},
+    "MISSING_REQUIRED_FIELD": {"decision": "REJECT", "disclosure": "PUBLIC", "public_message": "A required candidate field is absent."},
+    "EMPTY_EVIDENCE_REFS": {"decision": "REJECT", "disclosure": "PUBLIC", "public_message": "Candidate has no admissible evidence references."},
+    "STALE_VCS_IDENTITY": {"decision": "REJECT", "disclosure": "OPERATOR", "public_message": "Candidate is not bound to the active frozen code identity."},
+    "MIXED_VCS_IDENTITY": {"decision": "REJECT", "disclosure": "OPERATOR", "public_message": "Candidate mixes incompatible code or contract identities."},
+    "FORBIDDEN_DATA_CLASS": {"decision": "REJECT", "disclosure": "PUBLIC", "public_message": "Requested data class is outside A1 policy."},
+    "HOLDOUT_ACCESS_DENIED": {"decision": "REJECT", "disclosure": "PUBLIC", "public_message": "A1 cannot access a true unseen holdout."},
+    "PRIVATE_API_DENIED": {"decision": "REJECT", "disclosure": "PUBLIC", "public_message": "Private API use is outside A1 policy."},
+    "LIVE_EXECUTION_DENIED": {"decision": "REJECT", "disclosure": "PUBLIC", "public_message": "Live execution is outside A1 policy."},
+    "CANONICAL_WRITE_DENIED": {"decision": "REJECT", "disclosure": "PUBLIC", "public_message": "Autonomous canonical mutation is prohibited."},
+    "BUDGET_EXHAUSTED": {"decision": "PARK", "disclosure": "PUBLIC", "public_message": "Candidate is parked until budget becomes available."},
+    "EXPOSURE_BUDGET_EXHAUSTED": {"decision": "PARK", "disclosure": "OPERATOR", "public_message": "Candidate is parked by evaluator exposure controls."},
+    "SHADOW_TAINT_RESTRICTED": {"decision": "PARK", "disclosure": "PUBLIC", "public_message": "Shadow-derived knowledge can produce shadow work only."},
+    "POLICY_MISMATCH": {"decision": "REJECT", "disclosure": "OPERATOR", "public_message": "Candidate is bound to a different policy snapshot."},
+    "CONTEXT_MISMATCH": {"decision": "REJECT", "disclosure": "OPERATOR", "public_message": "Candidate is bound to a different context snapshot."},
+    "UNKNOWN_VALIDATION_FAILURE": {"decision": "REJECT", "disclosure": "RESTRICTED", "public_message": "Candidate failed deterministic validation."}
+  },
+  "rules": {
+    "receipt_stores_internal_code": true,
+    "external_projection_uses_public_message": true,
+    "restricted_details_never_enter_public_event_stream": true,
+    "model_may_not_create_or_override_codes": true
+  }
+}

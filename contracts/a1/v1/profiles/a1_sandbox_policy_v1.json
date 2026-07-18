@@ -1,0 +1,79 @@
+{
+  "profile_id": "a1-sandbox-policy-v1",
+  "schema_version": "1.0.0",
+  "status": "freeze-candidate",
+  "policy_mode": "deny-unless-proven",
+  "allowed_experiment_types": [
+    "synthetic-fixture-check",
+    "public-sanitized-dataset-analysis",
+    "registered-data-replay",
+    "static-contract-analysis",
+    "bounded-simulation"
+  ],
+  "allowed_data_classes": [
+    "synthetic",
+    "public-sanitized",
+    "already-registered-d1-reference"
+  ],
+  "required_candidate_fields": [
+    "estimand",
+    "null_hypothesis",
+    "falsifier",
+    "stop_condition",
+    "evidence_refs",
+    "evidence_independence_groups",
+    "vcs_identity",
+    "policy_sha256",
+    "context_sha256"
+  ],
+  "cycle_limits": {
+    "max_admitted_experiments": 4,
+    "max_model_calls": 12,
+    "max_wall_seconds": 7200,
+    "max_cpu_seconds": 14400,
+    "max_memory_mib": 8192,
+    "max_output_bytes": 1073741824,
+    "max_tokens": 200000,
+    "max_cost_units": 100
+  },
+  "daily_limits": {
+    "max_admitted_experiments": 16,
+    "max_model_calls": 64,
+    "max_wall_seconds": 28800,
+    "max_tokens": 800000,
+    "max_cost_units": 400
+  },
+  "hard_denies": [
+    "private-api",
+    "secret-or-account-material",
+    "unregistered-private-data",
+    "true-unseen-holdout",
+    "live-trading",
+    "live-security-execution",
+    "publication",
+    "external-side-effect",
+    "canonical-write",
+    "domain-ledger-write",
+    "deploy-or-reboot",
+    "service-kill",
+    "authority-escalation",
+    "unbounded-network",
+    "mixed-or-stale-vcs-identity"
+  ],
+  "network_policy": "none-by-default; pinned public fetch requires a separately admitted SourceEnvelope and exact content hash",
+  "holdout_policy": "sealed evaluator and true unseen holdout are never available to A1 autonomous admission",
+  "budget_semantics": {
+    "reservation_required_before_external_call": true,
+    "unknown_outcome_auto_retry": false,
+    "unknown_outcome_auto_release": false,
+    "reconciliation_required": true
+  },
+  "decisions": [
+    "ADMIT",
+    "REJECT",
+    "PARK"
+  ],
+  "default_decision": "REJECT",
+  "admission_algorithm": "a1-admission-v1",
+  "idempotency": "Same frozen candidate, ledger revision, policy, context, and algorithm produce the same AdmissionReceipt and spec hash."
+}

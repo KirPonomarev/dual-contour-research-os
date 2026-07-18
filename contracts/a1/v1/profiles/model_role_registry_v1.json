@@ -1,0 +1,66 @@
+{
+  "profile_id": "model-role-registry-v1",
+  "schema_version": "1.0.0",
+  "status": "freeze-candidate",
+  "routing_mode": "provider-neutral-role-binding",
+  "roles": {
+    "SCOUT_FAST": {
+      "purpose": "cheap source triage and idea extraction",
+      "initial_binding": "deepseek-v4-flash",
+      "risk_class": "proposal-only",
+      "required_independent_review": false
+    },
+    "RESEARCH_WORKER": {
+      "purpose": "main bounded research and synthesis workload",
+      "initial_binding": "deepseek-v4-pro",
+      "risk_class": "proposal-only",
+      "required_independent_review": false
+    },
+    "CRITIC_PRIMARY": {
+      "purpose": "independent falsification and methods critique",
+      "initial_binding": "glm-5.2-max",
+      "risk_class": "critique-only",
+      "required_independent_review": false
+    },
+    "CRITIC_DEEP": {
+      "purpose": "high-effort review of material candidates",
+      "initial_binding": "gpt-5.6-sol-xhigh",
+      "risk_class": "critique-only",
+      "required_independent_review": false
+    },
+    "CHIEF_SCIENTIST": {
+      "purpose": "portfolio-level synthesis, escalation advice, and final scientific critique",
+      "initial_binding": "gpt-5.6-sol-max",
+      "risk_class": "advice-only",
+      "required_independent_review": true
+    },
+    "ARBITER_RESERVE": {
+      "purpose": "independent tie-break and correlated-failure check",
+      "initial_binding": null,
+      "risk_class": "disabled-until-evaluated",
+      "required_independent_review": true
+    }
+  },
+  "invariants": {
+    "model_outputs_are_untrusted": true,
+    "models_cannot_self_assign_roles": true,
+    "models_cannot_admit_candidates": true,
+    "models_cannot_reserve_or_release_budget": true,
+    "models_cannot_issue_permits": true,
+    "models_cannot_mutate_canonical_state": true,
+    "consensus_is_not_evidence": true,
+    "same_family_effort_levels_are_correlated": true,
+    "bindings_are_replaceable_after_shadow_evaluation": true,
+    "allowed_input_classes": ["D0", "D1"],
+    "forbidden_input_classes": ["D2", "D3", "sealed-holdout"]
+  },
+  "call_state_machine": [
+    "PROPOSED",
+    "RESERVED",
+    "SENT",
+    "SUCCEEDED",
+    "FAILED_KNOWN",
+    "UNKNOWN",
+    "RECONCILED"
+  ]
+}

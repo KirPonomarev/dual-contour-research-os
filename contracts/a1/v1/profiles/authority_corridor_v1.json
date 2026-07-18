@@ -1,0 +1,64 @@
+{
+  "profile_id": "a1-authority-corridor-v1",
+  "schema_version": "1.0.0",
+  "status": "freeze-candidate",
+  "trusted_event_route": [
+    {"from": "SourceTrigger", "actor": "external-collector", "trust": "untrusted-input", "to": "MaterialityGate"},
+    {"from": "MaterialityGate", "actor": "trusted-event-minter", "trust": "deterministic-gate", "to": "MaterialEvent"}
+  ],
+  "proposal_route": [
+    "MaterialEvent",
+    "AITask",
+    "ProposalEnvelope",
+    "CandidateSpecDraft",
+    "AdmissionSnapshot",
+    "AdmissionReceipt"
+  ],
+  "execution_authority_route": [
+    "AdmissionReceipt",
+    "JobSpec",
+    "BudgetReservation",
+    "Permit",
+    "AttemptLease",
+    "L0Execution",
+    "ExecutionReceipt",
+    "ValidationReceipt",
+    "LearningDecisionProposal",
+    "WAIT_AUTHORITY"
+  ],
+  "issuers": {
+    "MaterialEvent": "trusted-event-minter",
+    "AdmissionReceipt": "a1-admission-validator",
+    "JobSpec": "admission-controller",
+    "BudgetReservation": "budget-authority",
+    "Permit": "permit-authority",
+    "AttemptLease": "researchd",
+    "ValidationReceipt": "pinned-validator",
+    "LearningDecision": "domain-registry-writer"
+  },
+  "autonomous_terminal_states": [
+    "WAIT_DATA",
+    "REJECTED",
+    "PARKED",
+    "WAIT_AUTHORITY"
+  ],
+  "human_required_for": [
+    "canonical-mutation",
+    "promotion",
+    "publication",
+    "deployment",
+    "live-trading",
+    "live-security-execution",
+    "true-holdout-release",
+    "policy-expansion"
+  ],
+  "invariants": {
+    "collector_cannot_mint_trusted_material_event": true,
+    "admission_receipt_is_not_execution_authority": true,
+    "cli_flag_is_not_authority": true,
+    "permit_is_single_use_and_exactly_bound": true,
+    "bridge_cannot_write_domain_truth": true,
+    "negative_results_enter_failure_memory": true,
+    "positive_results_remain_research_candidates": true
+  }
+}

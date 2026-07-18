@@ -1,0 +1,39 @@
+{
+  "profile_id": "storage-coverage-v1",
+  "schema_version": "1.0.0",
+  "status": "freeze-candidate",
+  "ordering_model": "single durable bridge event order plus explicitly linked domain-owned registries",
+  "authoritative_stores": {
+    "bridge_event_ledger": {
+      "owner": "bridge",
+      "contains": ["D0", "D1", "control-state", "receipts", "references"],
+      "forbids": ["D2", "D3", "domain-scientific-truth"]
+    },
+    "domain_registries": {
+      "owner": "domain",
+      "contains": ["scientific-truth", "domain-payloads", "holdouts"],
+      "bridge_access": "references-and-receipts-only"
+    }
+  },
+  "coverage_requirements": [
+    "every durable A1 object has object_id and payload hash",
+    "every admission binds exact ledger revision",
+    "every execution chain links admission, job, reservation, permit, and attempt",
+    "every derived event links root event and parent event",
+    "every checkpoint and receipt is replay-addressable",
+    "every projection declares last applied durable sequence"
+  ],
+  "replay_invariants": {
+    "no_second_event_ledger": true,
+    "global_sequence_is_monotonic": true,
+    "projection_rebuild_is_deterministic": true,
+    "late_receipts_are_linked_not_reordered": true,
+    "unknown_external_call_is_preserved": true
+  },
+  "retention_classes": [
+    "ephemeral-proposal",
+    "durable-operational-memory",
+    "immutable-receipt",
+    "domain-owned-reference"
+  ]
+}

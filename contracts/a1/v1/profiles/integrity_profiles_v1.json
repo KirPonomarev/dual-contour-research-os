@@ -1,0 +1,63 @@
+{
+  "profile_id": "integrity-profiles-v1",
+  "schema_version": "1.0.0",
+  "status": "freeze-candidate",
+  "migration_policy": "Record existing byte-level behavior exactly; RFC 8785/JCS requires a separately versioned migration and dual-read plan.",
+  "profiles": {
+    "core-json-sha256-v1": {
+      "serialization": "json",
+      "sort_keys": true,
+      "separators": [",", ":"],
+      "ensure_ascii": false,
+      "allow_nan": false,
+      "encoding": "utf-8",
+      "trailing_newline": false,
+      "scope": "A1 contract payload and admission decision identity"
+    },
+    "legacy-ledger-json-sha256-v1": {
+      "serialization": "json",
+      "sort_keys": true,
+      "separators": [",", ":"],
+      "ensure_ascii": true,
+      "allow_nan": false,
+      "encoding": "utf-8",
+      "trailing_newline": false,
+      "scope": "existing append-only ledger compatibility"
+    },
+    "ipc-jsonl-v1": {
+      "serialization": "json-lines",
+      "sort_keys": true,
+      "separators": [",", ":"],
+      "ensure_ascii": true,
+      "allow_nan": false,
+      "encoding": "ascii",
+      "trailing_newline": true,
+      "scope": "IPC 1.1 and 1.2 wire frames"
+    },
+    "generated-schema-pretty-json-v1": {
+      "serialization": "json",
+      "sort_keys": true,
+      "indent": 2,
+      "ensure_ascii": true,
+      "allow_nan": false,
+      "encoding": "utf-8",
+      "trailing_newline": true,
+      "scope": "generated schema files; not an object integrity profile"
+    }
+  },
+  "module_bindings": {
+    "src/research_bridge/admission.py": "core-json-sha256-v1",
+    "src/research_bridge/authority.py": "core-json-sha256-v1",
+    "src/research_bridge/validation.py": "core-json-sha256-v1",
+    "src/research_bridge/deployment.py": "core-json-sha256-v1",
+    "src/research_bridge/ledger.py": "legacy-ledger-json-sha256-v1",
+    "src/research_bridge/ipc.py": "ipc-jsonl-v1",
+    "contracts/a1/v1/*.schema.json": "generated-schema-pretty-json-v1"
+  },
+  "forbidden_equivalences": [
+    "sorted-json-is-jcs",
+    "transport-idempotency-key-is-object-id",
+    "object-hash-is-receipt-id",
+    "pretty-schema-bytes-are-contract-payload-bytes"
+  ]
+}

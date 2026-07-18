@@ -1,0 +1,33 @@
+{
+  "profile_id": "evaluator-exposure-v1",
+  "schema_version": "1.0.0",
+  "status": "freeze-candidate",
+  "principle": "Repeated feedback consumes evaluator validity even when no data bytes are disclosed.",
+  "budgets": {
+    "per_candidate_max_queries": 3,
+    "per_trial_family_max_queries": 12,
+    "per_day_max_queries": 50,
+    "true_holdout_queries_autonomous_a1": 0
+  },
+  "dimensions": [
+    "evaluator_id",
+    "trial_family_id",
+    "candidate_lineage",
+    "feedback_granularity",
+    "time_window"
+  ],
+  "feedback_classes": {
+    "binary-pass-fail": 1,
+    "coarse-reason-class": 2,
+    "metric-vector": 5,
+    "row-level-diagnostic": 100
+  },
+  "on_exhaustion": "PARK",
+  "reason_code": "EXPOSURE_BUDGET_EXHAUSTED",
+  "prohibitions": [
+    "adaptive-probing-of-sealed-evaluator",
+    "automatic-reset-by-model",
+    "lineage-splitting-to-evade-budget",
+    "row-level-holdout-feedback"
+  ]
+}

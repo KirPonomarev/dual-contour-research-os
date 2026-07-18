@@ -1,0 +1,42 @@
+{
+  "profile_id": "ipc-compatibility-v1",
+  "schema_version": "1.0.0",
+  "status": "freeze-candidate",
+  "server_versions": ["1.1", "1.2"],
+  "default_response_version": "request-version",
+  "roles": {
+    "operator": {
+      "versions": ["1.1", "1.2"],
+      "may_submit": ["control-command", "authority-reference"],
+      "may_mint_material_event": false
+    },
+    "collector": {
+      "versions": ["1.2"],
+      "may_submit": ["source-trigger"],
+      "may_mint_material_event": false
+    },
+    "scout": {
+      "versions": ["1.2"],
+      "may_submit": ["proposal-envelope"],
+      "may_mint_material_event": false
+    }
+  },
+  "compatibility_rules": {
+    "unknown_major": "reject",
+    "unsupported_minor": "reject-with-supported-versions",
+    "missing-version": "treat-as-1.1-during-deprecation-window",
+    "response-fields": "additive-only-within-1.x",
+    "unknown-command": "reject-without-side-effect"
+  },
+  "deprecation": {
+    "version": "1.1",
+    "state": "supported-legacy",
+    "removal_requires": [
+      "usage-observation-window",
+      "operator-notice",
+      "negative-probe-pack",
+      "versioned-release"
+    ]
+  },
+  "integrity_profile": "ipc-jsonl-v1"
+}

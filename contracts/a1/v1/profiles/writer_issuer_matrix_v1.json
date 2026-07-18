@@ -1,0 +1,58 @@
+{
+  "profile_id": "a1-writer-issuer-matrix-v1",
+  "schema_version": "1.0.0",
+  "status": "freeze-candidate",
+  "objects": {
+    "MaterialEvent": {
+      "owner": "bridge",
+      "writer": "trusted-event-minter",
+      "issuer": "trusted-event-minter",
+      "authority": "bounded-event",
+      "may_grant_execution": false,
+      "may_write_domain_truth": false
+    },
+    "CandidateSpecDraft": {
+      "owner": "bridge",
+      "writer": "proposal-ingestor",
+      "issuer": "proposal-ingestor",
+      "authority": "untrusted-proposal-only",
+      "may_grant_execution": false,
+      "may_write_domain_truth": false
+    },
+    "AdmissionReceipt": {
+      "owner": "bridge",
+      "writer": "a1-admission-validator",
+      "issuer": "a1-admission-validator",
+      "authority": "deterministic-admission-decision",
+      "may_grant_execution": false,
+      "may_write_domain_truth": false
+    },
+    "CapabilityProofReceipt": {
+      "owner": "governance",
+      "writer": "independent-assurance-issuer",
+      "issuer": "independent-assurance-issuer",
+      "authority": "evidence-only-no-authority",
+      "may_grant_execution": false,
+      "may_write_domain_truth": false
+    }
+  },
+  "identity_rules": {
+    "object_id": "stable content-object identity",
+    "receipt_id": "stable decision or evidence receipt identity inside payload",
+    "transport_idempotency_key": "delivery and retry deduplication identity; never scientific or authority identity",
+    "rule": "These three identities MUST NOT be substituted for one another."
+  },
+  "domain_owned_frozen_contracts": [
+    "HypothesisCard",
+    "ProtocolSnapshot",
+    "ValidationReceipt",
+    "LearningDecision"
+  ],
+  "bridge_prohibitions": [
+    "issue-domain-scientific-truth",
+    "self-admit-model-proposal",
+    "self-issue-execution-permit",
+    "promote-research-candidate",
+    "mutate-canonical-domain-ledger"
+  ]
+}

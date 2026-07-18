@@ -1,0 +1,323 @@
+{
+  "$defs": {
+    "non_empty_string": {
+      "maxLength": 4096,
+      "minLength": 1,
+      "type": "string"
+    },
+    "resource_budget": {
+      "additionalProperties": false,
+      "properties": {
+        "cost_units": {
+          "minimum": 0,
+          "type": "number"
+        },
+        "cpu_seconds": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "memory_mib": {
+          "minimum": 64,
+          "type": "integer"
+        },
+        "output_bytes": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "tokens": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "wall_seconds": {
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "wall_seconds",
+        "cpu_seconds",
+        "memory_mib",
+        "output_bytes",
+        "tokens",
+        "cost_units"
+      ],
+      "type": "object"
+    },
+    "sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "type": "string"
+    },
+    "string_array": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "vcs_identity": {
+      "additionalProperties": false,
+      "properties": {
+        "a1_catalog_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "base_sha": {
+          "pattern": "^[a-f0-9]{40}$",
+          "type": "string"
+        },
+        "contract_catalog_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "head_sha": {
+          "pattern": "^[a-f0-9]{40}$",
+          "type": "string"
+        },
+        "release_manifest_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "repository_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "worktree_clean": {
+          "const": true
+        }
+      },
+      "required": [
+        "repository_id",
+        "head_sha",
+        "base_sha",
+        "worktree_clean",
+        "contract_catalog_sha256",
+        "a1_catalog_sha256",
+        "release_manifest_sha256"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "https://contracts.dual-contour.invalid/a1/v1/CandidateSpecDraft.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "classification": {
+      "enum": [
+        "D0",
+        "D1"
+      ]
+    },
+    "contour": {
+      "const": "bridge"
+    },
+    "integrity": {
+      "additionalProperties": false,
+      "properties": {
+        "parent_refs": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "payload_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "profile_id": {
+          "const": "core-json-sha256-v1"
+        }
+      },
+      "required": [
+        "profile_id",
+        "payload_sha256",
+        "parent_refs"
+      ],
+      "type": "object"
+    },
+    "issued_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "issuer": {
+      "const": "proposal-ingestor"
+    },
+    "object_id": {
+      "maxLength": 256,
+      "minLength": 1,
+      "type": "string"
+    },
+    "payload": {
+      "additionalProperties": false,
+      "properties": {
+        "candidate_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "canonical_write_requested": {
+          "type": "boolean"
+        },
+        "context_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "critique_refs": {
+          "$ref": "#/$defs/string_array"
+        },
+        "data_classes": {
+          "$ref": "#/$defs/string_array"
+        },
+        "draft_revision": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "estimand": {
+          "maxLength": 4096,
+          "minLength": 1,
+          "type": "string"
+        },
+        "event_ref": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "evidence_independence_groups": {
+          "items": {
+            "$ref": "#/$defs/string_array"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "evidence_refs": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/string_array"
+            },
+            {
+              "minItems": 1
+            }
+          ]
+        },
+        "executor_family": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "expected_output": {
+          "maxLength": 4096,
+          "minLength": 1,
+          "type": "string"
+        },
+        "experiment_type": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "falsifier": {
+          "maxLength": 4096,
+          "minLength": 1,
+          "type": "string"
+        },
+        "holdout_access_requested": {
+          "type": "boolean"
+        },
+        "live_execution_requested": {
+          "type": "boolean"
+        },
+        "model_call_refs": {
+          "$ref": "#/$defs/string_array"
+        },
+        "network_required": {
+          "type": "boolean"
+        },
+        "null_hypothesis": {
+          "maxLength": 4096,
+          "minLength": 1,
+          "type": "string"
+        },
+        "policy_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "private_api_requested": {
+          "type": "boolean"
+        },
+        "resource_request": {
+          "$ref": "#/$defs/resource_budget"
+        },
+        "root_event_ref": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "scope": {
+          "maxLength": 4096,
+          "minLength": 1,
+          "type": "string"
+        },
+        "shadow_taint": {
+          "enum": [
+            "NONE",
+            "SHADOW_UNAPPLIED"
+          ]
+        },
+        "stop_condition": {
+          "maxLength": 4096,
+          "minLength": 1,
+          "type": "string"
+        },
+        "vcs_identity": {
+          "$ref": "#/$defs/vcs_identity"
+        }
+      },
+      "required": [
+        "candidate_id",
+        "event_ref",
+        "root_event_ref",
+        "draft_revision",
+        "experiment_type",
+        "estimand",
+        "null_hypothesis",
+        "falsifier",
+        "stop_condition",
+        "scope",
+        "expected_output",
+        "evidence_refs",
+        "evidence_independence_groups",
+        "executor_family",
+        "resource_request",
+        "data_classes",
+        "network_required",
+        "holdout_access_requested",
+        "canonical_write_requested",
+        "private_api_requested",
+        "live_execution_requested",
+        "vcs_identity",
+        "policy_sha256",
+        "context_sha256",
+        "shadow_taint",
+        "model_call_refs",
+        "critique_refs"
+      ],
+      "type": "object"
+    },
+    "schema_id": {
+      "const": "CandidateSpecDraft"
+    },
+    "schema_version": {
+      "const": "1.0.0"
+    }
+  },
+  "required": [
+    "schema_id",
+    "schema_version",
+    "object_id",
+    "issued_at",
+    "issuer",
+    "contour",
+    "classification",
+    "payload",
+    "integrity"
+  ],
+  "title": "CandidateSpecDraft",
+  "type": "object",
+  "x-dual-contour": {
+    "authority": "untrusted-proposal-only",
+    "catalog_status": "freeze-candidate",
+    "core_catalog_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "owner": "bridge",
+    "writer": "proposal-ingestor"
+  }
+}

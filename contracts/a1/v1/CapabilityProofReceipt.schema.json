@@ -1,0 +1,332 @@
+{
+  "$defs": {
+    "non_empty_string": {
+      "maxLength": 4096,
+      "minLength": 1,
+      "type": "string"
+    },
+    "resource_budget": {
+      "additionalProperties": false,
+      "properties": {
+        "cost_units": {
+          "minimum": 0,
+          "type": "number"
+        },
+        "cpu_seconds": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "memory_mib": {
+          "minimum": 64,
+          "type": "integer"
+        },
+        "output_bytes": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "tokens": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "wall_seconds": {
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "wall_seconds",
+        "cpu_seconds",
+        "memory_mib",
+        "output_bytes",
+        "tokens",
+        "cost_units"
+      ],
+      "type": "object"
+    },
+    "sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "type": "string"
+    },
+    "string_array": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "vcs_identity": {
+      "additionalProperties": false,
+      "properties": {
+        "a1_catalog_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "base_sha": {
+          "pattern": "^[a-f0-9]{40}$",
+          "type": "string"
+        },
+        "contract_catalog_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "head_sha": {
+          "pattern": "^[a-f0-9]{40}$",
+          "type": "string"
+        },
+        "release_manifest_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "repository_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "worktree_clean": {
+          "const": true
+        }
+      },
+      "required": [
+        "repository_id",
+        "head_sha",
+        "base_sha",
+        "worktree_clean",
+        "contract_catalog_sha256",
+        "a1_catalog_sha256",
+        "release_manifest_sha256"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "https://contracts.dual-contour.invalid/a1/v1/CapabilityProofReceipt.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "classification": {
+      "enum": [
+        "D0",
+        "D1"
+      ]
+    },
+    "contour": {
+      "const": "governance"
+    },
+    "integrity": {
+      "additionalProperties": false,
+      "properties": {
+        "parent_refs": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "payload_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "profile_id": {
+          "const": "core-json-sha256-v1"
+        }
+      },
+      "required": [
+        "profile_id",
+        "payload_sha256",
+        "parent_refs"
+      ],
+      "type": "object"
+    },
+    "issued_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "issuer": {
+      "const": "independent-assurance-issuer"
+    },
+    "object_id": {
+      "maxLength": 256,
+      "minLength": 1,
+      "type": "string"
+    },
+    "payload": {
+      "additionalProperties": false,
+      "properties": {
+        "capability_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "code_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "compatibility_dependencies": {
+          "$ref": "#/$defs/string_array"
+        },
+        "config_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "critical_dependencies": {
+          "$ref": "#/$defs/string_array"
+        },
+        "data_refs": {
+          "$ref": "#/$defs/string_array"
+        },
+        "environment_compatibility_ref": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "environment_ref": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "evaluator_ref": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "executor_ref": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "grants_authority": {
+          "const": false
+        },
+        "invalidation_conditions": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "issuer_independence": {
+          "additionalProperties": false,
+          "properties": {
+            "independent_of_executor": {
+              "const": true
+            },
+            "independent_of_subject": {
+              "const": true
+            },
+            "issuer_ref": {
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          "required": [
+            "issuer_ref",
+            "independent_of_subject",
+            "independent_of_executor"
+          ],
+          "type": "object"
+        },
+        "negative_probe_refs": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "policy_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "proof_basis": {
+          "items": {
+            "additionalProperties": true,
+            "minProperties": 1,
+            "type": "object"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "receipt_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "schema_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "scope": {
+          "additionalProperties": true,
+          "minProperties": 1,
+          "type": "object"
+        },
+        "status": {
+          "enum": [
+            "PASS_FOR_FROZEN_SCOPE",
+            "FAILED",
+            "INCONCLUSIVE",
+            "STALE",
+            "REVOKED"
+          ]
+        },
+        "subject_ref": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "test_refs": {
+          "$ref": "#/$defs/string_array"
+        },
+        "valid_from": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "valid_until": {
+          "format": "date-time",
+          "type": "string"
+        }
+      },
+      "required": [
+        "receipt_id",
+        "capability_id",
+        "subject_ref",
+        "scope",
+        "status",
+        "proof_basis",
+        "code_sha256",
+        "config_sha256",
+        "policy_sha256",
+        "schema_sha256",
+        "executor_ref",
+        "evaluator_ref",
+        "test_refs",
+        "environment_ref",
+        "data_refs",
+        "issuer_independence",
+        "critical_dependencies",
+        "compatibility_dependencies",
+        "environment_compatibility_ref",
+        "negative_probe_refs",
+        "valid_from",
+        "valid_until",
+        "invalidation_conditions",
+        "grants_authority"
+      ],
+      "type": "object"
+    },
+    "schema_id": {
+      "const": "CapabilityProofReceipt"
+    },
+    "schema_version": {
+      "const": "1.0.0"
+    }
+  },
+  "required": [
+    "schema_id",
+    "schema_version",
+    "object_id",
+    "issued_at",
+    "issuer",
+    "contour",
+    "classification",
+    "payload",
+    "integrity"
+  ],
+  "title": "CapabilityProofReceipt",
+  "type": "object",
+  "x-dual-contour": {
+    "authority": "evidence-only-no-authority",
+    "catalog_status": "freeze-candidate",
+    "core_catalog_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "owner": "governance",
+    "writer": "independent-assurance-issuer"
+  }
+}

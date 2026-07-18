@@ -1,0 +1,61 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-e0-a1-contract-candidate-20260718",
+  "issued_at": "2026-07-18T10:25:05Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "reuse-freeze-authority"
+  },
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "public-a1-contract-generation-and-validation",
+    "candidates": [
+      {
+        "candidate": "extend-existing-core-catalog-generator-pattern",
+        "disposition": "selected-for-additive-a1-bundle"
+      },
+      {
+        "candidate": "python-stdlib-json-hashlib-importlib",
+        "disposition": "selected-as-minimal-auditable-glue"
+      },
+      {
+        "candidate": "external-json-schema-code-generator",
+        "disposition": "rejected-no-demonstrated-need"
+      },
+      {
+        "candidate": "new-ledger-scheduler-database-or-vector-store",
+        "disposition": "rejected-duplicates-existing-control-plane"
+      }
+    ],
+    "selected_mode": "additive-four-contract-a1-catalog-with-hashed-machine-profiles-and-stdlib-deterministic-validation",
+    "source_ref": "internal:tools/generate_a1_contracts.py@sha256:c6d65da1be0fa07b4db539dd9609598a761cf8101b467cd6d8500f2d5a33c321;core-catalog:sha256:13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "code_sha256": "2efd3ded4c207b784c8e01e68bffb745ffa66299799c54cd7ea08109c192373e",
+    "license_spdx": "NOASSERTION",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "exact-additive-contract-set",
+      "deterministic-schema-regeneration",
+      "exact-profile-hash-binding",
+      "strict-envelope-and-payload",
+      "writer-issuer-authority-separation",
+      "snapshot-ledger-and-identity-binding",
+      "shadow-taint-inheritance",
+      "deny-unless-proven-sandbox-policy",
+      "conservative-unknown-model-call-semantics",
+      "scope-bound-non-authoritative-capability-proof",
+      "ipc-1.1-1.2-role-separation"
+    ],
+    "canonical_owner": "governance-agent-0",
+    "rollback": "Revert the additive A1 candidate files. Core catalog bytes and runtime behavior remain unchanged until a separate freeze receipt and E1 integration."
+  },
+  "integrity": {
+    "payload_sha256": "ef476554439ad7d40e90213e062217e5f2fe6a8ccdd9e0880d66fb73bd82cb07",
+    "parent_refs": [
+      "sha256:0014f2e2083415021f0de849f2b8a80cb0992e80",
+      "sha256:13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+      "sha256:87c0db3fae18f2e15c92bcb9252d820c9a2382afcbe491815a724b55ecd5e556"
+    ]
+  }
+}
