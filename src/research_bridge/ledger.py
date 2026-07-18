@@ -3771,6 +3771,14 @@ def _validate_feedback_knowledge_material(record: FeedbackBundleRecord) -> None:
         raise LedgerError("knowledge proposed outcome is invalid")
     if outcome["blame_axis"] not in _BLAME_AXES:
         raise LedgerError("knowledge blame axis is invalid")
+    if (
+        outcome["mechanical_axis"] == "MECHANICAL_SUCCESS"
+        and outcome["blame_axis"] != "NONE"
+    ) or (
+        outcome["mechanical_axis"] == "MECHANICAL_FAILURE"
+        and outcome["blame_axis"] == "NONE"
+    ):
+        raise LedgerError("knowledge mechanical blame relation is poisoned")
     if outcome["claims_scientific_truth"] is not False:
         raise LedgerError("operational memory cannot claim scientific truth")
     applied = outcome["domain_application_ref"] is not None
@@ -3782,10 +3790,25 @@ def _validate_feedback_knowledge_material(record: FeedbackBundleRecord) -> None:
         or outcome["disposition"] != ("DOMAIN_APPLIED" if applied else "SHADOW_UNAPPLIED")
     ):
         raise LedgerError("knowledge outcome taint or disposition is poisoned")
-    if not applied and outcome["epistemic_axis"] != "UNRESOLVED":
-        raise LedgerError("shadow knowledge cannot contain an epistemic conclusion")
-    if outcome["epistemic_axis"] not in {"UNRESOLVED", "SUPPORTED", "REFUTED", "INCONCLUSIVE"}:
-        raise LedgerError("knowledge epistemic axis is invalid")
+    if applied and (
+        outcome["mechanical_axis"] != "MECHANICAL_SUCCESS"
+        or outcome["proposed_outcome"] in {"PROVIDER_FAILURE", "VALIDATED_MECHANICAL"}
+    ):
+        raise LedgerError("knowledge domain application scope is poisoned")
+    if (
+        outcome["mechanical_axis"] != "MECHANICAL_SUCCESS"
+        or outcome["proposed_outcome"] == "PROVIDER_FAILURE"
+        or not applied
+    ):
+        expected_epistemic = "UNRESOLVED"
+    elif outcome["proposed_outcome"] == "SUPPORTED":
+        expected_epistemic = "SUPPORTED"
+    elif outcome["proposed_outcome"] == "REFUTED":
+        expected_epistemic = "REFUTED"
+    else:
+        expected_epistemic = "INCONCLUSIVE"
+    if outcome["epistemic_axis"] != expected_epistemic:
+        raise LedgerError("knowledge epistemic conclusion is poisoned")
 
     expected_evidence = [execution_ref, validation_ref]
     if applied:
