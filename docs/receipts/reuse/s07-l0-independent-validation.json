@@ -1,0 +1,29 @@
+{
+  "schema_id": "ReuseDecisionReceipt", "schema_version": "1.0.0",
+  "object_id": "reuse-s07-l0-independent-validation-20260718", "issued_at": "2026-07-18T15:00:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-freeze-authority"},
+  "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "registered-offline-L0-execution-and-independent-nonvacuous-validation",
+    "candidates": [
+      {"candidate": "reuse-OfflineExecutionCoordinator-L0-CAS-and-ValidationReceipt-contract", "disposition": "selected"},
+      {"candidate": "add-small-pinned-L0-result-validator-to-existing-validation-module", "disposition": "selected"},
+      {"candidate": "new-runner-sandbox-evaluator-service-or-holdout-store", "disposition": "rejected-duplicate-or-premature"},
+      {"candidate": "model-judged-validation", "disposition": "rejected-vacuous-and-nondeterministic"}
+    ],
+    "selected_mode": "existing-durable-executor-plus-independent-byte-level-L0-validator-with-zero-holdout-exposure",
+    "source_ref": "git:b96e4c41ed4bfb55caa9d0985c81a5be2fb096f0;internal:validation.py@bbe31177,execution.py@de5e6593,l0.py@310354c5,cas.py@e5c11a6d",
+    "code_sha256": "bbe31177e7525f4084f72b329d6be4e9f8f8c7afe02d3f124c5c810f54bbd10f",
+    "license_spdx": "NOASSERTION", "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "A1-corridor-to-CAS-L0-checkpoint-artifact-ExecutionReceipt", "independent-byte-recompute",
+      "known-invalid-artifact-kills-validator", "stale-fence-denied", "artifact-before-terminal-receipt",
+      "holdout-exposure-zero", "D2-D3-denied", "no-canonical-or-live-action"
+    ],
+    "canonical_owner": "agent-2-validation-with-agent-5-hostile-assurance",
+    "rollback": "Revert the additive L0 validator; existing execution and validation-boundary behavior remains unchanged."
+  },
+  "integrity": {"payload_sha256": "9b0929482aae92d92d1cff0e278f5f1822eb338f66f9f7127781f231965a8aab", "parent_refs": [
+    "git:b96e4c41ed4bfb55caa9d0985c81a5be2fb096f0", "sha256:13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50"
+  ]}
+}

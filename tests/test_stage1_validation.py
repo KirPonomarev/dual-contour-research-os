@@ -228,7 +228,12 @@ class ValidationBoundaryTests(unittest.TestCase):
 
         self.assertEqual(
             module.__all__,
-            ["ValidationBoundaryError", "ValidationProjection", "ValidationBoundary"],
+            [
+                "ValidationBoundaryError",
+                "ValidationProjection",
+                "ValidationBoundary",
+                "DeterministicL0Validator",
+            ],
         )
         self.assertEqual(
             [field.name for field in fields(ValidationProjection)],

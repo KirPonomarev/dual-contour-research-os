@@ -1,0 +1,13 @@
+{
+  "lease_id": "lease-s07-l0-validation-agent-5",
+  "stage_id": "s07-l0-validation-assurance", "agent_id": "agent-5",
+  "base_sha": "dc2df9edc98b7117e2ce03dd9169391eb5e9b532",
+  "branch": "codex/bridge-a5-s07-l0-assurance",
+  "issued_at": "2026-07-18T18:20:00Z", "expires_at": "2026-07-19T18:20:00Z",
+  "write_set": [
+    "tests/test_stage1_validation.py", "tests/test_s07_l0_independent_validation.py",
+    "stages/s07-l0-validation/assurance-stage-envelope.json",
+    "stages/s07-l0-validation/assurance-ownership-lease.json"
+  ],
+  "exclusive": true, "revoked": false
+}

@@ -1,0 +1,34 @@
+{
+  "stage_id": "s07-l0-validation-assurance", "agent_id": "agent-5",
+  "objective": "Prove the independent L0 validator accepts the real durable offline vertical, rejects invalid artifact/input/chunk bindings, exposes zero holdout and preserves the reference-only domain boundary.",
+  "executable_blocker": "The Agent 2 validator commit needs independent hostile and full-suite assurance before Agent 0 integration.",
+  "base_sha": "dc2df9edc98b7117e2ce03dd9169391eb5e9b532",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a5-s07-l0-assurance",
+  "worktree": "/Volumes/Work/dual-contour-research-os-s07-assurance",
+  "write_set": [
+    "tests/test_stage1_validation.py",
+    "tests/test_s07_l0_independent_validation.py",
+    "stages/s07-l0-validation/assurance-stage-envelope.json",
+    "stages/s07-l0-validation/assurance-ownership-lease.json"
+  ],
+  "forbidden_scope": ["source-edit", "contract-edit", "canonical-doc-edit", "live-data", "holdout-access", "deployment"],
+  "dependency_hashes": {
+    "agent_2_commit": "dc2df9edc98b7117e2ce03dd9169391eb5e9b532",
+    "validation_py": "6377a7d60c0246d38d2fefe5a3a685409a3434342e41d0d88262ece8d326fa51",
+    "external_dependencies": "none"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest tests.test_stage1_l0 tests.test_stage1_execution tests.test_stage1_execution_assurance tests.test_stage1_validation tests.test_stage1_validation_assurance tests.test_s07_l0_independent_validation",
+    "python3 -m unittest discover -s tests -p test_*.py",
+    "python3 -m unittest discover -s tests/stage0b -p test_*.py",
+    "git diff --check"
+  ],
+  "risk_class": "critical-hostile-executor-evaluator-boundary",
+  "stop_conditions": ["known-invalid-accepted", "receipt-before-byte-validation", "holdout-nonzero", "full-suite-regression"],
+  "expected_receipt": "docs/receipts/integration/s07-l0-validation-assurance.json",
+  "rollback": "Revert assurance-only tests and reject Agent 2 handoff.",
+  "commit_authority": "one-scoped-agent-5-commit", "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent0_audit", "blocked_validation_failed"]
+}
