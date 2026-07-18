@@ -1,0 +1,7 @@
+{
+  "lease_id": "lease-s04-capability-assurance-agent-5", "stage_id": "s04-capability-assurance",
+  "agent_id": "agent-5", "base_sha": "3bafc80d22d84ee4b1c749cf10baff0aebb48008",
+  "branch": "codex/bridge-a5-s04-capability-assurance",
+  "issued_at": "2026-07-18T14:08:00Z", "expires_at": "2026-07-19T14:08:00Z",
+  "write_set": ["tests/test_a1_capability_proof.py"], "exclusive": true, "revoked": false
+}

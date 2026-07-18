@@ -1,0 +1,28 @@
+{
+  "stage_id": "s04-capability-assurance", "agent_id": "agent-5",
+  "objective": "Independently prove the S04 capability receipt is exact, expiring, stale on relevant drift, non-authoritative and fixture-only.",
+  "executable_blocker": "The S04 proof requires hostile mixed-head, expiry, dependency-drift and overclaim tests.",
+  "base_sha": "3bafc80d22d84ee4b1c749cf10baff0aebb48008",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "a1_contract_sha256": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+  "branch": "codex/bridge-a5-s04-capability-assurance",
+  "worktree": "/Volumes/Work/dual-contour-research-os-s04-assurance",
+  "write_set": ["tests/test_a1_capability_proof.py"],
+  "forbidden_scope": ["source-edit", "contract-edit", "proof-overclaim", "runtime-organism", "authority", "provider", "live", "deployment"],
+  "dependency_hashes": {
+    "core_contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "a1_contract_catalog": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+    "capability_receipt_payload": "07dfd9437366b272aba8194f9395c96f484cccbb9de3f705fececc672c0962c1",
+    "external_dependencies": "none"
+  },
+  "acceptance_commands": [
+    "make contracts", "python3 -m unittest tests.test_a1_capability_proof",
+    "E1A focused suite", "make test", "git diff --check", "public safety scan"
+  ],
+  "risk_class": "independent-capability-overclaim-and-staleness-assurance",
+  "stop_conditions": ["mixed-head-pass", "expired-pass", "provider-overclaim", "authority-grant", "contract-drift"],
+  "expected_receipt": "docs/receipts/integration/s04-capability-assurance.json",
+  "rollback": "Revert only the S04 tests; proof cannot be accepted without them.",
+  "commit_authority": "one-scoped-agent-5-commit", "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent0_integration", "blocked_validation_failed"]
+}
