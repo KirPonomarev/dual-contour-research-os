@@ -1,0 +1,13 @@
+{
+  "lease_id": "lease-s07-l0-validation-agent-2",
+  "stage_id": "s07-l0-validation", "agent_id": "agent-2",
+  "base_sha": "e5c8ea7b40930851bebc8dd3445f770a9b956c41",
+  "branch": "codex/bridge-a2-s07-l0-validation",
+  "issued_at": "2026-07-18T18:00:00Z", "expires_at": "2026-07-19T18:00:00Z",
+  "write_set": [
+    "src/research_bridge/validation.py",
+    "stages/s07-l0-validation/stage-envelope.json",
+    "stages/s07-l0-validation/ownership-lease.json"
+  ],
+  "exclusive": true, "revoked": false
+}

@@ -1,0 +1,43 @@
+{
+  "stage_id": "s07-l0-validation", "agent_id": "agent-2",
+  "objective": "Independently recompute the frozen offline L0 artifact from CAS bytes and emit a reference-only ValidationReceipt without holdout, domain-writer or canonical mutation authority.",
+  "executable_blocker": "The durable L0 executor emits an ExecutionReceipt and artifact, but the Bridge has no pinned independent byte-level validator that fails closed on known-invalid results.",
+  "base_sha": "e5c8ea7b40930851bebc8dd3445f770a9b956c41",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a2-s07-l0-validation",
+  "worktree": "/Volumes/Work/dual-contour-research-os-s07-validation",
+  "write_set": [
+    "src/research_bridge/validation.py",
+    "stages/s07-l0-validation/stage-envelope.json",
+    "stages/s07-l0-validation/ownership-lease.json"
+  ],
+  "forbidden_scope": [
+    "contract-edit", "scientific-validity-claim", "domain-registry-write",
+    "holdout-access", "networked-execution", "canonical-mutation",
+    "LearningDecision", "deployment", "test-edit"
+  ],
+  "dependency_hashes": {
+    "core_contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "reuse_receipt_payload": "9b0929482aae92d92d1cff0e278f5f1822eb338f66f9f7127781f231965a8aab",
+    "validation_py": "bbe31177e7525f4084f72b329d6be4e9f8f8c7afe02d3f124c5c810f54bbd10f",
+    "l0_py": "310354c52eb4091652b370adde5ee82dacfe283b14215dfedfb49cc208b55502",
+    "execution_py": "de5e659332ab4f38174f50cc0a21557d2fe8398424e1378bebfe44928a5aee1a",
+    "external_dependencies": "none"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest tests.test_stage1_l0 tests.test_stage1_execution tests.test_stage1_execution_assurance tests.test_stage1_validation tests.test_stage1_validation_assurance tests.test_s07_l0_independent_validation",
+    "known-invalid-artifact-produces-no-validation-receipt",
+    "holdout-exposure-is-zero", "git diff --check"
+  ],
+  "risk_class": "critical-independent-execution-validation",
+  "stop_conditions": [
+    "invalid-bytes-accepted", "artifact-not-bound-to-execution",
+    "input-not-recomputed", "holdout-access-nonzero",
+    "domain-or-canonical-authority-nonzero"
+  ],
+  "expected_receipt": "docs/receipts/integration/s07-l0-validation.json",
+  "rollback": "Revert the additive independent validator; existing execution receipts and validation-boundary verification remain unchanged.",
+  "commit_authority": "one-scoped-agent-2-commit", "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent5_assurance", "blocked_validation_failed"]
+}
