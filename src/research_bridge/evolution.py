@@ -840,6 +840,72 @@ class ChallengerEvaluationPolicy:
         self.min_known_invalid=2; self.max_retained=32; self.max_metric=1_000_000
 
 
+class ShadowCanaryPolicy:
+    """Digest-bound S31 proposal-only shadow/canary policy."""
+
+    def __init__(self, profile_path: str | Path, *, expected_profile_sha256: str) -> None:
+        profile = _load_exact_json(profile_path, expected_profile_sha256, "shadow canary profile")
+        if set(profile) != {
+            "profile_id", "schema_version", "status", "allowed_classifications",
+            "statuses", "limits", "regression_policy", "acceptance", "invariants",
+        }:
+            raise EvolutionError("shadow canary profile keys drifted")
+        if (
+            profile["profile_id"] != "shadow-canary-evolution-loop-v1"
+            or profile["schema_version"] != "1.0.0"
+            or profile["status"] != "frozen-proposal-only-shadow-canary"
+            or profile["allowed_classifications"] != ["D0_PUBLIC"]
+            or profile["statuses"] != [
+                "MUTATION_PROPOSAL_LOOP_PASS", "EVOLUTION_LOOP_SHADOW_PASS",
+                "META_EVOLUTION_PROPOSAL_ONLY", "NOT_ESTABLISHED",
+                "REGRESSION_DETECTED", "PARKED_CAPACITY", "WAIT_AUTHORITY",
+            ]
+            or profile["limits"] != {
+                "min_observations": 8, "max_observations": 64,
+                "min_unique_cases": 4, "max_regression_signals": 32,
+                "max_metric_units": 1_000_000,
+            }
+            or profile["regression_policy"] != {
+                "safety_violations_allowed": 0, "unexpected_failures_allowed": 0,
+                "quality_regression_units_allowed": 0,
+                "information_regression_units_allowed": 0,
+                "cost_regression_units_allowed": 0,
+                "latency_regression_units_allowed": 0,
+            }
+            or profile["acceptance"] != {
+                "requires_champion_challenger_pass": True,
+                "requires_calibration_maturity": True,
+                "requires_zero_regressions": True,
+                "promotion_state": "WAIT_AUTHORITY",
+                "automatic_promotion": False,
+                "rollback_application": False,
+            }
+        ):
+            raise EvolutionError("shadow canary profile semantics drifted")
+        expected_invariants = {
+            "scope_is_digest_bound": True,
+            "observations_are_precomputed_D0_metadata": True,
+            "shadow_has_no_network_or_filesystem_writes": True,
+            "canary_never_executes_code": True,
+            "regression_creates_descriptive_rollback_proposal": True,
+            "rollback_proposal_requires_authority": True,
+            "meta_evolution_is_proposal_only": True,
+            "production_promotion": False,
+            "policy_application": False,
+            "canonical_writes": 0,
+            "holdout_queries": 0,
+            "grants_authority": False,
+        }
+        if profile["invariants"] != expected_invariants:
+            raise EvolutionError("shadow canary invariants drifted")
+        self.profile_sha256 = expected_profile_sha256
+        self.min_observations = 8
+        self.max_observations = 64
+        self.min_unique_cases = 4
+        self.max_regression_signals = 32
+        self.max_metric_units = 1_000_000
+
+
 @dataclass(frozen=True, slots=True)
 class BenchmarkCase:
     case_ref: str
@@ -908,6 +974,110 @@ class ChampionChallengerReport:
     single_scalar_score: int | None = None
     winner_promoted: bool = False
     mutation_applied: bool = False
+    holdout_queries: int = 0
+    side_effects: bool = False
+    grants_authority: bool = False
+
+
+@dataclass(frozen=True, slots=True)
+class CanaryScope:
+    scope_ref: str
+    policy_sha256: str
+    archive_sha256: str
+    report_sha256: str
+    benchmark_sha256: str
+    candidate_ref: str
+    case_refs: tuple[str, ...]
+    max_observations: int
+    scope_sha256: str
+    classification: str = "D0_PUBLIC"
+    network_enabled: bool = False
+    filesystem_write_enabled: bool = False
+    generated_code_execution_enabled: bool = False
+    canonical_write_enabled: bool = False
+    promotion_enabled: bool = False
+    grants_authority: bool = False
+
+
+@dataclass(frozen=True, slots=True)
+class ShadowCanaryObservation:
+    observation_ref: str
+    scope_sha256: str
+    candidate_ref: str
+    case_ref: str
+    quality_regression_units: int
+    information_regression_units: int
+    cost_regression_units: int
+    latency_regression_units: int
+    safety_violations: int
+    unexpected_failure: bool
+    classification: str = "D0_PUBLIC"
+
+    def __post_init__(self) -> None:
+        _reference(self.observation_ref, "observation_ref")
+        _digest(self.scope_sha256, "observation scope_sha256")
+        _reference(self.candidate_ref, "observation candidate_ref")
+        _reference(self.case_ref, "observation case_ref")
+        for name in (
+            "quality_regression_units", "information_regression_units",
+            "cost_regression_units", "latency_regression_units", "safety_violations",
+        ):
+            _nonnegative(getattr(self, name), name)
+        if type(self.unexpected_failure) is not bool or self.classification != "D0_PUBLIC":
+            raise EvolutionError("shadow observation boundary is invalid")
+
+
+@dataclass(frozen=True, slots=True)
+class RegressionSignal:
+    signal_ref: str
+    observation_ref: str
+    case_ref: str
+    regression_kinds: tuple[str, ...]
+    signal_sha256: str
+
+
+@dataclass(frozen=True, slots=True)
+class RollbackProposal:
+    proposal_ref: str
+    candidate_ref: str
+    scope_sha256: str
+    regression_signal_refs: tuple[str, ...]
+    reason_code: str
+    state: str = "WAIT_AUTHORITY"
+    executable_payload_present: bool = False
+    rollback_applied: bool = False
+    policy_applied: bool = False
+    canonical_writes: int = 0
+    grants_authority: bool = False
+
+
+@dataclass(frozen=True, slots=True)
+class ShadowCanarySnapshot:
+    version: str
+    policy_sha256: str
+    scope_sha256: str
+    report_sha256: str
+    archive_sha256: str
+    candidate_ref: str
+    mutation_proposal_loop_status: str
+    evolution_loop_shadow_status: str
+    meta_evolution_status: str
+    calibration_maturity_status: str
+    promotion_state: str
+    reason_codes: tuple[str, ...]
+    observation_count: int
+    unique_case_count: int
+    regression_signals: tuple[RegressionSignal, ...]
+    rollback_proposal: RollbackProposal | None
+    snapshot_sha256: str
+    network_calls: int = 0
+    filesystem_writes: int = 0
+    generated_code_executions: int = 0
+    canonical_writes: int = 0
+    winner_promoted: bool = False
+    mutation_applied: bool = False
+    policy_applied: bool = False
+    rollback_applied: bool = False
     holdout_queries: int = 0
     side_effects: bool = False
     grants_authority: bool = False
@@ -1125,6 +1295,145 @@ def evaluate_challenger(
         side_effects=False,
         grants_authority=False,
     )
+
+
+def build_canary_scope(
+    policy: ShadowCanaryPolicy,
+    report: ChampionChallengerReport,
+    archive: MutationCandidateArchive,
+    *,
+    scope_ref: str,
+    case_refs: Sequence[str],
+    max_observations: int,
+) -> CanaryScope:
+    """Freeze a D0 metadata-only scope for one S30-passing challenger."""
+
+    if not isinstance(policy, ShadowCanaryPolicy):
+        raise EvolutionError("shadow canary policy is required")
+    _validate_mutation_archive(archive)
+    _validate_challenger_report(report)
+    if report.status != "CHAMPION_CHALLENGER_PASS":
+        raise EvolutionError("only a frozen benchmark pass can enter shadow canary")
+    if report.challenger_ref not in {item.proposal_ref for item in archive.proposals}:
+        raise EvolutionError("shadow candidate is outside the mutation archive")
+    scope = _reference(scope_ref, "canary scope_ref")
+    cases = _references(case_refs, "canary case_refs")
+    if len(cases) < policy.min_unique_cases:
+        raise EvolutionError("canary case scope is immature")
+    maximum = _positive(max_observations, "canary max_observations")
+    if not policy.min_observations <= maximum <= policy.max_observations:
+        raise EvolutionError("canary observation scope exceeds frozen bounds")
+    material = {
+        "scope_ref": scope, "policy_sha256": policy.profile_sha256,
+        "archive_sha256": archive.archive_sha256,
+        "report_sha256": report.report_sha256,
+        "benchmark_sha256": report.benchmark_sha256,
+        "candidate_ref": report.challenger_ref,
+        "case_refs": tuple(sorted(cases)), "max_observations": maximum,
+        "classification": "D0_PUBLIC", "network_enabled": False,
+        "filesystem_write_enabled": False,
+        "generated_code_execution_enabled": False,
+        "canonical_write_enabled": False, "promotion_enabled": False,
+        "grants_authority": False,
+    }
+    return CanaryScope(**material, scope_sha256=_sha(material))
+
+
+def run_shadow_canary(
+    policy: ShadowCanaryPolicy,
+    scope: CanaryScope,
+    report: ChampionChallengerReport,
+    archive: MutationCandidateArchive,
+    observations: Sequence[ShadowCanaryObservation],
+) -> ShadowCanarySnapshot:
+    """Reduce precomputed D0 observations; never execute or apply a mutation."""
+
+    if not isinstance(policy, ShadowCanaryPolicy):
+        raise EvolutionError("shadow canary policy is required")
+    _validate_mutation_archive(archive)
+    _validate_challenger_report(report)
+    _validate_canary_scope(policy, scope, report, archive)
+    if not isinstance(observations, Sequence) or isinstance(observations, (str, bytes)):
+        raise EvolutionError("shadow observations must be a sequence")
+    if any(not isinstance(item, ShadowCanaryObservation) for item in observations):
+        raise EvolutionError("shadow observations must be typed")
+    ordered = tuple(sorted(observations, key=lambda item: item.observation_ref))
+    if len({item.observation_ref for item in ordered}) != len(ordered):
+        raise EvolutionError("shadow observation identity is duplicated")
+    for item in ordered:
+        if (
+            item.scope_sha256 != scope.scope_sha256
+            or item.candidate_ref != scope.candidate_ref
+            or item.case_ref not in scope.case_refs
+        ):
+            raise EvolutionError("shadow observation binding is invalid")
+        for name in (
+            "quality_regression_units", "information_regression_units",
+            "cost_regression_units", "latency_regression_units", "safety_violations",
+        ):
+            if getattr(item, name) > policy.max_metric_units:
+                raise EvolutionError("shadow observation metric exceeds frozen bound")
+
+    overloaded = len(ordered) > scope.max_observations or len(ordered) > policy.max_observations
+    unique_cases = len({item.case_ref for item in ordered})
+    regression_signals: tuple[RegressionSignal, ...] = ()
+    rollback: RollbackProposal | None = None
+    reasons: set[str] = set()
+    if overloaded:
+        shadow_status = "PARKED_CAPACITY"
+        maturity = "NOT_ESTABLISHED"
+        reasons.add("SHADOW_CANARY_CAPACITY_EXCEEDED")
+    else:
+        built_signals = tuple(
+            signal for signal in (_regression_signal(item) for item in ordered)
+            if signal is not None
+        )
+        if len(built_signals) > policy.max_regression_signals:
+            shadow_status = "PARKED_CAPACITY"
+            maturity = "NOT_ESTABLISHED"
+            reasons.add("REGRESSION_SIGNAL_CAPACITY_EXCEEDED")
+        else:
+            regression_signals = built_signals
+            mature = (
+                len(ordered) >= policy.min_observations
+                and unique_cases >= policy.min_unique_cases
+                and set(scope.case_refs) <= {item.case_ref for item in ordered}
+            )
+            maturity = "MATURE_FOR_FROZEN_SCOPE" if mature else "NOT_ESTABLISHED"
+            if regression_signals:
+                shadow_status = "REGRESSION_DETECTED"
+                reasons.add("SHADOW_CANARY_REGRESSION_DETECTED")
+                rollback = _rollback_proposal(scope, regression_signals)
+            elif mature:
+                shadow_status = "EVOLUTION_LOOP_SHADOW_PASS"
+                reasons.add("PASS_FOR_FROZEN_SHADOW_SCOPE")
+            else:
+                shadow_status = "NOT_ESTABLISHED"
+                reasons.add("CALIBRATION_MATURITY_NOT_ESTABLISHED")
+
+    material = {
+        "version": "shadow-canary-snapshot-v1",
+        "policy_sha256": policy.profile_sha256,
+        "scope_sha256": scope.scope_sha256,
+        "report_sha256": report.report_sha256,
+        "archive_sha256": archive.archive_sha256,
+        "candidate_ref": scope.candidate_ref,
+        "mutation_proposal_loop_status": "MUTATION_PROPOSAL_LOOP_PASS",
+        "evolution_loop_shadow_status": shadow_status,
+        "meta_evolution_status": "META_EVOLUTION_PROPOSAL_ONLY",
+        "calibration_maturity_status": maturity,
+        "promotion_state": "WAIT_AUTHORITY",
+        "reason_codes": tuple(sorted(reasons)),
+        "observation_count": len(ordered), "unique_case_count": unique_cases,
+        "regression_signals": [_regression_signal_material(item) for item in regression_signals],
+        "rollback_proposal": None if rollback is None else _rollback_proposal_material(rollback),
+        "network_calls": 0, "filesystem_writes": 0,
+        "generated_code_executions": 0, "canonical_writes": 0,
+        "winner_promoted": False, "mutation_applied": False,
+        "policy_applied": False, "rollback_applied": False,
+        "holdout_queries": 0, "side_effects": False, "grants_authority": False,
+    }
+    return ShadowCanarySnapshot(**material, snapshot_sha256=_sha(material))
 
 
 def build_research_agenda(
@@ -1995,6 +2304,164 @@ def _result_map(policy: ChallengerEvaluationPolicy, benchmark: BenchmarkSnapshot
         if x.candidate_ref!=candidate_ref or x.benchmark_sha256!=benchmark.benchmark_sha256: raise EvolutionError("candidate result binding mismatch")
         if any(getattr(x,name)>policy.max_metric for name in ("quality_units","information_value_units","cost_units","latency_units","safety_violations")): raise EvolutionError("candidate metric exceeds frozen bound")
     return mapped
+
+
+def _validate_challenger_report(report: ChampionChallengerReport) -> None:
+    if not isinstance(report, ChampionChallengerReport):
+        raise EvolutionError("typed champion/challenger report is required")
+    if (
+        report.version != "champion-challenger-report-v1"
+        or report.status not in {
+            "CHAMPION_CHALLENGER_PASS", "NOT_ESTABLISHED", "REJECTED_SAFETY"
+        }
+        or report.single_scalar_score is not None
+        or report.winner_promoted
+        or report.mutation_applied
+        or report.holdout_queries
+        or report.side_effects
+        or report.grants_authority
+    ):
+        raise EvolutionError("champion/challenger report boundary widened")
+    if tuple(item.name for item in report.dimensions) != (
+        "quality_units", "information_value_units", "cost_units",
+        "latency_units", "safety_violations",
+    ):
+        raise EvolutionError("champion/challenger dimensions drifted")
+    material = {
+        "version": report.version,
+        "benchmark_sha256": report.benchmark_sha256,
+        "evaluator_ref": report.evaluator_ref,
+        "champion_ref": report.champion_ref,
+        "challenger_ref": report.challenger_ref,
+        "dimensions": [_evaluation_dimension_material(item) for item in report.dimensions],
+        "pareto_relation": report.pareto_relation,
+        "status": report.status,
+        "reason_codes": report.reason_codes,
+        "retained_candidate_refs": report.retained_candidate_refs,
+        "single_scalar_score": None,
+        "winner_promoted": False,
+        "mutation_applied": False,
+        "holdout_queries": 0,
+        "side_effects": False,
+        "grants_authority": False,
+    }
+    if report.report_sha256 != _sha(material):
+        raise EvolutionError("champion/challenger report integrity mismatch")
+
+
+def _validate_canary_scope(
+    policy: ShadowCanaryPolicy,
+    scope: CanaryScope,
+    report: ChampionChallengerReport,
+    archive: MutationCandidateArchive,
+) -> None:
+    if not isinstance(scope, CanaryScope):
+        raise EvolutionError("typed canary scope is required")
+    if (
+        report.status != "CHAMPION_CHALLENGER_PASS"
+        or scope.policy_sha256 != policy.profile_sha256
+        or scope.archive_sha256 != archive.archive_sha256
+        or scope.report_sha256 != report.report_sha256
+        or scope.benchmark_sha256 != report.benchmark_sha256
+        or scope.candidate_ref != report.challenger_ref
+        or scope.candidate_ref not in {item.proposal_ref for item in archive.proposals}
+        or scope.classification != "D0_PUBLIC"
+        or scope.network_enabled
+        or scope.filesystem_write_enabled
+        or scope.generated_code_execution_enabled
+        or scope.canonical_write_enabled
+        or scope.promotion_enabled
+        or scope.grants_authority
+    ):
+        raise EvolutionError("canary scope boundary widened")
+    _reference(scope.scope_ref, "canary scope_ref")
+    cases = _references(scope.case_refs, "canary case_refs")
+    if tuple(sorted(cases)) != scope.case_refs or len(cases) < policy.min_unique_cases:
+        raise EvolutionError("canary case scope is not canonical or mature")
+    if not policy.min_observations <= scope.max_observations <= policy.max_observations:
+        raise EvolutionError("canary observation scope exceeds frozen bounds")
+    material = {
+        "scope_ref": scope.scope_ref, "policy_sha256": scope.policy_sha256,
+        "archive_sha256": scope.archive_sha256,
+        "report_sha256": scope.report_sha256,
+        "benchmark_sha256": scope.benchmark_sha256,
+        "candidate_ref": scope.candidate_ref, "case_refs": scope.case_refs,
+        "max_observations": scope.max_observations,
+        "classification": "D0_PUBLIC", "network_enabled": False,
+        "filesystem_write_enabled": False,
+        "generated_code_execution_enabled": False,
+        "canonical_write_enabled": False, "promotion_enabled": False,
+        "grants_authority": False,
+    }
+    if scope.scope_sha256 != _sha(material):
+        raise EvolutionError("canary scope integrity mismatch")
+
+
+def _regression_signal(item: ShadowCanaryObservation) -> RegressionSignal | None:
+    kinds: list[str] = []
+    if item.quality_regression_units:
+        kinds.append("quality-regression")
+    if item.information_regression_units:
+        kinds.append("information-regression")
+    if item.cost_regression_units:
+        kinds.append("cost-regression")
+    if item.latency_regression_units:
+        kinds.append("latency-regression")
+    if item.safety_violations:
+        kinds.append("safety-regression")
+    if item.unexpected_failure:
+        kinds.append("unexpected-failure")
+    if not kinds:
+        return None
+    material = {
+        "observation_ref": item.observation_ref, "case_ref": item.case_ref,
+        "regression_kinds": tuple(sorted(kinds)),
+    }
+    digest = _sha(material)
+    return RegressionSignal(
+        signal_ref="regression-signal:sha256:" + digest,
+        observation_ref=item.observation_ref,
+        case_ref=item.case_ref,
+        regression_kinds=tuple(sorted(kinds)),
+        signal_sha256=digest,
+    )
+
+
+def _regression_signal_material(item: RegressionSignal) -> dict[str, object]:
+    return {
+        "signal_ref": item.signal_ref, "observation_ref": item.observation_ref,
+        "case_ref": item.case_ref, "regression_kinds": item.regression_kinds,
+        "signal_sha256": item.signal_sha256,
+    }
+
+
+def _rollback_proposal(
+    scope: CanaryScope, signals: Sequence[RegressionSignal]
+) -> RollbackProposal:
+    signal_refs = tuple(item.signal_ref for item in signals)
+    material = {
+        "candidate_ref": scope.candidate_ref, "scope_sha256": scope.scope_sha256,
+        "regression_signal_refs": signal_refs,
+        "reason_code": "SHADOW_CANARY_REGRESSION_DETECTED",
+        "state": "WAIT_AUTHORITY", "executable_payload_present": False,
+        "rollback_applied": False, "policy_applied": False,
+        "canonical_writes": 0, "grants_authority": False,
+    }
+    return RollbackProposal(
+        proposal_ref="rollback-proposal:sha256:" + _sha(material), **material
+    )
+
+
+def _rollback_proposal_material(item: RollbackProposal) -> dict[str, object]:
+    return {
+        "proposal_ref": item.proposal_ref, "candidate_ref": item.candidate_ref,
+        "scope_sha256": item.scope_sha256,
+        "regression_signal_refs": item.regression_signal_refs,
+        "reason_code": item.reason_code, "state": "WAIT_AUTHORITY",
+        "executable_payload_present": False, "rollback_applied": False,
+        "policy_applied": False, "canonical_writes": 0,
+        "grants_authority": False,
+    }
 
 
 def _opportunity_material(item: ImprovementOpportunity) -> dict[str, object]:
