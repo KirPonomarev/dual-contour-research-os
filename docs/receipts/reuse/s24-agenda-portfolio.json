@@ -1,0 +1,23 @@
+{
+  "schema_id": "ReuseDecisionReceipt", "schema_version": "1.0.0",
+  "object_id": "reuse-s24-agenda-portfolio-20260718", "issued_at": "2026-07-18T21:32:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-freeze-authority"},
+  "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "BOUNDED_DETERMINISTIC_RESEARCH_AGENDA_AND_PORTFOLIO",
+    "candidates": [
+      {"candidate": "reuse-S23-typed-knowledge-fabric-research-debt-root-energy-and-provenance", "disposition": "selected"},
+      {"candidate": "minimal-pure-selector-in-activated-evolution-module", "disposition": "selected-minimal-missing-glue"},
+      {"candidate": "new-scheduler-queue-database-or-unbounded-autonomous-loop", "disposition": "rejected-no-measured-blocker-and-runaway-risk"},
+      {"candidate": "model-selected-budget-or-authority-policy", "disposition": "rejected-deterministic-kernel-boundary"}
+    ],
+    "selected_mode": "pure-versioned-agenda-snapshot-plus-bounded-value-cost-risk-diversity-selector-with-zero-or-one-next-trigger-per-outcome",
+    "source_ref": "git:b71ac22ff54a9f425cfd359a21adf70ca330b5c0;integration:integration-s23-knowledge-fabric-20260718",
+    "code_sha256": "de3be5fde4eaba49ba408fbf5574088d550c4d64ecbc888faa7fe222031a40d1",
+    "license_spdx": "NOASSERTION", "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": ["deterministic-selection", "budget-and-concurrency", "starvation-and-diversity", "root-energy-exhaustion", "unsafe-park-reason", "zero-or-one-next-event", "replay"],
+    "canonical_owner": "evolution-agent-1-with-agent-5-hostile-assurance",
+    "rollback": "Revert the pure selector and tests; no persistent schema, scheduler, queue or runtime data migration exists."
+  },
+  "integrity": {"payload_sha256": "b7878d5d1b140ab64c035ad5000befbd348fcada8568d093926c54025e30b12f", "parent_refs": ["git:b71ac22ff54a9f425cfd359a21adf70ca330b5c0", "integration:integration-s23-knowledge-fabric-20260718"]}
+}

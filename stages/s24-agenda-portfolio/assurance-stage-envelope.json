@@ -1,0 +1,18 @@
+{
+  "stage_id": "s24-agenda-portfolio-assurance", "agent_id": "agent-5",
+  "objective": "Prove deterministic bounded selection, immutable budget/slots, diversity/starvation behavior, energy exhaustion, unsafe parking, duplicate outcome denial and zero side effects.",
+  "executable_blocker": "The Agent-1 agenda/portfolio implementation needs independent hostile and static-boundary assurance before council work can consume it.",
+  "base_sha": "c056dd65042a323cf1579e14140e8058720c5a6c", "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a1-s24-agenda-portfolio", "worktree": "/private/tmp/dcr-s24-agenda-portfolio",
+  "read_set": ["src/research_bridge/evolution.py", "src/research_bridge/ledger.py", "tests/test_s23_knowledge_fabric.py"],
+  "write_set": ["tests/test_s24_agenda_portfolio.py", "tests/test_stage1_assurance.py", "stages/s24-agenda-portfolio/assurance-stage-envelope.json", "stages/s24-agenda-portfolio/assurance-ownership-lease.json"],
+  "forbidden_scope": ["runtime-source-contract-schema-storage-or-policy-edit", "model-network-external-domain-canonical-deploy-live-or-publication-action"],
+  "dependency_hashes": {"agent_1_commit": "c056dd65042a323cf1579e14140e8058720c5a6c", "evolution_py": "a70a45a6ac055f3e860c46aa0f17e3c3d3d40da34b394750e7590bde53389645", "external_dependencies": "none-stdlib-only"},
+  "acceptance_commands": ["make contracts", "python3 -m unittest tests.test_ownership_registry tests.test_s23_knowledge_fabric tests.test_s24_agenda_portfolio tests.test_stage1_assurance -v", "python3 -m unittest discover -s tests -p test_*.py", "python3 -m unittest discover -s tests/stage0b -p test_*.py", "git diff --check"],
+  "risk_class": "high-runaway-budget-gaming-starvation-and-authority-overclaim",
+  "stop_conditions": ["budget-slot-or-diversity-breach", "unsafe-or-exhausted-work-selected", "duplicate-next-trigger", "nondeterminism-or-side-effect"],
+  "expected_receipt": "docs/receipts/integration/s24-agenda-portfolio-assurance.json",
+  "rollback": "Revert assurance-only tests and reject the Agent-1 handoff.",
+  "commit_authority": "one-scoped-agent-5-commit", "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent0_audit", "blocked_validation_failed"]
+}

@@ -1,0 +1,18 @@
+{
+  "stage_id": "s24-agenda-portfolio", "agent_id": "agent-1",
+  "objective": "Build a versioned research agenda from S23 debt/energy evidence and select a bounded deterministic portfolio under immutable slots, cost, risk, diversity and starvation policy.",
+  "executable_blocker": "S23 exposes typed gaps and energy, but no deterministic bounded mechanism chooses runnable work without budget self-escalation or duplicate next events.",
+  "base_sha": "f560f8eb43c7839f9e218393fe14ddd083b5abb3", "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a1-s24-agenda-portfolio", "worktree": "/private/tmp/dcr-s24-agenda-portfolio",
+  "read_set": ["src/research_bridge/ledger.py", "docs/receipts/integration/s23-knowledge-fabric.json", "docs/receipts/reuse/s24-agenda-portfolio.json", "docs/ADR/0007-evolution-path-activation.md"],
+  "write_set": ["src/research_bridge/evolution.py", "stages/s24-agenda-portfolio/stage-envelope.json", "stages/s24-agenda-portfolio/ownership-lease.json"],
+  "forbidden_scope": ["ledger-schema-durable-write-second-store-scheduler-queue-or-vector-db", "budget-self-raise-model-network-or-external-call", "trusted-material-event-domain-scientific-canonical-deploy-live-or-publication-authority", "test-edit"],
+  "dependency_hashes": {"ownership_parent": "f560f8eb43c7839f9e218393fe14ddd083b5abb3", "s23_integration_payload": "18e47d18b8dcdcd31199aeb64ad37d65663705c3015dafed551c00c6e45fb080", "reuse_receipt_payload": "b7878d5d1b140ab64c035ad5000befbd348fcada8568d093926c54025e30b12f", "external_dependencies": "none-stdlib-only"},
+  "acceptance_commands": ["make contracts", "python3 -m unittest tests.test_s23_knowledge_fabric tests.test_s24_agenda_portfolio -v", "deterministic replay", "budget/diversity/starvation/root-energy negative probes", "git diff --check"],
+  "risk_class": "high-runaway-self-triggering-budget-gaming-and-starvation",
+  "stop_conditions": ["budget-or-slot-breach", "duplicate-next-event-for-outcome", "unsafe-or-zero-energy-work-selected", "authority-or-durable-write-created"],
+  "expected_receipt": "docs/receipts/integration/s24-agenda-portfolio.json",
+  "rollback": "Revert the new pure evolution module and stage metadata; no durable schema/data/runtime rollback is required.",
+  "commit_authority": "one-scoped-agent-1-commit", "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent5_assurance", "blocked_validation_failed"]
+}

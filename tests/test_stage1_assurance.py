@@ -583,6 +583,17 @@ class Stage1StaticBoundaryTests(unittest.TestCase):
                 "LedgerError",
                 "LedgerEvent",
             },
+            "evolution.py": {
+                "AgendaItem",
+                "AgendaProposal",
+                "AgendaSnapshot",
+                "EvolutionError",
+                "PortfolioEntry",
+                "PortfolioPolicy",
+                "PortfolioSnapshot",
+                "build_research_agenda",
+                "select_portfolio",
+            },
             "model_broker.py": {
                 "FixtureProviderAdapter",
                 "KnownProviderFailure",
