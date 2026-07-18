@@ -1,0 +1,65 @@
+{
+  "schema_id": "research-os.deployment-readiness-packet.v1",
+  "packet_id": "deployment-readiness-94f203fc",
+  "source_head": "94f203fc2e0fb85a6578d78a22b0f0bcefdf4c9b",
+  "exact_head_ci": {"run_id": 29659711260, "conclusion": "success", "url": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29659711260"},
+  "release": {
+    "manifest_ref": "docs/receipts/release/s4-release-manifest.json",
+    "manifest_sha256": "9ceae0bda066cf52577cec0fdc1d7230e92b3e4010f65b81613abf6a0a8a90dd",
+    "release_sha": "5c2bd7c090fada6e5b65dc955e80b256d88252de",
+    "image_id": "sha256:36069ee7a9db78af747d7fad65f9e33073824f27be898cdc0b7dd3b77ac5c235",
+    "policy_sha256": "61eac550de8a24ef24ab1dbb699ee874e32b4599dcdd23369319c27b5545c405",
+    "config_sha256": "0b186888a3a1bb8fb028315681bf4073ec4186a0acbdf2f226b5a53d69a9d542",
+    "schema_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50"
+  },
+  "isolation": {
+    "packet_ref": "ops/deploy/stage4-a1-isolation-release-packet.json",
+    "packet_sha256": "2038a4fe49e018d58832df5dd1028c5cd2e49e5075f98f805e393abbe14557f0",
+    "integration_ref": "docs/receipts/integration/s20-stage4-isolation-release-packet.json",
+    "integration_sha256": "7c16bec461a011232757622e6d9561675f113a33b7679f3c54160bda2566f7f0",
+    "single_supervisor": true,
+    "concurrent_writers": false
+  },
+  "backup_draft": {
+    "required_schema_id": "BackupReceipt",
+    "controller_ref": "tools/release_backup_restore.py",
+    "controller_sha256": "9e9c0d2d8a1be70e27c3d6d6c6dbf522a3fe0f331f4cc2d186968c1b60515a74",
+    "state": "RUNTIME_EVIDENCE_REQUIRED",
+    "encrypted": true,
+    "off_host": true,
+    "verification_result_required": "VERIFIED",
+    "repository_locator_in_git": false,
+    "credential_in_git": false
+  },
+  "restore_draft": {
+    "required_schema_id": "RestoreReceipt",
+    "state": "RUNTIME_EVIDENCE_REQUIRED",
+    "clean_target_required": true,
+    "manifest_equality_required": true,
+    "repository_check_required": true,
+    "destructive_restore": false
+  },
+  "rollback": {
+    "target": "release:none-service-stopped",
+    "target_is_predeclared": true,
+    "receipt_required": true,
+    "automatic_changed_release_rollback": false
+  },
+  "authority": {
+    "approval_issuer_ref": "tools/issue_deployment_approval.py",
+    "approval_issuer_sha256": "c7840433992324ec30f78b4f7adccd3899259422bbc703e508ef541d7034f7ce",
+    "deployment_approval_receipt_required": true,
+    "human_confirmation_required": true,
+    "maximum_approval_ttl_seconds": 300,
+    "packet_grants_external_action": false
+  },
+  "readiness": {
+    "structural_deployability": "PASS_FOR_FROZEN_SCOPE",
+    "backup_restore_path": "EXECUTABLE_SYNTHETIC_PROOF",
+    "actual_backup_receipt": "WAIT_OPERATOR_RUNTIME_EVIDENCE",
+    "actual_restore_receipt": "WAIT_OPERATOR_RUNTIME_EVIDENCE",
+    "deployment_authority": "WAIT_HUMAN_AUTHORITY",
+    "status": "READY_FOR_HUMAN_REVIEW_NOT_READY_TO_DEPLOY"
+  },
+  "integrity": {"profile": "core-json-sha256-v1", "payload_sha256": "a6408c2fff0db881a9aa0a8ed07b49ae7ba56ad382379553a1e344f265794ba8"}
+}

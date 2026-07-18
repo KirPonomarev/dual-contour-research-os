@@ -1,0 +1,6 @@
+{
+  "lease_id": "lease-s21-deployment-readiness-agent-0", "stage_id": "s21-deployment-readiness", "agent_id": "agent-0",
+  "branch": "codex/bridge-a0-s21-deployment-readiness", "issued_at": "2026-07-18T21:12:00Z", "expires_at": "2026-07-19T21:12:00Z",
+  "write_set": ["ops/deploy/deployment-readiness-packet.json", "tools/verify_deployment_readiness_packet.py", "tests/test_s21_deployment_readiness.py", "docs/receipts/reuse/s21-deployment-readiness.json", "stages/s21-deployment-readiness/stage-envelope.json", "stages/s21-deployment-readiness/ownership-lease.json"],
+  "exclusive": true, "revoked": false
+}
