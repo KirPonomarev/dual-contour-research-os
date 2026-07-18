@@ -72,7 +72,10 @@ class E2AggregateGateTests(unittest.TestCase):
             evidence["replication_status"],
             "AUTONOMOUS_REPLICATION_SHADOW_PASS",
         )
-        proof = gate.validate_aggregate_receipt(ROOT, receipt())
+        # The immutable S28 receipt remains structurally valid after later
+        # evolution stages, while its currentness is assessed separately and
+        # correctly becomes STALE when the frozen code bundle changes.
+        proof = validate_capability_proof(receipt())
         self.assertEqual(
             proof["payload"]["capability_id"],
             "AUTONOMOUS_RESEARCH_E2_SHADOW",
