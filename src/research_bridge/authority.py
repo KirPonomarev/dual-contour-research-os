@@ -244,6 +244,7 @@ class AuthorityCorridorBundle:
     attempt_lease: Mapping[str, Any]
     admission_receipt_ref: str
     reservation_ref: str
+    authority: PinnedOfflineAuthority
 
     def __post_init__(self) -> None:
         job = _copy_json_object(self.job_spec, "corridor JobSpec")
@@ -252,6 +253,8 @@ class AuthorityCorridorBundle:
         _expect_text(self.admission_receipt_ref, "admission_receipt_ref")
         if _A1_RESERVATION_REF.fullmatch(self.reservation_ref) is None:
             raise AuthorityError("corridor reservation_ref is invalid")
+        if type(self.authority) is not PinnedOfflineAuthority:
+            raise AuthorityError("corridor bundle requires a scoped pinned authority")
         object.__setattr__(self, "job_spec", _deep_freeze(job))
         object.__setattr__(self, "permit", _deep_freeze(permit))
         object.__setattr__(self, "attempt_lease", _deep_freeze(lease))
@@ -278,6 +281,7 @@ class PinnedOfflineAuthority:
         trusted_issuers: Mapping[str, TrustedIssuer],
         policy_snapshots: Mapping[str, Mapping[str, Any]],
         approval_receipts: Mapping[str, Mapping[str, Any]],
+        authority_documents: Mapping[str, Mapping[str, Any]] | None = None,
     ) -> None:
         if not isinstance(trusted_issuers, Mapping):
             raise AuthorityError("trusted issuers must be a mapping")
@@ -301,6 +305,18 @@ class PinnedOfflineAuthority:
             "approval receipt resolver",
             sha256_keys=False,
         )
+        documents = {} if authority_documents is None else authority_documents
+        self._authority_documents = _copy_object_mapping(
+            documents,
+            "scoped authority document resolver",
+            sha256_keys=False,
+        )
+        if self._authority_documents and set(self._authority_documents) != {
+            "JobSpec",
+            "Permit",
+            "AttemptLease",
+        }:
+            raise AuthorityError("scoped authority documents must contain the exact execution chain")
 
     def verify_admission(
         self,
@@ -316,6 +332,20 @@ class PinnedOfflineAuthority:
         self._verify_issuer(job_spec, "JobSpec")
         self._verify_issuer(permit, "Permit")
         self._verify_issuer(lease, "AttemptLease")
+        if self._authority_documents:
+            for schema_id, document in (
+                ("JobSpec", job_spec),
+                ("Permit", permit),
+                ("AttemptLease", lease),
+            ):
+                expected = self._authority_documents[schema_id]
+                if not hmac.compare_digest(
+                    _canonical_json_sha256(expected),
+                    _canonical_json_sha256(document),
+                ):
+                    raise AuthorityError(
+                        f"{schema_id} differs from the scoped authority document"
+                    )
 
         permit_payload = _expect_mapping_member(permit, "payload", "permit")
         policy_digest = permit_payload.get("policy_snapshot_sha256")
@@ -400,6 +430,23 @@ class PinnedOfflineAuthority:
             raise AuthorityError("policy does not deny connected execution")
         return _parse_timestamp(
             payload.get("valid_until"), "policy_snapshot.payload.valid_until"
+        )
+
+    def _scoped_execution_authority(
+        self,
+        job_spec: Mapping[str, Any],
+        permit: Mapping[str, Any],
+        lease: Mapping[str, Any],
+    ) -> PinnedOfflineAuthority:
+        return PinnedOfflineAuthority(
+            trusted_issuers=self._trusted_issuers,
+            policy_snapshots=self._policy_snapshots,
+            approval_receipts=self._approval_receipts,
+            authority_documents={
+                "JobSpec": job_spec,
+                "Permit": permit,
+                "AttemptLease": lease,
+            },
         )
 
     def _resolve_policy(self, digest: str) -> Mapping[str, Any]:
@@ -699,6 +746,7 @@ class A1AuthorityCorridor:
             attempt_lease=lease,
             admission_receipt_ref=receipt["object_id"],
             reservation_ref=reservation_ref,
+            authority=self._authority._scoped_execution_authority(job, permit, lease),
         )
 
     def _admission_receipt(
