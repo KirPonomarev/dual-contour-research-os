@@ -1,0 +1,7 @@
+{
+  "lease_id": "lease-s24-agenda-portfolio-agent-5", "stage_id": "s24-agenda-portfolio-assurance", "agent_id": "agent-5",
+  "base_sha": "c056dd65042a323cf1579e14140e8058720c5a6c", "branch": "codex/bridge-a1-s24-agenda-portfolio",
+  "issued_at": "2026-07-18T21:40:00Z", "expires_at": "2026-07-19T21:40:00Z",
+  "write_set": ["tests/test_s24_agenda_portfolio.py", "tests/test_stage1_assurance.py", "stages/s24-agenda-portfolio/assurance-stage-envelope.json", "stages/s24-agenda-portfolio/assurance-ownership-lease.json"],
+  "exclusive": true, "revoked": false
+}
