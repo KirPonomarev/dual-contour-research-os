@@ -1,0 +1,8 @@
+{
+  "lease_id": "lease-s17-raw-response-assurance-agent-5",
+  "stage_id": "s17-raw-response-assurance", "agent_id": "agent-5",
+  "branch": "codex/bridge-a5-s17-raw-response-assurance",
+  "issued_at": "2026-07-18T18:05:00Z", "expires_at": "2026-07-19T18:05:00Z",
+  "write_set": ["tests/test_s17_raw_response_boundary.py", "tests/test_stage1_assurance.py", "stages/s17-raw-response-assurance/stage-envelope.json", "stages/s17-raw-response-assurance/ownership-lease.json"],
+  "exclusive": true, "revoked": false
+}
