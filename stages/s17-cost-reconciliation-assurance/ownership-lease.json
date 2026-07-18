@@ -1,0 +1,8 @@
+{
+  "lease_id": "lease-s17-cost-reconciliation-assurance-agent-5",
+  "stage_id": "s17-cost-reconciliation-assurance", "agent_id": "agent-5",
+  "branch": "codex/bridge-a5-s17-cost-reconciliation-assurance",
+  "issued_at": "2026-07-18T18:38:00Z", "expires_at": "2026-07-19T18:38:00Z",
+  "write_set": ["tests/test_s17_cost_reconciliation.py", "stages/s17-cost-reconciliation-assurance/stage-envelope.json", "stages/s17-cost-reconciliation-assurance/ownership-lease.json"],
+  "exclusive": true, "revoked": false
+}
