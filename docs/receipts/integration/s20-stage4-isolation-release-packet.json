@@ -1,0 +1,45 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s20-stage4-isolation-release-packet-20260718",
+  "issued_at": "2026-07-18T21:02:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s20-stage4-isolation-release-packet",
+    "agent_id": "agent-0",
+    "ownership_lease_ref": "stages/s20-stage4-isolation-release-packet/ownership-lease.json",
+    "base_sha": "cf33dcea6566e69da0253f6b7613a9761a937713",
+    "head_sha": "844d8b662e99b887b930a20e80dc67a6e409e6ec",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": ["ops/deploy/research-os-a1-bridge.service", "ops/deploy/stage4-a1-isolation-release-packet.json", "docs/STAGE4_A1_ISOLATION_RELEASE_RUNBOOK.md", "tools/verify_stage4_release_packet.py", "tests/test_s20_stage4_release_packet.py", "docs/receipts/reuse/s20-stage4-isolation-release-packet.json", "stages/s20-stage4-isolation-release-packet/stage-envelope.json", "stages/s20-stage4-isolation-release-packet/ownership-lease.json"],
+    "audit_results": {
+      "contract_gate": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "bridge_runtime_source_mutation": false,
+      "agent0_ops_tool_and_candidate_unit_mutation": true,
+      "focused_tests": 46,
+      "new_packet_tests": 6,
+      "full_core_tests": 666,
+      "stage0b_tests": 25,
+      "frozen_predecessor_release_mutation": false,
+      "mutable_namespace_intersection": 0,
+      "concurrent_writer_activation": false,
+      "candidate_restart_supervisors": 1,
+      "candidate_container_restart_policy": "no",
+      "candidate_systemd_restart_policy": "on-failure",
+      "r0_scope": "SAME_RELEASE_SAME_IMAGE_SAME_POLICY_SAME_CONFIG_SAME_SCHEMA_ONLY",
+      "changed_release_requires_human_approval": true,
+      "packet_grants_deployment_reboot_sudo_canonical_or_live_authority": false,
+      "external_actions_performed": 0
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29659659958",
+    "integration_commit_sha": "c56b3f0107347e713c4941b42504a4b9b9b28f4d"
+  },
+  "integrity": {
+    "payload_sha256": "4a428e5dbe16d630470ced59014bba84e2d7a791856852d10f87cf28bffc5115",
+    "parent_refs": ["git:844d8b662e99b887b930a20e80dc67a6e409e6ec", "git:c56b3f0107347e713c4941b42504a4b9b9b28f4d", "ci:29659659958", "reuse:reuse-s20-stage4-isolation-release-packet-20260718", "packet:stage4-a1-isolation-candidate-cf33dcea"]
+  }
+}
