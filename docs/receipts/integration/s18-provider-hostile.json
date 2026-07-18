@@ -10,7 +10,7 @@
     "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
     "write_set": ["tools/model_provider_shadow.py", "tests/test_s18_provider_hostile.py", "docs/receipts/reuse/s18-provider-hostile.json", "stages/s18-provider-hostile/stage-envelope.json", "stages/s18-provider-hostile/ownership-lease.json"],
     "audit_results": {
-      "contract_gate": "green", "privacy_secret_scan": "green",
+      "contract_gate": "green", "privacy_secret_scan": "green", "source_mutation": false,
       "bridge_runtime_source_mutation": false, "agent0_connected_tool_mutation": true,
       "focused_tests": 24, "new_hostile_tests": 7,
       "full_core_tests": 652, "stage0b_tests": 25,
@@ -29,5 +29,5 @@
     },
     "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29658498353", "integration_commit_sha": "94633760196988d678f51babb5547907c0805f94"
   },
-  "integrity": {"payload_sha256": "810d4a9b44097cc574721573f82e369ac4d3b543b50bff0d6924498e5d0f202b", "parent_refs": ["git:468715434c9e22d27dea06383ec9b7a7a862417a", "git:94633760196988d678f51babb5547907c0805f94", "ci:29658498353", "reuse:reuse-s18-provider-hostile-20260718", "local-proof:sha256:43fafb2b354813d991da84c1a4757f88b5aee335d4861fa44d2998dcf534a399"]}
+  "integrity": {"payload_sha256": "e54269a3b6af4861fc422fe8a9711fe34512825f27119f3b11b3fca28eab32c7", "parent_refs": ["git:468715434c9e22d27dea06383ec9b7a7a862417a", "git:94633760196988d678f51babb5547907c0805f94", "ci:29658498353", "reuse:reuse-s18-provider-hostile-20260718", "local-proof:sha256:43fafb2b354813d991da84c1a4757f88b5aee335d4861fa44d2998dcf534a399"]}
 }
