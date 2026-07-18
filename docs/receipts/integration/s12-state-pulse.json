@@ -1,0 +1,35 @@
+{
+  "schema_id": "IntegrationReceipt", "schema_version": "1.0.0",
+  "object_id": "integration-s12-state-pulse-20260718", "issued_at": "2026-07-18T16:21:34Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s12-state-pulse", "agent_id": "agent-5",
+    "ownership_lease_ref": "stages/s12-state-pulse/ownership-lease.json",
+    "base_sha": "74a7d3418cfca5468a380e282ce6b08c94640d79",
+    "head_sha": "c7bfb963b46bdbec8572998cafa5463d7c41f915",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "src/research_bridge/organism.py", "ops/organism/pulse-policy.json",
+      "tests/test_s12_state_pulse.py", "stages/s12-state-pulse/stage-envelope.json",
+      "stages/s12-state-pulse/ownership-lease.json"
+    ],
+    "audit_results": {
+      "contract_gate": "green", "privacy_secret_scan": "green", "source_mutation": false,
+      "focused_tests": 17, "full_core_tests": 585, "stage0b_tests": 25,
+      "durable_states": ["WAIT_DATA", "REJECTED", "GENERATING", "ADMITTED_A1", "RUNNING", "LEARNED", "WAIT_AUTHORITY", "PARKED"],
+      "state_and_pulse_separate": "green", "same_input_same_id": "green", "pulse_side_effects": 0,
+      "WAIT_AUTHORITY_restart": "green", "PARKED_restart": "green",
+      "AI_OFF_core_operational": "green", "healthy_WAIT_DATA_REJECTED_explicit": "green",
+      "stale_failed_or_environment_mismatch_green": false, "queue_aging_yellow_red": "green",
+      "new_tables_writers_services": 0, "network_or_model_calls": 0,
+      "grants_authority": false, "canonical_or_live_authority": false
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29651777814",
+    "integration_commit_sha": "047b3974fdd20de66375b230e65fcbe24c26a5cf"
+  },
+  "integrity": {"payload_sha256": "9fc265e9ec3f6c36abb4231c16fca15a4d921194ad88d2e144e225ac471a004a", "parent_refs": [
+    "git:c7bfb963b46bdbec8572998cafa5463d7c41f915", "git:047b3974fdd20de66375b230e65fcbe24c26a5cf",
+    "ci:29651777814", "reuse:c96a1e389427e609d122dd14282a3aad21a6b6c3e0e9fec8a06f057f2cb395c9"
+  ]}
+}
