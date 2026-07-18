@@ -1,0 +1,8 @@
+{
+  "lease_id": "lease-s17-provider-shadow-assurance-agent-5",
+  "stage_id": "s17-provider-shadow-assurance", "agent_id": "agent-5",
+  "branch": "codex/bridge-a5-s17-provider-shadow-assurance",
+  "issued_at": "2026-07-18T18:25:00Z", "expires_at": "2026-07-19T18:25:00Z",
+  "write_set": ["tests/test_s17_provider_shadow_tool.py", "stages/s17-provider-shadow-assurance/stage-envelope.json", "stages/s17-provider-shadow-assurance/ownership-lease.json"],
+  "exclusive": true, "revoked": false
+}

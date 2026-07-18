@@ -1,0 +1,20 @@
+{
+  "stage_id": "s17-provider-shadow-assurance", "agent_id": "agent-5",
+  "objective": "Prove the connected shadow tool's strict official profile, codecs, secret boundary, response bounds, private CAS, conservative accounting and no-retry behavior without real provider calls.",
+  "executable_blocker": "Real S17 calls must not begin until deterministic fake transport and hostile parser/CAS/secret checks pass.",
+  "base_sha": "b95b4e7d791610c9064c5e6a104aa6a172417e04",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a5-s17-provider-shadow-assurance",
+  "worktree": "/Volumes/Work/dual-contour-research-os-s17-shadow-assurance",
+  "read_set": ["tools/model_provider_shadow.py", "provenance/model-provider-connected-shadow-v1.json", "src/research_bridge/model_broker.py", "src/research_bridge/cas.py"],
+  "write_set": ["tests/test_s17_provider_shadow_tool.py", "stages/s17-provider-shadow-assurance/stage-envelope.json", "stages/s17-provider-shadow-assurance/ownership-lease.json"],
+  "forbidden_scope": ["source-contract-profile-provenance-or-canonical-doc-edit", "real-network-call", "credential-value", "new-payment", "D2-D3-or-holdout", "authority-domain-canonical-deployment-or-live-action"],
+  "dependency_hashes": {"tool_stage": "b95b4e7d791610c9064c5e6a104aa6a172417e04", "connected_profile_sha256": "4ac18aaa960d78ee0103cd199f411067aca46fceb11efa8e0045c53f57c5affd", "core_contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50", "a1_contract_catalog": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1", "external_dependencies": "none"},
+  "acceptance_commands": ["make contracts", "python3 -m unittest tests.test_s17_provider_shadow_tool tests.test_s17_raw_response_boundary tests.test_s16_provider_routing tests.test_stage1_assurance", "make test", "git diff --check"],
+  "risk_class": "critical-secret-egress-response-and-cost-ambiguity",
+  "stop_conditions": ["secret-output", "redirect-or-unbounded-response", "repo-local-CAS", "automatic-retry-or-budget-release", "provider-availability-overclaim", "authority-expansion"],
+  "expected_receipt": "docs/receipts/integration/s17-provider-shadow-assurance.json",
+  "rollback": "Remove assurance test and stage metadata; provider shadow tool remains unaccepted.",
+  "commit_authority": "one-scoped-agent-5-commit", "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent0_s17_shadow_tool_audit", "blocked_validation_failed"]
+}

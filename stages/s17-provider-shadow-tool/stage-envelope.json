@@ -1,0 +1,20 @@
+{
+  "stage_id": "s17-provider-shadow-tool", "agent_id": "agent-0",
+  "objective": "Add an exact, bounded, tool-only connected shadow path for official DeepSeek, GLM and OpenAI API shapes without changing the Bridge runtime network boundary.",
+  "executable_blocker": "S17 cannot execute real provider shadow safely with only fixture adapters and no connected codec, credential preflight or private CAS runner.",
+  "base_sha": "7563f2fa6bc25c5f342dc4fa357a7ef09fd378da",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a0-s17-provider-shadow-tool",
+  "worktree": "/Volumes/Work/dual-contour-research-os-s17-shadow-tool",
+  "read_set": ["src/research_bridge/model_broker.py", "src/research_bridge/ledger.py", "src/research_bridge/cas.py", "provenance/model-provider-routing-v1.json", "contracts/a1/v1/profiles/model_role_registry_v1.json"],
+  "write_set": ["provenance/model-provider-connected-shadow-v1.json", "tools/model_provider_shadow.py", "docs/receipts/source-freeze/s17-official-provider-api-shapes.json", "docs/receipts/reuse/s17-connected-provider-shadow-tool.json", "stages/s17-provider-shadow-tool/stage-envelope.json", "stages/s17-provider-shadow-tool/ownership-lease.json"],
+  "forbidden_scope": ["Bridge-source-contract-or-test-edit", "dependency-addition", "credential-value-or-raw-response-in-Git", "automatic-retry", "new-payment", "D2-D3-or-holdout", "new-ledger-schema-service-queue-or-scheduler", "authority-domain-canonical-deployment-or-live-action"],
+  "dependency_hashes": {"base_main": "7563f2fa6bc25c5f342dc4fa357a7ef09fd378da", "core_contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50", "a1_contract_catalog": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1", "raw_response_repair": "integration-s17-raw-response-20260718", "external_dependencies": "none-stdlib-only"},
+  "acceptance_commands": ["make contracts", "python3 tools/model_provider_shadow.py preflight", "Agent-5 offline transport/parser/secret/CAS assurance", "make test", "git diff --check"],
+  "risk_class": "critical-payment-secret-egress-ambiguity-and-provider-drift",
+  "stop_conditions": ["secret-or-raw-response-output", "unbounded-or-redirected-egress", "automatic-retry", "private-data", "new-payment", "authority-expansion", "provider-availability-overclaim"],
+  "expected_receipt": "docs/receipts/integration/s17-provider-shadow-tool.json",
+  "rollback": "Remove tool, connected profile and governance receipts; provider-neutral broker and raw-response repair remain valid.",
+  "commit_authority": "one-scoped-agent-0-commit", "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent5_s17_shadow_tool_assurance", "blocked_validation_failed"]
+}
