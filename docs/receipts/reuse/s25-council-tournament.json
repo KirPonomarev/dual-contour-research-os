@@ -1,0 +1,25 @@
+{
+  "schema_id": "ReuseDecisionReceipt", "schema_version": "1.0.0",
+  "object_id": "reuse-s25-council-tournament-20260718", "issued_at": "2026-07-18T22:08:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-freeze-authority"},
+  "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "BOUNDED_ADVISORY_MODEL_COUNCIL_TOURNAMENT",
+    "candidates": [
+      {"candidate": "reuse-existing-ModelCouncilPlan-ModelProviderRouting-ModelRoleRegistry-and-ModelCallBroker-budget-FSM", "disposition": "selected"},
+      {"candidate": "reuse-stdlib-dataclasses-json-hash-and-immutable-tuples", "disposition": "selected"},
+      {"candidate": "add-small-strict-profile-loader-and-deterministic-advisory-aggregator-in-existing-model_broker-module", "disposition": "selected-minimal-missing-glue"},
+      {"candidate": "new-agent-framework-swarm-queue-scheduler-database-or-vector-store", "disposition": "rejected-duplicate-unbounded-or-out-of-scope"},
+      {"candidate": "majority-vote-consensus-or-ranking-as-scientific-evidence", "disposition": "rejected-epistemically-invalid"},
+      {"candidate": "caller-selected-evaluator-or-model-self-assigned-role", "disposition": "rejected-authority-and-collusion-risk"}
+    ],
+    "selected_mode": "frozen-rubric-existing-policy-assigned-evaluators-one-call-per-role-all-candidates-dissent-preserving-advisory-ranking-with-zero-authority",
+    "source_ref": "git:b4f3de8dfa57494cba88782b45f70c14896aaaf6;internal:model_provider_routing+model_role_registry+model_broker;profile:sha256:e27222fe820912b7dd0abf725bf1c1825115e8f51bfb50ce44666bc8c8f27d81",
+    "code_sha256": "e27222fe820912b7dd0abf725bf1c1825115e8f51bfb50ce44666bc8c8f27d81",
+    "license_spdx": "NOASSERTION", "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": ["strict-profile-and-digest", "candidate-and-call-caps", "policy-assigned-evaluator", "proposer-self-review-denial", "missing-critic-WAIT_PROVIDER", "missing-output-INCOMPLETE", "frozen-rubric", "dissent-preservation", "consensus-and-ranking-not-evidence", "deterministic-replay", "zero-authority-and-zero-write"],
+    "canonical_owner": "agent-0-profile-and-reuse-freeze-agent-1-existing-model-broker-agent-5-assurance",
+    "rollback": "Remove S25 tournament profile and additive aggregator; S16 deterministic council planner and all durable provider boundaries remain valid."
+  },
+  "integrity": {"payload_sha256": "f7abbd6cd1d15b3c19f7723a275f2d3e65823660f86dad28c9f9a2a41d571f81", "parent_refs": ["git:b4f3de8dfa57494cba88782b45f70c14896aaaf6", "reuse:reuse-s16-provider-adapters-routing-20260718", "profile:sha256:e27222fe820912b7dd0abf725bf1c1825115e8f51bfb50ce44666bc8c8f27d81"]}
+}

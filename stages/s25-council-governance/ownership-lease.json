@@ -1,0 +1,8 @@
+{
+  "lease_id": "lease-s25-council-governance-agent-0",
+  "stage_id": "s25-council-governance", "agent_id": "agent-0",
+  "branch": "codex/bridge-a0-s25-council-governance",
+  "issued_at": "2026-07-18T22:08:00Z", "expires_at": "2026-07-20T22:08:00Z",
+  "write_set": ["provenance/model-council-tournament-v1.json", "docs/receipts/reuse/s25-council-tournament.json", "stages/s25-council-governance/stage-envelope.json", "stages/s25-council-governance/ownership-lease.json"],
+  "exclusive": true, "revoked": false
+}
