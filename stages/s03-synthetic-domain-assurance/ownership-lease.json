@@ -1,0 +1,12 @@
+{
+  "lease_id": "lease-s03-synthetic-domain-assurance-agent-5",
+  "stage_id": "s03-synthetic-domain-assurance",
+  "agent_id": "agent-5",
+  "base_sha": "64f8bd3a7a6f0187de450b3d2990da9c48ded8fc",
+  "branch": "codex/bridge-a5-s03-synthetic-assurance",
+  "issued_at": "2026-07-18T13:51:00Z",
+  "expires_at": "2026-07-19T13:51:00Z",
+  "write_set": ["tests/test_a1_synthetic_domain_freeze.py"],
+  "exclusive": true,
+  "revoked": false
+}
