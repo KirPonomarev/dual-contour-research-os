@@ -1,0 +1,62 @@
+{
+  "schema_id": "CapabilityProofReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "capability-proof:b1ca90f8f7f196ddad03fdf3c23150dc2ec6020df27f3791fcfc1fb1d807caf3",
+  "issued_at": "2026-07-18T23:00:59Z",
+  "issuer": "independent-assurance-issuer",
+  "contour": "governance",
+  "classification": "D1",
+  "payload": {
+    "receipt_id": "capability-proof:e2-autonomous-research-shadow:b9fa2944",
+    "capability_id": "AUTONOMOUS_RESEARCH_E2_SHADOW",
+    "subject_ref": "git:b9fa2944c35f7edc1474c2e42c91680f1d177e19",
+    "scope": {
+      "proof_state": "AUTONOMOUS_RESEARCH_E2_SHADOW_PASS_FOR_FROZEN_SCOPE",
+      "data_scope": "D0_PUBLIC_SYNTHETIC_SHADOW_ONLY",
+      "agenda_status": "AUTONOMOUS_RESEARCH_AGENDA_SHADOW_PASS",
+      "portfolio_status": "AUTONOMOUS_PORTFOLIO_SELECTION_SHADOW_PASS",
+      "falsification_status": "AUTONOMOUS_FALSIFICATION_SHADOW_PASS",
+      "replication_status": "AUTONOMOUS_REPLICATION_SHADOW_PASS",
+      "memory_status": "MEASUREMENT_SCOPED_POPULATION_UPLIFT_NOT_ESTABLISHED",
+      "replication_independence": "PER_PAIR_FROZEN_SCOPE_NOT_GLOBAL",
+      "domain_application": "SHADOW_UNAPPLIED",
+      "autonomous_canonical_mutation": false,
+      "human_required_for_promotion": true,
+      "deployment": false,
+      "live_trading": false,
+      "live_security_execution": false,
+      "environments": ["linux-ci", "macos-development"]
+    },
+    "status": "PASS_FOR_FROZEN_SCOPE",
+    "proof_basis": [
+      {"integration_ref": "integration-s23-knowledge-fabric-assurance-20260718", "claim_scope": "READ_ONLY_OPERATIONAL_MEMORY_SHADOW"},
+      {"integration_ref": "integration-s24-agenda-portfolio-assurance-20260718", "claim_scope": "BOUNDED_AGENDA_AND_PORTFOLIO_SHADOW"},
+      {"integration_ref": "integration-s25-council-assurance-20260718", "claim_scope": "ADVISORY_FALSIFICATION_NOT_EVIDENCE"},
+      {"integration_ref": "integration-s26-replication-assurance-20260718", "claim_scope": "MULTIDIMENSIONAL_PER_PAIR_FROZEN_SCOPE"},
+      {"integration_ref": "integration-s27-memory-assurance-20260718", "claim_scope": "MEASUREMENT_CAPABILITY_NOT_POPULATION_UPLIFT"}
+    ],
+    "code_sha256": "a0cdce2ba022e7da4773b27d81992ff15245ee05c291e84c1d62c4211344832b",
+    "config_sha256": "1b15b5918efa09354da2c2a4a32c80198506c76fecc13d22a719c3612244fc77",
+    "policy_sha256": "e3b42680594e5a3953fc34bba20f708df04db82d82f6695b0d569005089b4e4b",
+    "schema_sha256": "d262099ef5993d9064717ac03ca58eb5d1c393cf69161746b96017a67470e379",
+    "executor_ref": "aggregate:deterministic-e2-evidence-gate",
+    "evaluator_ref": "assurance:agent5-fail-closed-e2-validator",
+    "test_refs": ["test:tests.test_s28_e2_aggregate_gate", "test:tests.test_s23_knowledge_fabric", "test:tests.test_s24_agenda_portfolio", "test:tests.test_s25_model_council_tournament", "test:tests.test_s26_evidence_replication", "test:tests.test_s27_memory_uplift"],
+    "environment_ref": "environment:macos-development+linux-ci:2026-07-18",
+    "data_refs": ["fixture:D0-public-synthetic", "evidence:D0-ref-hash-group-only"],
+    "issuer_independence": {"issuer_ref": "assurance-role:agent-5-deterministic-validator", "independent_of_subject": true, "independent_of_executor": true},
+    "critical_dependencies": ["catalog:core:13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50", "catalog:a1:eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1"],
+    "compatibility_dependencies": ["python:>=3.11", "git:required", "make:required"],
+    "environment_compatibility_ref": "profile:environment-compatibility-v1:52f5d7c8715b3027164a2b284ca912357fd2b8f4bf6f2f2ab356e032370d50e7",
+    "negative_probe_refs": ["probe:canonical-live-authority-absent", "probe:council-evidence-laundering-denied", "probe:e2-evidence-digest-tamper", "probe:e2-stage-mixed-head", "probe:expired-proof-stale", "probe:ipc-role-spoof-denied", "probe:memory-overclaim-denied", "probe:mixed-head-stale", "probe:parser-hostile-pack", "probe:replication-global-independence-denied", "probe:shadow-admission-parked", "probe:writer-spoof-denied"],
+    "valid_from": "2026-07-18T23:00:59Z",
+    "valid_until": "2026-07-25T23:00:59Z",
+    "invalidation_conditions": ["code-hash-drift", "config-hash-drift", "environment-compatibility-drift", "negative-probe-regression", "policy-hash-drift", "proof-expiry", "schema-hash-drift", "subject-head-drift"],
+    "grants_authority": false
+  },
+  "integrity": {
+    "profile_id": "core-json-sha256-v1",
+    "payload_sha256": "b1ca90f8f7f196ddad03fdf3c23150dc2ec6020df27f3791fcfc1fb1d807caf3",
+    "parent_refs": ["git:b9fa2944c35f7edc1474c2e42c91680f1d177e19", "probe:canonical-live-authority-absent", "probe:council-evidence-laundering-denied", "probe:e2-evidence-digest-tamper", "probe:e2-stage-mixed-head", "probe:expired-proof-stale", "probe:ipc-role-spoof-denied", "probe:memory-overclaim-denied", "probe:mixed-head-stale", "probe:parser-hostile-pack", "probe:replication-global-independence-denied", "probe:shadow-admission-parked", "probe:writer-spoof-denied", "profile:environment-compatibility-v1:52f5d7c8715b3027164a2b284ca912357fd2b8f4bf6f2f2ab356e032370d50e7", "test:tests.test_s23_knowledge_fabric", "test:tests.test_s24_agenda_portfolio", "test:tests.test_s25_model_council_tournament", "test:tests.test_s26_evidence_replication", "test:tests.test_s27_memory_uplift", "test:tests.test_s28_e2_aggregate_gate"]
+  }
+}

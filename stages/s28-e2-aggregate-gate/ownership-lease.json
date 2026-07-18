@@ -1,0 +1,6 @@
+{
+  "lease_id": "lease-s28-e2-aggregate-gate-agent-0", "stage_id": "s28-e2-aggregate-gate", "agent_id": "agent-0",
+  "branch": "codex/bridge-a0-s28-e2-aggregate-gate", "issued_at": "2026-07-18T23:00:59Z", "expires_at": "2026-07-20T23:00:59Z",
+  "write_set": ["tools/capability_proof.py", "tools/e2_aggregate_gate.py", "docs/receipts/capability/e2-autonomous-research-shadow.json", "docs/receipts/reuse/s28-e2-aggregate-gate.json", "stages/s28-e2-aggregate-gate/stage-envelope.json", "stages/s28-e2-aggregate-gate/ownership-lease.json"],
+  "exclusive": true, "revoked": false
+}
