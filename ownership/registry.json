@@ -1,7 +1,7 @@
 {
   "schema_version": "1.1.0",
   "frozen": true,
-  "amendment_ref": "docs/ADR/0004-synthetic-market-fixture-activation.md",
+  "amendment_ref": "docs/ADR/0005-organism-manifest-path-activation.md",
   "canonical_owners": {
     "adapters/market/**": "agent-3",
     "LICENSES/**": "agent-0",
@@ -28,6 +28,7 @@
     "src/research_bridge/l0.py": "agent-2",
     "src/research_bridge/validation.py": "agent-2",
     "src/research_bridge/deployment.py": "agent-5",
+    "src/research_bridge/organism.py": "agent-5",
     "ops/**": "agent-5",
     "stages/**": "agent-0",
     "tests/**": "agent-5",
@@ -38,7 +39,6 @@
     "adapters/security/**": "agent-4",
     "src/research_bridge/evolution.py": "agent-1",
     "src/research_bridge/model_broker.py": "agent-1",
-    "src/research_bridge/organism.py": "agent-5",
     "validator_adapters/market/**": "agent-3",
     "validator_adapters/security/**": "agent-4"
   },
