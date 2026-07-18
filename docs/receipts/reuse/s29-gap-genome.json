@@ -1,0 +1,22 @@
+{
+  "schema_id": "ReuseDecisionReceipt", "schema_version": "1.0.0", "object_id": "reuse-s29-gap-genome-20260718", "issued_at": "2026-07-18T23:12:13Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-freeze-authority"}, "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "VERSIONED_GENOME_GAP_MINER_IMPROVEMENT_OPPORTUNITY_MUTATION_PROPOSAL_AND_CANDIDATE_ARCHIVE",
+    "candidates": [
+      {"candidate": "reuse-existing-evolution-pure-digest-bound-snapshot-and-reference-patterns", "disposition": "selected"},
+      {"candidate": "reuse-S23-ResearchDebt-and-S24-proposal-only-shadow-boundaries", "disposition": "selected"},
+      {"candidate": "add-small-stdlib-only-genome-gap-opportunity-proposal-and-archive-primitives", "disposition": "selected-minimal-missing-glue"},
+      {"candidate": "generated-code-patch-application-policy-edit-or-authority-mutation", "disposition": "rejected-explicit-S29-boundary"},
+      {"candidate": "new-database-vector-store-queue-scheduler-or-agent-framework", "disposition": "rejected-no-measured-blocker"}
+    ],
+    "selected_mode": "D0-metadata-only-versioned-genome-transitive-reverse-dependency-blast-radius-monotonic-deny-invariants-and-zero-apply-candidate-archive",
+    "source_ref": "git:c5492b596598aecd9fd184a0f0c3972073995628;internal:evolution+ResearchDebt+shadow-proposal-patterns;profile:sha256:bd35130dc90e252773359973f77e4a8e4cc9cdc5a746c1ff362d1bee8a599c07",
+    "code_sha256": "bd35130dc90e252773359973f77e4a8e4cc9cdc5a746c1ff362d1bee8a599c07",
+    "license_spdx": "NOASSERTION", "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": ["genome-determinism", "gap-opportunity-determinism", "complete-transitive-blast-radius", "deny-invariant-monotonicity", "forbidden-kind-and-authority-policy-escalation", "descriptive-not-executable", "archive-provenance-and-dedupe", "zero-application-write-authority"],
+    "canonical_owner": "agent-0-profile-agent-1-existing-evolution-module-agent-5-hostile-assurance",
+    "rollback": "Remove S29 additive profile and pure evolution primitives; E2 capability and runtime remain unchanged."
+  },
+  "integrity": {"payload_sha256": "068a7b8f4c0b553d6acd1b049dcbdc0ffb3ecd3f6ea89755cb4299f4cb24899e", "parent_refs": ["git:c5492b596598aecd9fd184a0f0c3972073995628", "profile:sha256:bd35130dc90e252773359973f77e4a8e4cc9cdc5a746c1ff362d1bee8a599c07"]}
+}

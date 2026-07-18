@@ -1,0 +1,18 @@
+{
+  "stage_id": "s29-gap-genome-governance", "agent_id": "agent-0",
+  "objective": "Freeze a D0 metadata-only proposal-only genome, gap-miner, blast-radius, deny-invariant and candidate-archive boundary.",
+  "executable_blocker": "E2 can expose operational debt but no frozen E3 policy converts it into version-bound non-executable mutation proposals without risking self-application.",
+  "base_sha": "c5492b596598aecd9fd184a0f0c3972073995628", "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a0-s29-gap-genome-governance", "worktree": "/private/tmp/dcr-s29-gap-genome-governance",
+  "read_set": ["src/research_bridge/evolution.py", "docs/ARCHITECTURE.md", "docs/ADR/0003-a1-autonomous-research-corridor.md", "docs/receipts/capability/e2-autonomous-research-shadow.json"],
+  "write_set": ["provenance/evolution-genome-gap-miner-v1.json", "docs/receipts/reuse/s29-gap-genome.json", "stages/s29-gap-genome-governance/stage-envelope.json", "stages/s29-gap-genome-governance/ownership-lease.json"],
+  "forbidden_scope": ["contract-runtime-source-test-root-CI-lockfile-or-migration-edit", "generated-code-patch-or-command-payload", "mutation-application-policy-change-authority-expansion-or-deny-removal", "canonical-deploy-live-publication-private-data-or-model-call", "new-store-service-queue-scheduler-framework-or-dependency"],
+  "dependency_hashes": {"base_main": "c5492b596598aecd9fd184a0f0c3972073995628", "genome_profile": "bd35130dc90e252773359973f77e4a8e4cc9cdc5a746c1ff362d1bee8a599c07", "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50", "external_dependencies": "none"},
+  "acceptance_commands": ["make contracts", "profile and reuse integrity", "Agent-1 S29 implementation", "Agent-5 hostile assurance", "git diff --check"],
+  "risk_class": "critical-self-modification-authority-policy-and-executable-payload",
+  "stop_conditions": ["mutation-applied-or-executable-payload", "deny-invariant-removal", "authority-or-policy-expansion", "incomplete-blast-radius", "canonical-live-deploy-publication-or-private-data-surface"],
+  "expected_receipt": "docs/receipts/integration/s29-gap-genome-governance.json",
+  "rollback": "Remove additive S29 profile/reuse/stage metadata; E2 state remains unchanged.",
+  "commit_authority": "one-scoped-agent-0-commit", "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent1_s29_gap-miner", "blocked_validation_failed"]
+}
