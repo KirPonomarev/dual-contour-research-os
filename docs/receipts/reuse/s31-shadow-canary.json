@@ -1,0 +1,61 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-s31-shadow-canary-20260718",
+  "issued_at": "2026-07-18T23:38:08Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "reuse-freeze-authority"
+  },
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "BOUNDED_NO_WRITE_SHADOW_CANARY_REGRESSION_AND_ROLLBACK_PROPOSAL",
+    "candidates": [
+      {
+        "candidate": "reuse-S29-MutationCandidateArchive-and-proposal-identities",
+        "disposition": "selected"
+      },
+      {
+        "candidate": "reuse-S30-frozen-benchmark-report-and-visible-dimensions",
+        "disposition": "selected"
+      },
+      {
+        "candidate": "add-small-stdlib-only-scope-observation-regression-and-rollback-proposal-primitives",
+        "disposition": "selected-minimal-missing-glue"
+      },
+      {
+        "candidate": "execute-generated-code-or-contact-network-from-shadow-runner",
+        "disposition": "rejected-authority-and-isolation-risk"
+      },
+      {
+        "candidate": "automatic-promotion-policy-application-or-rollback",
+        "disposition": "rejected-out-of-scope"
+      }
+    ],
+    "selected_mode": "D0-precomputed-observation-reducer-digest-bound-canary-scope-zero-write-regression-signals-descriptive-rollback-and-WAIT_AUTHORITY",
+    "source_ref": "git:1f438d26538fa563a147c882a08800f37462584c;internal:S29-archive+S30-report;profile:sha256:81440253d296d04a42bacca18b259f715236444a7b4c068fda54bd382d6b9c5e",
+    "code_sha256": "81440253d296d04a42bacca18b259f715236444a7b4c068fda54bd382d6b9c5e",
+    "license_spdx": "NOASSERTION",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "scope-digest-binding",
+      "candidate-report-archive-binding",
+      "observation-capacity-and-case-scope",
+      "calibration-maturity-gate",
+      "regression-injection",
+      "rollback-proposal-only",
+      "no-write-no-execution",
+      "no-auto-promotion-authority"
+    ],
+    "canonical_owner": "agent-0-profile-agent-1-existing-evolution-module-agent-5-assurance",
+    "rollback": "Remove S31 additive profile and pure shadow/canary reducer; S29 and S30 remain unchanged."
+  },
+  "integrity": {
+    "payload_sha256": "1a082c734beecfa2dc5f04642f770a58e9daba3ff32cfecc57ff747bb9fab3e6",
+    "parent_refs": [
+      "git:1f438d26538fa563a147c882a08800f37462584c",
+      "profile:sha256:81440253d296d04a42bacca18b259f715236444a7b4c068fda54bd382d6b9c5e"
+    ]
+  }
+}
