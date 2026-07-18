@@ -166,13 +166,17 @@ class CapabilityProofTests(unittest.TestCase):
         self.assertIn("production-containment", profile["environments"]["macos-development"]["not_proof_of"])
         self.assertIn("vps-runtime-health", profile["environments"]["linux-ci"]["not_proof_of"])
 
-    def test_organism_activation_does_not_widen_the_e1a_capability_proof(self) -> None:
+    def test_later_path_activations_do_not_widen_the_e1a_capability_proof(self) -> None:
         registry = json.loads((ROOT / "ownership" / "registry.json").read_text())
         self.assertEqual(registry["canonical_owners"]["src/research_bridge/organism.py"], "agent-5")
         self.assertNotIn("src/research_bridge/organism.py", registry["reserved_future_paths"])
         self.assertTrue((ROOT / "src" / "research_bridge" / "organism.py").is_file())
-        self.assertEqual(registry["reserved_future_paths"]["src/research_bridge/model_broker.py"], "agent-1")
-        self.assertNotIn("organism", json.dumps(_receipt(), sort_keys=True).lower())
+        self.assertEqual(registry["canonical_owners"]["src/research_bridge/model_broker.py"], "agent-1")
+        self.assertNotIn("src/research_bridge/model_broker.py", registry["reserved_future_paths"])
+        self.assertTrue((ROOT / "src" / "research_bridge" / "model_broker.py").is_file())
+        receipt_text = json.dumps(_receipt(), sort_keys=True).lower()
+        self.assertNotIn("organism", receipt_text)
+        self.assertNotIn("model_broker", receipt_text)
 
 
 if __name__ == "__main__":

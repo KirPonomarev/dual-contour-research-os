@@ -577,9 +577,23 @@ class Stage1StaticBoundaryTests(unittest.TestCase):
                 "A1BundleRecord",
                 "FeedbackBundleRecord",
                 "FeedbackReplayReport",
+                "ModelCallTransitionRecord",
                 "JobLedger",
                 "LedgerError",
                 "LedgerEvent",
+            },
+            "model_broker.py": {
+                "KnownProviderFailure",
+                "ModelBrokerError",
+                "ModelBudgetPolicy",
+                "ModelCallBroker",
+                "ModelCallHandle",
+                "ModelCallSpec",
+                "ModelProviderAdapter",
+                "ModelRoleRegistry",
+                "ModelRoute",
+                "ProviderResult",
+                "ResponseCommitter",
             },
         }
         forbidden_imports = {
@@ -661,6 +675,7 @@ class Stage1StaticBoundaryTests(unittest.TestCase):
             {
                 "append_a1_bundle",
                 "append_feedback_bundle",
+                "append_model_call_transition",
                 "claim",
                 "checkpoint",
                 "complete",
@@ -678,6 +693,8 @@ class Stage1StaticBoundaryTests(unittest.TestCase):
                 "pause_global",
                 "resume_global",
                 "is_globally_paused",
+                "model_call_history",
+                "model_call_state",
                 "pause_snapshot",
             },
         )

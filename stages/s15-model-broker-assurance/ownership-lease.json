@@ -1,0 +1,7 @@
+{
+  "lease_id": "lease-s15-model-broker-assurance-agent-5", "stage_id": "s15-model-broker-assurance", "agent_id": "agent-5",
+  "base_sha": "b8e1d0d06e022e5b77067b48d1f5ccc30e11e0c1", "branch": "codex/bridge-a5-s15-model-broker-assurance",
+  "issued_at": "2026-07-18T17:12:00Z", "expires_at": "2026-07-19T17:12:00Z",
+  "write_set": ["tests/test_s15_model_registry_broker.py", "tests/test_a1_capability_proof.py", "tests/test_stage1_assurance.py", "stages/s15-model-broker-assurance/stage-envelope.json", "stages/s15-model-broker-assurance/ownership-lease.json"],
+  "exclusive": true, "revoked": false
+}
