@@ -1,0 +1,20 @@
+{
+  "stage_id": "s24-r2-openrouter-provider", "agent_id": "agent-0",
+  "objective": "Add an exact OpenRouter GPT-5.6 Sol xhigh binding to the existing bounded connected-provider shadow path without changing the Bridge runtime network or authority boundary.",
+  "executable_blocker": "S25 council cannot exercise its strongest configured xhigh critic route through the operator-provided OpenRouter credential until the route, secret resolver, provenance and failure behavior are frozen and tested.",
+  "base_sha": "026949695c8e34d8ebb64a80934744acd5294f8e",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a0-s24-r2-openrouter-provider",
+  "worktree": "/private/tmp/dcr-s24-r2-openrouter-provider",
+  "read_set": ["tools/model_provider_shadow.py", "provenance/model-provider-connected-shadow-v1.json", "provenance/model-provider-routing-v1.json", "src/research_bridge/model_broker.py", "src/research_bridge/ledger.py", "src/research_bridge/cas.py", "contracts/a1/v1/profiles/model_role_registry_v1.json"],
+  "write_set": ["provenance/model-provider-connected-shadow-v2.json", "tools/model_provider_shadow.py", "docs/receipts/source-freeze/s24-r2-openrouter-official-api-shape.json", "docs/receipts/reuse/s24-r2-openrouter-provider.json", "stages/s24-r2-openrouter-provider/stage-envelope.json", "stages/s24-r2-openrouter-provider/ownership-lease.json"],
+  "forbidden_scope": ["Bridge-runtime-network-or-credential-reader", "credential-value-or-raw-response-in-Git-output-log-exception-receipt-snapshot-or-test", "automatic-retry-or-ambiguous-budget-release", "unreserved-or-unbounded-call", "D2-D3-holdout-live-canonical-deploy-or-production-action", "provider-independence-overclaim", "new-service-queue-scheduler-or-broker"],
+  "dependency_hashes": {"base_main": "026949695c8e34d8ebb64a80934744acd5294f8e", "core_contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50", "a1_contract_catalog": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1", "role_registry": "4faf6765f48a952e4d35540d92797330517938b34b8d2f12cde791e761a32eac", "fixture_routing": "37db8596a8245a6b1ea2bc5bce1495a4e7dadb314876e51397ad11dd194b3dc6", "external_dependencies": "none-stdlib-only"},
+  "acceptance_commands": ["make contracts", "python3 -m unittest tests.test_s24_r2_openrouter_provider tests.test_s17_provider_shadow_tool tests.test_s18_provider_hostile", "python3 tools/model_provider_shadow.py preflight", "make test", "git diff --check", "exact-head remote CI"],
+  "risk_class": "critical-secret-payment-egress-cost-and-upstream-provenance-ambiguity",
+  "stop_conditions": ["secret-or-raw-response-emission", "redirect-or-unbounded-egress", "automatic-retry", "ambiguous-budget-release", "private-data", "authority-expansion", "provider-independence-or-upstream-attestation-overclaim"],
+  "expected_receipt": "docs/receipts/integration/s24-r2-openrouter-provider.json",
+  "rollback": "Revert the v2 connected profile, resolver and OpenRouter-specific code/tests; immutable S17 v1 profile and provider-neutral broker remain valid.",
+  "commit_authority": "scoped-agent-0-implementation-plus-agent-5-assurance-commits", "push_authority": true,
+  "expected_handoff_status": ["ready_for_s24_r2_assurance", "blocked_validation_failed"]
+}

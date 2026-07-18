@@ -1,0 +1,25 @@
+{
+  "schema_id": "ReuseDecisionReceipt", "schema_version": "1.0.0",
+  "object_id": "reuse-s24-r2-openrouter-provider-20260718", "issued_at": "2026-07-18T21:52:24Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-freeze-authority"},
+  "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "OPENROUTER_GPT_5_6_SOL_XHIGH_CONNECTED_SHADOW_ADAPTER",
+    "candidates": [
+      {"candidate": "extend-existing-model_provider_shadow-ModelProviderRouting-ModelCallBroker-JobLedger-and-private-CAS", "disposition": "selected"},
+      {"candidate": "reuse-stdlib-urllib-ssl-subprocess-json-base64-hashlib-and-tempfile", "disposition": "selected"},
+      {"candidate": "add-strict-v2-profile-and-env-then-macos-Keychain-resolver", "disposition": "selected-minimal-missing-glue"},
+      {"candidate": "OpenRouter-or-OpenAI-SDK-dependency", "disposition": "rejected-unnecessary-dependency-and-version-surface"},
+      {"candidate": "new-Bridge-runtime-provider-broker-or-secret-store", "disposition": "rejected-preserve-existing-zero-network-runtime-and-single-broker-boundary"},
+      {"candidate": "automatic-retry-provider-independence-claim-or-secret-command-line-argument", "disposition": "rejected-ambiguity-authority-and-secret-exposure"}
+    ],
+    "selected_mode": "immutable-v2-profile-deterministic-role-route-environment-precedence-Keychain-fallback-bounded-POST-private-CAS-before-parse-and-UNKNOWN-without-retry",
+    "source_ref": "source-freeze:source-freeze-s24-r2-openrouter-official-api-shape-20260718;git:026949695c8e34d8ebb64a80934744acd5294f8e;internal:model_provider_shadow+model_broker+ledger+cas+routing",
+    "code_sha256": "1c9f9d31df373bdc763c500d8ae3c34a74d14c1f5f35985e7e9d3001f906f0ae",
+    "license_spdx": "NOASSERTION", "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": ["legacy-v1-profile-compatibility", "strict-v2-openrouter-binding", "environment-precedence", "Keychain-capture-and-redaction", "exact-chat-request", "redirect-and-response-bounds", "private-CAS-before-parse", "durable-SENT-before-egress", "ambiguous-cost-reservation", "no-auto-retry", "provider-provenance-no-independence-overclaim"],
+    "canonical_owner": "agent-0-tool-and-profile-with-agent-5-assurance",
+    "rollback": "Remove the v2 profile and OpenRouter resolver path; retain immutable S17 v1 profile and provider-neutral durable broker."
+  },
+  "integrity": {"payload_sha256": "dc5279ceb624400e674e9e1461ba87a1fbcb7f6e361337379a73739c2a1109dc", "parent_refs": ["git:026949695c8e34d8ebb64a80934744acd5294f8e", "source-freeze:source-freeze-s24-r2-openrouter-official-api-shape-20260718", "reuse:reuse-s17-connected-provider-shadow-tool-20260718"]}
+}
