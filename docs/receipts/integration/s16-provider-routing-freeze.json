@@ -1,0 +1,31 @@
+{
+  "schema_id": "IntegrationReceipt", "schema_version": "1.0.0",
+  "object_id": "integration-s16-provider-routing-freeze-20260718", "issued_at": "2026-07-18T17:47:14Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s16-provider-routing-freeze", "agent_id": "agent-0",
+    "ownership_lease_ref": "stages/s16-provider-routing-freeze/ownership-lease.json",
+    "base_sha": "86a2be156bc840ee0a9d92035b15a5ad79e71936",
+    "head_sha": "bd1a20d099721b592a768658ada5498982ade2e6",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": ["provenance/model-provider-routing-v1.json", "docs/receipts/source-freeze/s16-model-provider-routing-fixtures.json", "docs/receipts/reuse/s16-provider-adapters-routing.json", "stages/s16-provider-routing-freeze/stage-envelope.json", "stages/s16-provider-routing-freeze/ownership-lease.json"],
+    "audit_results": {
+      "contract_gate": "green", "privacy_secret_scan": "green", "source_mutation": false,
+      "focused_routing_freeze_checks": 1, "full_core_tests": 623, "stage0b_tests": 25,
+      "routing_profile_sha256": "37db8596a8245a6b1ea2bc5bce1495a4e7dadb314876e51397ad11dd194b3dc6",
+      "fixture_evaluated_routed_bindings": 5, "disabled_unevaluated_reserve_slots": 1,
+      "api_identifiers": "UNVERIFIED_UNTIL_REAL_PROVIDER_SHADOW",
+      "credentials_endpoints_raw_responses_or_real_cost": false,
+      "new_dependency": false
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29654558366",
+    "integration_commit_sha": "36b00f1197f37f8804a698ae8a8996da195f4b7b"
+  },
+  "integrity": {"payload_sha256": "e4c478350242faf60bf2246b7d02a0ff41e6925899d057c20e4b50ba75620e57", "parent_refs": [
+    "git:bd1a20d099721b592a768658ada5498982ade2e6", "git:36b00f1197f37f8804a698ae8a8996da195f4b7b",
+    "ci:29654558366", "git:86a2be156bc840ee0a9d92035b15a5ad79e71936",
+    "source-freeze:source-freeze-s16-model-provider-routing-fixtures-20260718",
+    "reuse:reuse-s16-provider-adapters-routing-20260718"
+  ]}
+}

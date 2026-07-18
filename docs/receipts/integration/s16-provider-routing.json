@@ -1,0 +1,32 @@
+{
+  "schema_id": "IntegrationReceipt", "schema_version": "1.0.0",
+  "object_id": "integration-s16-provider-routing-20260718", "issued_at": "2026-07-18T17:47:14Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s16-provider-routing", "agent_id": "agent-1",
+    "ownership_lease_ref": "stages/s16-provider-routing/ownership-lease.json",
+    "base_sha": "bd1a20d099721b592a768658ada5498982ade2e6",
+    "head_sha": "5f4496112457e1c9febb14c0a912d195e22ed034",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": ["src/research_bridge/model_broker.py", "stages/s16-provider-routing/stage-envelope.json", "stages/s16-provider-routing/ownership-lease.json"],
+    "audit_results": {
+      "contract_gate": "green", "privacy_secret_scan": "green", "source_mutation": false,
+      "focused_tests": 32, "full_core_tests": 623, "stage0b_tests": 25,
+      "deterministic_primary_and_fallback": "green", "unavailable_worker": "PARKED",
+      "missing_critic": "WAIT_PROVIDER", "council_max_calls": 4,
+      "caller_selected_binding": false, "fallback_privacy_widening": false,
+      "same_family_provenance_group": "green",
+      "cross_family_independence": "INDEPENDENCE_NOT_ESTABLISHED",
+      "joint_error_sample_and_uncertainty": "measured-integer-ppm",
+      "network_provider_calls_or_real_cost": 0
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29654558366",
+    "integration_commit_sha": "36b00f1197f37f8804a698ae8a8996da195f4b7b"
+  },
+  "integrity": {"payload_sha256": "73dd180a2811d8bb4e10fa0ff39c716106da327b6e665225a938db24dcbbae13", "parent_refs": [
+    "git:5f4496112457e1c9febb14c0a912d195e22ed034", "git:36b00f1197f37f8804a698ae8a8996da195f4b7b",
+    "ci:29654558366", "git:bd1a20d099721b592a768658ada5498982ade2e6",
+    "sha256:37db8596a8245a6b1ea2bc5bce1495a4e7dadb314876e51397ad11dd194b3dc6"
+  ]}
+}

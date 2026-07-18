@@ -1,0 +1,32 @@
+{
+  "schema_id": "IntegrationReceipt", "schema_version": "1.0.0",
+  "object_id": "integration-s16-provider-routing-assurance-20260718", "issued_at": "2026-07-18T17:47:14Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s16-provider-routing-assurance", "agent_id": "agent-5",
+    "ownership_lease_ref": "stages/s16-provider-routing-assurance/ownership-lease.json",
+    "base_sha": "5f4496112457e1c9febb14c0a912d195e22ed034",
+    "head_sha": "3c8f3cac690e09a7c46bdf3befc70cc3b31da883",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": ["tests/test_s16_provider_routing.py", "tests/test_stage1_assurance.py", "stages/s16-provider-routing-assurance/stage-envelope.json", "stages/s16-provider-routing-assurance/ownership-lease.json"],
+    "audit_results": {
+      "contract_gate": "green", "privacy_secret_scan": "green", "source_mutation": false,
+      "focused_tests": 32, "new_hostile_tests": 8, "full_core_tests": 623, "stage0b_tests": 25,
+      "profile_digest_and_semantic_tamper_denied": 6,
+      "unknown_disabled_and_unevaluated_routes_denied": "green",
+      "fallback_and_unavailable_state_matrix": "green",
+      "council_cap_and_policy_selected_roles": "green",
+      "fixture_adapter_durable_broker_contract": "green",
+      "same_family_independence_overclaim_denied": "green",
+      "zero_sample_uncertainty_not_zero": "green",
+      "connected_material_scan": "green"
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29654558366",
+    "integration_commit_sha": "36b00f1197f37f8804a698ae8a8996da195f4b7b"
+  },
+  "integrity": {"payload_sha256": "841e23b0bdd1aa6773e3f32ddd5270282d4c19a1e5290edd64feb1b9c7167706", "parent_refs": [
+    "git:3c8f3cac690e09a7c46bdf3befc70cc3b31da883", "git:36b00f1197f37f8804a698ae8a8996da195f4b7b",
+    "ci:29654558366", "git:5f4496112457e1c9febb14c0a912d195e22ed034"
+  ]}
+}
