@@ -644,6 +644,313 @@ class MemoryUpliftSnapshot:
     grants_authority: bool = False
 
 
+class EvolutionGenomePolicy:
+    """Digest-bound S29 proposal-only genome policy."""
+
+    def __init__(self, profile_path: str | Path, *, expected_profile_sha256: str) -> None:
+        profile = _load_exact_json(profile_path, expected_profile_sha256, "genome profile")
+        if set(profile) != {
+            "profile_id", "schema_version", "status", "allowed_classifications",
+            "allowed_mutation_kinds", "forbidden_mutation_kinds",
+            "required_deny_invariants", "limits", "proposal_states", "invariants",
+        }:
+            raise EvolutionError("genome profile keys drifted")
+        allowed = (
+            "OBSERVABILITY_ADDITION", "PARAMETER_TIGHTENING", "REPLAY_HARDENING",
+            "TEST_ADDITION", "VALIDATOR_HARDENING",
+        )
+        forbidden = (
+            "AUTHORITY_EXPANSION", "CANONICAL_WRITE", "DEPLOYMENT",
+            "GENERATED_CODE_EXECUTION", "POLICY_RELAXATION", "PUBLICATION",
+            "LIVE_SECURITY_EXECUTION", "LIVE_TRADING",
+        )
+        denies = (
+            "authority-expansion-denied", "canonical-mutation-denied",
+            "d2-d3-private-data-denied", "deployment-denied",
+            "generated-code-execution-denied", "live-security-execution-denied",
+            "live-trading-denied", "policy-relaxation-denied", "publication-denied",
+        )
+        if (
+            profile["profile_id"] != "evolution-genome-gap-miner-v1"
+            or profile["schema_version"] != "1.0.0"
+            or profile["status"] != "frozen-proposal-only"
+            or profile["allowed_classifications"] != ["D0_PUBLIC"]
+            or tuple(profile["allowed_mutation_kinds"]) != allowed
+            or tuple(profile["forbidden_mutation_kinds"]) != forbidden
+            or tuple(profile["required_deny_invariants"]) != denies
+            or profile["limits"] != {
+                "max_components": 128, "max_dependencies_per_component": 16,
+                "max_gap_signals": 256, "max_evidence_refs_per_gap": 16,
+                "max_blast_radius_components": 64, "max_added_deny_invariants": 16,
+                "max_archive_candidates": 256,
+            }
+            or profile["proposal_states"] != [
+                "RESEARCH_CANDIDATE", "PARKED_FORBIDDEN", "PARKED_CAPACITY",
+                "WAIT_AUTHORITY",
+            ]
+        ):
+            raise EvolutionError("genome profile semantics drifted")
+        invariants = profile["invariants"]
+        expected_invariants = {
+            "genome_is_versioned_and_digest_bound": True,
+            "blast_radius_is_transitive_reverse_dependency_closure": True,
+            "all_required_deny_invariants_are_retained": True,
+            "deny_invariants_may_only_grow": True,
+            "policy_and_authority_may_not_expand": True,
+            "mutation_payload_is_descriptive_not_executable": True,
+            "candidate_archive_is_deterministic_and_provenance_bound": True,
+            "mutation_applied": False, "generated_code_executed": False,
+            "canonical_writes": 0, "grants_authority": False,
+        }
+        if invariants != expected_invariants:
+            raise EvolutionError("genome invariants drifted")
+        self.profile_sha256 = expected_profile_sha256
+        self.allowed_mutation_kinds = frozenset(allowed)
+        self.forbidden_mutation_kinds = frozenset(forbidden)
+        self.required_deny_invariants = frozenset(denies)
+        self.max_components = 128
+        self.max_dependencies_per_component = 16
+        self.max_gap_signals = 256
+        self.max_evidence_refs_per_gap = 16
+        self.max_blast_radius_components = 64
+        self.max_added_deny_invariants = 16
+        self.max_archive_candidates = 256
+
+
+@dataclass(frozen=True, slots=True)
+class GenomeComponent:
+    component_ref: str
+    version: str
+    content_sha256: str
+    dependency_refs: tuple[str, ...]
+    deny_invariants: tuple[str, ...]
+
+    def __post_init__(self) -> None:
+        _reference(self.component_ref, "genome component_ref")
+        _reference(self.version, "genome component version")
+        _digest(self.content_sha256, "genome component content_sha256")
+        _optional_references(self.dependency_refs, "genome dependency_refs")
+        _deny_invariants(self.deny_invariants, "genome deny_invariants")
+
+
+@dataclass(frozen=True, slots=True)
+class GenomeSnapshot:
+    version: str
+    subject_ref: str
+    policy_sha256: str
+    components: tuple[GenomeComponent, ...]
+    genome_sha256: str
+    mutation_authority: bool = False
+
+
+@dataclass(frozen=True, slots=True)
+class OperationalGapSignal:
+    gap_ref: str
+    target_component_ref: str
+    reason_code: str
+    objective_code: str
+    requested_mutation_kind: str
+    evidence_refs: tuple[str, ...]
+    added_deny_invariants: tuple[str, ...] = ()
+
+    def __post_init__(self) -> None:
+        _reference(self.gap_ref, "gap_ref")
+        _reference(self.target_component_ref, "target_component_ref")
+        _token(self.reason_code, "gap reason_code")
+        _token(self.objective_code, "gap objective_code")
+        if not isinstance(self.requested_mutation_kind, str) or re.fullmatch(
+            r"[A-Z][A-Z0-9_]{1,63}", self.requested_mutation_kind
+        ) is None:
+            raise EvolutionError("requested mutation kind is invalid")
+        _references(self.evidence_refs, "gap evidence_refs")
+        _deny_invariants(self.added_deny_invariants, "added deny_invariants", allow_empty=True)
+
+
+@dataclass(frozen=True, slots=True)
+class ImprovementOpportunity:
+    opportunity_ref: str
+    gap_ref: str
+    genome_ref: str
+    target_component_ref: str
+    reason_code: str
+    objective_code: str
+    evidence_refs: tuple[str, ...]
+    blast_radius_refs: tuple[str, ...]
+    status: str
+    grants_authority: bool = False
+
+
+@dataclass(frozen=True, slots=True)
+class MutationProposal:
+    proposal_ref: str
+    opportunity_ref: str
+    genome_ref: str
+    target_component_ref: str
+    mutation_kind: str
+    objective_code: str
+    blast_radius_refs: tuple[str, ...]
+    retained_deny_invariants: tuple[str, ...]
+    added_deny_invariants: tuple[str, ...]
+    state: str
+    executable_payload_present: bool = False
+    mutation_applied: bool = False
+    generated_code_executed: bool = False
+    canonical_writes: int = 0
+    grants_authority: bool = False
+
+
+@dataclass(frozen=True, slots=True)
+class MutationCandidateArchive:
+    version: str
+    genome_sha256: str
+    policy_sha256: str
+    opportunities: tuple[ImprovementOpportunity, ...]
+    proposals: tuple[MutationProposal, ...]
+    parked_gap_refs: tuple[str, ...]
+    provenance_refs: tuple[str, ...]
+    archive_sha256: str
+    applied_count: int = 0
+    side_effects: bool = False
+    grants_authority: bool = False
+
+
+def build_genome_snapshot(
+    policy: EvolutionGenomePolicy,
+    *,
+    subject_ref: str,
+    components: Sequence[GenomeComponent],
+) -> GenomeSnapshot:
+    """Freeze a versioned dependency genome with all deny invariants retained."""
+
+    if not isinstance(policy, EvolutionGenomePolicy):
+        raise EvolutionError("genome policy is required")
+    subject = _reference(subject_ref, "genome subject_ref")
+    if not isinstance(components, Sequence) or isinstance(components, (str, bytes)):
+        raise EvolutionError("genome components must be a sequence")
+    if not components or len(components) > policy.max_components:
+        raise EvolutionError("genome component capacity violated")
+    if any(not isinstance(item, GenomeComponent) for item in components):
+        raise EvolutionError("genome component type is invalid")
+    ordered = tuple(sorted(components, key=lambda item: item.component_ref))
+    refs = {item.component_ref for item in ordered}
+    if len(refs) != len(ordered):
+        raise EvolutionError("genome component identity is duplicated")
+    for item in ordered:
+        if len(item.dependency_refs) > policy.max_dependencies_per_component:
+            raise EvolutionError("genome dependency capacity violated")
+        if item.component_ref in item.dependency_refs or not set(item.dependency_refs) <= refs:
+            raise EvolutionError("genome dependency is self-referential or unknown")
+        if not policy.required_deny_invariants <= set(item.deny_invariants):
+            raise EvolutionError("genome component omits required deny invariants")
+    _assert_acyclic_genome(ordered)
+    material = {
+        "version": "evolution-genome-v1", "subject_ref": subject,
+        "policy_sha256": policy.profile_sha256,
+        "components": [_genome_component_material(item) for item in ordered],
+        "mutation_authority": False,
+    }
+    return GenomeSnapshot(
+        version="evolution-genome-v1", subject_ref=subject,
+        policy_sha256=policy.profile_sha256, components=ordered,
+        genome_sha256=_sha(material), mutation_authority=False,
+    )
+
+
+def mine_mutation_candidates(
+    policy: EvolutionGenomePolicy,
+    genome: GenomeSnapshot,
+    gaps: Sequence[OperationalGapSignal],
+) -> MutationCandidateArchive:
+    """Create descriptive opportunities and proposals without applying mutations."""
+
+    _validate_genome_snapshot(policy, genome)
+    if not isinstance(gaps, Sequence) or isinstance(gaps, (str, bytes)):
+        raise EvolutionError("gap signals must be a sequence")
+    if len(gaps) > policy.max_gap_signals:
+        raise EvolutionError("gap signal capacity violated")
+    if any(not isinstance(item, OperationalGapSignal) for item in gaps):
+        raise EvolutionError("gap signal type is invalid")
+    ordered = tuple(sorted(gaps, key=lambda item: item.gap_ref))
+    if len({item.gap_ref for item in ordered}) != len(ordered):
+        raise EvolutionError("gap signal identity is duplicated")
+    components = {item.component_ref: item for item in genome.components}
+    genome_ref = "genome:sha256:" + genome.genome_sha256
+    opportunities: list[ImprovementOpportunity] = []
+    proposals: list[MutationProposal] = []
+    parked: list[str] = []
+    provenance: set[str] = {genome_ref}
+    for gap in ordered:
+        if gap.target_component_ref not in components:
+            raise EvolutionError("gap target is outside the frozen genome")
+        if len(gap.evidence_refs) > policy.max_evidence_refs_per_gap:
+            raise EvolutionError("gap evidence capacity violated")
+        if len(gap.added_deny_invariants) > policy.max_added_deny_invariants:
+            raise EvolutionError("added deny invariant capacity violated")
+        blast = _blast_radius(genome.components, gap.target_component_ref)
+        if len(blast) > policy.max_blast_radius_components:
+            raise EvolutionError("mutation blast radius capacity violated")
+        allowed = gap.requested_mutation_kind in policy.allowed_mutation_kinds
+        status = "RESEARCH_CANDIDATE" if allowed else "PARKED_FORBIDDEN"
+        opportunity_material = {
+            "gap_ref": gap.gap_ref, "genome_ref": genome_ref,
+            "target_component_ref": gap.target_component_ref,
+            "reason_code": gap.reason_code, "objective_code": gap.objective_code,
+            "evidence_refs": tuple(sorted(gap.evidence_refs)),
+            "blast_radius_refs": blast, "status": status,
+            "grants_authority": False,
+        }
+        opportunity = ImprovementOpportunity(
+            opportunity_ref="improvement-opportunity:sha256:" + _sha(opportunity_material),
+            **opportunity_material,
+        )
+        opportunities.append(opportunity)
+        provenance.update(gap.evidence_refs)
+        if not allowed:
+            parked.append(gap.gap_ref)
+            continue
+        retained = tuple(sorted(set().union(
+            *(set(components[ref].deny_invariants) for ref in blast),
+            policy.required_deny_invariants,
+            gap.added_deny_invariants,
+        )))
+        proposal_material = {
+            "opportunity_ref": opportunity.opportunity_ref, "genome_ref": genome_ref,
+            "target_component_ref": gap.target_component_ref,
+            "mutation_kind": gap.requested_mutation_kind,
+            "objective_code": gap.objective_code, "blast_radius_refs": blast,
+            "retained_deny_invariants": retained,
+            "added_deny_invariants": tuple(sorted(gap.added_deny_invariants)),
+            "state": "RESEARCH_CANDIDATE", "executable_payload_present": False,
+            "mutation_applied": False, "generated_code_executed": False,
+            "canonical_writes": 0, "grants_authority": False,
+        }
+        proposals.append(MutationProposal(
+            proposal_ref="mutation-proposal:sha256:" + _sha(proposal_material),
+            **proposal_material,
+        ))
+    if len(proposals) > policy.max_archive_candidates:
+        raise EvolutionError("mutation archive capacity violated")
+    archive_material = {
+        "version": "mutation-candidate-archive-v1",
+        "genome_sha256": genome.genome_sha256,
+        "policy_sha256": policy.profile_sha256,
+        "opportunities": [_opportunity_material(item) for item in opportunities],
+        "proposals": [_proposal_material(item) for item in proposals],
+        "parked_gap_refs": tuple(parked),
+        "provenance_refs": tuple(sorted(provenance)),
+        "applied_count": 0, "side_effects": False, "grants_authority": False,
+    }
+    return MutationCandidateArchive(
+        version="mutation-candidate-archive-v1",
+        genome_sha256=genome.genome_sha256,
+        policy_sha256=policy.profile_sha256,
+        opportunities=tuple(opportunities), proposals=tuple(proposals),
+        parked_gap_refs=tuple(parked), provenance_refs=tuple(sorted(provenance)),
+        archive_sha256=_sha(archive_material), applied_count=0,
+        side_effects=False, grants_authority=False,
+    )
+
+
 def build_research_agenda(
     knowledge: KnowledgeFabricReport,
     proposals: Sequence[AgendaProposal],
@@ -1469,6 +1776,108 @@ def _calibration_bin_material(item: CalibrationBinSnapshot) -> dict[str, object]
     }
 
 
+def _genome_component_material(item: GenomeComponent) -> dict[str, object]:
+    return {
+        "component_ref": item.component_ref, "version": item.version,
+        "content_sha256": item.content_sha256,
+        "dependency_refs": item.dependency_refs,
+        "deny_invariants": item.deny_invariants,
+    }
+
+
+def _opportunity_material(item: ImprovementOpportunity) -> dict[str, object]:
+    return {
+        "opportunity_ref": item.opportunity_ref, "gap_ref": item.gap_ref,
+        "genome_ref": item.genome_ref,
+        "target_component_ref": item.target_component_ref,
+        "reason_code": item.reason_code, "objective_code": item.objective_code,
+        "evidence_refs": item.evidence_refs,
+        "blast_radius_refs": item.blast_radius_refs, "status": item.status,
+        "grants_authority": False,
+    }
+
+
+def _proposal_material(item: MutationProposal) -> dict[str, object]:
+    return {
+        "proposal_ref": item.proposal_ref, "opportunity_ref": item.opportunity_ref,
+        "genome_ref": item.genome_ref,
+        "target_component_ref": item.target_component_ref,
+        "mutation_kind": item.mutation_kind, "objective_code": item.objective_code,
+        "blast_radius_refs": item.blast_radius_refs,
+        "retained_deny_invariants": item.retained_deny_invariants,
+        "added_deny_invariants": item.added_deny_invariants,
+        "state": item.state, "executable_payload_present": False,
+        "mutation_applied": False, "generated_code_executed": False,
+        "canonical_writes": 0, "grants_authority": False,
+    }
+
+
+def _assert_acyclic_genome(components: Sequence[GenomeComponent]) -> None:
+    graph = {item.component_ref: item.dependency_refs for item in components}
+    visiting: set[str] = set()
+    visited: set[str] = set()
+
+    def visit(node: str) -> None:
+        if node in visiting:
+            raise EvolutionError("genome dependency cycle detected")
+        if node in visited:
+            return
+        visiting.add(node)
+        for dependency in graph[node]:
+            visit(dependency)
+        visiting.remove(node)
+        visited.add(node)
+
+    for node in sorted(graph):
+        visit(node)
+
+
+def _blast_radius(
+    components: Sequence[GenomeComponent], target: str
+) -> tuple[str, ...]:
+    reverse: dict[str, set[str]] = {item.component_ref: set() for item in components}
+    for item in components:
+        for dependency in item.dependency_refs:
+            reverse[dependency].add(item.component_ref)
+    reached = {target}
+    frontier = [target]
+    while frontier:
+        current = frontier.pop()
+        for dependent in sorted(reverse[current]):
+            if dependent not in reached:
+                reached.add(dependent)
+                frontier.append(dependent)
+    return tuple(sorted(reached))
+
+
+def _validate_genome_snapshot(
+    policy: EvolutionGenomePolicy, genome: GenomeSnapshot
+) -> None:
+    if not isinstance(policy, EvolutionGenomePolicy) or not isinstance(genome, GenomeSnapshot):
+        raise EvolutionError("typed genome policy and snapshot are required")
+    if (
+        genome.version != "evolution-genome-v1"
+        or genome.policy_sha256 != policy.profile_sha256
+        or genome.mutation_authority
+        or not genome.components
+        or len(genome.components) > policy.max_components
+    ):
+        raise EvolutionError("genome snapshot boundary widened")
+    material = {
+        "version": genome.version, "subject_ref": genome.subject_ref,
+        "policy_sha256": genome.policy_sha256,
+        "components": [_genome_component_material(item) for item in genome.components],
+        "mutation_authority": False,
+    }
+    if genome.genome_sha256 != _sha(material):
+        raise EvolutionError("genome snapshot integrity mismatch")
+    rebuilt = build_genome_snapshot(
+        policy, subject_ref=genome.subject_ref, components=genome.components
+    )
+    if rebuilt != genome:
+        raise EvolutionError("genome snapshot is not canonical")
+
+
 def _score(
     item: AgendaItem,
     policy: PortfolioPolicy,
@@ -1707,6 +2116,26 @@ def _references(value: object, name: str) -> tuple[str, ...]:
     result = tuple(_reference(item, name) for item in value)
     if len(result) != len(set(result)):
         raise EvolutionError(f"{name} must be unique")
+    return result
+
+
+def _optional_references(value: object, name: str) -> tuple[str, ...]:
+    if not isinstance(value, (list, tuple)):
+        raise EvolutionError(f"{name} must be a sequence")
+    result = tuple(_reference(item, name) for item in value)
+    if len(result) != len(set(result)):
+        raise EvolutionError(f"{name} must be unique")
+    return result
+
+
+def _deny_invariants(
+    value: object, name: str, *, allow_empty: bool = False
+) -> tuple[str, ...]:
+    if not isinstance(value, tuple) or (not allow_empty and not value):
+        raise EvolutionError(f"{name} must be a tuple")
+    result = tuple(_token(item, name) for item in value)
+    if result != tuple(sorted(set(result))):
+        raise EvolutionError(f"{name} must be sorted and unique")
     return result
 
 
