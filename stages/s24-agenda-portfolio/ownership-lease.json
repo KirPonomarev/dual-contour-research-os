@@ -1,0 +1,7 @@
+{
+  "lease_id": "lease-s24-agenda-portfolio-agent-1", "stage_id": "s24-agenda-portfolio", "agent_id": "agent-1",
+  "base_sha": "f560f8eb43c7839f9e218393fe14ddd083b5abb3", "branch": "codex/bridge-a1-s24-agenda-portfolio",
+  "issued_at": "2026-07-18T21:36:00Z", "expires_at": "2026-07-19T21:36:00Z",
+  "write_set": ["src/research_bridge/evolution.py", "stages/s24-agenda-portfolio/stage-envelope.json", "stages/s24-agenda-portfolio/ownership-lease.json"],
+  "exclusive": true, "revoked": false
+}
