@@ -1185,7 +1185,26 @@ class JobLedger:
                 ).fetchone()
                 if replay_row is not None:
                     replay = self._ledger_event_from_row(replay_row)
-                    if _canonical_json(replay.payload) != _canonical_json(bundle_payload):
+                    replay_projections = replay.payload.get("projections")
+                    if not isinstance(replay_projections, (list, tuple)):
+                        raise LedgerError("persisted A1 bundle projections are invalid")
+                    expected_base = {
+                        name: _digest(
+                            _canonical_json(projection_states[name]).encode("utf-8")
+                        )
+                        for name in _A1_PROJECTION_NAMES
+                    }
+                    actual_base = {
+                        item.get("projection_name"): item.get("state_sha256")
+                        for item in replay_projections
+                        if isinstance(item, Mapping)
+                        and item.get("projection_name") in _A1_PROJECTION_NAMES
+                    }
+                    if (
+                        replay.payload.get("bundle_kind") is not None
+                        or replay.payload.get("objects") != tuple(descriptors)
+                        or actual_base != expected_base
+                    ):
                         raise LedgerError("A1 bundle idempotency key was reused")
                     stored_ids = tuple(
                         row["object_id"]
@@ -1198,7 +1217,14 @@ class JobLedger:
                     return A1BundleRecord(
                         event=replay,
                         object_ids=stored_ids,
-                        projection_names=tuple(sorted(projection_states)),
+                        projection_names=tuple(
+                            sorted(
+                                item["projection_name"]
+                                for item in replay_projections
+                                if isinstance(item, Mapping)
+                                and isinstance(item.get("projection_name"), str)
+                            )
+                        ),
                     )
 
                 event = self._append(
