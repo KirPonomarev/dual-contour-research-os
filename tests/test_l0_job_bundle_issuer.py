@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 import hashlib
 import io
 import json
@@ -24,7 +24,6 @@ from research_bridge.admission import admit, canonical_json_sha256  # noqa: E402
 from research_bridge.cas import ContentAddressedStore  # noqa: E402
 from research_bridge.l0 import DeterministicL0Runner  # noqa: E402
 from research_bridge.researchctl import _submit_payload  # noqa: E402
-from research_bridge.researchd import _service_config_from_path  # noqa: E402
 
 
 RELEASE_MANIFEST = ROOT / "docs" / "receipts" / "release" / "s4-release-manifest.json"
@@ -80,7 +79,7 @@ class L0JobBundleIssuerTests(unittest.TestCase):
 
     def test_market_and_security_bundles_pass_exact_admission_researchctl_and_l0(self) -> None:
         config_path = self.capsule / builder.CONFIG_NAME
-        service = _service_config_from_path(str(config_path))
+        service = builder._parse_host_authority_projection(load_json(config_path))
         manifest = load_json(self.capsule / builder.MANIFEST_NAME)
         manifest_payload = manifest["payload"]
         self.assertIsInstance(manifest_payload, dict)
@@ -226,6 +225,66 @@ class L0JobBundleIssuerTests(unittest.TestCase):
                 with self.assertRaises((issuer.BundleError, builder.CapsuleError)):
                     issuer.issue_bundle(**arguments)
                 self.assertFalse(output.exists())
+
+    def test_issuer_rejects_host_uid_and_relative_runtime_root_profiles(self) -> None:
+        config_path = self.capsule / builder.CONFIG_NAME
+        original = config_path.read_bytes()
+        manifest = load_json(self.capsule / builder.MANIFEST_NAME)
+        manifest_payload = manifest["payload"]
+        self.assertIsInstance(manifest_payload, dict)
+        host_uid = os.geteuid()
+        self.assertNotEqual(host_uid, builder.DEPLOY_UID)
+
+        cases = (
+            ("host-uid", "allowed_uids", [host_uid]),
+            ("relative-root", "runtime_root", "runtime"),
+        )
+        for name, field, value in cases:
+            with self.subTest(name=name):
+                config = json.loads(original)
+                config[field] = value
+                encoded = builder._canonical_bytes(config)
+                config_path.write_bytes(encoded)
+                os.chmod(config_path, 0o600)
+                context = dict(manifest_payload)
+                context["runtime_config_sha256"] = hashlib.sha256(encoded).hexdigest()
+                with self.assertRaises(issuer.BundleError):
+                    issuer._config_context(self.capsule, context, self.observed)
+                config_path.write_bytes(original)
+                os.chmod(config_path, 0o600)
+
+    def test_bundle_lifetime_must_fit_active_policy_and_approval_window(self) -> None:
+        near_expiry = self.observed + timedelta(seconds=builder.AUTHORITY_VALID_SECONDS - 1)
+        rejected = self.base / "authority-window-rejected.json"
+        with self.assertRaises(issuer.BundleError):
+            issuer.issue_bundle(
+                capsule=self.capsule,
+                contour="market",
+                sequence=46,
+                lifetime_seconds=300,
+                output=rejected,
+                observed=near_expiry,
+            )
+        self.assertFalse(rejected.exists())
+
+        accepted = self.base / "authority-window-accepted.json"
+        issuer.issue_bundle(
+            capsule=self.capsule,
+            contour="market",
+            sequence=47,
+            lifetime_seconds=1,
+            output=accepted,
+            observed=near_expiry,
+        )
+        bundle = load_json(accepted)
+        permit = bundle["permit"]
+        self.assertIsInstance(permit, dict)
+        permit_payload = permit["payload"]
+        self.assertIsInstance(permit_payload, dict)
+        self.assertEqual(
+            parsed_time(permit_payload["expires_at"]),
+            self.observed + timedelta(seconds=builder.AUTHORITY_VALID_SECONDS),
+        )
 
     def test_existing_output_and_tampered_capsule_fail_without_overwrite(self) -> None:
         output = self.base / "existing.json"

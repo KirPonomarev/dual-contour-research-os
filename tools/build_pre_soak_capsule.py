@@ -20,7 +20,7 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from research_bridge.admission import canonical_json_sha256  # noqa: E402
 from research_bridge.cas import CASError, ContentAddressedStore  # noqa: E402
-from research_bridge.researchd import _service_config_from_path  # noqa: E402
+from research_bridge.researchd import _service_config_from_mapping  # noqa: E402
 
 
 RELEASE_MANIFEST_SHA256 = "9ceae0bda066cf52577cec0fdc1d7230e92b3e4010f65b81613abf6a0a8a90dd"
@@ -29,6 +29,8 @@ IMAGE_DIGEST = "sha256:36069ee7a9db78af747d7fad65f9e33073824f27be898cdc0b7dd3b77
 L0_TEMPLATE_SHA256 = "53e75c79888c60b304c0e7e5392a53c0ef508146dfd51c5dcb195a648a54f0c6"
 L0_PROTOCOL_REF = "research-bridge:l0:chunk-sha256:v1"
 RUNNER_IDENTITY = "pre-soak-offline-l0"
+DEPLOY_RUNTIME_ROOT = "/var/lib/research-os"
+DEPLOY_UID = 10001
 CONFIG_NAME = "researchd.config.json"
 MANIFEST_NAME = "capsule-manifest.json"
 INPUT_QUOTA_BYTES = 16 * 1024 * 1024
@@ -315,9 +317,9 @@ def _config(
     return {
         "schema_id": "ResearchdServiceConfig",
         "schema_version": "1.0.0",
-        "runtime_root": "runtime",
+        "runtime_root": DEPLOY_RUNTIME_ROOT,
         "runner_identity": RUNNER_IDENTITY,
-        "allowed_uids": [os.geteuid()],
+        "allowed_uids": [DEPLOY_UID],
         "input_quota_bytes": INPUT_QUOTA_BYTES,
         "checkpoint_quota_bytes": CHECKPOINT_QUOTA_BYTES,
         "artifact_quota_bytes": ARTIFACT_QUOTA_BYTES,
@@ -348,6 +350,14 @@ def _config(
         "policy_snapshots": {policy_sha256: policy},
         "approval_receipts": {approval_ref: approval},
     }
+
+
+def _parse_host_authority_projection(config: Mapping[str, object]):
+    """Parse the final config's shape and authority using the local owner UID."""
+
+    projected = dict(config)
+    projected["allowed_uids"] = [os.geteuid()]
+    return _service_config_from_mapping(projected)
 
 
 def _write_owner_file(path: Path, value: object) -> tuple[str, int]:
@@ -463,8 +473,16 @@ def build_capsule(
         config = _config(policy, policy_sha256, approval, approval_ref)
         config_sha256, _config_size = _write_owner_file(output / CONFIG_NAME, config)
 
-        service = _service_config_from_path(str(output / CONFIG_NAME))
-        if service.runner_identity != RUNNER_IDENTITY:
+        if (
+            config.get("runtime_root") != DEPLOY_RUNTIME_ROOT
+            or config.get("allowed_uids") != [DEPLOY_UID]
+        ):
+            raise CapsuleError("generated config deploy binding is invalid")
+        service = _parse_host_authority_projection(config)
+        if (
+            service.runtime_root != DEPLOY_RUNTIME_ROOT
+            or service.runner_identity != RUNNER_IDENTITY
+        ):
             raise CapsuleError("generated config runner binding is invalid")
         service.authority.verify_resume(approval_ref, now=moment)
 

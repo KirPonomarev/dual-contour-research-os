@@ -23,6 +23,8 @@ sys.path.insert(0, str(TOOLS))
 from build_pre_soak_capsule import (  # noqa: E402
     ALLOWED_CLASSIFICATIONS,
     CONFIG_NAME,
+    DEPLOY_RUNTIME_ROOT,
+    DEPLOY_UID,
     IMAGE_DIGEST,
     INPUT_QUOTA_BYTES,
     L0_PROTOCOL_REF,
@@ -33,6 +35,7 @@ from build_pre_soak_capsule import (  # noqa: E402
     RUNNER_IDENTITY,
     CapsuleError,
     _file_hashes,
+    _parse_host_authority_projection,
     _reject_constant,
     _strict_object,
     _write_owner_file,
@@ -40,7 +43,6 @@ from build_pre_soak_capsule import (  # noqa: E402
 from research_bridge import l0 as l0_module  # noqa: E402
 from research_bridge.admission import admit, canonical_json_sha256  # noqa: E402
 from research_bridge.cas import ContentAddressedStore  # noqa: E402
-from research_bridge.researchd import _service_config_from_path  # noqa: E402
 
 
 _CONTOURS = frozenset({"market", "security"})
@@ -223,9 +225,20 @@ def _config_context(capsule: Path, manifest_payload: Mapping[str, object], now: 
     config, raw = _owner_json(config_path, "runtime config")
     if hashlib.sha256(raw).hexdigest() != manifest_payload["runtime_config_sha256"]:
         raise BundleError("runtime config digest differs from the capsule manifest")
-    service = _service_config_from_path(str(config_path))
-    if service.runtime_root != "runtime" or service.runner_identity != RUNNER_IDENTITY:
-        raise BundleError("runtime config is not the frozen portable profile")
+    if (
+        config.get("runtime_root") != DEPLOY_RUNTIME_ROOT
+        or config.get("allowed_uids") != [DEPLOY_UID]
+    ):
+        raise BundleError("runtime config is not the frozen deploy profile")
+    try:
+        service = _parse_host_authority_projection(config)
+    except (TypeError, ValueError) as exc:
+        raise BundleError("runtime config is not the frozen deploy profile") from exc
+    if (
+        service.runtime_root != DEPLOY_RUNTIME_ROOT
+        or service.runner_identity != RUNNER_IDENTITY
+    ):
+        raise BundleError("runtime config is not the frozen deploy profile")
     policies = config.get("policy_snapshots")
     approvals = config.get("approval_receipts")
     policy_sha256 = manifest_payload["authority_policy_sha256"]
@@ -238,7 +251,24 @@ def _config_context(capsule: Path, manifest_payload: Mapping[str, object], now: 
     ):
         raise BundleError("runtime authority resolver differs from the capsule manifest")
     service.authority.verify_resume(str(approval_ref), now=now)
-    return config, service
+    policy = policies[policy_sha256]
+    approval = approvals[approval_ref]
+    if not isinstance(policy, Mapping) or not isinstance(approval, Mapping):
+        raise BundleError("runtime authority resolver contains an invalid document")
+    policy_payload = policy.get("payload")
+    approval_payload = approval.get("payload")
+    if not isinstance(policy_payload, Mapping) or not isinstance(approval_payload, Mapping):
+        raise BundleError("runtime authority resolver contains an invalid payload")
+    try:
+        policy_valid_until = datetime.fromisoformat(
+            str(policy_payload["valid_until"]).replace("Z", "+00:00")
+        )
+        approval_valid_until = datetime.fromisoformat(
+            str(approval_payload["expires_at"]).replace("Z", "+00:00")
+        )
+    except (KeyError, TypeError, ValueError) as exc:
+        raise BundleError("runtime authority expiry is invalid") from exc
+    return config, service, min(policy_valid_until, approval_valid_until)
 
 
 def _seal(document: dict[str, object]) -> dict[str, object]:
@@ -425,7 +455,9 @@ def issue_bundle(
     if _file_hashes(capsule) != manifest_payload["file_hashes"]:
         raise BundleError("capsule file inventory differs from the manifest")
     moment = (observed or datetime.now(timezone.utc)).astimezone(timezone.utc).replace(microsecond=0)
-    config, service = _config_context(capsule, manifest_payload, moment)
+    config, service, authority_valid_until = _config_context(capsule, manifest_payload, moment)
+    if moment + timedelta(seconds=lifetime_seconds) > authority_valid_until:
+        raise BundleError("bundle lifetime exceeds active authority")
 
     inputs = manifest_payload["inputs"]
     assert isinstance(inputs, Mapping)

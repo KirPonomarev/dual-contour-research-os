@@ -21,7 +21,6 @@ sys.path.insert(0, str(TOOLS))
 import build_pre_soak_capsule as builder  # noqa: E402
 from research_bridge.admission import canonical_json_sha256  # noqa: E402
 from research_bridge.cas import ContentAddressedStore  # noqa: E402
-from research_bridge.researchd import _service_config_from_path  # noqa: E402
 
 
 RELEASE_MANIFEST = ROOT / "docs" / "receipts" / "release" / "s4-release-manifest.json"
@@ -76,7 +75,8 @@ class PreSoakCapsuleTests(unittest.TestCase):
         self.assertEqual(os.lstat(config_path).st_uid, os.geteuid())
 
         config = load_json(config_path)
-        self.assertEqual(config["runtime_root"], "runtime")
+        self.assertEqual(config["runtime_root"], builder.DEPLOY_RUNTIME_ROOT)
+        self.assertEqual(config["allowed_uids"], [builder.DEPLOY_UID])
         self.assertEqual(config["runner_identity"], builder.RUNNER_IDENTITY)
         policies = config["policy_snapshots"]
         approvals = config["approval_receipts"]
@@ -89,8 +89,9 @@ class PreSoakCapsuleTests(unittest.TestCase):
         self.assertEqual(policy_sha256, canonical_json_sha256(policy))
         self.assertEqual(approval_ref, approval["object_id"])
 
-        service = _service_config_from_path(str(config_path))
-        self.assertEqual(service.runtime_root, "runtime")
+        service = builder._parse_host_authority_projection(config)
+        self.assertEqual(service.runtime_root, builder.DEPLOY_RUNTIME_ROOT)
+        self.assertEqual(service.allowed_uids, (os.geteuid(),))
         self.assertEqual(service.runner_identity, builder.RUNNER_IDENTITY)
         service.authority.verify_resume(approval_ref, now=self.observed)
         service.authority.verify_resume(approval_ref, now=self.observed + timedelta(hours=72))
@@ -239,7 +240,7 @@ class PreSoakCapsuleTests(unittest.TestCase):
         output = self.base / "transactional-rejection"
         with mock.patch.object(
             builder,
-            "_service_config_from_path",
+            "_parse_host_authority_projection",
             side_effect=ValueError("synthetic parser rejection"),
         ):
             with self.assertRaises(ValueError):
