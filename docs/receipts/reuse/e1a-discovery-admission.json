@@ -1,0 +1,64 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-e1a-discovery-admission-20260718",
+  "issued_at": "2026-07-18T10:51:00Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "reuse-freeze-authority"
+  },
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "e1a-trusted-material-event-and-deterministic-admission-fixture",
+    "candidates": [
+      {
+        "candidate": "extend-existing-src-research-bridge-admission-module",
+        "disposition": "selected-to-reuse-canonical-json-shape-and-fail-closed-validation"
+      },
+      {
+        "candidate": "reuse-frozen-a1-catalog-and-machine-profiles",
+        "disposition": "selected-as-runtime-policy-source"
+      },
+      {
+        "candidate": "python-stdlib-dataclasses-hashlib-json-pathlib",
+        "disposition": "selected-as-minimal-auditable-glue"
+      },
+      {
+        "candidate": "new-orchestrator-ledger-scheduler-queue-or-vector-database",
+        "disposition": "rejected-duplicates-existing-control-plane"
+      },
+      {
+        "candidate": "external-agent-framework",
+        "disposition": "rejected-no-demonstrated-need-and-would-expand-trust-surface"
+      }
+    ],
+    "selected_mode": "pure-snapshot-bound-a1-fixture-functions-in-existing-admission-module-with-no-side-effects-and-no-new-dependency",
+    "source_ref": "internal:src/research_bridge/admission.py@sha256:66a4b40cc81a350930e17bfaa53a880e0fd0554aa4cc4c0b229ac66a8dd64c92;a1-catalog:sha256:eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+    "code_sha256": "66a4b40cc81a350930e17bfaa53a880e0fd0554aa4cc4c0b229ac66a8dd64c92",
+    "license_spdx": "NOASSERTION",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "trusted-field-minting",
+      "exact-dedupe-before-model-call",
+      "wait-data-and-wait-budget-with-zero-model-calls",
+      "candidate-shape-and-integrity",
+      "snapshot-ledger-revision-binding",
+      "deterministic-receipt-identity",
+      "stale-mixed-head-rejection",
+      "hard-deny-and-budget-parking",
+      "shadow-taint-preservation",
+      "no-execution-authority"
+    ],
+    "canonical_owner": "governance-agent-0",
+    "rollback": "Revert the E1A stage before issuing an E1B base. The frozen A1 contracts remain valid and no runtime authority or durable state is created by this pure fixture."
+  },
+  "integrity": {
+    "payload_sha256": "000bac7dc4bb5152862621a14d35f739ce5f37854af25b92ac1135de5785ba40",
+    "parent_refs": [
+      "git:42a5bcf9354e2eec6150899b039ef03029ae09f7",
+      "sha256:eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+      "sha256:66a4b40cc81a350930e17bfaa53a880e0fd0554aa4cc4c0b229ac66a8dd64c92"
+    ]
+  }
+}
