@@ -1,0 +1,12 @@
+{
+  "schema_id": "IntegrationReceipt", "schema_version": "1.0.0", "object_id": "integration-s26-evidence-replication-20260718", "issued_at": "2026-07-18T22:41:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"}, "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s26-evidence-replication", "agent_id": "agent-1", "ownership_lease_ref": "stages/s26-evidence-replication/ownership-lease.json",
+    "base_sha": "30d8b9a171c1504b3ed86284ec23ce338588507c", "head_sha": "d428ba03b9298a2f7ad479ce7f21383c23b62e67", "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": ["src/research_bridge/evolution.py", "stages/s26-evidence-replication/stage-envelope.json", "stages/s26-evidence-replication/ownership-lease.json", "stages/s26-evidence-replication-repair/stage-envelope.json", "stages/s26-evidence-replication-repair/ownership-lease.json"],
+    "audit_results": {"contract_gate": "green", "privacy_secret_scan": "green", "source_mutation": false, "bridge_runtime_source_mutation": true, "raw_payload_surface": false, "D0_ref_hash_group_only": true, "dimension_groups_bound_to_sidecar": true, "same_group_status": "CORRELATED", "same_source_distinct_group_status": "INDEPENDENCE_NOT_ESTABLISHED", "all_distinct_status": "MULTIDIMENSIONAL_PASS_FOR_FROZEN_SCOPE", "research_islands_disjoint": true, "exposure_lineage_family_day_bound": true, "true_holdout_zero": true, "declassification_nested_integrity_revalidated": true, "domain_ReplicationReceipt_writer_implemented": false, "side_effects_or_authority": 0},
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29663844903", "integration_commit_sha": "1701ad1c9115a0b3753f2ae3681c516477aa73e7"
+  },
+  "integrity": {"payload_sha256": "c285b4d55e3e8ace3a243b787af3361c048c9f0c793f714932c5075e733e1d4b", "parent_refs": ["git:d428ba03b9298a2f7ad479ce7f21383c23b62e67", "git:1701ad1c9115a0b3753f2ae3681c516477aa73e7", "ci:29663844903", "git:30d8b9a171c1504b3ed86284ec23ce338588507c"]}
+}
