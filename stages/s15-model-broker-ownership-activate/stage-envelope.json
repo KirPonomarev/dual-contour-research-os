@@ -1,0 +1,20 @@
+{
+  "stage_id": "s15-model-broker-ownership-activate", "agent_id": "agent-0",
+  "objective": "Promote only the reserved model broker module to live Agent 1 ownership and freeze reuse before S15 implementation.",
+  "executable_blocker": "The ownership gate must reject a live model_broker.py while it remains a reserved future path.",
+  "base_sha": "ab3fd63b6d1ddb7783c26be226465be5f781496c",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a0-s15-model-broker-ownership",
+  "worktree": "/Volumes/Work/dual-contour-research-os-s15-ownership",
+  "read_set": ["ownership/registry.json", "docs/ADR/0002-ownership-registry-amendment.md", "contracts/a1/v1/profiles/model_role_registry_v1.json", "contracts/a1/v1/profiles/a1_sandbox_policy_v1.json"],
+  "write_set": ["ownership/registry.json", "docs/ADR/0006-model-broker-path-activation.md", "docs/receipts/OWNERSHIP_REGISTRY_AMENDMENT_5.json", "docs/receipts/reuse/s15-model-registry-broker.json", "stages/s15-model-broker-ownership-activate/stage-envelope.json", "stages/s15-model-broker-ownership-activate/ownership-lease.json"],
+  "forbidden_scope": ["contract-edit", "worker-implementation", "other-ownership-change", "provider-call", "new-service-or-database", "authority-grant", "canonical-or-live-action", "deployment"],
+  "dependency_hashes": {"core_contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50", "a1_contract_catalog": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1", "previous_ownership_registry": "862994bf57656148e5a75eece9686725efb733836567149baa23517e3f6421b1", "external_dependencies": "none"},
+  "acceptance_commands": ["ownership diff promotes only model_broker.py", "reuse receipt integrity", "make contracts after bounded worker path is visible", "python3 -m unittest tests.test_ownership_registry", "git diff --check"],
+  "risk_class": "high-model-egress-and-budget-ownership-boundary",
+  "stop_conditions": ["other-path-promoted", "owner-changed", "second-ledger-or-provider-authority-expansion"],
+  "expected_receipt": "docs/receipts/integration/s15-model-broker-ownership-activate.json",
+  "rollback": "Restore the prior registry and amendment reference; remove ADR, amendment/reuse receipts and stage metadata.",
+  "commit_authority": "one-scoped-agent-0-commit", "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent1_s15", "blocked_contract_validation_failed"]
+}

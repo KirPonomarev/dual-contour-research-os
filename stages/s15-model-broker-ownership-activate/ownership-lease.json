@@ -1,0 +1,7 @@
+{
+  "lease_id": "lease-s15-model-broker-ownership-agent-0", "stage_id": "s15-model-broker-ownership-activate", "agent_id": "agent-0",
+  "base_sha": "ab3fd63b6d1ddb7783c26be226465be5f781496c", "branch": "codex/bridge-a0-s15-model-broker-ownership",
+  "issued_at": "2026-07-18T16:49:00Z", "expires_at": "2026-07-19T16:49:00Z",
+  "write_set": ["ownership/registry.json", "docs/ADR/0006-model-broker-path-activation.md", "docs/receipts/OWNERSHIP_REGISTRY_AMENDMENT_5.json", "docs/receipts/reuse/s15-model-registry-broker.json", "stages/s15-model-broker-ownership-activate/stage-envelope.json", "stages/s15-model-broker-ownership-activate/ownership-lease.json"],
+  "exclusive": true, "revoked": false
+}
