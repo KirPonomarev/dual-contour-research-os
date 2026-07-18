@@ -1,0 +1,25 @@
+{
+  "schema_id": "SourceFreezeReceipt", "schema_version": "1.0.0",
+  "object_id": "source-freeze-s24-r2-openrouter-official-api-shape-20260718", "issued_at": "2026-07-18T21:52:24Z",
+  "issuer": {"id": "agent-0", "authority_class": "source-freeze-authority"},
+  "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "source_repo": "official-openrouter-documentation-plus-dual-contour-research-os",
+    "remote": "sha256:2218f184ab78ce45727e7d54d0a06345baca1f446ac84d491b471dbe1e75d0ae",
+    "branch": "sha256:0d6e4079e36703ebd37c00722f5891d28b0e2811dc114b129215123adcce3605",
+    "head_sha": "026949695c8e34d8ebb64a80934744acd5294f8e",
+    "upstream_sha": "026949695c8e34d8ebb64a80934744acd5294f8e",
+    "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "untracked_manifest_sha256": "63ae65247d61b918aced080e6419609459ebcbf4a3384ea29f2617e65597258c",
+    "path_dispositions": [
+      {"category": "openrouter-model-page", "path": "https://openrouter.ai/openai/gpt-5.6-sol/", "count": 1, "sha256": "NO_LOCAL_COPY", "disposition": "selected-exact-model-slug-and-1000000-context-window"},
+      {"category": "openrouter-authentication", "path": "https://openrouter.ai/docs/api/reference/authentication", "count": 1, "sha256": "NO_LOCAL_COPY", "disposition": "selected-bearer-auth-and-api-v1-base-url"},
+      {"category": "openrouter-chat-completions", "path": "https://openrouter.ai/docs/api/reference/overview", "count": 1, "sha256": "NO_LOCAL_COPY", "disposition": "selected-chat-completions-endpoint-and-openai-compatible-shape"},
+      {"category": "openrouter-reasoning", "path": "https://openrouter.ai/docs/guides/best-practices/reasoning-tokens", "count": 1, "sha256": "NO_LOCAL_COPY", "disposition": "selected-reasoning-effort-xhigh"},
+      {"category": "connected-shadow-profile", "path": "provenance/model-provider-connected-shadow-v2.json", "count": 1, "sha256": "63ae65247d61b918aced080e6419609459ebcbf4a3384ea29f2617e65597258c", "disposition": "selected-public-route-and-secret-locator-names-without-credential-value"},
+      {"category": "credential-values-raw-responses-private-data-or-billing-receipts", "count": 0, "disposition": "absent"}
+    ],
+    "selected_source_sha": "63ae65247d61b918aced080e6419609459ebcbf4a3384ea29f2617e65597258c"
+  },
+  "integrity": {"payload_sha256": "1589c27c71854106f5e608fdd84e06678a2a7ad9a75b15bde6b051f190266317", "parent_refs": ["git:026949695c8e34d8ebb64a80934744acd5294f8e", "sha256:63ae65247d61b918aced080e6419609459ebcbf4a3384ea29f2617e65597258c", "integration:integration-s24-agenda-portfolio-20260718"]}
+}

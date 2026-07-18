@@ -1,0 +1,8 @@
+{
+  "lease_id": "lease-s24-r2-openrouter-provider-agent-0",
+  "stage_id": "s24-r2-openrouter-provider", "agent_id": "agent-0",
+  "branch": "codex/bridge-a0-s24-r2-openrouter-provider",
+  "issued_at": "2026-07-18T21:52:24Z", "expires_at": "2026-07-20T21:52:24Z",
+  "write_set": ["provenance/model-provider-connected-shadow-v2.json", "tools/model_provider_shadow.py", "docs/receipts/source-freeze/s24-r2-openrouter-official-api-shape.json", "docs/receipts/reuse/s24-r2-openrouter-provider.json", "stages/s24-r2-openrouter-provider/stage-envelope.json", "stages/s24-r2-openrouter-provider/ownership-lease.json"],
+  "exclusive": true, "revoked": false
+}
