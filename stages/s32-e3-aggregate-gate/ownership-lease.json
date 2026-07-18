@@ -1,0 +1,18 @@
+{
+  "lease_id": "lease-s32-e3-aggregate-gate-agent-0",
+  "stage_id": "s32-e3-aggregate-gate",
+  "agent_id": "agent-0",
+  "branch": "codex/bridge-a0-s32-e3-aggregate-gate",
+  "issued_at": "2026-07-18T23:50:00Z",
+  "expires_at": "2026-07-20T23:50:00Z",
+  "write_set": [
+    "tools/capability_proof.py",
+    "tools/e3_aggregate_gate.py",
+    "docs/receipts/capability/e3-evolution-shadow.json",
+    "docs/receipts/reuse/s32-e3-aggregate-gate.json",
+    "stages/s32-e3-aggregate-gate/stage-envelope.json",
+    "stages/s32-e3-aggregate-gate/ownership-lease.json"
+  ],
+  "exclusive": true,
+  "revoked": false
+}
