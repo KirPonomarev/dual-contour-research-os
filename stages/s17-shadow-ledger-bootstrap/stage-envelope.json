@@ -1,0 +1,20 @@
+{
+  "stage_id": "s17-shadow-ledger-bootstrap", "agent_id": "agent-0",
+  "objective": "Add a fail-closed fixture-only initializer for a new private A1 ledger so S17 local connected shadow can execute without borrowing a production or domain ledger.",
+  "executable_blocker": "No local private A1 ledger exists, and ModelCallBroker correctly rejects a call until all four A1 projections are initialized.",
+  "base_sha": "6a8b690dc68c659f391f80d174f8381446bf4afa",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a0-s17-shadow-ledger-bootstrap",
+  "worktree": "/Volumes/Work/dual-contour-research-os-s17-ledger-bootstrap",
+  "read_set": ["tools/model_provider_shadow.py", "src/research_bridge/ledger.py", "contracts/CapabilityProofReceipt-1.0.0.schema.json", "docs/receipts/reuse/s17-connected-provider-shadow-tool.json"],
+  "write_set": ["tools/model_provider_shadow.py", "stages/s17-shadow-ledger-bootstrap/stage-envelope.json", "stages/s17-shadow-ledger-bootstrap/ownership-lease.json"],
+  "forbidden_scope": ["Bridge-source-contract-profile-provenance-test-or-canonical-doc-edit", "MaterialEvent-CandidateSpecDraft-or-AdmissionReceipt-mint", "authority-grant", "existing-ledger-mutation", "network-or-credential-access", "new-payment", "D1-D2-D3-or-holdout", "domain-scientific-truth-or-live-action"],
+  "dependency_hashes": {"base_main": "6a8b690dc68c659f391f80d174f8381446bf4afa", "core_contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50", "a1_contract_catalog": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1", "reuse_decision": "reuse-s17-connected-provider-shadow-tool-20260718", "external_dependencies": "none"},
+  "acceptance_commands": ["make contracts", "Agent-5 new-path/existing-path/authority/object-kind/reopen assurance", "make test", "git diff --check"],
+  "risk_class": "critical-fixture-authority-laundering-or-existing-ledger-mutation",
+  "stop_conditions": ["trusted-MaterialEvent-mint", "grants-authority", "existing-path-write", "non-D0-data", "network-or-credential-access", "authority-expansion"],
+  "expected_receipt": "docs/receipts/integration/s17-shadow-ledger-bootstrap.json",
+  "rollback": "Remove the additive init-ledger subcommand and stage metadata; operator may initialize an external conforming private ledger separately.",
+  "commit_authority": "one-scoped-agent-0-commit", "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent5_s17_bootstrap_assurance", "blocked_validation_failed"]
+}

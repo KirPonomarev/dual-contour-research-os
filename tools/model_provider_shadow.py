@@ -304,6 +304,85 @@ def _preflight(profile: ConnectedShadowProfile) -> int:
     return 0
 
 
+def _init_ledger(args: argparse.Namespace, profile: ConnectedShadowProfile) -> int:
+    """Create a new private fixture-only A1 ledger for connected shadow proof."""
+
+    ledger_path = _outside_repository(Path(args.ledger))
+    if ledger_path.exists():
+        raise ShadowProviderError("shadow ledger bootstrap requires a new path")
+    ledger_path.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
+    payload = {
+        "capability": "S17_CONNECTED_SHADOW_LEDGER_BOOTSTRAP",
+        "fixture_only": True,
+        "grants_authority": False,
+        "profile_sha256": profile.sha256,
+        "scope": "LOCAL_PRIVATE_D0_SHADOW_ONLY",
+        "shadow_status": "SHADOW_UNAPPLIED",
+    }
+    payload_sha256 = hashlib.sha256(_canonical_bytes(payload)).hexdigest()
+    document = {
+        "schema_id": "CapabilityProofReceipt",
+        "schema_version": "1.0.0",
+        "object_id": "capability-proof:s17-shadow-bootstrap:" + profile.sha256,
+        "issued_at": args.event_at,
+        "issuer": {
+            "id": "agent-0-s17-shadow-bootstrap",
+            "authority_class": "fixture-only-non-authoritative",
+        },
+        "contour": "governance",
+        "classification": "D0",
+        "payload": payload,
+        "integrity": {
+            "profile_id": "core-json-sha256-v1",
+            "payload_sha256": payload_sha256,
+            "parent_refs": ["profile:sha256:" + profile.sha256],
+        },
+    }
+    projections = {
+        name: {
+            "count": 1 if name == "capabilities" else 0,
+            "fixture_only": True,
+            "grants_authority": False,
+            "marker": "s17-connected-shadow-bootstrap-v1",
+            "shadow_only": True,
+        }
+        for name in ("admissions", "candidates", "capabilities", "material_events")
+    }
+    try:
+        with JobLedger(ledger_path) as ledger:
+            record = ledger.append_a1_bundle(
+                objects=[document],
+                projections=projections,
+                idempotency_key="s17-shadow-bootstrap:" + profile.sha256,
+                event_at=args.event_at,
+            )
+            if not ledger.verify_chain() or not ledger.verify_a1_coverage():
+                raise ShadowProviderError("shadow ledger bootstrap verification failed")
+    except Exception:
+        ledger_path.unlink(missing_ok=True)
+        raise
+    os.chmod(ledger_path, 0o600)
+    print(
+        json.dumps(
+            {
+                "status": "INITIALIZED_PRIVATE_FIXTURE_LEDGER",
+                "event_sequence": record.event.sequence,
+                "object_ids": list(record.object_ids),
+                "profile_sha256": profile.sha256,
+                "classification": "D0",
+                "fixture_only": True,
+                "grants_authority": False,
+                "trusted_material_events": 0,
+                "network_calls": 0,
+                "credential_access": False,
+                "secrets_printed": False,
+            },
+            sort_keys=True,
+        )
+    )
+    return 0
+
+
 def _run(args: argparse.Namespace, profile: ConnectedShadowProfile) -> int:
     prompt_path = Path(args.prompt_file)
     if prompt_path.is_symlink() or not prompt_path.is_file():
@@ -437,6 +516,9 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     subparsers = parser.add_subparsers(dest="command", required=True)
     subparsers.add_parser("preflight")
+    init_ledger = subparsers.add_parser("init-ledger")
+    init_ledger.add_argument("--ledger", required=True)
+    init_ledger.add_argument("--event-at", required=True)
     run = subparsers.add_parser("run")
     run.add_argument("--role", required=True, choices=("SCOUT_FAST", "RESEARCH_WORKER", "CRITIC_PRIMARY", "CRITIC_DEEP", "CHIEF_SCIENTIST"))
     run.add_argument("--classification", required=True, choices=("D0", "D1"))
@@ -462,6 +544,8 @@ def main(argv: list[str] | None = None) -> int:
         profile = ConnectedShadowProfile()
         if args.command == "preflight":
             return _preflight(profile)
+        if args.command == "init-ledger":
+            return _init_ledger(args, profile)
         if args.command == "reconcile":
             return _reconcile(args, profile)
         return _run(args, profile)
