@@ -1106,7 +1106,25 @@ def evaluate_challenger(
     retained=tuple(sorted(archive_refs))
     if len(retained)>policy.max_retained: raise EvolutionError("retained candidate capacity violated")
     material={"version":"champion-challenger-report-v1","benchmark_sha256":benchmark.benchmark_sha256,"evaluator_ref":benchmark.evaluator_ref,"champion_ref":champion,"challenger_ref":challenger,"dimensions":[_evaluation_dimension_material(x) for x in dimensions],"pareto_relation":relation,"status":status,"reason_codes":tuple(sorted(reasons)),"retained_candidate_refs":retained,"single_scalar_score":None,"winner_promoted":False,"mutation_applied":False,"holdout_queries":0,"side_effects":False,"grants_authority":False}
-    return ChampionChallengerReport(**material,report_sha256=_sha(material))
+    return ChampionChallengerReport(
+        version="champion-challenger-report-v1",
+        benchmark_sha256=benchmark.benchmark_sha256,
+        evaluator_ref=benchmark.evaluator_ref,
+        champion_ref=champion,
+        challenger_ref=challenger,
+        dimensions=tuple(dimensions),
+        pareto_relation=relation,
+        status=status,
+        reason_codes=tuple(sorted(reasons)),
+        retained_candidate_refs=retained,
+        report_sha256=_sha(material),
+        single_scalar_score=None,
+        winner_promoted=False,
+        mutation_applied=False,
+        holdout_queries=0,
+        side_effects=False,
+        grants_authority=False,
+    )
 
 
 def build_research_agenda(
