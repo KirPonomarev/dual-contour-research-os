@@ -1,0 +1,18 @@
+{
+  "stage_id": "s28-e2-aggregate-gate", "agent_id": "agent-0",
+  "objective": "Bind exact S23-S27 assurance evidence into one expiring, invalidatable, zero-authority E2 shadow capability proof.",
+  "executable_blocker": "E2 component receipts exist, but no deterministic exact-head gate prevents mixed evidence, stale proof or council/replication/memory overclaim.",
+  "base_sha": "b9fa2944c35f7edc1474c2e42c91680f1d177e19", "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a0-s28-e2-aggregate-gate", "worktree": "/private/tmp/dcr-s28-e2-aggregate-gate",
+  "read_set": ["tools/capability_proof.py", "docs/receipts/integration/s23-knowledge-fabric-assurance.json", "docs/receipts/integration/s24-agenda-portfolio-assurance.json", "docs/receipts/integration/s25-council-assurance.json", "docs/receipts/integration/s26-replication-assurance.json", "docs/receipts/integration/s27-memory-assurance.json"],
+  "write_set": ["tools/capability_proof.py", "tools/e2_aggregate_gate.py", "docs/receipts/capability/e2-autonomous-research-shadow.json", "docs/receipts/reuse/s28-e2-aggregate-gate.json", "stages/s28-e2-aggregate-gate/stage-envelope.json", "stages/s28-e2-aggregate-gate/ownership-lease.json"],
+  "forbidden_scope": ["contract-schema-catalog-freeze-runtime-source-test-root-CI-or-lockfile-edit", "component-evidence-rewrite", "global-replication-memory-uplift-calibrated-or-scientific-truth-claim", "canonical-mutation-promotion-deploy-live-or-authority-action", "model-call-secret-private-data-new-service-store-queue-scheduler-or-dependency"],
+  "dependency_hashes": {"base_main": "b9fa2944c35f7edc1474c2e42c91680f1d177e19", "e2_evidence_config": "1b15b5918efa09354da2c2a4a32c80198506c76fecc13d22a719c3612244fc77", "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50", "external_dependencies": "none-stdlib-only"},
+  "acceptance_commands": ["make contracts", "python3 tools/e2_aggregate_gate.py --receipt docs/receipts/capability/e2-autonomous-research-shadow.json", "Agent-5 S28 hostile assurance", "make test", "git diff --check"],
+  "risk_class": "high-aggregate-overclaim-mixed-head-and-proof-laundering",
+  "stop_conditions": ["evidence-digest-or-ancestry-mismatch", "council-as-evidence-or-global-independence-claim", "memory-uplift-or-calibrated-overclaim", "canonical-promotion-deploy-live-or-authority-claim", "secret-private-data-model-call-or-new-runtime-required"],
+  "expected_receipt": "docs/receipts/integration/s28-e2-aggregate-gate.json",
+  "rollback": "Revert S28 additive proof framework extension, aggregate tool and metadata; component evidence remains unchanged.",
+  "commit_authority": "one-scoped-agent-0-commit", "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent5_s28_assurance", "blocked_validation_failed"]
+}
