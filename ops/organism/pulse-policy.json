@@ -1,0 +1,11 @@
+{
+  "schema_id": "PulsePolicy",
+  "schema_version": "1.0.0",
+  "policy_id": "a1-read-only-pulse-policy",
+  "freshness_warn_seconds": 300,
+  "freshness_red_seconds": 900,
+  "queue_warn_count": 8,
+  "queue_red_count": 32,
+  "queue_age_warn_seconds": 600,
+  "queue_age_red_seconds": 1800
+}
