@@ -1,0 +1,27 @@
+{
+  "schema_id": "IntegrationReceipt", "schema_version": "1.0.0",
+  "object_id": "integration-s04-capability-assurance-20260718", "issued_at": "2026-07-18T14:12:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s04-capability-assurance", "agent_id": "agent-5",
+    "ownership_lease_ref": "stages/s04-capability-assurance/ownership-lease.json",
+    "base_sha": "3bafc80d22d84ee4b1c749cf10baff0aebb48008",
+    "head_sha": "8ce1c592450d6f45d5605cf2445da562f24eabd2",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": ["tests/test_a1_capability_proof.py", "stages/s04-capability-assurance/stage-envelope.json", "stages/s04-capability-assurance/ownership-lease.json"],
+    "audit_results": {
+      "contract_gate": "green", "privacy_secret_scan": "green", "source_mutation": false,
+      "focused_tests": 65, "full_core_tests": 510, "stage0b_tests": 25,
+      "mixed_head_stale": "green", "expiry_stale": "green", "dependency_drift_stale": "green",
+      "overclaim_negative_probes": "green", "environment_compatibility": "green",
+      "authority_grants": 0
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29647541044",
+    "integration_commit_sha": "815e8dc2e1fb10eaf795f3f2ddf08ec02308e986"
+  },
+  "integrity": {"payload_sha256": "a72f7293e1aae0e1ed8f3642052b40c9c943bee9b6d7e7ce6457b31a83d7afe0", "parent_refs": [
+    "git:8ce1c592450d6f45d5605cf2445da562f24eabd2", "git:815e8dc2e1fb10eaf795f3f2ddf08ec02308e986",
+    "ci:29647541044", "git:3bafc80d22d84ee4b1c749cf10baff0aebb48008"
+  ]}
+}
