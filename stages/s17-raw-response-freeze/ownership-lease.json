@@ -1,0 +1,8 @@
+{
+  "lease_id": "lease-s17-raw-response-freeze-agent-0",
+  "stage_id": "s17-raw-response-freeze", "agent_id": "agent-0",
+  "branch": "codex/bridge-a0-s17-raw-response-freeze",
+  "issued_at": "2026-07-18T17:58:13Z", "expires_at": "2026-07-19T17:58:13Z",
+  "write_set": ["docs/receipts/reuse/s17-raw-response-before-parse.json", "stages/s17-raw-response-freeze/stage-envelope.json", "stages/s17-raw-response-freeze/ownership-lease.json"],
+  "exclusive": true, "revoked": false
+}

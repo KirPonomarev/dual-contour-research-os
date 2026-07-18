@@ -1,0 +1,20 @@
+{
+  "stage_id": "s17-raw-response-freeze", "agent_id": "agent-0",
+  "objective": "Freeze the reuse and safety decision for a two-phase provider response boundary before any connected shadow call.",
+  "executable_blocker": "The S15 adapter returns parsed usage before raw bytes are durably committed, which cannot satisfy S17 raw-response protection for connected providers.",
+  "base_sha": "b2aef5371f1627aa33eaae3192e5c0b328bd13bc",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a0-s17-raw-response-freeze",
+  "worktree": "/Volumes/Work/dual-contour-research-os-s17-raw-freeze",
+  "read_set": ["src/research_bridge/model_broker.py", "src/research_bridge/cas.py", "provenance/model-provider-routing-v1.json", "ownership/registry.json"],
+  "write_set": ["docs/receipts/reuse/s17-raw-response-before-parse.json", "stages/s17-raw-response-freeze/stage-envelope.json", "stages/s17-raw-response-freeze/ownership-lease.json"],
+  "forbidden_scope": ["contract-or-source-edit", "dependency-addition", "network-call", "credential-or-endpoint", "provider-availability-claim", "payment", "D2-D3-or-holdout", "authority-domain-canonical-deployment-or-live-action"],
+  "dependency_hashes": {"base_main": "b2aef5371f1627aa33eaae3192e5c0b328bd13bc", "core_contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50", "a1_contract_catalog": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1", "external_dependencies": "none-stdlib-and-existing-CAS-only"},
+  "acceptance_commands": ["make contracts", "reuse receipt integrity", "python3 -m unittest tests.test_ownership_registry", "git diff --check"],
+  "risk_class": "critical-provider-ambiguity-and-response-loss",
+  "stop_conditions": ["response-parsed-before-durable-commit", "secret-or-connected-material", "authority-expansion", "contract-drift"],
+  "expected_receipt": "docs/receipts/integration/s17-raw-response-freeze.json",
+  "rollback": "Remove the reuse receipt and stage metadata; S16 fixture-only broker remains unchanged.",
+  "commit_authority": "one-scoped-agent-0-commit", "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent1_s17_repair", "blocked_governance_validation_failed"]
+}
