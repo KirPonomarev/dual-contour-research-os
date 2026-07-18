@@ -1,0 +1,24 @@
+{
+  "schema_id": "SourceFreezeReceipt", "schema_version": "1.0.0",
+  "object_id": "source-freeze-s17-official-provider-api-shapes-20260718", "issued_at": "2026-07-18T18:20:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "source-freeze-authority"},
+  "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "source_repo": "official-provider-documentation-plus-dual-contour-research-os",
+    "remote": "sha256:2218f184ab78ce45727e7d54d0a06345baca1f446ac84d491b471dbe1e75d0ae",
+    "branch": "sha256:0d6e4079e36703ebd37c00722f5891d28b0e2811dc114b129215123adcce3605",
+    "head_sha": "7563f2fa6bc25c5f342dc4fa357a7ef09fd378da",
+    "upstream_sha": "7563f2fa6bc25c5f342dc4fa357a7ef09fd378da",
+    "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "untracked_manifest_sha256": "4ac18aaa960d78ee0103cd199f411067aca46fceb11efa8e0045c53f57c5affd",
+    "path_dispositions": [
+      {"category": "deepseek-official-chat-api", "path": "https://api-docs.deepseek.com/api/create-chat-completion", "count": 2, "sha256": "NO_LOCAL_COPY", "disposition": "selected-model-ids-endpoint-thinking-effort-and-response-shape"},
+      {"category": "glm-official-model-api", "path": "https://docs.bigmodel.cn/cn/guide/models/text/glm-5.2", "count": 1, "sha256": "NO_LOCAL_COPY", "disposition": "selected-model-id-endpoint-and-max-effort"},
+      {"category": "openai-official-model-api", "path": "https://developers.openai.com/api/docs/models/gpt-5.6-sol", "count": 2, "sha256": "NO_LOCAL_COPY", "disposition": "selected-model-id-responses-endpoint-and-xhigh-max-effort"},
+      {"category": "connected-shadow-profile", "path": "provenance/model-provider-connected-shadow-v1.json", "count": 1, "sha256": "4ac18aaa960d78ee0103cd199f411067aca46fceb11efa8e0045c53f57c5affd", "disposition": "selected-public-endpoints-and-environment-variable-names-no-credential-values"},
+      {"category": "credentials-raw-responses-private-data-or-billing-receipts", "count": 0, "disposition": "absent"}
+    ],
+    "selected_source_sha": "4ac18aaa960d78ee0103cd199f411067aca46fceb11efa8e0045c53f57c5affd"
+  },
+  "integrity": {"payload_sha256": "354948bc5e4346066ec178f3f13b9aaf1d4c350b38eef83e650b3829b2ee1f51", "parent_refs": ["git:7563f2fa6bc25c5f342dc4fa357a7ef09fd378da", "integration:integration-s17-raw-response-20260718", "sha256:4ac18aaa960d78ee0103cd199f411067aca46fceb11efa8e0045c53f57c5affd"]}
+}

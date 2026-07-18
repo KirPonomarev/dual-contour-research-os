@@ -1,0 +1,25 @@
+{
+  "schema_id": "ReuseDecisionReceipt", "schema_version": "1.0.0",
+  "object_id": "reuse-s17-connected-provider-shadow-tool-20260718", "issued_at": "2026-07-18T18:20:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-freeze-authority"},
+  "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "BOUNDED_CONNECTED_PROVIDER_SHADOW_TOOL",
+    "candidates": [
+      {"candidate": "reuse-existing-ModelProviderRouting-ModelCallBroker-JobLedger-and-ContentAddressedStore", "disposition": "selected"},
+      {"candidate": "reuse-stdlib-urllib-ssl-json-base64-hashlib-and-tempfile", "disposition": "selected"},
+      {"candidate": "add-Agent0-tool-only-provider-codecs-transport-preflight-and-private-CAS-committer", "disposition": "selected-minimal-missing-glue"},
+      {"candidate": "openai-deepseek-zai-provider-SDK-dependencies", "disposition": "rejected-unnecessary-dependency-and-version-surface"},
+      {"candidate": "connected-transport-inside-Bridge-runtime-module", "disposition": "rejected-preserve-zero-network-runtime-import-boundary"},
+      {"candidate": "automatic-retry-or-credential-command-line-arguments", "disposition": "rejected-ambiguity-and-secret-exposure"}
+    ],
+    "selected_mode": "exact-profile-deterministic-role-route-environment-only-credential-bounded-POST-private-CAS-commit-before-parse-and-UNKNOWN-without-retry",
+    "source_ref": "source-freeze:source-freeze-s17-official-provider-api-shapes-20260718;git:7563f2fa6bc25c5f342dc4fa357a7ef09fd378da;internal:model_broker+ledger+cas+routing",
+    "code_sha256": "9e78d87d2c53cb6cadfd8a983764b5cb612da77aa7945bb56b37984defbc025b",
+    "license_spdx": "NOASSERTION", "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": ["strict-profile-and-endpoint-allowlist", "exact-request-codecs", "credential-redaction", "redirect-denial", "bounded-response", "private-CAS-only", "commit-before-parse", "HTTP-error-conservative-UNKNOWN", "missing-worker-PARKED", "missing-critic-WAIT_PROVIDER", "no-auto-retry"],
+    "canonical_owner": "agent-0-tool-and-profile-with-agent-5-assurance",
+    "rollback": "Remove the Agent-0 tool, connected overlay and its governance receipts; S17 raw broker repair remains valid."
+  },
+  "integrity": {"payload_sha256": "55e89b9534d42e5d69ac2d7a6017df71a39048ed22dc5ef427369b354ee8ab04", "parent_refs": ["git:7563f2fa6bc25c5f342dc4fa357a7ef09fd378da", "source-freeze:source-freeze-s17-official-provider-api-shapes-20260718", "reuse:reuse-s17-raw-response-before-parse-20260718"]}
+}
