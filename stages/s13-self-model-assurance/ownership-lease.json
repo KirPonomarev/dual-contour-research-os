@@ -1,0 +1,7 @@
+{
+  "lease_id": "lease-s13-self-model-assurance-agent-5", "stage_id": "s13-self-model-assurance", "agent_id": "agent-5",
+  "base_sha": "ac914783a6b8bb620ab82adf4cf421bc0e457be8", "branch": "codex/bridge-a5-s13-self-model-assurance",
+  "issued_at": "2026-07-18T16:30:00Z", "expires_at": "2026-07-19T16:30:00Z",
+  "write_set": ["tests/test_s13_operational_self_model_capability.py", "stages/s13-self-model-assurance/stage-envelope.json", "stages/s13-self-model-assurance/ownership-lease.json"],
+  "exclusive": true, "revoked": false
+}

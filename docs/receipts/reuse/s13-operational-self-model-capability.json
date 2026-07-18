@@ -1,0 +1,32 @@
+{
+  "schema_id": "ReuseDecisionReceipt", "schema_version": "1.0.0",
+  "object_id": "reuse-s13-operational-self-model-capability-20260718", "issued_at": "2026-07-18T16:25:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-freeze-authority"},
+  "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "OPERATIONAL_SELF_MODEL_PASS_FOR_FROZEN_SCOPE",
+    "candidates": [
+      {"candidate": "extend-existing-pure-capability-issuer-validator-with-one-E1C-profile", "disposition": "selected"},
+      {"candidate": "reuse-S11-topology-S12-state-pulse-integration-and-existing-environment-profile", "disposition": "selected"},
+      {"candidate": "new-proof-schema-runtime-service-ledger-or-assurance-daemon", "disposition": "rejected-duplicate-surface"},
+      {"candidate": "claim-consciousness-general-self-awareness-production-health-or-authority", "disposition": "rejected-anthropomorphic-or-unsupported-overclaim"}
+    ],
+    "selected_mode": "third-exact-zero-authority-capability-profile-over-existing-pure-issuer-with-release-hash-expiry-and-drift-invalidation",
+    "source_ref": "git:77f9860d13a80dcf9c277d27f0c2daf4a15ae9f2;internal:capability-proof+organism+ledger+ops-organism",
+    "code_sha256": "801f52bc35f6320481ce4435d7199f9cd3d61c1824a34ad272000d190c92a2a8",
+    "license_spdx": "NOASSERTION", "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "exact-static-reproduction", "subject-code-config-policy-schema-environment-drift-stale", "expiry-stale",
+      "manifest-topology-and-progressive-evidence", "durable-state-pulse-zero-write-and-AI_OFF",
+      "WAIT_AUTHORITY-restart", "overclaim-consciousness-authority-provider-domain-canonical-live-denial"
+    ],
+    "canonical_owner": "agent-0-proof-issuer-with-agent-5-independent-assurance",
+    "rollback": "Revert the additive E1C capability profile and receipt; E1A and E1B capability profiles remain byte-for-byte valid."
+  },
+  "integrity": {"payload_sha256": "daf040c07cf19657aa1c019dc49fff4c17ad28d32f1e14d8a7404f018353a427", "parent_refs": [
+    "git:77f9860d13a80dcf9c277d27f0c2daf4a15ae9f2",
+    "reuse:d00c99f1f8e64e1106fb8cfef14702e0ad240ab1d69faa88711febf598dd40d1",
+    "integration:integration-s11-manifest-topology-20260718",
+    "integration:integration-s12-state-pulse-20260718"
+  ]}
+}

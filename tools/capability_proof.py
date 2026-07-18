@@ -50,9 +50,20 @@ _DURABLE_FEEDBACK_REQUIRED_SCOPE = {
     "live_security_execution": "DENIED",
     "domain_application": "SHADOW_UNAPPLIED",
 }
+_OPERATIONAL_SELF_MODEL_REQUIRED_SCOPE = {
+    "proof_state": "OPERATIONAL_SELF_MODEL_PASS_WITH_DURABLE_OFFLINE_FIXTURES",
+    "data_scope": "D0_PUBLIC_SYNTHETIC_ONLY",
+    "model_route": "NO_REAL_PROVIDER_REQUIRED",
+    "real_provider": "UNPROVEN",
+    "canonical_mutation": "DENIED",
+    "live_trading": "DENIED",
+    "live_security_execution": "DENIED",
+    "domain_application": "SHADOW_UNAPPLIED",
+}
 _CAPABILITY_SCOPES = {
     "A1_DISCOVERY_ADMISSION_FIXTURE": _E1A_REQUIRED_SCOPE,
     "A1_DURABLE_FEEDBACK": _DURABLE_FEEDBACK_REQUIRED_SCOPE,
+    "OPERATIONAL_SELF_MODEL": _OPERATIONAL_SELF_MODEL_REQUIRED_SCOPE,
 }
 _REQUIRED_NEGATIVE_PROBES = frozenset(
     {
@@ -124,6 +135,23 @@ def issue_durable_feedback_proof(
 
     if payload.get("capability_id") != "A1_DURABLE_FEEDBACK":
         raise CapabilityProofError("durable feedback issuer received a different capability")
+    return issue_capability_proof(
+        payload,
+        issued_at=issued_at,
+        classification=classification,
+    )
+
+
+def issue_operational_self_model_proof(
+    payload: Mapping[str, object],
+    *,
+    issued_at: str,
+    classification: str = "D1",
+) -> Mapping[str, object]:
+    """Issue only the exact non-anthropomorphic E1C operational self-model proof."""
+
+    if payload.get("capability_id") != "OPERATIONAL_SELF_MODEL":
+        raise CapabilityProofError("operational self-model issuer received a different capability")
     return issue_capability_proof(
         payload,
         issued_at=issued_at,
@@ -260,6 +288,8 @@ def _validate_payload(payload: object) -> dict[str, object]:
     proof_basis = value["proof_basis"]
     if not isinstance(proof_basis, list) or not proof_basis or any(not isinstance(item, Mapping) or not item for item in proof_basis):
         raise CapabilityProofError("proof_basis must contain evidence objects")
+    if capability_id == "OPERATIONAL_SELF_MODEL":
+        _reject_anthropomorphic_overclaim(proof_basis)
     for name in ("code_sha256", "config_sha256", "policy_sha256", "schema_sha256"):
         _sha256(name, value[name])
     for name in (
@@ -294,6 +324,28 @@ def canonical_json_sha256(value: object) -> str:
     except (TypeError, ValueError, UnicodeError) as exc:
         raise CapabilityProofError("capability proof contains non-canonical JSON data") from exc
     return hashlib.sha256(encoded).hexdigest()
+
+
+def _reject_anthropomorphic_overclaim(value: object) -> None:
+    forbidden_keys = {
+        "consciousness", "sentience", "general_self_awareness", "human_equivalence",
+        "self_granted_authority", "autonomous_canonical_authority",
+    }
+    forbidden_claims = (
+        "is conscious", "is sentient", "general self-awareness", "human-equivalent",
+        "grants itself authority", "autonomous canonical authority",
+    )
+    if isinstance(value, Mapping):
+        for key, item in value.items():
+            normalized = str(key).strip().lower().replace("-", "_").replace(" ", "_")
+            if normalized in forbidden_keys:
+                raise CapabilityProofError("operational self-model proof contains an anthropomorphic or authority claim")
+            _reject_anthropomorphic_overclaim(item)
+    elif isinstance(value, (list, tuple)):
+        for item in value:
+            _reject_anthropomorphic_overclaim(item)
+    elif isinstance(value, str) and any(claim in value.lower() for claim in forbidden_claims):
+        raise CapabilityProofError("operational self-model proof contains an anthropomorphic or authority claim")
 
 
 def _exact(value: object, keys: frozenset[str], label: str) -> dict[str, object]:
@@ -357,6 +409,6 @@ def _freeze(value: object) -> object:
 
 __all__ = [
     "CapabilityProofError", "CapabilityAssessment", "issue_capability_proof",
-    "issue_e1a_fixture_proof", "issue_durable_feedback_proof",
+    "issue_e1a_fixture_proof", "issue_durable_feedback_proof", "issue_operational_self_model_proof",
     "validate_capability_proof", "assess_capability_proof", "canonical_json_sha256",
 ]
