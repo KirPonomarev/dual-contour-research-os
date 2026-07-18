@@ -1,0 +1,71 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-e0-a1-contract-candidate-20260718",
+  "issued_at": "2026-07-18T10:35:47Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "e0-a1-contract-candidate",
+    "agent_id": "agent-0",
+    "ownership_lease_ref": "stages/e0-a1-contract-candidate/ownership-lease.json",
+    "base_sha": "0014f2e2083415021f0de849f2b8a80cb0992e80",
+    "head_sha": "0ff9b097588b3f54c9e5e81a819b605d79aa79c8",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "contracts/a1/v1/catalog.json",
+      "contracts/a1/v1/AdmissionReceipt.schema.json",
+      "contracts/a1/v1/CandidateSpecDraft.schema.json",
+      "contracts/a1/v1/CapabilityProofReceipt.schema.json",
+      "contracts/a1/v1/MaterialEvent.schema.json",
+      "contracts/a1/v1/profiles/a1_sandbox_policy_v1.json",
+      "contracts/a1/v1/profiles/authority_corridor_v1.json",
+      "contracts/a1/v1/profiles/environment_compatibility_v1.json",
+      "contracts/a1/v1/profiles/evaluator_exposure_v1.json",
+      "contracts/a1/v1/profiles/integrity_profiles_v1.json",
+      "contracts/a1/v1/profiles/ipc_compatibility_v1.json",
+      "contracts/a1/v1/profiles/model_role_registry_v1.json",
+      "contracts/a1/v1/profiles/reason_codes_v1.json",
+      "contracts/a1/v1/profiles/storage_coverage_v1.json",
+      "contracts/a1/v1/profiles/writer_issuer_matrix_v1.json",
+      "docs/ADR/0003-a1-autonomous-research-corridor.md",
+      "docs/receipts/reuse/e0-a1-contract-candidate.json",
+      "stages/e0-a1-contract-candidate/ownership-lease.json",
+      "stages/e0-a1-contract-candidate/stage-envelope.json",
+      "tests/test_a1_contracts.py",
+      "tools/generate_a1_contracts.py",
+      "tools/validate_a1_contracts.py"
+    ],
+    "audit_results": {
+      "core_contract_gate": "green-unchanged",
+      "a1_contract_gate": "green-freeze-candidate",
+      "a1_contracts": 4,
+      "a1_profiles": 10,
+      "focused_tests": 15,
+      "full_core_tests": 457,
+      "stage0b_tests": 25,
+      "diff_check": "green",
+      "write_set_audit": "green",
+      "privacy_secret_scan": "green-policy-deny-phrases-only",
+      "core_catalog_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+      "a1_catalog_sha256": "87c0db3fae18f2e15c92bcb9252d820c9a2382afcbe491815a724b55ecd5e556",
+      "runtime_source_mutation": false,
+      "dependency_adoption": false,
+      "authority_expansion": false
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29641095258",
+    "integration_commit_sha": "0ff9b097588b3f54c9e5e81a819b605d79aa79c8"
+  },
+  "integrity": {
+    "payload_sha256": "d8c4f9e96b5fedac28d130030dc64594df27af2a9ca5d93e972dd91a24106b3e",
+    "parent_refs": [
+      "git:0ff9b097588b3f54c9e5e81a819b605d79aa79c8",
+      "ci:29641095258",
+      "sha256:87c0db3fae18f2e15c92bcb9252d820c9a2382afcbe491815a724b55ecd5e556"
+    ]
+  }
+}
