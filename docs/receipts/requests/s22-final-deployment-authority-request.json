@@ -1,0 +1,68 @@
+{
+  "schema_id": "research-os.human-authority-request.v1",
+  "request_id": "s22-final-deployment-authority-request-343ef061",
+  "issued_at": "2026-07-18T21:35:00Z",
+  "valid_until": "2026-07-19T21:35:00Z",
+  "status": "WAIT_HUMAN_REVIEW",
+  "grants_authority": false,
+  "request_base_sha": "343ef0611a501e4f58cbdd1f2bc55b1d121400a5",
+  "release_proposal": {
+    "manifest_ref": "docs/receipts/release/s4-release-manifest.json",
+    "manifest_sha256": "9ceae0bda066cf52577cec0fdc1d7230e92b3e4010f65b81613abf6a0a8a90dd",
+    "release_sha": "5c2bd7c090fada6e5b65dc955e80b256d88252de",
+    "image_id": "sha256:36069ee7a9db78af747d7fad65f9e33073824f27be898cdc0b7dd3b77ac5c235",
+    "final_release_rebind_required": true
+  },
+  "evidence": {
+    "readiness_packet_ref": "ops/deploy/deployment-readiness-packet.json",
+    "readiness_packet_sha256": "0085672bd78590fe96aa91b4a70bd2f09fa0ea81cb4405bde6596588ecdb0c48",
+    "isolation_packet_ref": "ops/deploy/stage4-a1-isolation-release-packet.json",
+    "isolation_packet_sha256": "2038a4fe49e018d58832df5dd1028c5cd2e49e5075f98f805e393abbe14557f0",
+    "runbook_ref": "docs/STAGE4_A1_ISOLATION_RELEASE_RUNBOOK.md",
+    "runbook_sha256": "cfe77859cf86f64e9272ced2a7799cce0744e74143a02096867e1ad821cd99da",
+    "exact_head_ci_run": 29660013371,
+    "exact_head_ci_sha": "343ef0611a501e4f58cbdd1f2bc55b1d121400a5"
+  },
+  "requested_future_scopes": [
+    "DEPLOY_EXACT_FINAL_OFFLINE_SHADOW_RELEASE",
+    "INTENTIONAL_REBOOT_WITH_POST_BOOT_IDENTITY_CHECK",
+    "TWO_CLEAN_RESTORE_DRILLS_WITH_RECEIPTS",
+    "ROLLBACK_TO_EXACT_PREDECLARED_TARGET"
+  ],
+  "blast_radius": {
+    "service": "research-os-a1-bridge.service",
+    "container": "research-os-a1-bridge",
+    "network": "none",
+    "published_ports": 0,
+    "live_capability": false,
+    "canonical_mutation": false,
+    "concurrent_predecessor_writer": false
+  },
+  "mandatory_preconditions": [
+    "S38_FINAL_RELEASE_FREEZE_COMPLETE",
+    "EXACT_FINAL_SHA_AND_RELEASE_MANIFEST_REVIEWED",
+    "CURRENT_ENCRYPTED_BACKUP_RECEIPT_PRESENT",
+    "CURRENT_CLEAN_RESTORE_RECEIPT_PRESENT",
+    "UNCONSUMED_MAX_300_SECOND_DEPLOYMENT_APPROVAL_RECEIPT",
+    "ROLLBACK_TARGET_VERIFIED"
+  ],
+  "expected_receipts": [
+    "DeploymentApprovalReceipt",
+    "BackupReceipt",
+    "RestoreReceipt",
+    "DeploymentReceipt",
+    "RollbackReceipt"
+  ],
+  "hard_denies": [
+    "AUTO_APPROVAL",
+    "AUTO_EXECUTE",
+    "SUDO_BYPASS",
+    "UNAPPROVED_REBOOT_OR_RESTORE",
+    "LIVE_TRADING",
+    "AUTONOMOUS_LIVE_SECURITY",
+    "PUBLICATION",
+    "CANONICAL_OR_POLICY_MUTATION"
+  ],
+  "review_decision": "PENDING",
+  "integrity": {"profile": "core-json-sha256-v1", "payload_sha256": "df7b6b04d5e8ff2a8c103bd594cb93c16df78e0899762d3de7038f1d3cc22147"}
+}

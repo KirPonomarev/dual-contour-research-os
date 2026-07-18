@@ -1,0 +1,22 @@
+{
+  "schema_id": "ReuseDecisionReceipt", "schema_version": "1.0.0",
+  "object_id": "reuse-s22-human-authority-request-20260718", "issued_at": "2026-07-18T21:35:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-freeze-authority"},
+  "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "BOUNDED_HUMAN_AUTHORITY_REQUEST_NO_EXECUTION",
+    "candidates": [
+      {"candidate": "reuse-S20-isolation-S21-readiness-release-manifest-and-existing-approval-contract", "disposition": "selected"},
+      {"candidate": "minimal-machine-readable-request-and-fail-closed-validator", "disposition": "selected-minimal-missing-glue"},
+      {"candidate": "issue-or-consume-DeploymentApprovalReceipt-now", "disposition": "rejected-human-authority-and-runtime-evidence-missing"},
+      {"candidate": "automatic-deploy-reboot-restore-or-rollback", "disposition": "rejected-night-contour-and-plan-boundary"}
+    ],
+    "selected_mode": "PR_HUMAN-WAIT_HUMAN_REVIEW-with-final-release-rebind-required",
+    "source_ref": "git:343ef0611a501e4f58cbdd1f2bc55b1d121400a5;readiness:sha256:0085672bd78590fe96aa91b4a70bd2f09fa0ea81cb4405bde6596588ecdb0c48",
+    "code_sha256": "bf524d093bc52912234904c51eaa28659f78754e4f246e275dab8363082d8929", "license_spdx": "NOASSERTION", "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": ["request-integrity", "exact-release-evidence", "authority-impersonation", "blast-radius", "hard-denies", "public-safety"],
+    "canonical_owner": "agent-0-release-governance",
+    "rollback": "Close the unmerged request PR and delete only its plan-owned branch/worktree; no authority or external state was created."
+  },
+  "integrity": {"payload_sha256": "c02742904b54cad15efb05e4bf51bdcfd70e8def277e47d7a4fd47853e14bab0", "parent_refs": ["git:343ef0611a501e4f58cbdd1f2bc55b1d121400a5", "integration:integration-s21-deployment-readiness-20260718"]}
+}

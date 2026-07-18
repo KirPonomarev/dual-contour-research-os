@@ -1,0 +1,17 @@
+{
+  "stage_id": "s22-human-authority-request", "agent_id": "agent-0",
+  "objective": "Create a reviewable bounded human-authority request for future final deployment/reboot/restore/rollback without issuing approval or executing any action.",
+  "executable_blocker": "S21 is review-ready but no exact, expiring, non-authoritative request exposes blast radius, commands, preconditions, expected receipts and final-release rebinding.",
+  "base_sha": "343ef0611a501e4f58cbdd1f2bc55b1d121400a5", "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a0-s22-human-authority-request", "worktree": "/private/tmp/dcr-s22-human-authority-request",
+  "read_set": ["ops/deploy/deployment-readiness-packet.json", "ops/deploy/stage4-a1-isolation-release-packet.json", "docs/STAGE4_A1_ISOLATION_RELEASE_RUNBOOK.md", "docs/receipts/release/s4-release-manifest.json"],
+  "write_set": ["docs/receipts/requests/s22-final-deployment-authority-request.json", "tools/verify_s22_authority_request.py", "tests/test_s22_authority_request.py", "docs/receipts/reuse/s22-human-authority-request.json", "stages/s22-human-authority-request/stage-envelope.json", "stages/s22-human-authority-request/ownership-lease.json"],
+  "forbidden_scope": ["approval-issuance-consumption-or-auto-approval", "deploy-reboot-backup-restore-rollback-sudo-or-production-action", "secret-host-account-locator-private-path-D2-D3-or-runtime-data", "canonical-policy-domain-live-trading-security-or-publication-authority"],
+  "dependency_hashes": {"base_main": "343ef0611a501e4f58cbdd1f2bc55b1d121400a5", "core_contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50", "a1_contract_catalog": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1", "readiness_packet": "0085672bd78590fe96aa91b4a70bd2f09fa0ea81cb4405bde6596588ecdb0c48", "external_dependencies": "none-stdlib-only"},
+  "acceptance_commands": ["make contracts", "python3 tools/verify_s22_authority_request.py", "python3 -m unittest tests.test_s22_authority_request -v", "git diff --check", "exact-diff public-safety scan"],
+  "risk_class": "high-Git-request-confused-with-human-authority",
+  "stop_conditions": ["request-can-approve-or-execute", "final-release-rebind-not-required", "blast-radius-or-hard-deny-widened", "private-data-or-external-action-required"],
+  "expected_receipt": "open PR_HUMAN and later IntegrationReceipt after explicit review",
+  "rollback": "Close request PR and remove only its plan-owned branch/worktree.", "commit_authority": "one-scoped-agent-0-commit", "push_authority": true,
+  "expected_handoff_status": ["WAIT_HUMAN_REVIEW", "blocked_validation_failed"]
+}
