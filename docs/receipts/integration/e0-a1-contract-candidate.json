@@ -41,6 +41,7 @@
       "tools/validate_a1_contracts.py"
     ],
     "audit_results": {
+      "contract_gate": "green",
       "core_contract_gate": "green-unchanged",
       "a1_contract_gate": "green-freeze-candidate",
       "a1_contracts": 4,
@@ -50,9 +51,10 @@
       "stage0b_tests": 25,
       "diff_check": "green",
       "write_set_audit": "green",
-      "privacy_secret_scan": "green-policy-deny-phrases-only",
+      "privacy_secret_scan": "green",
       "core_catalog_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
       "a1_catalog_sha256": "87c0db3fae18f2e15c92bcb9252d820c9a2382afcbe491815a724b55ecd5e556",
+      "source_mutation": false,
       "runtime_source_mutation": false,
       "dependency_adoption": false,
       "authority_expansion": false
@@ -61,7 +63,7 @@
     "integration_commit_sha": "0ff9b097588b3f54c9e5e81a819b605d79aa79c8"
   },
   "integrity": {
-    "payload_sha256": "d8c4f9e96b5fedac28d130030dc64594df27af2a9ca5d93e972dd91a24106b3e",
+    "payload_sha256": "2cb82f27a3384ecf2d35898c56134b58d387b4410cf31d94c7a737e609a2d690",
     "parent_refs": [
       "git:0ff9b097588b3f54c9e5e81a819b605d79aa79c8",
       "ci:29641095258",
