@@ -1,0 +1,32 @@
+{
+  "schema_id": "ReuseDecisionReceipt", "schema_version": "1.0.0",
+  "object_id": "reuse-s09-feedback-replay-capacity-20260718", "issued_at": "2026-07-18T15:30:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-freeze-authority"},
+  "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "deterministic-side-effect-free-feedback-replay-and-frozen-single-writer-capacity-envelope",
+    "candidates": [
+      {"candidate": "replay-existing-atomic-feedback-material-from-global-ledger-events", "disposition": "selected"},
+      {"candidate": "verify-rebuilt-hashes-against-event-descriptors-and-latest-projection-storage", "disposition": "selected"},
+      {"candidate": "derive-capacity-from-frozen-code-bounds-and-observed-durable-counts", "disposition": "selected"},
+      {"candidate": "benchmark-as-guarantee-distributed-scaling-second-writer-or-new-event-store", "disposition": "rejected-nondeterministic-or-out-of-scope"}
+    ],
+    "selected_mode": "read-only-global-ledger-replay-plus-static-capacity-bounds-and-live-queue-observation-with-zero-writes",
+    "source_ref": "git:9635d57ee34f1595dc7725d662896e9fc52f7427;internal:src/research_bridge/ledger.py@e2db89e4;profile:storage-coverage-v1",
+    "code_sha256": "e2db89e4e7c28270c4c91f5913d06e7096819b82f8f1d42bc76c28d945e9f474",
+    "license_spdx": "NOASSERTION", "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "deterministic-replay-equals-stored-projections", "replay-zero-writes",
+      "descriptor-gap-and-tamper-fail-closed", "restart-WAIT_AUTHORITY",
+      "fault-before-and-after-every-feedback-transition-no-second-bundle",
+      "single-writer-concurrency", "capacity-bounds-and-utilization-freeze"
+    ],
+    "canonical_owner": "bridge-ledger-agent-1-with-agent-5-recovery-and-capacity-assurance",
+    "rollback": "Revert additive read-only replay and capacity report APIs; no schema, event, projection or runtime migration is required."
+  },
+  "integrity": {"payload_sha256": "2c4cc00621273b8f35e68a9bd6e468e61ab9d30eb7b4de6304599df1e6d758c3", "parent_refs": [
+    "git:9635d57ee34f1595dc7725d662896e9fc52f7427",
+    "sha256:13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "profile:storage-coverage-v1", "integration:s08-atomic-feedback"
+  ]}
+}
