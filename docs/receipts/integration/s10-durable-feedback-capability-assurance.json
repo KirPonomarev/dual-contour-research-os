@@ -1,0 +1,32 @@
+{
+  "schema_id": "IntegrationReceipt", "schema_version": "1.0.0",
+  "object_id": "integration-s10-durable-feedback-capability-assurance-20260718", "issued_at": "2026-07-18T15:50:04Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s10-durable-feedback-capability-assurance", "agent_id": "agent-5",
+    "ownership_lease_ref": "stages/s10-durable-feedback-capability-assurance/ownership-lease.json",
+    "base_sha": "367c6ffe11c94bd3366753942fbf763ccfe804c6",
+    "head_sha": "b770c08362beaa7df7b1216a4a3340dc2bf0098e",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "tests/test_s10_durable_feedback_capability.py",
+      "stages/s10-durable-feedback-capability-assurance/stage-envelope.json",
+      "stages/s10-durable-feedback-capability-assurance/ownership-lease.json"
+    ],
+    "audit_results": {
+      "contract_gate": "green", "privacy_secret_scan": "green", "source_mutation": false,
+      "focused_tests": 20, "full_core_tests": 551, "stage0b_tests": 25,
+      "exact_static_reproduction": "green", "bound_dimensions_tested": 6,
+      "expiry_boundaries_tested": 2, "overclaim_mutations_rejected": 4,
+      "required_probe_omission_rejected": "green", "cross_capability_issuance_rejected": "green",
+      "integration_evidence_subject_bound": "green", "authority_or_provider_overclaim": false
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29650750161",
+    "integration_commit_sha": "ffc7e3073f8f240504039021ad6cb6aa333a09ba"
+  },
+  "integrity": {"payload_sha256": "ba6a59c653ebe15f421a9727378af1fdc88267f87f781e4ed477c4ea4b2552be", "parent_refs": [
+    "git:b770c08362beaa7df7b1216a4a3340dc2bf0098e", "git:ffc7e3073f8f240504039021ad6cb6aa333a09ba",
+    "ci:29650750161", "git:367c6ffe11c94bd3366753942fbf763ccfe804c6"
+  ]}
+}
