@@ -288,6 +288,8 @@ def _validate_payload(payload: object) -> dict[str, object]:
     proof_basis = value["proof_basis"]
     if not isinstance(proof_basis, list) or not proof_basis or any(not isinstance(item, Mapping) or not item for item in proof_basis):
         raise CapabilityProofError("proof_basis must contain evidence objects")
+    if capability_id == "OPERATIONAL_SELF_MODEL":
+        _reject_anthropomorphic_overclaim(proof_basis)
     for name in ("code_sha256", "config_sha256", "policy_sha256", "schema_sha256"):
         _sha256(name, value[name])
     for name in (
@@ -322,6 +324,28 @@ def canonical_json_sha256(value: object) -> str:
     except (TypeError, ValueError, UnicodeError) as exc:
         raise CapabilityProofError("capability proof contains non-canonical JSON data") from exc
     return hashlib.sha256(encoded).hexdigest()
+
+
+def _reject_anthropomorphic_overclaim(value: object) -> None:
+    forbidden_keys = {
+        "consciousness", "sentience", "general_self_awareness", "human_equivalence",
+        "self_granted_authority", "autonomous_canonical_authority",
+    }
+    forbidden_claims = (
+        "is conscious", "is sentient", "general self-awareness", "human-equivalent",
+        "grants itself authority", "autonomous canonical authority",
+    )
+    if isinstance(value, Mapping):
+        for key, item in value.items():
+            normalized = str(key).strip().lower().replace("-", "_").replace(" ", "_")
+            if normalized in forbidden_keys:
+                raise CapabilityProofError("operational self-model proof contains an anthropomorphic or authority claim")
+            _reject_anthropomorphic_overclaim(item)
+    elif isinstance(value, (list, tuple)):
+        for item in value:
+            _reject_anthropomorphic_overclaim(item)
+    elif isinstance(value, str) and any(claim in value.lower() for claim in forbidden_claims):
+        raise CapabilityProofError("operational self-model proof contains an anthropomorphic or authority claim")
 
 
 def _exact(value: object, keys: frozenset[str], label: str) -> dict[str, object]:
