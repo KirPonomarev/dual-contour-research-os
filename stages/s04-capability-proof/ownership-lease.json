@@ -1,0 +1,18 @@
+{
+  "lease_id": "lease-s04-capability-proof-agent-0",
+  "stage_id": "s04-capability-proof",
+  "agent_id": "agent-0",
+  "base_sha": "ca7f31b6ebce575af818f34209a2613835efd3e7",
+  "branch": "codex/bridge-a0-s04-capability-proof",
+  "issued_at": "2026-07-18T14:05:00Z",
+  "expires_at": "2026-07-19T14:05:00Z",
+  "write_set": [
+    "tools/capability_proof.py",
+    "docs/receipts/capability/e1a-discovery-admission-fixture.json",
+    "docs/receipts/reuse/s04-capability-proof.json",
+    "stages/s04-capability-proof/stage-envelope.json",
+    "stages/s04-capability-proof/ownership-lease.json"
+  ],
+  "exclusive": true,
+  "revoked": false
+}
