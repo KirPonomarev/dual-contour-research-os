@@ -1,0 +1,30 @@
+{
+  "schema_id": "IntegrationReceipt", "schema_version": "1.0.0",
+  "object_id": "integration-s05-db-v2-global-order-20260718", "issued_at": "2026-07-18T14:31:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s05-db-v2-global-order", "agent_id": "agent-1",
+    "ownership_lease_ref": "stages/s05-db-v2-global-order/ownership-lease.json",
+    "base_sha": "b97a465b6d3f4789b1bed8ce4ec7112db1c945be",
+    "head_sha": "1b33ccedd3f2f354cfab7cc76490d8e9ca717f9a",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "src/research_bridge/ledger.py", "stages/s05-db-v2-global-order/stage-envelope.json",
+      "stages/s05-db-v2-global-order/ownership-lease.json"
+    ],
+    "audit_results": {
+      "contract_gate": "green", "privacy_secret_scan": "green", "source_mutation": true,
+      "focused_tests": 40, "full_core_tests": 516, "stage0b_tests": 25,
+      "schema_version": 2, "migration_atomic": "green", "bundle_atomic": "green",
+      "ordering_model": "single-bridge-global-sequence", "second_event_ledger": false,
+      "D2_D3_persisted": false, "canonical_scientific_authority": "DENIED"
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29648108170",
+    "integration_commit_sha": "f5fe87671749ad311499ebe05742b0dd1f90bbe6"
+  },
+  "integrity": {"payload_sha256": "80150fb953329bd7dd3a4e3b348c3640cbf54927f8a3eecebc8b1e1949b2313f", "parent_refs": [
+    "git:1b33ccedd3f2f354cfab7cc76490d8e9ca717f9a", "git:f5fe87671749ad311499ebe05742b0dd1f90bbe6",
+    "ci:29648108170", "reuse:14967e2fa75b0454e019f94d81625694dab590884b5a3ceada74627b6ccb4542"
+  ]}
+}
