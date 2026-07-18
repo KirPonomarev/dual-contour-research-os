@@ -1,0 +1,17 @@
+{
+  "lease_id": "lease-s01-e1a-admission-complete-agent-1-20260718",
+  "stage_id": "s01-e1a-admission-complete",
+  "agent_id": "agent-1",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-18T13:07:00Z",
+  "expires_at": "2026-07-19T01:07:00Z",
+  "base_sha": "f48ea155961320b83d4c27799c9587d1809b14d9",
+  "branch": "codex/bridge-a1-s01-e1a-admission-complete",
+  "worktree": "/Volumes/Work/dual-contour-research-os-s01-e1a-complete",
+  "write_set": [
+    "src/research_bridge/admission.py",
+    "tests/test_a1_admission_fixture.py"
+  ],
+  "delegation_allowed": false,
+  "state": "active"
+}

@@ -1,0 +1,76 @@
+{
+  "stage_id": "s01-e1a-admission-complete",
+  "agent_id": "agent-1",
+  "objective": "Add direct focused acceptance coverage for the frozen E1A admission fixture, repair only evidence-backed defects, and return the existing candidate for Agent 0 integration.",
+  "executable_blocker": "The pushed E1A implementation has green legacy tests and CI but no focused tests importing or exercising A1AdmissionKernel, MaterialityResult, A1AdmissionSnapshot, or A1AdmissionDecision.",
+  "base_sha": "f48ea155961320b83d4c27799c9587d1809b14d9",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "a1_contract_sha256": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+  "branch": "codex/bridge-a1-s01-e1a-admission-complete",
+  "worktree": "/Volumes/Work/dual-contour-research-os-s01-e1a-complete",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "contracts/catalog.json",
+    "contracts/a1/v1/catalog.json",
+    "contracts/a1/v1/*.schema.json",
+    "contracts/a1/v1/profiles/*.json",
+    "docs/receipts/A1_CONTRACTS_FROZEN.json",
+    "docs/receipts/reuse/e1a-discovery-admission.json",
+    "src/research_bridge/admission.py",
+    "tests/test_a1_admission_fixture.py"
+  ],
+  "write_set": [
+    "src/research_bridge/admission.py",
+    "tests/test_a1_admission_fixture.py"
+  ],
+  "forbidden_scope": [
+    "frozen-contract-or-profile-edit",
+    "canonical-doc-edit",
+    "root-config-ci-lockfile-or-migration-edit",
+    "ledger-or-storage-write",
+    "model-api-call",
+    "external-dependency-adoption",
+    "domain-scientific-contract-issuance",
+    "execution-permit-issuance",
+    "canonical-mutation",
+    "live-trading",
+    "live-security-execution",
+    "deployment"
+  ],
+  "dependency_hashes": {
+    "core_contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "a1_contract_catalog": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+    "reuse_decision": "8cd39889d770104bf5900eff58c177cb45fb6adb5dbc9516d38d4441358c9604",
+    "candidate_head": "f48ea155961320b83d4c27799c9587d1809b14d9",
+    "external_dependencies": "none"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m compileall -q src/research_bridge/admission.py tests/test_a1_admission_fixture.py",
+    "python3 -m unittest tests.test_a1_admission_fixture",
+    "python3 -m unittest discover -s tests -p test_stage1_admission.py",
+    "python3 -m unittest discover -s tests -p test_stage1_assurance.py",
+    "make test",
+    "git diff --check",
+    "public privacy and secret scan over exact write-set"
+  ],
+  "risk_class": "a1-deterministic-admission-focused-assurance",
+  "stop_conditions": [
+    "contract-or-profile-drift",
+    "unknown-field-accepted",
+    "collector-controls-trusted-field",
+    "non-material-path-consumes-model-call",
+    "same-frozen-inputs-produce-different-receipt",
+    "admission-grants-execution-authority",
+    "private-data-detected",
+    "write-set-collision",
+    "external-dependency-needed",
+    "deterministic-mismatch"
+  ],
+  "expected_receipt": "docs/receipts/integration/s01-e1a-admission-complete.json",
+  "rollback": "Agent 0 reverts the scoped S01 commit and leaves the unintegrated f48ea155 candidate branch intact.",
+  "commit_authority": "one-or-more-scoped-worker-commits-with-plan-trailers",
+  "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent0_audit", "blocked_validation_failed"]
+}
