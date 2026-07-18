@@ -1,0 +1,22 @@
+{
+  "stage_id": "s27-memory-governance",
+  "agent_id": "agent-0",
+  "objective": "Freeze scoped memory-on/off uplift measurement, deterministic full replay binding, calibration collection and bounded evaluation capacity without scientific or authority claims.",
+  "executable_blocker": "S23 exposes measurable memory twins and S09 exposes full replay, but no frozen policy determines when uplift is scoped, not established or parked under capacity.",
+  "base_sha": "a33fb840c2d6a21424a7d40edc2fdeea2a66525a",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a0-s27-memory-governance",
+  "worktree": "/private/tmp/dcr-s27-memory-governance",
+  "read_set": ["src/research_bridge/evolution.py", "src/research_bridge/ledger.py", "tests/test_s23_knowledge_fabric.py", "tests/test_s09_feedback_replay_capacity.py"],
+  "write_set": ["provenance/memory-uplift-replay-capacity-v1.json", "docs/receipts/reuse/s27-memory-uplift-replay-capacity.json", "stages/s27-memory-governance/stage-envelope.json", "stages/s27-memory-governance/ownership-lease.json"],
+  "forbidden_scope": ["contract-source-test-root-CI-or-lockfile-edit", "new-store-service-queue-scheduler-or-infrastructure-scale", "raw-private-domain-or-holdout-payload", "learned-calibrated-scientific-truth-or-authority-claim", "canonical-live-deploy-publication-or-model-call"],
+  "dependency_hashes": {"base_main": "a33fb840c2d6a21424a7d40edc2fdeea2a66525a", "memory_profile": "0a02b65ff5db728bcf75c7368244c9d2071e266055d91519437fdc5316825393", "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50", "external_dependencies": "none"},
+  "acceptance_commands": ["make contracts", "profile and reuse integrity", "Agent-1 implementation", "Agent-5 hostile assurance", "make test", "git diff --check"],
+  "risk_class": "high-goodhart-underpowered-uplift-replay-integrity-and-capacity",
+  "stop_conditions": ["underpowered-positive-claim", "replay-mismatch-accepted", "capacity-bypass-or-auto-scale", "truth-authority-or-durable-write", "new-service-or-dependency"],
+  "expected_receipt": "docs/receipts/integration/s27-memory-governance.json",
+  "rollback": "Remove S27 additive policy, reuse receipt and stage metadata; existing S23/S09 behavior remains unchanged.",
+  "commit_authority": "one-scoped-agent-0-commit",
+  "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent1_s27_memory-evaluation", "blocked_validation_failed"]
+}
