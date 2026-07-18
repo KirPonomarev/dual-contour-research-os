@@ -347,11 +347,30 @@ class ModelCallBroker:
             request_sha256=request_sha256,
             event_at=timestamp,
         )
-        self._append(
-            proposed,
-            idempotency_key=f"{spec.idempotency_key}:proposed",
-            event_at=timestamp,
-        )
+        existing: ModelCallTransitionRecord | None = None
+        try:
+            existing = self._ledger.model_call_state(call_id)
+        except LedgerError:
+            try:
+                self._append(
+                    proposed,
+                    idempotency_key=f"{spec.idempotency_key}:proposed",
+                    event_at=timestamp,
+                )
+            except ModelBrokerError:
+                # A concurrent identical prepare may have durably won after
+                # our state read. Re-read and prove equivalence below.
+                try:
+                    existing = self._ledger.model_call_state(call_id)
+                except LedgerError as exc:
+                    raise ModelBrokerError(
+                        "durable model-call preparation is unavailable"
+                    ) from exc
+        if existing is not None:
+            self._assert_same_preparation(existing.snapshot, proposed)
+            if existing.snapshot["state"] != "PROPOSED":
+                return _handle(existing)
+            proposed = dict(existing.snapshot)
         reserved = {**proposed, "previous_state": "PROPOSED", "state": "RESERVED", "reserved_at": timestamp}
         record = self._append(
             reserved,
@@ -359,6 +378,22 @@ class ModelCallBroker:
             event_at=timestamp,
         )
         return _handle(record)
+
+    @staticmethod
+    def _assert_same_preparation(
+        current: Mapping[str, object], proposed: Mapping[str, object]
+    ) -> None:
+        immutable_fields = {
+            "call_id", "request_sha256", "registry_sha256", "binding_revision",
+            "role", "model_binding", "classification", "budget_policy_ref",
+            "budget_scope_ref", "max_active_calls", "max_tokens",
+            "max_cost_units", "max_reserved_tokens", "max_reserved_cost_units",
+            "expires_at", "auto_retry",
+        }
+        if any(current[field] != proposed[field] for field in immutable_fields):
+            raise ModelBrokerError(
+                "model call idempotency key was reused with different preparation"
+            )
 
     def execute(
         self,
