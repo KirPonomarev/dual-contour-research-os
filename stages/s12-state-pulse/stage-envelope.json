@@ -1,0 +1,30 @@
+{
+  "stage_id": "s12-state-pulse", "agent_id": "agent-5",
+  "objective": "Separate durable OrganismState from read-only live PulseSample with explicit lifecycle, freshness, queue, proof and environment health semantics.",
+  "executable_blocker": "S11 declares topology but does not yet project durable lifecycle or prevent a live health sample from showing false GREEN on stale proof, environment mismatch or a stuck queue.",
+  "base_sha": "74a7d3418cfca5468a380e282ce6b08c94640d79",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a5-s12-state-pulse",
+  "worktree": "/Volumes/Work/dual-contour-research-os-s12-state-pulse",
+  "read_set": ["src/research_bridge/organism.py", "src/research_bridge/ledger.py", "tools/capability_proof.py", "contracts/a1/v1/profiles/environment_compatibility_v1.json", "ops/organism/**"],
+  "write_set": [
+    "src/research_bridge/organism.py", "ops/organism/pulse-policy.json",
+    "tests/test_s12_state_pulse.py", "stages/s12-state-pulse/stage-envelope.json",
+    "stages/s12-state-pulse/ownership-lease.json"
+  ],
+  "forbidden_scope": ["contract-edit", "ledger-edit", "new-table-or-writer", "persist-live-pulse", "network-or-model-call", "runtime-mutation", "provider-proof", "domain-application", "authority-grant", "canonical-or-live-action", "deployment"],
+  "dependency_hashes": {
+    "core_contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "a1_contract_catalog": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+    "ownership_registry": "862994bf57656148e5a75eece9686725efb733836567149baa23517e3f6421b1",
+    "reuse_receipt_payload": "c96a1e389427e609d122dd14282a3aad21a6b6c3e0e9fec8a06f057f2cb395c9",
+    "external_dependencies": "none"
+  },
+  "acceptance_commands": ["make contracts", "python3 -m unittest tests.test_s12_state_pulse", "same-input-same-ID-and-zero-write", "WAIT_AUTHORITY-restart", "AI_OFF-core-operational", "stale-proof-no-GREEN", "queue-yellow-red", "git diff --check"],
+  "risk_class": "high-false-health-or-self-observation-side-effect",
+  "stop_conditions": ["pulse-mutates-state", "stale-or-mismatched-proof-green", "WAIT_DATA-or-REJECTED-misreported", "restart-loses-WAIT_AUTHORITY", "AI_OFF-breaks-core", "authority-overclaim"],
+  "expected_receipt": "docs/receipts/integration/s12-state-pulse.json",
+  "rollback": "Remove additive state/pulse projection, versioned pulse policy and focused tests; S11 manifest and durable ledger remain unchanged.",
+  "commit_authority": "one-scoped-agent-5-commit", "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent0_integration", "blocked_validation_failed"]
+}

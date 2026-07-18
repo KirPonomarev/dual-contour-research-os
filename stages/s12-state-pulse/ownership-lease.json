@@ -1,0 +1,7 @@
+{
+  "lease_id": "lease-s12-state-pulse-agent-5", "stage_id": "s12-state-pulse", "agent_id": "agent-5",
+  "base_sha": "74a7d3418cfca5468a380e282ce6b08c94640d79", "branch": "codex/bridge-a5-s12-state-pulse",
+  "issued_at": "2026-07-18T16:13:00Z", "expires_at": "2026-07-19T16:13:00Z",
+  "write_set": ["src/research_bridge/organism.py", "ops/organism/pulse-policy.json", "tests/test_s12_state_pulse.py", "stages/s12-state-pulse/stage-envelope.json", "stages/s12-state-pulse/ownership-lease.json"],
+  "exclusive": true, "revoked": false
+}

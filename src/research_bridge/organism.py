@@ -9,6 +9,7 @@ versioned source documents.
 from __future__ import annotations
 
 from collections import Counter, defaultdict
+from datetime import datetime, timezone
 import hashlib
 import hmac
 import json
@@ -22,6 +23,7 @@ _SHA256_RE = re.compile(r"^[a-f0-9]{64}$")
 _GIT_REF_RE = re.compile(r"^git:[a-f0-9]{40}$")
 _ID_RE = re.compile(r"^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$")
 _REF_RE = re.compile(r"^[a-z][a-z0-9+.-]*:[^\s]{1,1024}$")
+_REASON_RE = re.compile(r"^[A-Z][A-Z0-9_]{0,127}$")
 _STAGE_ORDER = {
     "DECLARED": 0,
     "OBSERVED": 1,
@@ -64,10 +66,45 @@ _PAYLOAD_KEYS = frozenset(
         "edges", "evidence_stage_summary", "grants_authority",
     }
 )
+_LIFECYCLE_STATES = frozenset(
+    {"WAIT_DATA", "REJECTED", "GENERATING", "ADMITTED_A1", "RUNNING", "LEARNED", "WAIT_AUTHORITY", "PARKED"}
+)
+_STATE_FACT_KEYS = frozenset(
+    {
+        "ledger_sequence", "lifecycle_state", "state_ref", "reason_codes", "queue",
+        "shadow_taint", "ai_enabled", "source", "proof_refs", "environment_ref", "updated_at",
+    }
+)
+_STATE_PAYLOAD_KEYS = _STATE_FACT_KEYS | frozenset(
+    {"manifest_ref", "manifest_subject_ref", "projected_at", "grants_authority"}
+)
+_QUEUE_KEYS = frozenset({"runnable", "waiting_authority", "parked", "oldest_event_at"})
+_PULSE_POLICY_KEYS = frozenset(
+    {
+        "schema_id", "schema_version", "policy_id", "freshness_warn_seconds", "freshness_red_seconds",
+        "queue_warn_count", "queue_red_count", "queue_age_warn_seconds", "queue_age_red_seconds",
+    }
+)
+_PULSE_PAYLOAD_KEYS = frozenset(
+    {
+        "organism_state_ref", "manifest_ref", "policy_id", "policy_sha256", "policy_limits",
+        "sampled_at", "state_updated_at", "environment_ref", "lifecycle_state", "ai_enabled", "queue",
+        "state_age_seconds", "queue_age_seconds", "capability_assessments", "traffic_light", "health_state",
+        "reason_codes", "side_effects", "grants_authority",
+    }
+)
+_CAPABILITY_ASSESSMENT_KEYS = frozenset(
+    {"capability_id", "status", "environment_ref", "critical", "reason_codes", "proof_ref"}
+)
+_CAPABILITY_STATUSES = frozenset({"PASS_FOR_FROZEN_SCOPE", "FAILED", "INCONCLUSIVE", "STALE", "REVOKED"})
 
 
 class OrganismManifestError(RuntimeError):
     """A source document, topology, or manifest failed closed."""
+
+
+class OrganismStateError(OrganismManifestError):
+    """A durable state or read-only pulse sample failed closed."""
 
 
 def load_json_document(path: Path) -> dict[str, object]:
@@ -471,6 +508,584 @@ def _validate_cycle_bound(value: object, label: str) -> dict[str, object] | None
     return bound
 
 
+def project_organism_state(
+    facts: Mapping[str, object],
+    manifest: Mapping[str, object],
+    *,
+    projected_at: str,
+) -> Mapping[str, object]:
+    """Project immutable lifecycle state from already durable facts."""
+
+    manifest_value = validate_organism_manifest(manifest)
+    fact_value = _validate_state_facts(facts)
+    projected = _format_time(_parse_time(projected_at, "projected_at"))
+    if _parse_time(fact_value["updated_at"], "updated_at") > _parse_time(projected, "projected_at"):
+        raise OrganismStateError("durable state cannot be updated after projection")
+    payload = {
+        **fact_value,
+        "manifest_ref": manifest_value["object_id"],
+        "manifest_subject_ref": manifest_value["payload"]["subject_ref"],
+        "projected_at": projected,
+        "grants_authority": False,
+    }
+    digest = canonical_json_sha256(payload)
+    parents = sorted(
+        set(
+            [
+                str(payload["manifest_ref"]),
+                str(payload["manifest_subject_ref"]),
+                str(payload["state_ref"]),
+                *[str(ref) for ref in payload["proof_refs"]],
+            ]
+        )
+    )
+    document = {
+        "schema_id": "OrganismState",
+        "schema_version": "1.0.0",
+        "object_id": f"organism-state:{digest}",
+        "issued_at": projected,
+        "issuer": "deterministic-organism-state-projector",
+        "contour": "governance",
+        "classification": "D1_INTERNAL_SANITIZED",
+        "payload": payload,
+        "integrity": {
+            "profile_id": "core-json-sha256-v1",
+            "payload_sha256": digest,
+            "parent_refs": parents,
+        },
+    }
+    validate_organism_state(document)
+    return _freeze(document)
+
+
+def project_organism_state_from_ledger(
+    ledger: object,
+    manifest: Mapping[str, object],
+    *,
+    projected_at: str,
+    environment_ref: str,
+    ai_enabled: bool,
+) -> Mapping[str, object]:
+    """Derive state from existing read-only ledger APIs; never add a writer."""
+
+    for method in (
+        "event_count", "storage_coverage_manifest", "feedback_projection_coverage", "replay_feedback"
+    ):
+        if not callable(getattr(ledger, method, None)):
+            raise OrganismStateError(f"ledger lacks required read API: {method}")
+    before = ledger.event_count()
+    storage = ledger.storage_coverage_manifest()
+    feedback = ledger.feedback_projection_coverage()
+    replay = ledger.replay_feedback()
+    after = ledger.event_count()
+    if before != after or replay.side_effects is not False:
+        raise OrganismStateError("organism state observation attempted a durable write")
+    if storage["global_sequence_last"] != replay.ledger_sequence_last:
+        raise OrganismStateError("ledger coverage and replay sequence disagree")
+    environment = _reference(environment_ref, "environment_ref")
+    projected = _format_time(_parse_time(projected_at, "projected_at"))
+    if not feedback:
+        facts = {
+            "ledger_sequence": replay.ledger_sequence_last,
+            "lifecycle_state": "WAIT_DATA",
+            "state_ref": f"ledger:sequence-{replay.ledger_sequence_last}",
+            "reason_codes": ["NO_DURABLE_FEEDBACK"],
+            "queue": {"runnable": 0, "waiting_authority": 0, "parked": 0, "oldest_event_at": None},
+            "shadow_taint": "NONE",
+            "ai_enabled": ai_enabled,
+            "source": "DURABLE_LEDGER_REPLAY",
+            "proof_refs": [f"replay:{replay.replay_sha256}"],
+            "environment_ref": environment,
+            "updated_at": projected,
+        }
+        return project_organism_state(facts, manifest, projected_at=projected)
+
+    if set(feedback) != {"outcome_dispositions", "experiences", "idea_tree", "feedback_outbox"}:
+        raise OrganismStateError("durable feedback coverage is incomplete")
+    idea = _latest_projection_entry(feedback["idea_tree"], "idea_tree")
+    outbox = _latest_projection_entry(feedback["feedback_outbox"], "feedback_outbox")
+    outbox_entries = feedback["feedback_outbox"]["entries"]
+    if not isinstance(outbox_entries, Mapping):
+        raise OrganismStateError("feedback outbox entries are invalid")
+    queue = _queue_from_outbox(outbox_entries)
+    if outbox.get("status") == "RUNNABLE" and outbox.get("runnable_count") == 1:
+        lifecycle = "GENERATING"
+        reasons = ["DURABLE_RUNNABLE_TRIGGER"]
+    elif outbox.get("parked_gap_refs"):
+        lifecycle = "PARKED"
+        reasons = ["BOUNDED_GAP_PARKED"]
+    elif outbox.get("status") == "WAIT_AUTHORITY" and outbox.get("runnable_count") == 0:
+        lifecycle = "WAIT_AUTHORITY"
+        reasons = ["WAITING_HUMAN_AUTHORITY"]
+    else:
+        raise OrganismStateError("latest durable outbox state is inconsistent")
+    if idea.get("state") not in {"GENERATING", "WAIT_AUTHORITY"}:
+        raise OrganismStateError("latest durable idea state is outside the proven corridor")
+    if lifecycle == "GENERATING" and idea.get("state") != "GENERATING":
+        raise OrganismStateError("durable idea and outbox lifecycle disagree")
+    if lifecycle in {"WAIT_AUTHORITY", "PARKED"} and idea.get("state") != "WAIT_AUTHORITY":
+        raise OrganismStateError("durable terminal idea and outbox disagree")
+    facts = {
+        "ledger_sequence": replay.ledger_sequence_last,
+        "lifecycle_state": lifecycle,
+        "state_ref": idea["object_id"],
+        "reason_codes": reasons,
+        "queue": queue,
+        "shadow_taint": idea["shadow_taint"],
+        "ai_enabled": ai_enabled,
+        "source": "DURABLE_LEDGER_REPLAY",
+        "proof_refs": [f"replay:{replay.replay_sha256}"],
+        "environment_ref": environment,
+        "updated_at": idea["updated_at"],
+    }
+    return project_organism_state(facts, manifest, projected_at=projected)
+
+
+def validate_organism_state(state: Mapping[str, object]) -> dict[str, object]:
+    """Validate content identity and lifecycle semantics of durable state."""
+
+    document = _exact(state, _DOCUMENT_KEYS, "organism state")
+    if (
+        document["schema_id"] != "OrganismState"
+        or document["schema_version"] != "1.0.0"
+        or document["issuer"] != "deterministic-organism-state-projector"
+        or document["contour"] != "governance"
+        or document["classification"] != "D1_INTERNAL_SANITIZED"
+    ):
+        raise OrganismStateError("organism state identity is invalid")
+    issued = _format_time(_parse_time(document["issued_at"], "issued_at"))
+    payload = _validate_state_payload(document["payload"])
+    if payload["projected_at"] != issued:
+        raise OrganismStateError("organism state issuance and projection time differ")
+    digest = canonical_json_sha256(payload)
+    if document["object_id"] != f"organism-state:{digest}":
+        raise OrganismStateError("organism state object identity mismatch")
+    integrity = _exact(document["integrity"], frozenset({"profile_id", "payload_sha256", "parent_refs"}), "integrity")
+    if integrity["profile_id"] != "core-json-sha256-v1":
+        raise OrganismStateError("organism state integrity profile is invalid")
+    if not hmac.compare_digest(_sha256(integrity["payload_sha256"], "integrity.payload_sha256"), digest):
+        raise OrganismStateError("organism state payload integrity mismatch")
+    expected_parents = {
+        str(payload["manifest_ref"]), str(payload["manifest_subject_ref"]), str(payload["state_ref"]),
+        *[str(ref) for ref in payload["proof_refs"]],
+    }
+    if set(_string_array(integrity["parent_refs"], "integrity.parent_refs", allow_empty=False)) != expected_parents:
+        raise OrganismStateError("organism state parent refs mismatch")
+    return document
+
+
+def validate_pulse_policy(policy: Mapping[str, object]) -> dict[str, object]:
+    value = _exact(policy, _PULSE_POLICY_KEYS, "pulse policy")
+    if value["schema_id"] != "PulsePolicy" or value["schema_version"] != "1.0.0":
+        raise OrganismStateError("pulse policy schema is invalid")
+    _identifier(value["policy_id"], "policy_id")
+    for name in (
+        "freshness_warn_seconds", "freshness_red_seconds", "queue_warn_count", "queue_red_count",
+        "queue_age_warn_seconds", "queue_age_red_seconds",
+    ):
+        value[name] = _bounded_nonnegative(value[name], name, maximum=31_536_000)
+    for warn, red in (
+        ("freshness_warn_seconds", "freshness_red_seconds"),
+        ("queue_warn_count", "queue_red_count"),
+        ("queue_age_warn_seconds", "queue_age_red_seconds"),
+    ):
+        if value[warn] >= value[red]:
+            raise OrganismStateError(f"pulse policy requires {warn} < {red}")
+    return value
+
+
+def sample_pulse(
+    state: Mapping[str, object],
+    manifest: Mapping[str, object],
+    capability_assessments: Sequence[Mapping[str, object]],
+    policy: Mapping[str, object],
+    *,
+    sampled_at: str,
+) -> Mapping[str, object]:
+    """Create a deterministic, zero-write health sample separate from durable state."""
+
+    state_document = validate_organism_state(state)
+    manifest_document = validate_organism_manifest(manifest)
+    state_payload = state_document["payload"]
+    if (
+        state_payload["manifest_ref"] != manifest_document["object_id"]
+        or state_payload["manifest_subject_ref"] != manifest_document["payload"]["subject_ref"]
+    ):
+        raise OrganismStateError("pulse inputs bind different manifest identities")
+    policy_value = validate_pulse_policy(policy)
+    capabilities = _validate_capability_assessments(capability_assessments)
+    sample_time = _format_time(_parse_time(sampled_at, "sampled_at"))
+    limits = {
+        name: policy_value[name]
+        for name in (
+            "freshness_warn_seconds", "freshness_red_seconds", "queue_warn_count", "queue_red_count",
+            "queue_age_warn_seconds", "queue_age_red_seconds",
+        )
+    }
+    health = _derive_pulse_health(state_payload, capabilities, limits, sample_time)
+    payload = {
+        "organism_state_ref": state_document["object_id"],
+        "manifest_ref": manifest_document["object_id"],
+        "policy_id": policy_value["policy_id"],
+        "policy_sha256": canonical_json_sha256(policy_value),
+        "policy_limits": limits,
+        "sampled_at": sample_time,
+        "state_updated_at": state_payload["updated_at"],
+        "environment_ref": state_payload["environment_ref"],
+        "lifecycle_state": state_payload["lifecycle_state"],
+        "ai_enabled": state_payload["ai_enabled"],
+        "queue": state_payload["queue"],
+        "state_age_seconds": health["state_age_seconds"],
+        "queue_age_seconds": health["queue_age_seconds"],
+        "capability_assessments": capabilities,
+        "traffic_light": health["traffic_light"],
+        "health_state": health["health_state"],
+        "reason_codes": health["reason_codes"],
+        "side_effects": False,
+        "grants_authority": False,
+    }
+    digest = canonical_json_sha256(payload)
+    document = {
+        "schema_id": "PulseSample",
+        "schema_version": "1.0.0",
+        "object_id": f"pulse-sample:{digest}",
+        "issued_at": sample_time,
+        "issuer": "read-only-pulse-projector",
+        "contour": "governance",
+        "classification": "D1_INTERNAL_SANITIZED",
+        "payload": payload,
+        "integrity": {
+            "profile_id": "core-json-sha256-v1",
+            "payload_sha256": digest,
+            "parent_refs": sorted(
+                {
+                    str(payload["organism_state_ref"]), str(payload["manifest_ref"]),
+                    f"pulse-policy:sha256:{payload['policy_sha256']}",
+                    *[str(item["proof_ref"]) for item in capabilities],
+                }
+            ),
+        },
+    }
+    validate_pulse_sample(document)
+    return _freeze(document)
+
+
+def validate_pulse_sample(sample: Mapping[str, object]) -> dict[str, object]:
+    document = _exact(sample, _DOCUMENT_KEYS, "pulse sample")
+    if (
+        document["schema_id"] != "PulseSample"
+        or document["schema_version"] != "1.0.0"
+        or document["issuer"] != "read-only-pulse-projector"
+        or document["contour"] != "governance"
+        or document["classification"] != "D1_INTERNAL_SANITIZED"
+    ):
+        raise OrganismStateError("pulse sample identity is invalid")
+    issued = _format_time(_parse_time(document["issued_at"], "issued_at"))
+    payload = _exact(document["payload"], _PULSE_PAYLOAD_KEYS, "pulse payload")
+    for name in ("organism_state_ref", "manifest_ref"):
+        _reference(payload[name], name)
+    _identifier(payload["policy_id"], "policy_id")
+    _sha256(payload["policy_sha256"], "policy_sha256")
+    limits = _exact(
+        payload["policy_limits"],
+        frozenset(
+            {
+                "freshness_warn_seconds", "freshness_red_seconds", "queue_warn_count", "queue_red_count",
+                "queue_age_warn_seconds", "queue_age_red_seconds",
+            }
+        ),
+        "policy_limits",
+    )
+    embedded_policy = validate_pulse_policy(
+        {"schema_id": "PulsePolicy", "schema_version": "1.0.0", "policy_id": payload["policy_id"], **limits}
+    )
+    if payload["policy_sha256"] != canonical_json_sha256(embedded_policy):
+        raise OrganismStateError("pulse policy digest does not bind embedded limits")
+    if payload["sampled_at"] != issued:
+        raise OrganismStateError("pulse sampled_at differs from issuance")
+    _parse_time(payload["state_updated_at"], "state_updated_at")
+    _reference(payload["environment_ref"], "environment_ref")
+    if payload["lifecycle_state"] not in _LIFECYCLE_STATES or not isinstance(payload["ai_enabled"], bool):
+        raise OrganismStateError("pulse lifecycle or AI mode is invalid")
+    queue = _validate_queue(payload["queue"])
+    capabilities = _validate_capability_assessments(payload["capability_assessments"])
+    expected = _derive_pulse_health(
+        {
+            "updated_at": payload["state_updated_at"], "environment_ref": payload["environment_ref"],
+            "lifecycle_state": payload["lifecycle_state"], "ai_enabled": payload["ai_enabled"], "queue": queue,
+        },
+        capabilities,
+        limits,
+        issued,
+    )
+    for name in ("state_age_seconds", "queue_age_seconds", "traffic_light", "health_state", "reason_codes"):
+        if payload[name] != expected[name]:
+            raise OrganismStateError(f"pulse {name} is misleading")
+    if payload["side_effects"] is not False or payload["grants_authority"] is not False:
+        raise OrganismStateError("pulse cannot have side effects or grant authority")
+    digest = canonical_json_sha256(payload)
+    if document["object_id"] != f"pulse-sample:{digest}":
+        raise OrganismStateError("pulse object identity mismatch")
+    integrity = _exact(document["integrity"], frozenset({"profile_id", "payload_sha256", "parent_refs"}), "integrity")
+    if integrity["profile_id"] != "core-json-sha256-v1":
+        raise OrganismStateError("pulse integrity profile is invalid")
+    if not hmac.compare_digest(_sha256(integrity["payload_sha256"], "integrity.payload_sha256"), digest):
+        raise OrganismStateError("pulse payload integrity mismatch")
+    expected_parents = {
+        str(payload["organism_state_ref"]), str(payload["manifest_ref"]),
+        f"pulse-policy:sha256:{payload['policy_sha256']}",
+        *[str(item["proof_ref"]) for item in capabilities],
+    }
+    if set(_string_array(integrity["parent_refs"], "integrity.parent_refs", allow_empty=False)) != expected_parents:
+        raise OrganismStateError("pulse parent refs mismatch")
+    return document
+
+
+def _validate_state_facts(facts: object) -> dict[str, object]:
+    value = _exact(facts, _STATE_FACT_KEYS, "organism state facts")
+    value["ledger_sequence"] = _bounded_nonnegative(value["ledger_sequence"], "ledger_sequence", maximum=9_007_199_254_740_991)
+    lifecycle = value["lifecycle_state"]
+    if lifecycle not in _LIFECYCLE_STATES:
+        raise OrganismStateError("organism lifecycle state is invalid")
+    _reference(value["state_ref"], "state_ref")
+    value["reason_codes"] = _reason_array(value["reason_codes"], "reason_codes", allow_empty=False)
+    value["queue"] = _validate_queue(value["queue"])
+    if value["shadow_taint"] not in {"NONE", "SHADOW_UNAPPLIED"}:
+        raise OrganismStateError("organism state shadow taint is invalid")
+    if not isinstance(value["ai_enabled"], bool):
+        raise OrganismStateError("organism AI mode must be boolean")
+    if value["source"] not in {"DURABLE_LEDGER_REPLAY", "FROZEN_CONTROLLER_SNAPSHOT"}:
+        raise OrganismStateError("organism state source is invalid")
+    value["proof_refs"] = _reference_array(value["proof_refs"], "proof_refs", allow_empty=False)
+    _reference(value["environment_ref"], "environment_ref")
+    value["updated_at"] = _format_time(_parse_time(value["updated_at"], "updated_at"))
+    _validate_lifecycle_queue(value)
+    return value
+
+
+def _validate_state_payload(payload: object) -> dict[str, object]:
+    value = _exact(payload, _STATE_PAYLOAD_KEYS, "organism state payload")
+    facts = _validate_state_facts({name: value[name] for name in _STATE_FACT_KEYS})
+    _reference(value["manifest_ref"], "manifest_ref")
+    _git_ref(value["manifest_subject_ref"], "manifest_subject_ref")
+    projected = _format_time(_parse_time(value["projected_at"], "projected_at"))
+    if _parse_time(facts["updated_at"], "updated_at") > _parse_time(projected, "projected_at"):
+        raise OrganismStateError("state update occurs after projection")
+    if value["grants_authority"] is not False:
+        raise OrganismStateError("organism state cannot grant authority")
+    return {**facts, "manifest_ref": value["manifest_ref"], "manifest_subject_ref": value["manifest_subject_ref"], "projected_at": projected, "grants_authority": False}
+
+
+def _validate_lifecycle_queue(value: Mapping[str, object]) -> None:
+    lifecycle = value["lifecycle_state"]
+    queue = value["queue"]
+    assert isinstance(queue, Mapping)
+    runnable = queue["runnable"]
+    waiting = queue["waiting_authority"]
+    parked = queue["parked"]
+    if lifecycle in {"WAIT_DATA", "REJECTED", "LEARNED"} and any((runnable, waiting, parked)):
+        raise OrganismStateError(f"{lifecycle} cannot claim queued work")
+    if lifecycle == "GENERATING" and runnable == 0:
+        raise OrganismStateError("GENERATING requires runnable work")
+    if lifecycle == "WAIT_AUTHORITY" and waiting == 0:
+        raise OrganismStateError("WAIT_AUTHORITY requires a durable authority wait")
+    if lifecycle == "PARKED" and parked == 0:
+        raise OrganismStateError("PARKED requires a durable parked item")
+    if value["ai_enabled"] is False and lifecycle in {"GENERATING", "ADMITTED_A1", "RUNNING"}:
+        raise OrganismStateError("AI_OFF cannot claim active autonomous work")
+    if lifecycle == "LEARNED" and (
+        value["shadow_taint"] != "NONE" or "DOMAIN_APPLIED" not in value["reason_codes"]
+    ):
+        raise OrganismStateError("LEARNED requires an applied domain outcome without shadow taint")
+
+
+def _validate_queue(value: object) -> dict[str, object]:
+    queue = _exact(value, _QUEUE_KEYS, "queue")
+    for name in ("runnable", "waiting_authority", "parked"):
+        queue[name] = _bounded_nonnegative(queue[name], f"queue.{name}", maximum=1_000_000)
+    total = sum(int(queue[name]) for name in ("runnable", "waiting_authority", "parked"))
+    if queue["oldest_event_at"] is None:
+        if total:
+            raise OrganismStateError("non-empty queue requires oldest_event_at")
+    else:
+        queue["oldest_event_at"] = _format_time(_parse_time(queue["oldest_event_at"], "queue.oldest_event_at"))
+        if total == 0:
+            raise OrganismStateError("empty queue cannot claim oldest_event_at")
+    return queue
+
+
+def _latest_projection_entry(projection: object, label: str) -> dict[str, object]:
+    value = _exact(projection, frozenset({"schema_id", "schema_version", "count", "latest_ref", "entries"}), label)
+    entries = value["entries"]
+    if not isinstance(entries, Mapping) or value["count"] != len(entries) or not entries:
+        raise OrganismStateError(f"{label} projection entries are invalid")
+    matches = [entry for entry in entries.values() if isinstance(entry, Mapping) and entry.get("object_id") == value["latest_ref"]]
+    if len(matches) != 1:
+        raise OrganismStateError(f"{label} latest_ref is not unique")
+    return _copy(matches[0])  # type: ignore[return-value]
+
+
+def _queue_from_outbox(entries: Mapping[str, object]) -> dict[str, object]:
+    runnable = waiting = parked = 0
+    event_times: list[str] = []
+    for raw in entries.values():
+        if not isinstance(raw, Mapping):
+            raise OrganismStateError("durable outbox record is invalid")
+        status = raw.get("status")
+        count = raw.get("runnable_count")
+        if status == "RUNNABLE" and count == 1:
+            runnable += 1
+        elif status == "WAIT_AUTHORITY" and count == 0:
+            waiting += 1
+        else:
+            raise OrganismStateError("durable outbox queue state is invalid")
+        parked_refs = raw.get("parked_gap_refs")
+        if not isinstance(parked_refs, (list, tuple)):
+            raise OrganismStateError("durable parked refs are invalid")
+        parked += len(parked_refs)
+        event_times.append(_format_time(_parse_time(raw.get("issued_at"), "outbox.issued_at")))
+    return {
+        "runnable": runnable,
+        "waiting_authority": waiting,
+        "parked": parked,
+        "oldest_event_at": min(event_times) if event_times else None,
+    }
+
+
+def _validate_capability_assessments(value: object) -> list[dict[str, object]]:
+    if not isinstance(value, (list, tuple)):
+        raise OrganismStateError("capability assessments must be an array")
+    result: list[dict[str, object]] = []
+    ids: set[str] = set()
+    for index, raw in enumerate(value):
+        item = _exact(raw, _CAPABILITY_ASSESSMENT_KEYS, f"capability_assessments[{index}]")
+        capability_id = _text(item["capability_id"], f"capability_assessments[{index}].capability_id")
+        if _REASON_RE.fullmatch(capability_id) is None or capability_id in ids:
+            raise OrganismStateError("capability IDs must be unique normalized constants")
+        ids.add(capability_id)
+        if item["status"] not in _CAPABILITY_STATUSES:
+            raise OrganismStateError("capability assessment status is invalid")
+        _reference(item["environment_ref"], f"capability_assessments[{index}].environment_ref")
+        if not isinstance(item["critical"], bool):
+            raise OrganismStateError("capability critical flag must be boolean")
+        item["reason_codes"] = _reason_array(
+            item["reason_codes"], f"capability_assessments[{index}].reason_codes", allow_empty=True
+        )
+        _reference(item["proof_ref"], f"capability_assessments[{index}].proof_ref")
+        result.append(item)
+    return sorted(result, key=lambda item: str(item["capability_id"]))
+
+
+def _derive_pulse_health(
+    state: Mapping[str, object],
+    capabilities: Sequence[Mapping[str, object]],
+    limits: Mapping[str, object],
+    sampled_at: str,
+) -> dict[str, object]:
+    sampled = _parse_time(sampled_at, "sampled_at")
+    updated = _parse_time(state["updated_at"], "state.updated_at")
+    if sampled < updated:
+        raise OrganismStateError("pulse cannot sample before durable state update")
+    state_age = int((sampled - updated).total_seconds())
+    queue = _validate_queue(state["queue"])
+    oldest = queue["oldest_event_at"]
+    queue_age = 0
+    if oldest is not None:
+        oldest_time = _parse_time(oldest, "queue.oldest_event_at")
+        if sampled < oldest_time:
+            raise OrganismStateError("pulse cannot sample before queued work exists")
+        queue_age = int((sampled - oldest_time).total_seconds())
+    severity = 0
+    reasons: set[str] = set()
+    lifecycle = state["lifecycle_state"]
+    if lifecycle == "WAIT_DATA":
+        reasons.add("WAIT_DATA_HEALTHY")
+    elif lifecycle == "REJECTED":
+        reasons.add("REJECTED_POLICY_HEALTHY")
+    elif lifecycle == "WAIT_AUTHORITY":
+        severity = 1
+        reasons.add("WAITING_HUMAN_AUTHORITY")
+    elif lifecycle == "PARKED":
+        severity = 1
+        reasons.add("BOUNDED_WORK_PARKED")
+    else:
+        reasons.add("ACTIVE_STATE_OBSERVED")
+    if state["ai_enabled"] is False:
+        reasons.add("AI_OFF_CORE_OPERATIONAL")
+    if not capabilities:
+        severity = max(severity, 1)
+        reasons.add("CAPABILITY_EVIDENCE_ABSENT")
+    for capability in capabilities:
+        if capability["status"] != "PASS_FOR_FROZEN_SCOPE":
+            severity = max(severity, 2 if capability["critical"] else 1)
+            reasons.add("CAPABILITY_NOT_CURRENT")
+        if capability["environment_ref"] != state["environment_ref"]:
+            severity = max(severity, 2 if capability["critical"] else 1)
+            reasons.add("ENVIRONMENT_COMPATIBILITY_MISMATCH")
+    if state_age >= limits["freshness_red_seconds"]:
+        severity = 2
+        reasons.add("STATE_STALE")
+    elif state_age >= limits["freshness_warn_seconds"]:
+        severity = max(severity, 1)
+        reasons.add("STATE_AGING")
+    queue_count = sum(int(queue[name]) for name in ("runnable", "waiting_authority", "parked"))
+    if queue_count >= limits["queue_red_count"] or queue_age >= limits["queue_age_red_seconds"]:
+        severity = 2
+        reasons.add("QUEUE_STUCK")
+    elif queue_count >= limits["queue_warn_count"] or queue_age >= limits["queue_age_warn_seconds"]:
+        severity = max(severity, 1)
+        reasons.add("QUEUE_PRESSURE")
+    traffic = ("GREEN", "YELLOW", "RED")[severity]
+    if severity == 2:
+        health = "UNHEALTHY"
+    elif severity == 1:
+        health = "WAIT_AUTHORITY" if lifecycle == "WAIT_AUTHORITY" else "PARKED" if lifecycle == "PARKED" else "DEGRADED"
+    elif state["ai_enabled"] is False:
+        health = "AI_OFF_CORE_OPERATIONAL"
+    elif lifecycle == "WAIT_DATA":
+        health = "HEALTHY_WAIT_DATA"
+    elif lifecycle == "REJECTED":
+        health = "HEALTHY_REJECTED"
+    else:
+        health = "HEALTHY_ACTIVE"
+    return {
+        "state_age_seconds": state_age,
+        "queue_age_seconds": queue_age,
+        "traffic_light": traffic,
+        "health_state": health,
+        "reason_codes": sorted(reasons),
+    }
+
+
+def _reason_array(value: object, label: str, *, allow_empty: bool) -> list[str]:
+    values = _string_array(value, label, allow_empty=allow_empty)
+    if any(_REASON_RE.fullmatch(item) is None for item in values):
+        raise OrganismStateError(f"{label} contains an invalid reason code")
+    return values
+
+
+def _bounded_nonnegative(value: object, label: str, *, maximum: int) -> int:
+    if not isinstance(value, int) or isinstance(value, bool) or not 0 <= value <= maximum:
+        raise OrganismStateError(f"{label} must be a bounded non-negative integer")
+    return value
+
+
+def _parse_time(value: object, label: str) -> datetime:
+    if not isinstance(value, str) or not value.endswith("Z"):
+        raise OrganismStateError(f"{label} must be RFC3339 UTC")
+    try:
+        parsed = datetime.fromisoformat(value[:-1] + "+00:00")
+    except ValueError as exc:
+        raise OrganismStateError(f"{label} must be RFC3339 UTC") from exc
+    if parsed.tzinfo is None or parsed.utcoffset() != timezone.utc.utcoffset(parsed):
+        raise OrganismStateError(f"{label} must be UTC")
+    return parsed.astimezone(timezone.utc)
+
+
+def _format_time(value: datetime) -> str:
+    return value.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
+
+
 def canonical_json_sha256(value: object) -> str:
     try:
         raw = json.dumps(
@@ -592,6 +1207,8 @@ def _freeze(value: object) -> object:
 
 
 __all__ = [
-    "OrganismManifestError", "build_manifest_from_files", "build_organism_manifest",
-    "validate_organism_manifest", "load_json_document", "canonical_json_sha256",
+    "OrganismManifestError", "OrganismStateError", "build_manifest_from_files", "build_organism_manifest",
+    "validate_organism_manifest", "project_organism_state", "project_organism_state_from_ledger",
+    "validate_organism_state", "validate_pulse_policy", "sample_pulse", "validate_pulse_sample",
+    "load_json_document", "canonical_json_sha256",
 ]
