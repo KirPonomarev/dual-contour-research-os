@@ -1,0 +1,34 @@
+{
+  "profile_id": "model-council-tournament-v1",
+  "schema_version": "1.0.0",
+  "status": "frozen-advisory-only",
+  "max_candidates": 4,
+  "max_total_model_calls": 4,
+  "proposer_role": "RESEARCH_WORKER",
+  "evaluator_roles": ["CRITIC_PRIMARY", "CRITIC_DEEP", "CHIEF_SCIENTIST"],
+  "rubric": {
+    "score_min": 0,
+    "score_max": 100,
+    "criteria": [
+      {"name": "falsifiability", "weight": 35},
+      {"name": "evidence_quality", "weight": 30},
+      {"name": "novelty", "weight": 15},
+      {"name": "cost_risk_fit", "weight": 20}
+    ],
+    "verdicts": ["SUPPORT", "REJECT", "UNCERTAIN"]
+  },
+  "invariants": {
+    "routing_plan_assigns_evaluators": true,
+    "proposer_cannot_select_or_act_as_evaluator": true,
+    "one_evaluator_call_scores_all_candidates": true,
+    "missing_assigned_evaluation_prevents_ranking": true,
+    "dissent_is_preserved": true,
+    "consensus_is_not_evidence": true,
+    "advisory_ranking_is_not_evidence": true,
+    "model_outputs_are_untrusted": true,
+    "independence_is_not_inferred_from_agreement": true,
+    "council_cannot_admit_promote_issue_permit_or_mutate_canonical_state": true,
+    "allowed_input_classes": ["D0", "D1"],
+    "forbidden_input_classes": ["D2", "D3", "sealed-holdout"]
+  }
+}

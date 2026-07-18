@@ -32,6 +32,11 @@ __all__ = [
     "ModelCallSpec",
     "ModelCorrelationSnapshot",
     "ModelCouncilPlan",
+    "ModelCouncilCandidate",
+    "ModelCouncilEvaluation",
+    "ModelCouncilScore",
+    "ModelCouncilTournament",
+    "ModelCouncilTournamentResult",
     "ModelErrorObservation",
     "RawModelProviderAdapter",
     "ModelProviderAdapter",
@@ -129,6 +134,40 @@ _ROUTING_INVARIANT_KEYS = frozenset(
         "credentials_or_endpoints_present",
     }
 )
+_TOURNAMENT_PROFILE_KEYS = frozenset(
+    {
+        "profile_id", "schema_version", "status", "max_candidates",
+        "max_total_model_calls", "proposer_role", "evaluator_roles",
+        "rubric", "invariants",
+    }
+)
+_TOURNAMENT_RUBRIC_KEYS = frozenset(
+    {"score_min", "score_max", "criteria", "verdicts"}
+)
+_TOURNAMENT_CRITERION_KEYS = frozenset({"name", "weight"})
+_TOURNAMENT_INVARIANT_KEYS = frozenset(
+    {
+        "routing_plan_assigns_evaluators",
+        "proposer_cannot_select_or_act_as_evaluator",
+        "one_evaluator_call_scores_all_candidates",
+        "missing_assigned_evaluation_prevents_ranking",
+        "dissent_is_preserved",
+        "consensus_is_not_evidence",
+        "advisory_ranking_is_not_evidence",
+        "model_outputs_are_untrusted",
+        "independence_is_not_inferred_from_agreement",
+        "council_cannot_admit_promote_issue_permit_or_mutate_canonical_state",
+        "allowed_input_classes",
+        "forbidden_input_classes",
+    }
+)
+_TOURNAMENT_CRITERIA = (
+    ("falsifiability", 35),
+    ("evidence_quality", 30),
+    ("novelty", 15),
+    ("cost_risk_fit", 20),
+)
+_TOURNAMENT_VERDICTS = frozenset({"SUPPORT", "REJECT", "UNCERTAIN"})
 
 
 class ModelBrokerError(RuntimeError):
@@ -226,6 +265,72 @@ class ModelCouncilPlan:
     provenance_groups: tuple[str, ...]
     independence_status: str
     consensus_is_evidence: bool
+
+
+@dataclass(frozen=True, slots=True)
+class ModelCouncilCandidate:
+    candidate_id: str
+    proposal_ref: str
+    proposer_role: str
+
+    def __post_init__(self) -> None:
+        _portable_ref("council candidate_id", self.candidate_id)
+        _portable_ref("council proposal_ref", self.proposal_ref)
+        _text("council proposer_role", self.proposer_role, maximum=128)
+
+
+@dataclass(frozen=True, slots=True)
+class ModelCouncilScore:
+    candidate_id: str
+    criterion_scores: tuple[tuple[str, int], ...]
+    verdict: str
+
+    def __post_init__(self) -> None:
+        _portable_ref("council score candidate_id", self.candidate_id)
+        if not isinstance(self.criterion_scores, tuple) or any(
+            not isinstance(item, tuple) or len(item) != 2
+            for item in self.criterion_scores
+        ):
+            raise ModelBrokerError("council criterion scores must be exact tuples")
+        _text("council verdict", self.verdict, maximum=32)
+
+
+@dataclass(frozen=True, slots=True)
+class ModelCouncilEvaluation:
+    evaluator_role: str
+    model_binding: str
+    response_ref: str
+    scores: tuple[ModelCouncilScore, ...]
+
+    def __post_init__(self) -> None:
+        _text("council evaluator_role", self.evaluator_role, maximum=128)
+        _text("council evaluator binding", self.model_binding, maximum=256)
+        _portable_ref("council response_ref", self.response_ref)
+        if not isinstance(self.scores, tuple) or any(
+            not isinstance(item, ModelCouncilScore) for item in self.scores
+        ):
+            raise ModelBrokerError("council evaluation scores must be a tuple")
+
+
+@dataclass(frozen=True, slots=True)
+class ModelCouncilTournamentResult:
+    status: str
+    tier: str
+    candidate_order: tuple[str, ...]
+    weighted_scores: tuple[tuple[str, int], ...]
+    evaluator_roles: tuple[str, ...]
+    missing_evaluator_roles: tuple[str, ...]
+    dissent_candidate_ids: tuple[str, ...]
+    unanimous_candidate_ids: tuple[str, ...]
+    planned_call_count: int
+    evaluation_call_count: int
+    max_total_model_calls: int
+    independence_status: str
+    consensus_is_evidence: bool
+    ranking_is_evidence: bool
+    grants_authority: bool
+    profile_sha256: str
+    reason_codes: tuple[str, ...]
 
 
 @dataclass(frozen=True, slots=True)
@@ -984,6 +1089,314 @@ class ModelProviderRouting:
         ):
             raise ModelBrokerError("disabled provider binding cannot become available")
         return values
+
+
+class ModelCouncilTournament:
+    """Deterministically aggregate policy-assigned critiques as advice only."""
+
+    def __init__(
+        self,
+        profile_path: str | Path,
+        *,
+        expected_profile_sha256: str,
+    ) -> None:
+        expected = _sha256(
+            "expected council tournament profile sha256",
+            expected_profile_sha256,
+        )
+        try:
+            raw = Path(profile_path).read_bytes()
+        except OSError as exc:
+            raise ModelBrokerError("council tournament profile is unavailable") from exc
+        actual = hashlib.sha256(raw).hexdigest()
+        if actual != expected:
+            raise ModelBrokerError("council tournament profile digest mismatch")
+        try:
+            profile = json.loads(raw, object_pairs_hook=_strict_object)
+        except (UnicodeDecodeError, json.JSONDecodeError, ModelBrokerError) as exc:
+            raise ModelBrokerError("council tournament profile is not strict JSON") from exc
+        value = _exact(profile, _TOURNAMENT_PROFILE_KEYS, "council tournament profile")
+        if (
+            value["profile_id"] != "model-council-tournament-v1"
+            or value["schema_version"] != "1.0.0"
+            or value["status"] != "frozen-advisory-only"
+            or value["max_candidates"] != 4
+            or value["max_total_model_calls"] != 4
+            or value["proposer_role"] != "RESEARCH_WORKER"
+            or value["evaluator_roles"]
+            != ["CRITIC_PRIMARY", "CRITIC_DEEP", "CHIEF_SCIENTIST"]
+        ):
+            raise ModelBrokerError("council tournament profile identity drifted")
+        rubric = _exact(
+            value["rubric"], _TOURNAMENT_RUBRIC_KEYS, "council tournament rubric"
+        )
+        criteria = rubric["criteria"]
+        if not isinstance(criteria, list):
+            raise ModelBrokerError("council tournament criteria must be a list")
+        normalized_criteria = tuple(
+            (
+                _text(
+                    "council tournament criterion name",
+                    _exact(item, _TOURNAMENT_CRITERION_KEYS, "council criterion")["name"],
+                    maximum=64,
+                ),
+                _positive(
+                    "council tournament criterion weight",
+                    _exact(item, _TOURNAMENT_CRITERION_KEYS, "council criterion")["weight"],
+                ),
+            )
+            for item in criteria
+        )
+        if (
+            rubric["score_min"] != 0
+            or rubric["score_max"] != 100
+            or normalized_criteria != _TOURNAMENT_CRITERIA
+            or sum(weight for _, weight in normalized_criteria) != 100
+            or rubric["verdicts"] != ["SUPPORT", "REJECT", "UNCERTAIN"]
+        ):
+            raise ModelBrokerError("council tournament rubric drifted")
+        invariants = _exact(
+            value["invariants"],
+            _TOURNAMENT_INVARIANT_KEYS,
+            "council tournament invariants",
+        )
+        if (
+            invariants["allowed_input_classes"] != ["D0", "D1"]
+            or invariants["forbidden_input_classes"]
+            != ["D2", "D3", "sealed-holdout"]
+            or any(
+                invariants[name] is not True
+                for name in _TOURNAMENT_INVARIANT_KEYS
+                - {"allowed_input_classes", "forbidden_input_classes"}
+            )
+        ):
+            raise ModelBrokerError("council tournament invariant drifted")
+        self._profile_sha256 = actual
+        self._max_candidates = 4
+        self._max_calls = 4
+        self._proposer_role = "RESEARCH_WORKER"
+        self._evaluator_roles = (
+            "CRITIC_PRIMARY",
+            "CRITIC_DEEP",
+            "CHIEF_SCIENTIST",
+        )
+        self._criteria = _TOURNAMENT_CRITERIA
+
+    @property
+    def profile_sha256(self) -> str:
+        return self._profile_sha256
+
+    def evaluate(
+        self,
+        plan: ModelCouncilPlan,
+        candidates: tuple[ModelCouncilCandidate, ...],
+        evaluations: tuple[ModelCouncilEvaluation, ...],
+    ) -> ModelCouncilTournamentResult:
+        if not isinstance(plan, ModelCouncilPlan):
+            raise ModelBrokerError("council tournament requires ModelCouncilPlan")
+        if (
+            plan.max_calls != self._max_calls
+            or plan.call_count > self._max_calls
+            or plan.consensus_is_evidence
+            or plan.independence_status != "INDEPENDENCE_NOT_ESTABLISHED"
+        ):
+            raise ModelBrokerError("council plan widens frozen tournament semantics")
+        if not isinstance(candidates, tuple) or any(
+            not isinstance(candidate, ModelCouncilCandidate) for candidate in candidates
+        ):
+            raise ModelBrokerError("council candidates must be a tuple")
+        if not candidates or len(candidates) > self._max_candidates:
+            raise ModelBrokerError("council candidate cap violated")
+        candidate_ids = tuple(candidate.candidate_id for candidate in candidates)
+        if len(set(candidate_ids)) != len(candidate_ids):
+            raise ModelBrokerError("council candidates contain duplicate identity")
+        if any(
+            candidate.proposer_role != self._proposer_role for candidate in candidates
+        ):
+            raise ModelBrokerError("council candidate proposer role is not policy-assigned")
+        if not isinstance(evaluations, tuple) or any(
+            not isinstance(evaluation, ModelCouncilEvaluation)
+            for evaluation in evaluations
+        ):
+            raise ModelBrokerError("council evaluations must be a tuple")
+        if not plan.decisions or plan.decisions[0].role != self._proposer_role:
+            raise ModelBrokerError("council plan proposer role drifted")
+        evaluator_decisions = plan.decisions[1:]
+        if any(
+            decision.role not in self._evaluator_roles
+            for decision in evaluator_decisions
+        ):
+            raise ModelBrokerError("council plan contains an unapproved evaluator")
+        expected_roles = tuple(decision.role for decision in evaluator_decisions)
+        if len(set(expected_roles)) != len(expected_roles):
+            raise ModelBrokerError("council plan duplicates an evaluator role")
+
+        if plan.status != "ROUTED":
+            if evaluations:
+                raise ModelBrokerError(
+                    "unroutable council cannot accept evaluator output"
+                )
+            missing = tuple(
+                decision.role
+                for decision in evaluator_decisions
+                if decision.status != "ROUTED"
+            )
+            return self._result(
+                status=plan.status,
+                plan=plan,
+                candidate_order=(),
+                weighted_scores=(),
+                evaluator_roles=expected_roles,
+                missing_evaluator_roles=missing,
+                dissent_candidate_ids=(),
+                unanimous_candidate_ids=(),
+                evaluation_call_count=0,
+                reason_codes=(
+                    "MISSING_ASSIGNED_CRITIC",
+                    "CONSENSUS_NOT_EVIDENCE",
+                    "INDEPENDENCE_NOT_ESTABLISHED",
+                ),
+            )
+        if any(
+            decision.status != "ROUTED" or decision.binding is None
+            for decision in plan.decisions
+        ):
+            raise ModelBrokerError("ROUTED council contains an unrouted decision")
+
+        by_role: dict[str, ModelCouncilEvaluation] = {}
+        for evaluation in evaluations:
+            role = evaluation.evaluator_role
+            if role == self._proposer_role:
+                raise ModelBrokerError("council proposer cannot act as evaluator")
+            if role not in expected_roles:
+                raise ModelBrokerError("council evaluator was not assigned by policy")
+            if role in by_role:
+                raise ModelBrokerError("council evaluator output is duplicated")
+            decision = next(item for item in evaluator_decisions if item.role == role)
+            if evaluation.model_binding != decision.binding:
+                raise ModelBrokerError("council evaluator binding differs from policy route")
+            self._validated_scores(evaluation, frozenset(candidate_ids))
+            by_role[role] = evaluation
+        missing_roles = tuple(role for role in expected_roles if role not in by_role)
+        if missing_roles:
+            return self._result(
+                status="INCOMPLETE",
+                plan=plan,
+                candidate_order=(),
+                weighted_scores=(),
+                evaluator_roles=expected_roles,
+                missing_evaluator_roles=missing_roles,
+                dissent_candidate_ids=(),
+                unanimous_candidate_ids=(),
+                evaluation_call_count=len(by_role),
+                reason_codes=(
+                    "MISSING_ASSIGNED_EVALUATION",
+                    "RANKING_WITHHELD",
+                    "CONSENSUS_NOT_EVIDENCE",
+                ),
+            )
+
+        weighted_totals = {candidate_id: 0 for candidate_id in candidate_ids}
+        verdicts = {candidate_id: set() for candidate_id in candidate_ids}
+        for role in expected_roles:
+            evaluation = by_role[role]
+            score_by_candidate = {
+                score.candidate_id: score for score in evaluation.scores
+            }
+            for candidate_id in candidate_ids:
+                score = score_by_candidate[candidate_id]
+                weighted_totals[candidate_id] += sum(
+                    value * weight
+                    for (name, value), (expected_name, weight) in zip(
+                        score.criterion_scores, self._criteria, strict=True
+                    )
+                    if name == expected_name
+                )
+                verdicts[candidate_id].add(score.verdict)
+        normalized_scores = {
+            candidate_id: weighted_totals[candidate_id] // len(expected_roles)
+            for candidate_id in candidate_ids
+        }
+        candidate_order = tuple(
+            sorted(candidate_ids, key=lambda item: (-normalized_scores[item], item))
+        )
+        weighted_scores = tuple(
+            (candidate_id, normalized_scores[candidate_id])
+            for candidate_id in candidate_order
+        )
+        dissent = tuple(
+            sorted(candidate_id for candidate_id, values in verdicts.items() if len(values) > 1)
+        )
+        unanimous = tuple(
+            sorted(candidate_id for candidate_id, values in verdicts.items() if len(values) == 1)
+        )
+        reasons = ["ADVISORY_RANKING_NOT_EVIDENCE", "INDEPENDENCE_NOT_ESTABLISHED"]
+        reasons.append("DISSENT_PRESERVED" if dissent else "UNANIMOUS_NOT_EVIDENCE")
+        return self._result(
+            status="COMPLETE_ADVISORY",
+            plan=plan,
+            candidate_order=candidate_order,
+            weighted_scores=weighted_scores,
+            evaluator_roles=expected_roles,
+            missing_evaluator_roles=(),
+            dissent_candidate_ids=dissent,
+            unanimous_candidate_ids=unanimous,
+            evaluation_call_count=len(by_role),
+            reason_codes=tuple(reasons),
+        )
+
+    def _validated_scores(
+        self,
+        evaluation: ModelCouncilEvaluation,
+        candidate_ids: frozenset[str],
+    ) -> None:
+        score_ids = tuple(score.candidate_id for score in evaluation.scores)
+        if len(set(score_ids)) != len(score_ids) or frozenset(score_ids) != candidate_ids:
+            raise ModelBrokerError("one evaluator call must score every candidate once")
+        for score in evaluation.scores:
+            if tuple(name for name, _ in score.criterion_scores) != tuple(
+                name for name, _ in self._criteria
+            ):
+                raise ModelBrokerError("council evaluation rubric keys or order drifted")
+            for _, value in score.criterion_scores:
+                if type(value) is not int or not 0 <= value <= 100:
+                    raise ModelBrokerError("council evaluation score is outside frozen bounds")
+            if score.verdict not in _TOURNAMENT_VERDICTS:
+                raise ModelBrokerError("council evaluation verdict is unsupported")
+
+    def _result(
+        self,
+        *,
+        status: str,
+        plan: ModelCouncilPlan,
+        candidate_order: tuple[str, ...],
+        weighted_scores: tuple[tuple[str, int], ...],
+        evaluator_roles: tuple[str, ...],
+        missing_evaluator_roles: tuple[str, ...],
+        dissent_candidate_ids: tuple[str, ...],
+        unanimous_candidate_ids: tuple[str, ...],
+        evaluation_call_count: int,
+        reason_codes: tuple[str, ...],
+    ) -> ModelCouncilTournamentResult:
+        return ModelCouncilTournamentResult(
+            status=status,
+            tier=plan.tier,
+            candidate_order=candidate_order,
+            weighted_scores=weighted_scores,
+            evaluator_roles=evaluator_roles,
+            missing_evaluator_roles=missing_evaluator_roles,
+            dissent_candidate_ids=dissent_candidate_ids,
+            unanimous_candidate_ids=unanimous_candidate_ids,
+            planned_call_count=plan.call_count,
+            evaluation_call_count=evaluation_call_count,
+            max_total_model_calls=self._max_calls,
+            independence_status="INDEPENDENCE_NOT_ESTABLISHED",
+            consensus_is_evidence=False,
+            ranking_is_evidence=False,
+            grants_authority=False,
+            profile_sha256=self._profile_sha256,
+            reason_codes=reason_codes,
+        )
 
 
 class ModelCallBroker:

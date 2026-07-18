@@ -1,0 +1,8 @@
+{
+  "lease_id": "lease-s25-council-tournament-agent-1",
+  "stage_id": "s25-council-tournament", "agent_id": "agent-1",
+  "branch": "codex/bridge-a1-s25-council-tournament",
+  "issued_at": "2026-07-18T22:10:00Z", "expires_at": "2026-07-20T22:10:00Z",
+  "write_set": ["src/research_bridge/model_broker.py", "stages/s25-council-tournament/stage-envelope.json", "stages/s25-council-tournament/ownership-lease.json"],
+  "exclusive": true, "revoked": false
+}

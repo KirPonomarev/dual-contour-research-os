@@ -1,0 +1,20 @@
+{
+  "stage_id": "s25-council-assurance", "agent_id": "agent-5",
+  "objective": "Hostile-test the S25 advisory tournament for call/candidate caps, exact policy-assigned evaluators, rubric integrity, dissent preservation, deterministic replay and zero evidence or authority claims.",
+  "executable_blocker": "S25 cannot integrate until forged evaluator roles/bindings, self-review, missing critics, incomplete scores, rubric drift and correlated unanimity all fail closed.",
+  "base_sha": "00e32eaba5fefefad32b9902ed2c9a16f379f43e",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a5-s25-council-assurance",
+  "worktree": "/private/tmp/dcr-s25-council-assurance",
+  "read_set": ["src/research_bridge/model_broker.py", "provenance/model-council-tournament-v1.json", "provenance/model-provider-routing-v1.json", "tests/test_s16_provider_routing.py"],
+  "write_set": ["tests/test_s25_council_tournament.py", "stages/s25-council-assurance/stage-envelope.json", "stages/s25-council-assurance/ownership-lease.json"],
+  "forbidden_scope": ["source-contract-profile-provenance-root-CI-or-lockfile-edit", "real-network-model-call-credential-cost-or-durable-write", "new-dependency-service-queue-scheduler-or-database", "consensus-ranking-or-model-output-as-evidence", "authority-canonical-live-deploy-or-publication-action"],
+  "dependency_hashes": {"implementation_stage": "00e32eaba5fefefad32b9902ed2c9a16f379f43e", "tournament_profile": "e27222fe820912b7dd0abf725bf1c1825115e8f51bfb50ce44666bc8c8f27d81", "provider_routing": "37db8596a8245a6b1ea2bc5bce1495a4e7dadb314876e51397ad11dd194b3dc6", "external_dependencies": "none"},
+  "acceptance_commands": ["make contracts", "python3 -m unittest tests.test_s25_council_tournament tests.test_s16_provider_routing tests.test_s18_provider_hostile", "make test", "git diff --check"],
+  "risk_class": "high-role-forgery-consensus-overclaim-budget-and-determinism",
+  "stop_conditions": ["cap-bypass", "self-review-or-forged-route-accepted", "missing-critic-ranked", "consensus-or-ranking-becomes-evidence", "side-effect-or-authority-expansion"],
+  "expected_receipt": "docs/receipts/integration/s25-council-assurance.json",
+  "rollback": "Remove S25 assurance test and stage metadata; tournament implementation remains unaccepted.",
+  "commit_authority": "one-scoped-agent-5-commit", "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent0_s25_integration", "blocked_validation_failed"]
+}
