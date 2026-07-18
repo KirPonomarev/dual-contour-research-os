@@ -1,8 +1,8 @@
 {
   "schema_id": "research-os.human-authority-request.v1",
   "request_id": "s22-final-deployment-authority-request-343ef061",
-  "issued_at": "2026-07-18T21:35:00Z",
-  "valid_until": "2026-07-19T21:35:00Z",
+  "issued_at": "2026-07-18T21:05:00Z",
+  "valid_until": "2026-07-19T21:05:00Z",
   "status": "WAIT_HUMAN_REVIEW",
   "grants_authority": false,
   "request_base_sha": "343ef0611a501e4f58cbdd1f2bc55b1d121400a5",
@@ -64,5 +64,5 @@
     "CANONICAL_OR_POLICY_MUTATION"
   ],
   "review_decision": "PENDING",
-  "integrity": {"profile": "core-json-sha256-v1", "payload_sha256": "df7b6b04d5e8ff2a8c103bd594cb93c16df78e0899762d3de7038f1d3cc22147"}
+  "integrity": {"profile": "core-json-sha256-v1", "payload_sha256": "8ffcc84755af933546efb5dc4fb58b79f999d7969b5ef1f990ce4c3d18f5d26d"}
 }

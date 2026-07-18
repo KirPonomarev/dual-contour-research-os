@@ -1,6 +1,6 @@
 {
   "schema_id": "ReuseDecisionReceipt", "schema_version": "1.0.0",
-  "object_id": "reuse-s22-human-authority-request-20260718", "issued_at": "2026-07-18T21:35:00Z",
+  "object_id": "reuse-s22-human-authority-request-20260718", "issued_at": "2026-07-18T21:05:00Z",
   "issuer": {"id": "agent-0", "authority_class": "reuse-freeze-authority"},
   "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
   "payload": {
