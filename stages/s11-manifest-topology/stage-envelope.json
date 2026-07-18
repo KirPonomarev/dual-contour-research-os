@@ -1,0 +1,31 @@
+{
+  "stage_id": "s11-manifest-topology", "agent_id": "agent-5",
+  "objective": "Implement a source-bound, count-agnostic organism manifest and pure topology validator with progressive evidence stages and hostile mismatch/orphan/cycle denial.",
+  "executable_blocker": "The repository has a reserved organism module and architectural intent but no machine-readable component topology or validator that separates declaration from observed and enforcement evidence.",
+  "base_sha": "d4977f120e194672c0b126161a9d0ff24d4439a9",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a5-s11-manifest-topology",
+  "worktree": "/Volumes/Work/dual-contour-research-os-s11-topology",
+  "read_set": ["ownership/registry.json", "docs/ADR/0003-a1-autonomous-research-corridor.md", "ops/deploy/**", "src/research_bridge/**"],
+  "write_set": [
+    "src/research_bridge/organism.py", "ops/organism/component-declarations.json",
+    "ops/organism/deployment-projection.json", "tests/test_s11_manifest_topology.py",
+    "tests/test_a1_capability_proof.py",
+    "stages/s11-manifest-topology/stage-envelope.json", "stages/s11-manifest-topology/ownership-lease.json"
+  ],
+  "forbidden_scope": ["contract-edit", "ownership-edit", "canonical-doc-edit", "runtime-mutation", "new-service", "provider-call", "domain-application", "authority-grant", "canonical-or-live-action", "deployment"],
+  "dependency_hashes": {
+    "core_contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "a1_contract_catalog": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+    "reuse_receipt_payload": "a98b01fcde8d632e740ee3b9146734847f29f42d22759179316e58b25ccff491",
+    "ownership_registry": "862994bf57656148e5a75eece9686725efb733836567149baa23517e3f6421b1",
+    "external_dependencies": "none"
+  },
+  "acceptance_commands": ["make contracts", "python3 -m unittest tests.test_s11_manifest_topology tests.test_a1_capability_proof tests.test_ownership_registry", "orphan-edge-channel-process-negative-probes", "unbounded-cycle-negative-probe", "deployment-mismatch-negative-probe", "git diff --check"],
+  "risk_class": "high-declared-topology-masquerades-as-enforced",
+  "stop_conditions": ["hardcoded-component-or-process-count", "declaration-implies-enforcement", "unbounded-cycle-accepted", "missing-deployment-component-accepted", "runtime-or-authority-mutation"],
+  "expected_receipt": "docs/receipts/integration/s11-manifest-topology.json",
+  "rollback": "Remove the additive organism module, ops declarations and focused tests; no existing runtime state or authority changes.",
+  "commit_authority": "one-scoped-agent-5-commit", "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent0_integration", "blocked_validation_failed"]
+}

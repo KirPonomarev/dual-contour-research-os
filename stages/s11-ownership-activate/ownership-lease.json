@@ -1,0 +1,7 @@
+{
+  "lease_id": "lease-s11-ownership-activate-agent-0", "stage_id": "s11-ownership-activate", "agent_id": "agent-0",
+  "base_sha": "26b7036d48d088d7232a2efe884ae5cf3c1c9580", "branch": "codex/bridge-a0-s11-ownership-activate",
+  "issued_at": "2026-07-18T16:05:00Z", "expires_at": "2026-07-19T16:05:00Z",
+  "write_set": ["ownership/registry.json", "docs/ADR/0005-organism-manifest-path-activation.md", "docs/receipts/OWNERSHIP_REGISTRY_AMENDMENT_4.json", "stages/s11-ownership-activate/stage-envelope.json", "stages/s11-ownership-activate/ownership-lease.json"],
+  "exclusive": true, "revoked": false
+}
