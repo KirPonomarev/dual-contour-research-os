@@ -1,0 +1,49 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s30-challenger-governance-20260718",
+  "issued_at": "2026-07-18T23:35:00Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s30-challenger-governance",
+    "agent_id": "agent-0",
+    "ownership_lease_ref": "stages/s30-challenger-governance/ownership-lease.json",
+    "base_sha": "acd3adb0615823afa460fb038b6aaeed81c163c9",
+    "head_sha": "9392f105ad641303a47191924c4644c8caf1b489",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "provenance/champion-challenger-evaluation-v1.json",
+      "docs/receipts/reuse/s30-champion-challenger.json",
+      "stages/s30-challenger-governance/"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "profile_sha256": "e31e4aa9f946e54ffe5c91ec887e5f26f44db2569c7edf975504aaa3be7831a8",
+      "dimensions": 5,
+      "single_scalar_score": false,
+      "Pareto_dominance_required": true,
+      "safety_violations_allowed": 0,
+      "holdout_queries": 0,
+      "promotion": false,
+      "grants_authority": false
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29665432545",
+    "integration_commit_sha": "da59363b09a7ea58821eecf4243af5e05fdb3532"
+  },
+  "integrity": {
+    "payload_sha256": "6db6aceb38dc7c6537c70b6974b7450b56242235b4ba570f3a2ee7516587926e",
+    "parent_refs": [
+      "git:9392f105ad641303a47191924c4644c8caf1b489",
+      "git:da59363b09a7ea58821eecf4243af5e05fdb3532",
+      "ci:29665432545",
+      "reuse:reuse-s30-champion-challenger-20260718"
+    ]
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s30-challenger-assurance-20260718",
+  "issued_at": "2026-07-18T23:35:00Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s30-challenger-assurance",
+    "agent_id": "agent-5",
+    "ownership_lease_ref": "stages/s30-challenger-assurance/ownership-lease.json",
+    "base_sha": "bd51d403569acbc9b73e3dc4fc861118fb9cf852",
+    "head_sha": "8e76a9411b1385deb40fffa2bb30f5a601d23092",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "tests/test_s30_champion_challenger.py",
+      "tests/test_stage1_assurance.py",
+      "stages/s30-challenger-assurance/"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "focused_tests": 19,
+      "full_core_tests": 739,
+      "stage0b_tests": 25,
+      "typed_dimension_repair": "green",
+      "Pareto_tradeoff_not_hidden": "green",
+      "safety_and_known_invalid_veto": "green",
+      "exact_twins_and_bindings": "green",
+      "benchmark_archive_forgery_denied": "green",
+      "zero_scalar_promotion_mutation_holdout_authority": "green",
+      "real_private_data_model_calls_or_external_actions": 0,
+      "grants_authority": false
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29665432545",
+    "integration_commit_sha": "da59363b09a7ea58821eecf4243af5e05fdb3532"
+  },
+  "integrity": {
+    "payload_sha256": "c8bef5fd3a062a8188bcf6ce601573e67d8f5a1266476abb9b89a21663e2a8f8",
+    "parent_refs": [
+      "git:8e76a9411b1385deb40fffa2bb30f5a601d23092",
+      "git:da59363b09a7ea58821eecf4243af5e05fdb3532",
+      "ci:29665432545",
+      "git:bd51d403569acbc9b73e3dc4fc861118fb9cf852"
+    ]
+  }
+}

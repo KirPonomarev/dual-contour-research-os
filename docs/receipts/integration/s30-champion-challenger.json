@@ -1,0 +1,61 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s30-champion-challenger-20260718",
+  "issued_at": "2026-07-18T23:35:00Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s30-champion-challenger",
+    "agent_id": "agent-1",
+    "ownership_lease_ref": "stages/s30-champion-challenger/ownership-lease.json",
+    "base_sha": "9392f105ad641303a47191924c4644c8caf1b489",
+    "head_sha": "bd51d403569acbc9b73e3dc4fc861118fb9cf852",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "src/research_bridge/evolution.py",
+      "stages/s30-champion-challenger/",
+      "stages/s30-champion-challenger-repair/"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "bridge_runtime_source_mutation": true,
+      "benchmark_and_evaluator_digest_bound": true,
+      "exact_counterfactual_twins": true,
+      "adversarial_known_invalid_required": true,
+      "dimensions_visible": [
+        "quality",
+        "information",
+        "cost",
+        "latency",
+        "safety"
+      ],
+      "tradeoff_status": "NOT_ESTABLISHED",
+      "safety_veto": "REJECTED_SAFETY",
+      "diversity_retained": true,
+      "single_scalar_score": null,
+      "winner_promoted": false,
+      "mutation_applied": false,
+      "holdout_queries": 0,
+      "new_runtime_or_dependency": 0,
+      "grants_authority": false
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29665432545",
+    "integration_commit_sha": "da59363b09a7ea58821eecf4243af5e05fdb3532"
+  },
+  "integrity": {
+    "payload_sha256": "2c76de059c4b287b3dcecb1b3ff9aeba76c07b2e024e09558dfd0c70fd7705ca",
+    "parent_refs": [
+      "git:bd51d403569acbc9b73e3dc4fc861118fb9cf852",
+      "git:da59363b09a7ea58821eecf4243af5e05fdb3532",
+      "ci:29665432545",
+      "git:9392f105ad641303a47191924c4644c8caf1b489"
+    ]
+  }
+}
