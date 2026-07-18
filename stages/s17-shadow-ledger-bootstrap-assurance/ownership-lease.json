@@ -1,0 +1,8 @@
+{
+  "lease_id": "lease-s17-shadow-ledger-bootstrap-assurance-agent-5",
+  "stage_id": "s17-shadow-ledger-bootstrap-assurance", "agent_id": "agent-5",
+  "branch": "codex/bridge-a5-s17-shadow-ledger-bootstrap-assurance",
+  "issued_at": "2026-07-18T18:46:00Z", "expires_at": "2026-07-19T18:46:00Z",
+  "write_set": ["tests/test_s17_shadow_ledger_bootstrap.py", "stages/s17-shadow-ledger-bootstrap-assurance/stage-envelope.json", "stages/s17-shadow-ledger-bootstrap-assurance/ownership-lease.json"],
+  "exclusive": true, "revoked": false
+}
