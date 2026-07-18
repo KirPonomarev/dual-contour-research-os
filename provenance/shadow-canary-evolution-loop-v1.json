@@ -1,0 +1,54 @@
+{
+  "profile_id": "shadow-canary-evolution-loop-v1",
+  "schema_version": "1.0.0",
+  "status": "frozen-proposal-only-shadow-canary",
+  "allowed_classifications": [
+    "D0_PUBLIC"
+  ],
+  "statuses": [
+    "MUTATION_PROPOSAL_LOOP_PASS",
+    "EVOLUTION_LOOP_SHADOW_PASS",
+    "META_EVOLUTION_PROPOSAL_ONLY",
+    "NOT_ESTABLISHED",
+    "REGRESSION_DETECTED",
+    "PARKED_CAPACITY",
+    "WAIT_AUTHORITY"
+  ],
+  "limits": {
+    "min_observations": 8,
+    "max_observations": 64,
+    "min_unique_cases": 4,
+    "max_regression_signals": 32,
+    "max_metric_units": 1000000
+  },
+  "regression_policy": {
+    "safety_violations_allowed": 0,
+    "unexpected_failures_allowed": 0,
+    "quality_regression_units_allowed": 0,
+    "information_regression_units_allowed": 0,
+    "cost_regression_units_allowed": 0,
+    "latency_regression_units_allowed": 0
+  },
+  "acceptance": {
+    "requires_champion_challenger_pass": true,
+    "requires_calibration_maturity": true,
+    "requires_zero_regressions": true,
+    "promotion_state": "WAIT_AUTHORITY",
+    "automatic_promotion": false,
+    "rollback_application": false
+  },
+  "invariants": {
+    "scope_is_digest_bound": true,
+    "observations_are_precomputed_D0_metadata": true,
+    "shadow_has_no_network_or_filesystem_writes": true,
+    "canary_never_executes_code": true,
+    "regression_creates_descriptive_rollback_proposal": true,
+    "rollback_proposal_requires_authority": true,
+    "meta_evolution_is_proposal_only": true,
+    "production_promotion": false,
+    "policy_application": false,
+    "canonical_writes": 0,
+    "holdout_queries": 0,
+    "grants_authority": false
+  }
+}
