@@ -1,0 +1,14 @@
+{
+  "lease_id": "lease-s06-authority-corridor-agent-1",
+  "stage_id": "s06-authority-corridor", "agent_id": "agent-1",
+  "base_sha": "64f7972e99d60a643352fba4e44f6ecda7e8b651",
+  "branch": "codex/bridge-a1-s06-authority-corridor",
+  "issued_at": "2026-07-18T14:45:00Z", "expires_at": "2026-07-19T14:45:00Z",
+  "write_set": [
+    "src/research_bridge/authority.py", "src/research_bridge/admission.py",
+    "src/research_bridge/kernel.py", "src/research_bridge/ledger.py",
+    "stages/s06-authority-corridor/stage-envelope.json",
+    "stages/s06-authority-corridor/ownership-lease.json"
+  ],
+  "exclusive": true, "revoked": false
+}

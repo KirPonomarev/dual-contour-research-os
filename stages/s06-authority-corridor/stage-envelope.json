@@ -1,0 +1,42 @@
+{
+  "stage_id": "s06-authority-corridor", "agent_id": "agent-1",
+  "objective": "Derive and activate a bounded trusted AdmissionReceipt-to-JobSpec-to-BudgetReservation-to-Permit-to-AttemptLease corridor without widening scientific, canonical or live authority.",
+  "executable_blocker": "The admitted A1 receipt is durable but has no deterministic bridge into the existing pinned offline JobSpec/Permit/AttemptLease and ledger budget/fencing path.",
+  "base_sha": "64f7972e99d60a643352fba4e44f6ecda7e8b651",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "a1_contract_sha256": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+  "branch": "codex/bridge-a1-s06-authority-corridor",
+  "worktree": "/Volumes/Work/dual-contour-research-os-s06-authority",
+  "write_set": [
+    "src/research_bridge/authority.py", "src/research_bridge/admission.py",
+    "src/research_bridge/kernel.py", "src/research_bridge/ledger.py",
+    "stages/s06-authority-corridor/stage-envelope.json",
+    "stages/s06-authority-corridor/ownership-lease.json"
+  ],
+  "forbidden_scope": [
+    "contract-edit", "policy-expansion", "new-orchestrator", "new-ledger",
+    "model-or-CLI-authority", "canonical-scientific-writer", "LearningDecision",
+    "networked-execution", "live-action", "deployment", "test-edit"
+  ],
+  "dependency_hashes": {
+    "core_contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "a1_contract_catalog": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+    "reuse_receipt_payload": "240a28169e6faff7c51d1d4d0ae8e6194952f5deca9dbe466aa8c3aed689350f",
+    "external_dependencies": "none"
+  },
+  "acceptance_commands": [
+    "make contracts", "python3 -m unittest tests.test_stage1_authority tests.test_stage1_authority_policy tests.test_stage1_admission tests.test_stage1_ledger tests.test_stage1_pause_epoch_fencing tests.test_a1_authority_corridor",
+    "AdmissionReceipt-is-not-Permit", "A1-reservation-parent-bound", "Permit-replay-expiry-transfer-denied",
+    "AttemptLease-single-use-fenced", "child-no-broader-than-parent", "git diff --check"
+  ],
+  "risk_class": "critical-execution-authority-and-budget-fencing",
+  "stop_conditions": [
+    "untrusted-issuer-accepted", "receipt-self-promotes", "child-authority-expands",
+    "reservation-unbound", "Permit-transfer-succeeds", "lease-reuse-executes",
+    "CLI-grants-authority", "canonical-or-live-authority-nonzero"
+  ],
+  "expected_receipt": "docs/receipts/integration/s06-authority-corridor.json",
+  "rollback": "Revert the additive corridor and optional claim parent binding; legacy pinned offline admission and ledger records remain readable.",
+  "commit_authority": "one-scoped-agent-1-commit", "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent5_assurance", "blocked_validation_failed"]
+}

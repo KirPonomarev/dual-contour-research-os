@@ -2,10 +2,14 @@
 
 from __future__ import annotations
 
+import re
 from typing import Any
 
 from .admission import admit
 from .authority import AuthorityError, PinnedOfflineAuthority, require_pinned_authority
+
+
+_A1_RESERVATION_REF = re.compile(r"^budget-reservation:[a-f0-9]{64}$")
 
 
 class BridgeKernel:
@@ -42,7 +46,7 @@ class BridgeKernel:
             now=now,
             authority=self._authority,
         )
-        return self._ledger.claim(
+        keywords = dict(
             job_id=grant.job_id,
             attempt_id=grant.attempt_id,
             permit_id=grant.permit_id,
@@ -63,3 +67,11 @@ class BridgeKernel:
             contour=grant.contour,
             classification=grant.classification,
         )
+        reservation_refs = [
+            reference
+            for reference in permit["integrity"]["parent_refs"]
+            if _A1_RESERVATION_REF.fullmatch(reference) is not None
+        ]
+        if reservation_refs:
+            keywords["admission_reservation_ref"] = reservation_refs[0]
+        return self._ledger.claim(**keywords)

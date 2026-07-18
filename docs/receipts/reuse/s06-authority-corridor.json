@@ -1,0 +1,34 @@
+{
+  "schema_id": "ReuseDecisionReceipt", "schema_version": "1.0.0",
+  "object_id": "reuse-s06-authority-corridor-20260718", "issued_at": "2026-07-18T14:40:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-freeze-authority"},
+  "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "AdmissionReceipt-to-single-use-offline-execution-authority-corridor",
+    "candidates": [
+      {"candidate": "extend-PinnedOfflineAuthority-and-existing-admission-kernel", "disposition": "selected"},
+      {"candidate": "reuse-JobLedger-budget-reservation-nonce-and-fencing-enforcement", "disposition": "selected"},
+      {"candidate": "reuse-issue-l0-job-bundle-contract-shapes-as-reference-only", "disposition": "selected"},
+      {"candidate": "new-orchestrator-scheduler-or-authority-ledger", "disposition": "rejected-duplicate-control-plane"},
+      {"candidate": "model-or-CLI-issued-authority", "disposition": "rejected-constitutional-boundary"}
+    ],
+    "selected_mode": "deterministic-corridor-issuer-plus-existing-kernel-ledger-activation-with-A1-reservation-parent-binding",
+    "source_ref": "git:5d636ca444782dab1200c4cdb72f8b3438a1a642;internal:authority.py@44a5c6c2,admission.py@7993125a,kernel.py@902ad981,ledger.py@b0ae61e0,issue_l0_job_bundle.py@ba52cb67",
+    "code_sha256": "44a5c6c208510761eb7256270307f60331981b7c19ef4d1bc3eee0769b7f7ba9",
+    "license_spdx": "NOASSERTION",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "AdmissionReceipt-is-not-Permit", "child-authority-no-broader-than-candidate",
+      "trusted-issuer-chain", "A1-reservation-parent-bound-to-durable-BudgetReservation",
+      "Permit-replay-expiry-transfer-denied", "AttemptLease-single-use-and-fenced",
+      "CLI-cannot-grant-authority", "canonical-and-live-authority-remain-zero"
+    ],
+    "canonical_owner": "agent-1-authority-admission-kernel-ledger-with-agent-5-assurance",
+    "rollback": "Revert the additive corridor and optional reservation-parent binding; legacy pinned JobSpec/Permit/AttemptLease admission remains unchanged."
+  },
+  "integrity": {"payload_sha256": "240a28169e6faff7c51d1d4d0ae8e6194952f5deca9dbe466aa8c3aed689350f", "parent_refs": [
+    "git:5d636ca444782dab1200c4cdb72f8b3438a1a642",
+    "sha256:13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "sha256:eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1"
+  ]}
+}
