@@ -15,6 +15,7 @@ import struct
 import time
 from dataclasses import dataclass
 from pathlib import Path
+from types import MappingProxyType
 from typing import Callable, Iterable, Mapping
 
 from .control import ControlError, ControlRequest, ControlResponse, ControlRouter
@@ -24,6 +25,7 @@ _MAX_REQUEST_BYTES = 65_536
 _MAX_RESPONSE_BYTES = 262_144
 _MAX_DEADLINE_SECONDS = 5.0
 _SOCKET_MODE = 0o660
+_PRINCIPAL_ROLES = frozenset({"operator", "collector", "scout"})
 
 
 class IPCError(RuntimeError):
@@ -152,6 +154,7 @@ class UnixControlServer:
         router: ControlRouter,
         *,
         allowed_uids: Iterable[int],
+        principal_roles: Mapping[int, str] | None = None,
         deadline_seconds: float = 5.0,
         credential_resolver: Callable[[socket.socket], PeerCredentials] = resolve_peer_credentials,
     ) -> None:
@@ -179,10 +182,27 @@ class UnixControlServer:
             for uid in allowed
         ):
             raise IPCError("allowed_uids must contain only non-negative integers")
+        if principal_roles is None:
+            resolved_roles = {uid: "operator" for uid in allowed}
+        else:
+            if not isinstance(principal_roles, Mapping):
+                raise IPCError("principal_roles must map verified UIDs to roles")
+            resolved_roles = dict(principal_roles)
+            if set(resolved_roles) != set(allowed):
+                raise IPCError("principal_roles must cover exactly the allowed UIDs")
+            for uid, role in resolved_roles.items():
+                if (
+                    isinstance(uid, bool)
+                    or not isinstance(uid, int)
+                    or uid < 0
+                    or role not in _PRINCIPAL_ROLES
+                ):
+                    raise IPCError("principal_roles contains an invalid principal")
 
         self._socket_path = normalized_path
         self._router = router
         self._allowed_uids = allowed
+        self._principal_roles = MappingProxyType(resolved_roles)
         self._deadline_seconds = float(deadline_seconds)
         self._credential_resolver = credential_resolver
         self._listener: socket.socket | None = None
@@ -272,11 +292,18 @@ class UnixControlServer:
             raise IPCError("peer credential resolver returned an invalid value")
         if credentials.uid not in self._allowed_uids:
             raise IPCError("peer UID is not allowed")
+        peer_role = self._principal_roles.get(credentials.uid)
+        if peer_role is None:
+            raise IPCError("peer UID has no verified principal role")
 
         frame = self._receive_frame(connection, deadline)
         decoded = decode_message(frame)
         request = ControlRequest.from_mapping(decoded)
-        response = self._router.dispatch(request, peer_uid=credentials.uid)
+        response = self._router.dispatch(
+            request,
+            peer_uid=credentials.uid,
+            peer_role=peer_role,
+        )
         encoded = encode_message(response, maximum_bytes=_MAX_RESPONSE_BYTES)
         self._set_remaining_timeout(connection, deadline)
         try:

@@ -1,0 +1,18 @@
+{
+  "lease_id": "lease-s02-scout-ipc-runtime-agent-1-20260718",
+  "stage_id": "s02-scout-ipc-runtime",
+  "agent_id": "agent-1",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-18T13:21:00Z",
+  "expires_at": "2026-07-19T01:21:00Z",
+  "base_sha": "24b44012cf25bd87dc36550114d1e147600713e5",
+  "branch": "codex/bridge-a1-s02-scout-ipc-fixture",
+  "worktree": "/Volumes/Work/dual-contour-research-os-s02-scout-ipc",
+  "write_set": [
+    "src/research_bridge/control.py",
+    "src/research_bridge/ipc.py",
+    "src/research_bridge/discovery.py"
+  ],
+  "delegation_allowed": false,
+  "state": "active"
+}

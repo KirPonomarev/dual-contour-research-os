@@ -20,9 +20,13 @@ from .authority import (
 )
 
 
-_PROTOCOL_VERSION = "1.1"
+_LEGACY_PROTOCOL_VERSION = "1.1"
+_SUPPORTED_PROTOCOL_VERSIONS = frozenset({"1.1", "1.2"})
 _REQUEST_KEYS = frozenset(
     {"version", "request_id", "idempotency_key", "command", "payload"}
+)
+_LEGACY_REQUEST_KEYS = frozenset(
+    {"request_id", "idempotency_key", "command", "payload"}
 )
 _COMMAND_PAYLOAD_KEYS = {
     "status": frozenset(),
@@ -30,6 +34,27 @@ _COMMAND_PAYLOAD_KEYS = {
     "resume_global": frozenset({"approval_ref"}),
     "submit": frozenset({"job_spec", "permit", "lease"}),
     "lookup": frozenset({"job_spec_ref"}),
+    "submit_source_trigger": frozenset({"source_trigger"}),
+    "claim_proposal": frozenset({"material_event_ref"}),
+    "submit_proposal": frozenset({"proposal_envelope"}),
+    "ack_proposal": frozenset({"material_event_ref", "claim_token"}),
+}
+_OPERATOR_COMMANDS = frozenset(
+    {"status", "pause_global", "resume_global", "submit", "lookup"}
+)
+_COLLECTOR_COMMANDS = frozenset({"submit_source_trigger"})
+_SCOUT_COMMANDS = frozenset(
+    {"claim_proposal", "submit_proposal", "ack_proposal"}
+)
+_ROLE_COMMANDS = {
+    "operator": _OPERATOR_COMMANDS,
+    "collector": _COLLECTOR_COMMANDS,
+    "scout": _SCOUT_COMMANDS,
+}
+_ROLE_VERSIONS = {
+    "operator": frozenset({"1.1", "1.2"}),
+    "collector": frozenset({"1.2"}),
+    "scout": frozenset({"1.2"}),
 }
 
 
@@ -72,6 +97,45 @@ class _ControlBackend(Protocol):
     def lookup(self, *, job_spec_ref: str) -> Mapping[str, object]: ...
 
 
+class _A1ControlBackend(Protocol):
+    def submit_source_trigger(
+        self,
+        *,
+        source_trigger: Mapping[str, object],
+        actor: str,
+        idempotency_key: str,
+        now: str,
+    ) -> Mapping[str, object]: ...
+
+    def claim_proposal(
+        self,
+        *,
+        material_event_ref: str,
+        actor: str,
+        idempotency_key: str,
+        now: str,
+    ) -> Mapping[str, object]: ...
+
+    def submit_proposal(
+        self,
+        *,
+        proposal_envelope: Mapping[str, object],
+        actor: str,
+        idempotency_key: str,
+        now: str,
+    ) -> Mapping[str, object]: ...
+
+    def ack_proposal(
+        self,
+        *,
+        material_event_ref: str,
+        claim_token: str,
+        actor: str,
+        idempotency_key: str,
+        now: str,
+    ) -> Mapping[str, object]: ...
+
+
 @dataclass(frozen=True, slots=True)
 class ControlRequest:
     """One strictly shaped versioned control request."""
@@ -83,12 +147,14 @@ class ControlRequest:
     payload: Mapping[str, object]
 
     def __post_init__(self) -> None:
-        if self.version != _PROTOCOL_VERSION:
+        if self.version not in _SUPPORTED_PROTOCOL_VERSIONS:
             raise ControlError("unsupported control protocol version")
         _normalized_text("request_id", self.request_id, maximum=256)
         _normalized_text("idempotency_key", self.idempotency_key, maximum=256)
         if not isinstance(self.command, str) or self.command not in _COMMAND_PAYLOAD_KEYS:
             raise ControlError("unsupported control command")
+        if self.version == _LEGACY_PROTOCOL_VERSION and self.command not in _OPERATOR_COMMANDS:
+            raise ControlError("protocol 1.1 supports operator commands only")
         if not isinstance(self.payload, Mapping):
             raise ControlError("payload must be an object")
 
@@ -114,16 +180,48 @@ class ControlRequest:
             _normalized_text(
                 "job_spec_ref", copied_payload["job_spec_ref"], maximum=256
             )
+        elif self.command == "submit_source_trigger":
+            value = copied_payload["source_trigger"]
+            if not isinstance(value, Mapping):
+                raise ControlError("source_trigger must be an object")
+            copied_payload["source_trigger"] = _json_copy(value)
+        elif self.command == "claim_proposal":
+            _normalized_text(
+                "material_event_ref",
+                copied_payload["material_event_ref"],
+                maximum=512,
+            )
+        elif self.command == "submit_proposal":
+            value = copied_payload["proposal_envelope"]
+            if not isinstance(value, Mapping):
+                raise ControlError("proposal_envelope must be an object")
+            copied_payload["proposal_envelope"] = _json_copy(value)
+        elif self.command == "ack_proposal":
+            _normalized_text(
+                "material_event_ref",
+                copied_payload["material_event_ref"],
+                maximum=512,
+            )
+            _normalized_text(
+                "claim_token", copied_payload["claim_token"], maximum=512
+            )
         object.__setattr__(self, "payload", MappingProxyType(copied_payload))
 
     @classmethod
     def from_mapping(cls, value: Mapping[str, object]) -> ControlRequest:
         """Build a request only when its top-level shape is exact."""
 
-        if not isinstance(value, Mapping) or set(value) != _REQUEST_KEYS:
+        if not isinstance(value, Mapping):
+            raise ControlError("control request keys do not match the protocol")
+        keys = set(value)
+        if keys == _REQUEST_KEYS:
+            version = value["version"]
+        elif keys == _LEGACY_REQUEST_KEYS:
+            version = _LEGACY_PROTOCOL_VERSION
+        else:
             raise ControlError("control request keys do not match the protocol")
         return cls(
-            version=value["version"],  # type: ignore[arg-type]
+            version=version,  # type: ignore[arg-type]
             request_id=value["request_id"],  # type: ignore[arg-type]
             idempotency_key=value["idempotency_key"],  # type: ignore[arg-type]
             command=value["command"],  # type: ignore[arg-type]
@@ -152,7 +250,7 @@ class ControlResponse:
     result: Mapping[str, object]
 
     def __post_init__(self) -> None:
-        if self.version != _PROTOCOL_VERSION:
+        if self.version not in _SUPPORTED_PROTOCOL_VERSIONS:
             raise ControlError("unsupported control response version")
         _normalized_text("request_id", self.request_id, maximum=256)
         if self.command not in _COMMAND_PAYLOAD_KEYS:
@@ -187,6 +285,7 @@ class ControlRouter:
         self,
         backend: _ControlBackend,
         *,
+        a1_backend: _A1ControlBackend | None = None,
         authority: PinnedOfflineAuthority | None = None,
         clock: Callable[[], datetime] | None = None,
     ) -> None:
@@ -199,17 +298,34 @@ class ControlRouter:
         except AuthorityError as exc:
             raise ControlError("pinned authority verifier is required") from exc
         self._backend = backend
+        self._a1_backend = a1_backend
         self._clock = clock if clock is not None else lambda: datetime.now(timezone.utc)
 
-    def dispatch(self, request: ControlRequest, *, peer_uid: int) -> ControlResponse:
+    def dispatch(
+        self,
+        request: ControlRequest,
+        *,
+        peer_uid: int,
+        peer_role: str = "operator",
+    ) -> ControlResponse:
         """Dispatch one request using only an OS-verified numeric peer UID."""
 
         if not isinstance(request, ControlRequest):
             raise ControlError("router accepts only typed ControlRequest values")
         if isinstance(peer_uid, bool) or not isinstance(peer_uid, int) or peer_uid < 0:
             raise ControlError("verified peer UID must be a non-negative integer")
+        if peer_role not in _ROLE_COMMANDS:
+            raise ControlError("verified peer role is unsupported")
+        if request.version not in _ROLE_VERSIONS[peer_role]:
+            raise ControlError("verified peer role cannot use this protocol version")
+        if request.command not in _ROLE_COMMANDS[peer_role]:
+            raise ControlError("verified peer role cannot use this command")
 
-        actor = f"uid:{peer_uid}"
+        actor = (
+            f"uid:{peer_uid}"
+            if peer_role == "operator"
+            else f"{peer_role}:uid:{peer_uid}"
+        )
         try:
             if request.command == "status":
                 result = self._backend.pause_snapshot()
@@ -250,6 +366,35 @@ class ControlRouter:
                 result = self._backend.lookup(
                     job_spec_ref=request.payload["job_spec_ref"],  # type: ignore[arg-type]
                 )
+            elif request.command == "submit_source_trigger":
+                result = self._require_a1_backend().submit_source_trigger(
+                    source_trigger=request.payload["source_trigger"],  # type: ignore[arg-type]
+                    actor=actor,
+                    idempotency_key=request.idempotency_key,
+                    now=self._event_at(),
+                )
+            elif request.command == "claim_proposal":
+                result = self._require_a1_backend().claim_proposal(
+                    material_event_ref=request.payload["material_event_ref"],  # type: ignore[arg-type]
+                    actor=actor,
+                    idempotency_key=request.idempotency_key,
+                    now=self._event_at(),
+                )
+            elif request.command == "submit_proposal":
+                result = self._require_a1_backend().submit_proposal(
+                    proposal_envelope=request.payload["proposal_envelope"],  # type: ignore[arg-type]
+                    actor=actor,
+                    idempotency_key=request.idempotency_key,
+                    now=self._event_at(),
+                )
+            elif request.command == "ack_proposal":
+                result = self._require_a1_backend().ack_proposal(
+                    material_event_ref=request.payload["material_event_ref"],  # type: ignore[arg-type]
+                    claim_token=request.payload["claim_token"],  # type: ignore[arg-type]
+                    actor=actor,
+                    idempotency_key=request.idempotency_key,
+                    now=self._event_at(),
+                )
             else:  # pragma: no cover - ControlRequest enforces the closed command set.
                 raise ControlError("unsupported control command")
         except ControlError:
@@ -263,6 +408,11 @@ class ControlRouter:
             command=request.command,
             result=result,
         )
+
+    def _require_a1_backend(self) -> _A1ControlBackend:
+        if self._a1_backend is None:
+            raise ControlError("A1 control backend is unavailable")
+        return self._a1_backend
 
     def _event_at(self) -> str:
         try:
