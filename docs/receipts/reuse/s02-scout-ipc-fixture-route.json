@@ -1,0 +1,62 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-s02-scout-ipc-fixture-route-20260718",
+  "issued_at": "2026-07-18T13:21:00Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "reuse-freeze-authority"
+  },
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "e1a-ipc-1-2-principal-routing-and-bounded-scout-fixture",
+    "candidates": [
+      {
+        "candidate": "extend-existing-control-router-and-af-unix-ipc",
+        "disposition": "selected"
+      },
+      {
+        "candidate": "reuse-frozen-ipc-reason-and-a1-policy-profiles",
+        "disposition": "selected"
+      },
+      {
+        "candidate": "python-stdlib-json-dataclasses-hashlib-mappingproxy",
+        "disposition": "selected"
+      },
+      {
+        "candidate": "new-network-service-or-second-orchestrator",
+        "disposition": "rejected-duplicates-existing-local-control-plane"
+      },
+      {
+        "candidate": "external-agent-framework-or-message-broker",
+        "disposition": "rejected-no-measured-blocker-and-expands-trust-surface"
+      }
+    ],
+    "selected_mode": "existing-af-unix-router-plus-owned-stdlib-strict-fixture-adapter-no-new-dependency",
+    "source_ref": "internal:src/research_bridge/control.py@sha256:78bf5029f856669623c72d63a0517b7cefa59da0ff77ff24328c8d22e8a4e49b;internal:src/research_bridge/ipc.py@sha256:2e0544592878e9030735d8d225a910cc75e727decf4155c5f818b8b341705c97;a1-catalog:sha256:eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+    "code_sha256": "78bf5029f856669623c72d63a0517b7cefa59da0ff77ff24328c8d22e8a4e49b",
+    "license_spdx": "NOASSERTION",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "ipc-1-1-backward-compatibility",
+      "ipc-1-2-os-verified-principal-routing",
+      "collector-and-scout-authority-separation",
+      "duplicate-key-size-depth-and-reference-bounds",
+      "trusted-field-projection",
+      "bounded-reason-feedback",
+      "zero-side-effect-denial"
+    ],
+    "canonical_owner": "governance-agent-0",
+    "rollback": "Revert the S02 runtime and assurance stages. IPC 1.1 remains the unchanged supported path and no durable state or external model call is created."
+  },
+  "integrity": {
+    "payload_sha256": "ec96accdbca21494bbf978ee003b834fd3b3916059769440e92ebfa037779a8c",
+    "parent_refs": [
+      "git:a49fb7767b1a663598b0ca179ad8ba7e1d3907da",
+      "sha256:eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+      "sha256:78bf5029f856669623c72d63a0517b7cefa59da0ff77ff24328c8d22e8a4e49b",
+      "sha256:2e0544592878e9030735d8d225a910cc75e727decf4155c5f818b8b341705c97"
+    ]
+  }
+}
