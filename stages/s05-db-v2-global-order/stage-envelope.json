@@ -1,0 +1,42 @@
+{
+  "stage_id": "s05-db-v2-global-order",
+  "agent_id": "agent-1",
+  "objective": "Migrate the existing durable SQLite ledger to exact schema v2 and persist A1 object/projection bundles atomically in its one global sequence.",
+  "executable_blocker": "A1 frozen contracts currently have no crash-safe durable projection storage bound to the existing ledger order.",
+  "base_sha": "b97a465b6d3f4789b1bed8ce4ec7112db1c945be",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "a1_contract_sha256": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+  "branch": "codex/bridge-a1-s05-db-v2",
+  "worktree": "/Volumes/Work/dual-contour-research-os-s05-db-v2",
+  "write_set": [
+    "src/research_bridge/ledger.py",
+    "stages/s05-db-v2-global-order/stage-envelope.json",
+    "stages/s05-db-v2-global-order/ownership-lease.json"
+  ],
+  "forbidden_scope": [
+    "new-ledger", "second-sequence-generator", "new-scheduler", "new-queue",
+    "D2-or-D3-storage", "canonical-scientific-writer", "live-action", "deployment",
+    "contract-edit", "test-edit"
+  ],
+  "dependency_hashes": {
+    "core_contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "a1_contract_catalog": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+    "reuse_receipt_payload": "14967e2fa75b0454e019f94d81625694dab590884b5a3ceada74627b6ccb4542",
+    "external_dependencies": "none"
+  },
+  "acceptance_commands": [
+    "make contracts", "python3 -m unittest tests.test_stage1_ledger tests.test_a1_storage_v2",
+    "fresh-v2-equals-migrated-v2", "migration-idempotent", "fault-injection-no-partial-state",
+    "single-global-sequence", "D2-D3-rejected", "git diff --check"
+  ],
+  "risk_class": "durable-storage-migration-and-global-order",
+  "stop_conditions": [
+    "unknown-fingerprint-accepted", "partial-migration", "partial-bundle",
+    "second-ordering-domain", "D2-or-D3-persisted", "existing-chain-corrupted"
+  ],
+  "expected_receipt": "docs/receipts/integration/s05-db-v2-global-order.json",
+  "rollback": "Reject automatic downgrade. Preserve the original database or approved backup and revert code only after an operator-approved recovery decision.",
+  "commit_authority": "one-scoped-agent-1-commit",
+  "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent5_assurance", "blocked_validation_failed"]
+}

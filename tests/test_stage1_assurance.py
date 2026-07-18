@@ -573,7 +573,12 @@ class Stage1StaticBoundaryTests(unittest.TestCase):
                 "admit",
             },
             "kernel.py": {"BridgeKernel"},
-            "ledger.py": {"LedgerError", "LedgerEvent", "JobLedger"},
+            "ledger.py": {
+                "A1BundleRecord",
+                "JobLedger",
+                "LedgerError",
+                "LedgerEvent",
+            },
         }
         forbidden_imports = {
             "ftplib",
@@ -652,11 +657,16 @@ class Stage1StaticBoundaryTests(unittest.TestCase):
         self.assertEqual(
             ledger_methods,
             {
+                "append_a1_bundle",
                 "claim",
                 "checkpoint",
                 "complete",
                 "completed_event",
                 "event_count",
+                "projection_coverage",
+                "read_a1_object",
+                "storage_coverage_manifest",
+                "verify_a1_coverage",
                 "verify_chain",
                 "close",
                 "pause_global",

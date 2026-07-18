@@ -1,0 +1,19 @@
+{
+  "lease_id": "lease-s05-db-v2-assurance-agent-5",
+  "stage_id": "s05-db-v2-assurance",
+  "agent_id": "agent-5",
+  "base_sha": "1b33ccedd3f2f354cfab7cc76490d8e9ca717f9a",
+  "branch": "codex/bridge-a5-s05-db-v2-assurance",
+  "issued_at": "2026-07-18T14:35:00Z",
+  "expires_at": "2026-07-19T14:35:00Z",
+  "write_set": [
+    "tests/test_stage1_ledger.py",
+    "tests/test_stage1_assurance.py",
+    "tests/test_stage1_control_assurance.py",
+    "tests/test_a1_storage_v2.py",
+    "stages/s05-db-v2-assurance/stage-envelope.json",
+    "stages/s05-db-v2-assurance/ownership-lease.json"
+  ],
+  "exclusive": true,
+  "revoked": false
+}
