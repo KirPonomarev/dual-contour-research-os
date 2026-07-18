@@ -1,0 +1,32 @@
+{
+  "schema_id": "ReuseDecisionReceipt", "schema_version": "1.0.0",
+  "object_id": "reuse-s15-model-registry-broker-20260718", "issued_at": "2026-07-18T16:49:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-freeze-authority"},
+  "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "VERSIONED_MODEL_ROLE_REGISTRY_AND_CONSERVATIVE_DURABLE_MODEL_CALL_FSM",
+    "candidates": [
+      {"candidate": "reuse-frozen-A1-model-role-registry-and-sandbox-budget-semantics", "disposition": "selected"},
+      {"candidate": "reuse-existing-JobLedger-a1_bundle-global-order-and-projection-carry-forward", "disposition": "selected"},
+      {"candidate": "add-stdlib-provider-neutral-model-broker-and-small-ledger-transition-glue", "disposition": "selected-minimal-missing-glue"},
+      {"candidate": "new-database-event-ledger-queue-scheduler-or-secret-store", "disposition": "rejected-duplicate-or-forbidden-surface"},
+      {"candidate": "provider-SDK-or-connected-HTTP-before-adapter-stage", "disposition": "rejected-premature-egress"}
+    ],
+    "selected_mode": "frozen-profile-backed-replaceable-role-bindings-plus-conservative-PROPOSED-RESERVED-SENT-terminal-RECONCILED-transitions-in-the-existing-global-ledger",
+    "source_ref": "git:ab3fd63b6d1ddb7783c26be226465be5f781496c;internal:contracts/a1/model_role_registry+a1_sandbox_policy+JobLedger+CAS-boundary",
+    "code_sha256": "fa705f2bfe46c0b4a5082431e090b13e3a7fa69a70cc58d05fa1d9c834f4cb4f",
+    "license_spdx": "NOASSERTION", "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "exact-profile-and-overlay-binding", "role-privacy-and-disabled-arbiter", "reservation-before-egress",
+      "crash-before-and-after-send", "raw-response-commit-before-success", "UNKNOWN-no-retry-no-release",
+      "duplicate-settlement", "reconciliation", "registry-drift-invalidation", "single-global-order"
+    ],
+    "canonical_owner": "agent-1-model-broker-and-ledger-with-agent-5-assurance-and-agent-0-integration",
+    "rollback": "Remove the additive broker module and model-call transition methods; existing A1, execution and feedback ledger paths remain valid."
+  },
+  "integrity": {"payload_sha256": "632e2d90b3161af8625fdabbddd009326e2b5bee12fd342be2e8b7fa3cfe24aa", "parent_refs": [
+    "git:ab3fd63b6d1ddb7783c26be226465be5f781496c",
+    "sha256:13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "sha256:eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1"
+  ]}
+}

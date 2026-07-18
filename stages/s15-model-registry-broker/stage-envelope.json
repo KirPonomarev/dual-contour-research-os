@@ -1,0 +1,20 @@
+{
+  "stage_id": "s15-model-registry-broker", "agent_id": "agent-1",
+  "objective": "Implement the provider-neutral versioned Model Role Registry and conservative durable model-call FSM in the existing global Bridge ledger.",
+  "executable_blocker": "S16 real provider routing cannot safely begin without deterministic roles, privacy denial, pre-egress reservation and durable UNKNOWN/reconciliation semantics.",
+  "base_sha": "ce89bdb55879ecb6a093dabdb75cb63fa3807d2e",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a1-s15-model-registry-broker",
+  "worktree": "/Volumes/Work/dual-contour-research-os-s15-broker",
+  "read_set": ["contracts/a1/v1/profiles/model_role_registry_v1.json", "contracts/a1/v1/profiles/a1_sandbox_policy_v1.json", "src/research_bridge/ledger.py", "src/research_bridge/cas.py", "docs/ADR/0003-a1-autonomous-research-corridor.md", "docs/ADR/0006-model-broker-path-activation.md"],
+  "write_set": ["src/research_bridge/model_broker.py", "src/research_bridge/ledger.py", "stages/s15-model-registry-broker/stage-envelope.json", "stages/s15-model-registry-broker/ownership-lease.json"],
+  "forbidden_scope": ["contract-edit", "tests-or-assurance-edit", "new-database-table-ledger-queue-or-scheduler", "real-provider-adapter-or-network", "credential-storage", "d2-d3-or-holdout-egress", "authority-grant", "domain-or-canonical-mutation", "deployment", "live-action"],
+  "dependency_hashes": {"core_contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50", "a1_contract_catalog": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1", "ownership_activation_commit": "ce89bdb55879ecb6a093dabdb75cb63fa3807d2e", "external_dependencies": "none-stdlib-only"},
+  "acceptance_commands": ["make contracts", "python3 -m unittest existing ledger/model-adjacent tests", "Agent-5 S15 focused hostile assurance", "make test", "git diff --check"],
+  "risk_class": "critical-cost-leak-duplicate-egress-and-privacy-widening",
+  "stop_conditions": ["provider-call-before-durable-SENT-after-reservation", "UNKNOWN-auto-retry-or-budget-release", "second-event-order", "D2-D3-egress", "registry-drift-not-fail-closed"],
+  "expected_receipt": "docs/receipts/integration/s15-model-registry-broker.json",
+  "rollback": "Remove model_broker.py and additive model-call transition methods; no schema migration, table or existing event semantics are changed.",
+  "commit_authority": "one-scoped-agent-1-commit", "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent5_s15_assurance", "blocked_implementation_failed"]
+}
