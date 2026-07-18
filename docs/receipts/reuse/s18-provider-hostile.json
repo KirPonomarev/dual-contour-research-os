@@ -1,0 +1,24 @@
+{
+  "schema_id": "ReuseDecisionReceipt", "schema_version": "1.0.0",
+  "object_id": "reuse-s18-provider-hostile-20260718", "issued_at": "2026-07-18T19:55:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-freeze-authority"},
+  "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "PROVIDER_SPECIFIC_HOSTILE_ASSURANCE",
+    "candidates": [
+      {"candidate": "reuse-S14-hostile-core-S15-durable-broker-S16-correlation-and-S17-connected-tool", "disposition": "selected"},
+      {"candidate": "add-strict-JSON-and-adapter-seam-bounds-to-existing-Agent0-tool", "disposition": "selected-minimal-missing-glue"},
+      {"candidate": "new-provider-gateway-service-or-SDK", "disposition": "rejected-unnecessary-architecture-and-dependency"},
+      {"candidate": "another-real-provider-call", "disposition": "rejected-five-call-operator-cap-exhausted"},
+      {"candidate": "automatic-UNKNOWN-retry-or-cost-inference", "disposition": "rejected-conservative-accounting-invariant"}
+    ],
+    "selected_mode": "offline-hostile-fixtures-over-existing-durable-connected-boundary-plus-private-S17-proof-digest",
+    "source_ref": "git:923fc65aef1c0511474c9f023b11a0878fb00f18;local-proof:sha256:43fafb2b354813d991da84c1a4757f88b5aee335d4861fa44d2998dcf534a399;official-provider-shapes:s17",
+    "code_sha256": "8558e6277cc357efabe748112c757ba0e2c98815f4c4ba7c090e70de4940a80c",
+    "license_spdx": "NOASSERTION", "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": ["duplicate-key", "nonfinite-number", "malformed-success", "HTTP-failure", "oversize-body", "hostile-header", "UNKNOWN-reconciliation", "drift-and-fallback", "collusion-correlation", "secret-redaction"],
+    "canonical_owner": "agent-0-tool-and-assurance",
+    "rollback": "Revert the scoped connected-tool parser/adapter hardening and remove S18 assurance metadata; no contract or Bridge runtime changes."
+  },
+  "integrity": {"payload_sha256": "f0d2da33ed4d67aa90da068779f7fd6fa96531b4d8101886281e4cd7fb0e3e5d", "parent_refs": ["git:923fc65aef1c0511474c9f023b11a0878fb00f18", "reuse:reuse-s17-connected-provider-shadow-tool-20260718", "integration:integration-s14-provider-independent-hostile-20260718"]}
+}
