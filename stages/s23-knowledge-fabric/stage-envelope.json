@@ -1,0 +1,18 @@
+{
+  "stage_id": "s23-knowledge-fabric", "agent_id": "agent-1",
+  "objective": "Expose a deterministic typed research knowledge fabric from the existing global ledger and atomic feedback projections without creating a second truth store or scientific authority.",
+  "executable_blocker": "Durable feedback exists, but callers cannot retrieve an exact provenanced view of ideas, conflicts, reusable failures, root energy and research debt or measure memory-off versus memory-on behavior.",
+  "base_sha": "8a14529e5086723bde7d35f669dc0470efa9c56b", "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a1-s23-knowledge-fabric", "worktree": "/private/tmp/dcr-s23-knowledge-fabric",
+  "read_set": ["src/research_bridge/ledger.py", "docs/receipts/reuse/s23-knowledge-fabric.json", "tests/test_s08_atomic_feedback.py", "tests/test_s09_feedback_replay_capacity.py"],
+  "write_set": ["src/research_bridge/ledger.py", "stages/s23-knowledge-fabric/stage-envelope.json", "stages/s23-knowledge-fabric/ownership-lease.json"],
+  "forbidden_scope": ["schema-migration-second-ledger-vector-db-or-shared-writer", "domain-scientific-truth-canonical-promotion-or-taint-removal", "scheduler-model-call-network-or-external-data", "test-edit-deploy-live-trading-security-execution-or-publication"],
+  "dependency_hashes": {"base_main": "343ef0611a501e4f58cbdd1f2bc55b1d121400a5", "reuse_receipt_payload": "dacb0e8941cba640fa2651a2b6a3c70f79c7619edf87db8818257517e5781044", "ledger_py": "cb22ee7dff13152ce8356e40df7cc70f81127efed61f04e70afc91ccba72a209", "external_dependencies": "none-stdlib-only"},
+  "acceptance_commands": ["make contracts", "python3 -m unittest tests.test_s08_atomic_feedback tests.test_s09_feedback_replay_capacity tests.test_s23_knowledge_fabric -v", "memory-off-on-measurable", "replay-zero-writes", "git diff --check"],
+  "risk_class": "high-memory-poisoning-shadow-laundering-and-second-truth-domain",
+  "stop_conditions": ["poisoned-or-duplicate-memory-accepted", "shadow-taint-removed-or-scientific-truth-claimed", "query-writes-state", "new-storage-service-or-external-action-required"],
+  "expected_receipt": "docs/receipts/integration/s23-knowledge-fabric.json",
+  "rollback": "Revert the additive read-only report/query and stage metadata; no durable migration or data rollback is required.",
+  "commit_authority": "one-scoped-agent-1-commit", "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent5_assurance", "blocked_validation_failed"]
+}
