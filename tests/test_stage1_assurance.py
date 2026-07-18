@@ -575,6 +575,7 @@ class Stage1StaticBoundaryTests(unittest.TestCase):
             "kernel.py": {"BridgeKernel"},
             "ledger.py": {
                 "A1BundleRecord",
+                "FeedbackBundleRecord",
                 "JobLedger",
                 "LedgerError",
                 "LedgerEvent",
@@ -658,11 +659,14 @@ class Stage1StaticBoundaryTests(unittest.TestCase):
             ledger_methods,
             {
                 "append_a1_bundle",
+                "append_feedback_bundle",
                 "claim",
                 "checkpoint",
                 "complete",
                 "completed_event",
                 "event_count",
+                "feedback_for_execution",
+                "feedback_projection_coverage",
                 "projection_coverage",
                 "read_a1_object",
                 "storage_coverage_manifest",
