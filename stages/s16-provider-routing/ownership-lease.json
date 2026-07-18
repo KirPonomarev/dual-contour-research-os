@@ -1,0 +1,8 @@
+{
+  "lease_id": "lease-s16-provider-routing-agent-1",
+  "stage_id": "s16-provider-routing", "agent_id": "agent-1",
+  "branch": "codex/bridge-a1-s16-provider-routing",
+  "issued_at": "2026-07-18T17:33:00Z", "expires_at": "2026-07-19T17:33:00Z",
+  "write_set": ["src/research_bridge/model_broker.py", "stages/s16-provider-routing/stage-envelope.json", "stages/s16-provider-routing/ownership-lease.json"],
+  "exclusive": true, "revoked": false
+}

@@ -12,6 +12,7 @@ from dataclasses import dataclass
 from datetime import datetime
 import hashlib
 import json
+import math
 from pathlib import Path
 import re
 from types import MappingProxyType
@@ -22,14 +23,21 @@ from .ledger import JobLedger, LedgerError, ModelCallTransitionRecord
 
 __all__ = [
     "KnownProviderFailure",
+    "FixtureProviderAdapter",
     "ModelBrokerError",
+    "ModelBinding",
     "ModelBudgetPolicy",
     "ModelCallBroker",
     "ModelCallHandle",
     "ModelCallSpec",
+    "ModelCorrelationSnapshot",
+    "ModelCouncilPlan",
+    "ModelErrorObservation",
     "ModelProviderAdapter",
+    "ModelProviderRouting",
     "ModelRoleRegistry",
     "ModelRoute",
+    "ModelRouteDecision",
     "ProviderResult",
     "ResponseCommitter",
 ]
@@ -60,6 +68,63 @@ _INVARIANT_KEYS = frozenset(
 )
 _MAX_REQUEST_BYTES = 1_048_576
 _MAX_SAFE_INTEGER = 9_007_199_254_740_991
+_FROZEN_MODEL_ROLES = frozenset(
+    {
+        "SCOUT_FAST",
+        "RESEARCH_WORKER",
+        "CRITIC_PRIMARY",
+        "CRITIC_DEEP",
+        "CHIEF_SCIENTIST",
+        "ARBITER_RESERVE",
+    }
+)
+_ROUTING_PROFILE_KEYS = frozenset(
+    {
+        "profile_id",
+        "schema_version",
+        "status",
+        "routing_mode",
+        "api_identifiers",
+        "privacy",
+        "council",
+        "bindings",
+        "roles",
+        "invariants",
+    }
+)
+_ROUTING_PRIVACY_KEYS = frozenset(
+    {"allowed_input_classes", "forbidden_input_classes"}
+)
+_ROUTING_COUNCIL_KEYS = frozenset({"max_calls", "tiers"})
+_ROUTING_BINDING_KEYS = frozenset(
+    {
+        "provider_slot",
+        "family",
+        "provenance_group",
+        "candidate_api_identifier",
+        "api_identifier_status",
+        "effort_class",
+        "fixture_eval_status",
+        "fixture_eval_ref",
+        "allowed_input_classes",
+        "availability",
+    }
+)
+_ROUTING_ROLE_KEYS = frozenset({"primary", "fallbacks", "unavailable_action"})
+_ROUTING_INVARIANT_KEYS = frozenset(
+    {
+        "model_outputs_are_untrusted",
+        "routing_is_deterministic",
+        "caller_cannot_select_binding",
+        "fallback_cannot_widen_privacy_or_authority",
+        "every_routed_binding_has_fixture_eval",
+        "same_family_efforts_share_provenance_group",
+        "consensus_is_not_evidence",
+        "cross_family_independence_is_not_claimed",
+        "real_provider_calls",
+        "credentials_or_endpoints_present",
+    }
+)
 
 
 class ModelBrokerError(RuntimeError):
@@ -96,6 +161,95 @@ class ModelRoute:
     required_independent_review: bool
     binding_revision: str
     registry_sha256: str
+
+
+@dataclass(frozen=True, slots=True)
+class ModelBinding:
+    name: str
+    provider_slot: str
+    family: str
+    provenance_group: str
+    candidate_api_identifier: str | None
+    api_identifier_status: str
+    effort_class: str
+    fixture_eval_status: str
+    fixture_eval_ref: str | None
+    allowed_input_classes: tuple[str, ...]
+    availability: str
+
+    def __post_init__(self) -> None:
+        _text("binding.name", self.name, maximum=256)
+        _text("binding.provider_slot", self.provider_slot, maximum=128)
+        _text("binding.family", self.family, maximum=128)
+        _portable_ref("binding.provenance_group", self.provenance_group)
+        if self.candidate_api_identifier is not None:
+            candidate = _text(
+                "binding.candidate_api_identifier",
+                self.candidate_api_identifier,
+                maximum=256,
+            )
+            if "://" in candidate:
+                raise ModelBrokerError("candidate API identifier cannot be an endpoint")
+        _text("binding.api_identifier_status", self.api_identifier_status, maximum=64)
+        _text("binding.effort_class", self.effort_class, maximum=64)
+        _text("binding.fixture_eval_status", self.fixture_eval_status, maximum=64)
+        if self.fixture_eval_ref is not None:
+            _portable_ref("binding.fixture_eval_ref", self.fixture_eval_ref)
+        if self.allowed_input_classes != ("D0", "D1"):
+            raise ModelBrokerError("provider binding privacy scope must remain D0/D1")
+        _text("binding.availability", self.availability, maximum=64)
+
+
+@dataclass(frozen=True, slots=True)
+class ModelRouteDecision:
+    role: str
+    status: str
+    binding: str | None
+    provider_slot: str | None
+    family: str | None
+    provenance_group: str | None
+    used_fallback: bool
+    profile_sha256: str
+
+
+@dataclass(frozen=True, slots=True)
+class ModelCouncilPlan:
+    tier: str
+    status: str
+    decisions: tuple[ModelRouteDecision, ...]
+    call_count: int
+    max_calls: int
+    provenance_groups: tuple[str, ...]
+    independence_status: str
+    consensus_is_evidence: bool
+
+
+@dataclass(frozen=True, slots=True)
+class ModelErrorObservation:
+    case_id: str
+    binding: str
+    failed: bool
+
+    def __post_init__(self) -> None:
+        _text("observation.case_id", self.case_id, maximum=256)
+        _text("observation.binding", self.binding, maximum=256)
+        if type(self.failed) is not bool:
+            raise ModelBrokerError("observation.failed must be boolean")
+
+
+@dataclass(frozen=True, slots=True)
+class ModelCorrelationSnapshot:
+    left_provenance_group: str
+    right_provenance_group: str
+    sample_size: int
+    left_errors: int
+    right_errors: int
+    joint_errors: int
+    joint_error_rate_ppm: int
+    uncertainty_low_ppm: int
+    uncertainty_high_ppm: int
+    independence_status: str
+    profile_sha256: str
 
 
 @dataclass(frozen=True, slots=True)
@@ -178,6 +332,69 @@ class ModelProviderAdapter(Protocol):
 
 class ResponseCommitter(Protocol):
     def commit_response(self, raw_response: bytes) -> str: ...
+
+
+class FixtureProviderAdapter:
+    """A strict zero-network adapter for pre-registered public test responses."""
+
+    def __init__(
+        self,
+        binding: ModelBinding,
+        responses_by_request_sha256: Mapping[str, ProviderResult],
+    ) -> None:
+        if not isinstance(binding, ModelBinding):
+            raise ModelBrokerError("fixture adapter requires a ModelBinding")
+        if (
+            binding.fixture_eval_status != "PASS"
+            or binding.availability != "FIXTURE_ONLY"
+        ):
+            raise ModelBrokerError("fixture adapter binding is not fixture-evaluated")
+        responses: dict[str, ProviderResult] = {}
+        for request_sha256, result in responses_by_request_sha256.items():
+            digest = _sha256("fixture request_sha256", request_sha256)
+            if not isinstance(result, ProviderResult):
+                raise ModelBrokerError("fixture response must be ProviderResult")
+            responses[digest] = result
+        self.model_binding = binding.name
+        self.provider_slot = binding.provider_slot
+        self._responses = MappingProxyType(responses)
+
+    def invoke(
+        self,
+        *,
+        call_id: str,
+        request_bytes: bytes,
+        max_tokens: int,
+    ) -> ProviderResult:
+        normalized_call_id = _text("call_id", call_id, maximum=128)
+        if not normalized_call_id.startswith("model-call:"):
+            raise ModelBrokerError("fixture call_id is invalid")
+        _sha256("call_id digest", normalized_call_id.removeprefix("model-call:"))
+        if not isinstance(request_bytes, bytes) or not request_bytes:
+            raise ModelBrokerError("fixture request must be non-empty bytes")
+        _positive("max_tokens", max_tokens)
+        request_sha256 = hashlib.sha256(request_bytes).hexdigest()
+        result = self._responses.get(request_sha256)
+        if result is None:
+            raise KnownProviderFailure(
+                "FIXTURE_CASE_NOT_REGISTERED",
+                actual_tokens=0,
+                actual_cost_units=0,
+                provider_receipt_ref=(
+                    "fixture:sha256:"
+                    + hashlib.sha256(
+                        f"{self.model_binding}:{request_sha256}".encode("utf-8")
+                    ).hexdigest()
+                ),
+            )
+        if result.actual_tokens is not None and result.actual_tokens > max_tokens:
+            raise KnownProviderFailure(
+                "FIXTURE_TOKEN_LIMIT_EXCEEDED",
+                actual_tokens=result.actual_tokens,
+                actual_cost_units=result.actual_cost_units,
+                provider_receipt_ref=result.provider_receipt_ref,
+            )
+        return result
 
 
 class ModelRoleRegistry:
@@ -299,6 +516,428 @@ class ModelRoleRegistry:
             binding_revision=self._binding_revision,
             registry_sha256=self._registry_sha256,
         )
+
+
+class ModelProviderRouting:
+    """Strict fixture-evaluated routing without transport or provider authority."""
+
+    def __init__(
+        self,
+        profile_path: str | Path,
+        *,
+        expected_profile_sha256: str,
+        role_registry: ModelRoleRegistry,
+    ) -> None:
+        if not isinstance(role_registry, ModelRoleRegistry):
+            raise ModelBrokerError("routing requires ModelRoleRegistry")
+        expected = _sha256(
+            "expected routing profile sha256", expected_profile_sha256
+        )
+        try:
+            raw = Path(profile_path).read_bytes()
+        except OSError as exc:
+            raise ModelBrokerError("provider routing profile is unavailable") from exc
+        actual = hashlib.sha256(raw).hexdigest()
+        if actual != expected:
+            raise ModelBrokerError("provider routing profile digest mismatch")
+        try:
+            profile = json.loads(raw, object_pairs_hook=_strict_object)
+        except (UnicodeDecodeError, json.JSONDecodeError, ModelBrokerError) as exc:
+            raise ModelBrokerError("provider routing profile is not strict JSON") from exc
+        value = _exact(profile, _ROUTING_PROFILE_KEYS, "provider routing profile")
+        if (
+            value["profile_id"] != "model-provider-routing-v1"
+            or value["schema_version"] != "1.0.0"
+            or value["status"] != "fixture-evaluated"
+            or value["routing_mode"]
+            != "deterministic-role-to-evaluated-binding"
+            or value["api_identifiers"]
+            != "UNVERIFIED_UNTIL_REAL_PROVIDER_SHADOW"
+        ):
+            raise ModelBrokerError("provider routing profile identity mismatch")
+
+        privacy = _exact(
+            value["privacy"], _ROUTING_PRIVACY_KEYS, "provider routing privacy"
+        )
+        if privacy != {
+            "allowed_input_classes": ["D0", "D1"],
+            "forbidden_input_classes": ["D2", "D3", "sealed-holdout"],
+        }:
+            raise ModelBrokerError("provider routing privacy scope drifted")
+        invariants = _exact(
+            value["invariants"],
+            _ROUTING_INVARIANT_KEYS,
+            "provider routing invariants",
+        )
+        true_invariants = set(_ROUTING_INVARIANT_KEYS) - {
+            "real_provider_calls",
+            "credentials_or_endpoints_present",
+        }
+        if any(invariants[name] is not True for name in true_invariants) or any(
+            invariants[name] is not False
+            for name in {"real_provider_calls", "credentials_or_endpoints_present"}
+        ):
+            raise ModelBrokerError("provider routing invariants drifted")
+
+        raw_bindings = value["bindings"]
+        if not isinstance(raw_bindings, Mapping) or not raw_bindings:
+            raise ModelBrokerError("provider routing bindings are empty")
+        bindings: dict[str, ModelBinding] = {}
+        family_groups: dict[str, str] = {}
+        for raw_name, raw_definition in raw_bindings.items():
+            name = _text("provider binding name", raw_name, maximum=256)
+            definition = _exact(
+                raw_definition,
+                _ROUTING_BINDING_KEYS,
+                f"provider binding.{name}",
+            )
+            allowed = definition["allowed_input_classes"]
+            if allowed != ["D0", "D1"]:
+                raise ModelBrokerError("provider binding privacy scope drifted")
+            candidate = definition["candidate_api_identifier"]
+            eval_ref = definition["fixture_eval_ref"]
+            binding = ModelBinding(
+                name=name,
+                provider_slot=_text(
+                    f"binding.{name}.provider_slot",
+                    definition["provider_slot"],
+                    maximum=128,
+                ),
+                family=_text(
+                    f"binding.{name}.family", definition["family"], maximum=128
+                ),
+                provenance_group=_portable_ref(
+                    f"binding.{name}.provenance_group",
+                    definition["provenance_group"],
+                ),
+                candidate_api_identifier=(
+                    None
+                    if candidate is None
+                    else _text(
+                        f"binding.{name}.candidate_api_identifier",
+                        candidate,
+                        maximum=256,
+                    )
+                ),
+                api_identifier_status=_text(
+                    f"binding.{name}.api_identifier_status",
+                    definition["api_identifier_status"],
+                    maximum=64,
+                ),
+                effort_class=_text(
+                    f"binding.{name}.effort_class",
+                    definition["effort_class"],
+                    maximum=64,
+                ),
+                fixture_eval_status=_text(
+                    f"binding.{name}.fixture_eval_status",
+                    definition["fixture_eval_status"],
+                    maximum=64,
+                ),
+                fixture_eval_ref=(
+                    None
+                    if eval_ref is None
+                    else _portable_ref(f"binding.{name}.fixture_eval_ref", eval_ref)
+                ),
+                allowed_input_classes=tuple(allowed),
+                availability=_text(
+                    f"binding.{name}.availability",
+                    definition["availability"],
+                    maximum=64,
+                ),
+            )
+            if binding.availability == "FIXTURE_ONLY":
+                if (
+                    binding.fixture_eval_status != "PASS"
+                    or binding.fixture_eval_ref is None
+                    or binding.api_identifier_status != "UNVERIFIED"
+                    or binding.candidate_api_identifier is None
+                ):
+                    raise ModelBrokerError(
+                        "routable fixture binding lacks exact evaluation state"
+                    )
+            elif binding.availability == "DISABLED_UNEVALUATED":
+                if (
+                    binding.fixture_eval_status != "NOT_RUN"
+                    or binding.fixture_eval_ref is not None
+                    or binding.api_identifier_status != "UNSELECTED"
+                    or binding.candidate_api_identifier is not None
+                ):
+                    raise ModelBrokerError("disabled reserve binding is not inert")
+            else:
+                raise ModelBrokerError("provider binding availability is unsupported")
+            previous_group = family_groups.setdefault(
+                binding.family, binding.provenance_group
+            )
+            if previous_group != binding.provenance_group:
+                raise ModelBrokerError(
+                    "same provider family must share one provenance group"
+                )
+            bindings[name] = binding
+
+        raw_roles = value["roles"]
+        if not isinstance(raw_roles, Mapping) or set(raw_roles) != _FROZEN_MODEL_ROLES:
+            raise ModelBrokerError("provider routing roles differ from frozen roles")
+        roles: dict[str, tuple[str | None, tuple[str, ...], str]] = {}
+        routed_bindings: set[str] = set()
+        for role in sorted(_FROZEN_MODEL_ROLES):
+            definition = _exact(
+                raw_roles[role], _ROUTING_ROLE_KEYS, f"provider route.{role}"
+            )
+            primary = definition["primary"]
+            if primary is not None:
+                primary = _text(f"route.{role}.primary", primary, maximum=256)
+            raw_fallbacks = definition["fallbacks"]
+            if not isinstance(raw_fallbacks, list):
+                raise ModelBrokerError("provider route fallbacks must be a list")
+            fallbacks = tuple(
+                _text(f"route.{role}.fallback", item, maximum=256)
+                for item in raw_fallbacks
+            )
+            if len(set(fallbacks)) != len(fallbacks) or primary in fallbacks:
+                raise ModelBrokerError("provider route contains duplicate bindings")
+            action = _text(
+                f"route.{role}.unavailable_action",
+                definition["unavailable_action"],
+                maximum=64,
+            )
+            if action not in {"PARKED", "WAIT_PROVIDER"}:
+                raise ModelBrokerError("provider unavailable action is unsupported")
+            candidates = (() if primary is None else (primary,)) + fallbacks
+            if any(candidate not in bindings for candidate in candidates):
+                raise ModelBrokerError("provider route references an unknown binding")
+            if any(
+                bindings[candidate].availability != "FIXTURE_ONLY"
+                or bindings[candidate].fixture_eval_status != "PASS"
+                for candidate in candidates
+            ):
+                raise ModelBrokerError("provider route references an unevaluated binding")
+            if role == "ARBITER_RESERVE":
+                if primary is not None or fallbacks:
+                    raise ModelBrokerError("reserve arbiter must remain disabled")
+                try:
+                    role_registry.route(role, "D0")
+                except ModelBrokerError:
+                    pass
+                else:
+                    raise ModelBrokerError("reserve arbiter registry binding is active")
+            else:
+                if primary is None:
+                    raise ModelBrokerError("active model role lacks a primary binding")
+                if role_registry.route(role, "D0").model_binding != primary:
+                    raise ModelBrokerError(
+                        "provider route primary differs from role registry binding"
+                    )
+            routed_bindings.update(candidates)
+            roles[role] = (primary, fallbacks, action)
+
+        council = _exact(
+            value["council"], _ROUTING_COUNCIL_KEYS, "provider council"
+        )
+        max_calls = _positive("provider council max_calls", council["max_calls"])
+        raw_tiers = council["tiers"]
+        expected_tiers = {
+            "STANDARD": ("RESEARCH_WORKER", "CRITIC_PRIMARY"),
+            "MATERIAL": (
+                "RESEARCH_WORKER",
+                "CRITIC_PRIMARY",
+                "CRITIC_DEEP",
+            ),
+            "CRITICAL": (
+                "RESEARCH_WORKER",
+                "CRITIC_PRIMARY",
+                "CRITIC_DEEP",
+                "CHIEF_SCIENTIST",
+            ),
+        }
+        if not isinstance(raw_tiers, Mapping) or set(raw_tiers) != set(
+            expected_tiers
+        ):
+            raise ModelBrokerError("provider council tiers differ from frozen scope")
+        tiers: dict[str, tuple[str, ...]] = {}
+        for tier, expected_roles in expected_tiers.items():
+            configured = raw_tiers[tier]
+            if not isinstance(configured, list) or tuple(configured) != expected_roles:
+                raise ModelBrokerError("provider council tier role order drifted")
+            if len(configured) > max_calls:
+                raise ModelBrokerError("provider council tier exceeds call cap")
+            tiers[tier] = expected_roles
+        if max_calls != 4:
+            raise ModelBrokerError("provider council call cap drifted")
+        if set(bindings) - routed_bindings != {"qwen-reserve-slot"}:
+            raise ModelBrokerError("unexpected unrouted provider binding")
+
+        self._profile_sha256 = actual
+        self._bindings = MappingProxyType(bindings)
+        self._roles = MappingProxyType(roles)
+        self._tiers = MappingProxyType(tiers)
+        self._max_calls = max_calls
+
+    @property
+    def profile_sha256(self) -> str:
+        return self._profile_sha256
+
+    def binding(self, name: str) -> ModelBinding:
+        normalized = _text("provider binding", name, maximum=256)
+        binding = self._bindings.get(normalized)
+        if binding is None:
+            raise ModelBrokerError("provider binding is not registered")
+        return binding
+
+    def route(
+        self,
+        role: str,
+        classification: str,
+        *,
+        available_bindings: frozenset[str],
+    ) -> ModelRouteDecision:
+        name = _text("provider route role", role, maximum=128)
+        if name not in self._roles:
+            raise ModelBrokerError("provider route role is unknown")
+        if classification not in {"D0", "D1"}:
+            raise ModelBrokerError("provider routing privacy matrix denies input")
+        available = self._available(available_bindings)
+        primary, fallbacks, unavailable_action = self._roles[name]
+        candidates = (() if primary is None else (primary,)) + fallbacks
+        for index, candidate in enumerate(candidates):
+            if candidate not in available:
+                continue
+            binding = self._bindings[candidate]
+            if classification not in binding.allowed_input_classes:
+                raise ModelBrokerError("provider fallback would widen privacy")
+            return ModelRouteDecision(
+                role=name,
+                status="ROUTED",
+                binding=binding.name,
+                provider_slot=binding.provider_slot,
+                family=binding.family,
+                provenance_group=binding.provenance_group,
+                used_fallback=index > 0,
+                profile_sha256=self._profile_sha256,
+            )
+        return ModelRouteDecision(
+            role=name,
+            status=unavailable_action,
+            binding=None,
+            provider_slot=None,
+            family=None,
+            provenance_group=None,
+            used_fallback=False,
+            profile_sha256=self._profile_sha256,
+        )
+
+    def plan_council(
+        self,
+        tier: str,
+        classification: str,
+        *,
+        available_bindings: frozenset[str],
+    ) -> ModelCouncilPlan:
+        normalized = _text("provider council tier", tier, maximum=64)
+        roles = self._tiers.get(normalized)
+        if roles is None:
+            raise ModelBrokerError("provider council tier is unknown")
+        decisions = tuple(
+            self.route(
+                role,
+                classification,
+                available_bindings=available_bindings,
+            )
+            for role in roles
+        )
+        if len(decisions) > self._max_calls:
+            raise ModelBrokerError("provider council call cap exceeded")
+        statuses = {decision.status for decision in decisions}
+        if statuses == {"ROUTED"}:
+            status = "ROUTED"
+        elif "WAIT_PROVIDER" in statuses:
+            status = "WAIT_PROVIDER"
+        else:
+            status = "PARKED"
+        groups = tuple(
+            sorted(
+                {
+                    decision.provenance_group
+                    for decision in decisions
+                    if decision.provenance_group is not None
+                }
+            )
+        )
+        return ModelCouncilPlan(
+            tier=normalized,
+            status=status,
+            decisions=decisions,
+            call_count=sum(decision.status == "ROUTED" for decision in decisions),
+            max_calls=self._max_calls,
+            provenance_groups=groups,
+            independence_status="INDEPENDENCE_NOT_ESTABLISHED",
+            consensus_is_evidence=False,
+        )
+
+    def correlation_snapshot(
+        self,
+        left_binding: str,
+        right_binding: str,
+        observations: tuple[ModelErrorObservation, ...],
+    ) -> ModelCorrelationSnapshot:
+        left = self.binding(left_binding)
+        right = self.binding(right_binding)
+        if left.name == right.name:
+            raise ModelBrokerError("correlation requires two distinct bindings")
+        if left.availability != "FIXTURE_ONLY" or right.availability != "FIXTURE_ONLY":
+            raise ModelBrokerError("correlation requires evaluated fixture bindings")
+        if not isinstance(observations, tuple) or any(
+            not isinstance(item, ModelErrorObservation) for item in observations
+        ):
+            raise ModelBrokerError("correlation observations must be a tuple")
+        allowed = {left.name, right.name}
+        by_case: dict[str, dict[str, bool]] = {}
+        for observation in observations:
+            if observation.binding not in allowed:
+                raise ModelBrokerError("correlation observation binding is unrelated")
+            case = by_case.setdefault(observation.case_id, {})
+            if observation.binding in case:
+                raise ModelBrokerError("duplicate correlation observation")
+            case[observation.binding] = observation.failed
+        paired = [case for case in by_case.values() if set(case) == allowed]
+        sample_size = len(paired)
+        left_errors = sum(case[left.name] for case in paired)
+        right_errors = sum(case[right.name] for case in paired)
+        joint_errors = sum(case[left.name] and case[right.name] for case in paired)
+        rate = 0 if sample_size == 0 else round(joint_errors * 1_000_000 / sample_size)
+        low, high = _wilson_ppm(joint_errors, sample_size)
+        status = (
+            "CORRELATED_SAME_PROVENANCE_GROUP"
+            if left.provenance_group == right.provenance_group
+            else "INDEPENDENCE_NOT_ESTABLISHED"
+        )
+        return ModelCorrelationSnapshot(
+            left_provenance_group=left.provenance_group,
+            right_provenance_group=right.provenance_group,
+            sample_size=sample_size,
+            left_errors=left_errors,
+            right_errors=right_errors,
+            joint_errors=joint_errors,
+            joint_error_rate_ppm=rate,
+            uncertainty_low_ppm=low,
+            uncertainty_high_ppm=high,
+            independence_status=status,
+            profile_sha256=self._profile_sha256,
+        )
+
+    def _available(self, values: frozenset[str]) -> frozenset[str]:
+        if not isinstance(values, frozenset) or any(
+            not isinstance(value, str) for value in values
+        ):
+            raise ModelBrokerError("available bindings must be a frozenset of names")
+        unknown = values - set(self._bindings)
+        if unknown:
+            raise ModelBrokerError("availability contains an unknown provider binding")
+        if any(
+            self._bindings[name].availability != "FIXTURE_ONLY" for name in values
+        ):
+            raise ModelBrokerError("disabled provider binding cannot become available")
+        return values
 
 
 class ModelCallBroker:
@@ -696,6 +1335,26 @@ def _canonical_sha256(value: object) -> str:
     except (TypeError, ValueError, UnicodeError) as exc:
         raise ModelBrokerError("registry material is not canonical JSON data") from exc
     return hashlib.sha256(encoded).hexdigest()
+
+
+def _wilson_ppm(errors: int, sample_size: int) -> tuple[int, int]:
+    if sample_size == 0:
+        return 0, 1_000_000
+    proportion = errors / sample_size
+    z = 1.959963984540054
+    denominator = 1 + z * z / sample_size
+    center = (proportion + z * z / (2 * sample_size)) / denominator
+    radius = (
+        z
+        * math.sqrt(
+            proportion * (1 - proportion) / sample_size
+            + z * z / (4 * sample_size * sample_size)
+        )
+        / denominator
+    )
+    low = max(0, min(1_000_000, round((center - radius) * 1_000_000)))
+    high = max(0, min(1_000_000, round((center + radius) * 1_000_000)))
+    return low, high
 
 
 def _text(name: str, value: object, *, maximum: int) -> str:
