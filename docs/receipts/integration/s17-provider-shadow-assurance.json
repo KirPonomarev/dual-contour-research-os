@@ -1,0 +1,16 @@
+{
+  "schema_id": "IntegrationReceipt", "schema_version": "1.0.0",
+  "object_id": "integration-s17-provider-shadow-assurance-20260718", "issued_at": "2026-07-18T18:27:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s17-provider-shadow-assurance", "agent_id": "agent-5",
+    "ownership_lease_ref": "stages/s17-provider-shadow-assurance/ownership-lease.json",
+    "base_sha": "b95b4e7d791610c9064c5e6a104aa6a172417e04", "head_sha": "38292f78e54651930318cc6dcb51495f618e20a6",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": ["tests/test_s17_provider_shadow_tool.py", "stages/s17-provider-shadow-assurance/stage-envelope.json", "stages/s17-provider-shadow-assurance/ownership-lease.json"],
+    "audit_results": {"contract_gate": "green", "privacy_secret_scan": "green", "source_mutation": false, "focused_tests": 34, "new_hostile_tests": 8, "full_core_tests": 636, "stage0b_tests": 25, "exact_model_and_effort_mapping": "green", "caller_selected_binding": false, "D0_D1_only": true, "secret_value_output": false, "redirect_denial": "green", "bounded_response_envelope": "green", "repo_local_private_CAS": false, "fake_connected_durable_broker": "green", "cost_reservation_retained": true, "automatic_retry": false, "real_provider_calls_or_cost": 0},
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29655873909", "integration_commit_sha": "0853860c64412a388122b60505d00264775d0ef6"
+  },
+  "integrity": {"payload_sha256": "ca9c2c6f1180f2af3168759b1fe2ee8de85995d0ece7942baae0c3e58747fe8e", "parent_refs": ["git:38292f78e54651930318cc6dcb51495f618e20a6", "git:0853860c64412a388122b60505d00264775d0ef6", "ci:29655873909", "git:b95b4e7d791610c9064c5e6a104aa6a172417e04"]}
+}
