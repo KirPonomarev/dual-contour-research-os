@@ -21,15 +21,27 @@ class OwnershipRegistryTests(unittest.TestCase):
     def test_current_registry_covers_every_live_path_exactly_once(self) -> None:
         self.assertEqual(ownership_failures(self.registry, self.live_paths), [])
 
-    def test_amendment_receipt_binds_previous_and_current_registry(self) -> None:
-        amendment = json.loads(
-            (ROOT / "docs" / "receipts" / "OWNERSHIP_REGISTRY_AMENDMENT.json").read_text()
-        )
+    def test_amendment_receipts_form_a_chain_to_current_registry(self) -> None:
+        amendments = [
+            json.loads(path.read_text())
+            for path in sorted(
+                (ROOT / "docs" / "receipts").glob("OWNERSHIP_REGISTRY_AMENDMENT*.json")
+            )
+        ]
         current = hashlib.sha256((ROOT / "ownership" / "registry.json").read_bytes()).hexdigest()
         frozen = json.loads((ROOT / "docs" / "receipts" / "CONTRACTS_FROZEN.json").read_text())
-        self.assertEqual(amendment["status"], "OWNERSHIP_REGISTRY_AMENDED")
-        self.assertEqual(amendment["previous_ownership_registry_sha256"], frozen["ownership_registry_sha256"])
-        self.assertEqual(amendment["current_ownership_registry_sha256"], current)
+        cursor = frozen["ownership_registry_sha256"]
+        while cursor != current:
+            candidates = [
+                value
+                for value in amendments
+                if value["previous_ownership_registry_sha256"] == cursor
+            ]
+            self.assertEqual(len(candidates), 1)
+            amendment = candidates[0]
+            self.assertEqual(amendment["status"], "OWNERSHIP_REGISTRY_AMENDED")
+            cursor = amendment["current_ownership_registry_sha256"]
+        self.assertEqual(cursor, current)
 
     def test_reuse_receipt_is_schema_shaped_and_integrity_bound(self) -> None:
         receipt = json.loads(
