@@ -575,6 +575,17 @@ class A1AuthorityCorridor:
             expected_core_catalog_sha256, "expected Core catalog digest"
         )
         _expect_sha256(expected_a1_catalog_sha256, "expected A1 catalog digest")
+        expected_classes = {
+            "JobSpec": "admission-controller",
+            "Permit": "permit-authority",
+            "AttemptLease": "researchd",
+        }
+        for schema_id, authority_class in expected_classes.items():
+            issuer = authority._trusted_issuer_document(schema_id)
+            if issuer["authority_class"] != authority_class:
+                raise AuthorityError(
+                    f"{schema_id} issuer does not hold the frozen corridor role"
+                )
         self._authority = authority
         self._executor = executor_profile
         self._admission_receipts = _copy_object_mapping(
