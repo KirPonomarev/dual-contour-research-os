@@ -1239,23 +1239,15 @@ class ModelCallBroker:
             )
             if not isinstance(accounting, ProviderAccounting):
                 raise ModelBrokerError("provider parser returned invalid accounting")
-        except KnownProviderFailure as exc:
-            failed = self._terminal(
+        except KnownProviderFailure:
+            # The frozen ledger shape cannot attach a response reference to
+            # FAILED_KNOWN. Conservatively retain the committed evidence as
+            # UNKNOWN for later provider reconciliation instead of creating an
+            # unreferenced CAS object or weakening that durable invariant.
+            return self._mark_unknown(
                 sent_record.snapshot,
-                state="FAILED_KNOWN",
                 event_at=timestamp,
                 response_ref=response_ref,
-                actual_tokens=exc.actual_tokens,
-                actual_cost_units=exc.actual_cost_units,
-                provider_receipt_ref=exc.provider_receipt_ref,
-                failure_code=exc.code,
-            )
-            return _handle(
-                self._append(
-                    failed,
-                    idempotency_key=f"{call_id}:failed-known",
-                    event_at=timestamp,
-                )
             )
         except Exception:
             return self._mark_unknown(
