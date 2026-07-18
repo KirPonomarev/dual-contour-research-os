@@ -27,6 +27,7 @@ _RFC3339_RE = re.compile(
 _PAYLOAD_REF_RE = re.compile(r"^(?:cas|vault):[A-Za-z0-9][A-Za-z0-9._:/+-]{0,511}$")
 _ACCOUNTING_POLICY_REF_RE = re.compile(r"^budget-policy:sha256:[a-f0-9]{64}$")
 _BUDGET_SCOPE_REF_RE = re.compile(r"^budget-scope:sha256:[a-f0-9]{64}$")
+_A1_RESERVATION_REF_RE = re.compile(r"^budget-reservation:[a-f0-9]{64}$")
 _EMBEDDED_REF_RE = re.compile(r"^embedded:sha256:[a-f0-9]{64}$")
 _EVENT_TYPES = frozenset(
     {"claim", "checkpoint", "complete", "pause", "resume", "a1_bundle"}
@@ -269,6 +270,9 @@ _CLAIM_PAYLOAD_FIELDS = frozenset(
         "runner_identity",
         "scope_limit",
     }
+)
+_CLAIM_PAYLOAD_FIELDS_WITH_A1 = _CLAIM_PAYLOAD_FIELDS | frozenset(
+    {"admission_reservation_ref"}
 )
 _COMPLETE_PAYLOAD_FIELDS = frozenset(
     {
@@ -578,6 +582,7 @@ class JobLedger:
         reservation_expires_at: str,
         contour: str,
         classification: str,
+        admission_reservation_ref: str | None = None,
     ) -> LedgerEvent:
         """Atomically reserve hard capacity and append the sole job claim."""
 
@@ -620,6 +625,12 @@ class JobLedger:
         classification = _enum_text(
             "classification", classification, _CLASSIFICATIONS
         )
+        if admission_reservation_ref is not None:
+            admission_reservation_ref = _pattern_text(
+                "admission_reservation_ref",
+                admission_reservation_ref,
+                _A1_RESERVATION_REF_RE,
+            )
         fencing_token_sha256 = _digest(fencing_token.encode("utf-8"))
 
         request_payload = {
@@ -636,6 +647,8 @@ class JobLedger:
             "runner_identity": runner_identity,
             "scope_limit": {"cost_units": scope_limit_cost_units},
         }
+        if admission_reservation_ref is not None:
+            request_payload["admission_reservation_ref"] = admission_reservation_ref
         with self._lock:
             self._ensure_open()
             self._begin_immediate()
@@ -687,6 +700,7 @@ class JobLedger:
                     contour=contour,
                     classification=classification,
                     ledger_version_before=self._ledger_tail_sequence(),
+                    admission_reservation_ref=admission_reservation_ref,
                 )
                 payload = {**request_payload, "budget_reservation": reservation}
                 event = self._append(
@@ -1556,6 +1570,7 @@ class JobLedger:
         contour: str,
         classification: str,
         ledger_version_before: int,
+        admission_reservation_ref: str | None,
     ) -> dict[str, object]:
         payload: dict[str, object] = {
             "trial_ref": trial_ref,
@@ -1567,6 +1582,16 @@ class JobLedger:
             "expires_at": expires_at,
         }
         payload_sha256 = _digest(_canonical_json(payload).encode("utf-8"))
+        parent_refs = [
+            job_id,
+            permit_id,
+            f"attempt:{attempt_id}",
+            f"admission:sha256:{admission_digest}",
+            accounting_policy_ref,
+            budget_scope_ref,
+        ]
+        if admission_reservation_ref is not None:
+            parent_refs.append(admission_reservation_ref)
         return {
             "schema_id": "BudgetReservation",
             "schema_version": "1.0.0",
@@ -1578,14 +1603,7 @@ class JobLedger:
             "payload": payload,
             "integrity": {
                 "payload_sha256": payload_sha256,
-                "parent_refs": [
-                    job_id,
-                    permit_id,
-                    f"attempt:{attempt_id}",
-                    f"admission:sha256:{admission_digest}",
-                    accounting_policy_ref,
-                    budget_scope_ref,
-                ],
+                "parent_refs": parent_refs,
             },
         }
 
@@ -1866,9 +1884,12 @@ class JobLedger:
 
     @staticmethod
     def _validate_budget_claim_event(event: LedgerEvent) -> _BudgetProjection:
-        payload = _exact_object(
-            "persisted claim payload", event.payload, _CLAIM_PAYLOAD_FIELDS
+        expected_fields = (
+            _CLAIM_PAYLOAD_FIELDS_WITH_A1
+            if "admission_reservation_ref" in event.payload
+            else _CLAIM_PAYLOAD_FIELDS
         )
+        payload = _exact_object("persisted claim payload", event.payload, expected_fields)
         accounting_policy_ref = _pattern_text(
             "persisted accounting_policy_ref",
             payload["accounting_policy_ref"],
@@ -1965,6 +1986,13 @@ class JobLedger:
             accounting_policy_ref,
             budget_scope_ref,
         ]
+        if "admission_reservation_ref" in payload:
+            admission_reservation_ref = _pattern_text(
+                "persisted admission_reservation_ref",
+                payload["admission_reservation_ref"],
+                _A1_RESERVATION_REF_RE,
+            )
+            expected_parents.append(admission_reservation_ref)
         if reservation["integrity"]["parent_refs"] != expected_parents:
             raise LedgerError("persisted reservation parent bindings are invalid")
         return _BudgetProjection(

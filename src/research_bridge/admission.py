@@ -94,6 +94,7 @@ _CLASSIFICATIONS = {
 _SHA256 = re.compile(r"^[a-f0-9]{64}$")
 _ACCOUNTING_POLICY_REF = re.compile(r"^budget-policy:sha256:[a-f0-9]{64}$")
 _BUDGET_SCOPE_REF = re.compile(r"^budget-scope:sha256:[a-f0-9]{64}$")
+_A1_RESERVATION_REF = re.compile(r"^budget-reservation:[a-f0-9]{64}$")
 _RFC3339 = re.compile(
     r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$"
 )
@@ -259,6 +260,14 @@ def admit(
             "permit_sha256": canonical_json_sha256(permit),
         }
     )
+    permit_parent_refs = permit["integrity"]["parent_refs"]
+    reservation_refs = [
+        reference
+        for reference in permit_parent_refs
+        if _A1_RESERVATION_REF.fullmatch(reference) is not None
+    ]
+    if len(reservation_refs) > 1:
+        raise AdmissionError("permit has ambiguous A1 reservation authority")
     return AdmissionGrant(
         job_id=job_id,
         attempt_id=lease_payload["attempt_id"],
