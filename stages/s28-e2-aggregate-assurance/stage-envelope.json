@@ -1,0 +1,18 @@
+{
+  "stage_id": "s28-e2-aggregate-assurance", "agent_id": "agent-5",
+  "objective": "Hostile-test exact E2 evidence digests, integration integrity and ancestry, scoped proof reproduction, overclaim denial and proof invalidation.",
+  "executable_blocker": "The S28 aggregate proof cannot integrate until resealed council, replication and memory claim laundering plus stale/mixed proof paths are proven fail-closed.",
+  "base_sha": "2ec7aeac182c863179762ad32119d635d47469ed", "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a5-s28-e2-aggregate-assurance", "worktree": "/private/tmp/dcr-s28-e2-aggregate-assurance",
+  "read_set": ["tools/capability_proof.py", "tools/e2_aggregate_gate.py", "docs/receipts/capability/e2-autonomous-research-shadow.json", "docs/receipts/integration/s23-knowledge-fabric-assurance.json", "docs/receipts/integration/s24-agenda-portfolio-assurance.json", "docs/receipts/integration/s25-council-assurance.json", "docs/receipts/integration/s26-replication-assurance.json", "docs/receipts/integration/s27-memory-assurance.json"],
+  "write_set": ["tests/test_s28_e2_aggregate_gate.py", "stages/s28-e2-aggregate-assurance/stage-envelope.json", "stages/s28-e2-aggregate-assurance/ownership-lease.json"],
+  "forbidden_scope": ["source-contract-profile-provenance-capability-receipt-root-CI-or-lockfile-edit", "real-private-data-model-call-network-or-new-runtime", "global-replication-memory-uplift-calibrated-truth-or-council-evidence-claim", "canonical-mutation-promotion-deploy-live-or-authority-action"],
+  "dependency_hashes": {"aggregate_stage": "2ec7aeac182c863179762ad32119d635d47469ed", "capability_payload": "b1ca90f8f7f196ddad03fdf3c23150dc2ec6020df27f3791fcfc1fb1d807caf3", "external_dependencies": "none"},
+  "acceptance_commands": ["make contracts", "python3 -m unittest tests.test_s28_e2_aggregate_gate", "python3 tools/e2_aggregate_gate.py --receipt docs/receipts/capability/e2-autonomous-research-shadow.json", "make test", "git diff --check"],
+  "risk_class": "high-aggregate-overclaim-proof-laundering-staleness-and-invalidation",
+  "stop_conditions": ["resealed-overclaim-accepted", "stale-or-mixed-head-pass", "authority-or-action-claim", "component-evidence-rewrite", "static-proof-framework-weakened"],
+  "expected_receipt": "docs/receipts/integration/s28-e2-aggregate-assurance.json",
+  "rollback": "Remove S28 hostile tests and stage metadata; aggregate implementation remains separately revertible.",
+  "commit_authority": "one-scoped-agent-5-commit", "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent0_s28_integration", "blocked_validation_failed"]
+}
