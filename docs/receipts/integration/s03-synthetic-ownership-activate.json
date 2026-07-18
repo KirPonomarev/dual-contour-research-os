@@ -1,0 +1,34 @@
+{
+  "schema_id": "IntegrationReceipt", "schema_version": "1.0.0",
+  "object_id": "integration-s03-synthetic-ownership-activate-20260718",
+  "issued_at": "2026-07-18T13:59:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s03-synthetic-ownership-activate", "agent_id": "agent-0",
+    "ownership_lease_ref": "stages/s03-synthetic-ownership-activate/ownership-lease.json",
+    "base_sha": "f9592bcaf7b6a94817dfb1937ba9e5f9c8e284ce",
+    "head_sha": "d293fa63062f1dd305f3cc9c7b7bc543689aac97",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "ownership/registry.json", "docs/ADR/0004-synthetic-market-fixture-activation.md",
+      "docs/receipts/OWNERSHIP_REGISTRY_AMENDMENT_3.json",
+      "docs/receipts/reuse/s03-synthetic-domain-freeze.json",
+      "stages/s03-synthetic-ownership-activate/stage-envelope.json",
+      "stages/s03-synthetic-ownership-activate/ownership-lease.json"
+    ],
+    "audit_results": {
+      "contract_gate": "green", "privacy_secret_scan": "green", "source_mutation": false,
+      "ownership_chain": "green", "reserved_path_activation": "agent-3-market-adapter-only",
+      "dependency_adoption": false, "authority_expansion": false
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29647118829",
+    "integration_commit_sha": "d293fa63062f1dd305f3cc9c7b7bc543689aac97"
+  },
+  "integrity": {"payload_sha256": "f617b76de518875ca9381bf130621c1f332d30b4a2790a71eae647aba24a946d", "parent_refs": [
+    "git:d293fa63062f1dd305f3cc9c7b7bc543689aac97", "ci:29647118829",
+    "git:ba12c7f3bac5642fc033da18710278bff41aea3b",
+    "sha256:038330ca44a43fed910fe1c495114f924a36877b7b98bf3cdac4a05fc15982b3",
+    "sha256:824d594e9ca8d1965e04724d0b9cb90952e6e74c875eea2f16c0113b6b26d7f1"
+  ]}
+}

@@ -1,0 +1,28 @@
+{
+  "schema_id": "IntegrationReceipt", "schema_version": "1.0.0",
+  "object_id": "integration-s03-synthetic-domain-assurance-20260718",
+  "issued_at": "2026-07-18T13:59:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s03-synthetic-domain-assurance", "agent_id": "agent-5",
+    "ownership_lease_ref": "stages/s03-synthetic-domain-assurance/ownership-lease.json",
+    "base_sha": "64f8bd3a7a6f0187de450b3d2990da9c48ded8fc",
+    "head_sha": "959297fdd007f6652cfc018b39fb3258b60b76f0",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": ["tests/test_a1_synthetic_domain_freeze.py", "stages/s03-synthetic-domain-assurance/stage-envelope.json", "stages/s03-synthetic-domain-assurance/ownership-lease.json"],
+    "audit_results": {
+      "contract_gate": "green", "privacy_secret_scan": "green", "source_mutation": false,
+      "focused_tests": 107, "full_core_tests": 500, "stage0b_tests": 25,
+      "deterministic_replay": "green", "deep_immutability": "green",
+      "authority_negative_probes": "green", "holdout_denial": "green",
+      "canonical_or_live_surface": false
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29647118829",
+    "integration_commit_sha": "d293fa63062f1dd305f3cc9c7b7bc543689aac97"
+  },
+  "integrity": {"payload_sha256": "92c6b4b2a88a11749b115beb1666dcab6ce0789bde56c7d0279e03971b765b73", "parent_refs": [
+    "git:959297fdd007f6652cfc018b39fb3258b60b76f0", "git:d293fa63062f1dd305f3cc9c7b7bc543689aac97",
+    "ci:29647118829", "git:64f8bd3a7a6f0187de450b3d2990da9c48ded8fc"
+  ]}
+}

@@ -1,0 +1,27 @@
+{
+  "schema_id": "IntegrationReceipt", "schema_version": "1.0.0",
+  "object_id": "integration-s03-freeze-projection-20260718",
+  "issued_at": "2026-07-18T13:59:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s03-freeze-projection", "agent_id": "agent-1",
+    "ownership_lease_ref": "stages/s03-freeze-projection/ownership-lease.json",
+    "base_sha": "ba12c7f3bac5642fc033da18710278bff41aea3b",
+    "head_sha": "0b5dd69e5ebfaa8dc577035512079856f8f15332",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": ["src/research_bridge/discovery.py", "stages/s03-freeze-projection/stage-envelope.json", "stages/s03-freeze-projection/ownership-lease.json"],
+    "audit_results": {
+      "contract_gate": "green", "privacy_secret_scan": "green", "source_mutation": false,
+      "focused_tests": 107, "full_core_tests": 500, "stage0b_tests": 25,
+      "bridge_domain_object_issuance": 0, "exact_admission_binding": "green",
+      "d0_only": true, "dependency_adoption": false
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29647118829",
+    "integration_commit_sha": "d293fa63062f1dd305f3cc9c7b7bc543689aac97"
+  },
+  "integrity": {"payload_sha256": "4527af68ab084a95c2d0780c3e8c06c989958618573fa6c7455a5f85485ece67", "parent_refs": [
+    "git:0b5dd69e5ebfaa8dc577035512079856f8f15332", "git:d293fa63062f1dd305f3cc9c7b7bc543689aac97",
+    "ci:29647118829", "sha256:824d594e9ca8d1965e04724d0b9cb90952e6e74c875eea2f16c0113b6b26d7f1"
+  ]}
+}
