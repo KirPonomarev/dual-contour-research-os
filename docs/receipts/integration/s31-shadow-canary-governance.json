@@ -1,0 +1,51 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s31-shadow-canary-governance-20260718",
+  "issued_at": "2026-07-18T23:47:20Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s31-shadow-canary-governance",
+    "agent_id": "agent-0",
+    "ownership_lease_ref": "stages/s31-shadow-canary-governance/ownership-lease.json",
+    "base_sha": "1f438d26538fa563a147c882a08800f37462584c",
+    "head_sha": "bc7d3d0708331f1a5d055c024c262e951be0288d",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "provenance/shadow-canary-evolution-loop-v1.json",
+      "docs/receipts/reuse/s31-shadow-canary.json",
+      "stages/s31-shadow-canary-governance/"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "profile_sha256": "81440253d296d04a42bacca18b259f715236444a7b4c068fda54bd382d6b9c5e",
+      "classification": "D0_PUBLIC",
+      "precomputed_metadata_only": true,
+      "network_or_filesystem_writes": 0,
+      "generated_code_execution": 0,
+      "automatic_promotion": false,
+      "rollback_application": false,
+      "canonical_writes": 0,
+      "holdout_queries": 0,
+      "grants_authority": false
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29665822775",
+    "integration_commit_sha": "14c3f0bdfcf6ce02bbf47a52cac9c8eef8745323"
+  },
+  "integrity": {
+    "payload_sha256": "05ad6d04f2f724ae3fa9b5a794ecf9e959c3f02d42229d5342f3e0300d6110f0",
+    "parent_refs": [
+      "git:bc7d3d0708331f1a5d055c024c262e951be0288d",
+      "git:14c3f0bdfcf6ce02bbf47a52cac9c8eef8745323",
+      "ci:29665822775",
+      "reuse:reuse-s31-shadow-canary-20260718"
+    ]
+  }
+}
