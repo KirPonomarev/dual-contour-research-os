@@ -60,10 +60,30 @@ _OPERATIONAL_SELF_MODEL_REQUIRED_SCOPE = {
     "live_security_execution": "DENIED",
     "domain_application": "SHADOW_UNAPPLIED",
 }
+_EVOLUTION_KERNEL_V1_REQUIRED_SCOPE = {
+    "proof_state": "EVOLUTION_KERNEL_V1_SHADOW_PASS_FOR_FROZEN_SCOPE",
+    "data_scope": "D0_PUBLIC_SYNTHETIC_AND_SANITIZED_D1_SHADOW_ONLY",
+    "model_claims": "FIXTURE_AND_REAL_PROVIDER_EVIDENCE_SEPARATED",
+    "real_provider": "SCOPED_AVAILABLE_EVALUATED_BINDINGS_ONLY",
+    "mandatory_gpt": "WAIT_PROVIDER",
+    "temporary_kimi": "UNPROMOTED_NOT_ROUTABLE",
+    "independence": "NOT_ESTABLISHED",
+    "domain_application": "SHADOW_UNAPPLIED",
+    "autonomous_idea_generation": True,
+    "autonomous_a1_sandbox_admission": True,
+    "autonomous_bounded_testing": True,
+    "autonomous_learning_memory": True,
+    "autonomous_canonical_mutation": False,
+    "human_required_for_promotion": True,
+    "deployment": False,
+    "live_trading": False,
+    "live_security_execution": False,
+}
 _CAPABILITY_SCOPES = {
     "A1_DISCOVERY_ADMISSION_FIXTURE": _E1A_REQUIRED_SCOPE,
     "A1_DURABLE_FEEDBACK": _DURABLE_FEEDBACK_REQUIRED_SCOPE,
     "OPERATIONAL_SELF_MODEL": _OPERATIONAL_SELF_MODEL_REQUIRED_SCOPE,
+    "EVOLUTION_KERNEL_V1": _EVOLUTION_KERNEL_V1_REQUIRED_SCOPE,
 }
 _REQUIRED_NEGATIVE_PROBES = frozenset(
     {
@@ -152,6 +172,23 @@ def issue_operational_self_model_proof(
 
     if payload.get("capability_id") != "OPERATIONAL_SELF_MODEL":
         raise CapabilityProofError("operational self-model issuer received a different capability")
+    return issue_capability_proof(
+        payload,
+        issued_at=issued_at,
+        classification=classification,
+    )
+
+
+def issue_evolution_kernel_v1_proof(
+    payload: Mapping[str, object],
+    *,
+    issued_at: str,
+    classification: str = "D1",
+) -> Mapping[str, object]:
+    """Issue only the aggregate E1 shadow proof with zero authority."""
+
+    if payload.get("capability_id") != "EVOLUTION_KERNEL_V1":
+        raise CapabilityProofError("evolution kernel issuer received a different capability")
     return issue_capability_proof(
         payload,
         issued_at=issued_at,
@@ -288,7 +325,7 @@ def _validate_payload(payload: object) -> dict[str, object]:
     proof_basis = value["proof_basis"]
     if not isinstance(proof_basis, list) or not proof_basis or any(not isinstance(item, Mapping) or not item for item in proof_basis):
         raise CapabilityProofError("proof_basis must contain evidence objects")
-    if capability_id == "OPERATIONAL_SELF_MODEL":
+    if capability_id in {"OPERATIONAL_SELF_MODEL", "EVOLUTION_KERNEL_V1"}:
         _reject_anthropomorphic_overclaim(proof_basis)
     for name in ("code_sha256", "config_sha256", "policy_sha256", "schema_sha256"):
         _sha256(name, value[name])
@@ -410,5 +447,6 @@ def _freeze(value: object) -> object:
 __all__ = [
     "CapabilityProofError", "CapabilityAssessment", "issue_capability_proof",
     "issue_e1a_fixture_proof", "issue_durable_feedback_proof", "issue_operational_self_model_proof",
+    "issue_evolution_kernel_v1_proof",
     "validate_capability_proof", "assess_capability_proof", "canonical_json_sha256",
 ]

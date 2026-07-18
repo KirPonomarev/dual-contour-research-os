@@ -1,0 +1,28 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-s19-e1-aggregate-gate-20260718",
+  "issued_at": "2026-07-18T20:25:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-freeze-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "EVOLUTION_KERNEL_V1_SHADOW_AGGREGATE_GATE",
+    "candidates": [
+      {"candidate": "reuse-existing-CapabilityProofReceipt-issuer-and-S04-S10-S13-S14-S18-receipts", "disposition": "selected"},
+      {"candidate": "minimal-stdlib-exact-evidence-cross-reference-validator", "disposition": "selected-minimal-missing-glue"},
+      {"candidate": "new-proof-schema-or-orchestrator", "disposition": "rejected-frozen-contract-and-unnecessary-architecture"},
+      {"candidate": "new-real-provider-call", "disposition": "rejected-operator-call-cap-exhausted"},
+      {"candidate": "promote-Kimi-or-infer-GPT-availability", "disposition": "rejected-evidence-laundering"}
+    ],
+    "selected_mode": "exact-digest-and-git-ancestry-validation-over-existing-scoped-receipts",
+    "source_ref": "git:475a68abc4ec48148f001d9b614a2b262a0dad69;capability:S04+S10+S13;integration:S14+S18",
+    "code_sha256": "68c1b84274aa15b36c031fda1c3f415267d8ac9b487dc1c4741bfe83882701e5",
+    "license_spdx": "NOASSERTION",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": ["exact-evidence", "deterministic-reissue", "tamper", "mixed-head", "fixture-provider-laundering", "authority-and-live-overclaim", "provider-role-preservation"],
+    "canonical_owner": "agent-0-assurance",
+    "rollback": "Revert the aggregate validator, scoped proof and S19 metadata; all component evidence remains unchanged."
+  },
+  "integrity": {"payload_sha256": "a8bb308d90cbc64ca539ecb1501df09d0c51802a225ccc96540034f6e0de662b", "parent_refs": ["git:475a68abc4ec48148f001d9b614a2b262a0dad69", "integration:integration-s14-provider-independent-hostile-20260718", "integration:integration-s18-provider-hostile-20260718"]}
+}
