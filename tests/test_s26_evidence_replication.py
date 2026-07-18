@@ -295,6 +295,30 @@ class EvidenceReplicationTests(unittest.TestCase):
         )
         self.assertEqual(wrong_binding.status, "DENIED")
         self.assertIn("REPLICATION_MATRIX_BINDING_MISMATCH", wrong_binding.reason_codes)
+        with self.assertRaises(EvolutionError):
+            declassification_dry_run(
+                self.policy,
+                candidate,
+                replace(islands, snapshot_sha256="0" * 64),
+                matrix,
+            )
+        with self.assertRaises(EvolutionError):
+            declassification_dry_run(
+                self.policy,
+                candidate,
+                islands,
+                replace(matrix, matrix_sha256="0" * 64),
+            )
+        with self.assertRaises(EvolutionError):
+            declassification_dry_run(
+                self.policy,
+                candidate,
+                islands,
+                replace(
+                    matrix,
+                    pairs=(replace(matrix.pairs[0], pair_sha256="0" * 64),),
+                ),
+            )
 
 
 if __name__ == "__main__":
