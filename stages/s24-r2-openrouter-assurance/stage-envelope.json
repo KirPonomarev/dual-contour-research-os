@@ -1,0 +1,20 @@
+{
+  "stage_id": "s24-r2-openrouter-assurance", "agent_id": "agent-5",
+  "objective": "Prove the OpenRouter v2 profile, environment-to-Keychain credential precedence, redaction, exact request shape and conservative durable call behavior without exposing a credential or treating the gateway as independent evidence.",
+  "executable_blocker": "A connected OpenRouter call must not begin until deterministic fake transport, Keychain redaction and durable SENT/UNKNOWN behavior pass.",
+  "base_sha": "c832c3ffa0cc5d04f99f5a97584f34de526200de",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a5-s24-r2-openrouter-assurance",
+  "worktree": "/private/tmp/dcr-s24-r2-openrouter-assurance",
+  "read_set": ["tools/model_provider_shadow.py", "provenance/model-provider-connected-shadow-v1.json", "provenance/model-provider-connected-shadow-v2.json", "src/research_bridge/model_broker.py", "src/research_bridge/ledger.py", "src/research_bridge/cas.py"],
+  "write_set": ["tests/test_s17_provider_shadow_tool.py", "tests/test_s24_r2_openrouter_provider.py", "stages/s24-r2-openrouter-assurance/stage-envelope.json", "stages/s24-r2-openrouter-assurance/ownership-lease.json"],
+  "forbidden_scope": ["source-tool-contract-profile-provenance-or-canonical-doc-edit", "real-network-call", "credential-value", "new-payment", "D2-D3-or-holdout", "authority-domain-canonical-deployment-or-live-action", "provider-independence-overclaim"],
+  "dependency_hashes": {"implementation_stage": "c832c3ffa0cc5d04f99f5a97584f34de526200de", "connected_profile_v2_sha256": "63ae65247d61b918aced080e6419609459ebcbf4a3384ea29f2617e65597258c", "legacy_profile_v1_sha256": "4ac18aaa960d78ee0103cd199f411067aca46fceb11efa8e0045c53f57c5affd", "core_contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50", "external_dependencies": "none"},
+  "acceptance_commands": ["make contracts", "python3 -m unittest tests.test_s24_r2_openrouter_provider tests.test_s17_provider_shadow_tool tests.test_s18_provider_hostile", "make test", "git diff --check"],
+  "risk_class": "critical-secret-egress-cost-and-upstream-provenance-ambiguity",
+  "stop_conditions": ["secret-output", "Keychain-command-drift-or-uncaptured-output", "redirect-or-unbounded-response", "automatic-retry-or-budget-release", "provider-independence-overclaim", "authority-expansion"],
+  "expected_receipt": "docs/receipts/integration/s24-r2-openrouter-assurance.json",
+  "rollback": "Remove assurance tests and stage metadata; Agent-0 v2 route remains unaccepted and must not perform a connected call.",
+  "commit_authority": "one-scoped-agent-5-commit", "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent0_s24_r2_connected-proof", "blocked_validation_failed"]
+}
