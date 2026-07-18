@@ -1,0 +1,34 @@
+{
+  "schema_id": "ReuseDecisionReceipt", "schema_version": "1.0.0",
+  "object_id": "reuse-s16-provider-adapters-routing-20260718", "issued_at": "2026-07-18T17:29:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-freeze-authority"},
+  "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "FIXTURE_EVALUATED_PROVIDER_ADAPTERS_AND_DETERMINISTIC_ROLE_ROUTING",
+    "candidates": [
+      {"candidate": "reuse-S15-ModelProviderAdapter-ModelRoleRegistry-ModelCallBroker-and-frozen-role-profile", "disposition": "selected"},
+      {"candidate": "reuse-stdlib-json-hash-dataclasses-and-mapping-types-for-strict-profile-and-fixture-adapters", "disposition": "selected"},
+      {"candidate": "add-small-deterministic-route-council-and-correlation-glue-in-existing-model_broker-module", "disposition": "selected-minimal-missing-glue"},
+      {"candidate": "httpx-or-provider-SDK-connected-transport", "disposition": "parked-until-S17-connected-shadow-and-separate-adoption-gate"},
+      {"candidate": "new-registry-service-database-queue-scheduler-or-secret-store", "disposition": "rejected-duplicate-or-forbidden-surface"},
+      {"candidate": "activate-Qwen-reserve-before-evaluation", "disposition": "rejected-unevaluated-route"}
+    ],
+    "selected_mode": "exact-public-profile-plus-stdlib-fixture-adapters-deterministic-fallback-council-cap-and-scoped-correlation-snapshot-with-zero-network",
+    "source_ref": "source-freeze:source-freeze-s16-model-provider-routing-fixtures-20260718;git:86a2be156bc840ee0a9d92035b15a5ad79e71936;internal:model_broker+model_role_registry",
+    "code_sha256": "37db8596a8245a6b1ea2bc5bce1495a4e7dadb314876e51397ad11dd194b3dc6",
+    "license_spdx": "NOASSERTION", "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "strict-profile-and-digest", "every-route-and-fallback-fixture-evaluated", "privacy-and-authority-non-widening",
+      "deterministic-primary-and-fallback", "unavailable-binding-parks", "missing-critic-waits-provider",
+      "council-cap", "same-family-one-provenance-group", "small-sample-independence-not-established",
+      "fixture-adapter-contract-and-zero-network-or-real-cost"
+    ],
+    "canonical_owner": "agent-1-existing-model-broker-with-agent-5-assurance-and-agent-0-profile-freeze-and-integration",
+    "rollback": "Remove S16 routing/profile additions; S15 registry and durable call broker remain provider-neutral and valid."
+  },
+  "integrity": {"payload_sha256": "7a4ce37ed5b80082bc8cc4bc38236409d9e3ce2e0ea2103df6f6679dd08ce282", "parent_refs": [
+    "git:86a2be156bc840ee0a9d92035b15a5ad79e71936",
+    "source-freeze:source-freeze-s16-model-provider-routing-fixtures-20260718",
+    "reuse:reuse-s15-model-registry-broker-20260718"
+  ]}
+}

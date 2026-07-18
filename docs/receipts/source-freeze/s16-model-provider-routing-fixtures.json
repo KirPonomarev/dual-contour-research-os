@@ -1,0 +1,27 @@
+{
+  "schema_id": "SourceFreezeReceipt", "schema_version": "1.0.0",
+  "object_id": "source-freeze-s16-model-provider-routing-fixtures-20260718", "issued_at": "2026-07-18T17:29:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "source-freeze-authority"},
+  "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "source_repo": "dual-contour-research-os",
+    "remote": "sha256:2218f184ab78ce45727e7d54d0a06345baca1f446ac84d491b471dbe1e75d0ae",
+    "branch": "sha256:0d6e4079e36703ebd37c00722f5891d28b0e2811dc114b129215123adcce3605",
+    "head_sha": "86a2be156bc840ee0a9d92035b15a5ad79e71936",
+    "upstream_sha": "86a2be156bc840ee0a9d92035b15a5ad79e71936",
+    "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "untracked_manifest_sha256": "a88d3ee37c63ccb59c8a923249fe01450adc073f0fb10a48e3989de84d9233d8",
+    "path_dispositions": [
+      {"category": "selected_fixture_routing_profile", "path": "provenance/model-provider-routing-v1.json", "count": 1, "sha256": "37db8596a8245a6b1ea2bc5bce1495a4e7dadb314876e51397ad11dd194b3dc6", "disposition": "selected-public-synthetic-fixture-only"},
+      {"category": "candidate_provider_bindings", "count": 5, "disposition": "api-identifiers-unverified-until-S17-real-shadow"},
+      {"category": "reserve_provider_slot", "count": 1, "disposition": "disabled-unevaluated-and-unroutable"},
+      {"category": "credentials-endpoints-raw-responses-or-real-cost", "count": 0, "disposition": "absent"}
+    ],
+    "selected_source_sha": "37db8596a8245a6b1ea2bc5bce1495a4e7dadb314876e51397ad11dd194b3dc6"
+  },
+  "integrity": {"payload_sha256": "778bf9a95661cc7c770fccd8c184b6915594ab075ed0f91e9a7ea8934048acc0", "parent_refs": [
+    "git:86a2be156bc840ee0a9d92035b15a5ad79e71936",
+    "sha256:37db8596a8245a6b1ea2bc5bce1495a4e7dadb314876e51397ad11dd194b3dc6",
+    "integration:integration-s15-model-registry-broker-20260718"
+  ]}
+}
