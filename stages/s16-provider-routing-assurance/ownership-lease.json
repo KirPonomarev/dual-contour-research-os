@@ -1,0 +1,8 @@
+{
+  "lease_id": "lease-s16-provider-routing-assurance-agent-5",
+  "stage_id": "s16-provider-routing-assurance", "agent_id": "agent-5",
+  "branch": "codex/bridge-a5-s16-provider-routing-assurance",
+  "issued_at": "2026-07-18T17:39:00Z", "expires_at": "2026-07-19T17:39:00Z",
+  "write_set": ["tests/test_s16_provider_routing.py", "tests/test_stage1_assurance.py", "stages/s16-provider-routing-assurance/stage-envelope.json", "stages/s16-provider-routing-assurance/ownership-lease.json"],
+  "exclusive": true, "revoked": false
+}
