@@ -15,11 +15,11 @@
     ],
     "selected_mode": "immutable-v2-profile-deterministic-role-route-environment-precedence-Keychain-fallback-bounded-POST-private-CAS-before-parse-and-UNKNOWN-without-retry",
     "source_ref": "source-freeze:source-freeze-s24-r2-openrouter-official-api-shape-20260718;git:026949695c8e34d8ebb64a80934744acd5294f8e;internal:model_provider_shadow+model_broker+ledger+cas+routing",
-    "code_sha256": "1c9f9d31df373bdc763c500d8ae3c34a74d14c1f5f35985e7e9d3001f906f0ae",
+    "code_sha256": "31254568045a82565e6ab8a77fe198c672d95e66d03f92a82e66af014d17ecfd",
     "license_spdx": "NOASSERTION", "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "tests": ["legacy-v1-profile-compatibility", "strict-v2-openrouter-binding", "environment-precedence", "Keychain-capture-and-redaction", "exact-chat-request", "redirect-and-response-bounds", "private-CAS-before-parse", "durable-SENT-before-egress", "ambiguous-cost-reservation", "no-auto-retry", "provider-provenance-no-independence-overclaim"],
     "canonical_owner": "agent-0-tool-and-profile-with-agent-5-assurance",
     "rollback": "Remove the v2 profile and OpenRouter resolver path; retain immutable S17 v1 profile and provider-neutral durable broker."
   },
-  "integrity": {"payload_sha256": "dc5279ceb624400e674e9e1461ba87a1fbcb7f6e361337379a73739c2a1109dc", "parent_refs": ["git:026949695c8e34d8ebb64a80934744acd5294f8e", "source-freeze:source-freeze-s24-r2-openrouter-official-api-shape-20260718", "reuse:reuse-s17-connected-provider-shadow-tool-20260718"]}
+  "integrity": {"payload_sha256": "0c53d47d775a8693258bfbb641b2890ba65351197a07a87a24159fefb0efb382", "parent_refs": ["git:026949695c8e34d8ebb64a80934744acd5294f8e", "source-freeze:source-freeze-s24-r2-openrouter-official-api-shape-20260718", "reuse:reuse-s17-connected-provider-shadow-tool-20260718"]}
 }

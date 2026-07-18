@@ -513,6 +513,14 @@ def _outside_repository(path: Path) -> Path:
     raise ShadowProviderError("private runtime storage must be outside the public repository")
 
 
+def _stage_tag(profile: ConnectedShadowProfile) -> str:
+    return (
+        "s17"
+        if profile.profile_id == "model-provider-connected-shadow-v1"
+        else "s24-r2-openrouter"
+    )
+
+
 def _preflight(profile: ConnectedShadowProfile) -> int:
     available = profile.resolved_available_bindings(CredentialResolver())
     bindings = {
@@ -530,8 +538,9 @@ def _init_ledger(args: argparse.Namespace, profile: ConnectedShadowProfile) -> i
     if ledger_path.exists():
         raise ShadowProviderError("shadow ledger bootstrap requires a new path")
     ledger_path.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
+    stage_tag = _stage_tag(profile)
     payload = {
-        "capability": "S17_CONNECTED_SHADOW_LEDGER_BOOTSTRAP",
+        "capability": stage_tag.upper().replace("-", "_") + "_CONNECTED_SHADOW_LEDGER_BOOTSTRAP",
         "fixture_only": True,
         "grants_authority": False,
         "profile_sha256": profile.sha256,
@@ -542,10 +551,10 @@ def _init_ledger(args: argparse.Namespace, profile: ConnectedShadowProfile) -> i
     document = {
         "schema_id": "CapabilityProofReceipt",
         "schema_version": "1.0.0",
-        "object_id": "capability-proof:s17-shadow-bootstrap:" + profile.sha256,
+        "object_id": "capability-proof:" + stage_tag + "-shadow-bootstrap:" + profile.sha256,
         "issued_at": args.event_at,
         "issuer": {
-            "id": "agent-0-s17-shadow-bootstrap",
+            "id": "agent-0-" + stage_tag + "-shadow-bootstrap",
             "authority_class": "fixture-only-non-authoritative",
         },
         "contour": "governance",
@@ -562,7 +571,7 @@ def _init_ledger(args: argparse.Namespace, profile: ConnectedShadowProfile) -> i
             "count": 1 if name == "capabilities" else 0,
             "fixture_only": True,
             "grants_authority": False,
-            "marker": "s17-connected-shadow-bootstrap-v1",
+            "marker": stage_tag + "-connected-shadow-bootstrap-v1",
             "shadow_only": True,
         }
         for name in ("admissions", "candidates", "capabilities", "material_events")
@@ -572,7 +581,7 @@ def _init_ledger(args: argparse.Namespace, profile: ConnectedShadowProfile) -> i
             record = ledger.append_a1_bundle(
                 objects=[document],
                 projections=projections,
-                idempotency_key="s17-shadow-bootstrap:" + profile.sha256,
+                idempotency_key=stage_tag + "-shadow-bootstrap:" + profile.sha256,
                 event_at=args.event_at,
             )
             if not ledger.verify_chain() or not ledger.verify_a1_coverage():
@@ -610,7 +619,8 @@ def _run(args: argparse.Namespace, profile: ConnectedShadowProfile) -> int:
     available = profile.resolved_available_bindings(credential_resolver)
     role_sha = hashlib.sha256(ROLE_PATH.read_bytes()).hexdigest()
     routing_sha = hashlib.sha256(ROUTING_PATH.read_bytes()).hexdigest()
-    base_registry = ModelRoleRegistry(ROLE_PATH, expected_profile_sha256=role_sha, binding_revision="s17-connected-" + profile.sha256[:16])
+    stage_tag = _stage_tag(profile)
+    base_registry = ModelRoleRegistry(ROLE_PATH, expected_profile_sha256=role_sha, binding_revision=stage_tag + "-connected-" + profile.sha256[:16])
     router = ModelProviderRouting(ROUTING_PATH, expected_profile_sha256=routing_sha, role_registry=base_registry)
     decision = router.route(args.role, args.classification, available_bindings=available)
     if decision.status != "ROUTED" or decision.binding is None:
@@ -622,7 +632,7 @@ def _run(args: argparse.Namespace, profile: ConnectedShadowProfile) -> int:
         raise ShadowProviderError("provider request exceeds frozen bound")
     registry = ModelRoleRegistry(
         ROLE_PATH, expected_profile_sha256=role_sha,
-        binding_revision="s17-connected-" + profile.sha256[:16],
+        binding_revision=stage_tag + "-connected-" + profile.sha256[:16],
         binding_overrides={args.role: decision.binding},
     )
     ledger_path = _outside_repository(Path(args.ledger))
@@ -641,7 +651,7 @@ def _run(args: argparse.Namespace, profile: ConnectedShadowProfile) -> int:
         )
         spec = ModelCallSpec(
             role=args.role,
-            role_assignment_ref="role-assignment:s17-shadow:" + profile.sha256,
+            role_assignment_ref="role-assignment:" + stage_tag + "-shadow:" + profile.sha256,
             classification=args.classification,
             request_bytes=request_bytes,
             max_tokens=args.max_tokens,
@@ -690,7 +700,7 @@ def _reconcile(args: argparse.Namespace, profile: ConnectedShadowProfile) -> int
     registry = ModelRoleRegistry(
         ROLE_PATH,
         expected_profile_sha256=role_sha,
-        binding_revision="s17-connected-" + profile.sha256[:16],
+        binding_revision=_stage_tag(profile) + "-connected-" + profile.sha256[:16],
     )
     policy_digest = hashlib.sha256((profile.sha256 + ":reconcile-policy").encode()).hexdigest()
     scope_digest = hashlib.sha256(str(ledger_path).encode()).hexdigest()
