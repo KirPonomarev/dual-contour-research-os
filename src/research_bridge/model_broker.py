@@ -33,7 +33,10 @@ __all__ = [
     "ModelCorrelationSnapshot",
     "ModelCouncilPlan",
     "ModelErrorObservation",
+    "RawModelProviderAdapter",
     "ModelProviderAdapter",
+    "ProviderAccounting",
+    "ProviderResponseParser",
     "ModelProviderRouting",
     "ModelRoleRegistry",
     "ModelRoute",
@@ -67,6 +70,7 @@ _INVARIANT_KEYS = frozenset(
     }
 )
 _MAX_REQUEST_BYTES = 1_048_576
+_MAX_RAW_RESPONSE_BYTES = 16_777_216
 _MAX_SAFE_INTEGER = 9_007_199_254_740_991
 _FROZEN_MODEL_ROLES = frozenset(
     {
@@ -310,6 +314,20 @@ class ProviderResult:
 
 
 @dataclass(frozen=True, slots=True)
+class ProviderAccounting:
+    """Parsed accounting emitted only after raw response durability."""
+
+    actual_tokens: int | None
+    actual_cost_units: int | None
+    provider_receipt_ref: str | None
+
+    def __post_init__(self) -> None:
+        _optional_nonnegative("actual_tokens", self.actual_tokens)
+        _optional_nonnegative("actual_cost_units", self.actual_cost_units)
+        _optional_ref("provider_receipt_ref", self.provider_receipt_ref)
+
+
+@dataclass(frozen=True, slots=True)
 class ModelCallHandle:
     call_id: str
     state: str
@@ -328,6 +346,34 @@ class ModelProviderAdapter(Protocol):
         request_bytes: bytes,
         max_tokens: int,
     ) -> ProviderResult: ...
+
+
+class RawModelProviderAdapter(Protocol):
+    """Receive opaque bounded bytes without parsing provider content."""
+
+    model_binding: str
+
+    def invoke_raw(
+        self,
+        *,
+        call_id: str,
+        request_bytes: bytes,
+        max_tokens: int,
+    ) -> bytes: ...
+
+
+class ProviderResponseParser(Protocol):
+    """Parse bytes that the broker has already committed to immutable CAS."""
+
+    model_binding: str
+
+    def parse_response(
+        self,
+        *,
+        raw_response: bytes,
+        response_ref: str,
+        max_tokens: int,
+    ) -> ProviderAccounting: ...
 
 
 class ResponseCommitter(Protocol):
@@ -1103,6 +1149,127 @@ class ModelCallBroker:
                 actual_cost_units=result.actual_cost_units,
                 provider_receipt_ref=result.provider_receipt_ref,
             )
+            return _handle(
+                self._append(
+                    succeeded,
+                    idempotency_key=f"{call_id}:succeeded",
+                    event_at=timestamp,
+                )
+            )
+        except (LedgerError, ModelBrokerError, OSError, RuntimeError):
+            return self._mark_unknown(sent_record.snapshot, event_at=timestamp)
+
+    def execute_raw(
+        self,
+        call_id: str,
+        *,
+        request_bytes: bytes,
+        adapter: RawModelProviderAdapter,
+        response_committer: ResponseCommitter,
+        response_parser: ProviderResponseParser,
+        event_at: str,
+    ) -> ModelCallHandle:
+        """Execute connected-style egress with commit-before-parse ordering.
+
+        Once ``SENT`` is durable, every uncertain transport, commit, or parse
+        outcome becomes ``UNKNOWN``. The method never retries and never
+        releases the reservation. A response-bearing known provider failure is
+        parsed only after its raw bytes have an exact immutable CAS reference.
+        """
+
+        timestamp = _timestamp("event_at", event_at)
+        current = self._state(call_id)
+        if current["state"] != "RESERVED":
+            raise ModelBrokerError("only a RESERVED model call may be sent")
+        if (
+            not isinstance(request_bytes, bytes)
+            or hashlib.sha256(request_bytes).hexdigest()
+            != current["request_sha256"]
+        ):
+            raise ModelBrokerError("model request bytes differ from the reservation")
+        if current["registry_sha256"] != self._registry.registry_sha256:
+            raise ModelBrokerError("model registry drifted after reservation")
+        route = self._registry.route(current["role"], current["classification"])
+        if (
+            route.model_binding != current["model_binding"]
+            or route.binding_revision != current["binding_revision"]
+        ):
+            raise ModelBrokerError("model route drifted after reservation")
+        if getattr(adapter, "model_binding", None) != current["model_binding"]:
+            raise ModelBrokerError(
+                "raw provider adapter binding differs from the reservation"
+            )
+        if getattr(response_parser, "model_binding", None) != current["model_binding"]:
+            raise ModelBrokerError(
+                "provider response parser binding differs from the reservation"
+            )
+
+        sent = self._transition(current, state="SENT", event_at=timestamp)
+        sent_record = self._append(
+            sent, idempotency_key=f"{call_id}:sent", event_at=timestamp
+        )
+        try:
+            raw_response = adapter.invoke_raw(
+                call_id=call_id,
+                request_bytes=request_bytes,
+                max_tokens=current["max_tokens"],
+            )
+            if not isinstance(raw_response, bytes) or not raw_response:
+                raise ModelBrokerError("raw provider adapter returned invalid bytes")
+            if len(raw_response) > _MAX_RAW_RESPONSE_BYTES:
+                raise ModelBrokerError("raw provider response exceeds the local bound")
+        except Exception:
+            return self._mark_unknown(sent_record.snapshot, event_at=timestamp)
+
+        try:
+            response_ref = response_committer.commit_response(raw_response)
+            expected_ref = "cas:sha256:" + hashlib.sha256(raw_response).hexdigest()
+            if response_ref != expected_ref:
+                raise ModelBrokerError(
+                    "response committer returned a mismatched CAS ref"
+                )
+        except (LedgerError, ModelBrokerError, OSError, RuntimeError):
+            return self._mark_unknown(sent_record.snapshot, event_at=timestamp)
+
+        try:
+            accounting = response_parser.parse_response(
+                raw_response=raw_response,
+                response_ref=response_ref,
+                max_tokens=current["max_tokens"],
+            )
+            if not isinstance(accounting, ProviderAccounting):
+                raise ModelBrokerError("provider parser returned invalid accounting")
+        except KnownProviderFailure as exc:
+            failed = self._terminal(
+                sent_record.snapshot,
+                state="FAILED_KNOWN",
+                event_at=timestamp,
+                response_ref=response_ref,
+                actual_tokens=exc.actual_tokens,
+                actual_cost_units=exc.actual_cost_units,
+                provider_receipt_ref=exc.provider_receipt_ref,
+                failure_code=exc.code,
+            )
+            return _handle(
+                self._append(
+                    failed,
+                    idempotency_key=f"{call_id}:failed-known",
+                    event_at=timestamp,
+                )
+            )
+        except Exception:
+            return self._mark_unknown(sent_record.snapshot, event_at=timestamp)
+
+        succeeded = self._terminal(
+            sent_record.snapshot,
+            state="SUCCEEDED",
+            event_at=timestamp,
+            response_ref=response_ref,
+            actual_tokens=accounting.actual_tokens,
+            actual_cost_units=accounting.actual_cost_units,
+            provider_receipt_ref=accounting.provider_receipt_ref,
+        )
+        try:
             return _handle(
                 self._append(
                     succeeded,
