@@ -1258,7 +1258,11 @@ class ModelCallBroker:
                 )
             )
         except Exception:
-            return self._mark_unknown(sent_record.snapshot, event_at=timestamp)
+            return self._mark_unknown(
+                sent_record.snapshot,
+                event_at=timestamp,
+                response_ref=response_ref,
+            )
 
         succeeded = self._terminal(
             sent_record.snapshot,
@@ -1278,7 +1282,11 @@ class ModelCallBroker:
                 )
             )
         except (LedgerError, ModelBrokerError, OSError, RuntimeError):
-            return self._mark_unknown(sent_record.snapshot, event_at=timestamp)
+            return self._mark_unknown(
+                sent_record.snapshot,
+                event_at=timestamp,
+                response_ref=response_ref,
+            )
 
     def recover_sent(self, call_id: str, *, event_at: str) -> ModelCallHandle:
         current = self._state(call_id)
@@ -1426,12 +1434,17 @@ class ModelCallBroker:
         }
 
     def _mark_unknown(
-        self, current: Mapping[str, object], *, event_at: str
+        self,
+        current: Mapping[str, object],
+        *,
+        event_at: str,
+        response_ref: str | None = None,
     ) -> ModelCallHandle:
         unknown = self._terminal(
             current,
             state="UNKNOWN",
             event_at=event_at,
+            response_ref=response_ref,
             failure_code="AMBIGUOUS_PROVIDER_OUTCOME",
         )
         return _handle(
