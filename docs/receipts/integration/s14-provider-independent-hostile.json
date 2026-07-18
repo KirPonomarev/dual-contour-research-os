@@ -1,0 +1,32 @@
+{
+  "schema_id": "IntegrationReceipt", "schema_version": "1.0.0",
+  "object_id": "integration-s14-provider-independent-hostile-20260718", "issued_at": "2026-07-18T16:43:34Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s14-provider-independent-hostile", "agent_id": "agent-5",
+    "ownership_lease_ref": "stages/s14-provider-independent-hostile/ownership-lease.json",
+    "base_sha": "98c21b1b68b0d7dd505229f8f02d7a233683a077",
+    "head_sha": "42564e28eb8fb032e15f022c808646d3a619b7c3",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": ["tests/test_s14_provider_independent_hostile_core.py", "stages/s14-provider-independent-hostile/stage-envelope.json", "stages/s14-provider-independent-hostile/ownership-lease.json"],
+    "audit_results": {
+      "contract_gate": "green", "privacy_secret_scan": "green", "source_mutation": false,
+      "focused_tests": 9, "full_core_tests": 604, "stage0b_tests": 25,
+      "parser_and_ipc_attack_vectors_rejected": 14,
+      "forbidden_or_unknown_fallback_routes_denied": 6,
+      "authority_spoof_zero_writes": "green", "claim_collusion_fenced": "green",
+      "poisoned_memory_and_shadow_laundering_denied": 4,
+      "transaction_crash_full_rollback_and_exact_retry": "green",
+      "feedback_race_single_terminal_result": "green",
+      "known_invalid_evaluator_control": "green",
+      "provider_specific_assurance": "deferred-until-real-shadow"
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29652508646",
+    "integration_commit_sha": "bb30f8e602998d00067cb06e6f179ffb325dce38"
+  },
+  "integrity": {"payload_sha256": "79c91026e4fb030cde0c85f6399ea57c3d81bfd72bc36ddbdd4ed1100a376287", "parent_refs": [
+    "git:42564e28eb8fb032e15f022c808646d3a619b7c3", "git:bb30f8e602998d00067cb06e6f179ffb325dce38",
+    "ci:29652508646", "git:98c21b1b68b0d7dd505229f8f02d7a233683a077"
+  ]}
+}
