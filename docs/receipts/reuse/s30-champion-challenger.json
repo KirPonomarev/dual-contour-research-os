@@ -1,0 +1,62 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-s30-champion-challenger-20260718",
+  "issued_at": "2026-07-18T23:26:08Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "reuse-freeze-authority"
+  },
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "FROZEN_BENCHMARK_COUNTERFACTUAL_CHAMPION_CHALLENGER_PARETO_EVALUATION",
+    "candidates": [
+      {
+        "candidate": "reuse-S29-MutationCandidateArchive-and-proposal-identities",
+        "disposition": "selected"
+      },
+      {
+        "candidate": "reuse-pure-digest-bound-evolution-snapshots",
+        "disposition": "selected"
+      },
+      {
+        "candidate": "add-small-stdlib-only-benchmark-twins-multidimensional-Pareto-and-diversity-primitives",
+        "disposition": "selected-minimal-missing-glue"
+      },
+      {
+        "candidate": "single-weighted-score-auto-winner-or-promotion",
+        "disposition": "rejected-Goodhart-and-authority-risk"
+      },
+      {
+        "candidate": "holdout-query-model-call-new-runner-store-or-service",
+        "disposition": "rejected-out-of-scope"
+      }
+    ],
+    "selected_mode": "D0-frozen-benchmark-exact-twins-visible-quality-information-cost-latency-safety-dimensions-Pareto-only-pass-and-zero-promotion",
+    "source_ref": "git:acd3adb0615823afa460fb038b6aaeed81c163c9;internal:S29-archive+evolution-snapshot-patterns;profile:sha256:e31e4aa9f946e54ffe5c91ec887e5f26f44db2569c7edf975504aaa3be7831a8",
+    "code_sha256": "e31e4aa9f946e54ffe5c91ec887e5f26f44db2569c7edf975504aaa3be7831a8",
+    "license_spdx": "NOASSERTION",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "benchmark-identity",
+      "exact-counterfactual-twins",
+      "adversarial-known-invalid-coverage",
+      "evaluator-immutability",
+      "Pareto-dominance",
+      "tradeoff-not-established",
+      "safety-regression-rejection",
+      "diversity-retention",
+      "zero-promotion-holdout-authority"
+    ],
+    "canonical_owner": "agent-0-profile-agent-1-existing-evolution-module-agent-5-assurance",
+    "rollback": "Remove S30 additive profile and pure evaluator; S29 archive remains unchanged."
+  },
+  "integrity": {
+    "payload_sha256": "25ffddb289e1ad9d83239d63c451370b29e5a4ee9fa0e2df3d0148ef2dce0ad9",
+    "parent_refs": [
+      "git:acd3adb0615823afa460fb038b6aaeed81c163c9",
+      "profile:sha256:e31e4aa9f946e54ffe5c91ec887e5f26f44db2569c7edf975504aaa3be7831a8"
+    ]
+  }
+}

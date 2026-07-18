@@ -1,0 +1,29 @@
+{
+  "profile_id": "champion-challenger-evaluation-v1",
+  "schema_version": "1.0.0",
+  "status": "frozen-shadow-evaluator",
+  "allowed_classifications": ["D0_PUBLIC"],
+  "dimensions": {
+    "quality_units": "maximize",
+    "information_value_units": "maximize",
+    "cost_units": "minimize",
+    "latency_units": "minimize",
+    "safety_violations": "zero-tolerance"
+  },
+  "statuses": ["CHAMPION_CHALLENGER_PASS", "NOT_ESTABLISHED", "REJECTED_SAFETY", "PARKED_CAPACITY"],
+  "limits": {"min_benchmark_cases": 8, "max_benchmark_cases": 64, "min_adversarial_cases": 2, "min_known_invalid_cases": 2, "max_retained_candidates": 32, "max_metric_units": 1000000},
+  "acceptance": {"requires_pareto_dominance": true, "requires_strict_benefit": true, "allowed_safety_violations": 0, "single_scalar_score": false, "promotion": false},
+  "invariants": {
+    "benchmark_identity_is_frozen": true,
+    "champion_and_challenger_use_exact_counterfactual_twins": true,
+    "adversarial_and_known_invalid_cases_are_mandatory": true,
+    "evaluator_identity_is_immutable": true,
+    "all_dimensions_remain_visible": true,
+    "tradeoffs_are_not_collapsed_to_one_score": true,
+    "candidate_diversity_is_retained": true,
+    "holdout_queries": 0,
+    "winner_promoted": false,
+    "mutation_applied": false,
+    "grants_authority": false
+  }
+}
