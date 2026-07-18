@@ -1,0 +1,26 @@
+{
+  "lease_id": "lease-e0-ownership-amendment-agent-0-20260718",
+  "stage_id": "e0-ownership-amendment",
+  "agent_id": "agent-0",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-18T10:07:41Z",
+  "expires_at": "2026-07-18T22:07:41Z",
+  "base_sha": "056a6529345a3723bd6c9bd0fd0a7ea745691aba",
+  "branch": "main",
+  "worktree": "canonical-main-worktree",
+  "write_set": [
+    "docs/ADR/0002-ownership-registry-amendment.md",
+    "docs/receipts/OWNERSHIP_REGISTRY_AMENDMENT.json",
+    "docs/receipts/reuse/e0-ownership-registry-amendment.json",
+    "docs/receipts/integration/e0-ownership-amendment.json",
+    "ownership/registry.json",
+    "stages/e0-ownership-amendment/ownership-lease.json",
+    "stages/e0-ownership-amendment/stage-envelope.json",
+    "tests/test_deployment_gate.py",
+    "tests/test_ownership_registry.py",
+    "tools/validate_contracts.py",
+    "tools/verify_freeze_receipt.py"
+  ],
+  "delegation_allowed": false,
+  "state": "active"
+}

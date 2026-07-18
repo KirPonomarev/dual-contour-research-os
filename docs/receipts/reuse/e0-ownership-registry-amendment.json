@@ -1,0 +1,53 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-e0-ownership-registry-amendment-20260718",
+  "issued_at": "2026-07-18T10:07:41Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "reuse-freeze-authority"
+  },
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "e0-live-path-ownership-registry-validation",
+    "candidates": [
+      {
+        "candidate": "existing-stage0a-ownership-gate",
+        "disposition": "selected-for-compatible-extension"
+      },
+      {
+        "candidate": "python-stdlib-re-plus-git-ls-files",
+        "disposition": "selected-as-minimal-internal-glue"
+      },
+      {
+        "candidate": "external-pathspec-dependency",
+        "disposition": "rejected-no-demonstrated-need"
+      }
+    ],
+    "selected_mode": "extend-existing-validator-with-stdlib-only-live-path-checks",
+    "source_ref": "internal:tools/validate_contracts.py@sha256:4f45d4f366d93d009c0025063b98270c9733318785a2da97c46699f6e6220baa;ownership-before:sha256:320a04d73a7eca8318a8ba407934142a0f57b892e98fd5c64644de4969538943",
+    "code_sha256": "42c07981c062099ff714f38fd64acdc6f8a22f701eb2303156f65d011a3f4e91",
+    "license_spdx": "NOASSERTION",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "every-live-path-owned-exactly-once",
+      "nonexistent-canonical-pattern-rejected",
+      "live-reserved-path-rejected",
+      "overlap-rejected",
+      "unowned-live-path-rejected",
+      "freeze-amendment-hash-chain",
+      "resource-warning-clean-focused-test"
+    ],
+    "canonical_owner": "governance-agent-0",
+    "rollback": "Revert the scoped E0 ownership amendment before A1 StageEnvelopes are issued; retain the immutable original CONTRACTS_FROZEN receipt."
+  },
+  "integrity": {
+    "payload_sha256": "a2bb6b66954ec246750e463accda3961625dd37890c96d3b99ad96c2e59b2ae2",
+    "parent_refs": [
+      "sha256:320a04d73a7eca8318a8ba407934142a0f57b892e98fd5c64644de4969538943",
+      "sha256:e8095063e94da82ab4a9658d9a7cdefd8d2e50bfa73c7b553b9ca9fdd6022f4a",
+      "sha256:6c47f4f1a3e85a94346eabb6fabe7f6fdf615d67fed692c120de62c576fe7833"
+    ]
+  }
+}

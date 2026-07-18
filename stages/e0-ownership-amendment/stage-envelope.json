@@ -1,0 +1,72 @@
+{
+  "stage_id": "e0-ownership-amendment",
+  "agent_id": "agent-0",
+  "objective": "Dogfood the canonical amendment path by replacing stale ownership globs with validated current-file ownership and explicit future reservations, while removing the known test-only SQLite ResourceWarning.",
+  "executable_blocker": "A1 contracts and worker StageEnvelopes cannot be frozen while the canonical ownership registry assigns live flat modules to nonexistent directories and the validator cannot detect that drift.",
+  "base_sha": "056a6529345a3723bd6c9bd0fd0a7ea745691aba",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "main",
+  "worktree": "canonical-main-worktree",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "contracts/catalog.json",
+    "ownership/registry.json",
+    "tools/validate_contracts.py",
+    "tests/test_deployment_gate.py"
+  ],
+  "write_set": [
+    "docs/ADR/0002-ownership-registry-amendment.md",
+    "docs/receipts/OWNERSHIP_REGISTRY_AMENDMENT.json",
+    "docs/receipts/reuse/e0-ownership-registry-amendment.json",
+    "docs/receipts/integration/e0-ownership-amendment.json",
+    "ownership/registry.json",
+    "stages/e0-ownership-amendment/ownership-lease.json",
+    "stages/e0-ownership-amendment/stage-envelope.json",
+    "tests/test_deployment_gate.py",
+    "tests/test_ownership_registry.py",
+    "tools/validate_contracts.py",
+    "tools/verify_freeze_receipt.py"
+  ],
+  "forbidden_scope": [
+    "core-contract-edit",
+    "a1-contract-freeze",
+    "runtime-behavior-change",
+    "external-dependency-adoption",
+    "d2-d3-payload",
+    "domain-scientific-truth",
+    "live-trading",
+    "live-security-execution",
+    "deployment",
+    "policy-authority-expansion"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "ownership_registry_before": "320a04d73a7eca8318a8ba407934142a0f57b892e98fd5c64644de4969538943",
+    "development_agent_contract": "b4ca3f735cbbc0359ca20e47681f38d47527969f4b4f3fa2eb49bf694fc856aa",
+    "agent_operating_contract": "1779a4fc01c2c5e607c57330e435fa4cdd5454c3eb82e517a7ed519437adcf4f",
+    "contract_validator_before": "4f45d4f366d93d009c0025063b98270c9733318785a2da97c46699f6e6220baa"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest discover -s tests -p test_ownership_registry.py",
+    "python3 -W error::ResourceWarning -m unittest discover -s tests -p test_deployment_gate.py",
+    "make test",
+    "git diff --check",
+    "public privacy and secret scan over exact write-set"
+  ],
+  "risk_class": "e0-canonical-ownership-amendment",
+  "stop_conditions": [
+    "private-data-detected",
+    "core-contract-drift",
+    "write-set-collision",
+    "ownership-overlap",
+    "unowned-live-module",
+    "reserved-path-is-live",
+    "deterministic-mismatch"
+  ],
+  "expected_receipt": "docs/receipts/integration/e0-ownership-amendment.json",
+  "rollback": "Revert the scoped E0 amendment commits before issuing any A1 worker base; the prior registry remains frozen but is explicitly unfit for A1 worker admission.",
+  "commit_authority": "agent-0-scoped-amendment-commit",
+  "push_authority": true
+}

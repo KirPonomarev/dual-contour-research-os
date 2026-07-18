@@ -1,0 +1,29 @@
+{
+  "receipt_type": "OWNERSHIP_REGISTRY_AMENDMENT",
+  "receipt_version": "1.0.0",
+  "status": "OWNERSHIP_REGISTRY_AMENDED",
+  "issued_at": "2026-07-18T10:07:41Z",
+  "issuer": "agent-0",
+  "stage_id": "e0-ownership-amendment",
+  "base_sha": "056a6529345a3723bd6c9bd0fd0a7ea745691aba",
+  "contract_catalog_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "previous_ownership_registry_sha256": "320a04d73a7eca8318a8ba407934142a0f57b892e98fd5c64644de4969538943",
+  "current_ownership_registry_sha256": "e8095063e94da82ab4a9658d9a7cdefd8d2e50bfa73c7b553b9ca9fdd6022f4a",
+  "stage_envelope_ref": "stages/e0-ownership-amendment/stage-envelope.json",
+  "adr_ref": "docs/ADR/0002-ownership-registry-amendment.md",
+  "scope": {
+    "allows": [
+      "validated-live-path-ownership",
+      "explicit-future-path-reservations",
+      "a1-stage-envelope-preparation"
+    ],
+    "does_not_allow": [
+      "core-contract-edit",
+      "runtime-authority-expansion",
+      "live-trading",
+      "live-security-execution",
+      "canonical-scientific-write-from-bridge",
+      "d2-d3-payload-in-public-repository"
+    ]
+  }
+}

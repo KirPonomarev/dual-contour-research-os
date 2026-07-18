@@ -450,8 +450,12 @@ class DeploymentGateTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             database = Path(directory) / "deployment.sqlite3"
             self.consume(database, fixtures())
-            with sqlite3.connect(database) as connection:
+            connection = sqlite3.connect(database)
+            try:
                 connection.execute("DROP TRIGGER deployment_approval_consumption_no_update")
+                connection.commit()
+            finally:
+                connection.close()
             with self.assertRaisesRegex(DeploymentGateError, "chain is invalid"):
                 DeploymentApprovalConsumer(
                     database,
