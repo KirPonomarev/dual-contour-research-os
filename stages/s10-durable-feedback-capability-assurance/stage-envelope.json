@@ -1,0 +1,28 @@
+{
+  "stage_id": "s10-durable-feedback-capability-assurance", "agent_id": "agent-5",
+  "objective": "Independently prove exact reproducibility, drift invalidation, expiry, zero authority and fail-closed overclaim rejection for the S10 durable-feedback capability receipt.",
+  "executable_blocker": "The Agent 0 issuer and static receipt require independent hostile assurance before integration.",
+  "base_sha": "367c6ffe11c94bd3366753942fbf763ccfe804c6",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a5-s10-capability-assurance",
+  "worktree": "/Volumes/Work/dual-contour-research-os-s10-assurance",
+  "write_set": [
+    "tests/test_s10_durable_feedback_capability.py",
+    "stages/s10-durable-feedback-capability-assurance/stage-envelope.json",
+    "stages/s10-durable-feedback-capability-assurance/ownership-lease.json"
+  ],
+  "forbidden_scope": ["contract-edit", "source-edit", "proof-edit", "runtime-organism", "provider-proof", "domain-application", "authority-grant", "canonical-or-live-action", "deployment"],
+  "dependency_hashes": {
+    "core_contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "a1_contract_catalog": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+    "agent0_source_commit": "367c6ffe11c94bd3366753942fbf763ccfe804c6",
+    "external_dependencies": "none"
+  },
+  "acceptance_commands": ["make contracts", "python3 -m unittest tests.test_a1_capability_proof tests.test_s10_durable_feedback_capability", "make test", "make test-stage0b", "git diff --check"],
+  "risk_class": "medium-proof-overbreadth",
+  "stop_conditions": ["proof-not-exactly-reproducible", "drift-or-expiry-passes", "overclaim-validates", "authority-or-provider-claim-present"],
+  "expected_receipt": "docs/receipts/integration/s10-durable-feedback-capability-assurance.json",
+  "rollback": "Remove the assurance-only tests and stage metadata; the unintegrated Agent 0 source remains unchanged.",
+  "commit_authority": "one-scoped-agent-5-commit", "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent0_integration", "blocked_assurance_failed"]
+}

@@ -1,0 +1,88 @@
+{
+  "schema_id": "CapabilityProofReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "capability-proof:a5fadfff749d1ca23e94d87c7095ef043d5683376be73f7503d1d233e5431916",
+  "issued_at": "2026-07-18T15:50:00Z",
+  "issuer": "independent-assurance-issuer",
+  "contour": "governance",
+  "classification": "D1",
+  "payload": {
+    "receipt_id": "capability-proof:e1b-durable-feedback-offline:c49f0cb",
+    "capability_id": "A1_DURABLE_FEEDBACK",
+    "subject_ref": "git:c49f0cba0d1f866da009788c72ccee005f93f150",
+    "scope": {
+      "proof_state": "DURABLE_FEEDBACK_PASS_WITH_OFFLINE_L0_FIXTURE",
+      "data_scope": "D0_PUBLIC_SYNTHETIC_ONLY",
+      "model_route": "NO_REAL_PROVIDER_REQUIRED",
+      "real_provider": "UNPROVEN",
+      "canonical_mutation": "DENIED",
+      "live_trading": "DENIED",
+      "live_security_execution": "DENIED",
+      "domain_application": "SHADOW_UNAPPLIED",
+      "environments": ["linux-ci", "macos-development"]
+    },
+    "status": "PASS_FOR_FROZEN_SCOPE",
+    "proof_basis": [
+      {"integration_ref": "integration:integration-s05-db-v2-global-order-20260718", "ci_run": 29648199423},
+      {"integration_ref": "integration:integration-s06-authority-corridor-20260718", "ci_run": 29648881613},
+      {"integration_ref": "integration:integration-s07-l0-validation-20260718", "ci_run": 29649326475},
+      {"integration_ref": "integration:integration-s08-atomic-feedback-20260718", "ci_run": 29649957229},
+      {"integration_ref": "integration:integration-s09-replay-capacity-20260718", "ci_run": 29650400176},
+      {"full_suite": {"core": 541, "stage0b": 25}, "result": "green"}
+    ],
+    "code_sha256": "97048822943c2988cb576ccdcd5caa4d3f9b27fa31e7b0d1885fc9825685a30f",
+    "config_sha256": "13fb276889f8d0b230dccbbb3c07b898a1844b33d0b55006b8872540c6a0603c",
+    "policy_sha256": "50a3f629d8931262b7cd7109575ddb99f5fc8cacffec1985e1d5793e012dc3b4",
+    "schema_sha256": "c4aaee2a50fa86552bada215bfd5bac9b6af374997aabf1365012c3ce8485f54",
+    "executor_ref": "executor:deterministic-offline-l0:53e75c79888c60b304c0e7e5392a53c0ef508146dfd51c5dcb195a648a54f0c6",
+    "evaluator_ref": "validator:independent-byte-level-l0:6377a7d60c0246d38d2fefe5a3a685409a3434342e41d0d88262ece8d326fa51",
+    "test_refs": [
+      "test:tests.test_a1_authority_corridor", "test:tests.test_s07_l0_independent_validation",
+      "test:tests.test_s08_atomic_feedback", "test:tests.test_s09_feedback_replay_capacity"
+    ],
+    "environment_ref": "environment:macos-development+linux-ci:2026-07-18",
+    "data_refs": ["fixture:public-synthetic-L0-inputs", "fixture:public-synthetic-domain-writer"],
+    "issuer_independence": {
+      "issuer_ref": "assurance-role:agent-5",
+      "independent_of_subject": true,
+      "independent_of_executor": true
+    },
+    "critical_dependencies": [
+      "catalog:core:13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+      "catalog:a1:eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+      "integration:s05-s06-s07-s08-s09"
+    ],
+    "compatibility_dependencies": ["python:>=3.11", "git:required", "make:required", "sqlite:WAL-single-writer"],
+    "environment_compatibility_ref": "profile:environment-compatibility-v1:52f5d7c8715b3027164a2b284ca912357fd2b8f4bf6f2f2ab356e032370d50e7",
+    "negative_probe_refs": [
+      "probe:canonical-live-authority-absent", "probe:expired-proof-stale",
+      "probe:feedback-fault-rollback", "probe:feedback-replay-zero-write",
+      "probe:ipc-role-spoof-denied", "probe:mixed-head-stale",
+      "probe:parser-hostile-pack", "probe:shadow-admission-parked",
+      "probe:validator-known-invalid-denied", "probe:writer-spoof-denied"
+    ],
+    "valid_from": "2026-07-18T15:50:00Z",
+    "valid_until": "2026-07-25T15:50:00Z",
+    "invalidation_conditions": [
+      "code-hash-drift", "config-hash-drift", "environment-compatibility-drift",
+      "negative-probe-regression", "policy-hash-drift", "proof-expiry",
+      "schema-hash-drift", "subject-head-drift"
+    ],
+    "grants_authority": false
+  },
+  "integrity": {
+    "profile_id": "core-json-sha256-v1",
+    "payload_sha256": "a5fadfff749d1ca23e94d87c7095ef043d5683376be73f7503d1d233e5431916",
+    "parent_refs": [
+      "git:c49f0cba0d1f866da009788c72ccee005f93f150",
+      "probe:canonical-live-authority-absent", "probe:expired-proof-stale",
+      "probe:feedback-fault-rollback", "probe:feedback-replay-zero-write",
+      "probe:ipc-role-spoof-denied", "probe:mixed-head-stale",
+      "probe:parser-hostile-pack", "probe:shadow-admission-parked",
+      "probe:validator-known-invalid-denied", "probe:writer-spoof-denied",
+      "profile:environment-compatibility-v1:52f5d7c8715b3027164a2b284ca912357fd2b8f4bf6f2f2ab356e032370d50e7",
+      "test:tests.test_a1_authority_corridor", "test:tests.test_s07_l0_independent_validation",
+      "test:tests.test_s08_atomic_feedback", "test:tests.test_s09_feedback_replay_capacity"
+    ]
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "stage_id": "s10-durable-feedback-capability", "agent_id": "agent-0",
+  "objective": "Issue a bounded, expiring and drift-invalidated PASS_FOR_FROZEN_SCOPE receipt for the proven offline durable-feedback corridor without extending authority or provider claims.",
+  "executable_blocker": "E1B integration evidence is green, but the existing issuer is hard-coded to E1A discovery and cannot honestly represent the distinct durable-feedback scope.",
+  "base_sha": "fb9a7a8908810d79cda2371b3ae8467ca96adf7a",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a0-s10-capability-governance",
+  "worktree": "/Volumes/Work/dual-contour-research-os-s10-capability",
+  "write_set": [
+    "tools/capability_proof.py", "docs/receipts/capability/e1b-durable-feedback-offline.json",
+    "stages/s10-durable-feedback-capability/stage-envelope.json",
+    "stages/s10-durable-feedback-capability/ownership-lease.json"
+  ],
+  "forbidden_scope": ["contract-edit", "runtime-organism", "provider-proof", "domain-application", "authority-grant", "canonical-or-live-action", "test-edit", "deployment"],
+  "dependency_hashes": {
+    "core_contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "a1_contract_catalog": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+    "reuse_receipt_payload": "d00c99f1f8e64e1106fb8cfef14702e0ad240ab1d69faa88711febf598dd40d1",
+    "external_dependencies": "none"
+  },
+  "acceptance_commands": ["make contracts", "python3 -m unittest tests.test_a1_capability_proof tests.test_s10_durable_feedback_capability", "proof-exact-reproduction", "all-drift-and-expiry-stale", "overclaim-fail-closed", "git diff --check"],
+  "risk_class": "medium-proof-overbreadth",
+  "stop_conditions": ["real-provider-proven", "domain-application-applied", "authority-granted", "subject-or-evidence-unbound", "expiry-or-drift-not-stale"],
+  "expected_receipt": "docs/receipts/integration/s10-durable-feedback-capability.json",
+  "rollback": "Revert the additive issuer profile and E1B proof receipt; E1A proof remains valid and unchanged.",
+  "commit_authority": "one-scoped-agent-0-commit", "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent5_assurance", "blocked_validation_failed"]
+}

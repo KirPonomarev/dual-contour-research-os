@@ -1,0 +1,31 @@
+{
+  "schema_id": "ReuseDecisionReceipt", "schema_version": "1.0.0",
+  "object_id": "reuse-s10-durable-feedback-capability-proof-20260718", "issued_at": "2026-07-18T15:45:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-freeze-authority"},
+  "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "A1_DURABLE_FEEDBACK_PASS_FOR_FROZEN_SCOPE",
+    "candidates": [
+      {"candidate": "extend-existing-pure-capability-proof-issuer-validator-currentness-tool", "disposition": "selected"},
+      {"candidate": "reuse-frozen-CapabilityProofReceipt-contract-and-environment-profile", "disposition": "selected"},
+      {"candidate": "new-proof-schema-runtime-service-or-organism-state", "disposition": "rejected-duplicate-or-next-phase"},
+      {"candidate": "claim-real-provider-domain-application-or-production-proof", "disposition": "rejected-unsupported-overclaim"}
+    ],
+    "selected_mode": "add-second-exact-capability-profile-to-existing-pure-issuer-with-shared-drift-expiry-and-zero-authority-semantics",
+    "source_ref": "git:c49f0cba0d1f866da009788c72ccee005f93f150;internal:tools/capability_proof.py@7976983e;reuse:s04-capability-proof",
+    "code_sha256": "7976983ea3f7bbe4472f701076e088ea1bd7bdf9a18405b01e1891b3461d8055",
+    "license_spdx": "NOASSERTION", "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "exact-static-reproduction", "subject-code-config-policy-schema-environment-drift-stale",
+      "expiry-stale", "proof-overclaim-fail-closed", "E1B-integration-receipts-exist",
+      "real-provider-UNPROVEN", "canonical-live-DENIED", "grants-authority-false"
+    ],
+    "canonical_owner": "agent-0-proof-issuer-with-agent-5-independent-assurance",
+    "rollback": "Revert the additive durable-feedback profile and receipt; the existing E1A fixture proof remains byte-for-byte valid."
+  },
+  "integrity": {"payload_sha256": "d00c99f1f8e64e1106fb8cfef14702e0ad240ab1d69faa88711febf598dd40d1", "parent_refs": [
+    "git:c49f0cba0d1f866da009788c72ccee005f93f150",
+    "reuse:6286442f93a7ba32cb1e12c7709975b026020a04d8a177ad81e104d9ab1667ae",
+    "sha256:eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1"
+  ]}
+}
