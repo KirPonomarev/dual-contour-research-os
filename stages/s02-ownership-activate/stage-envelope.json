@@ -12,7 +12,8 @@
     "docs/ADR/0003-discovery-path-activation.md",
     "docs/receipts/OWNERSHIP_REGISTRY_AMENDMENT_2.json",
     "stages/s02-ownership-activate/stage-envelope.json",
-    "stages/s02-ownership-activate/ownership-lease.json"
+    "stages/s02-ownership-activate/ownership-lease.json",
+    "tools/verify_freeze_receipt.py"
   ],
   "forbidden_scope": [
     "contract-edit",

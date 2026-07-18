@@ -10,7 +10,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 RECEIPT = ROOT / "docs" / "receipts" / "CONTRACTS_FROZEN.json"
-OWNERSHIP_AMENDMENT = ROOT / "docs" / "receipts" / "OWNERSHIP_REGISTRY_AMENDMENT.json"
+OWNERSHIP_AMENDMENTS = ROOT / "docs" / "receipts"
 
 
 def sha(path: Path) -> str:
@@ -20,6 +20,62 @@ def sha(path: Path) -> str:
 def fail(reason: str) -> None:
     print(f"freeze_receipt=FAILED reason={reason}")
     raise SystemExit(1)
+
+
+def verify_ownership_amendment_chain(
+    *, frozen_sha256: str, current_sha256: str, catalog_sha256: str
+) -> tuple[str, ...]:
+    """Verify a unique immutable amendment chain from freeze to live registry."""
+
+    receipts: list[dict[str, object]] = []
+    for path in sorted(OWNERSHIP_AMENDMENTS.glob("OWNERSHIP_REGISTRY_AMENDMENT*.json")):
+        try:
+            value = json.loads(path.read_text())
+        except (OSError, json.JSONDecodeError):
+            fail("ownership_amendment_parse")
+        if not isinstance(value, dict):
+            fail("ownership_amendment_shape")
+        receipts.append(value)
+
+    cursor = frozen_sha256
+    consumed: list[str] = []
+    while cursor != current_sha256:
+        candidates = [
+            value
+            for value in receipts
+            if value.get("previous_ownership_registry_sha256") == cursor
+        ]
+        if len(candidates) != 1:
+            fail("ownership_amendment_chain")
+        amendment = candidates[0]
+        if amendment.get("receipt_type") != "OWNERSHIP_REGISTRY_AMENDMENT":
+            fail("ownership_amendment_type")
+        if amendment.get("status") != "OWNERSHIP_REGISTRY_AMENDED":
+            fail("ownership_amendment_status")
+        if amendment.get("issuer") != "agent-0":
+            fail("ownership_amendment_issuer")
+        if amendment.get("contract_catalog_sha256") != catalog_sha256:
+            fail("ownership_amendment_catalog")
+        next_sha256 = amendment.get("current_ownership_registry_sha256")
+        if not isinstance(next_sha256, str) or next_sha256 in consumed:
+            fail("ownership_amendment_cycle")
+        for ref_field in ("stage_envelope_ref", "adr_ref"):
+            ref = amendment.get(ref_field)
+            if not isinstance(ref, str) or not ref or not (ROOT / ref).is_file():
+                fail(f"ownership_amendment_{ref_field}")
+        amendment_base = amendment.get("base_sha", "")
+        amendment_base_exists = subprocess.run(
+            ["git", "cat-file", "-e", f"{amendment_base}^{{commit}}"],
+            cwd=ROOT,
+            check=False,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+        if amendment_base_exists.returncode:
+            fail("ownership_amendment_base")
+        consumed.append(next_sha256)
+        cursor = next_sha256
+    return tuple(consumed)
 
 
 def main() -> int:
@@ -61,35 +117,11 @@ def main() -> int:
     current_ownership_sha256 = sha(ROOT / "ownership" / "registry.json")
     frozen_ownership_sha256 = receipt.get("ownership_registry_sha256")
     if current_ownership_sha256 != frozen_ownership_sha256:
-        if not OWNERSHIP_AMENDMENT.exists():
-            fail("hash_mismatch:ownership_registry_sha256")
-        amendment = json.loads(OWNERSHIP_AMENDMENT.read_text())
-        if amendment.get("receipt_type") != "OWNERSHIP_REGISTRY_AMENDMENT":
-            fail("ownership_amendment_type")
-        if amendment.get("status") != "OWNERSHIP_REGISTRY_AMENDED":
-            fail("ownership_amendment_status")
-        if amendment.get("issuer") != "agent-0":
-            fail("ownership_amendment_issuer")
-        if amendment.get("contract_catalog_sha256") != receipt.get("catalog_sha256"):
-            fail("ownership_amendment_catalog")
-        if amendment.get("previous_ownership_registry_sha256") != frozen_ownership_sha256:
-            fail("ownership_amendment_previous_hash")
-        if amendment.get("current_ownership_registry_sha256") != current_ownership_sha256:
-            fail("ownership_amendment_current_hash")
-        for ref_field in ("stage_envelope_ref", "adr_ref"):
-            ref = amendment.get(ref_field)
-            if not isinstance(ref, str) or not ref or not (ROOT / ref).is_file():
-                fail(f"ownership_amendment_{ref_field}")
-        amendment_base = amendment.get("base_sha", "")
-        amendment_base_exists = subprocess.run(
-            ["git", "cat-file", "-e", f"{amendment_base}^{{commit}}"],
-            cwd=ROOT,
-            check=False,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
+        verify_ownership_amendment_chain(
+            frozen_sha256=frozen_ownership_sha256,
+            current_sha256=current_ownership_sha256,
+            catalog_sha256=receipt["catalog_sha256"],
         )
-        if amendment_base_exists.returncode:
-            fail("ownership_amendment_base")
 
     print("freeze_receipt=GREEN")
     print(f"baseline_head_sha={baseline}")
