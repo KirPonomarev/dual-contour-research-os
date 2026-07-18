@@ -1,0 +1,31 @@
+{
+  "stage_id": "s08-atomic-feedback-assurance", "agent_id": "agent-5",
+  "objective": "Prove atomic feedback rollback, exact replay, restart lookup, epistemic separation, shadow inheritance, bounded outbox and projection continuity.",
+  "executable_blocker": "The Agent 1 feedback commit needs independent transaction fault and false-learning assurance before integration.",
+  "base_sha": "fcd038a2d57c7ef628e85f55baaab718819cbdf3",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a5-s08-feedback-assurance",
+  "worktree": "/Volumes/Work/dual-contour-research-os-s08-assurance",
+  "write_set": [
+    "tests/test_s08_atomic_feedback.py",
+    "tests/test_stage1_assurance.py",
+    "stages/s08-atomic-feedback/assurance-stage-envelope.json",
+    "stages/s08-atomic-feedback/assurance-ownership-lease.json"
+  ],
+  "forbidden_scope": ["source-edit", "contract-edit", "canonical-doc-edit", "live-data", "deployment"],
+  "dependency_hashes": {
+    "agent_1_commit": "fcd038a2d57c7ef628e85f55baaab718819cbdf3",
+    "ledger_py": "8e11e46b228e99bb390777d98d27e472bdc56fec40ebcb42b4c059baa83832f4",
+    "external_dependencies": "none"
+  },
+  "acceptance_commands": [
+    "make contracts", "python3 -m unittest tests.test_stage1_ledger tests.test_a1_storage_v2 tests.test_s08_atomic_feedback",
+    "git diff --check"
+  ],
+  "risk_class": "high-hostile-epistemic-transaction-assurance",
+  "stop_conditions": ["partial-state-after-fault", "false-refuted-or-learned", "taint-loss", "duplicate-trigger", "restart-loss"],
+  "expected_receipt": "docs/receipts/integration/s08-atomic-feedback-assurance.json",
+  "rollback": "Revert assurance-only tests and reject the Agent 1 handoff.",
+  "commit_authority": "one-scoped-agent-5-commit", "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent0_audit", "blocked_validation_failed"]
+}

@@ -1,0 +1,41 @@
+{
+  "stage_id": "s08-atomic-feedback", "agent_id": "agent-1",
+  "objective": "Atomically project reference-only execution feedback into separated outcome, operational experience, idea state and a zero-or-one InternalEventTrigger outbox on the existing global ledger.",
+  "executable_blocker": "Execution and validation terminate durably, but no atomic feedback transaction preserves shadow taint, epistemic separation, reusable memory, idea state and bounded next-work intent.",
+  "base_sha": "c0f8c2d786612742c33753b23b1d29bd946cc403",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a1-s08-atomic-feedback",
+  "worktree": "/Volumes/Work/dual-contour-research-os-s08-implementation",
+  "write_set": [
+    "src/research_bridge/ledger.py",
+    "stages/s08-atomic-feedback/stage-envelope.json",
+    "stages/s08-atomic-feedback/ownership-lease.json"
+  ],
+  "forbidden_scope": [
+    "contract-edit", "new-ledger", "new-scheduler", "direct-MaterialEvent-mint",
+    "LearningDecision", "canonical-confidence", "domain-writer", "model-authority",
+    "network-or-live-action", "test-edit", "deployment"
+  ],
+  "dependency_hashes": {
+    "core_contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "reuse_receipt_payload": "779f21151e1988a6a5f251c76198ba50062a8691a9ad995d07251eb499d2a2a1",
+    "ledger_py": "db36cf71ba04e4f1bb05208e3a0d3b9a543ff377b1f164baefbc32906f6888d2",
+    "external_dependencies": "none"
+  },
+  "acceptance_commands": [
+    "make contracts", "python3 -m unittest tests.test_stage1_ledger tests.test_a1_storage_v2 tests.test_s08_atomic_feedback",
+    "feedback-bundle-one-transaction", "exact-retry-zero-duplicate",
+    "no-false-REFUTED-or-LEARNED", "zero-or-one-runnable-trigger",
+    "shadow-inheritance", "WAIT_AUTHORITY-restart", "git diff --check"
+  ],
+  "risk_class": "high-epistemic-and-transactional-feedback",
+  "stop_conditions": [
+    "partial-feedback-visible", "infra-becomes-refutation", "shadow-becomes-domain-applied",
+    "LearningDecision-emitted", "more-than-one-next-trigger-per-outcome",
+    "second-ledger-or-event-writer-created"
+  ],
+  "expected_receipt": "docs/receipts/integration/s08-atomic-feedback.json",
+  "rollback": "Revert the additive feedback API and projection handling; existing event/object rows and legacy A1 bundles remain readable without destructive migration.",
+  "commit_authority": "one-scoped-agent-1-commit", "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent5_assurance", "blocked_validation_failed"]
+}
