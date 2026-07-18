@@ -1,0 +1,29 @@
+{
+  "schema_id": "IntegrationReceipt", "schema_version": "1.0.0",
+  "object_id": "integration-s13-self-model-proof-20260718", "issued_at": "2026-07-18T16:31:15Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s13-self-model-proof", "agent_id": "agent-0",
+    "ownership_lease_ref": "stages/s13-self-model-proof/ownership-lease.json",
+    "base_sha": "079d378138c0e09ccd2f8ee66327f68a219dfee0",
+    "head_sha": "ac914783a6b8bb620ab82adf4cf421bc0e457be8",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": ["tools/capability_proof.py", "docs/receipts/capability/e1c-operational-self-model-offline.json", "stages/s13-self-model-proof/stage-envelope.json", "stages/s13-self-model-proof/ownership-lease.json"],
+    "audit_results": {
+      "contract_gate": "green", "privacy_secret_scan": "green", "source_mutation": false,
+      "focused_tests": 10, "full_core_tests": 595, "stage0b_tests": 25,
+      "proof_status": "PASS_FOR_FROZEN_SCOPE", "proof_scope": "OPERATIONAL_SELF_MODEL_OFFLINE_E1C",
+      "exact_release_hashes": "green", "drift_and_expiry_stale": "green",
+      "anthropomorphic_or_self_authority_claims": false, "real_provider": "UNPROVEN",
+      "domain_application": "SHADOW_UNAPPLIED", "canonical_and_live_authority": "DENIED",
+      "grants_authority": false
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29652103927",
+    "integration_commit_sha": "15a2eb89c7654f454621653a7e76f495e9758cff"
+  },
+  "integrity": {"payload_sha256": "d508e0991727150ca95e8a07a022930f408840eecd9db6c71e874fb692ba364b", "parent_refs": [
+    "git:ac914783a6b8bb620ab82adf4cf421bc0e457be8", "git:15a2eb89c7654f454621653a7e76f495e9758cff",
+    "ci:29652103927", "reuse:daf040c07cf19657aa1c019dc49fff4c17ad28d32f1e14d8a7404f018353a427"
+  ]}
+}
