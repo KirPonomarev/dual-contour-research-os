@@ -1,0 +1,32 @@
+{
+  "schema_id": "ReuseDecisionReceipt", "schema_version": "1.0.0",
+  "object_id": "reuse-s05-db-v2-global-order-20260718", "issued_at": "2026-07-18T14:20:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-freeze-authority"},
+  "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "SQLite-v2-single-global-order-atomic-A1-object-and-projection-bundles",
+    "candidates": [
+      {"candidate": "extend-existing-JobLedger-SQLite-WAL-and-global-sequence", "disposition": "selected"},
+      {"candidate": "reuse-frozen-storage-coverage-profile-and-A1-contracts", "disposition": "selected"},
+      {"candidate": "new-event-ledger-or-sequence", "disposition": "rejected-split-ordering"},
+      {"candidate": "Redis-Kafka-vector-DB-or-new-scheduler", "disposition": "rejected-no-measured-blocker"}
+    ],
+    "selected_mode": "transactional-SQLite-v2-rebuild-plus-A1-object-FK-and-projection-last-applied-sequence-no-second-generator",
+    "source_ref": "git:7fe46d7cdbb828dd22ac490c0de88642dd7f2404;internal:src/research_bridge/ledger.py;profile:storage-coverage-v1",
+    "code_sha256": "3108bc0381dcddd470c6053ab712b3f30143929e9328bb132d3883f34e7e70c8",
+    "license_spdx": "NOASSERTION",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "fresh-v2-equals-migrated-v2", "migration-idempotent", "unknown-fingerprint-fail-closed",
+      "transaction-fault-no-partial-schema-or-bundle", "single-global-sequence",
+      "projection-coverage-and-deterministic-digests", "D2-D3-rejected"
+    ],
+    "canonical_owner": "bridge-ledger-agent-1-with-agent-0-migration-authority-and-agent-5-assurance",
+    "rollback": "Restore a pre-migration copy only under approved recovery; code rollback cannot open user_version 2 as version 1. No destructive automatic downgrade exists."
+  },
+  "integrity": {"payload_sha256": "14967e2fa75b0454e019f94d81625694dab590884b5a3ceada74627b6ccb4542", "parent_refs": [
+    "git:7fe46d7cdbb828dd22ac490c0de88642dd7f2404",
+    "sha256:13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "sha256:eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1"
+  ]}
+}
