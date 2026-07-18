@@ -1,0 +1,49 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-e1a-discovery-admission-20260718",
+  "issued_at": "2026-07-18T13:17:11Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "e1a-admission",
+    "agent_id": "agent-1",
+    "ownership_lease_ref": "stages/e1a-admission/ownership-lease.json",
+    "base_sha": "395d8d95a0a226ca3dbae0fbc1caafb12b670b76",
+    "head_sha": "f48ea155961320b83d4c27799c9587d1809b14d9",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "src/research_bridge/admission.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "worker_commit_sha": "f48ea155961320b83d4c27799c9587d1809b14d9",
+      "worker_base_exact": true,
+      "worker_write_set_exact": true,
+      "legacy_focused_test_count": 27,
+      "full_core_test_count_after_repair": 475,
+      "full_inventory_test_count": 25,
+      "branch_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29641854631",
+      "trusted_field_minting": "green",
+      "non_material_zero_model_calls": "green",
+      "snapshot_bound_determinism": "green",
+      "admission_grants_execution_authority": false,
+      "direct_a1_assurance_supplied_by_stage": "s01-e1a-admission-complete"
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29645846659",
+    "integration_commit_sha": "2f5e25b432c3cf7bf3dd40a5383f60d798cca8ca"
+  },
+  "integrity": {
+    "payload_sha256": "f9554b1ce7261a7245adbcdbdb92d79e58d60c1d66b0c1a9d0cb6dffaae91e4e",
+    "parent_refs": [
+      "git:f48ea155961320b83d4c27799c9587d1809b14d9",
+      "git:2f5e25b432c3cf7bf3dd40a5383f60d798cca8ca",
+      "ci:29641854631",
+      "ci:29645846659",
+      "reuse:reuse-e1a-discovery-admission-20260718"
+    ]
+  }
+}

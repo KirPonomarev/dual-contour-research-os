@@ -1,0 +1,54 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s01-e1a-admission-complete-20260718",
+  "issued_at": "2026-07-18T13:17:11Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s01-e1a-admission-complete",
+    "agent_id": "agent-1",
+    "ownership_lease_ref": "stages/s01-e1a-admission-complete/ownership-lease.json",
+    "base_sha": "f48ea155961320b83d4c27799c9587d1809b14d9",
+    "head_sha": "42c3f4dab97c8be95d844dba95ee6db083f5db6e",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "src/research_bridge/admission.py",
+      "tests/test_a1_admission_fixture.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "worker_commit_sha": "42c3f4dab97c8be95d844dba95ee6db083f5db6e",
+      "worker_base_exact": true,
+      "worker_write_set_exact": true,
+      "focused_test_count": 14,
+      "legacy_connected_test_count": 27,
+      "full_core_test_count": 475,
+      "full_inventory_test_count": 25,
+      "branch_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29645832846",
+      "deeply_immutable_outputs": "green",
+      "evidence_partition_and_self_reference_denial": "green",
+      "resource_schema_minimums": "green",
+      "active_reservation_capacity_gate": "green",
+      "deterministic_receipt_identity": "green",
+      "hard_deny_matrix": "green",
+      "admission_grants_execution_authority": false,
+      "external_dependency_adoption": false
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29645846659",
+    "integration_commit_sha": "2f5e25b432c3cf7bf3dd40a5383f60d798cca8ca"
+  },
+  "integrity": {
+    "payload_sha256": "ad476d32e41e73b7aff5593e7af0ec7dcc4d9811ba77f017f455b9fa2e1dfdf5",
+    "parent_refs": [
+      "git:42c3f4dab97c8be95d844dba95ee6db083f5db6e",
+      "git:2f5e25b432c3cf7bf3dd40a5383f60d798cca8ca",
+      "ci:29645832846",
+      "ci:29645846659",
+      "integration:integration-e1a-discovery-admission-20260718"
+    ]
+  }
+}
