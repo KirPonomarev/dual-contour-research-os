@@ -1,0 +1,32 @@
+{
+  "schema_id": "OrganismDeploymentProjection",
+  "schema_version": "1.0.0",
+  "projection_id": "bridge-a1-deployment-projection",
+  "subject_ref": "git:2196ba43267e5465e699ae06aa18015e67cd16af",
+  "processes": [
+    {
+      "process_id": "researchd-single-writer",
+      "service_ref": "repo:ops/deploy/research-os-bridge.service",
+      "component_ids": ["materiality-gate", "admission-controller", "authority-corridor", "feedback-projector"],
+      "isolation": "ROOTLESS_SINGLE_WRITER_NO_LIVE_AUTHORITY",
+      "lifecycle": "DAEMON",
+      "observed_ref": "repo:docs/receipts/integration/s09-replay-capacity.json"
+    },
+    {
+      "process_id": "offline-l0-path",
+      "service_ref": "repo:src/research_bridge/l0.py",
+      "component_ids": ["offline-l0-executor", "independent-l0-validator"],
+      "isolation": "NO_NETWORK_BOUNDED_D0_SYNTHETIC",
+      "lifecycle": "ON_DEMAND_IN_PROCESS",
+      "observed_ref": "repo:docs/receipts/integration/s07-l0-validation-assurance.json"
+    },
+    {
+      "process_id": "governance-proof-tool",
+      "service_ref": "repo:tools/capability_proof.py",
+      "component_ids": ["capability-proof-issuer"],
+      "isolation": "PURE_OFFLINE_ZERO_AUTHORITY",
+      "lifecycle": "ON_DEMAND_OFFLINE_TOOL",
+      "observed_ref": "repo:docs/receipts/integration/s10-durable-feedback-capability-assurance.json"
+    }
+  ]
+}
