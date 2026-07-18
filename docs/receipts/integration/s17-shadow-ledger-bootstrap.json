@@ -1,0 +1,16 @@
+{
+  "schema_id": "IntegrationReceipt", "schema_version": "1.0.0",
+  "object_id": "integration-s17-shadow-ledger-bootstrap-20260718", "issued_at": "2026-07-18T18:49:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s17-shadow-ledger-bootstrap", "agent_id": "agent-0",
+    "ownership_lease_ref": "stages/s17-shadow-ledger-bootstrap/ownership-lease.json",
+    "base_sha": "6a8b690dc68c659f391f80d174f8381446bf4afa", "head_sha": "0376644b6e373dbae01bb405a4ff370c8b11ce81",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": ["tools/model_provider_shadow.py", "stages/s17-shadow-ledger-bootstrap/stage-envelope.json", "stages/s17-shadow-ledger-bootstrap/ownership-lease.json"],
+    "audit_results": {"contract_gate": "green", "privacy_secret_scan": "green", "source_mutation": false, "full_core_tests": 645, "stage0b_tests": 25, "new_path_only": true, "database_mode": "0600", "bootstrap_object_kind": "CapabilityProofReceipt", "classification": "D0", "fixture_only": true, "grants_authority": false, "trusted_material_events": 0, "complete_A1_projections": 4, "existing_path_mutation": false, "partial_database_after_fault": false, "network_calls_or_credential_access": 0},
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29656567263", "integration_commit_sha": "af14d83674399d2fba7c3c39d2c744512d96e0c5"
+  },
+  "integrity": {"payload_sha256": "40bac072710a3addcd423325efe34327a2fcdee03b174f6445cc0d2122cdabca", "parent_refs": ["git:0376644b6e373dbae01bb405a4ff370c8b11ce81", "git:af14d83674399d2fba7c3c39d2c744512d96e0c5", "ci:29656567263", "reuse:reuse-s17-connected-provider-shadow-tool-20260718"]}
+}

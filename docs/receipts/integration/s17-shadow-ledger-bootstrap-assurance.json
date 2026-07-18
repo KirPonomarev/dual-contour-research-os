@@ -1,0 +1,16 @@
+{
+  "schema_id": "IntegrationReceipt", "schema_version": "1.0.0",
+  "object_id": "integration-s17-shadow-ledger-bootstrap-assurance-20260718", "issued_at": "2026-07-18T18:49:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s17-shadow-ledger-bootstrap-assurance", "agent_id": "agent-5",
+    "ownership_lease_ref": "stages/s17-shadow-ledger-bootstrap-assurance/ownership-lease.json",
+    "base_sha": "0376644b6e373dbae01bb405a4ff370c8b11ce81", "head_sha": "24c3a916e5c066d530b6b8da1210fc6d374050ab",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": ["tests/test_s17_shadow_ledger_bootstrap.py", "stages/s17-shadow-ledger-bootstrap-assurance/stage-envelope.json", "stages/s17-shadow-ledger-bootstrap-assurance/ownership-lease.json"],
+    "audit_results": {"contract_gate": "green", "privacy_secret_scan": "green", "source_mutation": false, "focused_tests": 22, "new_hostile_tests": 5, "full_core_tests": 645, "stage0b_tests": 25, "chain_and_A1_coverage": "green", "reopen_model_reservation": "green", "existing_path": "REJECTED_BEFORE_MUTATION", "repository_path": "REJECTED", "fault_cleanup": "green", "authority_laundering": "REJECTED", "environment_secret_read": false, "network_path": false},
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29656567263", "integration_commit_sha": "af14d83674399d2fba7c3c39d2c744512d96e0c5"
+  },
+  "integrity": {"payload_sha256": "2351e70cdb3574f3ac1fbcbb6159ffe9e9d085126b430898db4ace4a6f83cd40", "parent_refs": ["git:24c3a916e5c066d530b6b8da1210fc6d374050ab", "git:af14d83674399d2fba7c3c39d2c744512d96e0c5", "ci:29656567263", "git:0376644b6e373dbae01bb405a4ff370c8b11ce81"]}
+}
