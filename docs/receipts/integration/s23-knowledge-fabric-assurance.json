@@ -1,0 +1,26 @@
+{
+  "schema_id": "IntegrationReceipt", "schema_version": "1.0.0",
+  "object_id": "integration-s23-knowledge-fabric-assurance-20260718", "issued_at": "2026-07-18T21:29:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s23-knowledge-fabric-assurance", "agent_id": "agent-5",
+    "ownership_lease_ref": "stages/s23-knowledge-fabric/assurance-ownership-lease.json",
+    "base_sha": "ba861a3f7cd504fefda2c2e2058929fcdef46786", "head_sha": "63fa45ab0b87bc0c6d87aeb876e3e8e05e1e172e",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": ["tests/test_s23_knowledge_fabric.py", "tests/test_stage1_assurance.py", "stages/s23-knowledge-fabric/assurance-stage-envelope.json", "stages/s23-knowledge-fabric/assurance-ownership-lease.json"],
+    "audit_results": {
+      "contract_gate": "green", "privacy_secret_scan": "green", "source_mutation": false,
+      "focused_tests": 22, "new_knowledge_tests": 7, "full_core_tests": 677, "stage0b_tests": 25,
+      "deterministic_restart_hash": "green", "memory_disabled_selected_records": 0,
+      "resealed_truth_claim_rejected": "green", "shadow_laundering_rejected": "green",
+      "epistemic_contradiction_rejected": "green", "duplicate_execution_rejected": "green",
+      "bounded_limit_rejected_above": 256, "immutable_report": "green",
+      "public_surface_boundary": "green", "durable_writes_from_retrieval": 0,
+      "scientific_truth_or_learning_overclaim": 0, "grants_authority": false
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29661643555",
+    "integration_commit_sha": "c0665219a4ee334ee39cd0ff76056acf02e774dc"
+  },
+  "integrity": {"payload_sha256": "618963236bbc741efd9518d4cd3b06bed09dbc379a31d3bfafa4d078b652b8d9", "parent_refs": ["git:63fa45ab0b87bc0c6d87aeb876e3e8e05e1e172e", "git:c0665219a4ee334ee39cd0ff76056acf02e774dc", "ci:29661643555", "git:ba861a3f7cd504fefda2c2e2058929fcdef46786"]}
+}
