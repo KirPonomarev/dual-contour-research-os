@@ -429,6 +429,21 @@ class FeedbackBundleRecord:
 
 
 @dataclass(frozen=True, slots=True)
+class FeedbackReplayReport:
+    """Immutable proof that feedback projections replay without side effects."""
+
+    ledger_sequence_last: int
+    feedback_bundle_count: int
+    first_feedback_sequence: int | None
+    last_feedback_sequence: int | None
+    rebuilt_projection_sha256: Mapping[str, str]
+    stored_projection_sha256: Mapping[str, str]
+    capacity_envelope: Mapping[str, object]
+    replay_sha256: str
+    side_effects: bool
+
+
+@dataclass(frozen=True, slots=True)
 class _BudgetProjection:
     event: LedgerEvent
     accounting_policy_ref: str
@@ -1447,6 +1462,113 @@ class JobLedger:
             self._ensure_open()
             states = self._projection_states_locked(_FEEDBACK_PROJECTION_NAMES)
         return _deep_freeze(states)
+
+    def replay_feedback(self) -> FeedbackReplayReport:
+        """Rebuild feedback projections from the global ledger with zero writes."""
+
+        with self._lock:
+            self._ensure_open()
+            changes_before = self._connection.total_changes
+            rows = self._connection.execute(
+                "SELECT * FROM bridge_job_ledger ORDER BY sequence"
+            ).fetchall()
+            stored_rows = self._connection.execute(
+                "SELECT * FROM bridge_a1_projection_state WHERE projection_name IN (?, ?, ?, ?) ORDER BY projection_name",
+                tuple(sorted(_FEEDBACK_PROJECTION_NAMES)),
+            ).fetchall()
+
+            previous_sha256 = _GENESIS_SHA256
+            rebuilt: dict[str, dict[str, object]] = {}
+            feedback_sequences: list[int] = []
+            for expected_sequence, row in enumerate(rows, start=1):
+                event = self._ledger_event_from_row(row)
+                if (
+                    event.sequence != expected_sequence
+                    or event.previous_sha256 != previous_sha256
+                ):
+                    raise LedgerError("global sequence gap blocks feedback replay")
+                previous_sha256 = event.event_sha256
+                if event.event_type != "a1_bundle":
+                    continue
+                descriptors = _projection_descriptor_map(event.payload)
+                if event.payload.get("bundle_kind") == "atomic_feedback_v1":
+                    record = _feedback_record_from_event(event)
+                    material = {
+                        "outcome_disposition": _json_copy(
+                            record.outcome_disposition, "replay outcome"
+                        ),
+                        "experience_record": _json_copy(
+                            record.experience_record, "replay experience"
+                        ),
+                        "idea_node": _json_copy(record.idea_node, "replay idea"),
+                        "outbox_record": _json_copy(
+                            record.outbox_record, "replay outbox"
+                        ),
+                    }
+                    rebuilt = _advance_feedback_states(rebuilt, material)
+                    feedback_sequences.append(event.sequence)
+                if rebuilt:
+                    if set(descriptors).issuperset(_FEEDBACK_PROJECTION_NAMES) is False:
+                        raise LedgerError("feedback replay descriptor coverage is incomplete")
+                    for name in _FEEDBACK_PROJECTION_NAMES:
+                        expected_digest = _digest(
+                            _canonical_json(rebuilt[name]).encode("utf-8")
+                        )
+                        if descriptors[name] != expected_digest:
+                            raise LedgerError("feedback replay descriptor digest mismatch")
+
+            stored: dict[str, dict[str, object]] = {}
+            stored_digests: dict[str, str] = {}
+            for row in stored_rows:
+                state = _load_json_object(row["state_json"], "stored feedback projection")
+                digest = _digest(_canonical_json(state).encode("utf-8"))
+                if not _constant_time_equal(digest, row["state_sha256"]):
+                    raise LedgerError("stored feedback projection digest mismatch")
+                stored[row["projection_name"]] = state
+                stored_digests[row["projection_name"]] = digest
+            if bool(rebuilt) != bool(stored):
+                raise LedgerError("feedback replay and stored coverage disagree")
+            if rebuilt and set(stored) != _FEEDBACK_PROJECTION_NAMES:
+                raise LedgerError("stored feedback projection coverage is incomplete")
+            rebuilt_digests = {
+                name: _digest(_canonical_json(state).encode("utf-8"))
+                for name, state in sorted(rebuilt.items())
+            }
+            if rebuilt_digests != stored_digests:
+                raise LedgerError("rebuilt feedback projections differ from storage")
+
+            capacity = _feedback_capacity_envelope(
+                ledger_event_count=len(rows),
+                feedback_bundle_count=len(feedback_sequences),
+                projections=rebuilt,
+            )
+            material = {
+                "ledger_sequence_last": len(rows),
+                "feedback_bundle_count": len(feedback_sequences),
+                "first_feedback_sequence": (
+                    feedback_sequences[0] if feedback_sequences else None
+                ),
+                "last_feedback_sequence": (
+                    feedback_sequences[-1] if feedback_sequences else None
+                ),
+                "rebuilt_projection_sha256": rebuilt_digests,
+                "stored_projection_sha256": stored_digests,
+                "capacity_envelope": capacity,
+                "side_effects": False,
+            }
+            if self._connection.total_changes != changes_before:
+                raise LedgerError("feedback replay attempted a durable write")
+        return FeedbackReplayReport(
+            ledger_sequence_last=material["ledger_sequence_last"],
+            feedback_bundle_count=material["feedback_bundle_count"],
+            first_feedback_sequence=material["first_feedback_sequence"],
+            last_feedback_sequence=material["last_feedback_sequence"],
+            rebuilt_projection_sha256=_deep_freeze(rebuilt_digests),
+            stored_projection_sha256=_deep_freeze(stored_digests),
+            capacity_envelope=_deep_freeze(capacity),
+            replay_sha256=_digest(_canonical_json(material).encode("utf-8")),
+            side_effects=False,
+        )
 
     def _projection_states_locked(
         self, names: frozenset[str]
@@ -3049,6 +3171,98 @@ def _safe_nonnegative_integer(name: str, value: object) -> int:
     if normalized > _MAX_SAFE_INTEGER:
         raise LedgerError(f"{name} exceeds the safe integer limit")
     return normalized
+
+
+def _projection_descriptor_map(payload: Mapping[str, object]) -> dict[str, str]:
+    raw = payload.get("projections")
+    if not isinstance(raw, (list, tuple)):
+        raise LedgerError("A1 projection descriptors are invalid")
+    descriptors: dict[str, str] = {}
+    for index, item in enumerate(raw):
+        descriptor = _exact_mapping(
+            item,
+            frozenset({"projection_name", "state_sha256"}),
+            f"projection descriptor[{index}]",
+        )
+        name = _text(
+            descriptor["projection_name"],
+            f"projection descriptor[{index}].projection_name",
+            maximum=128,
+        )
+        if name in descriptors:
+            raise LedgerError("A1 projection descriptor is duplicated")
+        descriptors[name] = _sha256(
+            f"projection descriptor[{index}].state_sha256",
+            descriptor["state_sha256"],
+        )
+    return descriptors
+
+
+def _feedback_capacity_envelope(
+    *,
+    ledger_event_count: int,
+    feedback_bundle_count: int,
+    projections: Mapping[str, Mapping[str, object]],
+) -> dict[str, object]:
+    counts: dict[str, int] = {}
+    runnable = 0
+    wait_authority = 0
+    for name in sorted(_FEEDBACK_PROJECTION_NAMES):
+        state = projections.get(name)
+        if state is None:
+            counts[name] = 0
+            continue
+        exact = _exact_mapping(
+            state,
+            frozenset({"schema_id", "schema_version", "count", "latest_ref", "entries"}),
+            f"capacity {name}",
+        )
+        count = _safe_nonnegative_integer(f"capacity {name}.count", exact["count"])
+        if count > _FEEDBACK_PROJECTION_ENTRY_LIMIT:
+            raise LedgerError("persisted feedback projection exceeds capacity")
+        if not isinstance(exact["entries"], Mapping) or len(exact["entries"]) != count:
+            raise LedgerError("persisted feedback projection count mismatch")
+        counts[name] = count
+        if name == "feedback_outbox":
+            for record in exact["entries"].values():
+                if not isinstance(record, Mapping):
+                    raise LedgerError("persisted outbox record is invalid")
+                status = record.get("status")
+                runnable_count = record.get("runnable_count")
+                if status == "RUNNABLE" and runnable_count == 1:
+                    runnable += 1
+                elif status == "WAIT_AUTHORITY" and runnable_count == 0:
+                    wait_authority += 1
+                else:
+                    raise LedgerError("persisted outbox state is invalid")
+    remaining = {
+        name: _FEEDBACK_PROJECTION_ENTRY_LIMIT - count
+        for name, count in counts.items()
+    }
+    return {
+        "scope": "single-process-single-SQLite-writer-frozen-v1",
+        "writer_count": 1,
+        "ordering_model": "single-bridge-global-sequence",
+        "projection_entry_limit_each": _FEEDBACK_PROJECTION_ENTRY_LIMIT,
+        "parked_gap_refs_per_outcome_limit": _PARKED_GAP_LIMIT,
+        "causal_depth_limit": _MAX_CAUSAL_DEPTH,
+        "observed": {
+            "ledger_events": ledger_event_count,
+            "feedback_bundles": feedback_bundle_count,
+            "projection_entries": counts,
+            "projection_remaining": remaining,
+            "runnable_outbox_records": runnable,
+            "wait_authority_outbox_records": wait_authority,
+        },
+        "throughput_observation": {
+            "kind": "durable-counts-not-wall-clock-rate",
+            "committed_global_events": ledger_event_count,
+            "committed_feedback_bundles": feedback_bundle_count,
+            "rate_claimed": False,
+        },
+        "distributed_scale_claimed": False,
+        "second_writer_authorized": False,
+    }
 
 
 def _expected_schema_fingerprint(

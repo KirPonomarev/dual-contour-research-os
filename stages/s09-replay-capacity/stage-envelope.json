@@ -1,0 +1,32 @@
+{
+  "stage_id": "s09-replay-capacity", "agent_id": "agent-1",
+  "objective": "Rebuild feedback projections deterministically from the existing global ledger with zero writes and expose an evidence-based frozen single-writer capacity envelope.",
+  "executable_blocker": "Atomic feedback is durable, but no read-only replay proof or explicit projection/queue capacity report detects silent gaps after restart.",
+  "base_sha": "7b933b4c597bc98fd64441f4c90f3120f3d685ea",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a1-s09-replay-capacity",
+  "worktree": "/Volumes/Work/dual-contour-research-os-s09-implementation",
+  "write_set": [
+    "src/research_bridge/ledger.py",
+    "stages/s09-replay-capacity/stage-envelope.json",
+    "stages/s09-replay-capacity/ownership-lease.json"
+  ],
+  "forbidden_scope": ["schema-change", "second-ledger", "second-writer", "scheduler", "benchmark-guarantee", "network-or-model-call", "test-edit", "deployment"],
+  "dependency_hashes": {
+    "core_contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "reuse_receipt_payload": "2c4cc00621273b8f35e68a9bd6e468e61ab9d30eb7b4de6304599df1e6d758c3",
+    "ledger_py": "e2db89e4e7c28270c4c91f5913d06e7096819b82f8f1d42bc76c28d945e9f474",
+    "external_dependencies": "none"
+  },
+  "acceptance_commands": [
+    "make contracts", "python3 -m unittest tests.test_stage1_recovery tests.test_stage1_storage_assurance tests.test_a1_storage_v2 tests.test_s08_atomic_feedback tests.test_s09_feedback_replay_capacity",
+    "replay-zero-writes", "projection-hash-and-coverage-exact", "restart-WAIT_AUTHORITY",
+    "capacity-envelope-frozen", "single-writer-only", "git diff --check"
+  ],
+  "risk_class": "high-replay-gap-and-capacity-proof",
+  "stop_conditions": ["replay-mutates-state", "descriptor-gap-accepted", "stored-projection-mismatch-accepted", "capacity-claimed-from-flaky-benchmark", "second-writer-created"],
+  "expected_receipt": "docs/receipts/integration/s09-replay-capacity.json",
+  "rollback": "Revert additive read-only replay/capacity APIs; no durable migration or downgrade is required.",
+  "commit_authority": "one-scoped-agent-1-commit", "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent5_assurance", "blocked_validation_failed"]
+}
