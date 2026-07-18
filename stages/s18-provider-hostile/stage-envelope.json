@@ -1,0 +1,20 @@
+{
+  "stage_id": "s18-provider-hostile", "agent_id": "agent-0",
+  "objective": "Close provider-specific hostile assurance for strict response parsing, oversize and header bounds, ambiguity, settlement, drift, fallback and measured error correlation without another real provider call.",
+  "executable_blocker": "S17 proved bounded real responses but the connected parser still accepted duplicate JSON keys/non-finite constants and the adapter trusted custom transport size/header bounds.",
+  "base_sha": "923fc65aef1c0511474c9f023b11a0878fb00f18",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a0-s18-provider-hostile",
+  "worktree": "/private/tmp/dcr-s18-provider-hostile",
+  "read_set": ["tools/model_provider_shadow.py", "src/research_bridge/model_broker.py", "tests/test_s14_provider_independent_hostile_core.py", "tests/test_s16_provider_routing.py", "tests/test_s17_provider_shadow_tool.py", "tests/test_s17_cost_reconciliation.py"],
+  "write_set": ["tools/model_provider_shadow.py", "tests/test_s18_provider_hostile.py", "docs/receipts/reuse/s18-provider-hostile.json", "stages/s18-provider-hostile/stage-envelope.json", "stages/s18-provider-hostile/ownership-lease.json"],
+  "forbidden_scope": ["contract-or-runtime-source-edit", "credential-or-raw-response-in-Git", "real-provider-call", "automatic-retry", "automatic-cost-inference", "Kimi-promotion-or-GPT-substitution", "dependency-schema-service-queue-or-scheduler", "domain-canonical-authority-deployment-or-live-action"],
+  "dependency_hashes": {"base_main": "923fc65aef1c0511474c9f023b11a0878fb00f18", "core_contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50", "a1_contract_catalog": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1", "s17_local_proof_sha256": "43fafb2b354813d991da84c1a4757f88b5aee335d4861fa44d2998dcf534a399", "external_dependencies": "none-stdlib-only"},
+  "acceptance_commands": ["make contracts", "python3 -m unittest tests.test_s18_provider_hostile tests.test_s17_provider_shadow_tool tests.test_s17_raw_response_boundary tests.test_s17_cost_reconciliation", "make test", "git diff --check"],
+  "risk_class": "critical-provider-ambiguity-cost-and-false-independence",
+  "stop_conditions": ["duplicate-or-nonfinite-provider-body-accepted", "oversize-response-committed", "UNKNOWN-retried-or-budget-released", "drifted-or-unevaluated-binding-routed", "independence-overclaim", "secret-or-response-content-in-public-diff"],
+  "expected_receipt": "docs/receipts/integration/s18-provider-hostile.json",
+  "rollback": "Revert strict connected-tool parser/adapter bounds and remove the assurance test/metadata; S17 durable evidence remains private and unchanged.",
+  "commit_authority": "one-scoped-agent-0-commit", "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent0_integration", "blocked_validation_failed"]
+}

@@ -1,0 +1,8 @@
+{
+  "lease_id": "lease-s18-provider-hostile-agent-0",
+  "stage_id": "s18-provider-hostile", "agent_id": "agent-0",
+  "branch": "codex/bridge-a0-s18-provider-hostile",
+  "issued_at": "2026-07-18T19:55:00Z", "expires_at": "2026-07-19T19:55:00Z",
+  "write_set": ["tools/model_provider_shadow.py", "tests/test_s18_provider_hostile.py", "docs/receipts/reuse/s18-provider-hostile.json", "stages/s18-provider-hostile/stage-envelope.json", "stages/s18-provider-hostile/ownership-lease.json"],
+  "exclusive": true, "revoked": false
+}

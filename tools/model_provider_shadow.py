@@ -58,6 +58,43 @@ _ALLOWED_ENDPOINTS = {
     "https://api.openai.com/v1/responses",
 }
 _ALLOWED_PROTOCOLS = {"OPENAI_CHAT_COMPLETIONS", "OPENAI_RESPONSES"}
+_EXPECTED_BINDING_SHAPES = {
+    "deepseek-v4-flash": {
+        "provider_slot": "DEEPSEEK_API", "credential_env": "DEEPSEEK_API_KEY",
+        "endpoint": "https://api.deepseek.com/chat/completions",
+        "protocol": "OPENAI_CHAT_COMPLETIONS", "api_model": "deepseek-v4-flash",
+        "request_options": {"thinking": {"type": "disabled"}, "reasoning_effort": "high"},
+        "source": "https://api-docs.deepseek.com/api/create-chat-completion",
+    },
+    "deepseek-v4-pro": {
+        "provider_slot": "DEEPSEEK_API", "credential_env": "DEEPSEEK_API_KEY",
+        "endpoint": "https://api.deepseek.com/chat/completions",
+        "protocol": "OPENAI_CHAT_COMPLETIONS", "api_model": "deepseek-v4-pro",
+        "request_options": {"thinking": {"type": "enabled"}, "reasoning_effort": "high"},
+        "source": "https://api-docs.deepseek.com/api/create-chat-completion",
+    },
+    "glm-5.2-max": {
+        "provider_slot": "GLM_API", "credential_env": "ZHIPU_API_KEY",
+        "endpoint": "https://open.bigmodel.cn/api/paas/v4/chat/completions",
+        "protocol": "OPENAI_CHAT_COMPLETIONS", "api_model": "glm-5.2",
+        "request_options": {"thinking": {"type": "enabled"}, "reasoning_effort": "max"},
+        "source": "https://docs.bigmodel.cn/cn/guide/models/text/glm-5.2",
+    },
+    "gpt-5.6-sol-xhigh": {
+        "provider_slot": "OPENAI_API", "credential_env": "OPENAI_API_KEY",
+        "endpoint": "https://api.openai.com/v1/responses",
+        "protocol": "OPENAI_RESPONSES", "api_model": "gpt-5.6-sol",
+        "request_options": {"reasoning": {"effort": "xhigh"}, "store": False},
+        "source": "https://developers.openai.com/api/docs/models/gpt-5.6-sol",
+    },
+    "gpt-5.6-sol-max": {
+        "provider_slot": "OPENAI_API", "credential_env": "OPENAI_API_KEY",
+        "endpoint": "https://api.openai.com/v1/responses",
+        "protocol": "OPENAI_RESPONSES", "api_model": "gpt-5.6-sol",
+        "request_options": {"reasoning": {"effort": "max"}, "store": False},
+        "source": "https://developers.openai.com/api/docs/models/gpt-5.6-sol",
+    },
+}
 
 
 class ShadowProviderError(RuntimeError):
@@ -66,6 +103,33 @@ class ShadowProviderError(RuntimeError):
 
 def _canonical_bytes(value: object) -> bytes:
     return json.dumps(value, sort_keys=True, separators=(",", ":")).encode("utf-8")
+
+
+def _strict_json_object(raw: bytes, *, label: str) -> dict[str, object]:
+    """Decode one provider object without duplicate keys or non-finite numbers."""
+
+    def reject_pairs(pairs: list[tuple[str, object]]) -> dict[str, object]:
+        result: dict[str, object] = {}
+        for key, value in pairs:
+            if key in result:
+                raise ShadowProviderError(f"{label} contains duplicate JSON keys")
+            result[key] = value
+        return result
+
+    def reject_constant(_value: str) -> object:
+        raise ShadowProviderError(f"{label} contains a non-finite number")
+
+    try:
+        value = json.loads(
+            raw,
+            object_pairs_hook=reject_pairs,
+            parse_constant=reject_constant,
+        )
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise ShadowProviderError(f"{label} is not strict JSON") from exc
+    if not isinstance(value, dict):
+        raise ShadowProviderError(f"{label} must be a JSON object")
+    return value
 
 
 def _load_json_object(path: Path) -> dict[str, object]:
@@ -106,6 +170,8 @@ class ConnectedShadowProfile:
                 raise ShadowProviderError("provider shadow endpoint is not allowlisted")
             if item["protocol"] not in _ALLOWED_PROTOCOLS:
                 raise ShadowProviderError("provider shadow protocol is not allowlisted")
+            if item != _EXPECTED_BINDING_SHAPES[name]:
+                raise ShadowProviderError("provider shadow binding semantics drifted")
             credential = item["credential_env"]
             if not isinstance(credential, str) or not credential.endswith("_API_KEY"):
                 raise ShadowProviderError("provider credential environment name is invalid")
@@ -189,8 +255,13 @@ def _http_post(endpoint: str, api_key: str, body: bytes, timeout: int, maximum: 
         response = exc
     with response:
         content_length = response.headers.get("Content-Length")
-        if content_length is not None and int(content_length) > maximum:
-            raise ShadowProviderError("provider response exceeds declared bound")
+        if content_length is not None:
+            try:
+                declared_length = int(content_length)
+            except ValueError as exc:
+                raise ShadowProviderError("provider Content-Length is invalid") from exc
+            if declared_length < 0 or declared_length > maximum:
+                raise ShadowProviderError("provider response exceeds declared bound")
         body_bytes = response.read(maximum + 1)
         if len(body_bytes) > maximum:
             raise ShadowProviderError("provider response exceeds streaming bound")
@@ -219,6 +290,16 @@ class HTTPRawAdapter:
         )
         if type(status) is not int or not 100 <= status <= 599 or not isinstance(body, bytes) or not body:
             raise ShadowProviderError("provider transport returned an invalid envelope")
+        if len(body) > self._maximum:
+            raise ShadowProviderError("provider response exceeds adapter bound")
+        if not isinstance(headers, Mapping) or len(headers) > 3 or any(
+            not isinstance(key, str)
+            or not isinstance(value, str)
+            or len(key) > 64
+            or len(value) > 512
+            for key, value in headers.items()
+        ):
+            raise ShadowProviderError("provider response headers are invalid")
         return _canonical_bytes({
             "binding": self.model_binding, "protocol": self._binding["protocol"],
             "http_status": status, "headers": dict(headers),
@@ -233,14 +314,18 @@ class HTTPResponseParser:
 
     def parse_response(self, *, raw_response: bytes, response_ref: str, max_tokens: int) -> ProviderAccounting:
         try:
-            envelope = json.loads(raw_response)
-            if not isinstance(envelope, dict) or set(envelope) != {"binding", "protocol", "http_status", "headers", "body_base64"}:
+            envelope = _strict_json_object(
+                raw_response, label="provider response envelope"
+            )
+            if set(envelope) != {"binding", "protocol", "http_status", "headers", "body_base64"}:
                 raise ValueError
             if envelope["binding"] != self.model_binding or envelope["protocol"] != self._protocol:
                 raise ValueError
+            if not isinstance(envelope["body_base64"], str):
+                raise ValueError
             body = base64.b64decode(envelope["body_base64"], validate=True)
-            value = json.loads(body)
-        except (ValueError, TypeError, KeyError, json.JSONDecodeError) as exc:
+            value = _strict_json_object(body, label="provider response body")
+        except (ValueError, TypeError, KeyError) as exc:
             raise ShadowProviderError("provider response envelope is malformed") from exc
         receipt_ref = "provider-response:sha256:" + hashlib.sha256(body).hexdigest()
         status = envelope["http_status"]
@@ -248,10 +333,15 @@ class HTTPResponseParser:
             raise ShadowProviderError("provider HTTP status is invalid")
         if status < 200 or status >= 300:
             raise KnownProviderFailure("HTTP_" + str(status), provider_receipt_ref=receipt_ref)
-        if not isinstance(value, dict) or not isinstance(value.get("id"), str):
+        response_id = value.get("id")
+        if not isinstance(response_id, str) or not response_id or len(response_id) > 512:
             raise ShadowProviderError("provider success response identity is invalid")
         usage = value.get("usage")
-        if not isinstance(usage, dict) or type(usage.get("total_tokens")) is not int or usage["total_tokens"] < 0:
+        if (
+            not isinstance(usage, dict)
+            or type(usage.get("total_tokens")) is not int
+            or not 0 <= usage["total_tokens"] <= 1_000_000_000
+        ):
             raise ShadowProviderError("provider success usage is invalid")
         if self._protocol == "OPENAI_CHAT_COMPLETIONS":
             choices = value.get("choices")
