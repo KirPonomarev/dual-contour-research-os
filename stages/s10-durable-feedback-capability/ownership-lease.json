@@ -1,0 +1,9 @@
+{
+  "lease_id": "lease-s10-durable-feedback-capability-agent-0",
+  "stage_id": "s10-durable-feedback-capability", "agent_id": "agent-0",
+  "base_sha": "fb9a7a8908810d79cda2371b3ae8467ca96adf7a",
+  "branch": "codex/bridge-a0-s10-capability-governance",
+  "issued_at": "2026-07-18T15:50:00Z", "expires_at": "2026-07-19T15:50:00Z",
+  "write_set": ["tools/capability_proof.py", "docs/receipts/capability/e1b-durable-feedback-offline.json", "stages/s10-durable-feedback-capability/stage-envelope.json", "stages/s10-durable-feedback-capability/ownership-lease.json"],
+  "exclusive": true, "revoked": false
+}

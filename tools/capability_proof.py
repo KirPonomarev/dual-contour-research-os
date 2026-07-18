@@ -30,7 +30,7 @@ _PAYLOAD_KEYS = frozenset(
     }
 )
 _INTEGRITY_KEYS = frozenset({"profile_id", "payload_sha256", "parent_refs"})
-_REQUIRED_SCOPE = {
+_E1A_REQUIRED_SCOPE = {
     "proof_state": "SHADOW_PASS_WITH_FIXTURE_MODEL",
     "data_scope": "D0_PUBLIC_SYNTHETIC_ONLY",
     "model_route": "LOCAL_FIXTURE_ONLY",
@@ -39,6 +39,20 @@ _REQUIRED_SCOPE = {
     "live_trading": "DENIED",
     "live_security_execution": "DENIED",
     "domain_application": "SHADOW_UNAPPLIED",
+}
+_DURABLE_FEEDBACK_REQUIRED_SCOPE = {
+    "proof_state": "DURABLE_FEEDBACK_PASS_WITH_OFFLINE_L0_FIXTURE",
+    "data_scope": "D0_PUBLIC_SYNTHETIC_ONLY",
+    "model_route": "NO_REAL_PROVIDER_REQUIRED",
+    "real_provider": "UNPROVEN",
+    "canonical_mutation": "DENIED",
+    "live_trading": "DENIED",
+    "live_security_execution": "DENIED",
+    "domain_application": "SHADOW_UNAPPLIED",
+}
+_CAPABILITY_SCOPES = {
+    "A1_DISCOVERY_ADMISSION_FIXTURE": _E1A_REQUIRED_SCOPE,
+    "A1_DURABLE_FEEDBACK": _DURABLE_FEEDBACK_REQUIRED_SCOPE,
 }
 _REQUIRED_NEGATIVE_PROBES = frozenset(
     {
@@ -90,6 +104,40 @@ def issue_e1a_fixture_proof(
     classification: str = "D1",
 ) -> Mapping[str, object]:
     """Issue only the exact bounded E1A fixture capability proof."""
+
+    if payload.get("capability_id") != "A1_DISCOVERY_ADMISSION_FIXTURE":
+        raise CapabilityProofError("E1A issuer received a different capability")
+    return issue_capability_proof(
+        payload,
+        issued_at=issued_at,
+        classification=classification,
+    )
+
+
+def issue_durable_feedback_proof(
+    payload: Mapping[str, object],
+    *,
+    issued_at: str,
+    classification: str = "D1",
+) -> Mapping[str, object]:
+    """Issue only the exact bounded offline durable-feedback capability proof."""
+
+    if payload.get("capability_id") != "A1_DURABLE_FEEDBACK":
+        raise CapabilityProofError("durable feedback issuer received a different capability")
+    return issue_capability_proof(
+        payload,
+        issued_at=issued_at,
+        classification=classification,
+    )
+
+
+def issue_capability_proof(
+    payload: Mapping[str, object],
+    *,
+    issued_at: str,
+    classification: str = "D1",
+) -> Mapping[str, object]:
+    """Issue one exact registered non-authoritative capability profile."""
 
     value = _validate_payload(payload)
     issued = _timestamp("issued_at", issued_at)
@@ -194,16 +242,18 @@ def assess_capability_proof(
 
 def _validate_payload(payload: object) -> dict[str, object]:
     value = _exact(payload, _PAYLOAD_KEYS, "capability payload")
-    if value["capability_id"] != "A1_DISCOVERY_ADMISSION_FIXTURE":
-        raise CapabilityProofError("capability id is outside the S04 issuer scope")
+    capability_id = value["capability_id"]
+    if capability_id not in _CAPABILITY_SCOPES:
+        raise CapabilityProofError("capability id is outside the registered issuer scope")
     if not isinstance(value["subject_ref"], str) or _GIT_SUBJECT_RE.fullmatch(value["subject_ref"]) is None:
         raise CapabilityProofError("capability subject must be an exact Git head")
     if value["status"] != "PASS_FOR_FROZEN_SCOPE" or value["grants_authority"] is not False:
-        raise CapabilityProofError("S04 proof must be scoped PASS with zero authority")
+        raise CapabilityProofError("capability proof must be scoped PASS with zero authority")
     scope = value["scope"]
-    if not isinstance(scope, Mapping) or any(scope.get(key) != expected for key, expected in _REQUIRED_SCOPE.items()):
-        raise CapabilityProofError("capability scope overclaims fixture evidence")
-    if set(scope) != set(_REQUIRED_SCOPE) | {"environments"}:
+    required_scope = _CAPABILITY_SCOPES[capability_id]
+    if not isinstance(scope, Mapping) or any(scope.get(key) != expected for key, expected in required_scope.items()):
+        raise CapabilityProofError("capability scope overclaims frozen evidence")
+    if set(scope) != set(required_scope) | {"environments"}:
         raise CapabilityProofError("capability scope shape is not frozen")
     if _strings("scope.environments", scope["environments"], allow_empty=False) != ["linux-ci", "macos-development"]:
         raise CapabilityProofError("capability environments are not the tested fixture pair")
@@ -306,6 +356,7 @@ def _freeze(value: object) -> object:
 
 
 __all__ = [
-    "CapabilityProofError", "CapabilityAssessment", "issue_e1a_fixture_proof",
+    "CapabilityProofError", "CapabilityAssessment", "issue_capability_proof",
+    "issue_e1a_fixture_proof", "issue_durable_feedback_proof",
     "validate_capability_proof", "assess_capability_proof", "canonical_json_sha256",
 ]
