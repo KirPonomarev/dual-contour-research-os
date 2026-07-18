@@ -1,0 +1,18 @@
+{
+  "receipt_type": "OWNERSHIP_REGISTRY_AMENDMENT",
+  "receipt_version": "1.0.0",
+  "status": "OWNERSHIP_REGISTRY_AMENDED",
+  "issued_at": "2026-07-18T21:32:00Z",
+  "issuer": "agent-0",
+  "stage_id": "s24-evolution-ownership-activate",
+  "base_sha": "b71ac22ff54a9f425cfd359a21adf70ca330b5c0",
+  "contract_catalog_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "previous_ownership_registry_sha256": "d8ce57b15b8a240af7d4afea9b5c53f8c5be29e79b59d4b19ee53fd5c392275d",
+  "current_ownership_registry_sha256": "c2b67f6c9de257ddfe3686c86311d11d2d69b15632d0278706a98f14d6f3a2d8",
+  "stage_envelope_ref": "stages/s24-evolution-ownership-activate/stage-envelope.json",
+  "adr_ref": "docs/ADR/0007-evolution-path-activation.md",
+  "scope": {
+    "allows": ["activate-agent-1-evolution-module-path", "bounded-e2-e5-non-authoritative-evolution-algorithms"],
+    "does_not_allow": ["other-ownership-change", "contract-edit", "second-ledger-scheduler-queue-vector-db-or-shared-writer", "model-or-network-call", "budget-self-raise", "trusted-material-event-mint", "shadow-taint-removal", "domain-scientific-or-canonical-mutation", "deployment", "live-trading", "live-security-execution", "publication"]
+  }
+}
