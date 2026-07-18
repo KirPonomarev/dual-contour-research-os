@@ -1,0 +1,50 @@
+{
+  "stage_id": "s32-e3-aggregate-assurance",
+  "agent_id": "agent-5",
+  "objective": "Hostile-test the exact E3 evidence graph, scoped proof, currentness and zero-authority claims.",
+  "executable_blocker": "The aggregate proof cannot close E3 without independent tamper, mixed-head, overclaim and expiry probes.",
+  "base_sha": "8e444b141324bda386c9d28073ed73a266b0c462",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a5-s32-e3-aggregate-assurance",
+  "worktree": "/private/tmp/dcr-s32-e3-aggregate-assurance",
+  "read_set": [
+    "tools/capability_proof.py",
+    "tools/e3_aggregate_gate.py",
+    "docs/receipts/capability/e3-evolution-shadow.json"
+  ],
+  "write_set": [
+    "tests/test_s32_e3_aggregate_gate.py",
+    "stages/s32-e3-aggregate-assurance/stage-envelope.json",
+    "stages/s32-e3-aggregate-assurance/ownership-lease.json"
+  ],
+  "forbidden_scope": [
+    "runtime-contract-canonical-proof-root-CI-lockfile-migration-edit",
+    "real-private-live-provider-or-external-action",
+    "promotion-policy-canonical-deploy-or-authority"
+  ],
+  "dependency_hashes": {
+    "gate_commit": "8e444b141324bda386c9d28073ed73a266b0c462",
+    "capability_payload": "df7828e64d3a5238e6d0720576cbf5638176cc145c2465b3af9bb85a1eb962dd"
+  },
+  "acceptance_commands": [
+    "python3 -m pytest -q tests/test_s32_e3_aggregate_gate.py",
+    "make contracts",
+    "make test",
+    "git diff --check"
+  ],
+  "risk_class": "critical-proof-laundering-and-self-improvement-overclaim",
+  "stop_conditions": [
+    "resealed-overclaim-passes",
+    "mixed-head-or-hash-drift-passes",
+    "expired-proof-passes",
+    "authority-or-action-claim"
+  ],
+  "expected_receipt": "docs/receipts/integration/s32-e3-aggregate-assurance.json",
+  "rollback": "Revert additive S32 hostile tests and stage metadata.",
+  "commit_authority": "one-scoped-agent-5-commit",
+  "push_authority": true,
+  "expected_handoff_status": [
+    "ready_for_agent0_audit",
+    "blocked_validation_failed"
+  ]
+}

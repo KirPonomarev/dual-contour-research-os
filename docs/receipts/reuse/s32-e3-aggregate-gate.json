@@ -1,0 +1,55 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-s32-e3-aggregate-gate-20260718",
+  "issued_at": "2026-07-18T23:50:00Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "reuse-freeze-authority"
+  },
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "EXACT_HEAD_E3_PROPOSAL_ONLY_EVOLUTION_CAPABILITY_PROOF",
+    "candidates": [
+      {
+        "candidate": "reuse-tools-capability_proof.py-frozen-integrity-currentness-framework",
+        "disposition": "selected"
+      },
+      {
+        "candidate": "reuse-S28-deterministic-aggregate-evidence-validator-pattern",
+        "disposition": "selected"
+      },
+      {
+        "candidate": "add-small-stdlib-only-E3-profile-gate-and-static-receipt",
+        "disposition": "selected-minimal-missing-glue"
+      },
+      {
+        "candidate": "claim-production-uplift-self-modification-or-promotion",
+        "disposition": "rejected-overclaim-and-authority-risk"
+      }
+    ],
+    "selected_mode": "exact-S29-S31-integration-digests-ancestry-currentness-scoped-shadow-proof-and-zero-authority",
+    "source_ref": "git:26eed42993b11551b94e7c9054fdddf0be87ca64;internal:S28-capability-proof+S29-S31-integration-receipts",
+    "code_sha256": "ded5d677ffacb4b5838a664fc29ab3ed3cf731d4da9fd8cc9581b8e74c8a7097",
+    "license_spdx": "NOASSERTION",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "exact-evidence-digests",
+      "integration-ancestry",
+      "receipt-reproduction",
+      "mixed-head-and-resealed-overclaim",
+      "hash-drift-and-expiry",
+      "zero-authority-action"
+    ],
+    "canonical_owner": "agent-0-proof-framework-and-gate-agent-5-hostile-assurance",
+    "rollback": "Remove S32 additive E3 scope, aggregate gate, proof and assurance; S29-S31 evidence remains unchanged."
+  },
+  "integrity": {
+    "payload_sha256": "b6f7f1b79d03ecc15fb6de9196f0e350d96c65a9ca32f6775ccbcb7e348b88fc",
+    "parent_refs": [
+      "git:26eed42993b11551b94e7c9054fdddf0be87ca64",
+      "capability:capability-proof:df7828e64d3a5238e6d0720576cbf5638176cc145c2465b3af9bb85a1eb962dd"
+    ]
+  }
+}
