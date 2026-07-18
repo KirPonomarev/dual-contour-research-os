@@ -1,0 +1,12 @@
+{
+  "schema_id": "IntegrationReceipt", "schema_version": "1.0.0", "object_id": "integration-s27-memory-governance-20260718", "issued_at": "2026-07-18T22:56:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"}, "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s27-memory-governance", "agent_id": "agent-0", "ownership_lease_ref": "stages/s27-memory-governance/ownership-lease.json",
+    "base_sha": "a33fb840c2d6a21424a7d40edc2fdeea2a66525a", "head_sha": "c77f6b80c431ba82959f95f87bf2bf5b8c81d1c9", "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": ["provenance/memory-uplift-replay-capacity-v1.json", "docs/receipts/reuse/s27-memory-uplift-replay-capacity.json", "stages/s27-memory-governance/stage-envelope.json", "stages/s27-memory-governance/ownership-lease.json"],
+    "audit_results": {"contract_gate": "green", "privacy_secret_scan": "green", "source_mutation": false, "profile_sha256": "0a02b65ff5db728bcf75c7368244c9d2071e266055d91519437fdc5316825393", "minimum_sample_pairs": 16, "maximum_twin_pairs": 256, "maximum_calibration_observations": 512, "zero_observation_status": "NOT_ESTABLISHED", "overload_status": "PARKED_CAPACITY", "calibrated_or_learned_claim": false, "infrastructure_scale_claim": false, "scientific_truth_or_authority": 0},
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29664310753", "integration_commit_sha": "f23da2f08d6311d4dfe1919171d3df2016b59081"
+  },
+  "integrity": {"payload_sha256": "5aefec9367f7110d91b3a5f62dd50d37b67e9edbd52448ba1c659c8328491d91", "parent_refs": ["git:c77f6b80c431ba82959f95f87bf2bf5b8c81d1c9", "git:f23da2f08d6311d4dfe1919171d3df2016b59081", "ci:29664310753", "reuse:reuse-s27-memory-uplift-replay-capacity-20260718", "profile:sha256:0a02b65ff5db728bcf75c7368244c9d2071e266055d91519437fdc5316825393"]}
+}
