@@ -1,0 +1,16 @@
+{
+  "stage_id": "s29-gap-genome-assurance-repair", "agent_id": "agent-5",
+  "objective": "Make the S28 aggregate test distinguish immutable proof validity from expected post-S28 code-drift staleness.",
+  "executable_blocker": "S29 changes evolution.py, so the exact S28 code hash is correctly stale and must not be asserted current forever.",
+  "base_sha": "e283331", "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a5-s29-gap-genome-assurance", "worktree": "/private/tmp/dcr-s29-gap-genome-assurance",
+  "read_set": ["tools/e2_aggregate_gate.py", "tools/capability_proof.py", "tests/test_s28_e2_aggregate_gate.py"],
+  "write_set": ["tests/test_s28_e2_aggregate_gate.py", "stages/s29-gap-genome-assurance-repair/stage-envelope.json", "stages/s29-gap-genome-assurance-repair/ownership-lease.json"],
+  "forbidden_scope": ["source-or-proof-receipt-edit", "weaken-currentness-invalidation", "authority-action"],
+  "dependency_hashes": {"failed_ci": "29665008297", "implementation_stage": "4372129afb8a9b911c3f8b1b2b2f819e6ccb4611"},
+  "acceptance_commands": ["python3 -m unittest tests.test_s28_e2_aggregate_gate tests.test_s29_gap_genome", "make test", "git diff --check"],
+  "risk_class": "medium-proof-currentness-test-semantics", "stop_conditions": ["stale-proof-treated-current", "receipt-integrity-bypass"],
+  "expected_receipt": "docs/receipts/integration/s29-gap-genome-assurance.json", "rollback": "Revert the S28 test repair.",
+  "commit_authority": "one-scoped-agent-5-repair-commit", "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent0_s29_integration", "blocked_validation_failed"]
+}
