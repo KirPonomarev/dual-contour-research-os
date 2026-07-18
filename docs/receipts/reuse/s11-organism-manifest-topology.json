@@ -1,0 +1,32 @@
+{
+  "schema_id": "ReuseDecisionReceipt", "schema_version": "1.0.0",
+  "object_id": "reuse-s11-organism-manifest-topology-20260718", "issued_at": "2026-07-18T15:53:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-freeze-authority"},
+  "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "E1C_SOURCE_BOUND_ORGANISM_MANIFEST_AND_TOPOLOGY_VALIDATION",
+    "candidates": [
+      {"candidate": "reuse-ownership-registry-A1-ADR-runtime-service-and-existing-corridor-modules-as-source-anchors", "disposition": "selected"},
+      {"candidate": "add-versioned-ops-declarations-and-pure-validator-in-reserved-organism-module", "disposition": "selected-minimal-missing-glue"},
+      {"candidate": "hardcode-cell-or-process-counts-in-code", "disposition": "rejected-brittle-and-misleading"},
+      {"candidate": "add-graph-framework-database-scheduler-or-runtime-service", "disposition": "rejected-duplicate-surface"},
+      {"candidate": "infer-enforcement-from-declaration-or-live-heartbeat", "disposition": "rejected-unsupported-overclaim"}
+    ],
+    "selected_mode": "stdlib-only-content-addressed-declarations-plus-pure-topology-and-progressive-evidence-validator-over-existing-runtime-boundaries",
+    "source_ref": "git:2196ba43267e5465e699ae06aa18015e67cd16af;internal:ownership/registry.json+docs/ADR/0003+ops/deploy+existing-A1-modules",
+    "code_sha256": "2680f40bd0b0583c0c9bbbe7152c024856cdd41ebd364a6a53e7c77265b57e26",
+    "license_spdx": "NOASSERTION", "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "exact-source-and-deployment-content-binding", "no-hardcoded-counts", "orphan-component-edge-channel-and-process-denial",
+      "unbounded-cycle-denial", "bounded-cycle-acceptance", "deployment-projection-mismatch-denial",
+      "progressive-DECLARED-OBSERVED-NEGATIVE_PROBE_PASSED-ENFORCEMENT_PROVEN-stages", "authority-ceiling-and-zero-mutation"
+    ],
+    "canonical_owner": "agent-5-organism-and-ops-with-agent-0-integration",
+    "rollback": "Remove the additive manifest declarations, pure validator and focused tests; existing A1 runtime and deployment remain unchanged."
+  },
+  "integrity": {"payload_sha256": "a98b01fcde8d632e740ee3b9146734847f29f42d22759179316e58b25ccff491", "parent_refs": [
+    "git:2196ba43267e5465e699ae06aa18015e67cd16af",
+    "sha256:13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "sha256:eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1"
+  ]}
+}
