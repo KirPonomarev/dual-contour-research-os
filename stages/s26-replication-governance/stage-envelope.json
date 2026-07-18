@@ -1,0 +1,19 @@
+{
+  "stage_id": "s26-replication-governance", "agent_id": "agent-0",
+  "objective": "Freeze the D0 metadata-only five-dimensional replication, research-island, evaluator-exposure and no-export declassification dry-run boundary.",
+  "executable_blocker": "The public repository has a domain-owned ReplicationReceipt and exposure policy but no Bridge-safe metadata matrix or dry-run primitive that cannot ingest scientific payloads.",
+  "base_sha": "d22bdb37193e2b55be27887c8df22849370b9544",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a0-s26-replication-governance", "worktree": "/private/tmp/dcr-s26-replication-governance",
+  "read_set": ["src/research_bridge/evolution.py", "contracts/v1/ReplicationReceipt.schema.json", "contracts/a1/v1/profiles/evaluator_exposure_v1.json", "docs/TRUST_BOUNDARIES.md"],
+  "write_set": ["provenance/evidence-replication-matrix-v1.json", "docs/receipts/reuse/s26-evidence-replication.json", "stages/s26-replication-governance/stage-envelope.json", "stages/s26-replication-governance/ownership-lease.json"],
+  "forbidden_scope": ["contract-source-test-root-CI-or-lockfile-edit", "raw-evidence-private-domain-or-holdout-payload", "D1-D2-D3-cross-contour-export", "new-service-store-vector-db-queue-scheduler-or-island-runtime", "linear-replication-or-absolute-independence-claim", "domain-canonical-live-deploy-publication-or-authority-action"],
+  "dependency_hashes": {"base_main": "d22bdb37193e2b55be27887c8df22849370b9544", "profile": "4af1043d70a41950b8688806d96ae844cfdc33f6240c3fae8d82a7fcf2aa2966", "evaluator_exposure": "646ef26b37a277b9abb2912f4000d5f9b6c5c754e239ffbbd9aac076c2727f9d", "external_dependencies": "none"},
+  "acceptance_commands": ["make contracts", "profile and reuse integrity", "Agent-1 implementation", "Agent-5 hostile privacy assurance", "make test", "git diff --check"],
+  "risk_class": "critical-private-evidence-holdout-metadata-leak-and-false-independence",
+  "stop_conditions": ["raw-or-D1-D2-D3-data-surface", "holdout-query", "correlated-source-independent", "actual-export-write-or-authority", "new-service-or-dependency"],
+  "expected_receipt": "docs/receipts/integration/s26-replication-governance.json",
+  "rollback": "Remove S26 additive metadata profile/reuse/stage files; domain contracts remain untouched.",
+  "commit_authority": "one-scoped-agent-0-commit", "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent1_s26_evidence_replication", "blocked_validation_failed"]
+}
