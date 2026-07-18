@@ -1,0 +1,8 @@
+{
+  "lease_id": "lease-s16-provider-routing-freeze-agent-0",
+  "stage_id": "s16-provider-routing-freeze", "agent_id": "agent-0",
+  "branch": "codex/bridge-a0-s16-provider-routing-freeze",
+  "issued_at": "2026-07-18T17:29:00Z", "expires_at": "2026-07-19T17:29:00Z",
+  "write_set": ["provenance/model-provider-routing-v1.json", "docs/receipts/source-freeze/s16-model-provider-routing-fixtures.json", "docs/receipts/reuse/s16-provider-adapters-routing.json", "stages/s16-provider-routing-freeze/stage-envelope.json", "stages/s16-provider-routing-freeze/ownership-lease.json"],
+  "exclusive": true, "revoked": false
+}
