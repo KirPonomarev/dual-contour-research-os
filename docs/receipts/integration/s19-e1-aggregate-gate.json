@@ -1,0 +1,52 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s19-e1-aggregate-gate-20260718",
+  "issued_at": "2026-07-18T20:31:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s19-e1-aggregate-gate",
+    "agent_id": "agent-0",
+    "ownership_lease_ref": "stages/s19-e1-aggregate-gate/ownership-lease.json",
+    "base_sha": "475a68abc4ec48148f001d9b614a2b262a0dad69",
+    "head_sha": "ed448246508c5f096f8975078081f359cbb5e9e0",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": ["tools/capability_proof.py", "tools/e1_aggregate_gate.py", "tests/test_s19_e1_aggregate_gate.py", "docs/receipts/capability/e1-evolution-kernel-v1-shadow.json", "docs/receipts/reuse/s19-e1-aggregate-gate.json", "stages/s19-e1-aggregate-gate/stage-envelope.json", "stages/s19-e1-aggregate-gate/ownership-lease.json"],
+    "audit_results": {
+      "contract_gate": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "bridge_runtime_source_mutation": false,
+      "agent0_assurance_tool_mutation": true,
+      "focused_tests": 55,
+      "new_aggregate_tests": 8,
+      "full_core_tests": 660,
+      "stage0b_tests": 25,
+      "aggregate_status": "EVOLUTION_KERNEL_V1_SHADOW_PASS_FOR_FROZEN_SCOPE",
+      "fixture_and_real_provider_claims": "SEPARATED",
+      "mandatory_gpt": "WAIT_PROVIDER",
+      "temporary_kimi": "UNPROMOTED_NOT_ROUTABLE",
+      "independence": "NOT_ESTABLISHED",
+      "autonomous_idea_generation": true,
+      "autonomous_a1_sandbox_admission": true,
+      "autonomous_bounded_testing": true,
+      "autonomous_learning_memory": true,
+      "autonomous_canonical_mutation": false,
+      "human_required_for_promotion": true,
+      "deployment": false,
+      "live_trading": false,
+      "live_security_execution": false,
+      "grants_authority": false,
+      "additional_real_provider_calls": 0,
+      "credentials_raw_responses_or_private_evidence_in_git": 0
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29659145791",
+    "integration_commit_sha": "94c9a107f164dfabf32230b733c10d1791b2aa65"
+  },
+  "integrity": {
+    "payload_sha256": "4e90608302cf4323051e0211fb4a886165abd6d18add350d18567814a542a563",
+    "parent_refs": ["git:ed448246508c5f096f8975078081f359cbb5e9e0", "git:94c9a107f164dfabf32230b733c10d1791b2aa65", "ci:29659145791", "capability:capability-proof:4437133b72f9ee21fe84c84c6e78e60dec94731d1e727c8f9bc1f5e00444a0dc", "reuse:reuse-s19-e1-aggregate-gate-20260718"]
+  }
+}
