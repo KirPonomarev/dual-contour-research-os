@@ -247,6 +247,21 @@ _A1_OBJECT_KINDS = frozenset(
 _A1_PROJECTION_NAMES = frozenset(
     {"material_events", "candidates", "admissions", "capabilities"}
 )
+_FEEDBACK_PROJECTION_NAMES = frozenset(
+    {"outcome_dispositions", "experiences", "idea_tree", "feedback_outbox"}
+)
+_ALL_PROJECTION_NAMES = _A1_PROJECTION_NAMES | _FEEDBACK_PROJECTION_NAMES
+_FEEDBACK_REF_RE = re.compile(r"^[A-Za-z][A-Za-z0-9+.-]*:[^\s\\]{1,511}$")
+_FEEDBACK_PROJECTION_ENTRY_LIMIT = 256
+_PARKED_GAP_LIMIT = 16
+_MAX_CAUSAL_DEPTH = 16
+_MECHANICAL_AXES = frozenset({"MECHANICAL_SUCCESS", "MECHANICAL_FAILURE"})
+_PROPOSED_OUTCOMES = frozenset(
+    {"SUPPORTED", "REFUTED", "INCONCLUSIVE", "VALIDATED_MECHANICAL", "PROVIDER_FAILURE"}
+)
+_BLAME_AXES = frozenset(
+    {"NONE", "INFRASTRUCTURE", "PROVIDER", "INPUT", "EXECUTOR", "UNKNOWN"}
+)
 _A1_RETENTION_BY_KIND = {
     "MaterialEvent": "durable-operational-memory",
     "CandidateSpecDraft": "ephemeral-proposal",
@@ -389,8 +404,28 @@ class A1BundleRecord:
             raise LedgerError("A1 bundle record must reference an a1_bundle event")
         if not self.object_ids or len(self.object_ids) != len(set(self.object_ids)):
             raise LedgerError("A1 bundle object ids must be unique and non-empty")
-        if frozenset(self.projection_names) != _A1_PROJECTION_NAMES:
+        if frozenset(self.projection_names) not in {
+            _A1_PROJECTION_NAMES,
+            _ALL_PROJECTION_NAMES,
+        }:
             raise LedgerError("A1 bundle must advance every registered projection")
+
+
+@dataclass(frozen=True, slots=True)
+class FeedbackBundleRecord:
+    """One immutable atomic feedback projection in the global event order."""
+
+    event: LedgerEvent
+    outcome_disposition: Mapping[str, object]
+    experience_record: Mapping[str, object]
+    idea_node: Mapping[str, object]
+    outbox_record: Mapping[str, object]
+
+    def __post_init__(self) -> None:
+        if self.event.event_type != "a1_bundle":
+            raise LedgerError("feedback bundle must use the existing A1 global event")
+        if self.event.payload.get("bundle_kind") != "atomic_feedback_v1":
+            raise LedgerError("feedback bundle kind is invalid")
 
 
 @dataclass(frozen=True, slots=True)
@@ -1108,33 +1143,38 @@ class JobLedger:
                 raise LedgerError("A1 projection state must be non-empty")
             projection_states[name] = copied
 
-        descriptors = [
-            {
-                "object_id": document["object_id"],
-                "object_kind": document["schema_id"],
-                "payload_sha256": document["integrity"]["payload_sha256"],
-            }
-            for document in documents
-        ]
-        projection_descriptors = [
-            {
-                "projection_name": name,
-                "state_sha256": _digest(
-                    _canonical_json(projection_states[name]).encode("utf-8")
-                ),
-            }
-            for name in sorted(projection_states)
-        ]
-        bundle_payload: dict[str, object] = {
-            "idempotency_key": key,
-            "objects": descriptors,
-            "projections": projection_descriptors,
-        }
-
         with self._lock:
             self._ensure_open()
             self._begin_immediate()
             try:
+                carried_feedback = self._projection_states_locked(
+                    _FEEDBACK_PROJECTION_NAMES
+                )
+                if carried_feedback and set(carried_feedback) != _FEEDBACK_PROJECTION_NAMES:
+                    raise LedgerError("feedback projection coverage is partial")
+                projection_states.update(carried_feedback)
+                descriptors = [
+                    {
+                        "object_id": document["object_id"],
+                        "object_kind": document["schema_id"],
+                        "payload_sha256": document["integrity"]["payload_sha256"],
+                    }
+                    for document in documents
+                ]
+                projection_descriptors = [
+                    {
+                        "projection_name": name,
+                        "state_sha256": _digest(
+                            _canonical_json(projection_states[name]).encode("utf-8")
+                        ),
+                    }
+                    for name in sorted(projection_states)
+                ]
+                bundle_payload: dict[str, object] = {
+                    "idempotency_key": key,
+                    "objects": descriptors,
+                    "projections": projection_descriptors,
+                }
                 replay_row = self._connection.execute(
                     """
                     SELECT * FROM bridge_job_ledger
@@ -1158,7 +1198,7 @@ class JobLedger:
                     return A1BundleRecord(
                         event=replay,
                         object_ids=stored_ids,
-                        projection_names=tuple(sorted(_A1_PROJECTION_NAMES)),
+                        projection_names=tuple(sorted(projection_states)),
                     )
 
                 event = self._append(
@@ -1211,11 +1251,193 @@ class JobLedger:
                 return A1BundleRecord(
                     event=event,
                     object_ids=tuple(sorted(object_ids)),
-                    projection_names=tuple(sorted(_A1_PROJECTION_NAMES)),
+                    projection_names=tuple(sorted(projection_states)),
                 )
             except Exception as exc:
                 self._rollback()
                 self._raise_ledger_error(exc)
+
+    def append_feedback_bundle(
+        self,
+        *,
+        execution_ref: str,
+        validation_ref: str,
+        root_event_ref: str,
+        parent_event_ref: str,
+        contour: str,
+        classification: str,
+        shadow_taint: str,
+        mechanical_axis: str,
+        proposed_outcome: str,
+        blame_axis: str,
+        domain_application_ref: str | None,
+        next_event_candidate: Mapping[str, object] | None,
+        parked_gap_refs: Sequence[str],
+        idempotency_key: str,
+        event_at: str,
+    ) -> FeedbackBundleRecord:
+        """Atomically preserve operational feedback without asserting scientific truth."""
+
+        request = _feedback_request(
+            execution_ref=execution_ref,
+            validation_ref=validation_ref,
+            root_event_ref=root_event_ref,
+            parent_event_ref=parent_event_ref,
+            contour=contour,
+            classification=classification,
+            shadow_taint=shadow_taint,
+            mechanical_axis=mechanical_axis,
+            proposed_outcome=proposed_outcome,
+            blame_axis=blame_axis,
+            domain_application_ref=domain_application_ref,
+            next_event_candidate=next_event_candidate,
+            parked_gap_refs=parked_gap_refs,
+            idempotency_key=idempotency_key,
+            event_at=event_at,
+        )
+        request_sha256 = _digest(_canonical_json(request).encode("utf-8"))
+
+        with self._lock:
+            self._ensure_open()
+            self._begin_immediate()
+            try:
+                replay_row = self._connection.execute(
+                    """
+                    SELECT * FROM bridge_job_ledger
+                    WHERE event_type = 'a1_bundle'
+                      AND json_extract(payload_json, '$.idempotency_key') = ?
+                    """,
+                    (request["idempotency_key"],),
+                ).fetchone()
+                if replay_row is not None:
+                    replay = self._ledger_event_from_row(replay_row)
+                    if (
+                        replay.payload.get("bundle_kind") != "atomic_feedback_v1"
+                        or replay.payload.get("request_sha256") != request_sha256
+                    ):
+                        raise LedgerError("feedback idempotency key was reused")
+                    self._connection.execute("COMMIT")
+                    return _feedback_record_from_event(replay)
+
+                prior = self._connection.execute(
+                    """
+                    SELECT * FROM bridge_job_ledger
+                    WHERE event_type = 'a1_bundle'
+                      AND json_extract(payload_json, '$.bundle_kind') = 'atomic_feedback_v1'
+                      AND json_extract(payload_json, '$.feedback.outcome_disposition.execution_ref') = ?
+                    """,
+                    (request["execution_ref"],),
+                ).fetchall()
+                if prior:
+                    raise LedgerError("execution already has a feedback bundle")
+
+                base_states = self._projection_states_locked(_A1_PROJECTION_NAMES)
+                if set(base_states) != _A1_PROJECTION_NAMES:
+                    raise LedgerError("feedback requires complete A1 base projections")
+                feedback_states = self._projection_states_locked(
+                    _FEEDBACK_PROJECTION_NAMES
+                )
+                if feedback_states and set(feedback_states) != _FEEDBACK_PROJECTION_NAMES:
+                    raise LedgerError("feedback projection coverage is partial")
+
+                feedback = _construct_feedback_material(request)
+                projected = _advance_feedback_states(feedback_states, feedback)
+                projection_states = {**base_states, **projected}
+                projection_descriptors = [
+                    {
+                        "projection_name": name,
+                        "state_sha256": _digest(
+                            _canonical_json(projection_states[name]).encode("utf-8")
+                        ),
+                    }
+                    for name in sorted(projection_states)
+                ]
+                bundle_payload: dict[str, object] = {
+                    "bundle_kind": "atomic_feedback_v1",
+                    "idempotency_key": request["idempotency_key"],
+                    "request_sha256": request_sha256,
+                    "objects": [],
+                    "projections": projection_descriptors,
+                    "feedback": feedback,
+                }
+                event = self._append(
+                    event_type="a1_bundle",
+                    job_id="bridge-a1-feedback",
+                    attempt_id=f"feedback:{request_sha256}",
+                    fencing_epoch=0,
+                    checkpoint_sequence=None,
+                    event_at=request["event_at"],
+                    payload=bundle_payload,
+                )
+                for descriptor in projection_descriptors:
+                    name = descriptor["projection_name"]
+                    self._connection.execute(
+                        """
+                        INSERT INTO bridge_a1_projection_state (
+                            projection_name, last_applied_sequence, state_sha256, state_json
+                        ) VALUES (?, ?, ?, ?)
+                        ON CONFLICT(projection_name) DO UPDATE SET
+                            last_applied_sequence = excluded.last_applied_sequence,
+                            state_sha256 = excluded.state_sha256,
+                            state_json = excluded.state_json
+                        """,
+                        (
+                            name,
+                            event.sequence,
+                            descriptor["state_sha256"],
+                            _canonical_json(projection_states[name]),
+                        ),
+                    )
+                self._connection.execute("COMMIT")
+                return _feedback_record_from_event(event)
+            except Exception as exc:
+                self._rollback()
+                self._raise_ledger_error(exc)
+
+    def feedback_for_execution(self, execution_ref: str) -> FeedbackBundleRecord:
+        """Return one terminal feedback bundle without changing durable state."""
+
+        reference = _feedback_ref(execution_ref, "execution_ref")
+        with self._lock:
+            self._ensure_open()
+            rows = self._connection.execute(
+                """
+                SELECT * FROM bridge_job_ledger
+                WHERE event_type = 'a1_bundle'
+                  AND json_extract(payload_json, '$.bundle_kind') = 'atomic_feedback_v1'
+                  AND json_extract(payload_json, '$.feedback.outcome_disposition.execution_ref') = ?
+                ORDER BY sequence
+                """,
+                (reference,),
+            ).fetchall()
+        if len(rows) != 1:
+            raise LedgerError("terminal feedback lookup is not unique")
+        return _feedback_record_from_event(self._ledger_event_from_row(rows[0]))
+
+    def feedback_projection_coverage(self) -> Mapping[str, Mapping[str, object]]:
+        """Return exact feedback projection snapshots without side effects."""
+
+        with self._lock:
+            self._ensure_open()
+            states = self._projection_states_locked(_FEEDBACK_PROJECTION_NAMES)
+        return _deep_freeze(states)
+
+    def _projection_states_locked(
+        self, names: frozenset[str]
+    ) -> dict[str, dict[str, object]]:
+        placeholders = ",".join("?" for _ in names)
+        rows = self._connection.execute(
+            f"SELECT * FROM bridge_a1_projection_state WHERE projection_name IN ({placeholders}) ORDER BY projection_name",
+            tuple(sorted(names)),
+        ).fetchall()
+        states: dict[str, dict[str, object]] = {}
+        for row in rows:
+            state = _load_json_object(row["state_json"], "projection state")
+            digest = _digest(_canonical_json(state).encode("utf-8"))
+            if not _constant_time_equal(digest, row["state_sha256"]):
+                raise LedgerError("projection state storage digest mismatch")
+            states[row["projection_name"]] = state
+        return states
 
     def read_a1_object(self, object_id: str) -> Mapping[str, object]:
         """Return one immutable A1 document without changing durable state."""
@@ -1344,8 +1566,11 @@ class JobLedger:
         if not bundle_rows:
             return not object_rows and not projection_rows
         latest = bundle_rows[-1]["sequence"]
+        observed_projections = {
+            row["projection_name"] for row in projection_rows
+        }
         return (
-            {row["projection_name"] for row in projection_rows} == _A1_PROJECTION_NAMES
+            observed_projections in {_A1_PROJECTION_NAMES, _ALL_PROJECTION_NAMES}
             and all(row["last_applied_sequence"] == latest for row in projection_rows)
         )
 
@@ -2455,6 +2680,349 @@ class JobLedger:
         if isinstance(exc, sqlite3.Error):
             raise LedgerError(f"durable ledger transaction failed: {exc}") from exc
         raise exc
+
+
+def _feedback_request(
+    *,
+    execution_ref: str,
+    validation_ref: str,
+    root_event_ref: str,
+    parent_event_ref: str,
+    contour: str,
+    classification: str,
+    shadow_taint: str,
+    mechanical_axis: str,
+    proposed_outcome: str,
+    blame_axis: str,
+    domain_application_ref: str | None,
+    next_event_candidate: Mapping[str, object] | None,
+    parked_gap_refs: Sequence[str],
+    idempotency_key: str,
+    event_at: str,
+) -> dict[str, object]:
+    execution = _feedback_ref(execution_ref, "execution_ref")
+    if not execution.startswith("execution:"):
+        raise LedgerError("execution_ref must use the execution scheme")
+    validation = _feedback_ref(validation_ref, "validation_ref")
+    if not validation.startswith("validation:"):
+        raise LedgerError("validation_ref must use the validation scheme")
+    root = _feedback_ref(root_event_ref, "root_event_ref")
+    parent = _feedback_ref(parent_event_ref, "parent_event_ref")
+    if contour not in _CONTOURS:
+        raise LedgerError("feedback contour is invalid")
+    if classification not in {"D0", "D1"}:
+        raise LedgerError("feedback accepts D0 or D1 only")
+    if shadow_taint not in {"NONE", "SHADOW_UNAPPLIED"}:
+        raise LedgerError("feedback shadow_taint is invalid")
+    if mechanical_axis not in _MECHANICAL_AXES:
+        raise LedgerError("feedback mechanical_axis is invalid")
+    if proposed_outcome not in _PROPOSED_OUTCOMES:
+        raise LedgerError("feedback proposed_outcome is invalid")
+    if blame_axis not in _BLAME_AXES:
+        raise LedgerError("feedback blame_axis is invalid")
+    if mechanical_axis == "MECHANICAL_SUCCESS" and blame_axis != "NONE":
+        raise LedgerError("mechanical success cannot assign blame")
+    if mechanical_axis == "MECHANICAL_FAILURE" and blame_axis == "NONE":
+        raise LedgerError("mechanical failure requires a blame axis")
+    application = None
+    if domain_application_ref is not None:
+        application = _feedback_ref(
+            domain_application_ref, "domain_application_ref"
+        )
+        if shadow_taint == "SHADOW_UNAPPLIED":
+            raise LedgerError("shadow feedback cannot claim domain application")
+        if mechanical_axis != "MECHANICAL_SUCCESS":
+            raise LedgerError("failed execution cannot claim domain application")
+        if proposed_outcome in {"PROVIDER_FAILURE", "VALIDATED_MECHANICAL"}:
+            raise LedgerError("non-epistemic validation cannot be domain applied")
+
+    candidate = None
+    if next_event_candidate is not None:
+        candidate = _exact_mapping(
+            next_event_candidate,
+            frozenset(
+                {"reason_code", "policy_ref", "remaining_energy", "causal_depth"}
+            ),
+            "next_event_candidate",
+        )
+        candidate = {
+            "reason_code": _text(
+                candidate["reason_code"], "next reason_code", maximum=128
+            ),
+            "policy_ref": _feedback_ref(
+                candidate["policy_ref"], "next policy_ref"
+            ),
+            "remaining_energy": _safe_nonnegative_integer(
+                "next remaining_energy", candidate["remaining_energy"]
+            ),
+            "causal_depth": _safe_nonnegative_integer(
+                "next causal_depth", candidate["causal_depth"]
+            ),
+        }
+    if not isinstance(parked_gap_refs, Sequence) or isinstance(
+        parked_gap_refs, (str, bytes)
+    ):
+        raise LedgerError("parked_gap_refs must be a sequence")
+    if len(parked_gap_refs) > _PARKED_GAP_LIMIT:
+        raise LedgerError("parked gap bound exceeded")
+    parked = tuple(
+        _feedback_ref(value, f"parked_gap_refs[{index}]")
+        for index, value in enumerate(parked_gap_refs)
+    )
+    if len(parked) != len(set(parked)):
+        raise LedgerError("parked gap refs must be unique")
+
+    return {
+        "execution_ref": execution,
+        "validation_ref": validation,
+        "root_event_ref": root,
+        "parent_event_ref": parent,
+        "contour": contour,
+        "classification": classification,
+        "shadow_taint": shadow_taint,
+        "mechanical_axis": mechanical_axis,
+        "proposed_outcome": proposed_outcome,
+        "blame_axis": blame_axis,
+        "domain_application_ref": application,
+        "next_event_candidate": candidate,
+        "parked_gap_refs": list(parked),
+        "idempotency_key": _text(
+            idempotency_key, "feedback idempotency_key", maximum=256
+        ),
+        "event_at": _timestamp("feedback event_at", event_at),
+    }
+
+
+def _construct_feedback_material(request: Mapping[str, object]) -> dict[str, object]:
+    applied = request["domain_application_ref"] is not None
+    proposed = request["proposed_outcome"]
+    mechanical = request["mechanical_axis"]
+    if mechanical != "MECHANICAL_SUCCESS" or proposed == "PROVIDER_FAILURE":
+        epistemic_axis = "UNRESOLVED"
+        memory_class = "INCONCLUSIVE"
+    elif not applied:
+        epistemic_axis = "UNRESOLVED"
+        memory_class = "INCONCLUSIVE"
+    elif proposed == "SUPPORTED":
+        epistemic_axis = "SUPPORTED"
+        memory_class = "POSITIVE"
+    elif proposed == "REFUTED":
+        epistemic_axis = "REFUTED"
+        memory_class = "NEGATIVE"
+    else:
+        epistemic_axis = "INCONCLUSIVE"
+        memory_class = "INCONCLUSIVE"
+
+    disposition = "DOMAIN_APPLIED" if applied else "SHADOW_UNAPPLIED"
+    inherited_shadow = "NONE" if applied else "SHADOW_UNAPPLIED"
+    outcome_payload = {
+        "execution_ref": request["execution_ref"],
+        "validation_ref": request["validation_ref"],
+        "mechanical_axis": mechanical,
+        "epistemic_axis": epistemic_axis,
+        "blame_axis": request["blame_axis"],
+        "proposed_outcome": proposed,
+        "disposition": disposition,
+        "domain_application_ref": request["domain_application_ref"],
+        "shadow_taint": inherited_shadow,
+        "claims_scientific_truth": False,
+        "issued_at": request["event_at"],
+    }
+    outcome_id = f"outcome-disposition:{_digest(_canonical_json(outcome_payload).encode('utf-8'))}"
+    outcome = {"object_id": outcome_id, **outcome_payload}
+
+    experience_payload = {
+        "outcome_ref": outcome_id,
+        "memory_class": memory_class,
+        "mechanical_axis": mechanical,
+        "epistemic_axis": epistemic_axis,
+        "blame_axis": request["blame_axis"],
+        "evidence_refs": [
+            request["execution_ref"],
+            request["validation_ref"],
+            *(
+                [request["domain_application_ref"]]
+                if request["domain_application_ref"] is not None
+                else []
+            ),
+        ],
+        "reusable_failure": (
+            memory_class == "NEGATIVE" or mechanical == "MECHANICAL_FAILURE"
+        ),
+        "shadow_taint": inherited_shadow,
+        "claims_learning": False,
+        "issued_at": request["event_at"],
+    }
+    experience_id = f"experience:{_digest(_canonical_json(experience_payload).encode('utf-8'))}"
+    experience = {"object_id": experience_id, **experience_payload}
+
+    trigger, derived_parked = _next_internal_trigger(request, outcome_id, inherited_shadow)
+    parked_refs = list(request["parked_gap_refs"])
+    if derived_parked is not None and derived_parked not in parked_refs:
+        if len(parked_refs) >= _PARKED_GAP_LIMIT:
+            raise LedgerError("derived parked gap exceeds the bound")
+        parked_refs.append(derived_parked)
+    outbox_payload = {
+        "outcome_ref": outcome_id,
+        "status": "RUNNABLE" if trigger is not None else "WAIT_AUTHORITY",
+        "runnable_count": 1 if trigger is not None else 0,
+        "internal_event_trigger": trigger,
+        "parked_gap_refs": parked_refs,
+        "material_event_minted": False,
+        "issued_at": request["event_at"],
+    }
+    outbox_id = f"feedback-outbox:{_digest(_canonical_json(outbox_payload).encode('utf-8'))}"
+    outbox = {"object_id": outbox_id, **outbox_payload}
+
+    idea_payload = {
+        "root_event_ref": request["root_event_ref"],
+        "parent_event_ref": request["parent_event_ref"],
+        "outcome_ref": outcome_id,
+        "experience_ref": experience_id,
+        "outbox_ref": outbox_id,
+        "state": "GENERATING" if trigger is not None else "WAIT_AUTHORITY",
+        "shadow_taint": inherited_shadow,
+        "learned": False,
+        "updated_at": request["event_at"],
+    }
+    idea_id = f"idea-node:{_digest(_canonical_json(idea_payload).encode('utf-8'))}"
+    idea = {"object_id": idea_id, **idea_payload}
+    return {
+        "outcome_disposition": outcome,
+        "experience_record": experience,
+        "idea_node": idea,
+        "outbox_record": outbox,
+    }
+
+
+def _next_internal_trigger(
+    request: Mapping[str, object], outcome_ref: str, shadow_taint: str
+) -> tuple[dict[str, object] | None, str | None]:
+    candidate = request["next_event_candidate"]
+    if candidate is None:
+        return None, None
+    if not isinstance(candidate, Mapping):
+        raise LedgerError("persisted next event candidate is invalid")
+    energy = candidate["remaining_energy"]
+    depth = candidate["causal_depth"]
+    if not isinstance(energy, int) or not isinstance(depth, int):
+        raise LedgerError("persisted next event bounds are invalid")
+    if energy <= 0 or depth >= _MAX_CAUSAL_DEPTH:
+        parked = f"agenda-gap:{_digest(_canonical_json({'outcome_ref': outcome_ref, 'candidate': candidate}).encode('utf-8'))}"
+        return None, parked
+    payload = {
+        "source": "trusted-outcome-projector",
+        "outcome_ref": outcome_ref,
+        "root_event_ref": request["root_event_ref"],
+        "parent_event_ref": request["parent_event_ref"],
+        "contour": request["contour"],
+        "classification": request["classification"],
+        "shadow_taint": shadow_taint,
+        "policy_ref": candidate["policy_ref"],
+        "reason_code": candidate["reason_code"],
+        "causal_depth": depth + 1,
+        "remaining_energy": energy - 1,
+        "grants_authority": False,
+    }
+    return {
+        "trigger_id": f"internal-trigger:{_digest(_canonical_json(payload).encode('utf-8'))}",
+        **payload,
+    }, None
+
+
+def _advance_feedback_states(
+    previous: Mapping[str, Mapping[str, object]],
+    feedback: Mapping[str, object],
+) -> dict[str, dict[str, object]]:
+    bindings = {
+        "outcome_dispositions": ("outcome_disposition", "execution_ref"),
+        "experiences": ("experience_record", "object_id"),
+        "idea_tree": ("idea_node", "root_event_ref"),
+        "feedback_outbox": ("outbox_record", "object_id"),
+    }
+    result: dict[str, dict[str, object]] = {}
+    for projection_name, (feedback_name, key_name) in bindings.items():
+        item = feedback[feedback_name]
+        if not isinstance(item, Mapping):
+            raise LedgerError("feedback material is invalid")
+        key = item[key_name]
+        if not isinstance(key, str):
+            raise LedgerError("feedback projection key is invalid")
+        prior = previous.get(projection_name)
+        if prior is None:
+            entries: dict[str, object] = {}
+        else:
+            state = _exact_mapping(
+                prior,
+                frozenset({"schema_id", "schema_version", "count", "latest_ref", "entries"}),
+                f"{projection_name} projection",
+            )
+            if (
+                state["schema_id"] != f"{projection_name}.projection"
+                or state["schema_version"] != "1.0.0"
+                or not isinstance(state["entries"], Mapping)
+            ):
+                raise LedgerError("feedback projection identity is invalid")
+            entries = _json_copy(state["entries"], f"{projection_name}.entries")
+            if not isinstance(entries, dict):
+                raise LedgerError("feedback projection entries are invalid")
+        if key not in entries and len(entries) >= _FEEDBACK_PROJECTION_ENTRY_LIMIT:
+            raise LedgerError("feedback projection capacity is exhausted")
+        entries[key] = _json_copy(item, feedback_name)
+        latest_ref = item["object_id"]
+        result[projection_name] = {
+            "schema_id": f"{projection_name}.projection",
+            "schema_version": "1.0.0",
+            "count": len(entries),
+            "latest_ref": latest_ref,
+            "entries": entries,
+        }
+    return result
+
+
+def _feedback_record_from_event(event: LedgerEvent) -> FeedbackBundleRecord:
+    payload = event.payload
+    if payload.get("bundle_kind") != "atomic_feedback_v1":
+        raise LedgerError("ledger event is not atomic feedback")
+    feedback = payload.get("feedback")
+    exact = _exact_mapping(
+        feedback,
+        frozenset(
+            {"outcome_disposition", "experience_record", "idea_node", "outbox_record"}
+        ),
+        "feedback material",
+    )
+    return FeedbackBundleRecord(
+        event=event,
+        outcome_disposition=_deep_freeze(
+            _json_copy(exact["outcome_disposition"], "outcome_disposition")
+        ),
+        experience_record=_deep_freeze(
+            _json_copy(exact["experience_record"], "experience_record")
+        ),
+        idea_node=_deep_freeze(_json_copy(exact["idea_node"], "idea_node")),
+        outbox_record=_deep_freeze(
+            _json_copy(exact["outbox_record"], "outbox_record")
+        ),
+    )
+
+
+def _feedback_ref(value: object, name: str) -> str:
+    normalized = _text(value, name, maximum=512)
+    if (
+        _FEEDBACK_REF_RE.fullmatch(normalized) is None
+        or normalized.lower().startswith(("file:", "host:"))
+        or normalized.startswith(("/", "~"))
+    ):
+        raise LedgerError(f"{name} must be a portable non-file reference")
+    return normalized
+
+
+def _safe_nonnegative_integer(name: str, value: object) -> int:
+    normalized = _nonnegative_integer(name, value)
+    if normalized > _MAX_SAFE_INTEGER:
+        raise LedgerError(f"{name} exceeds the safe integer limit")
+    return normalized
 
 
 def _expected_schema_fingerprint(

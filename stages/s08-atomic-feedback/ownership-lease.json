@@ -1,0 +1,13 @@
+{
+  "lease_id": "lease-s08-atomic-feedback-agent-1",
+  "stage_id": "s08-atomic-feedback", "agent_id": "agent-1",
+  "base_sha": "c0f8c2d786612742c33753b23b1d29bd946cc403",
+  "branch": "codex/bridge-a1-s08-atomic-feedback",
+  "issued_at": "2026-07-18T15:15:00Z", "expires_at": "2026-07-19T15:15:00Z",
+  "write_set": [
+    "src/research_bridge/ledger.py",
+    "stages/s08-atomic-feedback/stage-envelope.json",
+    "stages/s08-atomic-feedback/ownership-lease.json"
+  ],
+  "exclusive": true, "revoked": false
+}
