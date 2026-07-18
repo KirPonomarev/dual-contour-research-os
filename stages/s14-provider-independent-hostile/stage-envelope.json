@@ -1,0 +1,20 @@
+{
+  "stage_id": "s14-provider-independent-hostile", "agent_id": "agent-5",
+  "objective": "Prove the provider-independent E1A/E1B/E1C core fails closed under parser, authority, memory, evaluator, shadow, transaction, fallback, concurrency and collusion attacks.",
+  "executable_blocker": "Real model providers must not be connected before one shared cross-slice hostile matrix proves the existing deterministic substrate.",
+  "base_sha": "98c21b1b68b0d7dd505229f8f02d7a233683a077",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a5-s14-provider-independent-hostile",
+  "worktree": "/Volumes/Work/dual-contour-research-os-s14-hostile",
+  "read_set": ["src/research_bridge/{admission,authority,discovery,ipc,kernel,ledger,organism,validation}.py", "tests/test_a1_*.py", "tests/test_s07_l0_independent_validation.py", "tests/test_s08_atomic_feedback.py", "docs/receipts/reuse/s14-provider-independent-hostile-core.json"],
+  "write_set": ["tests/test_s14_provider_independent_hostile_core.py", "stages/s14-provider-independent-hostile/stage-envelope.json", "stages/s14-provider-independent-hostile/ownership-lease.json"],
+  "forbidden_scope": ["contract-edit", "runtime-source-edit", "provider-call", "private-data", "domain-or-canonical-mutation", "authority-grant", "live-action", "deployment"],
+  "dependency_hashes": {"core_contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50", "a1_contract_catalog": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1", "reuse_freeze_commit": "98c21b1b68b0d7dd505229f8f02d7a233683a077", "external_dependencies": "none"},
+  "acceptance_commands": ["make contracts", "python3 -m unittest tests.test_s14_provider_independent_hostile_core", "make test", "git diff --check"],
+  "risk_class": "critical-false-assurance-before-real-provider",
+  "stop_conditions": ["known-invalid-input-accepted", "authority-spoof-causes-write", "shadow-becomes-learned-or-domain-applied", "transaction-fault-leaves-partial-state", "race-duplicates-terminal-result", "forbidden-request-receives-reservation-or-authority"],
+  "expected_receipt": "docs/receipts/integration/s14-provider-independent-hostile.json",
+  "rollback": "Remove the assurance-only test and stage metadata; runtime source and frozen contracts are unchanged.",
+  "commit_authority": "one-scoped-agent-5-commit", "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent0_integration", "blocked_assurance_failed"]
+}

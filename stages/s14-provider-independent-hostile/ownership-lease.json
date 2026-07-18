@@ -1,0 +1,7 @@
+{
+  "lease_id": "lease-s14-provider-independent-hostile-agent-5", "stage_id": "s14-provider-independent-hostile", "agent_id": "agent-5",
+  "base_sha": "98c21b1b68b0d7dd505229f8f02d7a233683a077", "branch": "codex/bridge-a5-s14-provider-independent-hostile",
+  "issued_at": "2026-07-18T16:39:00Z", "expires_at": "2026-07-19T16:39:00Z",
+  "write_set": ["tests/test_s14_provider_independent_hostile_core.py", "stages/s14-provider-independent-hostile/stage-envelope.json", "stages/s14-provider-independent-hostile/ownership-lease.json"],
+  "exclusive": true, "revoked": false
+}
