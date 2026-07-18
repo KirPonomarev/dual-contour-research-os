@@ -1,0 +1,31 @@
+{
+  "schema_id": "ReuseDecisionReceipt", "schema_version": "1.0.0",
+  "object_id": "reuse-s14-provider-independent-hostile-core-20260718", "issued_at": "2026-07-18T16:40:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-freeze-authority"},
+  "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "PROVIDER_INDEPENDENT_HOSTILE_CORE_ASSURANCE",
+    "candidates": [
+      {"candidate": "compose-one-cross-slice-hostile-pack-from-existing-E1A-E1B-E1C-fixtures", "disposition": "selected"},
+      {"candidate": "reuse-existing-strict-parser-authority-corridor-independent-validator-atomic-feedback-and-concurrency-fixtures", "disposition": "selected"},
+      {"candidate": "new-fuzzer-service-ledger-scheduler-queue-or-provider-runtime", "disposition": "rejected-duplicate-or-premature-surface"},
+      {"candidate": "claim-provider-specific-or-production-assurance-before-real-shadow", "disposition": "rejected-unsupported-overclaim"}
+    ],
+    "selected_mode": "one-additive-tests-only-hostile-matrix-over-existing-public-synthetic-offline-fixtures-with-zero-new-runtime-surface",
+    "source_ref": "git:092f7fbded7cbe53ec36475781914b9911deb19b;internal:discovery+ipc+authority+validation+ledger+organism",
+    "code_sha256": "e7d8bde060725c81ed5a55df5df7ff22f2f56494ec1d3c6f403384c877f21681",
+    "license_spdx": "NOASSERTION", "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "parser-attack-corpus", "authority-spoof-zero-write", "poisoned-memory-zero-write",
+      "known-invalid-and-vacuous-evaluator", "shadow-laundering-denial", "transaction-crash-rollback",
+      "fallback-widening-denial", "claim-and-feedback-race-fencing", "collusion-reference-denial"
+    ],
+    "canonical_owner": "agent-5-assurance-with-agent-0-integration-and-agent-1-only-if-a-source-repair-is-proven",
+    "rollback": "Remove the additive S14 assurance stage and tests; E1A, E1B and E1C runtime behavior remains unchanged."
+  },
+  "integrity": {"payload_sha256": "a722216b84b0a5ea813a355abb48767c2a3295d899291af3dd5ae6052fc7751a", "parent_refs": [
+    "git:092f7fbded7cbe53ec36475781914b9911deb19b",
+    "integration:integration-s13-self-model-assurance-20260718",
+    "integration:integration-s13-self-model-proof-20260718"
+  ]}
+}
