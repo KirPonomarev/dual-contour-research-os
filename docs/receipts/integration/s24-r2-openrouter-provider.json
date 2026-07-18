@@ -1,0 +1,35 @@
+{
+  "schema_id": "IntegrationReceipt", "schema_version": "1.0.0",
+  "object_id": "integration-s24-r2-openrouter-provider-20260718", "issued_at": "2026-07-18T22:04:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s24-r2-openrouter-provider", "agent_id": "agent-0",
+    "ownership_lease_ref": "stages/s24-r2-openrouter-provider/ownership-lease.json",
+    "base_sha": "026949695c8e34d8ebb64a80934744acd5294f8e", "head_sha": "4772eb6ee54deaec7c75831455e5988f8d24437e",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": ["provenance/model-provider-connected-shadow-v2.json", "tools/model_provider_shadow.py", "docs/receipts/source-freeze/s24-r2-openrouter-official-api-shape.json", "docs/receipts/reuse/s24-r2-openrouter-provider.json", "stages/s24-r2-openrouter-provider/stage-envelope.json", "stages/s24-r2-openrouter-provider/ownership-lease.json"],
+    "audit_results": {
+      "contract_gate": "green", "privacy_secret_scan": "green", "source_mutation": false,
+      "full_core_tests": 692, "stage0b_tests": 25, "focused_provider_tests": 23,
+      "connected_profile_sha256": "63ae65247d61b918aced080e6419609459ebcbf4a3384ea29f2617e65597258c",
+      "legacy_profile_sha256": "4ac18aaa960d78ee0103cd199f411067aca46fceb11efa8e0045c53f57c5affd",
+      "provider_gateway": "openrouter", "requested_model": "openai/gpt-5.6-sol",
+      "logical_alias": "gpt-5.6-sol-xhigh", "context_window": 1000000,
+      "reasoning_effort": "xhigh", "credential_precedence": "environment-then-macos-keychain",
+      "configured_credentials_found": 1, "credential_source_used": "macos-keychain-captured-subprocess",
+      "credential_value_output_or_storage": false, "real_provider_calls": 1,
+      "connected_call_state": "SUCCEEDED", "connected_call_actual_tokens": 24,
+      "used_fallback": false, "actual_upstream_provider_status": "NOT_ATTESTED",
+      "provider_gateway_as_independence_evidence": false,
+      "actual_cost_units": null, "requires_exact_cost_reconciliation": true,
+      "budget_reservation_released": false, "automatic_retry": false,
+      "raw_response_public_or_in_git": false, "private_CAS_only": true,
+      "bridge_runtime_network_or_credential_reader": false,
+      "new_dependency_schema_service_queue_scheduler_or_broker": false,
+      "grants_authority": false
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29662751852", "integration_commit_sha": "f159b70ba963f110e6b6c2b18ddafc63d7182774"
+  },
+  "integrity": {"payload_sha256": "68ca90b98ec13e8cebb811c07befdbeae5e96ec7f6d5b20da1b6f4b4dbb9639e", "parent_refs": ["git:4772eb6ee54deaec7c75831455e5988f8d24437e", "git:f159b70ba963f110e6b6c2b18ddafc63d7182774", "ci:29662751852", "source-freeze:source-freeze-s24-r2-openrouter-official-api-shape-20260718", "reuse:reuse-s24-r2-openrouter-provider-20260718"]}
+}
