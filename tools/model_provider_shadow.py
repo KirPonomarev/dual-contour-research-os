@@ -374,6 +374,65 @@ def _run(args: argparse.Namespace, profile: ConnectedShadowProfile) -> int:
     return 0 if completed.state == "SUCCEEDED" else 30
 
 
+def _reconcile(args: argparse.Namespace, profile: ConnectedShadowProfile) -> int:
+    """Apply exact operator/provider billing evidence to one terminal call.
+
+    This path performs no network or credential access. It only closes an
+    existing reservation after the caller supplies exact provider-side usage
+    and a portable billing receipt reference. Exact replay is idempotent;
+    conflicting replay fails closed in the existing broker.
+    """
+
+    ledger_path = _outside_repository(Path(args.ledger))
+    role_sha = hashlib.sha256(ROLE_PATH.read_bytes()).hexdigest()
+    registry = ModelRoleRegistry(
+        ROLE_PATH,
+        expected_profile_sha256=role_sha,
+        binding_revision="s17-connected-" + profile.sha256[:16],
+    )
+    policy_digest = hashlib.sha256((profile.sha256 + ":reconcile-policy").encode()).hexdigest()
+    scope_digest = hashlib.sha256(str(ledger_path).encode()).hexdigest()
+    with JobLedger(ledger_path) as ledger:
+        broker = ModelCallBroker(
+            registry=registry,
+            ledger=ledger,
+            budget_policy=ModelBudgetPolicy(
+                "budget-policy:sha256:" + policy_digest,
+                "budget-scope:sha256:" + scope_digest,
+                1,
+                max(1, args.actual_tokens),
+                max(1, args.actual_cost_units),
+            ),
+        )
+        completed = broker.reconcile(
+            args.call_id,
+            actual_tokens=args.actual_tokens,
+            actual_cost_units=args.actual_cost_units,
+            provider_receipt_ref=args.provider_receipt_ref,
+            event_at=args.event_at,
+            idempotency_key=args.idempotency_key,
+        )
+        snapshot = ledger.model_call_state(completed.call_id).snapshot
+    print(
+        json.dumps(
+            {
+                "call_id": completed.call_id,
+                "state": completed.state,
+                "actual_tokens": snapshot["actual_tokens"],
+                "actual_cost_units": snapshot["actual_cost_units"],
+                "provider_receipt_ref": snapshot["provider_receipt_ref"],
+                "ambiguous_usage": snapshot["ambiguous_usage"],
+                "budget_released": snapshot["budget_released"],
+                "network_calls": 0,
+                "credential_access": False,
+                "secrets_printed": False,
+            },
+            sort_keys=True,
+        )
+    )
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -390,11 +449,21 @@ def main(argv: list[str] | None = None) -> int:
     run.add_argument("--max-tokens", type=int, default=64)
     run.add_argument("--max-cost-units", type=int, default=1)
     run.add_argument("--cas-quota-bytes", type=int, default=16_777_216)
+    reconcile = subparsers.add_parser("reconcile")
+    reconcile.add_argument("--ledger", required=True)
+    reconcile.add_argument("--call-id", required=True)
+    reconcile.add_argument("--actual-tokens", type=int, required=True)
+    reconcile.add_argument("--actual-cost-units", type=int, required=True)
+    reconcile.add_argument("--provider-receipt-ref", required=True)
+    reconcile.add_argument("--event-at", required=True)
+    reconcile.add_argument("--idempotency-key", required=True)
     args = parser.parse_args(argv)
     try:
         profile = ConnectedShadowProfile()
         if args.command == "preflight":
             return _preflight(profile)
+        if args.command == "reconcile":
+            return _reconcile(args, profile)
         return _run(args, profile)
     except Exception as exc:
         print(json.dumps({"status": "FAILED_CLOSED", "error_type": type(exc).__name__, "secrets_printed": False}, sort_keys=True), file=sys.stderr)
