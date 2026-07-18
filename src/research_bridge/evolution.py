@@ -890,6 +890,10 @@ def declassification_dry_run(
         raise EvolutionError("typed declassification inputs are required")
     if not isinstance(islands, ResearchIslandSnapshot) or not isinstance(matrix, ReplicationMatrixSnapshot):
         raise EvolutionError("declassification snapshots are invalid")
+    _validate_island_snapshot(policy, islands)
+    _validate_matrix_snapshot(policy, matrix)
+    if islands.evidence_sidecar_sha256 != matrix.evidence_sidecar_sha256:
+        raise EvolutionError("declassification snapshots bind different evidence sidecars")
     reasons: list[str] = []
     forbidden = False
     if candidate.classification != "D0_PUBLIC":
@@ -1039,6 +1043,67 @@ def _validate_sidecar(policy: ReplicationPolicy, sidecar: EvidenceSidecar) -> No
     }
     if sidecar.sidecar_sha256 != _sha(material):
         raise EvolutionError("evidence sidecar integrity mismatch")
+
+
+def _validate_matrix_snapshot(policy: ReplicationPolicy, matrix: ReplicationMatrixSnapshot) -> None:
+    if (
+        matrix.version != "replication-matrix-v1"
+        or matrix.absolute_independence_claimed
+        or matrix.linear_replication_level is not None
+        or matrix.side_effects
+        or matrix.grants_authority
+        or not matrix.pairs
+        or len(matrix.pairs) > policy.max_replication_pairs
+    ):
+        raise EvolutionError("replication matrix boundary widened")
+    for pair in matrix.pairs:
+        if tuple(item.dimension for item in pair.dimensions) != _REPLICATION_DIMENSIONS:
+            raise EvolutionError("replication matrix dimensions drifted")
+        pair_material = {
+            "parent_trial_ref": pair.parent_trial_ref,
+            "child_trial_ref": pair.child_trial_ref,
+            "original_outcome_ref": pair.original_outcome_ref,
+            "replication_outcome_ref": pair.replication_outcome_ref,
+            "dimensions": [_dimension_result_material(item) for item in pair.dimensions],
+            "overall_status": pair.overall_status,
+        }
+        if pair.pair_sha256 != _sha(pair_material):
+            raise EvolutionError("replication pair integrity mismatch")
+    material = {
+        "version": matrix.version,
+        "evidence_sidecar_sha256": matrix.evidence_sidecar_sha256,
+        "pairs": [_pair_result_material(item) for item in matrix.pairs],
+        "absolute_independence_claimed": False,
+        "linear_replication_level": None,
+        "side_effects": False,
+        "grants_authority": False,
+    }
+    if matrix.matrix_sha256 != _sha(material):
+        raise EvolutionError("replication matrix integrity mismatch")
+
+
+def _validate_island_snapshot(policy: ReplicationPolicy, islands: ResearchIslandSnapshot) -> None:
+    if (
+        islands.version != "research-islands-v1"
+        or islands.side_effects
+        or islands.grants_authority
+        or not islands.islands
+        or len(islands.islands) > policy.max_islands
+        or islands.status not in {"READY_METADATA_ONLY", "PARKED_EXPOSURE"}
+    ):
+        raise EvolutionError("research island snapshot boundary widened")
+    material = {
+        "version": islands.version,
+        "evidence_sidecar_sha256": islands.evidence_sidecar_sha256,
+        "islands": [_island_material(item) for item in islands.islands],
+        "status": islands.status,
+        "reason_codes": islands.reason_codes,
+        "weighted_exposure_units": islands.weighted_exposure_units,
+        "side_effects": False,
+        "grants_authority": False,
+    }
+    if islands.snapshot_sha256 != _sha(material):
+        raise EvolutionError("research island snapshot integrity mismatch")
 
 
 def _policy_material(policy: PortfolioPolicy) -> dict[str, object]:

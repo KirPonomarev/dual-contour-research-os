@@ -1,0 +1,6 @@
+{
+  "lease_id": "lease-s26-evidence-replication-repair-agent-1", "stage_id": "s26-evidence-replication-repair", "agent_id": "agent-1",
+  "branch": "codex/bridge-a1-s26-evidence-replication", "issued_at": "2026-07-18T22:38:00Z", "expires_at": "2026-07-20T22:38:00Z",
+  "write_set": ["src/research_bridge/evolution.py", "stages/s26-evidence-replication-repair/stage-envelope.json", "stages/s26-evidence-replication-repair/ownership-lease.json"],
+  "exclusive": true, "revoked": false
+}
