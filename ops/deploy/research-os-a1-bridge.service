@@ -1,0 +1,41 @@
+[Unit]
+Description=Dual-Contour Research OS A1 Bridge release candidate
+Documentation=https://github.com/KirPonomarev/dual-contour-research-os
+After=docker.service
+Requires=docker.service
+ConditionPathIsSocket=%t/docker.sock
+
+[Service]
+Type=simple
+Environment=DOCKER_HOST=unix://%t/docker.sock
+Environment=RESEARCH_OS_ENVIRONMENT=pre-soak
+Environment=RESEARCH_OS_EXTERNAL_ACTION_AUTHORITY=false
+ExecStartPre=-/usr/bin/docker container inspect research-os-a1-bridge
+ExecStartPre=-/usr/bin/docker container create --name=research-os-a1-bridge --user=10001:10001 --network=none --read-only --cap-drop=ALL --security-opt=no-new-privileges:true --pids-limit=256 --memory=2147483648 --cpus=2 --restart=no --env=RESEARCH_OS_ENVIRONMENT=pre-soak --env=RESEARCH_OS_EXTERNAL_ACTION_AUTHORITY=false --env=TMPDIR=/var/lib/research-os/tmp --label=org.research-os.release-sha=@@RELEASE_SHA@@ --label=org.research-os.policy-sha256=@@POLICY_SHA256@@ --label=org.research-os.config-sha256=@@CONFIG_SHA256@@ --label=org.research-os.capsule-manifest-sha256=@@CAPSULE_MANIFEST_SHA256@@ --mount=type=volume,source=research-os-a1-runtime,target=/var/lib/research-os --mount=type=volume,source=research-os-a1-config,target=/run/research-os,readonly @@IMAGE_ID@@
+ExecStartPre=-/usr/bin/docker stop --time=30 research-os-a1-bridge
+ExecStart=/usr/bin/docker start --attach research-os-a1-bridge
+ExecStop=/usr/bin/docker stop --time=30 research-os-a1-bridge
+Restart=on-failure
+RestartSec=5s
+TimeoutStartSec=90s
+TimeoutStopSec=45s
+NoNewPrivileges=yes
+RestrictAddressFamilies=AF_UNIX
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+PrivateDevices=yes
+ProtectClock=yes
+ProtectControlGroups=yes
+ProtectKernelLogs=yes
+ProtectKernelModules=yes
+ProtectKernelTunables=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+SystemCallArchitectures=native
+TasksMax=256
+MemoryMax=2147483648
+CPUQuota=200%
+UMask=0077
+
+[Install]
+WantedBy=default.target

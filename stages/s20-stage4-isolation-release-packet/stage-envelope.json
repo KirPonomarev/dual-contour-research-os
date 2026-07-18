@@ -1,0 +1,22 @@
+{
+  "stage_id": "s20-stage4-isolation-release-packet",
+  "agent_id": "agent-0",
+  "objective": "Prepare an immutable Stage 4 to A1 isolation and recovery packet with one restart supervisor, disjoint mutable namespaces, bounded same-release R0 and human-gated changed releases.",
+  "executable_blocker": "The frozen predecessor unit has competing Docker and systemd restart policies and no machine-readable cutover rule separating predecessor and A1 mutable namespaces.",
+  "base_sha": "cf33dcea6566e69da0253f6b7613a9761a937713",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a0-s20-stage4-isolation",
+  "worktree": "/private/tmp/dcr-s20-stage4-isolation",
+  "read_set": ["ops/deploy/research-os-bridge.service", "ops/deploy/research-os-bridge.functional.service", "ops/release/runtime-policy.json", "docs/receipts/release/s4-release-manifest.json", "tools/pre_soak_deploy.py", "tests/test_release_deploy_recovery.py"],
+  "write_set": ["ops/deploy/research-os-a1-bridge.service", "ops/deploy/stage4-a1-isolation-release-packet.json", "docs/STAGE4_A1_ISOLATION_RELEASE_RUNBOOK.md", "tools/verify_stage4_release_packet.py", "tests/test_s20_stage4_release_packet.py", "docs/receipts/reuse/s20-stage4-isolation-release-packet.json", "stages/s20-stage4-isolation-release-packet/stage-envelope.json", "stages/s20-stage4-isolation-release-packet/ownership-lease.json"],
+  "forbidden_scope": ["mutate-or-relabel-frozen-S4-release", "deploy-reboot-sudo-backup-restore-rollback-or-approval-consumption", "concurrent-legacy-and-A1-writers", "second-ledger-scheduler-service-or-external-dependency", "private-host-account-path-secret-D2-D3-or-runtime-data", "canonical-domain-promotion-trading-security-execution-or-publication"],
+  "dependency_hashes": {"base_main": "cf33dcea6566e69da0253f6b7613a9761a937713", "core_contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50", "a1_contract_catalog": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1", "predecessor_release_manifest": "9ceae0bda066cf52577cec0fdc1d7230e92b3e4010f65b81613abf6a0a8a90dd", "external_dependencies": "none-stdlib-only"},
+  "acceptance_commands": ["make contracts", "python3 tools/verify_stage4_release_packet.py", "python3 -m unittest tests.test_s20_stage4_release_packet tests.test_release_identity tests.test_release_deploy_recovery tests.test_deployment_gate -v", "make test", "git diff --check"],
+  "risk_class": "critical-release-isolation-supervision-and-recovery-authority",
+  "stop_conditions": ["frozen-predecessor-bytes-change", "mutable-namespace-overlap-or-concurrent-writers", "more-than-one-restart-supervisor", "R0-can-change-release-image-policy-config-or-schema", "packet-grants-deploy-reboot-sudo-canonical-or-live-authority", "external-action-or-private-data-required"],
+  "expected_receipt": "docs/receipts/integration/s20-stage4-isolation-release-packet.json",
+  "rollback": "Revert only the uninstalled candidate packet/unit/runbook/validator/tests/metadata; no runtime or external state was changed.",
+  "commit_authority": "one-scoped-agent-0-commit",
+  "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent0_integration", "blocked_validation_failed"]
+}

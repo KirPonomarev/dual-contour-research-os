@@ -1,0 +1,11 @@
+{
+  "lease_id": "lease-s20-stage4-isolation-release-packet-agent-0",
+  "stage_id": "s20-stage4-isolation-release-packet",
+  "agent_id": "agent-0",
+  "branch": "codex/bridge-a0-s20-stage4-isolation",
+  "issued_at": "2026-07-18T20:45:00Z",
+  "expires_at": "2026-07-19T20:45:00Z",
+  "write_set": ["ops/deploy/research-os-a1-bridge.service", "ops/deploy/stage4-a1-isolation-release-packet.json", "docs/STAGE4_A1_ISOLATION_RELEASE_RUNBOOK.md", "tools/verify_stage4_release_packet.py", "tests/test_s20_stage4_release_packet.py", "docs/receipts/reuse/s20-stage4-isolation-release-packet.json", "stages/s20-stage4-isolation-release-packet/stage-envelope.json", "stages/s20-stage4-isolation-release-packet/ownership-lease.json"],
+  "exclusive": true,
+  "revoked": false
+}
