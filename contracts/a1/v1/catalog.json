@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "catalog_id": "dual-contour-a1-contract-catalog",
   "schema_version": "1.0.0",
-  "status": "freeze-candidate",
+  "status": "frozen",
   "core_catalog_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
   "integrity_profile_id": "core-json-sha256-v1",
   "common_required": [
@@ -17,16 +17,16 @@
     "integrity"
   ],
   "profile_manifest": {
-    "a1_sandbox_policy": {"ref": "profiles/a1_sandbox_policy_v1.json", "sha256": "a7d92c27562fec18925c8dab6533e6f2e8d13091e5ec70e470181330be6cab22"},
-    "authority_corridor": {"ref": "profiles/authority_corridor_v1.json", "sha256": "2717a4a282fbce9f22e3f5c8d668ca50673ce8a082003ea290fe379348cdfdff"},
-    "environment_compatibility": {"ref": "profiles/environment_compatibility_v1.json", "sha256": "504067d196e36da2d0b609754f5a64ed72cb4aa4b8b9b428ea82d7fbb6da183f"},
-    "evaluator_exposure": {"ref": "profiles/evaluator_exposure_v1.json", "sha256": "b92a2631742804c2aab04d7f8e5159bdcaca75152fc7cc964a1c7c5d58950ed6"},
-    "integrity_profiles": {"ref": "profiles/integrity_profiles_v1.json", "sha256": "1a35fef19cc951f1660810ceb9fcbb2dcbec9aa08bc7ab2c28bdc93c19bc231a"},
-    "ipc_compatibility": {"ref": "profiles/ipc_compatibility_v1.json", "sha256": "1d43a8f32f6a9736596219d8de87f0dd453cd0ff50796ddb2a2928e089c63cb2"},
-    "model_role_registry": {"ref": "profiles/model_role_registry_v1.json", "sha256": "04483c019c4989e1b6962c4f677c396675c6d275736d8cfc5a5c59c489aad7de"},
-    "reason_codes": {"ref": "profiles/reason_codes_v1.json", "sha256": "6e9984d002aacae699e81017a57809171b2b49731115fdffacf5ba01fbb50eea"},
-    "storage_coverage": {"ref": "profiles/storage_coverage_v1.json", "sha256": "9fa706b2274aa591fa9b779467f073a486d9bd759d841532ccca4f41886c4086"},
-    "writer_issuer_matrix": {"ref": "profiles/writer_issuer_matrix_v1.json", "sha256": "4f1ad6ed5bf641a679f7c02ec734321448d1622c33a038a05115986174ad7892"}
+    "a1_sandbox_policy": {"ref": "profiles/a1_sandbox_policy_v1.json", "sha256": "50a3f629d8931262b7cd7109575ddb99f5fc8cacffec1985e1d5793e012dc3b4"},
+    "authority_corridor": {"ref": "profiles/authority_corridor_v1.json", "sha256": "8b54955af78f4f6b0ac8df934abf05f971e10252f6477f95845c58ff60b66b22"},
+    "environment_compatibility": {"ref": "profiles/environment_compatibility_v1.json", "sha256": "52f5d7c8715b3027164a2b284ca912357fd2b8f4bf6f2f2ab356e032370d50e7"},
+    "evaluator_exposure": {"ref": "profiles/evaluator_exposure_v1.json", "sha256": "646ef26b37a277b9abb2912f4000d5f9b6c5c754e239ffbbd9aac076c2727f9d"},
+    "integrity_profiles": {"ref": "profiles/integrity_profiles_v1.json", "sha256": "a9484599c6712fc8a8eb877c9cee42a1ecd4a85ecd90ce304175e1893b3e4ba4"},
+    "ipc_compatibility": {"ref": "profiles/ipc_compatibility_v1.json", "sha256": "c9cdd8c51616ac843a6729166b6f21c9a44de24fac7559b86f842c7e1930ba04"},
+    "model_role_registry": {"ref": "profiles/model_role_registry_v1.json", "sha256": "4faf6765f48a952e4d35540d92797330517938b34b8d2f12cde791e761a32eac"},
+    "reason_codes": {"ref": "profiles/reason_codes_v1.json", "sha256": "3077326cdf37cf6c4ceb69a9019b41471aae6e29b9c5ab7c8c2c892bc9425201"},
+    "storage_coverage": {"ref": "profiles/storage_coverage_v1.json", "sha256": "e41dc4e5a5b5b33c33b670d49433be9c54c602fc896a6db7eabf683cd224a385"},
+    "writer_issuer_matrix": {"ref": "profiles/writer_issuer_matrix_v1.json", "sha256": "921a5d088d49e0fa8d65a686678b6073276edb18d440ffb2cce77e2585cf46c7"}
   },
   "$defs": {
     "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},

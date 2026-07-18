@@ -1,7 +1,7 @@
 {
   "profile_id": "ipc-compatibility-v1",
   "schema_version": "1.0.0",
-  "status": "freeze-candidate",
+  "status": "frozen",
   "server_versions": ["1.1", "1.2"],
   "default_response_version": "request-version",
   "roles": {

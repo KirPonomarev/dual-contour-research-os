@@ -1,7 +1,7 @@
 {
   "profile_id": "a1-reason-codes-v1",
   "schema_version": "1.0.0",
-  "status": "freeze-candidate",
+  "status": "frozen",
   "parser_bounds": {
     "code_pattern": "^[A-Z][A-Z0-9_]{2,63}$",
     "public_message_max_chars": 240,

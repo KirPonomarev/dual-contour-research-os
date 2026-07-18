@@ -1,7 +1,7 @@
 {
   "profile_id": "environment-compatibility-v1",
   "schema_version": "1.0.0",
-  "status": "freeze-candidate",
+  "status": "frozen",
   "environments": {
     "macos-development": {
       "purpose": "development and contract validation",

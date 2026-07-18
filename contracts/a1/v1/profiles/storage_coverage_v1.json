@@ -1,7 +1,7 @@
 {
   "profile_id": "storage-coverage-v1",
   "schema_version": "1.0.0",
-  "status": "freeze-candidate",
+  "status": "frozen",
   "ordering_model": "single durable bridge event order plus explicitly linked domain-owned registries",
   "authoritative_stores": {
     "bridge_event_ledger": {

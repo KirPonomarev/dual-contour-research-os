@@ -1,0 +1,14 @@
+{
+  "lease_id": "lease-e0-a1-contract-freeze-agent-0-20260718",
+  "stage_id": "e0-a1-contract-freeze",
+  "agent_id": "agent-0",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-18T10:38:49Z",
+  "expires_at": "2026-07-18T22:38:49Z",
+  "base_sha": "64b55a39cc5880b849df705cf3a5f3cecdac386b",
+  "branch": "main",
+  "worktree": "canonical-main-worktree",
+  "write_set_ref": "stages/e0-a1-contract-freeze/stage-envelope.json",
+  "delegation_allowed": false,
+  "state": "active"
+}

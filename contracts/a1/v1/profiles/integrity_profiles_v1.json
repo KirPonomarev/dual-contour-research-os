@@ -1,7 +1,7 @@
 {
   "profile_id": "integrity-profiles-v1",
   "schema_version": "1.0.0",
-  "status": "freeze-candidate",
+  "status": "frozen",
   "migration_policy": "Record existing byte-level behavior exactly; RFC 8785/JCS requires a separately versioned migration and dual-read plan.",
   "profiles": {
     "core-json-sha256-v1": {

@@ -1,7 +1,7 @@
 {
   "profile_id": "a1-writer-issuer-matrix-v1",
   "schema_version": "1.0.0",
-  "status": "freeze-candidate",
+  "status": "frozen",
   "objects": {
     "MaterialEvent": {
       "owner": "bridge",

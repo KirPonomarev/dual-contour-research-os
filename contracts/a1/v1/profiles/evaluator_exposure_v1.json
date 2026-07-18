@@ -1,7 +1,7 @@
 {
   "profile_id": "evaluator-exposure-v1",
   "schema_version": "1.0.0",
-  "status": "freeze-candidate",
+  "status": "frozen",
   "principle": "Repeated feedback consumes evaluator validity even when no data bytes are disclosed.",
   "budgets": {
     "per_candidate_max_queries": 3,

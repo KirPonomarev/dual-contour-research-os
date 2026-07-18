@@ -37,6 +37,7 @@ class A1ContractTests(unittest.TestCase):
         self.assertIn("A1 contracts: GREEN", result.stdout)
 
     def test_contract_set_is_exact_and_additive(self) -> None:
+        self.assertEqual(self.catalog["status"], "frozen")
         self.assertEqual(
             set(self.catalog["contracts"]),
             {"MaterialEvent", "CandidateSpecDraft", "AdmissionReceipt", "CapabilityProofReceipt"},

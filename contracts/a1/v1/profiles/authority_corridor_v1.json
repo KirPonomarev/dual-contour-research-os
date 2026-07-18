@@ -1,7 +1,7 @@
 {
   "profile_id": "a1-authority-corridor-v1",
   "schema_version": "1.0.0",
-  "status": "freeze-candidate",
+  "status": "frozen",
   "trusted_event_route": [
     {"from": "SourceTrigger", "actor": "external-collector", "trust": "untrusted-input", "to": "MaterialityGate"},
     {"from": "MaterialityGate", "actor": "trusted-event-minter", "trust": "deterministic-gate", "to": "MaterialEvent"}

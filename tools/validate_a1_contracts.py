@@ -78,7 +78,7 @@ def load_generator():
 def validate_catalog(catalog: dict) -> None:
     require(catalog.get("catalog_id") == "dual-contour-a1-contract-catalog", "unexpected A1 catalog_id")
     require(catalog.get("schema_version") == "1.0.0", "A1 schema_version must be 1.0.0")
-    require(catalog.get("status") == "freeze-candidate", "A1 catalog must remain freeze-candidate before authority receipt")
+    require(catalog.get("status") == "frozen", "A1 catalog must be frozen")
     require(catalog.get("integrity_profile_id") == "core-json-sha256-v1", "unexpected A1 integrity profile")
     require(sha256(CORE_CATALOG_PATH) == catalog.get("core_catalog_sha256"), "A1 core catalog binding mismatch")
     require(set(catalog.get("contracts", {})) == set(EXPECTED_CONTRACTS), "A1 contract set must be exact")
@@ -106,7 +106,7 @@ def validate_profiles(catalog: dict) -> dict[str, dict]:
         require(sha256(path) == entry["sha256"], f"profile hash mismatch: {entry['ref']}")
         profile = load_json(path)
         require(profile.get("schema_version") == "1.0.0", f"profile version mismatch: {name}")
-        require(profile.get("status") == "freeze-candidate", f"profile status mismatch: {name}")
+        require(profile.get("status") == "frozen", f"profile status mismatch: {name}")
         loaded[name] = profile
     return loaded
 
