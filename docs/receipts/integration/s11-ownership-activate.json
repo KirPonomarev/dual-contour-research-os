@@ -1,0 +1,32 @@
+{
+  "schema_id": "IntegrationReceipt", "schema_version": "1.0.0",
+  "object_id": "integration-s11-ownership-activate-20260718", "issued_at": "2026-07-18T16:08:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s11-ownership-activate", "agent_id": "agent-0",
+    "ownership_lease_ref": "stages/s11-ownership-activate/ownership-lease.json",
+    "base_sha": "26b7036d48d088d7232a2efe884ae5cf3c1c9580",
+    "head_sha": "d4977f120e194672c0b126161a9d0ff24d4439a9",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "ownership/registry.json", "docs/ADR/0005-organism-manifest-path-activation.md",
+      "docs/receipts/OWNERSHIP_REGISTRY_AMENDMENT_4.json",
+      "stages/s11-ownership-activate/stage-envelope.json", "stages/s11-ownership-activate/ownership-lease.json"
+    ],
+    "audit_results": {
+      "contract_gate": "green", "privacy_secret_scan": "green", "source_mutation": false,
+      "ownership_tests": 7, "full_core_tests": 568, "stage0b_tests": 25,
+      "promoted_path": "src/research_bridge/organism.py", "owner_retained": "agent-5",
+      "other_paths_promoted": 0, "new_service_or_authority": false,
+      "previous_registry_sha256": "038330ca44a43fed910fe1c495114f924a36877b7b98bf3cdac4a05fc15982b3",
+      "current_registry_sha256": "862994bf57656148e5a75eece9686725efb733836567149baa23517e3f6421b1"
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29651330990",
+    "integration_commit_sha": "2435e9ee8c0778f54955515825f548e15a07616d"
+  },
+  "integrity": {"payload_sha256": "f1af49397e0869fb6d6237e4006cf8d9a14b260c2df54e63942c3d448edc8500", "parent_refs": [
+    "git:d4977f120e194672c0b126161a9d0ff24d4439a9", "git:2435e9ee8c0778f54955515825f548e15a07616d",
+    "ci:29651330990", "sha256:038330ca44a43fed910fe1c495114f924a36877b7b98bf3cdac4a05fc15982b3"
+  ]}
+}

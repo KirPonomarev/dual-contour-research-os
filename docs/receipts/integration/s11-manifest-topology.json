@@ -1,0 +1,36 @@
+{
+  "schema_id": "IntegrationReceipt", "schema_version": "1.0.0",
+  "object_id": "integration-s11-manifest-topology-20260718", "issued_at": "2026-07-18T16:08:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s11-manifest-topology", "agent_id": "agent-5",
+    "ownership_lease_ref": "stages/s11-manifest-topology/ownership-lease.json",
+    "base_sha": "d4977f120e194672c0b126161a9d0ff24d4439a9",
+    "head_sha": "842c36352585d2c9b6d9a07120121c2e2ae2a987",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "src/research_bridge/organism.py", "ops/organism/component-declarations.json",
+      "ops/organism/deployment-projection.json", "tests/test_s11_manifest_topology.py",
+      "tests/test_a1_capability_proof.py", "stages/s11-manifest-topology/stage-envelope.json",
+      "stages/s11-manifest-topology/ownership-lease.json"
+    ],
+    "audit_results": {
+      "contract_gate": "green", "privacy_secret_scan": "green", "source_mutation": false,
+      "focused_tests": 34, "full_core_tests": 568, "stage0b_tests": 25,
+      "manifest_status": "DECLARATIVE_NON_AUTHORITATIVE", "grants_authority": false,
+      "component_count_hardcoded": false, "process_count_hardcoded": false,
+      "source_and_projection_content_bound": "green", "deployment_exact_coverage": "green",
+      "orphan_dependency_channel_process_denial": "green", "unbounded_cycle_denial": "green",
+      "bounded_cycle_shared_limit": 16, "progressive_evidence_stages": 4,
+      "runtime_mutations": 0, "new_services": 0, "provider_or_domain_authority": false
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29651330990",
+    "integration_commit_sha": "2435e9ee8c0778f54955515825f548e15a07616d"
+  },
+  "integrity": {"payload_sha256": "fad4031376ebbefdf0b4d1e0a944c309d56bb8c0af266c73b91cd78a59d02b7e", "parent_refs": [
+    "git:842c36352585d2c9b6d9a07120121c2e2ae2a987", "git:2435e9ee8c0778f54955515825f548e15a07616d",
+    "ci:29651330990", "reuse:a98b01fcde8d632e740ee3b9146734847f29f42d22759179316e58b25ccff491",
+    "sha256:862994bf57656148e5a75eece9686725efb733836567149baa23517e3f6421b1"
+  ]}
+}
