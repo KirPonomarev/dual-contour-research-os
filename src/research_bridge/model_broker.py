@@ -457,6 +457,25 @@ class ModelCallBroker:
     ) -> ModelCallHandle:
         timestamp = _timestamp("event_at", event_at)
         current = self._state(call_id)
+        if current["state"] == "RECONCILED":
+            if (
+                current["actual_tokens"] != _nonnegative("actual_tokens", actual_tokens)
+                or current["actual_cost_units"]
+                != _nonnegative("actual_cost_units", actual_cost_units)
+                or current["provider_receipt_ref"]
+                != _portable_ref("provider_receipt_ref", provider_receipt_ref)
+                or current["reconciled_at"] != timestamp
+            ):
+                raise ModelBrokerError("reconciliation replay differs from durable state")
+            return _handle(
+                self._append(
+                    current,
+                    idempotency_key=_text(
+                        "idempotency_key", idempotency_key, maximum=256
+                    ),
+                    event_at=timestamp,
+                )
+            )
         if current["state"] not in {"SUCCEEDED", "FAILED_KNOWN", "UNKNOWN"}:
             raise ModelBrokerError("model call is not ready for reconciliation")
         reconciled = {
