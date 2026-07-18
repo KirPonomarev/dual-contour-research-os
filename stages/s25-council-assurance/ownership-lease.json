@@ -1,0 +1,8 @@
+{
+  "lease_id": "lease-s25-council-assurance-agent-5",
+  "stage_id": "s25-council-assurance", "agent_id": "agent-5",
+  "branch": "codex/bridge-a5-s25-council-assurance",
+  "issued_at": "2026-07-18T22:12:00Z", "expires_at": "2026-07-20T22:12:00Z",
+  "write_set": ["tests/test_s25_council_tournament.py", "stages/s25-council-assurance/stage-envelope.json", "stages/s25-council-assurance/ownership-lease.json"],
+  "exclusive": true, "revoked": false
+}
