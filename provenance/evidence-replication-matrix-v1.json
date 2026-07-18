@@ -1,0 +1,34 @@
+{
+  "profile_id": "evidence-replication-matrix-v1",
+  "schema_version": "1.0.0",
+  "status": "frozen-control-plane-metadata-only",
+  "allowed_classifications": ["D0_PUBLIC"],
+  "forbidden_classifications": ["D1_INTERNAL_SANITIZED", "D2_DOMAIN_CONFIDENTIAL", "D3_RESTRICTED"],
+  "dimensions": ["data", "code", "environment", "temporal", "model"],
+  "dimension_statuses": ["CORRELATED_SAME_GROUP", "DISTINCT_DECLARED_CORRELATED_SOURCE", "DISTINCT_FOR_FROZEN_SCOPE"],
+  "overall_statuses": ["CORRELATED", "INDEPENDENCE_NOT_ESTABLISHED", "MULTIDIMENSIONAL_PASS_FOR_FROZEN_SCOPE"],
+  "limits": {"max_evidence_items": 64, "max_replication_pairs": 32, "max_islands": 8, "max_metadata_labels": 16},
+  "evaluator_exposure_profile_sha256": "646ef26b37a277b9abb2912f4000d5f9b6c5c754e239ffbbd9aac076c2727f9d",
+  "declassification": {
+    "mode": "dry-run-only",
+    "allowed_candidate_fields": ["candidate_ref", "source_island_id", "classification", "public_manifest_sha256", "evidence_refs", "replication_matrix_ref", "metadata_labels"],
+    "true_holdout_queries": 0,
+    "network_calls": 0,
+    "bytes_exported": 0,
+    "canonical_writes": 0
+  },
+  "invariants": {
+    "sidecars_contain_refs_hashes_groups_and_labels_only": true,
+    "raw_evidence_payloads_are_forbidden": true,
+    "dimension_groups_must_be_bound_to_sidecar_evidence": true,
+    "distinct_groups_require_distinct_source_groups": true,
+    "correlated_sources_are_not_independent": true,
+    "dimension_independence_is_scoped_not_absolute": true,
+    "linear_replication_level_is_forbidden": true,
+    "research_islands_have_disjoint_namespaces_and_trial_ownership": true,
+    "evaluator_exposure_is_lineage_family_day_bound": true,
+    "true_holdout_autonomous_queries_are_zero": true,
+    "declassification_is_no-write-no-export-no-authority": true,
+    "domain_replication_receipts_remain_domain_writer_owned": true
+  }
+}

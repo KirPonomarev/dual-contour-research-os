@@ -1,0 +1,6 @@
+{
+  "lease_id": "lease-s26-replication-assurance-agent-5", "stage_id": "s26-replication-assurance", "agent_id": "agent-5",
+  "branch": "codex/bridge-a5-s26-replication-assurance", "issued_at": "2026-07-18T22:35:00Z", "expires_at": "2026-07-20T22:35:00Z",
+  "write_set": ["tests/test_s26_evidence_replication.py", "tests/test_stage1_assurance.py", "stages/s26-replication-assurance/stage-envelope.json", "stages/s26-replication-assurance/ownership-lease.json"],
+  "exclusive": true, "revoked": false
+}

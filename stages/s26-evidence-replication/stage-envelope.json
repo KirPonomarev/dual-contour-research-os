@@ -1,0 +1,18 @@
+{
+  "stage_id": "s26-evidence-replication", "agent_id": "agent-1",
+  "objective": "Implement pure D0 metadata-only evidence sidecars, five-dimensional scoped replication, disjoint research-island projections, evaluator-exposure accounting and declassification dry-run in the existing evolution module.",
+  "executable_blocker": "No current Bridge primitive can represent replication dimensions and privacy-safe island/export checks without risking domain-owned ReplicationReceipt or payload storage.",
+  "base_sha": "30d8b9a171c1504b3ed86284ec23ce338588507c", "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a1-s26-evidence-replication", "worktree": "/private/tmp/dcr-s26-evidence-replication",
+  "read_set": ["src/research_bridge/evolution.py", "provenance/evidence-replication-matrix-v1.json", "contracts/a1/v1/profiles/evaluator_exposure_v1.json", "contracts/v1/ReplicationReceipt.schema.json"],
+  "write_set": ["src/research_bridge/evolution.py", "stages/s26-evidence-replication/stage-envelope.json", "stages/s26-evidence-replication/ownership-lease.json"],
+  "forbidden_scope": ["contract-profile-provenance-test-root-CI-lockfile-or-other-source-edit", "raw-payload-or-D1-D2-D3-storage", "domain-ReplicationReceipt-writer", "network-export-durable-write-model-call-or-new-runtime", "linear-or-absolute-independence", "canonical-live-deploy-publication-or-authority-action"],
+  "dependency_hashes": {"governance_stage": "30d8b9a171c1504b3ed86284ec23ce338588507c", "replication_profile": "4af1043d70a41950b8688806d96ae844cfdc33f6240c3fae8d82a7fcf2aa2966", "evaluator_exposure": "646ef26b37a277b9abb2912f4000d5f9b6c5c754e239ffbbd9aac076c2727f9d", "external_dependencies": "none"},
+  "acceptance_commands": ["make contracts", "python3 -m py_compile src/research_bridge/evolution.py", "Agent-5 S26 hostile assurance", "make test", "git diff --check"],
+  "risk_class": "critical-private-payload-holdout-exposure-correlation-and-declassification",
+  "stop_conditions": ["payload-byte-surface", "D1-D2-D3-accepted", "correlated-source-independent", "holdout-query", "actual-export-write-or-authority"],
+  "expected_receipt": "docs/receipts/integration/s26-evidence-replication.json",
+  "rollback": "Revert additive evolution primitives and stage metadata; S24 agenda and domain-owned replication contracts remain unchanged.",
+  "commit_authority": "one-scoped-agent-1-commit", "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent5_s26_replication_assurance", "blocked_validation_failed"]
+}
