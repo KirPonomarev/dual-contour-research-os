@@ -10,6 +10,7 @@
   "write_set": [
     "src/research_bridge/organism.py", "ops/organism/component-declarations.json",
     "ops/organism/deployment-projection.json", "tests/test_s11_manifest_topology.py",
+    "tests/test_a1_capability_proof.py",
     "stages/s11-manifest-topology/stage-envelope.json", "stages/s11-manifest-topology/ownership-lease.json"
   ],
   "forbidden_scope": ["contract-edit", "ownership-edit", "canonical-doc-edit", "runtime-mutation", "new-service", "provider-call", "domain-application", "authority-grant", "canonical-or-live-action", "deployment"],
@@ -20,7 +21,7 @@
     "ownership_registry": "862994bf57656148e5a75eece9686725efb733836567149baa23517e3f6421b1",
     "external_dependencies": "none"
   },
-  "acceptance_commands": ["make contracts", "python3 -m unittest tests.test_s11_manifest_topology", "orphan-edge-channel-process-negative-probes", "unbounded-cycle-negative-probe", "deployment-mismatch-negative-probe", "git diff --check"],
+  "acceptance_commands": ["make contracts", "python3 -m unittest tests.test_s11_manifest_topology tests.test_a1_capability_proof tests.test_ownership_registry", "orphan-edge-channel-process-negative-probes", "unbounded-cycle-negative-probe", "deployment-mismatch-negative-probe", "git diff --check"],
   "risk_class": "high-declared-topology-masquerades-as-enforced",
   "stop_conditions": ["hardcoded-component-or-process-count", "declaration-implies-enforcement", "unbounded-cycle-accepted", "missing-deployment-component-accepted", "runtime-or-authority-mutation"],
   "expected_receipt": "docs/receipts/integration/s11-manifest-topology.json",

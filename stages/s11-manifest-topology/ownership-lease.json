@@ -4,6 +4,6 @@
   "base_sha": "d4977f120e194672c0b126161a9d0ff24d4439a9",
   "branch": "codex/bridge-a5-s11-manifest-topology",
   "issued_at": "2026-07-18T15:54:00Z", "expires_at": "2026-07-19T15:54:00Z",
-  "write_set": ["src/research_bridge/organism.py", "ops/organism/component-declarations.json", "ops/organism/deployment-projection.json", "tests/test_s11_manifest_topology.py", "stages/s11-manifest-topology/stage-envelope.json", "stages/s11-manifest-topology/ownership-lease.json"],
+  "write_set": ["src/research_bridge/organism.py", "ops/organism/component-declarations.json", "ops/organism/deployment-projection.json", "tests/test_s11_manifest_topology.py", "tests/test_a1_capability_proof.py", "stages/s11-manifest-topology/stage-envelope.json", "stages/s11-manifest-topology/ownership-lease.json"],
   "exclusive": true, "revoked": false
 }
