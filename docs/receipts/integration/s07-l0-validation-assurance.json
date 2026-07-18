@@ -1,0 +1,32 @@
+{
+  "schema_id": "IntegrationReceipt", "schema_version": "1.0.0",
+  "object_id": "integration-s07-l0-validation-assurance-20260718", "issued_at": "2026-07-18T15:03:56Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s07-l0-validation-assurance", "agent_id": "agent-5",
+    "ownership_lease_ref": "stages/s07-l0-validation/assurance-ownership-lease.json",
+    "base_sha": "dc2df9edc98b7117e2ce03dd9169391eb5e9b532",
+    "head_sha": "4e3b5a581987d9eaaf8e78dd905a53b29c5ff4b9",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "tests/test_stage1_validation.py", "tests/test_s07_l0_independent_validation.py",
+      "stages/s07-l0-validation/assurance-stage-envelope.json",
+      "stages/s07-l0-validation/assurance-ownership-lease.json"
+    ],
+    "audit_results": {
+      "contract_gate": "green", "privacy_secret_scan": "green", "source_mutation": false,
+      "focused_tests": 73, "full_core_tests": 526, "stage0b_tests": 25,
+      "forged_artifact_rejected": "green", "forged_input_rejected": "green",
+      "forged_chunk_rejected": "green", "duplicate_json_key_rejected": "green",
+      "store_failure_rejected": "green", "invalid_limits_rejected": "green",
+      "receipt_before_validation": false, "holdout_exposure": 0
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29649227470",
+    "integration_commit_sha": "758272d96afd075f4f08599db8cbaafdb76d2fa1"
+  },
+  "integrity": {"payload_sha256": "50f47ce06a78893994ce7511008e958054701ab52d7efba9dfed5b166cf6631d", "parent_refs": [
+    "git:4e3b5a581987d9eaaf8e78dd905a53b29c5ff4b9", "git:758272d96afd075f4f08599db8cbaafdb76d2fa1",
+    "ci:29649227470", "git:dc2df9edc98b7117e2ce03dd9169391eb5e9b532"
+  ]}
+}
