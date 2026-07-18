@@ -1433,7 +1433,36 @@ def run_shadow_canary(
         "policy_applied": False, "rollback_applied": False,
         "holdout_queries": 0, "side_effects": False, "grants_authority": False,
     }
-    return ShadowCanarySnapshot(**material, snapshot_sha256=_sha(material))
+    return ShadowCanarySnapshot(
+        version="shadow-canary-snapshot-v1",
+        policy_sha256=policy.profile_sha256,
+        scope_sha256=scope.scope_sha256,
+        report_sha256=report.report_sha256,
+        archive_sha256=archive.archive_sha256,
+        candidate_ref=scope.candidate_ref,
+        mutation_proposal_loop_status="MUTATION_PROPOSAL_LOOP_PASS",
+        evolution_loop_shadow_status=shadow_status,
+        meta_evolution_status="META_EVOLUTION_PROPOSAL_ONLY",
+        calibration_maturity_status=maturity,
+        promotion_state="WAIT_AUTHORITY",
+        reason_codes=tuple(sorted(reasons)),
+        observation_count=len(ordered),
+        unique_case_count=unique_cases,
+        regression_signals=regression_signals,
+        rollback_proposal=rollback,
+        snapshot_sha256=_sha(material),
+        network_calls=0,
+        filesystem_writes=0,
+        generated_code_executions=0,
+        canonical_writes=0,
+        winner_promoted=False,
+        mutation_applied=False,
+        policy_applied=False,
+        rollback_applied=False,
+        holdout_queries=0,
+        side_effects=False,
+        grants_authority=False,
+    )
 
 
 def build_research_agenda(
