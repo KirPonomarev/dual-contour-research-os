@@ -16,7 +16,7 @@ from dataclasses import dataclass, replace
 from datetime import datetime
 from pathlib import Path
 from types import MappingProxyType
-from typing import Any, Mapping
+from typing import Any, Mapping, Sequence
 
 
 _GENESIS_SHA256 = "0" * 64
@@ -28,10 +28,13 @@ _PAYLOAD_REF_RE = re.compile(r"^(?:cas|vault):[A-Za-z0-9][A-Za-z0-9._:/+-]{0,511
 _ACCOUNTING_POLICY_REF_RE = re.compile(r"^budget-policy:sha256:[a-f0-9]{64}$")
 _BUDGET_SCOPE_REF_RE = re.compile(r"^budget-scope:sha256:[a-f0-9]{64}$")
 _EMBEDDED_REF_RE = re.compile(r"^embedded:sha256:[a-f0-9]{64}$")
-_EVENT_TYPES = frozenset({"claim", "checkpoint", "complete", "pause", "resume"})
+_EVENT_TYPES = frozenset(
+    {"claim", "checkpoint", "complete", "pause", "resume", "a1_bundle"}
+)
 _CONTROL_EVENT_TYPES = frozenset({"pause", "resume"})
 _GLOBAL_CONTROL_JOB_ID = "bridge-global-control"
-_DATABASE_USER_VERSION = 1
+_SCHEMA_V1_USER_VERSION = 1
+_DATABASE_USER_VERSION = 2
 _MAX_SAFE_INTEGER = 9_007_199_254_740_991
 _BUDGET_ISSUER = {"id": "bridge-budget-ledger", "authority_class": "budget-ledger"}
 _CONTOURS = frozenset({"bridge", "market", "security", "governance"})
@@ -44,7 +47,7 @@ _CLASSIFICATIONS = frozenset(
     }
 )
 
-_TABLE_SQL = """CREATE TABLE bridge_job_ledger (
+_TABLE_V1_SQL = """CREATE TABLE bridge_job_ledger (
                 sequence INTEGER PRIMARY KEY,
                 event_type TEXT NOT NULL
                     CHECK (event_type IN ('claim', 'checkpoint', 'complete', 'pause', 'resume')),
@@ -61,8 +64,25 @@ _TABLE_SQL = """CREATE TABLE bridge_job_ledger (
                     OR (event_type != 'checkpoint' AND checkpoint_sequence IS NULL)
                 )
             )"""
+_TABLE_SQL = """CREATE TABLE bridge_job_ledger (
+                sequence INTEGER PRIMARY KEY,
+                event_type TEXT NOT NULL
+                    CHECK (event_type IN ('claim', 'checkpoint', 'complete', 'pause', 'resume', 'a1_bundle')),
+                job_id TEXT NOT NULL,
+                attempt_id TEXT NOT NULL,
+                fencing_epoch INTEGER NOT NULL CHECK (fencing_epoch >= 0),
+                checkpoint_sequence INTEGER,
+                event_at TEXT NOT NULL,
+                payload_json TEXT NOT NULL,
+                previous_sha256 TEXT NOT NULL CHECK (length(previous_sha256) = 64),
+                event_sha256 TEXT NOT NULL UNIQUE CHECK (length(event_sha256) = 64),
+                CHECK (
+                    (event_type = 'checkpoint' AND checkpoint_sequence IS NOT NULL)
+                    OR (event_type != 'checkpoint' AND checkpoint_sequence IS NULL)
+                )
+            )"""
 _LEGACY_SCHEMA_OBJECTS = (
-    ("table", "bridge_job_ledger", _TABLE_SQL),
+    ("table", "bridge_job_ledger", _TABLE_V1_SQL),
     (
         "index",
         "bridge_job_one_claim",
@@ -143,6 +163,95 @@ _BUDGET_INDEX_OBJECTS = (
     ),
 )
 _SCHEMA_V1_OBJECTS = _LEGACY_SCHEMA_OBJECTS + _BUDGET_INDEX_OBJECTS
+
+_A1_OBJECT_TABLE_SQL = """CREATE TABLE bridge_a1_objects (
+                object_id TEXT PRIMARY KEY,
+                object_kind TEXT NOT NULL
+                    CHECK (object_kind IN ('MaterialEvent', 'CandidateSpecDraft', 'AdmissionReceipt', 'CapabilityProofReceipt')),
+                ledger_sequence INTEGER NOT NULL,
+                classification TEXT NOT NULL CHECK (classification IN ('D0', 'D1')),
+                payload_sha256 TEXT NOT NULL CHECK (length(payload_sha256) = 64),
+                document_json TEXT NOT NULL,
+                retention_class TEXT NOT NULL
+                    CHECK (retention_class IN ('ephemeral-proposal', 'durable-operational-memory', 'immutable-receipt', 'domain-owned-reference')),
+                FOREIGN KEY (ledger_sequence) REFERENCES bridge_job_ledger(sequence),
+                UNIQUE (ledger_sequence, object_id)
+            )"""
+_A1_PROJECTION_TABLE_SQL = """CREATE TABLE bridge_a1_projection_state (
+                projection_name TEXT PRIMARY KEY,
+                last_applied_sequence INTEGER NOT NULL,
+                state_sha256 TEXT NOT NULL CHECK (length(state_sha256) = 64),
+                state_json TEXT NOT NULL,
+                FOREIGN KEY (last_applied_sequence) REFERENCES bridge_job_ledger(sequence)
+            )"""
+_A1_SCHEMA_OBJECTS = (
+    ("table", "bridge_a1_objects", _A1_OBJECT_TABLE_SQL),
+    ("table", "bridge_a1_projection_state", _A1_PROJECTION_TABLE_SQL),
+    (
+        "index",
+        "bridge_a1_bundle_idempotency",
+        "CREATE UNIQUE INDEX bridge_a1_bundle_idempotency ON bridge_job_ledger("
+        "json_extract(payload_json, '$.idempotency_key')) WHERE event_type = 'a1_bundle'",
+    ),
+    (
+        "index",
+        "bridge_a1_object_sequence",
+        "CREATE INDEX bridge_a1_object_sequence ON bridge_a1_objects(ledger_sequence, object_id)",
+    ),
+    (
+        "trigger",
+        "bridge_a1_objects_no_update",
+        """CREATE TRIGGER bridge_a1_objects_no_update
+            BEFORE UPDATE ON bridge_a1_objects
+            BEGIN
+                SELECT RAISE(ABORT, 'bridge_a1_objects is append-only');
+            END""",
+    ),
+    (
+        "trigger",
+        "bridge_a1_objects_no_delete",
+        """CREATE TRIGGER bridge_a1_objects_no_delete
+            BEFORE DELETE ON bridge_a1_objects
+            BEGIN
+                SELECT RAISE(ABORT, 'bridge_a1_objects is append-only');
+            END""",
+    ),
+    (
+        "trigger",
+        "bridge_a1_projection_no_regression",
+        """CREATE TRIGGER bridge_a1_projection_no_regression
+            BEFORE UPDATE ON bridge_a1_projection_state
+            WHEN NEW.last_applied_sequence <= OLD.last_applied_sequence
+            BEGIN
+                SELECT RAISE(ABORT, 'bridge_a1_projection sequence must advance');
+            END""",
+    ),
+    (
+        "trigger",
+        "bridge_a1_projection_no_delete",
+        """CREATE TRIGGER bridge_a1_projection_no_delete
+            BEFORE DELETE ON bridge_a1_projection_state
+            BEGIN
+                SELECT RAISE(ABORT, 'bridge_a1_projection_state cannot be deleted');
+            END""",
+    ),
+)
+_SCHEMA_V2_OBJECTS = (
+    ("table", "bridge_job_ledger", _TABLE_SQL),
+) + _LEGACY_SCHEMA_OBJECTS[1:] + _BUDGET_INDEX_OBJECTS + _A1_SCHEMA_OBJECTS
+
+_A1_OBJECT_KINDS = frozenset(
+    {"MaterialEvent", "CandidateSpecDraft", "AdmissionReceipt", "CapabilityProofReceipt"}
+)
+_A1_PROJECTION_NAMES = frozenset(
+    {"material_events", "candidates", "admissions", "capabilities"}
+)
+_A1_RETENTION_BY_KIND = {
+    "MaterialEvent": "durable-operational-memory",
+    "CandidateSpecDraft": "ephemeral-proposal",
+    "AdmissionReceipt": "immutable-receipt",
+    "CapabilityProofReceipt": "immutable-receipt",
+}
 
 _CLAIM_PAYLOAD_FIELDS = frozenset(
     {
@@ -264,6 +373,23 @@ class LedgerEvent:
 
 
 @dataclass(frozen=True, slots=True)
+class A1BundleRecord:
+    """One atomic A1 object/projection bundle in the global event order."""
+
+    event: LedgerEvent
+    object_ids: tuple[str, ...]
+    projection_names: tuple[str, ...]
+
+    def __post_init__(self) -> None:
+        if self.event.event_type != "a1_bundle":
+            raise LedgerError("A1 bundle record must reference an a1_bundle event")
+        if not self.object_ids or len(self.object_ids) != len(set(self.object_ids)):
+            raise LedgerError("A1 bundle object ids must be unique and non-empty")
+        if frozenset(self.projection_names) != _A1_PROJECTION_NAMES:
+            raise LedgerError("A1 bundle must advance every registered projection")
+
+
+@dataclass(frozen=True, slots=True)
 class _BudgetProjection:
     event: LedgerEvent
     accounting_policy_ref: str
@@ -323,52 +449,89 @@ class JobLedger:
 
     def _initialize_schema(self) -> None:
         version, fingerprint, object_count = self._schema_identity()
+        expected_v2 = _expected_schema_fingerprint(
+            _SCHEMA_V2_OBJECTS, user_version=_DATABASE_USER_VERSION
+        )
         expected_v1 = _expected_schema_fingerprint(
-            _SCHEMA_V1_OBJECTS, user_version=_DATABASE_USER_VERSION
+            _SCHEMA_V1_OBJECTS, user_version=_SCHEMA_V1_USER_VERSION
         )
         if version == _DATABASE_USER_VERSION:
-            if fingerprint != expected_v1:
-                raise LedgerError("ledger schema fingerprint is not exact version 1")
+            if fingerprint != expected_v2:
+                raise LedgerError("ledger schema fingerprint is not exact version 2")
             return
-        if version != 0:
+        if version not in {0, _SCHEMA_V1_USER_VERSION}:
             raise LedgerError("ledger database user_version is unsupported")
 
         expected_legacy = _expected_schema_fingerprint(
             _LEGACY_SCHEMA_OBJECTS, user_version=0
         )
-        if object_count and fingerprint != expected_legacy:
+        if version == _SCHEMA_V1_USER_VERSION and fingerprint != expected_v1:
+            raise LedgerError("ledger schema fingerprint is not exact version 1")
+        if version == 0 and object_count and fingerprint != expected_legacy:
             raise LedgerError("unversioned ledger schema is ambiguous")
 
         self._connection.execute("BEGIN IMMEDIATE")
         try:
             version, fingerprint, object_count = self._schema_identity()
             if version == _DATABASE_USER_VERSION:
-                if fingerprint != expected_v1:
-                    raise LedgerError("ledger schema fingerprint is not exact version 1")
+                if fingerprint != expected_v2:
+                    raise LedgerError("ledger schema fingerprint is not exact version 2")
                 self._connection.execute("COMMIT")
                 return
-            if version != 0:
+            if version not in {0, _SCHEMA_V1_USER_VERSION}:
                 raise LedgerError("ledger database user_version is unsupported")
             if object_count == 0:
-                self._create_schema_objects(_SCHEMA_V1_OBJECTS)
-            elif fingerprint == expected_legacy:
+                self._create_schema_objects(_SCHEMA_V2_OBJECTS)
+            elif version == 0 and fingerprint == expected_legacy:
                 row_count = self._connection.execute(
                     "SELECT COUNT(*) FROM bridge_job_ledger"
                 ).fetchone()[0]
                 if row_count != 0:
                     raise LedgerError("nonempty unversioned ledger requires quarantine")
-                self._create_schema_objects(_BUDGET_INDEX_OBJECTS)
+                self._migrate_v1_objects_to_v2(include_budget_indexes=False)
+            elif version == _SCHEMA_V1_USER_VERSION and fingerprint == expected_v1:
+                self._migrate_v1_objects_to_v2(include_budget_indexes=True)
             else:
-                raise LedgerError("unversioned ledger schema is ambiguous")
+                raise LedgerError("ledger schema cannot be migrated safely")
             self._connection.execute(f"PRAGMA user_version = {_DATABASE_USER_VERSION}")
             version, fingerprint, _ = self._schema_identity()
-            if version != _DATABASE_USER_VERSION or fingerprint != expected_v1:
-                raise LedgerError("ledger schema version 1 creation was not exact")
+            if version != _DATABASE_USER_VERSION or fingerprint != expected_v2:
+                raise LedgerError("ledger schema version 2 creation was not exact")
             self._connection.execute("COMMIT")
         except Exception:
             if self._connection.in_transaction:
                 self._connection.execute("ROLLBACK")
             raise
+
+    def _migrate_v1_objects_to_v2(self, *, include_budget_indexes: bool) -> None:
+        """Atomically rebuild the event table and add v2 A1 projection storage."""
+
+        index_objects = list(_LEGACY_SCHEMA_OBJECTS[1:])
+        if include_budget_indexes:
+            index_objects.extend(_BUDGET_INDEX_OBJECTS)
+        for object_type, name, _statement in reversed(index_objects):
+            keyword = "TRIGGER" if object_type == "trigger" else "INDEX"
+            self._connection.execute(f"DROP {keyword} {name}")
+        self._connection.execute(
+            "ALTER TABLE bridge_job_ledger RENAME TO bridge_job_ledger_v1"
+        )
+        self._connection.execute(_TABLE_SQL)
+        self._connection.execute(
+            """
+            INSERT INTO bridge_job_ledger (
+                sequence, event_type, job_id, attempt_id, fencing_epoch,
+                checkpoint_sequence, event_at, payload_json,
+                previous_sha256, event_sha256
+            )
+            SELECT sequence, event_type, job_id, attempt_id, fencing_epoch,
+                   checkpoint_sequence, event_at, payload_json,
+                   previous_sha256, event_sha256
+            FROM bridge_job_ledger_v1
+            ORDER BY sequence
+            """
+        )
+        self._connection.execute("DROP TABLE bridge_job_ledger_v1")
+        self._create_schema_objects(_SCHEMA_V2_OBJECTS[1:])
 
     def _schema_identity(self) -> tuple[int, str, int]:
         version = int(self._connection.execute("PRAGMA user_version").fetchone()[0])
@@ -898,6 +1061,309 @@ class JobLedger:
             except Exception as exc:
                 self._rollback()
                 self._raise_ledger_error(exc)
+
+    def append_a1_bundle(
+        self,
+        *,
+        objects: Sequence[Mapping[str, object]],
+        projections: Mapping[str, Mapping[str, object]],
+        idempotency_key: str,
+        event_at: str,
+    ) -> A1BundleRecord:
+        """Commit A1 objects and all projections at one global ledger sequence."""
+
+        key = _text(idempotency_key, "idempotency_key", maximum=256)
+        timestamp = _timestamp("event_at", event_at)
+        if not isinstance(objects, Sequence) or isinstance(objects, (str, bytes)):
+            raise LedgerError("A1 bundle objects must be a sequence")
+        if not objects or len(objects) > 64:
+            raise LedgerError("A1 bundle object count is outside the bound")
+        documents = [self._validate_a1_document(value) for value in objects]
+        object_ids = [value["object_id"] for value in documents]
+        if len(object_ids) != len(set(object_ids)):
+            raise LedgerError("A1 bundle object ids must be unique")
+        if not isinstance(projections, Mapping) or set(projections) != _A1_PROJECTION_NAMES:
+            raise LedgerError("A1 bundle must provide every registered projection")
+        projection_states: dict[str, dict[str, object]] = {}
+        for name in sorted(_A1_PROJECTION_NAMES):
+            state = projections[name]
+            if not isinstance(state, Mapping):
+                raise LedgerError("A1 projection state must be an object")
+            copied = _json_copy(state, f"projection.{name}")
+            if not isinstance(copied, dict) or not copied:
+                raise LedgerError("A1 projection state must be non-empty")
+            projection_states[name] = copied
+
+        descriptors = [
+            {
+                "object_id": document["object_id"],
+                "object_kind": document["schema_id"],
+                "payload_sha256": document["integrity"]["payload_sha256"],
+            }
+            for document in documents
+        ]
+        projection_descriptors = [
+            {
+                "projection_name": name,
+                "state_sha256": _digest(
+                    _canonical_json(projection_states[name]).encode("utf-8")
+                ),
+            }
+            for name in sorted(projection_states)
+        ]
+        bundle_payload: dict[str, object] = {
+            "idempotency_key": key,
+            "objects": descriptors,
+            "projections": projection_descriptors,
+        }
+
+        with self._lock:
+            self._ensure_open()
+            self._begin_immediate()
+            try:
+                replay_row = self._connection.execute(
+                    """
+                    SELECT * FROM bridge_job_ledger
+                    WHERE event_type = 'a1_bundle'
+                      AND json_extract(payload_json, '$.idempotency_key') = ?
+                    """,
+                    (key,),
+                ).fetchone()
+                if replay_row is not None:
+                    replay = self._ledger_event_from_row(replay_row)
+                    if _canonical_json(replay.payload) != _canonical_json(bundle_payload):
+                        raise LedgerError("A1 bundle idempotency key was reused")
+                    stored_ids = tuple(
+                        row["object_id"]
+                        for row in self._connection.execute(
+                            "SELECT object_id FROM bridge_a1_objects WHERE ledger_sequence = ? ORDER BY object_id",
+                            (replay.sequence,),
+                        )
+                    )
+                    self._connection.execute("COMMIT")
+                    return A1BundleRecord(
+                        event=replay,
+                        object_ids=stored_ids,
+                        projection_names=tuple(sorted(_A1_PROJECTION_NAMES)),
+                    )
+
+                event = self._append(
+                    event_type="a1_bundle",
+                    job_id="bridge-a1-global-bundle",
+                    attempt_id=f"a1-bundle:{_digest(key.encode('utf-8'))}",
+                    fencing_epoch=0,
+                    checkpoint_sequence=None,
+                    event_at=timestamp,
+                    payload=bundle_payload,
+                )
+                for document in documents:
+                    self._connection.execute(
+                        """
+                        INSERT INTO bridge_a1_objects (
+                            object_id, object_kind, ledger_sequence, classification,
+                            payload_sha256, document_json, retention_class
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                        """,
+                        (
+                            document["object_id"],
+                            document["schema_id"],
+                            event.sequence,
+                            document["classification"],
+                            document["integrity"]["payload_sha256"],
+                            _canonical_json(document),
+                            _A1_RETENTION_BY_KIND[document["schema_id"]],
+                        ),
+                    )
+                for descriptor in projection_descriptors:
+                    name = descriptor["projection_name"]
+                    self._connection.execute(
+                        """
+                        INSERT INTO bridge_a1_projection_state (
+                            projection_name, last_applied_sequence, state_sha256, state_json
+                        ) VALUES (?, ?, ?, ?)
+                        ON CONFLICT(projection_name) DO UPDATE SET
+                            last_applied_sequence = excluded.last_applied_sequence,
+                            state_sha256 = excluded.state_sha256,
+                            state_json = excluded.state_json
+                        """,
+                        (
+                            name,
+                            event.sequence,
+                            descriptor["state_sha256"],
+                            _canonical_json(projection_states[name]),
+                        ),
+                    )
+                self._connection.execute("COMMIT")
+                return A1BundleRecord(
+                    event=event,
+                    object_ids=tuple(sorted(object_ids)),
+                    projection_names=tuple(sorted(_A1_PROJECTION_NAMES)),
+                )
+            except Exception as exc:
+                self._rollback()
+                self._raise_ledger_error(exc)
+
+    def read_a1_object(self, object_id: str) -> Mapping[str, object]:
+        """Return one immutable A1 document without changing durable state."""
+
+        reference = _text(object_id, "object_id", maximum=256)
+        with self._lock:
+            self._ensure_open()
+            row = self._connection.execute(
+                "SELECT document_json, payload_sha256 FROM bridge_a1_objects WHERE object_id = ?",
+                (reference,),
+            ).fetchone()
+        if row is None:
+            raise LedgerError("A1 object is not registered")
+        document = _load_json_object(row["document_json"], "A1 object")
+        validated = self._validate_a1_document(document)
+        if not _constant_time_equal(
+            validated["integrity"]["payload_sha256"], row["payload_sha256"]
+        ):
+            raise LedgerError("A1 object storage digest mismatch")
+        return _deep_freeze(validated)
+
+    def projection_coverage(self) -> Mapping[str, Mapping[str, object]]:
+        """Return exact registered projections and their last global sequence."""
+
+        with self._lock:
+            self._ensure_open()
+            rows = self._connection.execute(
+                "SELECT * FROM bridge_a1_projection_state ORDER BY projection_name"
+            ).fetchall()
+        result: dict[str, Mapping[str, object]] = {}
+        for row in rows:
+            state = _load_json_object(row["state_json"], "A1 projection")
+            state_sha = _digest(_canonical_json(state).encode("utf-8"))
+            if not _constant_time_equal(state_sha, row["state_sha256"]):
+                raise LedgerError("A1 projection storage digest mismatch")
+            result[row["projection_name"]] = _deep_freeze(
+                {
+                    "last_applied_sequence": row["last_applied_sequence"],
+                    "state_sha256": row["state_sha256"],
+                    "state": state,
+                }
+            )
+        return MappingProxyType(result)
+
+    def storage_coverage_manifest(self) -> Mapping[str, object]:
+        """Describe v2 ordering and projection coverage without mutating state."""
+
+        with self._lock:
+            self._ensure_open()
+            version, fingerprint, _ = self._schema_identity()
+            row = self._connection.execute(
+                "SELECT MAX(sequence) AS last_sequence FROM bridge_job_ledger"
+            ).fetchone()
+            bundle_row = self._connection.execute(
+                "SELECT MAX(sequence) AS last_sequence FROM bridge_job_ledger WHERE event_type = 'a1_bundle'"
+            ).fetchone()
+            projections = self._connection.execute(
+                "SELECT projection_name, last_applied_sequence FROM bridge_a1_projection_state ORDER BY projection_name"
+            ).fetchall()
+        return _deep_freeze(
+            {
+                "schema_version": version,
+                "schema_fingerprint_sha256": fingerprint,
+                "ordering_model": "single-bridge-global-sequence",
+                "global_sequence_last": row["last_sequence"] or 0,
+                "a1_bundle_sequence_last": bundle_row["last_sequence"] or 0,
+                "registered_projections": {
+                    projection["projection_name"]: projection["last_applied_sequence"]
+                    for projection in projections
+                },
+                "invariants": {
+                    "no_second_event_ledger": True,
+                    "projection_state_has_no_sequence_generator": True,
+                    "a1_objects_reference_global_sequence": True,
+                    "atomic_bundle": True,
+                },
+            }
+        )
+
+    def verify_a1_coverage(self) -> bool:
+        """Verify object descriptors and complete projection coverage of latest bundle."""
+
+        with self._lock:
+            self._ensure_open()
+            bundle_rows = self._connection.execute(
+                "SELECT * FROM bridge_job_ledger WHERE event_type = 'a1_bundle' ORDER BY sequence"
+            ).fetchall()
+            object_rows = self._connection.execute(
+                "SELECT * FROM bridge_a1_objects ORDER BY ledger_sequence, object_id"
+            ).fetchall()
+            projection_rows = self._connection.execute(
+                "SELECT * FROM bridge_a1_projection_state ORDER BY projection_name"
+            ).fetchall()
+        objects_by_sequence: dict[int, list[sqlite3.Row]] = {}
+        for row in object_rows:
+            objects_by_sequence.setdefault(row["ledger_sequence"], []).append(row)
+            try:
+                document = self._validate_a1_document(
+                    _load_json_object(row["document_json"], "A1 object")
+                )
+            except LedgerError:
+                return False
+            if (
+                document["object_id"] != row["object_id"]
+                or document["schema_id"] != row["object_kind"]
+                or document["classification"] != row["classification"]
+                or document["integrity"]["payload_sha256"] != row["payload_sha256"]
+            ):
+                return False
+        for bundle_row in bundle_rows:
+            try:
+                event = self._ledger_event_from_row(bundle_row)
+                descriptors = event.payload["objects"]
+            except (LedgerError, KeyError, TypeError):
+                return False
+            actual = [
+                {
+                    "object_id": row["object_id"],
+                    "object_kind": row["object_kind"],
+                    "payload_sha256": row["payload_sha256"],
+                }
+                for row in objects_by_sequence.get(event.sequence, [])
+            ]
+            if sorted(descriptors, key=lambda item: item["object_id"]) != actual:
+                return False
+        if not bundle_rows:
+            return not object_rows and not projection_rows
+        latest = bundle_rows[-1]["sequence"]
+        return (
+            {row["projection_name"] for row in projection_rows} == _A1_PROJECTION_NAMES
+            and all(row["last_applied_sequence"] == latest for row in projection_rows)
+        )
+
+    @staticmethod
+    def _validate_a1_document(value: Mapping[str, object]) -> dict[str, object]:
+        document = _exact_mapping(value, _RECEIPT_FIELDS, "A1 document")
+        kind = document["schema_id"]
+        if kind not in _A1_OBJECT_KINDS or document["schema_version"] != "1.0.0":
+            raise LedgerError("A1 document schema identity is unsupported")
+        _text(document["object_id"], "A1 object_id", maximum=256)
+        _timestamp("A1 issued_at", document["issued_at"])
+        if document["classification"] not in {"D0", "D1"}:
+            raise LedgerError("durable A1 storage accepts D0 or D1 only")
+        expected_contour = "governance" if kind == "CapabilityProofReceipt" else "bridge"
+        if document["contour"] != expected_contour:
+            raise LedgerError("A1 document contour is invalid")
+        if not isinstance(document["payload"], Mapping):
+            raise LedgerError("A1 document payload must be an object")
+        integrity = _exact_mapping(
+            document["integrity"],
+            frozenset({"profile_id", "payload_sha256", "parent_refs"}),
+            "A1 document integrity",
+        )
+        if integrity["profile_id"] != "core-json-sha256-v1":
+            raise LedgerError("A1 document integrity profile is invalid")
+        digest = _digest(_canonical_json(document["payload"]).encode("utf-8"))
+        if not _constant_time_equal(
+            digest, _sha256("A1 payload_sha256", integrity["payload_sha256"])
+        ):
+            raise LedgerError("A1 document payload digest mismatch")
+        _string_array(integrity["parent_refs"], "A1 parent_refs", allow_empty=True)
+        return document
 
     def event_count(self, event_type: str | None = None) -> int:
         """Return the number of committed events, optionally for one event type."""
@@ -1966,12 +2432,21 @@ class JobLedger:
 def _expected_schema_fingerprint(
     objects: tuple[tuple[str, str, str], ...], *, user_version: int
 ) -> str:
+    def table_name(object_type: str, name: str) -> str:
+        if object_type == "table":
+            return name
+        if name.startswith("bridge_a1_object_") or name.startswith("bridge_a1_objects_"):
+            return "bridge_a1_objects"
+        if name.startswith("bridge_a1_projection_"):
+            return "bridge_a1_projection_state"
+        return "bridge_job_ledger"
+
     manifest = tuple(
         sorted(
             (
                 object_type,
                 name,
-                "bridge_job_ledger",
+                table_name(object_type, name),
                 statement,
             )
             for object_type, name, statement in objects
@@ -2136,6 +2611,54 @@ def _json_ready(value: Any) -> Any:
     return value
 
 
+def _text(value: object, name: str, *, maximum: int) -> str:
+    result = _nonempty_text(name, value)
+    if len(result) > maximum:
+        raise LedgerError(f"{name} exceeds its text bound")
+    return result
+
+
+def _json_copy(value: object, name: str) -> object:
+    try:
+        encoded = _canonical_json(value)
+        return json.loads(encoded)
+    except (TypeError, ValueError, json.JSONDecodeError) as exc:
+        raise LedgerError(f"{name} is not JSON-shaped") from exc
+
+
+def _exact_mapping(
+    value: object, expected_fields: frozenset[str], name: str
+) -> dict[str, object]:
+    copied = _json_copy(value, name)
+    if not isinstance(copied, dict) or set(copied) != expected_fields:
+        raise LedgerError(f"{name} fields are not exact")
+    return copied
+
+
+def _string_array(value: object, name: str, *, allow_empty: bool) -> list[str]:
+    if not isinstance(value, (list, tuple)) or (not allow_empty and not value):
+        raise LedgerError(f"{name} must be a string array")
+    result = [
+        _nonempty_text(f"{name}[{index}]", item)
+        for index, item in enumerate(value)
+    ]
+    if len(result) != len(set(result)):
+        raise LedgerError(f"{name} must contain unique values")
+    return result
+
+
+def _load_json_object(value: object, name: str) -> dict[str, object]:
+    if not isinstance(value, str):
+        raise LedgerError(f"{name} storage value must be JSON text")
+    try:
+        decoded = json.loads(value)
+    except json.JSONDecodeError as exc:
+        raise LedgerError(f"{name} storage value is invalid JSON") from exc
+    if not isinstance(decoded, dict):
+        raise LedgerError(f"{name} storage value must be an object")
+    return decoded
+
+
 def _payload_ref(value: object) -> str:
     value = _nonempty_text("payload_ref", value)
     if _PAYLOAD_REF_RE.fullmatch(value) is None:
@@ -2143,4 +2666,4 @@ def _payload_ref(value: object) -> str:
     return value
 
 
-__all__ = ["LedgerError", "LedgerEvent", "JobLedger"]
+__all__ = ["LedgerError", "LedgerEvent", "A1BundleRecord", "JobLedger"]

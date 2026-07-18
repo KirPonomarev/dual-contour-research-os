@@ -1,0 +1,16 @@
+{
+  "lease_id": "lease-s05-db-v2-global-order-agent-1",
+  "stage_id": "s05-db-v2-global-order",
+  "agent_id": "agent-1",
+  "base_sha": "b97a465b6d3f4789b1bed8ce4ec7112db1c945be",
+  "branch": "codex/bridge-a1-s05-db-v2",
+  "issued_at": "2026-07-18T14:25:00Z",
+  "expires_at": "2026-07-19T14:25:00Z",
+  "write_set": [
+    "src/research_bridge/ledger.py",
+    "stages/s05-db-v2-global-order/stage-envelope.json",
+    "stages/s05-db-v2-global-order/ownership-lease.json"
+  ],
+  "exclusive": true,
+  "revoked": false
+}
