@@ -8,6 +8,8 @@ import json
 import subprocess
 from pathlib import Path
 
+from verify_freeze_receipt import verify_ownership_amendment_chain
+
 
 ROOT = Path(__file__).resolve().parents[1]
 RECEIPT = ROOT / "docs" / "receipts" / "A1_CONTRACTS_FROZEN.json"
@@ -52,12 +54,22 @@ def main() -> int:
     exact_hashes = {
         "core_catalog_sha256": ROOT / "contracts" / "catalog.json",
         "a1_catalog_sha256": A1_DIR / "catalog.json",
-        "ownership_registry_sha256": ROOT / "ownership" / "registry.json",
         "candidate_integration_receipt_sha256": CANDIDATE_RECEIPT,
     }
     for field, path in exact_hashes.items():
         if receipt.get(field) != sha(path):
             fail(f"hash_mismatch:{field}")
+
+    current_ownership_sha256 = sha(ROOT / "ownership" / "registry.json")
+    frozen_ownership_sha256 = receipt.get("ownership_registry_sha256")
+    if not isinstance(frozen_ownership_sha256, str):
+        fail("ownership_registry_sha256")
+    if current_ownership_sha256 != frozen_ownership_sha256:
+        verify_ownership_amendment_chain(
+            frozen_sha256=frozen_ownership_sha256,
+            current_sha256=current_ownership_sha256,
+            catalog_sha256=receipt["core_catalog_sha256"],
+        )
 
     catalog = json.loads((A1_DIR / "catalog.json").read_text(encoding="utf-8"))
     if catalog.get("status") != "frozen":

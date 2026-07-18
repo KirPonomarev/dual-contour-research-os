@@ -1,0 +1,15 @@
+{
+  "lease_id": "lease-s02-scout-ipc-assurance-agent-5",
+  "stage_id": "s02-scout-ipc-assurance",
+  "agent_id": "agent-5",
+  "base_sha": "f925daa773e229fb942d066d002a9ff877cb82f8",
+  "branch": "codex/bridge-a5-s02-scout-ipc-assurance",
+  "issued_at": "2026-07-18T13:36:00Z",
+  "expires_at": "2026-07-19T13:36:00Z",
+  "write_set": [
+    "tests/test_a1_scout_ipc_fixture.py",
+    "tests/test_ownership_registry.py"
+  ],
+  "exclusive": true,
+  "revoked": false
+}

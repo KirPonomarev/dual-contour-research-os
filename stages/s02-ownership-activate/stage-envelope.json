@@ -1,0 +1,35 @@
+{
+  "stage_id": "s02-ownership-activate",
+  "agent_id": "agent-0",
+  "objective": "Promote the pre-reserved discovery.py path to live Agent 1 ownership for the approved S02 implementation.",
+  "base_sha": "a49fb7767b1a663598b0ca179ad8ba7e1d3907da",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "a1_contract_sha256": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+  "branch": "codex/bridge-a0-s02-ownership-activate",
+  "worktree": "/Volumes/Work/dual-contour-research-os-s02-ownership-activate",
+  "write_set": [
+    "ownership/registry.json",
+    "docs/ADR/0003-discovery-path-activation.md",
+    "docs/receipts/OWNERSHIP_REGISTRY_AMENDMENT_2.json",
+    "stages/s02-ownership-activate/stage-envelope.json",
+    "stages/s02-ownership-activate/ownership-lease.json",
+    "tools/verify_freeze_receipt.py",
+    "tools/verify_a1_freeze_receipt.py"
+  ],
+  "forbidden_scope": [
+    "contract-edit",
+    "source-edit",
+    "test-edit",
+    "runtime-authority-expansion",
+    "external-dependency",
+    "deployment"
+  ],
+  "acceptance_commands": [
+    "make contracts after the paired Agent 1 live-path stage",
+    "python3 -m unittest tests.test_ownership_registry after the paired Agent 1 live-path stage",
+    "git diff --check"
+  ],
+  "expected_receipt": "docs/receipts/integration/s02-ownership-activate.json",
+  "commit_authority": "one-scoped-agent-0-commit",
+  "push_authority": true
+}
