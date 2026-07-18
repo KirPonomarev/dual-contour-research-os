@@ -1,0 +1,29 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-s20-stage4-isolation-release-packet-20260718",
+  "issued_at": "2026-07-18T20:45:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-freeze-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "STAGE4_A1_ISOLATION_RELEASE_RECOVERY_PACKET",
+    "candidates": [
+      {"candidate": "reuse-existing-rootless-systemd-unit-release-manifest-and-recovery-controller", "disposition": "selected"},
+      {"candidate": "add-isolated-candidate-unit-and-deterministic-packet-validator", "disposition": "selected-minimal-missing-glue"},
+      {"candidate": "mutate-frozen-S4-release-in-place", "disposition": "rejected-immutable-release-violation"},
+      {"candidate": "run-legacy-and-A1-writers-concurrently", "disposition": "rejected-single-ledger-single-writer-violation"},
+      {"candidate": "Docker-and-systemd-dual-restart-supervision", "disposition": "rejected-competing-supervisors"},
+      {"candidate": "deploy-reboot-sudo-or-restore-now", "disposition": "rejected-S20-preparation-only"}
+    ],
+    "selected_mode": "new-immutable-candidate-packet-over-existing-release-and-rootless-boundaries",
+    "source_ref": "git:cf33dcea6566e69da0253f6b7613a9761a937713;release-manifest:sha256:9ceae0bda066cf52577cec0fdc1d7230e92b3e4010f65b81613abf6a0a8a90dd",
+    "code_sha256": "4e8451e08bccb5573cb604ecd943320b75f790097283f58fb7472773aef7954a",
+    "license_spdx": "NOASSERTION",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": ["packet-integrity", "namespace-disjointness", "single-writer", "single-supervisor", "R0-same-release", "changed-release-human-approval", "unit-drift"],
+    "canonical_owner": "agent-0-release-governance",
+    "rollback": "Remove only the uninstalled candidate packet, unit, validator, runbook and S20 metadata; the frozen S4 release remains byte-identical."
+  },
+  "integrity": {"payload_sha256": "e550aae89b4f375fa603de6c0600a9ba7bce8e37285689e1ee590f2fe0d3d486", "parent_refs": ["git:cf33dcea6566e69da0253f6b7613a9761a937713", "release:sha256:9ceae0bda066cf52577cec0fdc1d7230e92b3e4010f65b81613abf6a0a8a90dd", "integration:integration-s19-e1-aggregate-gate-20260718"]}
+}

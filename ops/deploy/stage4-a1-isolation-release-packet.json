@@ -1,0 +1,50 @@
+{
+  "schema_id": "research-os.stage4-a1-isolation-release-packet.v1",
+  "packet_id": "stage4-a1-isolation-candidate-cf33dcea",
+  "source_head": "cf33dcea6566e69da0253f6b7613a9761a937713",
+  "predecessor": {
+    "release_manifest_sha256": "9ceae0bda066cf52577cec0fdc1d7230e92b3e4010f65b81613abf6a0a8a90dd",
+    "release_sha": "5c2bd7c090fada6e5b65dc955e80b256d88252de",
+    "image_id": "sha256:36069ee7a9db78af747d7fad65f9e33073824f27be898cdc0b7dd3b77ac5c235",
+    "service": "research-os-bridge.service",
+    "container": "research-os-bridge",
+    "mutable_namespaces": ["research-os-bridge-runtime", "research-os-bridge-config"]
+  },
+  "candidate": {
+    "unit_ref": "ops/deploy/research-os-a1-bridge.service",
+    "unit_sha256": "032d55766037b1af6dadf214abdf8df254a0f4a9081fa03a4d7c83c18faa8ebb",
+    "service": "research-os-a1-bridge.service",
+    "container": "research-os-a1-bridge",
+    "mutable_namespaces": ["research-os-a1-runtime", "research-os-a1-config"],
+    "runtime_model": "ONE_BRIDGE_PROCESS_ONE_LEDGER_ONE_WRITER_A1_ADDITIVE",
+    "supervisor": "systemd-user",
+    "container_restart_policy": "no",
+    "systemd_restart_policy": "on-failure"
+  },
+  "cutover": {
+    "concurrent_activation": false,
+    "predecessor_must_be_stopped": true,
+    "single_writer_required": true,
+    "namespace_intersection": [],
+    "migration_mode": "STOP_EXPORT_VERIFY_RESTORE_START",
+    "automatic_cutover": false
+  },
+  "recovery": {
+    "r0_pre_authorized": true,
+    "r0_scope": "SAME_RELEASE_SAME_IMAGE_SAME_POLICY_SAME_CONFIG_SAME_SCHEMA_ONLY",
+    "r0_actions": ["restart-same-service", "replay-existing-ledger", "verify-existing-cas"],
+    "changed_release_requires_human_approval": true,
+    "rollback_requires_receipt": true,
+    "restore_requires_clean-verification": true
+  },
+  "authority": {
+    "packet_grants_deployment": false,
+    "packet_grants_reboot": false,
+    "packet_grants_sudo": false,
+    "packet_grants_canonical_mutation": false,
+    "packet_grants_live_action": false,
+    "deployment_approval_receipt_required": true
+  },
+  "runbook_ref": "docs/STAGE4_A1_ISOLATION_RELEASE_RUNBOOK.md",
+  "integrity": {"profile": "core-json-sha256-v1", "payload_sha256": "45715b3e6728d190fd2f397efa67ef4924d55577c3ded8c9a10b783cdd1bcb6f"}
+}
