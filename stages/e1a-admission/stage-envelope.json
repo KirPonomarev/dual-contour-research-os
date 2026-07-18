@@ -1,0 +1,94 @@
+{
+  "stage_id": "e1a-admission",
+  "agent_id": "agent-1",
+  "objective": "Implement the pure E1A fixture path from an untrusted SourceTrigger through deterministic MaterialityGate and trusted MaterialEvent minting to frozen AdmissionSnapshot and non-authoritative AdmissionReceipt.",
+  "executable_blocker": "The frozen A1 objects have no runtime implementation that proves trusted-field minting, zero-call non-material outcomes, exact dedupe, snapshot-bound admission, hard denies, and deterministic receipt identity.",
+  "base_sha": "395d8d95a0a226ca3dbae0fbc1caafb12b670b76",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "a1_contract_sha256": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+  "branch": "codex/bridge-a1-e1a-admission",
+  "worktree": "/Volumes/Work/dual-contour-research-os-e1a-admission",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "contracts/a1/v1/catalog.json",
+    "contracts/a1/v1/profiles/a1_sandbox_policy_v1.json",
+    "contracts/a1/v1/profiles/reason_codes_v1.json",
+    "contracts/a1/v1/profiles/writer_issuer_matrix_v1.json",
+    "docs/receipts/A1_CONTRACTS_FROZEN.json",
+    "docs/receipts/reuse/e1a-discovery-admission.json",
+    "src/research_bridge/admission.py"
+  ],
+  "write_set": [
+    "src/research_bridge/admission.py"
+  ],
+  "forbidden_scope": [
+    "frozen-contract-or-profile-edit",
+    "canonical-doc-edit",
+    "root-config-ci-lockfile-or-migration-edit",
+    "ledger-or-storage-write",
+    "model-api-call",
+    "external-dependency-adoption",
+    "new-orchestrator-scheduler-queue-or-database",
+    "domain-scientific-contract-issuance",
+    "d2-d3-payload",
+    "execution-permit-issuance",
+    "canonical-mutation",
+    "live-trading",
+    "live-security-execution",
+    "deployment"
+  ],
+  "dependency_hashes": {
+    "core_contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "a1_contract_catalog": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+    "reuse_decision": "8cd39889d770104bf5900eff58c177cb45fb6adb5dbc9516d38d4441358c9604",
+    "admission_module_before": "66a4b40cc81a350930e17bfaa53a880e0fd0554aa4cc4c0b229ac66a8dd64c92",
+    "external_dependencies": "none"
+  },
+  "interface_contract": {
+    "new_exports": [
+      "A1AdmissionError",
+      "A1AdmissionKernel",
+      "A1AdmissionSnapshot",
+      "A1AdmissionDecision",
+      "MaterialityResult"
+    ],
+    "materiality_decisions": [
+      "MATERIAL",
+      "NON_MATERIAL",
+      "DUPLICATE_EXACT",
+      "WAIT_DATA",
+      "WAIT_BUDGET",
+      "REJECTED_POLICY"
+    ],
+    "side_effects": "none; E1B owns durable reservation and outbox integration",
+    "authority": "AdmissionReceipt remains a deterministic policy decision and never an execution permit"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m compileall -q src/research_bridge/admission.py",
+    "python3 -m unittest discover -s tests -p test_stage1_admission.py",
+    "python3 -m unittest discover -s tests -p test_stage1_assurance.py",
+    "make test",
+    "git diff --check",
+    "public privacy and secret scan over exact write-set"
+  ],
+  "risk_class": "a1-deterministic-admission-non-authoritative-fixture",
+  "stop_conditions": [
+    "contract-or-profile-drift",
+    "unknown-field-accepted",
+    "collector-controls-trusted-field",
+    "non-material-path-consumes-model-call",
+    "same-frozen-inputs-produce-different-receipt",
+    "admission-grants-execution-authority",
+    "private-data-detected",
+    "write-set-collision",
+    "external-dependency-needed",
+    "deterministic-mismatch"
+  ],
+  "expected_receipt": "docs/receipts/integration/e1a-discovery-admission.json",
+  "rollback": "Agent 0 reverts the scoped admission implementation commit before issuing E1B. This stage has no migration or durable state write.",
+  "commit_authority": "one-scoped-worker-commit",
+  "push_authority": false,
+  "expected_handoff_status": ["ready_for_agent0_audit", "blocked_validation_failed"]
+}

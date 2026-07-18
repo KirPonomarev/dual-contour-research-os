@@ -1,0 +1,14 @@
+{
+  "lease_id": "lease-e1a-admission-agent-1-20260718",
+  "stage_id": "e1a-admission",
+  "agent_id": "agent-1",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-18T10:52:26Z",
+  "expires_at": "2026-07-18T22:52:26Z",
+  "base_sha": "395d8d95a0a226ca3dbae0fbc1caafb12b670b76",
+  "branch": "codex/bridge-a1-e1a-admission",
+  "worktree": "/Volumes/Work/dual-contour-research-os-e1a-admission",
+  "write_set": ["src/research_bridge/admission.py"],
+  "delegation_allowed": false,
+  "state": "active"
+}
