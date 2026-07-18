@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 import hashlib
 import json
+from pathlib import Path
 import re
 from types import MappingProxyType
 from typing import Mapping, Sequence
@@ -18,6 +19,9 @@ _MAX_AGENDA_ITEMS = 256
 _MAX_PORTFOLIO_SLOTS = 32
 _MAX_SAFE_INTEGER = 9_007_199_254_740_991
 _SHA_REF_RE = re.compile(r"^agenda-item:sha256:[a-f0-9]{64}$")
+_SHA256_RE = re.compile(r"^[a-f0-9]{64}$")
+_DAY_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+_REPLICATION_DIMENSIONS = ("data", "code", "environment", "temporal", "model")
 
 
 class EvolutionError(RuntimeError):
@@ -158,6 +162,295 @@ class PortfolioSnapshot:
     portfolio_sha256: str
     side_effects: bool = False
     grants_authority: bool = False
+
+
+class ReplicationPolicy:
+    """Digest-bound S26 metadata and evaluator-exposure policy."""
+
+    def __init__(
+        self,
+        profile_path: str | Path,
+        *,
+        expected_profile_sha256: str,
+        exposure_profile_path: str | Path,
+        expected_exposure_sha256: str,
+    ) -> None:
+        profile = _load_exact_json(profile_path, expected_profile_sha256, "replication profile")
+        expected_keys = {
+            "profile_id", "schema_version", "status", "allowed_classifications",
+            "forbidden_classifications", "dimensions", "dimension_statuses",
+            "overall_statuses", "limits", "evaluator_exposure_profile_sha256",
+            "declassification", "invariants",
+        }
+        if set(profile) != expected_keys:
+            raise EvolutionError("replication profile keys drifted")
+        if (
+            profile["profile_id"] != "evidence-replication-matrix-v1"
+            or profile["schema_version"] != "1.0.0"
+            or profile["status"] != "frozen-control-plane-metadata-only"
+            or profile["allowed_classifications"] != ["D0_PUBLIC"]
+            or profile["forbidden_classifications"]
+            != ["D1_INTERNAL_SANITIZED", "D2_DOMAIN_CONFIDENTIAL", "D3_RESTRICTED"]
+            or tuple(profile["dimensions"]) != _REPLICATION_DIMENSIONS
+            or profile["dimension_statuses"] != [
+                "CORRELATED_SAME_GROUP", "DISTINCT_DECLARED_CORRELATED_SOURCE",
+                "DISTINCT_FOR_FROZEN_SCOPE",
+            ]
+            or profile["overall_statuses"] != [
+                "CORRELATED", "INDEPENDENCE_NOT_ESTABLISHED",
+                "MULTIDIMENSIONAL_PASS_FOR_FROZEN_SCOPE",
+            ]
+        ):
+            raise EvolutionError("replication profile identity or privacy drifted")
+        limits = profile["limits"]
+        if limits != {
+            "max_evidence_items": 64, "max_replication_pairs": 32,
+            "max_islands": 8, "max_metadata_labels": 16,
+        }:
+            raise EvolutionError("replication limits drifted")
+        if profile["evaluator_exposure_profile_sha256"] != expected_exposure_sha256:
+            raise EvolutionError("replication exposure binding drifted")
+        declassification = profile["declassification"]
+        if (
+            not isinstance(declassification, Mapping)
+            or declassification.get("mode") != "dry-run-only"
+            or declassification.get("true_holdout_queries") != 0
+            or any(declassification.get(name) != 0 for name in ("network_calls", "bytes_exported", "canonical_writes"))
+        ):
+            raise EvolutionError("declassification boundary drifted")
+        invariants = profile["invariants"]
+        if not isinstance(invariants, Mapping) or set(invariants) != {
+            "sidecars_contain_refs_hashes_groups_and_labels_only", "raw_evidence_payloads_are_forbidden",
+            "dimension_groups_must_be_bound_to_sidecar_evidence", "distinct_groups_require_distinct_source_groups",
+            "correlated_sources_are_not_independent", "dimension_independence_is_scoped_not_absolute",
+            "linear_replication_level_is_forbidden", "research_islands_have_disjoint_namespaces_and_trial_ownership",
+            "evaluator_exposure_is_lineage_family_day_bound", "true_holdout_autonomous_queries_are_zero",
+            "declassification_is_no-write-no-export-no-authority", "domain_replication_receipts_remain_domain_writer_owned",
+        } or any(value is not True for value in invariants.values()):
+            raise EvolutionError("replication invariants drifted")
+        exposure = _load_exact_json(
+            exposure_profile_path, expected_exposure_sha256, "evaluator exposure profile"
+        )
+        if (
+            exposure.get("profile_id") != "evaluator-exposure-v1"
+            or exposure.get("budgets") != {
+                "per_candidate_max_queries": 3,
+                "per_trial_family_max_queries": 12,
+                "per_day_max_queries": 50,
+                "true_holdout_queries_autonomous_a1": 0,
+            }
+            or exposure.get("feedback_classes") != {
+                "binary-pass-fail": 1, "coarse-reason-class": 2,
+                "metric-vector": 5, "row-level-diagnostic": 100,
+            }
+            or exposure.get("on_exhaustion") != "PARK"
+        ):
+            raise EvolutionError("evaluator exposure profile drifted")
+        self.profile_sha256 = expected_profile_sha256
+        self.exposure_profile_sha256 = expected_exposure_sha256
+        self.max_evidence_items = 64
+        self.max_replication_pairs = 32
+        self.max_islands = 8
+        self.max_metadata_labels = 16
+        self.feedback_weights = MappingProxyType(dict(exposure["feedback_classes"]))
+
+
+@dataclass(frozen=True, slots=True)
+class EvidenceDescriptor:
+    evidence_ref: str
+    classification: str
+    content_sha256: str
+    source_group: str
+    dimension_groups: tuple[tuple[str, str], ...]
+    synthetic: bool
+    shadow_taint: str
+
+    def __post_init__(self) -> None:
+        _reference(self.evidence_ref, "evidence_ref")
+        _digest(self.content_sha256, "content_sha256")
+        _reference(self.source_group, "source_group")
+        if self.classification != "D0_PUBLIC":
+            raise EvolutionError("evidence sidecar accepts D0_PUBLIC only")
+        if type(self.synthetic) is not bool:
+            raise EvolutionError("evidence synthetic flag must be boolean")
+        if self.shadow_taint not in {"NONE", "SHADOW_UNAPPLIED"}:
+            raise EvolutionError("evidence shadow taint is invalid")
+        if not isinstance(self.dimension_groups, tuple) or tuple(
+            name for name, _ in self.dimension_groups
+        ) != _REPLICATION_DIMENSIONS:
+            raise EvolutionError("evidence dimension groups must be exact and ordered")
+        for _, group in self.dimension_groups:
+            _reference(group, "dimension_group")
+
+
+@dataclass(frozen=True, slots=True)
+class EvidenceSidecar:
+    version: str
+    descriptors: tuple[EvidenceDescriptor, ...]
+    sidecar_sha256: str
+    raw_payloads_present: bool = False
+    side_effects: bool = False
+    grants_authority: bool = False
+
+
+@dataclass(frozen=True, slots=True)
+class ReplicationDimensionClaim:
+    dimension: str
+    parent_group: str
+    child_group: str
+    verification_refs: tuple[str, ...]
+
+    def __post_init__(self) -> None:
+        if self.dimension not in _REPLICATION_DIMENSIONS:
+            raise EvolutionError("replication dimension is unknown")
+        _reference(self.parent_group, "parent_group")
+        _reference(self.child_group, "child_group")
+        _references(self.verification_refs, "verification_refs")
+
+
+@dataclass(frozen=True, slots=True)
+class ReplicationPairClaim:
+    parent_trial_ref: str
+    child_trial_ref: str
+    original_outcome_ref: str
+    replication_outcome_ref: str
+    dimensions: tuple[ReplicationDimensionClaim, ...]
+
+    def __post_init__(self) -> None:
+        for name in ("parent_trial_ref", "child_trial_ref", "original_outcome_ref", "replication_outcome_ref"):
+            _reference(getattr(self, name), name)
+        if self.parent_trial_ref == self.child_trial_ref:
+            raise EvolutionError("replication trials must differ")
+        if not isinstance(self.dimensions, tuple) or tuple(item.dimension for item in self.dimensions) != _REPLICATION_DIMENSIONS:
+            raise EvolutionError("replication claim requires five ordered dimensions")
+
+
+@dataclass(frozen=True, slots=True)
+class ReplicationDimensionResult:
+    dimension: str
+    parent_group: str
+    child_group: str
+    verification_refs: tuple[str, ...]
+    status: str
+
+
+@dataclass(frozen=True, slots=True)
+class ReplicationPairResult:
+    parent_trial_ref: str
+    child_trial_ref: str
+    original_outcome_ref: str
+    replication_outcome_ref: str
+    dimensions: tuple[ReplicationDimensionResult, ...]
+    overall_status: str
+    pair_sha256: str
+
+
+@dataclass(frozen=True, slots=True)
+class ReplicationMatrixSnapshot:
+    version: str
+    evidence_sidecar_sha256: str
+    pairs: tuple[ReplicationPairResult, ...]
+    matrix_sha256: str
+    absolute_independence_claimed: bool = False
+    linear_replication_level: str | None = None
+    side_effects: bool = False
+    grants_authority: bool = False
+
+
+@dataclass(frozen=True, slots=True)
+class EvaluatorExposureRecord:
+    evaluator_ref: str
+    candidate_lineage: str
+    trial_family_ref: str
+    day_bucket: str
+    feedback_class: str
+    query_count: int
+    true_holdout: bool
+
+    def __post_init__(self) -> None:
+        for name in ("evaluator_ref", "candidate_lineage", "trial_family_ref"):
+            _reference(getattr(self, name), name)
+        if not isinstance(self.day_bucket, str) or _DAY_RE.fullmatch(self.day_bucket) is None:
+            raise EvolutionError("exposure day bucket is invalid")
+        _token(self.feedback_class, "feedback_class")
+        _positive(self.query_count, "query_count")
+        if type(self.true_holdout) is not bool:
+            raise EvolutionError("true_holdout must be boolean")
+
+
+@dataclass(frozen=True, slots=True)
+class ResearchIslandSpec:
+    island_id: str
+    workspace_namespace_ref: str
+    model_context_ref: str
+    classification: str
+    trial_refs: tuple[str, ...]
+    evidence_refs: tuple[str, ...]
+    exposures: tuple[EvaluatorExposureRecord, ...]
+    network_enabled: bool = False
+    canonical_write_enabled: bool = False
+
+    def __post_init__(self) -> None:
+        for name in ("island_id", "workspace_namespace_ref", "model_context_ref"):
+            _reference(getattr(self, name), name)
+        _references(self.trial_refs, "island trial_refs")
+        _references(self.evidence_refs, "island evidence_refs")
+        if self.classification != "D0_PUBLIC":
+            raise EvolutionError("research islands accept D0_PUBLIC only")
+        if not isinstance(self.exposures, tuple) or any(not isinstance(item, EvaluatorExposureRecord) for item in self.exposures):
+            raise EvolutionError("island exposures must be typed tuples")
+        if self.network_enabled or self.canonical_write_enabled:
+            raise EvolutionError("research island cannot enable network or canonical writes")
+
+
+@dataclass(frozen=True, slots=True)
+class ResearchIslandSnapshot:
+    version: str
+    evidence_sidecar_sha256: str
+    islands: tuple[ResearchIslandSpec, ...]
+    status: str
+    reason_codes: tuple[str, ...]
+    weighted_exposure_units: int
+    snapshot_sha256: str
+    side_effects: bool = False
+    grants_authority: bool = False
+
+
+@dataclass(frozen=True, slots=True)
+class DeclassificationCandidate:
+    candidate_ref: str
+    source_island_id: str
+    classification: str
+    public_manifest_sha256: str
+    evidence_refs: tuple[str, ...]
+    replication_matrix_ref: str
+    metadata_labels: tuple[str, ...]
+
+    def __post_init__(self) -> None:
+        _reference(self.candidate_ref, "declassification candidate_ref")
+        _reference(self.source_island_id, "declassification source_island_id")
+        _digest(self.public_manifest_sha256, "public_manifest_sha256")
+        _references(self.evidence_refs, "declassification evidence_refs")
+        _reference(self.replication_matrix_ref, "replication_matrix_ref")
+        if self.classification not in {"D0_PUBLIC", "D1_INTERNAL_SANITIZED", "D2_DOMAIN_CONFIDENTIAL", "D3_RESTRICTED"}:
+            raise EvolutionError("declassification classification is invalid")
+        if not isinstance(self.metadata_labels, tuple) or any(_token(item, "metadata_label") != item for item in self.metadata_labels):
+            raise EvolutionError("declassification metadata labels are invalid")
+        if len(set(self.metadata_labels)) != len(self.metadata_labels):
+            raise EvolutionError("declassification metadata labels are duplicated")
+
+
+@dataclass(frozen=True, slots=True)
+class DeclassificationDryRunResult:
+    status: str
+    candidate_ref: str
+    reason_codes: tuple[str, ...]
+    forbidden_bytes_or_metadata_detected: bool
+    bytes_exported: int
+    network_calls: int
+    canonical_writes: int
+    grants_authority: bool
+    result_sha256: str
 
 
 def build_research_agenda(
@@ -390,6 +683,246 @@ def select_portfolio(
     )
 
 
+def build_evidence_sidecar(
+    policy: ReplicationPolicy,
+    descriptors: Sequence[EvidenceDescriptor],
+) -> EvidenceSidecar:
+    if not isinstance(policy, ReplicationPolicy):
+        raise EvolutionError("replication policy is required")
+    if not isinstance(descriptors, Sequence) or isinstance(descriptors, (str, bytes)):
+        raise EvolutionError("evidence descriptors must be a sequence")
+    if not descriptors or len(descriptors) > policy.max_evidence_items:
+        raise EvolutionError("evidence sidecar capacity violated")
+    if any(not isinstance(item, EvidenceDescriptor) for item in descriptors):
+        raise EvolutionError("evidence descriptor type is invalid")
+    ordered = tuple(sorted(descriptors, key=lambda item: item.evidence_ref))
+    if len({item.evidence_ref for item in ordered}) != len(ordered):
+        raise EvolutionError("evidence reference is duplicated")
+    material = {
+        "version": "evidence-sidecar-v1",
+        "descriptors": [_evidence_material(item) for item in ordered],
+        "raw_payloads_present": False,
+        "side_effects": False,
+        "grants_authority": False,
+    }
+    return EvidenceSidecar(
+        version="evidence-sidecar-v1",
+        descriptors=ordered,
+        sidecar_sha256=_sha(material),
+        raw_payloads_present=False,
+        side_effects=False,
+        grants_authority=False,
+    )
+
+
+def build_replication_matrix(
+    policy: ReplicationPolicy,
+    sidecar: EvidenceSidecar,
+    claims: Sequence[ReplicationPairClaim],
+) -> ReplicationMatrixSnapshot:
+    _validate_sidecar(policy, sidecar)
+    if not isinstance(claims, Sequence) or isinstance(claims, (str, bytes)):
+        raise EvolutionError("replication claims must be a sequence")
+    if not claims or len(claims) > policy.max_replication_pairs:
+        raise EvolutionError("replication pair capacity violated")
+    if any(not isinstance(item, ReplicationPairClaim) for item in claims):
+        raise EvolutionError("replication claim type is invalid")
+    descriptors = {item.evidence_ref: item for item in sidecar.descriptors}
+    results: list[ReplicationPairResult] = []
+    seen_pairs: set[tuple[str, str]] = set()
+    for claim in claims:
+        pair_key = (claim.parent_trial_ref, claim.child_trial_ref)
+        if pair_key in seen_pairs:
+            raise EvolutionError("replication trial pair is duplicated")
+        seen_pairs.add(pair_key)
+        dimensions: list[ReplicationDimensionResult] = []
+        for dimension in claim.dimensions:
+            selected: list[EvidenceDescriptor] = []
+            for reference in dimension.verification_refs:
+                descriptor = descriptors.get(reference)
+                if descriptor is None:
+                    raise EvolutionError("replication verification reference is outside sidecar")
+                selected.append(descriptor)
+            parent = [item for item in selected if dict(item.dimension_groups)[dimension.dimension] == dimension.parent_group]
+            child = [item for item in selected if dict(item.dimension_groups)[dimension.dimension] == dimension.child_group]
+            if not parent or not child:
+                raise EvolutionError("replication dimension groups lack sidecar evidence")
+            if dimension.parent_group == dimension.child_group:
+                status = "CORRELATED_SAME_GROUP"
+            elif {item.source_group for item in parent} & {item.source_group for item in child}:
+                status = "DISTINCT_DECLARED_CORRELATED_SOURCE"
+            else:
+                status = "DISTINCT_FOR_FROZEN_SCOPE"
+            dimensions.append(
+                ReplicationDimensionResult(
+                    dimension=dimension.dimension,
+                    parent_group=dimension.parent_group,
+                    child_group=dimension.child_group,
+                    verification_refs=tuple(sorted(dimension.verification_refs)),
+                    status=status,
+                )
+            )
+        statuses = {item.status for item in dimensions}
+        if "CORRELATED_SAME_GROUP" in statuses:
+            overall = "CORRELATED"
+        elif statuses == {"DISTINCT_FOR_FROZEN_SCOPE"}:
+            overall = "MULTIDIMENSIONAL_PASS_FOR_FROZEN_SCOPE"
+        else:
+            overall = "INDEPENDENCE_NOT_ESTABLISHED"
+        pair_material = {
+            "parent_trial_ref": claim.parent_trial_ref,
+            "child_trial_ref": claim.child_trial_ref,
+            "original_outcome_ref": claim.original_outcome_ref,
+            "replication_outcome_ref": claim.replication_outcome_ref,
+            "dimensions": [_dimension_result_material(item) for item in dimensions],
+            "overall_status": overall,
+        }
+        results.append(
+            ReplicationPairResult(
+                parent_trial_ref=claim.parent_trial_ref,
+                child_trial_ref=claim.child_trial_ref,
+                original_outcome_ref=claim.original_outcome_ref,
+                replication_outcome_ref=claim.replication_outcome_ref,
+                dimensions=tuple(dimensions),
+                overall_status=overall,
+                pair_sha256=_sha(pair_material),
+            )
+        )
+    results.sort(key=lambda item: (item.parent_trial_ref, item.child_trial_ref))
+    material = {
+        "version": "replication-matrix-v1",
+        "evidence_sidecar_sha256": sidecar.sidecar_sha256,
+        "pairs": [_pair_result_material(item) for item in results],
+        "absolute_independence_claimed": False,
+        "linear_replication_level": None,
+        "side_effects": False,
+        "grants_authority": False,
+    }
+    return ReplicationMatrixSnapshot(
+        version="replication-matrix-v1",
+        evidence_sidecar_sha256=sidecar.sidecar_sha256,
+        pairs=tuple(results),
+        matrix_sha256=_sha(material),
+        absolute_independence_claimed=False,
+        linear_replication_level=None,
+        side_effects=False,
+        grants_authority=False,
+    )
+
+
+def build_research_islands(
+    policy: ReplicationPolicy,
+    sidecar: EvidenceSidecar,
+    islands: Sequence[ResearchIslandSpec],
+) -> ResearchIslandSnapshot:
+    _validate_sidecar(policy, sidecar)
+    if not isinstance(islands, Sequence) or isinstance(islands, (str, bytes)):
+        raise EvolutionError("research islands must be a sequence")
+    if not islands or len(islands) > policy.max_islands:
+        raise EvolutionError("research island capacity violated")
+    if any(not isinstance(item, ResearchIslandSpec) for item in islands):
+        raise EvolutionError("research island type is invalid")
+    ordered = tuple(sorted(islands, key=lambda item: item.island_id))
+    for attribute in ("island_id", "workspace_namespace_ref", "model_context_ref"):
+        values = [getattr(item, attribute) for item in ordered]
+        if len(values) != len(set(values)):
+            raise EvolutionError(f"research island {attribute} is duplicated")
+    all_trials = [reference for item in ordered for reference in item.trial_refs]
+    if len(all_trials) != len(set(all_trials)):
+        raise EvolutionError("research island trial ownership overlaps")
+    available_evidence = {item.evidence_ref for item in sidecar.descriptors}
+    if any(reference not in available_evidence for item in ordered for reference in item.evidence_refs):
+        raise EvolutionError("research island evidence is outside sidecar")
+    reasons: set[str] = set()
+    candidate_units: dict[str, int] = {}
+    family_units: dict[str, int] = {}
+    day_units: dict[str, int] = {}
+    total_units = 0
+    for island in ordered:
+        for exposure in island.exposures:
+            weight = policy.feedback_weights.get(exposure.feedback_class)
+            if weight is None:
+                raise EvolutionError("evaluator feedback class is unsupported")
+            units = exposure.query_count * int(weight)
+            total_units += units
+            candidate_units[exposure.candidate_lineage] = candidate_units.get(exposure.candidate_lineage, 0) + units
+            family_units[exposure.trial_family_ref] = family_units.get(exposure.trial_family_ref, 0) + units
+            day_units[exposure.day_bucket] = day_units.get(exposure.day_bucket, 0) + units
+            if exposure.true_holdout:
+                reasons.add("TRUE_HOLDOUT_AUTONOMOUS_DENIED")
+    if any(value > 3 for value in candidate_units.values()):
+        reasons.add("CANDIDATE_EXPOSURE_BUDGET_EXHAUSTED")
+    if any(value > 12 for value in family_units.values()):
+        reasons.add("TRIAL_FAMILY_EXPOSURE_BUDGET_EXHAUSTED")
+    if any(value > 50 for value in day_units.values()):
+        reasons.add("DAILY_EXPOSURE_BUDGET_EXHAUSTED")
+    status = "READY_METADATA_ONLY" if not reasons else "PARKED_EXPOSURE"
+    material = {
+        "version": "research-islands-v1",
+        "evidence_sidecar_sha256": sidecar.sidecar_sha256,
+        "islands": [_island_material(item) for item in ordered],
+        "status": status,
+        "reason_codes": tuple(sorted(reasons)),
+        "weighted_exposure_units": total_units,
+        "side_effects": False,
+        "grants_authority": False,
+    }
+    return ResearchIslandSnapshot(
+        version="research-islands-v1",
+        evidence_sidecar_sha256=sidecar.sidecar_sha256,
+        islands=ordered,
+        status=status,
+        reason_codes=tuple(sorted(reasons)),
+        weighted_exposure_units=total_units,
+        snapshot_sha256=_sha(material),
+        side_effects=False,
+        grants_authority=False,
+    )
+
+
+def declassification_dry_run(
+    policy: ReplicationPolicy,
+    candidate: DeclassificationCandidate,
+    islands: ResearchIslandSnapshot,
+    matrix: ReplicationMatrixSnapshot,
+) -> DeclassificationDryRunResult:
+    if not isinstance(policy, ReplicationPolicy) or not isinstance(candidate, DeclassificationCandidate):
+        raise EvolutionError("typed declassification inputs are required")
+    if not isinstance(islands, ResearchIslandSnapshot) or not isinstance(matrix, ReplicationMatrixSnapshot):
+        raise EvolutionError("declassification snapshots are invalid")
+    reasons: list[str] = []
+    forbidden = False
+    if candidate.classification != "D0_PUBLIC":
+        reasons.append("CLASSIFICATION_NOT_PUBLIC")
+        forbidden = True
+    if len(candidate.metadata_labels) > policy.max_metadata_labels:
+        reasons.append("METADATA_LABEL_CAP_EXCEEDED")
+        forbidden = True
+    source = next((item for item in islands.islands if item.island_id == candidate.source_island_id), None)
+    if source is None:
+        reasons.append("SOURCE_ISLAND_NOT_FOUND")
+    elif not set(candidate.evidence_refs).issubset(source.evidence_refs):
+        reasons.append("EVIDENCE_OUTSIDE_SOURCE_ISLAND")
+        forbidden = True
+    if islands.status != "READY_METADATA_ONLY":
+        reasons.append("ISLAND_EXPOSURE_NOT_READY")
+    expected_matrix_ref = "replication-matrix:sha256:" + matrix.matrix_sha256
+    if candidate.replication_matrix_ref != expected_matrix_ref:
+        reasons.append("REPLICATION_MATRIX_BINDING_MISMATCH")
+    status = "PASS_DRY_RUN_NO_AUTHORITY" if not reasons else "DENIED"
+    material = {
+        "status": status,
+        "candidate_ref": candidate.candidate_ref,
+        "reason_codes": tuple(sorted(reasons)),
+        "forbidden_bytes_or_metadata_detected": forbidden,
+        "bytes_exported": 0,
+        "network_calls": 0,
+        "canonical_writes": 0,
+        "grants_authority": False,
+    }
+    return DeclassificationDryRunResult(**material, result_sha256=_sha(material))
+
+
 def _score(
     item: AgendaItem,
     policy: PortfolioPolicy,
@@ -427,6 +960,87 @@ def _portfolio_entry_material(item: PortfolioEntry) -> dict[str, object]:
     }
 
 
+def _evidence_material(item: EvidenceDescriptor) -> dict[str, object]:
+    return {
+        "evidence_ref": item.evidence_ref,
+        "classification": item.classification,
+        "content_sha256": item.content_sha256,
+        "source_group": item.source_group,
+        "dimension_groups": item.dimension_groups,
+        "synthetic": item.synthetic,
+        "shadow_taint": item.shadow_taint,
+    }
+
+
+def _dimension_result_material(item: ReplicationDimensionResult) -> dict[str, object]:
+    return {
+        "dimension": item.dimension,
+        "parent_group": item.parent_group,
+        "child_group": item.child_group,
+        "verification_refs": item.verification_refs,
+        "status": item.status,
+    }
+
+
+def _pair_result_material(item: ReplicationPairResult) -> dict[str, object]:
+    return {
+        "parent_trial_ref": item.parent_trial_ref,
+        "child_trial_ref": item.child_trial_ref,
+        "original_outcome_ref": item.original_outcome_ref,
+        "replication_outcome_ref": item.replication_outcome_ref,
+        "dimensions": [_dimension_result_material(value) for value in item.dimensions],
+        "overall_status": item.overall_status,
+        "pair_sha256": item.pair_sha256,
+    }
+
+
+def _island_material(item: ResearchIslandSpec) -> dict[str, object]:
+    return {
+        "island_id": item.island_id,
+        "workspace_namespace_ref": item.workspace_namespace_ref,
+        "model_context_ref": item.model_context_ref,
+        "classification": item.classification,
+        "trial_refs": item.trial_refs,
+        "evidence_refs": item.evidence_refs,
+        "exposures": [
+            {
+                "evaluator_ref": value.evaluator_ref,
+                "candidate_lineage": value.candidate_lineage,
+                "trial_family_ref": value.trial_family_ref,
+                "day_bucket": value.day_bucket,
+                "feedback_class": value.feedback_class,
+                "query_count": value.query_count,
+                "true_holdout": value.true_holdout,
+            }
+            for value in item.exposures
+        ],
+        "network_enabled": False,
+        "canonical_write_enabled": False,
+    }
+
+
+def _validate_sidecar(policy: ReplicationPolicy, sidecar: EvidenceSidecar) -> None:
+    if not isinstance(policy, ReplicationPolicy) or not isinstance(sidecar, EvidenceSidecar):
+        raise EvolutionError("typed replication policy and evidence sidecar are required")
+    if (
+        sidecar.version != "evidence-sidecar-v1"
+        or sidecar.raw_payloads_present
+        or sidecar.side_effects
+        or sidecar.grants_authority
+        or len(sidecar.descriptors) > policy.max_evidence_items
+    ):
+        raise EvolutionError("evidence sidecar boundary widened")
+    material = {
+        "version": sidecar.version,
+        "descriptors": [_evidence_material(item) for item in sidecar.descriptors],
+        "raw_payloads_present": False,
+        "side_effects": False,
+        "grants_authority": False,
+    }
+    if sidecar.sidecar_sha256 != _sha(material):
+        raise EvolutionError("evidence sidecar integrity mismatch")
+
+
 def _policy_material(policy: PortfolioPolicy) -> dict[str, object]:
     return {
         "policy_id": policy.policy_id, "max_slots": policy.max_slots,
@@ -438,6 +1052,38 @@ def _policy_material(policy: PortfolioPolicy) -> dict[str, object]:
         "starvation_after_sequences": policy.starvation_after_sequences,
         "starvation_bonus": policy.starvation_bonus,
     }
+
+
+def _digest(value: object, name: str) -> str:
+    if not isinstance(value, str) or _SHA256_RE.fullmatch(value) is None:
+        raise EvolutionError(f"{name} must be sha256")
+    return value
+
+
+def _load_exact_json(path: str | Path, expected_sha256: str, label: str) -> dict[str, object]:
+    _digest(expected_sha256, f"{label} expected_sha256")
+    try:
+        raw = Path(path).read_bytes()
+    except OSError as exc:
+        raise EvolutionError(f"{label} is unavailable") from exc
+    if hashlib.sha256(raw).hexdigest() != expected_sha256:
+        raise EvolutionError(f"{label} digest mismatch")
+
+    def reject_duplicates(pairs: list[tuple[str, object]]) -> dict[str, object]:
+        result: dict[str, object] = {}
+        for key, value in pairs:
+            if key in result:
+                raise EvolutionError(f"{label} contains duplicate keys")
+            result[key] = value
+        return result
+
+    try:
+        value = json.loads(raw, object_pairs_hook=reject_duplicates)
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise EvolutionError(f"{label} is not strict JSON") from exc
+    if not isinstance(value, dict):
+        raise EvolutionError(f"{label} must be an object")
+    return value
 
 
 def _reference(value: object, name: str) -> str:
