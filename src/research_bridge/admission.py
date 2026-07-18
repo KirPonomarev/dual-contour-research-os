@@ -133,10 +133,11 @@ class AdmissionGrant:
 def canonical_json_sha256(value: Any) -> str:
     """Return SHA-256 over deterministic UTF-8 JSON after strict JSON checking."""
 
-    _ensure_json_value(value, "value")
+    normalized = _a1_deep_thaw(value)
+    _ensure_json_value(normalized, "value")
     try:
         encoded = json.dumps(
-            value,
+            normalized,
             sort_keys=True,
             separators=(",", ":"),
             ensure_ascii=False,
@@ -579,11 +580,18 @@ class _MaterialityResult:
     def __post_init__(self) -> None:
         if self.decision not in _A1_MATERIALITY_DECISIONS:
             raise A1AdmissionError("unknown materiality decision")
+        if self.reason_code != self.decision:
+            raise A1AdmissionError("materiality reason must match the frozen decision")
         _a1_sha(self.exact_key_sha256, "exact_key_sha256")
         if self.model_calls_consumed != 0:
             raise A1AdmissionError("MaterialityGate cannot consume model calls")
         if (self.decision == "MATERIAL") != (self.material_event is not None):
             raise A1AdmissionError("only MATERIAL may carry a MaterialEvent")
+        if self.material_event is not None:
+            copied = _a1_json_copy(self.material_event, "material_event")
+            if copied.get("schema_id") != "MaterialEvent":
+                raise A1AdmissionError("materiality result object type mismatch")
+            object.__setattr__(self, "material_event", _a1_deep_freeze(copied))
 
 
 @dataclass(frozen=True, slots=True)
@@ -594,16 +602,16 @@ class _A1AdmissionSnapshot:
     sha256: str
 
     def __post_init__(self) -> None:
-        copied = _a1_json_copy(dict(self.payload), "admission_snapshot")
+        copied = _a1_json_copy(self.payload, "admission_snapshot")
         if set(copied) != _A1_SNAPSHOT_KEYS:
             raise A1AdmissionError("admission snapshot shape mismatch")
         expected = canonical_json_sha256(copied)
         if not hmac.compare_digest(expected, self.sha256):
             raise A1AdmissionError("admission snapshot digest mismatch")
-        object.__setattr__(self, "payload", MappingProxyType(copied))
+        object.__setattr__(self, "payload", _a1_deep_freeze(copied))
 
     def to_mapping(self) -> dict[str, object]:
-        return _a1_json_copy(dict(self.payload), "admission_snapshot")
+        return _a1_json_copy(self.payload, "admission_snapshot")
 
 
 @dataclass(frozen=True, slots=True)
@@ -621,15 +629,15 @@ class _A1AdmissionDecision:
         _a1_sha(self.decision_key_sha256, "decision_key_sha256")
         if self.grants_execution_authority is not False:
             raise A1AdmissionError("AdmissionReceipt cannot grant execution authority")
-        copied = _a1_json_copy(dict(self.receipt), "admission_receipt")
+        copied = _a1_json_copy(self.receipt, "admission_receipt")
         if copied.get("schema_id") != "AdmissionReceipt":
             raise A1AdmissionError("admission decision receipt type mismatch")
         if copied.get("payload", {}).get("decision") != self.decision:
             raise A1AdmissionError("admission decision and receipt mismatch")
-        object.__setattr__(self, "receipt", MappingProxyType(copied))
+        object.__setattr__(self, "receipt", _a1_deep_freeze(copied))
 
     def to_mapping(self) -> dict[str, object]:
-        return _a1_json_copy(dict(self.receipt), "admission_receipt")
+        return _a1_json_copy(self.receipt, "admission_receipt")
 
 
 class _A1AdmissionKernel:
@@ -715,8 +723,8 @@ class _A1AdmissionKernel:
         }:
             raise A1AdmissionError("unexpected frozen A1 contract set")
 
-        self._catalog = MappingProxyType(_a1_json_copy(catalog, "a1 catalog"))
-        self._profiles = MappingProxyType(profiles)
+        self._catalog = _a1_deep_freeze(_a1_json_copy(catalog, "a1 catalog"))
+        self._profiles = _a1_deep_freeze(profiles)
         self._catalog_sha256 = catalog_sha
         self._core_catalog_sha256 = core_sha
 
@@ -861,7 +869,7 @@ class _A1AdmissionKernel:
             "MATERIAL",
             "MATERIAL",
             exact_key,
-            MappingProxyType(_a1_json_copy(event, "material_event")),
+            _a1_deep_freeze(_a1_json_copy(event, "material_event")),
         )
 
     def freeze_admission_snapshot(
@@ -1127,9 +1135,11 @@ class _A1AdmissionKernel:
             if request[field] > limits[limit_field]:
                 return "PARK", "BUDGET_EXHAUSTED"
         budget = snapshot["budget_state"]
+        active_reservation_count = len(budget["active_reservations"])
         if (
-            budget["cycle_admitted"] >= limits["max_admitted_experiments"]
-            or budget["daily_admitted"]
+            budget["cycle_admitted"] + active_reservation_count
+            >= limits["max_admitted_experiments"]
+            or budget["daily_admitted"] + active_reservation_count
             >= policy["daily_limits"]["max_admitted_experiments"]
             or budget["wip_available"] is not True
             or request["cost_units"] > budget["available_cost_units"]
@@ -1142,12 +1152,12 @@ class _A1AdmissionKernel:
 
     def _reason_entry(self, code: str) -> dict[str, object]:
         codes = self._profiles["reason_codes"].get("codes")
-        if not isinstance(codes, dict) or code not in codes:
+        if not isinstance(codes, Mapping) or code not in codes:
             raise A1AdmissionError("admission algorithm selected an unknown reason code")
         entry = codes[code]
-        if not isinstance(entry, dict):
+        if not isinstance(entry, Mapping):
             raise A1AdmissionError("reason code registry entry is invalid")
-        return entry
+        return _a1_deep_thaw(entry)
 
     def _validate_candidate(
         self, candidate: Mapping[str, object]
@@ -1183,7 +1193,7 @@ class _A1AdmissionKernel:
             _a1_text(payload[field], f"candidate.payload.{field}", maximum=4096)
         _a1_positive_integer(payload["draft_revision"], "candidate.payload.draft_revision")
         payload["evidence_refs"] = _a1_string_array(
-            payload["evidence_refs"], "candidate.payload.evidence_refs", allow_empty=True
+            payload["evidence_refs"], "candidate.payload.evidence_refs", allow_empty=False
         )
         groups = payload["evidence_independence_groups"]
         if not isinstance(groups, list) or not groups:
@@ -1192,6 +1202,23 @@ class _A1AdmissionKernel:
             _a1_string_array(group, f"evidence_independence_groups[{index}]", allow_empty=False)
             for index, group in enumerate(groups)
         ]
+        grouped_refs = [
+            item
+            for group in payload["evidence_independence_groups"]
+            for item in group
+        ]
+        if (
+            len(grouped_refs) != len(set(grouped_refs))
+            or set(grouped_refs) != set(payload["evidence_refs"])
+        ):
+            raise A1AdmissionError(
+                "evidence independence groups must partition evidence_refs"
+            )
+        if (
+            value["object_id"] in payload["evidence_refs"]
+            or payload["candidate_id"] in payload["evidence_refs"]
+        ):
+            raise A1AdmissionError("candidate evidence cannot reference itself")
         payload["model_call_refs"] = _a1_string_array(
             payload["model_call_refs"], "candidate.payload.model_call_refs", allow_empty=True
         )
@@ -1287,11 +1314,12 @@ def _a1_strict_object(pairs: list[tuple[str, object]]) -> dict[str, object]:
 
 
 def _a1_json_copy(value: object, path: str) -> Any:
-    _ensure_json_value(value, path)
+    thawed = _a1_deep_thaw(value)
+    _ensure_json_value(thawed, path)
     try:
         return json.loads(
             json.dumps(
-                value,
+                thawed,
                 sort_keys=True,
                 separators=(",", ":"),
                 ensure_ascii=False,
@@ -1302,12 +1330,34 @@ def _a1_json_copy(value: object, path: str) -> Any:
         raise A1AdmissionError(f"{path} is not strict JSON") from exc
 
 
+def _a1_deep_freeze(value: object) -> Any:
+    if isinstance(value, Mapping):
+        return MappingProxyType(
+            {str(key): _a1_deep_freeze(item) for key, item in value.items()}
+        )
+    if isinstance(value, list):
+        return tuple(_a1_deep_freeze(item) for item in value)
+    if isinstance(value, tuple):
+        return tuple(_a1_deep_freeze(item) for item in value)
+    return value
+
+
+def _a1_deep_thaw(value: object) -> Any:
+    if isinstance(value, Mapping):
+        return {str(key): _a1_deep_thaw(item) for key, item in value.items()}
+    if isinstance(value, tuple):
+        return [_a1_deep_thaw(item) for item in value]
+    if isinstance(value, list):
+        return [_a1_deep_thaw(item) for item in value]
+    return value
+
+
 def _a1_exact_mapping(
     value: object, expected: set[str], path: str
 ) -> dict[str, object]:
     if not isinstance(value, Mapping):
         raise A1AdmissionError(f"{path} must be an object")
-    copied = _a1_json_copy(dict(value), path)
+    copied = _a1_json_copy(value, path)
     actual = set(copied)
     if actual != expected:
         raise A1AdmissionError(
@@ -1397,6 +1447,8 @@ def _a1_resource_budget(value: object, path: str) -> dict[str, int | float]:
     budget = _a1_exact_mapping(value, _A1_RESOURCE_KEYS, path)
     for field in ("wall_seconds", "cpu_seconds", "memory_mib", "output_bytes"):
         _a1_positive_integer(budget[field], f"{path}.{field}")
+    if budget["memory_mib"] < 64:
+        raise A1AdmissionError(f"{path}.memory_mib must be at least 64")
     _a1_nonnegative_integer(budget["tokens"], f"{path}.tokens")
     _a1_nonnegative_number(budget["cost_units"], f"{path}.cost_units")
     return budget  # type: ignore[return-value]
