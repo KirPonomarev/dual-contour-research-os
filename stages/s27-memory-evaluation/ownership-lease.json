@@ -1,0 +1,11 @@
+{
+  "lease_id": "lease-s27-memory-evaluation-agent-1",
+  "stage_id": "s27-memory-evaluation",
+  "agent_id": "agent-1",
+  "branch": "codex/bridge-a1-s27-memory-evaluation",
+  "issued_at": "2026-07-18T22:48:00Z",
+  "expires_at": "2026-07-20T22:48:00Z",
+  "write_set": ["src/research_bridge/evolution.py", "stages/s27-memory-evaluation/stage-envelope.json", "stages/s27-memory-evaluation/ownership-lease.json"],
+  "exclusive": true,
+  "revoked": false
+}

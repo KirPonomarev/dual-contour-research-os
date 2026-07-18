@@ -1,0 +1,47 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-s27-memory-uplift-replay-capacity-20260718",
+  "issued_at": "2026-07-18T22:45:43Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-freeze-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "SCOPED_MEMORY_UPLIFT_FULL_REPLAY_CALIBRATION_COLLECTION_AND_FROZEN_CAPACITY",
+    "candidates": [
+      {"candidate": "reuse-existing-KnowledgeFabricReport-memory-switch-and-source-replay-binding", "disposition": "selected"},
+      {"candidate": "reuse-existing-FeedbackReplayReport-rebuilt-versus-stored-and-frozen-single-writer-capacity", "disposition": "selected"},
+      {"candidate": "add-small-stdlib-only-paired-counterfactual-metrics-and-conservative-integer-uncertainty", "disposition": "selected-minimal-missing-glue"},
+      {"candidate": "new-memory-store-vector-database-evaluation-service-or-scheduler", "disposition": "rejected-no-measured-blocker-and-duplicate-surface"},
+      {"candidate": "claim-learned-or-calibrated-from-underpowered-shadow-observations", "disposition": "rejected-overclaim"},
+      {"candidate": "auto-scale-infrastructure-on-capacity-exhaustion", "disposition": "rejected-out-of-scope"}
+    ],
+    "selected_mode": "pure-digest-bound-twin-evaluation-over-existing-read-only-fabric-and-full-feedback-replay-with-fail-closed-uncertainty-false-learn-debt-and-backpressure",
+    "source_ref": "git:a33fb840c2d6a21424a7d40edc2fdeea2a66525a;internal:KnowledgeFabricReport+FeedbackReplayReport+replay_feedback+research_knowledge_fabric;profile:sha256:0a02b65ff5db728bcf75c7368244c9d2071e266055d91519437fdc5316825393",
+    "code_sha256": "0a02b65ff5db728bcf75c7368244c9d2071e266055d91519437fdc5316825393",
+    "license_spdx": "NOASSERTION",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "exact-memory-off-on-twins",
+      "zero-observation-and-underpowered-bounds",
+      "positive-uplift-scoped-only",
+      "false-learn-and-research-debt-denial",
+      "calibration-collection-without-calibrated-claim",
+      "two-equal-full-replays-and-fabric-binding",
+      "forged-replay-and-fabric-denial",
+      "capacity-overload-backpressure",
+      "deterministic-metrics-and-zero-authority"
+    ],
+    "canonical_owner": "agent-0-profile-agent-1-existing-evolution-module-agent-5-assurance-domain-writers-retain-scientific-truth",
+    "rollback": "Remove S27 additive profile and pure evaluation primitives; existing durable feedback, knowledge fabric and S26 replication remain unchanged."
+  },
+  "integrity": {
+    "payload_sha256": "e8899139e93f24d10a556b5fbb919e0a173b307ea62ed819fa9323dd68b49488",
+    "parent_refs": [
+      "git:a33fb840c2d6a21424a7d40edc2fdeea2a66525a",
+      "integration:s23-knowledge-fabric",
+      "integration:s09-replay-capacity",
+      "profile:sha256:0a02b65ff5db728bcf75c7368244c9d2071e266055d91519437fdc5316825393"
+    ]
+  }
+}
