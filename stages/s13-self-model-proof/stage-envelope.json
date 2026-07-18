@@ -1,0 +1,20 @@
+{
+  "stage_id": "s13-self-model-proof", "agent_id": "agent-0",
+  "objective": "Issue an expiring, drift-invalidated OPERATIONAL_SELF_MODEL proof for the frozen E1C offline scope without anthropomorphic, provider, domain or authority claims.",
+  "executable_blocker": "S11 and S12 are integrated and green, but the existing capability issuer has no exact E1C profile or frozen receipt.",
+  "base_sha": "079d378138c0e09ccd2f8ee66327f68a219dfee0",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a0-s13-self-model-proof",
+  "worktree": "/Volumes/Work/dual-contour-research-os-s13-proof",
+  "read_set": ["src/research_bridge/organism.py", "src/research_bridge/ledger.py", "ops/organism/**", "docs/receipts/integration/s11*.json", "docs/receipts/integration/s12*.json"],
+  "write_set": ["tools/capability_proof.py", "docs/receipts/capability/e1c-operational-self-model-offline.json", "stages/s13-self-model-proof/stage-envelope.json", "stages/s13-self-model-proof/ownership-lease.json"],
+  "forbidden_scope": ["contract-edit", "organism-or-ledger-edit", "runtime-mutation", "consciousness-claim", "provider-proof", "domain-application", "authority-grant", "canonical-or-live-action", "test-edit", "deployment"],
+  "dependency_hashes": {"core_contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50", "a1_contract_catalog": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1", "reuse_receipt_payload": "daf040c07cf19657aa1c019dc49fff4c17ad28d32f1e14d8a7404f018353a427", "external_dependencies": "none"},
+  "acceptance_commands": ["make contracts", "python3 -m unittest tests.test_s13_operational_self_model_capability", "proof-exact-reproduction", "all-drift-and-expiry-stale", "anthropomorphic-and-authority-overclaim-fail-closed", "git diff --check"],
+  "risk_class": "medium-anthropomorphic-or-absolute-proof-overclaim",
+  "stop_conditions": ["consciousness-or-general-self-awareness-claimed", "real-provider-or-domain-application-claimed", "authority-granted", "expiry-or-drift-not-stale", "subject-or-E1C-evidence-unbound"],
+  "expected_receipt": "docs/receipts/integration/s13-self-model-proof.json",
+  "rollback": "Revert the additive E1C issuer profile and receipt; E1A/E1B profiles remain unchanged.",
+  "commit_authority": "one-scoped-agent-0-commit", "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent5_assurance", "blocked_validation_failed"]
+}

@@ -50,9 +50,20 @@ _DURABLE_FEEDBACK_REQUIRED_SCOPE = {
     "live_security_execution": "DENIED",
     "domain_application": "SHADOW_UNAPPLIED",
 }
+_OPERATIONAL_SELF_MODEL_REQUIRED_SCOPE = {
+    "proof_state": "OPERATIONAL_SELF_MODEL_PASS_WITH_DURABLE_OFFLINE_FIXTURES",
+    "data_scope": "D0_PUBLIC_SYNTHETIC_ONLY",
+    "model_route": "NO_REAL_PROVIDER_REQUIRED",
+    "real_provider": "UNPROVEN",
+    "canonical_mutation": "DENIED",
+    "live_trading": "DENIED",
+    "live_security_execution": "DENIED",
+    "domain_application": "SHADOW_UNAPPLIED",
+}
 _CAPABILITY_SCOPES = {
     "A1_DISCOVERY_ADMISSION_FIXTURE": _E1A_REQUIRED_SCOPE,
     "A1_DURABLE_FEEDBACK": _DURABLE_FEEDBACK_REQUIRED_SCOPE,
+    "OPERATIONAL_SELF_MODEL": _OPERATIONAL_SELF_MODEL_REQUIRED_SCOPE,
 }
 _REQUIRED_NEGATIVE_PROBES = frozenset(
     {
@@ -124,6 +135,23 @@ def issue_durable_feedback_proof(
 
     if payload.get("capability_id") != "A1_DURABLE_FEEDBACK":
         raise CapabilityProofError("durable feedback issuer received a different capability")
+    return issue_capability_proof(
+        payload,
+        issued_at=issued_at,
+        classification=classification,
+    )
+
+
+def issue_operational_self_model_proof(
+    payload: Mapping[str, object],
+    *,
+    issued_at: str,
+    classification: str = "D1",
+) -> Mapping[str, object]:
+    """Issue only the exact non-anthropomorphic E1C operational self-model proof."""
+
+    if payload.get("capability_id") != "OPERATIONAL_SELF_MODEL":
+        raise CapabilityProofError("operational self-model issuer received a different capability")
     return issue_capability_proof(
         payload,
         issued_at=issued_at,
@@ -357,6 +385,6 @@ def _freeze(value: object) -> object:
 
 __all__ = [
     "CapabilityProofError", "CapabilityAssessment", "issue_capability_proof",
-    "issue_e1a_fixture_proof", "issue_durable_feedback_proof",
+    "issue_e1a_fixture_proof", "issue_durable_feedback_proof", "issue_operational_self_model_proof",
     "validate_capability_proof", "assess_capability_proof", "canonical_json_sha256",
 ]

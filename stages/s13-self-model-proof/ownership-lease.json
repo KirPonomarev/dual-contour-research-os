@@ -1,0 +1,7 @@
+{
+  "lease_id": "lease-s13-self-model-proof-agent-0", "stage_id": "s13-self-model-proof", "agent_id": "agent-0",
+  "base_sha": "079d378138c0e09ccd2f8ee66327f68a219dfee0", "branch": "codex/bridge-a0-s13-self-model-proof",
+  "issued_at": "2026-07-18T16:25:00Z", "expires_at": "2026-07-19T16:25:00Z",
+  "write_set": ["tools/capability_proof.py", "docs/receipts/capability/e1c-operational-self-model-offline.json", "stages/s13-self-model-proof/stage-envelope.json", "stages/s13-self-model-proof/ownership-lease.json"],
+  "exclusive": true, "revoked": false
+}

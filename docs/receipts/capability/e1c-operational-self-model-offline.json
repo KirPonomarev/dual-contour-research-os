@@ -1,0 +1,94 @@
+{
+  "schema_id": "CapabilityProofReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "capability-proof:35970fc539cd474fff829070b6847b164150280b967b9e8f41877775dd2fbc49",
+  "issued_at": "2026-07-18T16:25:00Z",
+  "issuer": "independent-assurance-issuer",
+  "contour": "governance",
+  "classification": "D1",
+  "payload": {
+    "receipt_id": "capability-proof:e1c-operational-self-model-offline:77f9860",
+    "capability_id": "OPERATIONAL_SELF_MODEL",
+    "subject_ref": "git:77f9860d13a80dcf9c277d27f0c2daf4a15ae9f2",
+    "scope": {
+      "proof_state": "OPERATIONAL_SELF_MODEL_PASS_WITH_DURABLE_OFFLINE_FIXTURES",
+      "data_scope": "D0_PUBLIC_SYNTHETIC_ONLY",
+      "model_route": "NO_REAL_PROVIDER_REQUIRED",
+      "real_provider": "UNPROVEN",
+      "canonical_mutation": "DENIED",
+      "live_trading": "DENIED",
+      "live_security_execution": "DENIED",
+      "domain_application": "SHADOW_UNAPPLIED",
+      "environments": ["linux-ci", "macos-development"]
+    },
+    "status": "PASS_FOR_FROZEN_SCOPE",
+    "proof_basis": [
+      {"integration_ref": "integration:integration-s11-manifest-topology-20260718", "ci_run": 29651378496},
+      {"integration_ref": "integration:integration-s12-state-pulse-20260718", "ci_run": 29651825920},
+      {"acceptance": "AC-ORGANISM", "result": "green-for-frozen-offline-scope"},
+      {"full_suite": {"core": 585, "stage0b": 25}, "result": "green"}
+    ],
+    "code_sha256": "829eb5b9a6523cf782779df1172e9201d7409d8f16af89b011e0fb9467aafad9",
+    "config_sha256": "bf69090e209e76c49a8dd7662bf67492c81f87e147a38291d02adf94767110aa",
+    "policy_sha256": "0727ef9c26a19ef6ef2d89e358e3d0c2785eda3402efc796092a66c856a9bf89",
+    "schema_sha256": "5038820e8edba6584c3668773e37078e3395026d58bfcdbbc05772298b233334",
+    "executor_ref": "projector:organism-manifest-state-pulse:829eb5b9a6523cf782779df1172e9201d7409d8f16af89b011e0fb9467aafad9",
+    "evaluator_ref": "validator:operational-self-model-frozen-scope-v1",
+    "test_refs": [
+      "test:tests.test_s11_manifest_topology", "test:tests.test_s12_state_pulse",
+      "test:tests.test_s10_durable_feedback_capability"
+    ],
+    "environment_ref": "environment:macos-development+linux-ci:2026-07-18",
+    "data_refs": [
+      "fixture:public-synthetic-organism-topology", "fixture:durable-offline-ledger-replay",
+      "fixture:versioned-read-only-pulse-policy"
+    ],
+    "issuer_independence": {
+      "issuer_ref": "assurance-role:agent-5",
+      "independent_of_subject": true,
+      "independent_of_executor": true
+    },
+    "critical_dependencies": [
+      "catalog:core:13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+      "catalog:a1:eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+      "integration:s11-manifest-topology+s12-state-pulse"
+    ],
+    "compatibility_dependencies": [
+      "python:>=3.11", "git:required", "make:required", "sqlite:WAL-single-writer",
+      "environment-profile:52f5d7c8715b3027164a2b284ca912357fd2b8f4bf6f2f2ab356e032370d50e7"
+    ],
+    "environment_compatibility_ref": "profile:environment-compatibility-v1:52f5d7c8715b3027164a2b284ca912357fd2b8f4bf6f2f2ab356e032370d50e7",
+    "negative_probe_refs": [
+      "probe:ai-off-core-operational", "probe:canonical-live-authority-absent",
+      "probe:consciousness-authority-claim-absent", "probe:expired-proof-stale",
+      "probe:ipc-role-spoof-denied", "probe:manifest-orphan-unbounded-cycle-denied",
+      "probe:mixed-head-stale", "probe:parser-hostile-pack", "probe:pulse-stale-proof-no-green",
+      "probe:pulse-zero-write", "probe:shadow-admission-parked", "probe:wait-authority-restart",
+      "probe:writer-spoof-denied"
+    ],
+    "valid_from": "2026-07-18T16:25:00Z",
+    "valid_until": "2026-07-25T16:25:00Z",
+    "invalidation_conditions": [
+      "code-hash-drift", "config-hash-drift", "environment-compatibility-drift",
+      "negative-probe-regression", "policy-hash-drift", "proof-expiry",
+      "schema-hash-drift", "subject-head-drift"
+    ],
+    "grants_authority": false
+  },
+  "integrity": {
+    "profile_id": "core-json-sha256-v1",
+    "payload_sha256": "35970fc539cd474fff829070b6847b164150280b967b9e8f41877775dd2fbc49",
+    "parent_refs": [
+      "git:77f9860d13a80dcf9c277d27f0c2daf4a15ae9f2",
+      "probe:ai-off-core-operational", "probe:canonical-live-authority-absent",
+      "probe:consciousness-authority-claim-absent", "probe:expired-proof-stale",
+      "probe:ipc-role-spoof-denied", "probe:manifest-orphan-unbounded-cycle-denied",
+      "probe:mixed-head-stale", "probe:parser-hostile-pack", "probe:pulse-stale-proof-no-green",
+      "probe:pulse-zero-write", "probe:shadow-admission-parked", "probe:wait-authority-restart",
+      "probe:writer-spoof-denied",
+      "profile:environment-compatibility-v1:52f5d7c8715b3027164a2b284ca912357fd2b8f4bf6f2f2ab356e032370d50e7",
+      "test:tests.test_s10_durable_feedback_capability", "test:tests.test_s11_manifest_topology",
+      "test:tests.test_s12_state_pulse"
+    ]
+  }
+}
