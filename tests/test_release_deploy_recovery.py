@@ -7,12 +7,14 @@ import sys
 import tempfile
 import unittest
 import io
+import os
 
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
 
 import pre_soak_deploy as deploy
+import build_pre_soak_capsule as capsule_builder
 
 
 BOOT_A = "123e4567-e89b-12d3-a456-426614174000"
@@ -33,6 +35,20 @@ class FakeRunner:
         self.pause_state: dict[str, object] = {"paused": False}
         self.fail_activation = False
         self.tamper_archive = False
+        self.remote_capsule_objects: set[str] = set()
+        self.unexpected_remote_capsule_object = False
+        self.remote_capsule_symlink_race = False
+        self.inject_tmpdir = False
+        self.container_cap_add: list[str] | None = None
+        self.container_privileged = False
+        self.container_devices: list[object] | None = None
+        self.container_binds: list[str] | None = None
+        self.extra_mount = False
+        self.omit_capsule_label = False
+        self.container_entrypoint = ["python", "-m", "research_bridge.researchd"]
+        self.container_cmd = ["--config", "/run/research-os/researchd.json"]
+        self.extra_environment: list[str] = []
+        self.container_healthcheck: dict[str, object] | None = None
 
     def run(
         self,
@@ -45,6 +61,11 @@ class FakeRunner:
         argv = tuple(arguments)
         self.commands.append((argv, input_bytes))
         if argv[0] == "scp":
+            destination = argv[-1]
+            if self.bundle.capsule is not None and destination.rsplit("/", 1)[-1] in {
+                item.sha256 for item in self.bundle.capsule.objects
+            }:
+                self.remote_capsule_objects.add(destination.rsplit("/", 1)[-1])
             return deploy.CommandResult(0)
         if "-G" in argv:
             return deploy.CommandResult(
@@ -63,9 +84,30 @@ class FakeRunner:
             return deploy.CommandResult(0, json.dumps(security) + "|linux|x86_64\n")
         if command == "cat /proc/sys/kernel/random/boot_id":
             return deploy.CommandResult(0, self.boot_id + "\n")
+        if "CAPSULE_STAGE_CREATED" in command:
+            return deploy.CommandResult(0, "CAPSULE_STAGE_CREATED\n")
+        if "CAPSULE_STAGE_READY" in command:
+            if self.unexpected_remote_capsule_object or self.remote_capsule_symlink_race:
+                return deploy.CommandResult(1, "", "unsafe stage")
+            return deploy.CommandResult(0, "CAPSULE_STAGE_READY\n")
+        if "CAPSULE_STAGE_CLEANED" in command:
+            self.remote_capsule_objects.clear()
+            return deploy.CommandResult(0, "CAPSULE_STAGE_CLEANED\n")
+        if "research-os-bridge-capsule-volume-init" in command:
+            return deploy.CommandResult(
+                0, f"CAPSULE_VOLUME_INIT_OK:{self.bundle.config_sha256}\n"
+            )
         if "sha256sum --" in command:
             if "release-" in command:
                 value = "0" * 64 if self.tamper_archive else self.bundle.archive_sha256
+            elif self.bundle.capsule is not None and any(
+                item.sha256 in command for item in self.bundle.capsule.objects
+            ):
+                value = next(
+                    item.sha256
+                    for item in self.bundle.capsule.objects
+                    if item.sha256 in command
+                )
             elif "researchd-" in command:
                 value = self.bundle.config_sha256
             else:
@@ -136,21 +178,39 @@ class FakeRunner:
             "Config": {
                 "Image": self.bundle.image_id,
                 "User": "10001:10001",
+                "Entrypoint": self.container_entrypoint,
+                "Cmd": self.container_cmd,
+                "WorkingDir": "/opt/research-os",
+                "StopSignal": "SIGTERM",
+                "Healthcheck": self.container_healthcheck,
                 "Labels": {
                     "org.research-os.release-sha": self.bundle.release_sha,
                     "org.research-os.policy-sha256": self.bundle.policy_sha256,
                     "org.research-os.config-sha256": self.bundle.config_sha256,
+                    **(
+                        {"org.research-os.capsule-manifest-sha256": self.bundle.capsule.manifest_sha256}
+                        if self.bundle.capsule is not None and not self.omit_capsule_label
+                        else {}
+                    ),
                 },
                 "Env": [
                     "RESEARCH_OS_ENVIRONMENT=pre-soak",
                     "RESEARCH_OS_EXTERNAL_ACTION_AUTHORITY=false",
-                ],
+                ] + (
+                    ["TMPDIR=/var/lib/research-os/tmp"]
+                    if self.bundle.capsule is not None or self.inject_tmpdir
+                    else []
+                ) + deploy._FROZEN_IMAGE_ENV + self.extra_environment,
             },
             "HostConfig": {
                 "NetworkMode": "none",
                 "ReadonlyRootfs": True,
                 "CapDrop": ["ALL"],
                 "SecurityOpt": ["no-new-privileges:true"],
+                "CapAdd": self.container_cap_add,
+                "Privileged": self.container_privileged,
+                "Devices": self.container_devices,
+                "Binds": self.container_binds,
                 "PidsLimit": 256,
                 "Memory": 2147483648,
                 "NanoCpus": 2000000000,
@@ -171,7 +231,11 @@ class FakeRunner:
                     "Destination": "/run/research-os",
                     "RW": False,
                 },
-            ],
+            ] + (
+                [{"Type": "bind", "Source": "/unsafe", "Destination": "/unsafe", "RW": True}]
+                if self.extra_mount
+                else []
+            ),
             "NetworkSettings": {"Ports": {}},
         }
 
@@ -203,6 +267,43 @@ class ReleaseDeployRecoveryTests(unittest.TestCase):
             runner=runner,
             clock=self.clock,
         )
+
+    def functional_bundle(self, suffix: str) -> tuple[Path, deploy.ReleaseBundle]:
+        market = self.temp / f"market-{suffix}.json"
+        security = self.temp / f"security-{suffix}.json"
+        market.write_text('{"contour":"market","value":1}\n')
+        security.write_text('{"contour":"security","value":2}\n')
+        capsule_path = self.temp / f"capsule-{suffix}"
+        capsule_builder.build_capsule(
+            release_manifest_path=ROOT / "docs/receipts/release/s4-release-manifest.json",
+            market_input_path=market,
+            market_classification="D0_PUBLIC",
+            security_input_path=security,
+            security_classification="D1_INTERNAL_SANITIZED",
+            output=capsule_path,
+            observed=self.clock(),
+        )
+        capsule = deploy._load_capsule(capsule_path, now=self.clock())
+        manifest = json.loads(
+            (ROOT / "docs/receipts/release/s4-release-manifest.json").read_text()
+        )
+        manifest["payload"]["config_sha256"] = capsule.config_sha256
+        manifest["integrity"]["payload_sha256"] = deploy._payload_sha(manifest["payload"])
+        manifest["integrity"]["parent_refs"].append(
+            "capsule:sha256:" + capsule.manifest_sha256
+        )
+        functional_manifest = self.temp / f"functional-manifest-{suffix}.json"
+        functional_manifest.write_text(json.dumps(manifest, sort_keys=True) + "\n")
+        bundle = deploy._load_bundle(
+            manifest_path=functional_manifest,
+            policy_path=ROOT / "ops/release/runtime-policy.json",
+            config_path=ROOT / "ops/release/researchd.config.template.json",
+            unit_path=ROOT / "ops/deploy/research-os-bridge.functional.service",
+            archive_path=self.archive,
+            archive_sha256=self.archive_sha,
+            capsule=capsule,
+        )
+        return capsule_path, bundle
 
     def test_public_host_profile_has_no_locator_or_mutation_authority(self) -> None:
         profile = json.loads((ROOT / "ops/deploy/host-profile.json").read_text())
@@ -264,6 +365,260 @@ class ReleaseDeployRecoveryTests(unittest.TestCase):
         snapshot, digest = controller._verify_running(self.bundle)
         self.assertEqual(snapshot, {"paused": False})
         self.assertEqual(digest, deploy._payload_sha(snapshot))
+
+    def test_functional_capsule_full_recovery_lifecycle_is_exact_and_receipted(self) -> None:
+        capsule_path, bundle = self.functional_bundle("lifecycle")
+        runner = FakeRunner(bundle)
+        controller = self.controller(runner)
+        deployed = controller.deploy(bundle)
+        evidence = deployed["payload"]["evidence"]
+        self.assertEqual(
+            evidence["capsule_manifest_sha256"], bundle.capsule.manifest_sha256
+        )
+        self.assertEqual(
+            evidence["capsule_cas_refs"],
+            {item.contour: item.cas_ref for item in bundle.capsule.objects},
+        )
+        self.assertEqual(deployed["payload"]["capsule_manifest_sha256"], bundle.capsule.manifest_sha256)
+        serialized = json.dumps(deployed, sort_keys=True)
+        self.assertNotIn(str(capsule_path), serialized)
+        object_transfers = [
+            argv
+            for argv, _ in runner.commands
+            if argv[0] == "scp"
+            and argv[-1].rsplit("/", 1)[-1]
+            in {item.sha256 for item in bundle.capsule.objects}
+        ]
+        self.assertEqual(len(object_transfers), 2)
+        self.assertEqual(
+            {item[-1].rsplit("/", 1)[-1] for item in object_transfers},
+            {item.sha256 for item in bundle.capsule.objects},
+        )
+        self.assertEqual(runner.remote_capsule_objects, set())
+        command_text = "\n".join(" ".join(argv) for argv, _ in runner.commands)
+        self.assertIn("--network=none --read-only --cap-drop=ALL", command_text)
+        self.assertIn("--cap-add=CHOWN --cap-add=DAC_OVERRIDE", command_text)
+        self.assertEqual(command_text.count("--cap-add=CHOWN"), 1)
+        self.assertIn("fsync_dir(path)", command_text)
+        self.assertIn("CAPSULE_STAGE_CLEANED", command_text)
+        self.assertNotIn("--network=bridge", command_text)
+        rendered_units = [body for _, body in runner.commands if body and b"[Unit]" in body]
+        self.assertTrue(rendered_units)
+        self.assertIn(b"--env=TMPDIR=/var/lib/research-os/tmp", rendered_units[-1])
+        self.assertIn(
+            b"org.research-os.capsule-manifest-sha256="
+            + bundle.capsule.manifest_sha256.encode("ascii"),
+            rendered_units[-1],
+        )
+
+        boundary = controller.reboot_boundary(bundle)
+        runner.boot_id = BOOT_B
+        verified = controller.verify_reboot(bundle, boundary)
+        self.assertTrue(verified["payload"]["evidence"]["boot_identity_changed"])
+        rollback = controller.rollback(bundle)
+        redeployed = controller.redeploy(bundle, rollback)
+        self.assertTrue(redeployed["payload"]["evidence"]["exact_release_restored"])
+
+        actions = {
+            "deploy": ["--archive", str(self.archive), "--archive-sha256", self.archive_sha],
+            "reboot-boundary": [],
+            "verify-reboot": ["--boundary-receipt", str(self.temp / "boundary.json")],
+            "rollback": [],
+            "redeploy": ["--rollback-receipt", str(self.temp / "rollback.json")],
+        }
+        for action, trailing in actions.items():
+            parsed = deploy._parser().parse_args(
+                [
+                    "--ssh-alias", "synthetic_lab", "--known-hosts", str(self.known_hosts),
+                    "--capsule", str(capsule_path), "--receipt", str(self.temp / f"{action}.json"),
+                    action, *trailing,
+                ]
+            )
+            self.assertEqual(parsed.capsule, capsule_path)
+
+    def test_capsule_rejects_unbound_symlink_and_remote_unexpected_object(self) -> None:
+        capsule_path, bundle = self.functional_bundle("negative")
+        unexpected = capsule_path / "runtime" / "input-cas" / "objects" / ("f" * 64)
+        unexpected.symlink_to(bundle.capsule.objects[0].source_path)
+        with self.assertRaisesRegex(deploy.DeploymentError, "symbolic link"):
+            deploy._load_capsule(capsule_path)
+
+        _, clean_bundle = self.functional_bundle("remote-negative")
+        runner = FakeRunner(clean_bundle)
+        runner.unexpected_remote_capsule_object = True
+        with self.assertRaisesRegex(deploy.DeploymentError, "remote bounded command"):
+            self.controller(runner).deploy(clean_bundle)
+        self.assertFalse(runner.container_exists)
+
+        _, race_bundle = self.functional_bundle("remote-symlink")
+        race_runner = FakeRunner(race_bundle)
+        race_runner.remote_capsule_symlink_race = True
+        with self.assertRaisesRegex(deploy.DeploymentError, "remote bounded command"):
+            self.controller(race_runner).deploy(race_bundle)
+        self.assertFalse(race_runner.container_exists)
+
+    def test_capsule_profile_requires_manifest_parent_and_functional_tmpdir(self) -> None:
+        _, bundle = self.functional_bundle("binding")
+        capsule = bundle.capsule
+        self.assertIsNotNone(capsule)
+        manifest_path = self.temp / "unbound-functional.json"
+        manifest = json.loads(
+            (ROOT / "docs/receipts/release/s4-release-manifest.json").read_text()
+        )
+        manifest["payload"]["config_sha256"] = capsule.config_sha256
+        manifest["integrity"]["payload_sha256"] = deploy._payload_sha(manifest["payload"])
+        manifest_path.write_text(json.dumps(manifest, sort_keys=True) + "\n")
+        with self.assertRaisesRegex(deploy.DeploymentError, "bind the sealed capsule"):
+            deploy._load_bundle(
+                manifest_path=manifest_path,
+                policy_path=ROOT / "ops/release/runtime-policy.json",
+                config_path=capsule.config_path,
+                unit_path=ROOT / "ops/deploy/research-os-bridge.functional.service",
+                capsule=capsule,
+            )
+        bound = json.loads(manifest_path.read_text())
+        bound["integrity"]["parent_refs"].append(
+            "capsule:sha256:" + capsule.manifest_sha256
+        )
+        manifest_path.write_text(json.dumps(bound, sort_keys=True) + "\n")
+        with self.assertRaisesRegex(deploy.DeploymentError, "tokens"):
+            deploy._load_bundle(
+                manifest_path=manifest_path,
+                policy_path=ROOT / "ops/release/runtime-policy.json",
+                config_path=capsule.config_path,
+                unit_path=ROOT / "ops/deploy/research-os-bridge.service",
+                capsule=capsule,
+            )
+
+    def test_capsule_init_script_executes_fresh_and_exact_same_volume_retry(self) -> None:
+        _, bundle = self.functional_bundle("init-exec")
+        capsule = bundle.capsule
+        source_cas = self.temp / "exec-source-cas"
+        source_config = self.temp / "exec-source-config" / "researchd.json"
+        target_runtime = self.temp / "exec-target-runtime"
+        target_config = self.temp / "exec-target-config"
+        source_cas.mkdir()
+        source_config.parent.mkdir()
+        source_config.write_bytes(capsule.config_path.read_bytes())
+        for item in capsule.objects:
+            (source_cas / item.sha256).write_bytes(item.source_path.read_bytes())
+        script = deploy.PreSoakDeployController._capsule_volume_init_script(capsule)
+        script = script.replace(
+            "UID = GID = 10001", f"UID = {os.geteuid()}; GID = {os.getegid()}"
+        )
+        for frozen, local in (
+            ("/target-runtime", target_runtime),
+            ("/target-config", target_config),
+            ("/source-cas", source_cas),
+            ("/source-config/researchd.json", source_config),
+        ):
+            script = script.replace(frozen, str(local))
+        for _ in range(2):
+            exec(compile(script, "capsule-volume-init-smoke", "exec"), {})
+        self.assertEqual(target_runtime.stat().st_mode & 0o777, 0o700)
+        self.assertEqual((target_runtime / "tmp").stat().st_mode & 0o777, 0o700)
+        for item in capsule.objects:
+            target = target_runtime / "input-cas" / "objects" / item.sha256
+            self.assertEqual(target.stat().st_mode & 0o777, 0o444)
+            self.assertEqual(hashlib.sha256(target.read_bytes()).hexdigest(), item.sha256)
+
+    def test_capsule_rejects_resealed_quota_escalation_and_duplicate_json(self) -> None:
+        capsule_path, _ = self.functional_bundle("semantic-mutation")
+        config_path = capsule_path / capsule_builder.CONFIG_NAME
+        manifest_path = capsule_path / capsule_builder.MANIFEST_NAME
+        config = json.loads(config_path.read_text())
+        config["input_quota_bytes"] = 1024**4
+        config_bytes = (
+            json.dumps(config, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+            + "\n"
+        ).encode()
+        config_path.write_bytes(config_bytes)
+        os.chmod(config_path, 0o600)
+        manifest = json.loads(manifest_path.read_text())
+        config_sha = hashlib.sha256(config_bytes).hexdigest()
+        manifest["payload"]["runtime_config_sha256"] = config_sha
+        for record in manifest["payload"]["file_hashes"]:
+            if record["relative_path"] == capsule_builder.CONFIG_NAME:
+                record["sha256"] = config_sha
+                record["size_bytes"] = len(config_bytes)
+        payload_sha = deploy._payload_sha(manifest["payload"])
+        manifest["object_id"] = "pre-soak-capsule-" + payload_sha
+        manifest["integrity"]["payload_sha256"] = payload_sha
+        manifest_path.write_text(
+            json.dumps(manifest, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+            + "\n"
+        )
+        os.chmod(manifest_path, 0o600)
+        with self.assertRaisesRegex(deploy.DeploymentError, "config boundary"):
+            deploy._load_capsule(capsule_path, now=self.clock())
+
+        duplicate_path, _ = self.functional_bundle("duplicate-json")
+        duplicate_manifest = duplicate_path / capsule_builder.MANIFEST_NAME
+        raw = duplicate_manifest.read_text()
+        duplicate_manifest.write_text(
+            raw.replace('"classification":', '"classification":"D0_PUBLIC","classification":', 1)
+        )
+        with self.assertRaisesRegex(deploy.DeploymentError, "duplicate key"):
+            deploy._load_capsule(duplicate_path, now=self.clock())
+
+    def test_omitting_capsule_cannot_downgrade_functional_lifecycle(self) -> None:
+        capsule_path, bundle = self.functional_bundle("downgrade")
+        manifest_path = self.temp / "functional-manifest-downgrade.json"
+        with self.assertRaisesRegex(deploy.DeploymentError, "exact frozen profile"):
+            deploy._load_bundle(
+                manifest_path=manifest_path,
+                policy_path=ROOT / "ops/release/runtime-policy.json",
+                config_path=bundle.capsule.config_path,
+                unit_path=ROOT / "ops/deploy/research-os-bridge.service",
+                capsule=None,
+            )
+        runner = FakeRunner(bundle)
+        exit_code = deploy.run(
+            [
+                "--ssh-alias", "synthetic_lab", "--known-hosts", str(self.known_hosts),
+                "--manifest", str(manifest_path), "--config", str(bundle.capsule.config_path),
+                "--unit", str(ROOT / "ops/deploy/research-os-bridge.functional.service"),
+                "--receipt", str(self.temp / "downgrade-receipt.json"), "reboot-boundary",
+            ],
+            runner=runner,
+            stdout=io.StringIO(),
+            stderr=io.StringIO(),
+        )
+        self.assertEqual(exit_code, 2)
+        self.assertEqual(runner.commands, [])
+
+        legacy_runner = FakeRunner(self.bundle)
+        legacy_runner.container_exists = True
+        legacy_runner.inject_tmpdir = True
+        with self.assertRaisesRegex(deploy.DeploymentError, "runtime policy"):
+            self.controller(legacy_runner)._container_inspect(
+                self.bundle, require_running=False
+            )
+
+    def test_preexisting_container_rejects_privilege_and_mount_supersets(self) -> None:
+        _, bundle = self.functional_bundle("unsafe-container")
+        mutations = (
+            ("container_entrypoint", ["/bin/sh"]),
+            ("container_cmd", ["-c", "echo unsafe > /var/lib/research-os/tamper"]),
+            ("extra_environment", ["PYTHONPATH=/var/lib/research-os"]),
+            ("extra_environment", ["RESEARCH_OS_ENVIRONMENT=pre-soak"]),
+            ("container_healthcheck", {"Test": ["CMD-SHELL", "echo unsafe > /var/lib/research-os/tamper"]}),
+            ("container_cap_add", ["SYS_ADMIN"]),
+            ("container_privileged", True),
+            ("container_devices", [{"PathOnHost": "/dev/null"}]),
+            ("container_binds", ["/tmp:/unsafe:rw"]),
+            ("extra_mount", True),
+            ("omit_capsule_label", True),
+        )
+        for attribute, value in mutations:
+            with self.subTest(attribute=attribute, value=value):
+                runner = FakeRunner(bundle)
+                runner.container_exists = True
+                setattr(runner, attribute, value)
+                with self.assertRaisesRegex(deploy.DeploymentError, "runtime policy|mount"):
+                    self.controller(runner)._container_inspect(
+                        bundle, require_running=False
+                    )
 
     def test_local_archive_tamper_stops_before_any_external_action(self) -> None:
         with self.assertRaisesRegex(deploy.DeploymentError, "local release archive"):

@@ -28,6 +28,10 @@ from typing import Any, Protocol, TextIO
 
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "src"))
+
+from research_bridge.researchd import _service_config_from_mapping  # noqa: E402
+
 SERVICE_NAME = "research-os-bridge.service"
 CONTAINER_NAME = "research-os-bridge"
 RUNTIME_VOLUME = "research-os-bridge-runtime"
@@ -40,6 +44,32 @@ _ALIAS = re.compile(r"[A-Za-z0-9][A-Za-z0-9_-]{0,63}\Z")
 _SHA256 = re.compile(r"[a-f0-9]{64}\Z")
 _GIT_SHA = re.compile(r"[a-f0-9]{40}\Z")
 _MAX_JSON_BYTES = 2 * 1024 * 1024
+_MAX_CAPSULE_INPUT_BYTES = 4 * 1024 * 1024
+_FROZEN_RELEASE_MANIFEST_SHA256 = "9ceae0bda066cf52577cec0fdc1d7230e92b3e4010f65b81613abf6a0a8a90dd"
+_FROZEN_RELEASE_CONFIG_SHA256 = "0b186888a3a1bb8fb028315681bf4073ec4186a0acbdf2f226b5a53d69a9d542"
+_LEGACY_UNIT_SHA256 = "f0ea702877b67205a2727537bb0954a6ce15214875d142a9dce76d9fcf8c49c3"
+_CAPSULE_MANIFEST_NAME = "capsule-manifest.json"
+_CAPSULE_CONFIG_NAME = "researchd.config.json"
+_CAPSULE_PARENT_PREFIX = "capsule:sha256:"
+_CAPSULE_UNIT_TOKEN = "@@CAPSULE_MANIFEST_SHA256@@"
+_EXPECTED_TRUSTED_ISSUERS = {
+    "JobSpec": {"issuer_id": "pre-soak-admission-controller", "authority_class": "admission-controller"},
+    "Permit": {"issuer_id": "pre-soak-permit-authority", "authority_class": "permit-authority"},
+    "AttemptLease": {"issuer_id": "researchd", "authority_class": "researchd"},
+    "PolicySnapshot": {"issuer_id": "pre-soak-policy-authority", "authority_class": "policy-authority"},
+    "ApprovalReceipt": {"issuer_id": "pre-soak-operator-authority", "authority_class": "operator-authority"},
+}
+_FROZEN_IMAGE_ENV = [
+    "PATH=/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+    "LANG=C.UTF-8",
+    "GPG_KEY=A035C8C19219BA821ECEA86B64E628F8D684696D",
+    "PYTHON_VERSION=3.11.14",
+    "PYTHON_SHA256=8d3ed8ec5c88c1c95f5e558612a725450d2452813ddad5e58fdb1a53b1209b78",
+    "PYTHONDONTWRITEBYTECODE=1",
+    "PYTHONHASHSEED=0",
+    "PYTHONPATH=/opt/research-os/src",
+    "PYTHONUNBUFFERED=1",
+]
 _DOCKER = 'env DOCKER_HOST="unix:///run/user/$(id -u)/docker.sock" /usr/bin/docker'
 _REMOTE_BASE = "$HOME/.local/share/research-os-bridge"
 _REMOTE_CONFIG = "$HOME/.config/research-os-bridge"
@@ -145,6 +175,28 @@ class ReleaseBundle:
     unit_sha256: str
     config_path: Path
     archive_path: Path | None
+    capsule: CapsuleSeed | None = None
+
+
+@dataclass(frozen=True)
+class CapsuleObject:
+    contour: str
+    classification: str
+    cas_ref: str
+    sha256: str
+    size_bytes: int
+    source_path: Path
+
+
+@dataclass(frozen=True)
+class CapsuleSeed:
+    manifest_sha256: str
+    manifest_object_id: str
+    config_sha256: str
+    config_path: Path
+    release_policy_sha256: str
+    release_config_sha256: str
+    objects: tuple[CapsuleObject, CapsuleObject]
 
 
 def _regular_file(path: Path, label: str, *, maximum: int | None = None) -> bytes:
@@ -236,6 +288,369 @@ def _sha256(value: object, label: str) -> str:
     return value
 
 
+def _bound_file_bytes(
+    path: Path,
+    label: str,
+    *,
+    maximum: int,
+    expected_owner: int | None = None,
+) -> tuple[bytes, str, int, str]:
+    """Read one no-follow regular file once and reject metadata races."""
+
+    flags = os.O_RDONLY | getattr(os, "O_CLOEXEC", 0) | getattr(os, "O_NOFOLLOW", 0)
+    descriptor: int | None = None
+    try:
+        before_path = os.lstat(path)
+        if stat.S_ISLNK(before_path.st_mode) or not stat.S_ISREG(before_path.st_mode):
+            raise DeploymentError(f"{label} must be a regular file")
+        if before_path.st_size < 0 or before_path.st_size > maximum:
+            raise DeploymentError(f"{label} size is invalid")
+        if expected_owner is not None and before_path.st_uid != expected_owner:
+            raise DeploymentError(f"{label} owner is invalid")
+        descriptor = os.open(path, flags)
+        before = os.fstat(descriptor)
+        if (
+            not stat.S_ISREG(before.st_mode)
+            or (before.st_dev, before.st_ino) != (before_path.st_dev, before_path.st_ino)
+        ):
+            raise DeploymentError(f"{label} identity is invalid")
+        total = 0
+        chunks: list[bytes] = []
+        while True:
+            block = os.read(descriptor, min(65_536, maximum + 1 - total))
+            if not block:
+                break
+            total += len(block)
+            if total > maximum:
+                raise DeploymentError(f"{label} size is invalid")
+            chunks.append(block)
+        after = os.fstat(descriptor)
+        after_path = os.lstat(path)
+        identity = lambda value: (
+            value.st_dev,
+            value.st_ino,
+            value.st_size,
+            stat.S_IMODE(value.st_mode),
+            value.st_uid,
+            value.st_gid,
+            getattr(value, "st_mtime_ns", None),
+            getattr(value, "st_ctime_ns", None),
+        )
+        if (
+            identity(before) != identity(after)
+            or (after.st_dev, after.st_ino) != (after_path.st_dev, after_path.st_ino)
+            or total != before.st_size
+        ):
+            raise DeploymentError(f"{label} changed during inspection")
+        raw = b"".join(chunks)
+        return raw, _digest_bytes(raw), total, f"{stat.S_IMODE(before.st_mode):04o}"
+    except DeploymentError:
+        raise
+    except OSError as exc:
+        raise DeploymentError(f"{label} is unavailable") from exc
+    finally:
+        if descriptor is not None:
+            os.close(descriptor)
+
+
+def _inspect_bound_file(
+    path: Path,
+    label: str,
+    *,
+    maximum: int,
+    expected_owner: int | None = None,
+) -> tuple[str, int, str]:
+    _, digest, size, mode = _bound_file_bytes(
+        path, label, maximum=maximum, expected_owner=expected_owner
+    )
+    return digest, size, mode
+
+
+def _json_bound_file(
+    path: Path,
+    label: str,
+    *,
+    maximum: int = _MAX_JSON_BYTES,
+    expected_owner: int | None = None,
+) -> tuple[dict[str, Any], str, int, str]:
+    raw, digest, size, mode = _bound_file_bytes(
+        path, label, maximum=maximum, expected_owner=expected_owner
+    )
+    if not raw:
+        raise DeploymentError(f"{label} size is invalid")
+    try:
+        value = json.loads(
+            raw.decode("utf-8", errors="strict"),
+            object_pairs_hook=_strict_object,
+            parse_constant=lambda _: (_ for _ in ()).throw(
+                DeploymentError("JSON contains a non-finite number")
+            ),
+        )
+    except (UnicodeError, json.JSONDecodeError) as exc:
+        raise DeploymentError(f"{label} is not strict JSON") from exc
+    if not isinstance(value, dict):
+        raise DeploymentError(f"{label} must be an object")
+    return value, digest, size, mode
+
+
+def _load_capsule(
+    capsule_path: Path,
+    *,
+    now: datetime | None = None,
+) -> CapsuleSeed:
+    """Validate the complete sealed capsule before any SSH operation."""
+
+    if ".." in capsule_path.parts:
+        raise DeploymentError("capsule path traversal is forbidden")
+    try:
+        root = os.lstat(capsule_path)
+    except OSError as exc:
+        raise DeploymentError("capsule root is unavailable") from exc
+    if (
+        stat.S_ISLNK(root.st_mode)
+        or not stat.S_ISDIR(root.st_mode)
+        or stat.S_IMODE(root.st_mode) != 0o700
+        or root.st_uid != os.geteuid()
+    ):
+        raise DeploymentError("capsule root ownership or mode is invalid")
+
+    expected_directories = {
+        "runtime",
+        "runtime/input-cas",
+        "runtime/input-cas/objects",
+        "runtime/input-cas/.tmp",
+    }
+    observed_directories: set[str] = set()
+    observed_files: set[str] = set()
+    try:
+        for path in capsule_path.rglob("*"):
+            relative = path.relative_to(capsule_path).as_posix()
+            metadata = os.lstat(path)
+            if stat.S_ISLNK(metadata.st_mode):
+                raise DeploymentError("capsule contains a symbolic link")
+            if stat.S_ISDIR(metadata.st_mode):
+                if stat.S_IMODE(metadata.st_mode) != 0o700 or metadata.st_uid != os.geteuid():
+                    raise DeploymentError("capsule directory ownership or mode is invalid")
+                observed_directories.add(relative)
+            elif stat.S_ISREG(metadata.st_mode):
+                if metadata.st_uid != os.geteuid():
+                    raise DeploymentError("capsule file owner is invalid")
+                observed_files.add(relative)
+            else:
+                raise DeploymentError("capsule contains an unsupported entry")
+    except DeploymentError:
+        raise
+    except OSError as exc:
+        raise DeploymentError("capsule inventory is unavailable") from exc
+    if observed_directories != expected_directories:
+        raise DeploymentError("capsule directory inventory is unexpected")
+
+    manifest_path = capsule_path / _CAPSULE_MANIFEST_NAME
+    manifest, manifest_sha, _, manifest_mode = _json_bound_file(
+        manifest_path,
+        "capsule manifest",
+        maximum=_MAX_JSON_BYTES,
+        expected_owner=os.geteuid(),
+    )
+    common = {
+        "schema_id", "schema_version", "object_id", "issued_at", "issuer",
+        "contour", "classification", "payload", "integrity",
+    }
+    if set(manifest) != common or manifest_mode != "0600":
+        raise DeploymentError("capsule manifest shape or mode is invalid")
+    payload = manifest.get("payload")
+    integrity = manifest.get("integrity")
+    issuer = manifest.get("issuer")
+    payload_fields = {
+        "release_manifest_sha256", "release_manifest_ref", "release_sha",
+        "image_digest", "release_policy_sha256", "release_config_sha256",
+        "runtime_config_sha256", "authority_policy_sha256",
+        "resume_approval_ref", "runner_identity", "network_class",
+        "external_action_authority", "inputs", "file_hashes",
+    }
+    if (
+        manifest.get("schema_id") != "PreSoakCapsuleManifest"
+        or manifest.get("schema_version") != "1.0.0"
+        or manifest.get("contour") != "governance"
+        or manifest.get("classification") != "D1_INTERNAL_SANITIZED"
+        or issuer != {
+            "id": "pre-soak-capsule-builder",
+            "authority_class": "local-release-capsule-builder",
+        }
+        or not isinstance(payload, dict)
+        or set(payload) != payload_fields
+        or not isinstance(integrity, dict)
+        or set(integrity) != {"payload_sha256", "parent_refs"}
+        or integrity.get("payload_sha256") != _payload_sha(payload)
+        or manifest.get("object_id") != "pre-soak-capsule-" + _payload_sha(payload)
+    ):
+        raise DeploymentError("capsule manifest identity or integrity is invalid")
+    if (
+        payload.get("release_manifest_sha256") != _FROZEN_RELEASE_MANIFEST_SHA256
+        or payload.get("release_sha") != RELEASE_SHA
+        or payload.get("image_digest") != IMAGE_ID
+        or payload.get("release_config_sha256") != _FROZEN_RELEASE_CONFIG_SHA256
+        or payload.get("runner_identity") != "pre-soak-offline-l0"
+        or payload.get("network_class") != "offline"
+        or payload.get("external_action_authority") is not False
+    ):
+        raise DeploymentError("capsule frozen release binding is invalid")
+    release_policy_sha = _sha256(payload.get("release_policy_sha256"), "capsule release policy")
+    config_sha = _sha256(payload.get("runtime_config_sha256"), "capsule runtime config")
+    authority_policy_sha = _sha256(
+        payload.get("authority_policy_sha256"), "capsule authority policy"
+    )
+
+    inputs = payload.get("inputs")
+    if not isinstance(inputs, dict) or set(inputs) != {"market", "security"}:
+        raise DeploymentError("capsule must bind exactly market and security inputs")
+    objects: list[CapsuleObject] = []
+    for contour in ("market", "security"):
+        item = inputs.get(contour)
+        if not isinstance(item, dict) or set(item) != {
+            "classification", "cas_ref", "sha256", "size_bytes"
+        }:
+            raise DeploymentError("capsule input shape is invalid")
+        classification = item.get("classification")
+        digest = _sha256(item.get("sha256"), f"{contour} capsule input")
+        size = item.get("size_bytes")
+        cas_ref = item.get("cas_ref")
+        if (
+            classification not in {"D0_PUBLIC", "D1_INTERNAL_SANITIZED"}
+            or cas_ref != f"cas:sha256:{digest}"
+            or isinstance(size, bool)
+            or not isinstance(size, int)
+            or size < 0
+            or size > _MAX_CAPSULE_INPUT_BYTES
+        ):
+            raise DeploymentError("capsule input binding is invalid")
+        source = capsule_path / "runtime" / "input-cas" / "objects" / digest
+        objects.append(CapsuleObject(contour, classification, cas_ref, digest, size, source))
+    if objects[0].sha256 == objects[1].sha256:
+        raise DeploymentError("capsule must contain two distinct CAS objects")
+
+    config_path = capsule_path / _CAPSULE_CONFIG_NAME
+    expected_files = {
+        _CAPSULE_MANIFEST_NAME,
+        _CAPSULE_CONFIG_NAME,
+        "runtime/input-cas/.cas.lock",
+        *(f"runtime/input-cas/objects/{item.sha256}" for item in objects),
+    }
+    if observed_files != expected_files:
+        raise DeploymentError("capsule contains an unexpected or unbound file")
+    file_hashes = payload.get("file_hashes")
+    if not isinstance(file_hashes, list):
+        raise DeploymentError("capsule file inventory is invalid")
+    config, config_actual_sha, config_size, config_mode = _json_bound_file(
+        config_path,
+        "capsule runtime config",
+        expected_owner=os.geteuid(),
+    )
+    expected_records: dict[str, dict[str, object]] = {}
+    for relative in sorted(expected_files - {_CAPSULE_MANIFEST_NAME}):
+        if relative == _CAPSULE_CONFIG_NAME:
+            actual_sha, actual_size, actual_mode = config_actual_sha, config_size, config_mode
+        else:
+            actual_sha, actual_size, actual_mode = _inspect_bound_file(
+                capsule_path / relative,
+                f"capsule file {relative}",
+                maximum=_MAX_CAPSULE_INPUT_BYTES,
+                expected_owner=os.geteuid(),
+            )
+        expected_records[relative] = {
+            "relative_path": relative,
+            "sha256": actual_sha,
+            "size_bytes": actual_size,
+            "mode": actual_mode,
+        }
+    observed_records: dict[str, dict[str, object]] = {}
+    for record in file_hashes:
+        if not isinstance(record, dict) or set(record) != {
+            "relative_path", "sha256", "size_bytes", "mode"
+        }:
+            raise DeploymentError("capsule file hash record is invalid")
+        relative = record.get("relative_path")
+        if not isinstance(relative, str) or relative in observed_records:
+            raise DeploymentError("capsule file hash path is invalid")
+        observed_records[relative] = record
+    if observed_records != expected_records:
+        raise DeploymentError("capsule file hashes do not match sealed bytes")
+    if expected_records[_CAPSULE_CONFIG_NAME]["sha256"] != config_sha or expected_records[_CAPSULE_CONFIG_NAME]["mode"] != "0600":
+        raise DeploymentError("capsule config binding or mode is invalid")
+    if expected_records["runtime/input-cas/.cas.lock"] != {
+        "relative_path": "runtime/input-cas/.cas.lock",
+        "sha256": hashlib.sha256(b"").hexdigest(),
+        "size_bytes": 0,
+        "mode": "0600",
+    }:
+        raise DeploymentError("capsule CAS lock is invalid")
+    for item in objects:
+        record = expected_records[f"runtime/input-cas/objects/{item.sha256}"]
+        if record["sha256"] != item.sha256 or record["size_bytes"] != item.size_bytes or record["mode"] != "0444":
+            raise DeploymentError("capsule CAS object bytes or mode are invalid")
+    parent_refs = integrity.get("parent_refs")
+    if not isinstance(parent_refs, list) or any(not isinstance(item, str) for item in parent_refs):
+        raise DeploymentError("capsule parent references are invalid")
+    for required in (objects[0].cas_ref, objects[1].cas_ref, f"image:{IMAGE_ID}"):
+        if required not in parent_refs:
+            raise DeploymentError("capsule parent references are incomplete")
+    config_fields = {
+        "schema_id", "schema_version", "runtime_root", "runner_identity",
+        "allowed_uids", "input_quota_bytes", "checkpoint_quota_bytes",
+        "artifact_quota_bytes", "maximum_input_bytes", "deadline_seconds",
+        "trusted_issuers", "policy_snapshots", "approval_receipts",
+    }
+    policies = config.get("policy_snapshots")
+    approvals = config.get("approval_receipts")
+    if (
+        set(config) != config_fields
+        or config.get("schema_id") != "ResearchdServiceConfig"
+        or config.get("schema_version") != "1.0.0"
+        or config.get("runtime_root") != "/var/lib/research-os"
+        or config.get("runner_identity") != "pre-soak-offline-l0"
+        or config.get("allowed_uids") != [10001]
+        or config.get("input_quota_bytes") != 16 * 1024 * 1024
+        or config.get("checkpoint_quota_bytes") != 16 * 1024 * 1024
+        or config.get("artifact_quota_bytes") != 16 * 1024 * 1024
+        or config.get("maximum_input_bytes") != 4 * 1024 * 1024
+        or config.get("deadline_seconds") != 5
+        or config.get("trusted_issuers") != _EXPECTED_TRUSTED_ISSUERS
+        or not isinstance(policies, dict)
+        or set(policies) != {authority_policy_sha}
+        or not isinstance(approvals, dict)
+        or set(approvals) != {payload.get("resume_approval_ref")}
+    ):
+        raise DeploymentError("capsule runtime config boundary is invalid")
+    moment = now or datetime.now(timezone.utc)
+    if moment.tzinfo is None or moment.utcoffset() is None:
+        raise DeploymentError("capsule validation time must be timezone-aware")
+    projected = dict(config)
+    projected["allowed_uids"] = [os.geteuid()]
+    try:
+        service = _service_config_from_mapping(projected)
+        if (
+            service.runtime_root != "/var/lib/research-os"
+            or service.runner_identity != "pre-soak-offline-l0"
+        ):
+            raise DeploymentError("capsule parsed service boundary is invalid")
+        service.authority.verify_resume(
+            str(payload.get("resume_approval_ref")), now=moment
+        )
+    except DeploymentError:
+        raise
+    except Exception as exc:
+        raise DeploymentError("capsule active authority is invalid") from exc
+    return CapsuleSeed(
+        manifest_sha256=manifest_sha,
+        manifest_object_id=str(manifest["object_id"]),
+        config_sha256=config_sha,
+        config_path=config_path,
+        release_policy_sha256=release_policy_sha,
+        release_config_sha256=_FROZEN_RELEASE_CONFIG_SHA256,
+        objects=(objects[0], objects[1]),
+    )
+
+
 def _load_bundle(
     *,
     manifest_path: Path,
@@ -244,10 +659,15 @@ def _load_bundle(
     unit_path: Path,
     archive_path: Path | None = None,
     archive_sha256: str | None = None,
+    capsule: CapsuleSeed | None = None,
 ) -> ReleaseBundle:
-    manifest = _json_file(manifest_path, "ReleaseManifest")
-    policy = _json_file(policy_path, "runtime policy")
-    config_bytes = _regular_file(config_path, "service config", maximum=_MAX_JSON_BYTES)
+    manifest, _, _, _ = _json_bound_file(manifest_path, "ReleaseManifest")
+    policy, policy_sha, _, _ = _json_bound_file(policy_path, "runtime policy")
+    if capsule is not None:
+        config_path = capsule.config_path
+    config_bytes, config_sha, _, _ = _bound_file_bytes(
+        config_path, "service config", maximum=_MAX_JSON_BYTES
+    )
     unit_template = _regular_file(unit_path, "service unit template", maximum=256_000)
 
     if policy != _EXPECTED_POLICY:
@@ -280,14 +700,28 @@ def _load_bundle(
         raise DeploymentError("release image identity is not the frozen candidate")
     if release_sha != RELEASE_SHA or payload.get("previous_release_ref") != PREVIOUS_RELEASE:
         raise DeploymentError("release or rollback identity is not frozen")
-    policy_sha = _digest_bytes(_regular_file(policy_path, "runtime policy", maximum=_MAX_JSON_BYTES))
-    config_sha = _digest_bytes(config_bytes)
     if payload.get("policy_sha256") != policy_sha or payload.get("config_sha256") != config_sha:
         raise DeploymentError("release policy or config binding is invalid")
+    if capsule is not None:
+        parent_refs = integrity.get("parent_refs")
+        if (
+            config_sha != capsule.config_sha256
+            or policy_sha != capsule.release_policy_sha256
+            or not isinstance(parent_refs, list)
+            or f"{_CAPSULE_PARENT_PREFIX}{capsule.manifest_sha256}" not in parent_refs
+        ):
+            raise DeploymentError("functional release does not bind the sealed capsule")
+    elif (
+        config_sha != _FROZEN_RELEASE_CONFIG_SHA256
+        or _digest_bytes(unit_template) != _LEGACY_UNIT_SHA256
+    ):
+        raise DeploymentError("legacy deployment profile is not the exact frozen profile")
 
     template = unit_template.decode("utf-8", errors="strict")
-    observed_tokens = {token for token in _UNIT_TOKENS if token in template}
-    if observed_tokens != _UNIT_TOKENS:
+    allowed_tokens = _UNIT_TOKENS | {_CAPSULE_UNIT_TOKEN}
+    observed_tokens = {token for token in allowed_tokens if token in template}
+    expected_tokens = _UNIT_TOKENS | ({_CAPSULE_UNIT_TOKEN} if capsule is not None else set())
+    if observed_tokens != expected_tokens:
         raise DeploymentError("service unit template tokens are invalid")
     rendered = (
         template.replace("@@IMAGE_ID@@", IMAGE_ID)
@@ -295,8 +729,17 @@ def _load_bundle(
         .replace("@@POLICY_SHA256@@", policy_sha)
         .replace("@@CONFIG_SHA256@@", config_sha)
     ).encode("utf-8")
+    if capsule is not None:
+        rendered = rendered.replace(
+            _CAPSULE_UNIT_TOKEN.encode("ascii"), capsule.manifest_sha256.encode("ascii")
+        )
     if b"@@" in rendered:
         raise DeploymentError("service unit retained an unresolved token")
+    has_tmpdir = "--env=TMPDIR=/var/lib/research-os/tmp" in template
+    if capsule is not None and not has_tmpdir:
+        raise DeploymentError("capsule service unit does not bind the writable TMPDIR")
+    if capsule is None and has_tmpdir:
+        raise DeploymentError("legacy service unit unexpectedly selects the capsule profile")
 
     actual_archive_sha: str | None = None
     if archive_path is not None:
@@ -318,6 +761,7 @@ def _load_bundle(
         unit_sha256=_digest_bytes(rendered),
         config_path=config_path,
         archive_path=archive_path,
+        capsule=capsule,
     )
 
 
@@ -482,6 +926,187 @@ class PreSoakDeployController:
             raise DeploymentError("loaded image does not match the frozen release identity")
         return value
 
+    def _stage_capsule_objects(self, capsule: CapsuleSeed) -> str:
+        nonce = _digest_bytes(os.urandom(32))
+        incoming_name = f"capsule-{nonce}"
+        incoming_relative = f".local/share/research-os-bridge/incoming/{incoming_name}"
+        incoming_remote = f"{_REMOTE_BASE}/incoming/{incoming_name}"
+        created = self._ssh(
+            "set -eu; umask 077; directory=" + incoming_remote + "; "
+            f"for parent in \"$HOME\" \"$HOME/.local\" \"$HOME/.local/share\" {_REMOTE_BASE} {_REMOTE_BASE}/incoming; do "
+            "test ! -L \"$parent\"; test -d \"$parent\"; test -O \"$parent\"; "
+            "mode=\"$(stat -c %a \"$parent\")\"; test \"$((0$mode & 0022))\" = 0; done; "
+            f"test \"$(stat -c %a {_REMOTE_BASE})\" = 700; "
+            f"test \"$(stat -c %a {_REMOTE_BASE}/incoming)\" = 700; "
+            "mkdir -m 0700 -- \"$directory\"; "
+            "test ! -L \"$directory\"; test -d \"$directory\"; test -O \"$directory\"; "
+            "test \"$(stat -c %a \"$directory\")\" = 700; "
+            "printf 'CAPSULE_STAGE_CREATED\\n'"
+        )
+        if created.stdout.strip() != "CAPSULE_STAGE_CREATED":
+            raise DeploymentError("remote capsule staging directory is invalid")
+        for item in capsule.objects:
+            actual_sha, actual_size, actual_mode = _inspect_bound_file(
+                item.source_path,
+                f"{item.contour} capsule object",
+                maximum=_MAX_CAPSULE_INPUT_BYTES,
+                expected_owner=os.geteuid(),
+            )
+            if (actual_sha, actual_size, actual_mode) != (item.sha256, item.size_bytes, "0444"):
+                raise DeploymentError("capsule object changed before transfer")
+            self._scp(item.source_path, f"{incoming_relative}/{item.sha256}")
+        checks = " ".join(
+            f'{item.sha256}) expected_sha={item.sha256}; expected_size={item.size_bytes} ;;'
+            for item in capsule.objects
+        )
+        ready = self._ssh(
+            "set -eu; directory=" + incoming_remote + "; "
+            "test ! -L \"$directory\"; test -d \"$directory\"; test -O \"$directory\"; "
+            "test \"$(stat -c %a \"$directory\")\" = 700; count=0; "
+            "for entry in \"$directory\"/* \"$directory\"/.[!.]* \"$directory\"/..?*; do "
+            "test -e \"$entry\" || test -L \"$entry\" || continue; count=$((count + 1)); "
+            "test ! -L \"$entry\"; test -f \"$entry\"; test -O \"$entry\"; name=${entry##*/}; "
+            f"case \"$name\" in {checks} *) exit 42 ;; esac; "
+            "chmod 0400 -- \"$entry\"; test \"$(stat -c %a \"$entry\")\" = 400; "
+            "test \"$(stat -c %s \"$entry\")\" = \"$expected_size\"; "
+            "observed=\"$(sha256sum -- \"$entry\")\"; "
+            "test \"${observed%% *}\" = \"$expected_sha\"; done; "
+            "test \"$count\" = 2; printf 'CAPSULE_STAGE_READY\\n'"
+        )
+        if ready.stdout.strip() != "CAPSULE_STAGE_READY":
+            raise DeploymentError("remote capsule staging content is invalid")
+        return incoming_remote
+
+    def _cleanup_capsule_stage(self, capsule: CapsuleSeed, incoming_remote: str) -> None:
+        paths = " ".join(f'"$directory/{item.sha256}"' for item in capsule.objects)
+        checks = " ".join(
+            f'{item.sha256}) expected={item.sha256} ;;' for item in capsule.objects
+        )
+        result = self._ssh(
+            "set -eu; directory=" + incoming_remote + "; "
+            "test ! -L \"$directory\"; test -d \"$directory\"; "
+            "for entry in \"$directory\"/* \"$directory\"/.[!.]* \"$directory\"/..?*; do "
+            "test -e \"$entry\" || test -L \"$entry\" || continue; "
+            "test ! -L \"$entry\"; test -f \"$entry\"; test -O \"$entry\"; "
+            "test \"$(stat -c %a \"$entry\")\" = 400; name=${entry##*/}; "
+            f"case \"$name\" in {checks} *) exit 43 ;; esac; "
+            "observed=\"$(sha256sum -- \"$entry\")\"; "
+            "test \"${observed%% *}\" = \"$expected\"; done; "
+            f"rm -- {paths}; rmdir -- \"$directory\"; "
+            "test ! -e \"$directory\"; printf 'CAPSULE_STAGE_CLEANED\\n'"
+        )
+        if result.stdout.strip() != "CAPSULE_STAGE_CLEANED":
+            raise DeploymentError("remote capsule staging cleanup is invalid")
+
+    @staticmethod
+    def _capsule_volume_init_script(capsule: CapsuleSeed) -> str:
+        expected = {item.sha256: item.size_bytes for item in capsule.objects}
+        return "\n".join(
+            (
+                "import hashlib, os, stat, sys",
+                "UID = GID = 10001",
+                f"EXPECTED = {expected!r}",
+                f"CONFIG_SHA = {capsule.config_sha256!r}",
+                "def fail(): raise SystemExit(70)",
+                "def digest(path):",
+                "    h = hashlib.sha256()",
+                "    flags = os.O_RDONLY | getattr(os, 'O_NOFOLLOW', 0)",
+                "    fd = os.open(path, flags)",
+                "    try:",
+                "        while True:",
+                "            block = os.read(fd, 65536)",
+                "            if not block: break",
+                "            h.update(block)",
+                "    finally: os.close(fd)",
+                "    return h.hexdigest()",
+                "def exact(path, kind, mode):",
+                "    st = os.lstat(path)",
+                "    if stat.S_ISLNK(st.st_mode): fail()",
+                "    if kind == 'dir' and not stat.S_ISDIR(st.st_mode): fail()",
+                "    if kind == 'file' and not stat.S_ISREG(st.st_mode): fail()",
+                "    if stat.S_IMODE(st.st_mode) != mode or st.st_uid != UID or st.st_gid != GID: fail()",
+                "def ensure_dir(path, initialize_empty=False):",
+                "    if os.path.lexists(path):",
+                "        st = os.lstat(path)",
+                "        if stat.S_ISLNK(st.st_mode) or not stat.S_ISDIR(st.st_mode): fail()",
+                "        if stat.S_IMODE(st.st_mode) == 0o700 and st.st_uid == UID and st.st_gid == GID: return",
+                "        if not initialize_empty or os.listdir(path): fail()",
+                "        os.chmod(path, 0o700); os.chown(path, UID, GID)",
+                "    else:",
+                "        os.mkdir(path, 0o700); os.chmod(path, 0o700); os.chown(path, UID, GID)",
+                "def fsync_dir(path):",
+                "    fd = os.open(path, os.O_RDONLY | getattr(os, 'O_DIRECTORY', 0))",
+                "    try: os.fsync(fd)",
+                "    finally: os.close(fd)",
+                "def install_exact(source, target, expected_sha, expected_size, mode):",
+                "    source_st = os.lstat(source)",
+                "    if stat.S_ISLNK(source_st.st_mode) or not stat.S_ISREG(source_st.st_mode): fail()",
+                "    source_fd = os.open(source, os.O_RDONLY | getattr(os, 'O_NOFOLLOW', 0))",
+                "    opened = os.fstat(source_fd)",
+                "    if not stat.S_ISREG(opened.st_mode) or (opened.st_dev, opened.st_ino) != (source_st.st_dev, source_st.st_ino) or opened.st_size != expected_size: fail()",
+                "    target_fd = None",
+                "    created = False",
+                "    complete = False",
+                "    try:",
+                "        if not os.path.lexists(target):",
+                "            target_fd = os.open(target, os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, 'O_NOFOLLOW', 0), mode)",
+                "            created = True",
+                "        h = hashlib.sha256(); total = 0",
+                "        while True:",
+                "            block = os.read(source_fd, 65536)",
+                "            if not block: break",
+                "            total += len(block); h.update(block)",
+                "            if target_fd is not None:",
+                "                view = memoryview(block)",
+                "                while view:",
+                "                    written = os.write(target_fd, view)",
+                "                    if written <= 0: fail()",
+                "                    view = view[written:]",
+                "        after = os.fstat(source_fd); after_path = os.lstat(source)",
+                "        identity = lambda value: (value.st_dev, value.st_ino, value.st_size, value.st_mtime_ns, value.st_ctime_ns)",
+                "        if identity(opened) != identity(after) or (after.st_dev, after.st_ino) != (after_path.st_dev, after_path.st_ino) or total != expected_size or h.hexdigest() != expected_sha: fail()",
+                "        if target_fd is not None:",
+                "            os.fchmod(target_fd, mode); os.fchown(target_fd, UID, GID); os.fsync(target_fd)",
+                "        complete = True",
+                "    finally:",
+                "        os.close(source_fd)",
+                "        if target_fd is not None: os.close(target_fd)",
+                "        if created and not complete:",
+                "            try: os.unlink(target)",
+                "            except OSError: pass",
+                "    exact(target, 'file', mode)",
+                "    target_st = os.lstat(target)",
+                "    if target_st.st_size != expected_size or digest(target) != expected_sha: fail()",
+                "runtime = '/target-runtime'",
+                "config_root = '/target-config'",
+                "ensure_dir(runtime, initialize_empty=True)",
+                "ensure_dir(config_root, initialize_empty=True)",
+                "for path in (runtime + '/input-cas', runtime + '/input-cas/objects', runtime + '/input-cas/.tmp', runtime + '/tmp'): ensure_dir(path)",
+                "input_root = runtime + '/input-cas'",
+                "objects = input_root + '/objects'",
+                "temporary = input_root + '/.tmp'",
+                "lock = input_root + '/.cas.lock'",
+                "if os.path.lexists(lock):",
+                "    exact(lock, 'file', 0o600)",
+                "    if os.lstat(lock).st_size != 0: fail()",
+                "else:",
+                "    fd = os.open(lock, os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, 'O_NOFOLLOW', 0), 0o600)",
+                "    os.fchmod(fd, 0o600); os.fchown(fd, UID, GID); os.fsync(fd); os.close(fd)",
+                "if set(os.listdir(input_root)) != {'objects', '.tmp', '.cas.lock'}: fail()",
+                "if os.listdir(temporary) or os.listdir(runtime + '/tmp'): fail()",
+                "if not set(os.listdir(objects)).issubset(set(EXPECTED)): fail()",
+                "if set(os.listdir('/source-cas')) != set(EXPECTED): fail()",
+                "for name, size in EXPECTED.items(): install_exact('/source-cas/' + name, objects + '/' + name, name, size, 0o444)",
+                "if set(os.listdir(objects)) != set(EXPECTED): fail()",
+                "source_config = '/source-config/researchd.json'",
+                "config_size = os.lstat(source_config).st_size",
+                "install_exact(source_config, config_root + '/researchd.json', CONFIG_SHA, config_size, 0o600)",
+                "for path in (runtime, input_root, objects, temporary, runtime + '/tmp'): exact(path, 'dir', 0o700)",
+                "for path in (objects, input_root, runtime, config_root): fsync_dir(path)",
+                "print('CAPSULE_VOLUME_INIT_OK:' + CONFIG_SHA)",
+            )
+        )
+
     def _stage_content(self, bundle: ReleaseBundle) -> None:
         if bundle.archive_path is None or bundle.archive_sha256 is None:
             raise DeploymentError("deployment requires a content-addressed archive")
@@ -504,9 +1129,13 @@ class PreSoakDeployController:
         if self._remote_sha(config_remote) != bundle.config_sha256:
             raise DeploymentError("remote service config SHA-256 does not match")
         self._ssh(f"chmod 0600 {config_remote}")
+        capsule_remote = None
+        if bundle.capsule is not None:
+            capsule_remote = self._stage_capsule_objects(bundle.capsule)
         self._ssh(f"{_DOCKER} volume create {RUNTIME_VOLUME}")
         self._ssh(f"{_DOCKER} volume create {CONFIG_VOLUME}")
-        init_command = (
+        if bundle.capsule is None:
+            init_command = (
             f"{_DOCKER} run --rm --name=research-os-bridge-volume-init "
             "--user=0:0 --network=none --read-only "
             "--security-opt=no-new-privileges:true --pids-limit=32 "
@@ -520,9 +1149,9 @@ class PreSoakDeployController:
                 "/target-config/researchd.json; "
                 "install -d -m 0700 -o 10001 -g 10001 /target-runtime"
             )
-        )
-        self._ssh(init_command)
-        verify_command = (
+            )
+            self._ssh(init_command)
+            verify_command = (
             f"{_DOCKER} run --rm --network=none --read-only --cap-drop=ALL "
             "--security-opt=no-new-privileges:true --pids-limit=16 "
             "--memory=67108864 --cpus=0.25 --user=10001:10001 "
@@ -535,10 +1164,29 @@ class PreSoakDeployController:
                 "test \"$(stat -c %u:%g:%a /target-runtime)\" = 10001:10001:700; "
                 "sha256sum /target-config/researchd.json"
             )
-        )
-        verified = self._ssh(verify_command).stdout.strip().split(maxsplit=1)
-        if not verified or verified[0] != bundle.config_sha256:
-            raise DeploymentError("container-visible config ownership or digest is invalid")
+            )
+            verified = self._ssh(verify_command).stdout.strip().split(maxsplit=1)
+            if not verified or verified[0] != bundle.config_sha256:
+                raise DeploymentError("container-visible config ownership or digest is invalid")
+        else:
+            assert capsule_remote is not None
+            init_command = (
+                f"{_DOCKER} run --rm --name=research-os-bridge-capsule-volume-init "
+                "--user=0:0 --network=none --read-only --cap-drop=ALL "
+                "--cap-add=CHOWN --cap-add=DAC_OVERRIDE "
+                "--security-opt=no-new-privileges:true --pids-limit=32 "
+                "--memory=134217728 --cpus=0.25 "
+                f"--mount=type=bind,source={config_remote},target=/source-config/researchd.json,readonly "
+                f"--mount=type=bind,source={capsule_remote},target=/source-cas,readonly "
+                f"--mount=type=volume,source={CONFIG_VOLUME},target=/target-config "
+                f"--mount=type=volume,source={RUNTIME_VOLUME},target=/target-runtime "
+                f"--entrypoint=python {bundle.image_id} -c "
+                + shlex.quote(self._capsule_volume_init_script(bundle.capsule))
+            )
+            proof = self._ssh(init_command).stdout.strip()
+            if proof != f"CAPSULE_VOLUME_INIT_OK:{bundle.config_sha256}":
+                raise DeploymentError("capsule volume initialization proof is invalid")
+            self._cleanup_capsule_stage(bundle.capsule, capsule_remote)
 
         saved_unit = self._saved_unit(bundle)
         self._ssh(
@@ -613,24 +1261,63 @@ class PreSoakDeployController:
         cap_drop = host.get("CapDrop")
         restart = host.get("RestartPolicy")
         running = state.get("Running")
+        expected_environment = [
+            "RESEARCH_OS_ENVIRONMENT=pre-soak",
+            "RESEARCH_OS_EXTERNAL_ACTION_AUTHORITY=false",
+            *(
+                ["TMPDIR=/var/lib/research-os/tmp"]
+                if bundle.capsule is not None
+                else []
+            ),
+            *_FROZEN_IMAGE_ENV,
+        ]
+        tmpdir_entries = (
+            [item for item in environment if isinstance(item, str) and item.startswith("TMPDIR=")]
+            if isinstance(environment, list)
+            else []
+        )
+        capsule_tmpdir_valid = (
+            tmpdir_entries == ["TMPDIR=/var/lib/research-os/tmp"]
+            if bundle.capsule is not None
+            else tmpdir_entries == []
+        )
+        capsule_label_valid = (
+            isinstance(labels, dict)
+            and labels.get("org.research-os.capsule-manifest-sha256")
+            == bundle.capsule.manifest_sha256
+            if bundle.capsule is not None
+            else isinstance(labels, dict)
+            and "org.research-os.capsule-manifest-sha256" not in labels
+        )
         if (
             value.get("Name") not in {CONTAINER_NAME, f"/{CONTAINER_NAME}"}
             or value.get("Image") != bundle.image_id
             or config.get("Image") != bundle.image_id
             or config.get("User") != "10001:10001"
+            or config.get("Entrypoint")
+            != ["python", "-m", "research_bridge.researchd"]
+            or config.get("Cmd")
+            != ["--config", "/run/research-os/researchd.json"]
+            or config.get("WorkingDir") != "/opt/research-os"
+            or config.get("StopSignal") != "SIGTERM"
+            or config.get("Healthcheck") is not None
             or not isinstance(labels, dict)
             or labels.get("org.research-os.release-sha") != bundle.release_sha
             or labels.get("org.research-os.policy-sha256") != bundle.policy_sha256
             or labels.get("org.research-os.config-sha256") != bundle.config_sha256
-            or not isinstance(environment, list)
-            or "RESEARCH_OS_ENVIRONMENT=pre-soak" not in environment
-            or "RESEARCH_OS_EXTERNAL_ACTION_AUTHORITY=false" not in environment
+            or not capsule_label_valid
+            or environment != expected_environment
+            or not capsule_tmpdir_valid
             or host.get("NetworkMode") != "none"
             or host.get("ReadonlyRootfs") is not True
             or not isinstance(cap_drop, list)
             or {str(item).upper() for item in cap_drop} != {"ALL"}
             or not isinstance(security, list)
-            or "no-new-privileges:true" not in security
+            or security != ["no-new-privileges:true"]
+            or host.get("CapAdd") not in (None, [])
+            or host.get("Privileged") is not False
+            or host.get("Devices") not in (None, [])
+            or host.get("Binds") not in (None, [])
             or host.get("PidsLimit") != 256
             or host.get("Memory") != 2147483648
             or host.get("NanoCpus") != 2_000_000_000
@@ -640,6 +1327,13 @@ class PreSoakDeployController:
             or running is not require_running
         ):
             raise DeploymentError("container drifted from the frozen runtime policy")
+        if (
+            len(mounts) != 2
+            or any(not isinstance(item, dict) for item in mounts)
+            or {item.get("Destination") for item in mounts}
+            != {"/var/lib/research-os", "/run/research-os"}
+        ):
+            raise DeploymentError("container has an unexpected mount")
         mount_by_destination = {
             item.get("Destination"): item for item in mounts if isinstance(item, dict)
         }
@@ -706,22 +1400,34 @@ class PreSoakDeployController:
         self._stage_content(bundle)
         self._install_saved_unit(bundle)
         snapshot, pause_sha = self._verify_running(bundle)
+        evidence: dict[str, Any] = {
+            "preflight": preflight,
+            "archive_sha256": bundle.archive_sha256,
+            "remote_archive_verified": True,
+            "unit_sha256": bundle.unit_sha256,
+            "pause_state": snapshot,
+            "pause_state_sha256": pause_sha,
+            "runtime_policy_enforced": True,
+            "rollback_target": PREVIOUS_RELEASE,
+            "automatic_sudo_executed": False,
+            "automatic_reboot_executed": False,
+            "declares_ready_for_72h_soak": False,
+        }
+        if bundle.capsule is not None:
+            evidence.update(
+                {
+                    "capsule_manifest_sha256": bundle.capsule.manifest_sha256,
+                    "capsule_cas_refs": {
+                        item.contour: item.cas_ref for item in bundle.capsule.objects
+                    },
+                    "capsule_objects_verified": True,
+                    "runtime_tmpdir": "/var/lib/research-os/tmp",
+                }
+            )
         return _receipt(
             "deploy",
             bundle,
-            {
-                "preflight": preflight,
-                "archive_sha256": bundle.archive_sha256,
-                "remote_archive_verified": True,
-                "unit_sha256": bundle.unit_sha256,
-                "pause_state": snapshot,
-                "pause_state_sha256": pause_sha,
-                "runtime_policy_enforced": True,
-                "rollback_target": PREVIOUS_RELEASE,
-                "automatic_sudo_executed": False,
-                "automatic_reboot_executed": False,
-                "declares_ready_for_72h_soak": False,
-            },
+            evidence,
             clock=self._clock,
         )
 
@@ -897,6 +1603,8 @@ def _receipt(
         "config_sha256": bundle.config_sha256,
         "evidence": dict(evidence),
     }
+    if bundle.capsule is not None:
+        payload["capsule_manifest_sha256"] = bundle.capsule.manifest_sha256
     return {
         "schema_version": RECEIPT_SCHEMA,
         "issued_at": issued_at,
@@ -929,6 +1637,8 @@ def _verified_parent_receipt(
         or payload.get("image_id") != bundle.image_id
         or payload.get("policy_sha256") != bundle.policy_sha256
         or payload.get("config_sha256") != bundle.config_sha256
+        or payload.get("capsule_manifest_sha256")
+        != (bundle.capsule.manifest_sha256 if bundle.capsule is not None else None)
     ):
         raise DeploymentError("parent receipt does not bind the exact release")
     evidence = payload.get("evidence")
@@ -988,7 +1698,8 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--manifest", type=Path, default=ROOT / "docs/receipts/release/s4-release-manifest.json")
     parser.add_argument("--policy", type=Path, default=ROOT / "ops/release/runtime-policy.json")
     parser.add_argument("--config", type=Path, default=ROOT / "ops/release/researchd.config.template.json")
-    parser.add_argument("--unit", type=Path, default=ROOT / "ops/deploy/research-os-bridge.service")
+    parser.add_argument("--unit", type=Path)
+    parser.add_argument("--capsule", type=Path)
     parser.add_argument("--receipt", type=Path, required=True)
     commands = parser.add_subparsers(dest="action", required=True)
 
@@ -1022,13 +1733,22 @@ def run(
         action = arguments.action
         archive = arguments.archive if arguments.action == "deploy" else None
         archive_sha = arguments.archive_sha256 if arguments.action == "deploy" else None
+        capsule = _load_capsule(arguments.capsule) if arguments.capsule is not None else None
+        unit_path = arguments.unit
+        if unit_path is None:
+            unit_path = ROOT / "ops/deploy" / (
+                "research-os-bridge.functional.service"
+                if capsule is not None
+                else "research-os-bridge.service"
+            )
         bundle = _load_bundle(
             manifest_path=arguments.manifest,
             policy_path=arguments.policy,
             config_path=arguments.config,
-            unit_path=arguments.unit,
+            unit_path=unit_path,
             archive_path=archive,
             archive_sha256=archive_sha,
+            capsule=capsule,
         )
         controller = PreSoakDeployController(
             ssh_alias=arguments.ssh_alias,
