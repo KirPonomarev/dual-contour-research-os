@@ -1,0 +1,16 @@
+{
+  "schema_id": "IntegrationReceipt", "schema_version": "1.0.0",
+  "object_id": "integration-s17-raw-response-assurance-20260718", "issued_at": "2026-07-18T18:10:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s17-raw-response-assurance", "agent_id": "agent-5",
+    "ownership_lease_ref": "stages/s17-raw-response-assurance/ownership-lease.json",
+    "base_sha": "fb9821b3ff655972f8f663991f86d36e7f230288", "head_sha": "9cbcc6787b17bbd82a71aa22cbf9a0c6979ba874",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": ["tests/test_s17_raw_response_boundary.py", "tests/test_stage1_assurance.py", "stages/s17-raw-response-assurance/stage-envelope.json", "stages/s17-raw-response-assurance/ownership-lease.json"],
+    "audit_results": {"contract_gate": "green", "privacy_secret_scan": "green", "focused_tests": 37, "new_hostile_tests": 5, "full_core_tests": 628, "stage0b_tests": 25, "sandbox_socket_failure": "baseline-environment-only-rerun-outside-sandbox-green", "commit_before_parse": "green", "committed_evidence_retention": "green", "binding_mismatch_before_egress": "green", "unknown_retry_denial": "green"},
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29655305985", "integration_commit_sha": "7d9b87fc1710b7c691d2e23bfb779f65b9bbc009"
+  },
+  "integrity": {"payload_sha256": "56a108ca93736bc142d76a2c4d59dc309beab2cd99caffbe0aa5c0a118326f5b", "parent_refs": ["git:9cbcc6787b17bbd82a71aa22cbf9a0c6979ba874", "git:7d9b87fc1710b7c691d2e23bfb779f65b9bbc009", "ci:29655305985", "git:fb9821b3ff655972f8f663991f86d36e7f230288"]}
+}
