@@ -1,0 +1,49 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s02-ownership-activate-20260718",
+  "issued_at": "2026-07-18T13:41:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s02-ownership-activate",
+    "agent_id": "agent-0",
+    "ownership_lease_ref": "stages/s02-ownership-activate/ownership-lease.json",
+    "base_sha": "a49fb7767b1a663598b0ca179ad8ba7e1d3907da",
+    "head_sha": "a3f1fa13bcf32d7ac6c723dfdb97aae84af52747",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "ownership/registry.json",
+      "docs/ADR/0003-discovery-path-activation.md",
+      "docs/receipts/OWNERSHIP_REGISTRY_AMENDMENT_2.json",
+      "stages/s02-ownership-activate/stage-envelope.json",
+      "stages/s02-ownership-activate/ownership-lease.json",
+      "tools/verify_freeze_receipt.py",
+      "tools/verify_a1_freeze_receipt.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "ownership_chain": "green",
+      "ownership_registry_previous_sha256": "e8095063e94da82ab4a9658d9a7cdefd8d2e50bfa73c7b553b9ca9fdd6022f4a",
+      "ownership_registry_current_sha256": "39b6c0fcbea908db44a390ff70b04b93bd8f4474cca9b0bbdbf336f369dcab67",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "dependency_adoption": false,
+      "authority_expansion": false
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29646558710",
+    "integration_commit_sha": "a3f1fa13bcf32d7ac6c723dfdb97aae84af52747"
+  },
+  "integrity": {
+    "payload_sha256": "6b0ec4868ae2dc24a898d8f67dbedaeb4dbe28f964fa56465ccd64e9866694d5",
+    "parent_refs": [
+      "git:a3f1fa13bcf32d7ac6c723dfdb97aae84af52747",
+      "ci:29646558710",
+      "git:491f362ca4a22e4ed2d62c29b9e776e010505858",
+      "git:76a4c8b9f1247a661db4ceb2d0733c54ec54f568",
+      "git:a50df5edbdf5f267015e2c29046952a14e468e18",
+      "sha256:39b6c0fcbea908db44a390ff70b04b93bd8f4474cca9b0bbdbf336f369dcab67"
+    ]
+  }
+}

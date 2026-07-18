@@ -1,0 +1,48 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s02-scout-ipc-assurance-20260718",
+  "issued_at": "2026-07-18T13:41:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s02-scout-ipc-assurance",
+    "agent_id": "agent-5",
+    "ownership_lease_ref": "stages/s02-scout-ipc-assurance/ownership-lease.json",
+    "base_sha": "f925daa773e229fb942d066d002a9ff877cb82f8",
+    "head_sha": "8d5c396a80595ac62728ed350230977bb4b0488c",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "tests/test_a1_scout_ipc_fixture.py",
+      "tests/test_ownership_registry.py",
+      "stages/s02-scout-ipc-assurance/stage-envelope.json",
+      "stages/s02-scout-ipc-assurance/ownership-lease.json"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "focused_tests": 60,
+      "full_core_tests": 490,
+      "stage0b_tests": 25,
+      "claim_race_and_fencing": "green",
+      "parser_hostile_pack": "green",
+      "reason_disclosure": "green",
+      "idempotency": "green",
+      "authority_negative_probes": "green",
+      "write_set_audit": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29646558710",
+    "integration_commit_sha": "a3f1fa13bcf32d7ac6c723dfdb97aae84af52747"
+  },
+  "integrity": {
+    "payload_sha256": "759cb51918746e5f17529014f04a00b8a31890d6be3741f62dc307712b8e6e34",
+    "parent_refs": [
+      "git:a3f1fa13bcf32d7ac6c723dfdb97aae84af52747",
+      "ci:29646558710",
+      "git:8d5c396a80595ac62728ed350230977bb4b0488c",
+      "git:f925daa773e229fb942d066d002a9ff877cb82f8"
+    ]
+  }
+}
