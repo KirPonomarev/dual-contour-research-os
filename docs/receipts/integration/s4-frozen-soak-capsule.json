@@ -1,0 +1,75 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s4-frozen-soak-capsule-20260718",
+  "issued_at": "2026-07-18T00:20:48Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s4-frozen-soak-capsule",
+    "agent_id": "agent-1",
+    "ownership_lease_ref": "stages/s4-frozen-soak-capsule/ownership-lease.json",
+    "base_sha": "287bace2500a6c9fcbf59a3a9b546b1ac51f77b6",
+    "head_sha": "f34ec24815d8888eab1bd233f32ffd0136d6f481",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "tools/build_pre_soak_capsule.py",
+      "tools/issue_l0_job_bundle.py",
+      "tests/test_pre_soak_capsule.py",
+      "tests/test_l0_job_bundle_issuer.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "privacy_secret_scan": "green",
+      "path_network_scan": "green",
+      "source_mutation": false,
+      "focused_test_count": 14,
+      "full_core_test_count": 428,
+      "full_inventory_test_count": 25,
+      "worker_initial_commit_sha": "de9a5bdb8ba5d2c0c21bbe2583f1b640913a865a",
+      "worker_final_commit_sha": "6f821ddce62785cb629cb501abb94d4eb4359013",
+      "worker_base_exact": true,
+      "worker_write_set_exact": true,
+      "capsule_new_only_owner_mode": "0700",
+      "config_owner_mode": "0600",
+      "deploy_runtime_root": "/var/lib/research-os",
+      "deploy_uid": 10001,
+      "target_parser_proven_in_frozen_image": true,
+      "target_image_digest": "sha256:36069ee7a9db78af747d7fad65f9e33073824f27be898cdc0b7dd3b77ac5c235",
+      "target_image_user": "10001:10001",
+      "target_smoke_network": "none",
+      "target_smoke_read_only_root": true,
+      "target_smoke_config_sha256": "dd831e14fc47ca28912d5f8d40bac92ed45ceb75ef013cc39bd522f65e4882b7",
+      "target_daemon_start_and_status": "green",
+      "market_and_security_D0_D1_inputs_seeded_via_CAS": true,
+      "capsule_manifest_binds_every_file": true,
+      "offline_L0_bundle_admission_and_validation": "green",
+      "bundle_maximum_lifetime_seconds": 300,
+      "bundle_lifetime_bounded_by_policy_and_approval": true,
+      "manual_ephemeral_CAS_seed_smoke_only": true,
+      "production_deploy_CAS_seed_implemented": false,
+      "target_L0_terminal_completion_proven": false,
+      "target_L0_stop_reason": "current-deployment-profile-has-no-writable-temp-directory-under-read-only-root",
+      "external_action_authority": false,
+      "external_runtime_mutated": false,
+      "declares_ready_for_72h_soak": false,
+      "next_stage": "s4-capsule-seeded-deploy"
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29622488307",
+    "integration_commit_sha": "f34ec24815d8888eab1bd233f32ffd0136d6f481"
+  },
+  "integrity": {
+    "payload_sha256": "1288e69d5c2d290ad0866814909a77b39f1c5f98be9e75601b097bc437e6a95e",
+    "parent_refs": [
+      "git:f34ec24815d8888eab1bd233f32ffd0136d6f481",
+      "git:6f821ddce62785cb629cb501abb94d4eb4359013",
+      "ci:29622488307",
+      "reuse:reuse-s4-frozen-soak-capsule-20260718",
+      "image:sha256:36069ee7a9db78af747d7fad65f9e33073824f27be898cdc0b7dd3b77ac5c235"
+    ]
+  }
+}
