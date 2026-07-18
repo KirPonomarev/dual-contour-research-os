@@ -1,0 +1,18 @@
+{
+  "lease_id": "lease-s02-ownership-activate-agent-0",
+  "stage_id": "s02-ownership-activate",
+  "agent_id": "agent-0",
+  "base_sha": "a49fb7767b1a663598b0ca179ad8ba7e1d3907da",
+  "branch": "codex/bridge-a0-s02-ownership-activate",
+  "issued_at": "2026-07-18T13:28:37Z",
+  "expires_at": "2026-07-19T13:28:37Z",
+  "write_set": [
+    "ownership/registry.json",
+    "docs/ADR/0003-discovery-path-activation.md",
+    "docs/receipts/OWNERSHIP_REGISTRY_AMENDMENT_2.json",
+    "stages/s02-ownership-activate/stage-envelope.json",
+    "stages/s02-ownership-activate/ownership-lease.json"
+  ],
+  "exclusive": true,
+  "revoked": false
+}

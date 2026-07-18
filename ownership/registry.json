@@ -1,7 +1,7 @@
 {
   "schema_version": "1.1.0",
   "frozen": true,
-  "amendment_ref": "docs/ADR/0002-ownership-registry-amendment.md",
+  "amendment_ref": "docs/ADR/0003-discovery-path-activation.md",
   "canonical_owners": {
     "LICENSES/**": "agent-0",
     "contracts/**": "agent-0",
@@ -15,6 +15,7 @@
     "src/research_bridge/admission.py": "agent-1",
     "src/research_bridge/authority.py": "agent-1",
     "src/research_bridge/control.py": "agent-1",
+    "src/research_bridge/discovery.py": "agent-1",
     "src/research_bridge/ipc.py": "agent-1",
     "src/research_bridge/kernel.py": "agent-1",
     "src/research_bridge/ledger.py": "agent-1",
@@ -35,7 +36,6 @@
   "reserved_future_paths": {
     "adapters/market/**": "agent-3",
     "adapters/security/**": "agent-4",
-    "src/research_bridge/discovery.py": "agent-1",
     "src/research_bridge/evolution.py": "agent-1",
     "src/research_bridge/model_broker.py": "agent-1",
     "src/research_bridge/organism.py": "agent-5",
