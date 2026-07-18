@@ -1,0 +1,38 @@
+{
+  "stage_id": "s03-synthetic-domain-writer",
+  "agent_id": "agent-3",
+  "objective": "Freeze a typed S03 projection into D0 public shadow-only HypothesisCard and ProtocolSnapshot values under separately pinned domain writer identities.",
+  "executable_blocker": "Bridge FreezeProjection has no domain-owned fixture consumer, so writer separation and exact Core object binding are unproved.",
+  "base_sha": "0b5dd69e5ebfaa8dc577035512079856f8f15332",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "a1_contract_sha256": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+  "branch": "codex/bridge-a3-s03-synthetic-writer",
+  "worktree": "/Volumes/Work/dual-contour-research-os-s03-synthetic-writer",
+  "write_set": ["adapters/market/synthetic_fixture.py"],
+  "forbidden_scope": [
+    "real-market-data", "strategy", "account-material", "network", "live-api",
+    "order", "canonical-market-ledger", "true-holdout", "LearningDecision",
+    "Permit", "Bridge-writer-authority", "D1-D2-D3", "dependency", "deployment"
+  ],
+  "dependency_hashes": {
+    "core_contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "a1_contract_catalog": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+    "reuse_decision": "824d594e9ca8d1965e04724d0b9cb90952e6e74c875eea2f16c0113b6b26d7f1",
+    "external_dependencies": "none"
+  },
+  "acceptance_commands": [
+    "make contracts", "compile synthetic_fixture.py", "S03 focused tests after Agent 5 stage",
+    "git diff --check", "public safety scan"
+  ],
+  "risk_class": "synthetic-domain-writer-authority-boundary",
+  "stop_conditions": [
+    "writer-spoof-accepted", "Bridge-issuer-accepted", "non-D0-accepted",
+    "shadow-taint-lost", "canonical-or-live-surface", "contract-drift",
+    "private-data-detected"
+  ],
+  "expected_receipt": "docs/receipts/integration/s03-synthetic-domain-writer.json",
+  "rollback": "Revert only the pure synthetic writer; it performs no durable or canonical write.",
+  "commit_authority": "one-scoped-agent-3-commit",
+  "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent5_assurance", "blocked_validation_failed"]
+}
