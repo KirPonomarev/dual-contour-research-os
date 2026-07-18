@@ -1,0 +1,12 @@
+{
+  "lease_id": "lease-s03-synthetic-domain-writer-agent-3",
+  "stage_id": "s03-synthetic-domain-writer",
+  "agent_id": "agent-3",
+  "base_sha": "0b5dd69e5ebfaa8dc577035512079856f8f15332",
+  "branch": "codex/bridge-a3-s03-synthetic-writer",
+  "issued_at": "2026-07-18T13:49:00Z",
+  "expires_at": "2026-07-19T13:49:00Z",
+  "write_set": ["adapters/market/synthetic_fixture.py"],
+  "exclusive": true,
+  "revoked": false
+}

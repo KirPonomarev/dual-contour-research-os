@@ -21,7 +21,7 @@ import time
 from types import MappingProxyType
 from typing import Callable, Mapping, Sequence
 
-from .admission import A1AdmissionKernel, canonical_json_sha256
+from .admission import A1AdmissionKernel, A1AdmissionSnapshot, canonical_json_sha256
 
 
 _SHA256_RE = re.compile(r"^[a-f0-9]{64}$")
@@ -80,6 +80,43 @@ _RESOURCE_KEYS = frozenset(
         "output_bytes",
         "tokens",
         "cost_units",
+    }
+)
+_CANDIDATE_KEYS = frozenset(
+    {
+        "schema_id",
+        "schema_version",
+        "object_id",
+        "issued_at",
+        "issuer",
+        "contour",
+        "classification",
+        "payload",
+        "integrity",
+    }
+)
+_CANDIDATE_TRUSTED_PAYLOAD_KEYS = frozenset(
+    {
+        "event_ref",
+        "root_event_ref",
+        "vcs_identity",
+        "policy_sha256",
+        "context_sha256",
+        "shadow_taint",
+        "model_call_refs",
+        "critique_refs",
+    }
+)
+_CANDIDATE_PAYLOAD_KEYS = _MODEL_BODY_KEYS | _CANDIDATE_TRUSTED_PAYLOAD_KEYS
+_VCS_IDENTITY_KEYS = frozenset(
+    {
+        "repository_id",
+        "head_sha",
+        "base_sha",
+        "worktree_clean",
+        "contract_catalog_sha256",
+        "a1_catalog_sha256",
+        "release_manifest_sha256",
     }
 )
 _MAX_SAFE_INTEGER = 9_007_199_254_740_991
@@ -191,6 +228,70 @@ class DiscoveryFixtureConfig:
             "remaining_energy",
             _deep_freeze(_json_copy(self.remaining_energy)),
         )
+
+
+@dataclass(frozen=True, slots=True)
+class FreezeProjectionConfig:
+    """Trusted D0 fixture inputs that no candidate or model may override."""
+
+    domain_contour: str
+    hypothesis_writer_id: str
+    protocol_writer_id: str
+    input_manifest_sha256: str
+    code_sha256: str
+    environment_digest: str
+    seed_set: tuple[int, ...]
+    validator_sha256: str
+    trial_family_prefix: str
+    holdout_policy_ref: str
+
+    def __post_init__(self) -> None:
+        if self.domain_contour != "market":
+            raise DiscoveryError("S03 synthetic fixture contour must be market")
+        for name, value in (
+            ("hypothesis_writer_id", self.hypothesis_writer_id),
+            ("protocol_writer_id", self.protocol_writer_id),
+            ("environment_digest", self.environment_digest),
+            ("trial_family_prefix", self.trial_family_prefix),
+            ("holdout_policy_ref", self.holdout_policy_ref),
+        ):
+            _text(name, value, maximum=512)
+        for name, value in (
+            ("input_manifest_sha256", self.input_manifest_sha256),
+            ("code_sha256", self.code_sha256),
+            ("validator_sha256", self.validator_sha256),
+        ):
+            _sha256(name, value)
+        if self.holdout_policy_ref != "synthetic-no-true-holdout-v1":
+            raise DiscoveryError("synthetic fixture must deny true holdout access")
+        if (
+            not isinstance(self.seed_set, tuple)
+            or not self.seed_set
+            or len(self.seed_set) > 64
+            or any(type(seed) is not int or seed < 0 for seed in self.seed_set)
+            or len(set(self.seed_set)) != len(self.seed_set)
+        ):
+            raise DiscoveryError("seed_set must contain unique non-negative integers")
+
+
+@dataclass(frozen=True, slots=True)
+class FreezeProjection:
+    """Non-authoritative immutable request for a pinned domain fixture writer."""
+
+    payload: Mapping[str, object]
+    sha256: str
+
+    def __post_init__(self) -> None:
+        copied = _json_copy(self.payload)
+        if not isinstance(copied, dict):
+            raise DiscoveryError("freeze projection payload must be an object")
+        digest = canonical_json_sha256(copied)
+        if not hmac.compare_digest(digest, _sha256("projection sha256", self.sha256)):
+            raise DiscoveryError("freeze projection digest mismatch")
+        object.__setattr__(self, "payload", _deep_freeze(copied))
+
+    def to_mapping(self) -> dict[str, object]:
+        return _json_copy(self.payload)  # type: ignore[return-value]
 
 
 @dataclass(frozen=True, slots=True)
@@ -696,6 +797,208 @@ class DiscoveryFixtureService:
         return _deep_freeze(candidate)
 
 
+class FreezeProjector:
+    """Project one validated-looking candidate without issuing domain objects.
+
+    The output is only an immutable request.  It has no Core schema identity,
+    issuer, scientific authority, execution authority, writer callback, or I/O
+    surface.  A separately pinned domain fixture must validate and freeze it.
+    """
+
+    def __init__(self, config: FreezeProjectionConfig) -> None:
+        if not isinstance(config, FreezeProjectionConfig):
+            raise DiscoveryError("freeze projection config is required")
+        self._config = config
+
+    def project(self, candidate: Mapping[str, object]) -> FreezeProjection:
+        document, body = self._validate_candidate(candidate)
+        candidate_sha256 = canonical_json_sha256(document)
+        hypothesis_payload = {
+            "hypothesis_id": body["candidate_id"],
+            "thesis": body["estimand"],
+            "null_hypothesis": body["null_hypothesis"],
+            "mechanism": body["experiment_type"],
+            "falsification_rule": body["falsifier"],
+            "scope_boundary": body["scope"],
+            "source_refs": _json_copy(body["evidence_refs"]),
+        }
+        protocol_inputs = {
+            "primary_outcome": body["expected_output"],
+            "input_manifest_sha256": self._config.input_manifest_sha256,
+            "code_sha256": self._config.code_sha256,
+            "environment_digest": self._config.environment_digest,
+            "seed_set": list(self._config.seed_set),
+            "stopping_rule": body["stop_condition"],
+            "validator_sha256": self._config.validator_sha256,
+            "trial_family_id": (
+                f"{self._config.trial_family_prefix}:{body['candidate_id']}"
+            ),
+            "holdout_policy_ref": self._config.holdout_policy_ref,
+        }
+        core: dict[str, object] = {
+            "algorithm_version": "freeze-projection-v1",
+            "candidate_ref": document["object_id"],
+            "candidate_sha256": candidate_sha256,
+            "source_event_ref": body["event_ref"],
+            "domain_contour": self._config.domain_contour,
+            "classification": "D0_PUBLIC",
+            "shadow_taint": "SHADOW_UNAPPLIED",
+            "policy_sha256": body["policy_sha256"],
+            "context_sha256": body["context_sha256"],
+            "required_writers": {
+                "HypothesisCard": self._config.hypothesis_writer_id,
+                "ProtocolSnapshot": self._config.protocol_writer_id,
+            },
+            "hypothesis_payload": hypothesis_payload,
+            "protocol_inputs": protocol_inputs,
+        }
+        projection_identity = canonical_json_sha256(core)
+        core["projection_id"] = f"freeze-projection:{projection_identity}"
+        return FreezeProjection(
+            payload=core,
+            sha256=canonical_json_sha256(core),
+        )
+
+    @staticmethod
+    def bind_admission_snapshot(
+        projection: FreezeProjection,
+        snapshot: A1AdmissionSnapshot,
+    ) -> Mapping[str, object]:
+        """Prove that admission and domain freeze bind the exact same candidate."""
+
+        if not isinstance(projection, FreezeProjection):
+            raise DiscoveryError("freeze projection is required")
+        if not isinstance(snapshot, A1AdmissionSnapshot):
+            raise DiscoveryError("A1 admission snapshot is required")
+        projected = projection.to_mapping()
+        frozen = snapshot.to_mapping()
+        if (
+            frozen.get("candidate_ref") != projected["candidate_ref"]
+            or frozen.get("candidate_sha256") != projected["candidate_sha256"]
+        ):
+            raise DiscoveryError("freeze projection and admission snapshot diverge")
+        return _deep_freeze(
+            {
+                "candidate_ref": projected["candidate_ref"],
+                "candidate_sha256": projected["candidate_sha256"],
+                "freeze_projection_ref": projected["projection_id"],
+                "freeze_projection_sha256": projection.sha256,
+                "admission_snapshot_sha256": snapshot.sha256,
+                "shadow_taint": "SHADOW_UNAPPLIED",
+            }
+        )
+
+    @staticmethod
+    def _validate_candidate(
+        candidate: Mapping[str, object],
+    ) -> tuple[dict[str, object], dict[str, object]]:
+        document = _exact_mapping(candidate, _CANDIDATE_KEYS, "candidate")
+        if (
+            document["schema_id"] != "CandidateSpecDraft"
+            or document["schema_version"] != "1.0.0"
+            or document["issuer"] != "proposal-ingestor"
+            or document["contour"] != "bridge"
+        ):
+            raise DiscoveryError("candidate identity or writer boundary is invalid")
+        if document["classification"] != "D0":
+            raise DiscoveryError("S03 synthetic fixture accepts D0 candidates only")
+        _text("candidate.object_id", document["object_id"], maximum=256)
+        _timestamp("candidate.issued_at", document["issued_at"])
+        body = _exact_mapping(
+            document["payload"], _CANDIDATE_PAYLOAD_KEYS, "candidate.payload"
+        )
+        for field in (
+            "candidate_id",
+            "event_ref",
+            "root_event_ref",
+            "experiment_type",
+            "estimand",
+            "null_hypothesis",
+            "falsifier",
+            "stop_condition",
+            "scope",
+            "expected_output",
+        ):
+            _text(f"candidate.payload.{field}", body[field], maximum=4_096)
+        _positive_integer("candidate.payload.draft_revision", body["draft_revision"])
+        evidence_refs = _string_sequence(
+            "candidate.payload.evidence_refs",
+            body["evidence_refs"],
+            allow_empty=False,
+            maximum=512,
+        )
+        groups = body["evidence_independence_groups"]
+        if not isinstance(groups, list) or not groups:
+            raise DiscoveryError("candidate evidence groups must be non-empty")
+        grouped = [
+            reference
+            for index, group in enumerate(groups)
+            for reference in _string_sequence(
+                f"candidate.payload.evidence_independence_groups[{index}]",
+                group,
+                allow_empty=False,
+                maximum=512,
+            )
+        ]
+        if len(grouped) != len(set(grouped)) or set(grouped) != set(evidence_refs):
+            raise DiscoveryError("candidate evidence groups must partition refs")
+        if document["object_id"] in evidence_refs or body["candidate_id"] in evidence_refs:
+            raise DiscoveryError("candidate cannot use self evidence")
+        _resource_budget("candidate.payload.resource_request", body["resource_request"])
+        _string_sequence(
+            "candidate.payload.data_classes", body["data_classes"], allow_empty=False, maximum=256
+        )
+        for field in (
+            "network_required",
+            "holdout_access_requested",
+            "canonical_write_requested",
+            "private_api_requested",
+            "live_execution_requested",
+        ):
+            if type(body[field]) is not bool:
+                raise DiscoveryError(f"candidate.payload.{field} must be boolean")
+        vcs = _exact_mapping(body["vcs_identity"], _VCS_IDENTITY_KEYS, "candidate.vcs_identity")
+        _text("candidate.vcs_identity.repository_id", vcs["repository_id"], maximum=256)
+        for field in ("head_sha", "base_sha"):
+            if not isinstance(vcs[field], str) or _GIT_SHA_RE.fullmatch(vcs[field]) is None:
+                raise DiscoveryError(f"candidate.vcs_identity.{field} is invalid")
+        if type(vcs["worktree_clean"]) is not bool:
+            raise DiscoveryError("candidate.vcs_identity.worktree_clean must be boolean")
+        for field in (
+            "contract_catalog_sha256",
+            "a1_catalog_sha256",
+            "release_manifest_sha256",
+        ):
+            _sha256(f"candidate.vcs_identity.{field}", vcs[field])
+        for field in ("policy_sha256", "context_sha256"):
+            _sha256(f"candidate.payload.{field}", body[field])
+        if body["shadow_taint"] not in {"NONE", "SHADOW_UNAPPLIED"}:
+            raise DiscoveryError("candidate shadow taint is invalid")
+        for field in ("model_call_refs", "critique_refs"):
+            _string_sequence(
+                f"candidate.payload.{field}", body[field], allow_empty=True, maximum=512
+            )
+        integrity = _exact_mapping(
+            document["integrity"],
+            frozenset({"profile_id", "payload_sha256", "parent_refs"}),
+            "candidate.integrity",
+        )
+        if integrity["profile_id"] != "core-json-sha256-v1":
+            raise DiscoveryError("candidate integrity profile is invalid")
+        expected = canonical_json_sha256(body)
+        if not hmac.compare_digest(
+            expected, _sha256("candidate.integrity.payload_sha256", integrity["payload_sha256"])
+        ):
+            raise DiscoveryError("candidate payload integrity mismatch")
+        _string_sequence(
+            "candidate.integrity.parent_refs",
+            integrity["parent_refs"],
+            allow_empty=False,
+            maximum=512,
+        )
+        return document, body
+
+
 def _strict_object(pairs: list[tuple[str, object]]) -> dict[str, object]:
     result: dict[str, object] = {}
     for key, value in pairs:
@@ -860,4 +1163,7 @@ __all__ = [
     "DiscoveryFixtureConfig",
     "StrictProposalParser",
     "DiscoveryFixtureService",
+    "FreezeProjectionConfig",
+    "FreezeProjection",
+    "FreezeProjector",
 ]

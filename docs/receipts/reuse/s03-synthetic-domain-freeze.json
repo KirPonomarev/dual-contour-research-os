@@ -1,0 +1,42 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-s03-synthetic-domain-freeze-20260718",
+  "issued_at": "2026-07-18T13:45:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-freeze-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "deterministic-candidate-freeze-to-domain-owned-public-synthetic-hypothesis-and-protocol",
+    "candidates": [
+      {"candidate": "existing-Core-HypothesisCard-and-ProtocolSnapshot-contracts", "disposition": "selected"},
+      {"candidate": "existing-A1-CandidateSpecDraft-and-admission-snapshot-binding", "disposition": "selected"},
+      {"candidate": "reserved-Agent3-market-adapter-boundary-with-D0-synthetic-fixture", "disposition": "selected"},
+      {"candidate": "Bridge-issued-scientific-contracts", "disposition": "rejected-authority-violation"},
+      {"candidate": "new-domain-ledger-or-external-framework", "disposition": "rejected-no-measured-blocker"}
+    ],
+    "selected_mode": "pure-Bridge-FreezeProjection-plus-pinned-Agent3-D0-shadow-writer-using-existing-contracts-and-stdlib",
+    "source_ref": "core-catalog:sha256:13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50;a1-catalog:sha256:eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1;git:f9592bcaf7b6a94817dfb1937ba9e5f9c8e284ce",
+    "code_sha256": "2a0e52a52fd21909d9acd4f24ce72fd1997a6a2dedea94df42c6b991811d972e",
+    "license_spdx": "NOASSERTION",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "Bridge-projects-but-never-issues-domain-contracts",
+      "pinned-writer-and-issuer-spoof-negative-probes",
+      "D0-only-and-SHADOW_UNAPPLIED-inheritance",
+      "exact-candidate-hypothesis-protocol-and-admission-binding",
+      "deterministic-replay-and-deep-immutability",
+      "no-LearningDecision-Permit-ledger-network-or-live-surface"
+    ],
+    "canonical_owner": "synthetic-Market-fixture-Agent3-and-governance-Agent0-integration",
+    "rollback": "Revert S03 projection, adapter, tests and ownership activation. S02 CandidateSpecDraft and admission remain valid; no durable or canonical domain state exists."
+  },
+  "integrity": {
+    "payload_sha256": "824d594e9ca8d1965e04724d0b9cb90952e6e74c875eea2f16c0113b6b26d7f1",
+    "parent_refs": [
+      "git:f9592bcaf7b6a94817dfb1937ba9e5f9c8e284ce",
+      "sha256:13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+      "sha256:eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1"
+    ]
+  }
+}

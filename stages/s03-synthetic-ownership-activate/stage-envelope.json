@@ -1,0 +1,23 @@
+{
+  "stage_id": "s03-synthetic-ownership-activate",
+  "agent_id": "agent-0",
+  "objective": "Activate the existing Agent 3 Market adapter reservation for the S03 public synthetic fixture and freeze its reuse decision.",
+  "base_sha": "f9592bcaf7b6a94817dfb1937ba9e5f9c8e284ce",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "a1_contract_sha256": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+  "branch": "codex/bridge-a0-s03-synthetic-ownership",
+  "worktree": "/Volumes/Work/dual-contour-research-os-s03-ownership",
+  "write_set": [
+    "ownership/registry.json",
+    "docs/ADR/0004-synthetic-market-fixture-activation.md",
+    "docs/receipts/OWNERSHIP_REGISTRY_AMENDMENT_3.json",
+    "docs/receipts/reuse/s03-synthetic-domain-freeze.json",
+    "stages/s03-synthetic-ownership-activate/stage-envelope.json",
+    "stages/s03-synthetic-ownership-activate/ownership-lease.json"
+  ],
+  "forbidden_scope": ["contract-edit", "source-edit", "test-edit", "private-domain-data", "authority-expansion", "deployment"],
+  "acceptance_commands": ["make contracts after paired live-path stage", "git diff --check", "receipt integrity check"],
+  "expected_receipt": "docs/receipts/integration/s03-synthetic-ownership-activate.json",
+  "commit_authority": "one-scoped-agent-0-commit",
+  "push_authority": true
+}

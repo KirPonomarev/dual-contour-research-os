@@ -1,0 +1,12 @@
+{
+  "lease_id": "lease-s03-freeze-projection-agent-1",
+  "stage_id": "s03-freeze-projection",
+  "agent_id": "agent-1",
+  "base_sha": "ba12c7f3bac5642fc033da18710278bff41aea3b",
+  "branch": "codex/bridge-a1-s03-freeze-projection",
+  "issued_at": "2026-07-18T13:47:00Z",
+  "expires_at": "2026-07-19T13:47:00Z",
+  "write_set": ["src/research_bridge/discovery.py"],
+  "exclusive": true,
+  "revoked": false
+}

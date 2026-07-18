@@ -1,8 +1,9 @@
 {
   "schema_version": "1.1.0",
   "frozen": true,
-  "amendment_ref": "docs/ADR/0003-discovery-path-activation.md",
+  "amendment_ref": "docs/ADR/0004-synthetic-market-fixture-activation.md",
   "canonical_owners": {
+    "adapters/market/**": "agent-3",
     "LICENSES/**": "agent-0",
     "contracts/**": "agent-0",
     "docs/*.md": "agent-0",
@@ -34,7 +35,6 @@
     "tools/**": "agent-0"
   },
   "reserved_future_paths": {
-    "adapters/market/**": "agent-3",
     "adapters/security/**": "agent-4",
     "src/research_bridge/evolution.py": "agent-1",
     "src/research_bridge/model_broker.py": "agent-1",
