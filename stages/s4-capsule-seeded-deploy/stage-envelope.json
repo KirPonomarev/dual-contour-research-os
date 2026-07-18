@@ -1,0 +1,60 @@
+{
+  "stage_id": "s4-capsule-seeded-deploy",
+  "agent_id": "agent-2",
+  "objective": "Extend the rootless deploy controller to validate and seed the frozen capsule's exact two CAS inputs and provide a bounded writable TMPDIR without weakening the read-only no-network runtime.",
+  "executable_blocker": "The frozen daemon starts with the functional config, but current deployment leaves input CAS empty and terminal L0 materialization has no writable tempfile directory under the read-only root.",
+  "base_sha": "1f3962163741571828d8f0a8abb3ad41cbd99ad3",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a2-s4-capsule-seeded-deploy",
+  "worktree": "/private/tmp/dcros-s4-capsule-seeded-deploy",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "tools/pre_soak_deploy.py",
+    "tools/build_pre_soak_capsule.py",
+    "tools/issue_l0_job_bundle.py",
+    "src/research_bridge/cas.py",
+    "ops/deploy/research-os-bridge.service",
+    "ops/release/runtime-policy.json",
+    "tests/test_release_deploy_recovery.py",
+    "docs/receipts/integration/s4-frozen-soak-capsule.json"
+  ],
+  "write_set": [
+    "tools/pre_soak_deploy.py",
+    "tests/test_release_deploy_recovery.py",
+    "ops/deploy/research-os-bridge.functional.service"
+  ],
+  "forbidden_scope": [
+    "contracts-catalog-runtime-source-existing-release-manifest-config-policy-lock-workflow-migration-or-domain-repository-edit",
+    "image-rebuild-new-dependency-network-enabled-container-writable-root-public-port-or-rootful-Docker",
+    "private-path-host-IP-user-secret-D2-D3-payload-or-unbound-capsule-file",
+    "overwrite-mismatched-CAS-object-delete-prune-reboot-rollback-approval-consumption-or-READY-claim"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "reuse_decision": "6ba1f46883cac366edd2ce37e93ac044708aa52efb74c84f7f0a354881e25561",
+    "public_head": "1f3962163741571828d8f0a8abb3ad41cbd99ad3",
+    "selected_internal_boundary_tree": "2b39b52c1887e04a47173cc7b6f1cdaedbc0462979e05dd96fe77d0ec55d312b",
+    "frozen_image": "sha256:36069ee7a9db78af747d7fad65f9e33073824f27be898cdc0b7dd3b77ac5c235",
+    "external_dependencies": "none"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest tests.test_release_deploy_recovery -v",
+    "make test",
+    "git diff --check",
+    "exact-capsule-CAS-TMPDIR-unit-receipt-write-set-secret-path-network-overwrite-and-authority scans"
+  ],
+  "risk_class": "rootless-capsule-seed-and-terminal-temp-deployment",
+  "stop_conditions": [
+    "base-contract-reuse-image-capsule-or-existing-deploy-boundary-mismatch",
+    "capsule-config-CAS-object-hash-owner-mode-or-two-contour-shape-cannot-be-proven",
+    "implementation-would-require-image-rebuild-new-dependency-writable-root-network-rootful-Docker-or-unbounded-archive-extraction",
+    "remote-existing-object-differs-or-any-unbound-file-would-be-copied",
+    "before-equals-after-or-either-CAS-seed-or-writable-terminal-temp-blocker-remains"
+  ],
+  "expected_receipt": "docs/receipts/integration/s4-capsule-seeded-deploy.json",
+  "rollback": "Revert worker commit and functional unit; Agent0 remains sole external deploy and rollback authority.",
+  "commit_authority": "worker-a2-audited-commit-only",
+  "push_authority": false
+}

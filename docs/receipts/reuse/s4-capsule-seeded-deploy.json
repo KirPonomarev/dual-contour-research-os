@@ -1,0 +1,57 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-s4-capsule-seeded-deploy-20260718",
+  "issued_at": "2026-07-18T00:27:24Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "reuse-freeze-authority"
+  },
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "exact-capsule-CAS-seeding-and-writable-terminal-temp-for-rootless-frozen-deploy",
+    "candidates": [
+      {
+        "candidate": "existing-pre-soak-deploy-capsule-manifest-CAS-and-rootless-volume-boundaries-at-1f3962163741571828d8f0a8abb3ad41cbd99ad3",
+        "disposition": "selected-internal-adapters"
+      },
+      {
+        "candidate": "small-stdlib-only-exact-two-contour-CAS-seed-glue-and-functional-unit-template",
+        "disposition": "selected-minimal-missing-glue"
+      },
+      {
+        "candidate": "new-archive-or-sync-dependency",
+        "disposition": "rejected-unnecessary-supply-chain-surface"
+      },
+      {
+        "candidate": "writable-container-root-or-network-enabled-bootstrap",
+        "disposition": "rejected-security-boundary-regression"
+      }
+    ],
+    "selected_mode": "validate-sealed-capsule-and-exact-config-CAS-hashes-scp-only-two-bound-objects-install-new-only-or-exact-match-into-rootless-volume-and-use-runtime-owned-TMPDIR-under-the-same-volume",
+    "source_ref": "git:1f3962163741571828d8f0a8abb3ad41cbd99ad3;components:tools/{pre_soak_deploy,build_pre_soak_capsule}.py,src/research_bridge/cas.py,ops/deploy/research-os-bridge.service",
+    "code_sha256": "2b39b52c1887e04a47173cc7b6f1cdaedbc0462979e05dd96fe77d0ec55d312b",
+    "license_spdx": "Proprietary-Internal-Owned",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "capsule manifest config and every selected CAS object are verified before SSH mutation",
+      "only exact market and security D0-D1 objects are staged under digest-derived remote names",
+      "existing different bytes symlinks unexpected files and ownership or mode drift fail closed",
+      "runtime input CAS objects are 0444 and owned by UID 10001",
+      "runtime TMPDIR is 0700 under /var/lib/research-os and root filesystem remains read-only",
+      "deployment receipt binds capsule manifest hash and both CAS refs without payload bytes or local paths"
+    ],
+    "canonical_owner": "Agent0-deployment-release-authority-with-Agent2-rootless-controller-implementation",
+    "rollback": "Revert the seeded-deploy implementation and functional unit; no release is declared ready and Agent0 performs any external rollback."
+  },
+  "integrity": {
+    "payload_sha256": "6ba1f46883cac366edd2ce37e93ac044708aa52efb74c84f7f0a354881e25561",
+    "parent_refs": [
+      "git:1f3962163741571828d8f0a8abb3ad41cbd99ad3",
+      "integration:integration-s4-frozen-soak-capsule-20260718",
+      "integration:integration-s4-rootless-deploy-recovery-20260718",
+      "integration:integration-s4-release-manifest-sbom-20260718"
+    ]
+  }
+}
