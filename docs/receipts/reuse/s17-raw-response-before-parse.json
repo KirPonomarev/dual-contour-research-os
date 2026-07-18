@@ -1,0 +1,24 @@
+{
+  "schema_id": "ReuseDecisionReceipt", "schema_version": "1.0.0",
+  "object_id": "reuse-s17-raw-response-before-parse-20260718", "issued_at": "2026-07-18T17:58:13Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-freeze-authority"},
+  "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "DURABLE_RAW_PROVIDER_RESPONSE_BEFORE_UNTRUSTED_PARSE",
+    "candidates": [
+      {"candidate": "reuse-S15-ModelCallBroker-SENT-UNKNOWN-settlement-and-ResponseCommitter", "disposition": "selected"},
+      {"candidate": "reuse-existing-Bridge-content-addressed-storage-through-injected-ResponseCommitter", "disposition": "selected"},
+      {"candidate": "add-small-two-phase-raw-adapter-and-parser-protocol-in-existing-model_broker", "disposition": "selected-minimal-missing-glue"},
+      {"candidate": "parse-provider-response-inside-connected-adapter-before-CAS", "disposition": "rejected-violates-raw-response-protection"},
+      {"candidate": "new-ledger-table-queue-scheduler-or-provider-SDK", "disposition": "rejected-duplicate-or-unnecessary-surface"}
+    ],
+    "selected_mode": "durable-SENT-then-receive-bounded-raw-bytes-then-exact-CAS-commit-then-parse-then-idempotent-terminal-settlement",
+    "source_ref": "git:b2aef5371f1627aa33eaae3192e5c0b328bd13bc;internal:model_broker+cas",
+    "code_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "license_spdx": "NOASSERTION", "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": ["commit-precedes-parser", "commit-failure-is-UNKNOWN", "parse-failure-after-commit-is-UNKNOWN", "ambiguous-transport-is-UNKNOWN", "UNKNOWN-has-no-auto-retry", "fixture-path-backward-compatible"],
+    "canonical_owner": "agent-1-existing-model-broker-with-agent-5-assurance-and-agent-0-integration",
+    "rollback": "Remove the additive two-phase protocols and method; existing fixture execute path remains unchanged."
+  },
+  "integrity": {"payload_sha256": "20659492259cf5496148f209a16310084cbe88c8006dcd2c0d8e56fa5eb74351", "parent_refs": ["git:b2aef5371f1627aa33eaae3192e5c0b328bd13bc", "reuse:reuse-s15-model-registry-broker-20260718", "integration:integration-s16-provider-routing-20260718"]}
+}
