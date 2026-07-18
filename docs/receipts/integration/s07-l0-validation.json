@@ -15,7 +15,7 @@
       "stages/s07-l0-validation/ownership-lease.json"
     ],
     "audit_results": {
-      "contract_gate": "green", "privacy_secret_scan": "green",
+      "contract_gate": "green", "privacy_secret_scan": "green", "source_mutation": false,
       "focused_tests": 73, "full_core_tests": 526, "stage0b_tests": 25,
       "real_durable_l0_vertical": "green", "artifact_cas_recomputation": "green",
       "ordered_input_recomputation": "green", "chunk_byte_recomputation": "green",
@@ -25,7 +25,7 @@
     "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29649227470",
     "integration_commit_sha": "758272d96afd075f4f08599db8cbaafdb76d2fa1"
   },
-  "integrity": {"payload_sha256": "c5a16d2856f1b015fce035bd2e9d85eaf8077ad20ccb9ef2082ceead30e7f942", "parent_refs": [
+  "integrity": {"payload_sha256": "3e9506f40f5aeef46f42131e51b52eba54f175e0ece33c97d73a4bbb837c6722", "parent_refs": [
     "git:dc2df9edc98b7117e2ce03dd9169391eb5e9b532", "git:758272d96afd075f4f08599db8cbaafdb76d2fa1",
     "ci:29649227470", "reuse:9b0929482aae92d92d1cff0e278f5f1822eb338f66f9f7127781f231965a8aab"
   ]}
