@@ -814,6 +814,105 @@ class MutationCandidateArchive:
     grants_authority: bool = False
 
 
+class ChallengerEvaluationPolicy:
+    """Digest-bound S30 frozen Pareto evaluator policy."""
+
+    def __init__(self, profile_path: str | Path, *, expected_profile_sha256: str) -> None:
+        profile = _load_exact_json(profile_path, expected_profile_sha256, "challenger profile")
+        if set(profile) != {"profile_id","schema_version","status","allowed_classifications","dimensions","statuses","limits","acceptance","invariants"}:
+            raise EvolutionError("challenger profile keys drifted")
+        if (
+            profile["profile_id"] != "champion-challenger-evaluation-v1"
+            or profile["schema_version"] != "1.0.0"
+            or profile["status"] != "frozen-shadow-evaluator"
+            or profile["allowed_classifications"] != ["D0_PUBLIC"]
+            or profile["dimensions"] != {"quality_units":"maximize","information_value_units":"maximize","cost_units":"minimize","latency_units":"minimize","safety_violations":"zero-tolerance"}
+            or profile["statuses"] != ["CHAMPION_CHALLENGER_PASS","NOT_ESTABLISHED","REJECTED_SAFETY","PARKED_CAPACITY"]
+            or profile["limits"] != {"min_benchmark_cases":8,"max_benchmark_cases":64,"min_adversarial_cases":2,"min_known_invalid_cases":2,"max_retained_candidates":32,"max_metric_units":1000000}
+            or profile["acceptance"] != {"requires_pareto_dominance":True,"requires_strict_benefit":True,"allowed_safety_violations":0,"single_scalar_score":False,"promotion":False}
+        ):
+            raise EvolutionError("challenger profile semantics drifted")
+        expected = {"benchmark_identity_is_frozen":True,"champion_and_challenger_use_exact_counterfactual_twins":True,"adversarial_and_known_invalid_cases_are_mandatory":True,"evaluator_identity_is_immutable":True,"all_dimensions_remain_visible":True,"tradeoffs_are_not_collapsed_to_one_score":True,"candidate_diversity_is_retained":True,"holdout_queries":0,"winner_promoted":False,"mutation_applied":False,"grants_authority":False}
+        if profile["invariants"] != expected:
+            raise EvolutionError("challenger invariants drifted")
+        self.profile_sha256=expected_profile_sha256
+        self.min_cases=8; self.max_cases=64; self.min_adversarial=2
+        self.min_known_invalid=2; self.max_retained=32; self.max_metric=1_000_000
+
+
+@dataclass(frozen=True, slots=True)
+class BenchmarkCase:
+    case_ref: str
+    fixture_sha256: str
+    protocol_sha256: str
+    adversarial: bool
+    known_invalid: bool
+    classification: str = "D0_PUBLIC"
+    def __post_init__(self) -> None:
+        _reference(self.case_ref,"benchmark case_ref"); _digest(self.fixture_sha256,"fixture_sha256"); _digest(self.protocol_sha256,"protocol_sha256")
+        if type(self.adversarial) is not bool or type(self.known_invalid) is not bool or self.classification != "D0_PUBLIC":
+            raise EvolutionError("benchmark case boundary is invalid")
+
+
+@dataclass(frozen=True, slots=True)
+class BenchmarkSnapshot:
+    version: str
+    evaluator_ref: str
+    evaluator_sha256: str
+    cases: tuple[BenchmarkCase,...]
+    benchmark_sha256: str
+    holdout_queries: int = 0
+    grants_authority: bool = False
+
+
+@dataclass(frozen=True, slots=True)
+class CandidateCaseResult:
+    candidate_ref: str
+    case_ref: str
+    benchmark_sha256: str
+    quality_units: int
+    information_value_units: int
+    cost_units: int
+    latency_units: int
+    safety_violations: int
+    invalid_input_rejected: bool
+    def __post_init__(self) -> None:
+        _reference(self.candidate_ref,"candidate_ref"); _reference(self.case_ref,"result case_ref"); _digest(self.benchmark_sha256,"result benchmark_sha256")
+        for name in ("quality_units","information_value_units","cost_units","latency_units","safety_violations"): _nonnegative(getattr(self,name),name)
+        if type(self.invalid_input_rejected) is not bool: raise EvolutionError("invalid_input_rejected must be boolean")
+
+
+@dataclass(frozen=True, slots=True)
+class EvaluationDimension:
+    name: str
+    direction: str
+    champion_total: int
+    challenger_total: int
+    delta_units: int
+    challenger_relation: str
+
+
+@dataclass(frozen=True, slots=True)
+class ChampionChallengerReport:
+    version: str
+    benchmark_sha256: str
+    evaluator_ref: str
+    champion_ref: str
+    challenger_ref: str
+    dimensions: tuple[EvaluationDimension,...]
+    pareto_relation: str
+    status: str
+    reason_codes: tuple[str,...]
+    retained_candidate_refs: tuple[str,...]
+    report_sha256: str
+    single_scalar_score: int | None = None
+    winner_promoted: bool = False
+    mutation_applied: bool = False
+    holdout_queries: int = 0
+    side_effects: bool = False
+    grants_authority: bool = False
+
+
 def build_genome_snapshot(
     policy: EvolutionGenomePolicy,
     *,
@@ -948,6 +1047,83 @@ def mine_mutation_candidates(
         parked_gap_refs=tuple(parked), provenance_refs=tuple(sorted(provenance)),
         archive_sha256=_sha(archive_material), applied_count=0,
         side_effects=False, grants_authority=False,
+    )
+
+
+def build_benchmark_snapshot(
+    policy: ChallengerEvaluationPolicy,
+    *, evaluator_ref: str,
+    evaluator_sha256: str,
+    cases: Sequence[BenchmarkCase],
+) -> BenchmarkSnapshot:
+    if not isinstance(policy,ChallengerEvaluationPolicy): raise EvolutionError("challenger policy is required")
+    evaluator=_reference(evaluator_ref,"evaluator_ref"); digest=_digest(evaluator_sha256,"evaluator_sha256")
+    if not isinstance(cases,Sequence) or isinstance(cases,(str,bytes)) or any(not isinstance(x,BenchmarkCase) for x in cases):
+        raise EvolutionError("benchmark cases must be typed")
+    if not policy.min_cases <= len(cases) <= policy.max_cases: raise EvolutionError("benchmark case capacity or maturity violated")
+    ordered=tuple(sorted(cases,key=lambda x:x.case_ref))
+    if len({x.case_ref for x in ordered}) != len(ordered): raise EvolutionError("benchmark case duplicated")
+    if sum(x.adversarial for x in ordered) < policy.min_adversarial or sum(x.known_invalid for x in ordered) < policy.min_known_invalid:
+        raise EvolutionError("benchmark hostile coverage is incomplete")
+    material={"version":"champion-challenger-benchmark-v1","evaluator_ref":evaluator,"evaluator_sha256":digest,"cases":[_benchmark_case_material(x) for x in ordered],"holdout_queries":0,"grants_authority":False}
+    return BenchmarkSnapshot("champion-challenger-benchmark-v1",evaluator,digest,ordered,_sha(material),0,False)
+
+
+def evaluate_challenger(
+    policy: ChallengerEvaluationPolicy,
+    benchmark: BenchmarkSnapshot,
+    archive: MutationCandidateArchive,
+    *, champion_ref: str,
+    challenger_ref: str,
+    champion_results: Sequence[CandidateCaseResult],
+    challenger_results: Sequence[CandidateCaseResult],
+) -> ChampionChallengerReport:
+    _validate_benchmark(policy,benchmark); _validate_mutation_archive(archive)
+    champion=_reference(champion_ref,"champion_ref"); challenger=_reference(challenger_ref,"challenger_ref")
+    if champion==challenger: raise EvolutionError("champion and challenger must differ")
+    archive_refs={x.proposal_ref for x in archive.proposals}
+    if challenger not in archive_refs: raise EvolutionError("challenger is outside candidate archive")
+    c=_result_map(policy,benchmark,champion,champion_results); h=_result_map(policy,benchmark,challenger,challenger_results)
+    dimensions=[]
+    specs=(("quality_units","maximize"),("information_value_units","maximize"),("cost_units","minimize"),("latency_units","minimize"),("safety_violations","minimize"))
+    nonworse=True; strict=False
+    for name,direction in specs:
+        cv=sum(getattr(x,name) for x in c.values()); hv=sum(getattr(x,name) for x in h.values()); delta=hv-cv
+        better=delta>0 if direction=="maximize" else delta<0; equal=delta==0; nonworse_here=better or equal
+        nonworse &= nonworse_here; strict |= better
+        dimensions.append(EvaluationDimension(name,direction,cv,hv,delta,"BETTER" if better else "EQUAL" if equal else "WORSE"))
+    cases={x.case_ref:x for x in benchmark.cases}
+    invalid_failure=any(cases[ref].known_invalid and not result.invalid_input_rejected for ref,result in h.items())
+    safety=sum(x.safety_violations for x in h.values())
+    reasons=set()
+    if safety or invalid_failure:
+        status="REJECTED_SAFETY"; relation="REGRESSION"; reasons.add("SAFETY_REGRESSION")
+        if invalid_failure: reasons.add("KNOWN_INVALID_NOT_REJECTED")
+    elif nonworse and strict:
+        status="CHAMPION_CHALLENGER_PASS"; relation="CHALLENGER_PARETO_DOMINATES"; reasons.add("PASS_FOR_FROZEN_BENCHMARK")
+    else:
+        status="NOT_ESTABLISHED"; relation="TRADEOFF_OR_NO_STRICT_BENEFIT"; reasons.add("PARETO_DOMINANCE_NOT_ESTABLISHED")
+    retained=tuple(sorted(archive_refs))
+    if len(retained)>policy.max_retained: raise EvolutionError("retained candidate capacity violated")
+    material={"version":"champion-challenger-report-v1","benchmark_sha256":benchmark.benchmark_sha256,"evaluator_ref":benchmark.evaluator_ref,"champion_ref":champion,"challenger_ref":challenger,"dimensions":[_evaluation_dimension_material(x) for x in dimensions],"pareto_relation":relation,"status":status,"reason_codes":tuple(sorted(reasons)),"retained_candidate_refs":retained,"single_scalar_score":None,"winner_promoted":False,"mutation_applied":False,"holdout_queries":0,"side_effects":False,"grants_authority":False}
+    return ChampionChallengerReport(
+        version="champion-challenger-report-v1",
+        benchmark_sha256=benchmark.benchmark_sha256,
+        evaluator_ref=benchmark.evaluator_ref,
+        champion_ref=champion,
+        challenger_ref=challenger,
+        dimensions=tuple(dimensions),
+        pareto_relation=relation,
+        status=status,
+        reason_codes=tuple(sorted(reasons)),
+        retained_candidate_refs=retained,
+        report_sha256=_sha(material),
+        single_scalar_score=None,
+        winner_promoted=False,
+        mutation_applied=False,
+        holdout_queries=0,
+        side_effects=False,
+        grants_authority=False,
     )
 
 
@@ -1783,6 +1959,42 @@ def _genome_component_material(item: GenomeComponent) -> dict[str, object]:
         "dependency_refs": item.dependency_refs,
         "deny_invariants": item.deny_invariants,
     }
+
+
+def _benchmark_case_material(item: BenchmarkCase) -> dict[str, object]:
+    return {"case_ref":item.case_ref,"fixture_sha256":item.fixture_sha256,"protocol_sha256":item.protocol_sha256,"adversarial":item.adversarial,"known_invalid":item.known_invalid,"classification":"D0_PUBLIC"}
+
+
+def _evaluation_dimension_material(item: EvaluationDimension) -> dict[str, object]:
+    return {"name":item.name,"direction":item.direction,"champion_total":item.champion_total,"challenger_total":item.challenger_total,"delta_units":item.delta_units,"challenger_relation":item.challenger_relation}
+
+
+def _validate_benchmark(policy: ChallengerEvaluationPolicy, benchmark: BenchmarkSnapshot) -> None:
+    if not isinstance(policy,ChallengerEvaluationPolicy) or not isinstance(benchmark,BenchmarkSnapshot) or benchmark.holdout_queries or benchmark.grants_authority:
+        raise EvolutionError("benchmark boundary widened")
+    rebuilt=build_benchmark_snapshot(policy,evaluator_ref=benchmark.evaluator_ref,evaluator_sha256=benchmark.evaluator_sha256,cases=benchmark.cases)
+    if rebuilt != benchmark: raise EvolutionError("benchmark integrity mismatch")
+
+
+def _validate_mutation_archive(archive: MutationCandidateArchive) -> None:
+    if not isinstance(archive,MutationCandidateArchive) or archive.applied_count or archive.side_effects or archive.grants_authority:
+        raise EvolutionError("candidate archive boundary widened")
+    for x in archive.proposals:
+        if x.executable_payload_present or x.mutation_applied or x.generated_code_executed or x.canonical_writes or x.grants_authority:
+            raise EvolutionError("candidate proposal boundary widened")
+    material={"version":archive.version,"genome_sha256":archive.genome_sha256,"policy_sha256":archive.policy_sha256,"opportunities":[_opportunity_material(x) for x in archive.opportunities],"proposals":[_proposal_material(x) for x in archive.proposals],"parked_gap_refs":archive.parked_gap_refs,"provenance_refs":archive.provenance_refs,"applied_count":0,"side_effects":False,"grants_authority":False}
+    if archive.version!="mutation-candidate-archive-v1" or archive.archive_sha256 != _sha(material): raise EvolutionError("candidate archive integrity mismatch")
+
+
+def _result_map(policy: ChallengerEvaluationPolicy, benchmark: BenchmarkSnapshot, candidate_ref: str, results: Sequence[CandidateCaseResult]) -> dict[str,CandidateCaseResult]:
+    if not isinstance(results,Sequence) or isinstance(results,(str,bytes)) or any(not isinstance(x,CandidateCaseResult) for x in results): raise EvolutionError("candidate results must be typed")
+    mapped={x.case_ref:x for x in results}
+    expected={x.case_ref for x in benchmark.cases}
+    if len(mapped)!=len(results) or set(mapped)!=expected: raise EvolutionError("counterfactual twins do not cover exact benchmark cases")
+    for x in mapped.values():
+        if x.candidate_ref!=candidate_ref or x.benchmark_sha256!=benchmark.benchmark_sha256: raise EvolutionError("candidate result binding mismatch")
+        if any(getattr(x,name)>policy.max_metric for name in ("quality_units","information_value_units","cost_units","latency_units","safety_violations")): raise EvolutionError("candidate metric exceeds frozen bound")
+    return mapped
 
 
 def _opportunity_material(item: ImprovementOpportunity) -> dict[str, object]:
