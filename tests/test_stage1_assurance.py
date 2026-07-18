@@ -576,6 +576,7 @@ class Stage1StaticBoundaryTests(unittest.TestCase):
             "ledger.py": {
                 "A1BundleRecord",
                 "FeedbackBundleRecord",
+                "FeedbackReplayReport",
                 "JobLedger",
                 "LedgerError",
                 "LedgerEvent",
@@ -667,6 +668,7 @@ class Stage1StaticBoundaryTests(unittest.TestCase):
                 "event_count",
                 "feedback_for_execution",
                 "feedback_projection_coverage",
+                "replay_feedback",
                 "projection_coverage",
                 "read_a1_object",
                 "storage_coverage_manifest",
