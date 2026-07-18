@@ -1,0 +1,16 @@
+{
+  "schema_id": "IntegrationReceipt", "schema_version": "1.0.0",
+  "object_id": "integration-s25-council-governance-20260718", "issued_at": "2026-07-18T22:22:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s25-council-governance", "agent_id": "agent-0",
+    "ownership_lease_ref": "stages/s25-council-governance/ownership-lease.json",
+    "base_sha": "b4f3de8dfa57494cba88782b45f70c14896aaaf6", "head_sha": "51a30ed3b536b5d4b39a48425ca5b463b04448f5",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": ["provenance/model-council-tournament-v1.json", "docs/receipts/reuse/s25-council-tournament.json", "stages/s25-council-governance/stage-envelope.json", "stages/s25-council-governance/ownership-lease.json"],
+    "audit_results": {"contract_gate": "green", "privacy_secret_scan": "green", "source_mutation": false, "profile_sha256": "e27222fe820912b7dd0abf725bf1c1825115e8f51bfb50ce44666bc8c8f27d81", "max_candidates": 4, "max_total_model_calls": 4, "rubric_weight_total": 100, "policy_assigns_evaluators": true, "consensus_is_evidence": false, "ranking_is_evidence": false, "model_network_cost_or_durable_writes": 0, "new_dependency_service_queue_scheduler_database_or_framework": false, "grants_authority": false},
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29663277358", "integration_commit_sha": "7c6c415632cdc962bb6ba87355c215dbc8ee2289"
+  },
+  "integrity": {"payload_sha256": "7c75a9ed57d19200550c69318ae6547d9831023db671edd0d54eaa27477edad9", "parent_refs": ["git:51a30ed3b536b5d4b39a48425ca5b463b04448f5", "git:7c6c415632cdc962bb6ba87355c215dbc8ee2289", "ci:29663277358", "reuse:reuse-s25-council-tournament-20260718", "profile:sha256:e27222fe820912b7dd0abf725bf1c1825115e8f51bfb50ce44666bc8c8f27d81"]}
+}
