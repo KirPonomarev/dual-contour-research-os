@@ -1,0 +1,27 @@
+{
+  "schema_id": "IntegrationReceipt", "schema_version": "1.0.0",
+  "object_id": "integration-s24-agenda-portfolio-20260718", "issued_at": "2026-07-18T21:46:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s24-agenda-portfolio", "agent_id": "agent-1",
+    "ownership_lease_ref": "stages/s24-agenda-portfolio/ownership-lease.json",
+    "base_sha": "f560f8eb43c7839f9e218393fe14ddd083b5abb3", "head_sha": "c056dd65042a323cf1579e14140e8058720c5a6c",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": ["src/research_bridge/evolution.py", "stages/s24-agenda-portfolio/stage-envelope.json", "stages/s24-agenda-portfolio/ownership-lease.json"],
+    "audit_results": {
+      "contract_gate": "green", "privacy_secret_scan": "green", "source_mutation": false,
+      "bridge_runtime_source_mutation": true, "schema_or_durable_write": false,
+      "focused_tests": 22, "new_agenda_tests": 7, "full_core_tests": 684, "stage0b_tests": 25,
+      "deterministic_selection": "green", "memory_debt_energy_binding": "green",
+      "slot_cost_risk_diversity_caps": "green", "starvation_handling": "green",
+      "unsafe_and_exhausted_work": "PARKED_WITH_REASON", "zero_value_work": "REJECTED_WITH_REASON",
+      "next_triggers_per_outcome_max": 1, "shadow_taint_inherited": "green",
+      "scheduler_queue_store_vector_db_model_network_or_external_action": 0,
+      "domain_canonical_live_or_publication_authority": false, "grants_authority": false
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29662124539",
+    "integration_commit_sha": "541bbf851cd9073d08da2427cb7ff3f48a877dbf"
+  },
+  "integrity": {"payload_sha256": "ff73783976f7e3878a6d5fbc7bd5ef062163b9e491145e772dd38042ec7d4df5", "parent_refs": ["git:c056dd65042a323cf1579e14140e8058720c5a6c", "git:541bbf851cd9073d08da2427cb7ff3f48a877dbf", "ci:29662124539", "reuse:reuse-s24-agenda-portfolio-20260718"]}
+}

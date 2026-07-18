@@ -1,0 +1,23 @@
+{
+  "schema_id": "IntegrationReceipt", "schema_version": "1.0.0",
+  "object_id": "integration-s24-evolution-ownership-activate-20260718", "issued_at": "2026-07-18T21:46:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s24-evolution-ownership-activate", "agent_id": "agent-0",
+    "ownership_lease_ref": "stages/s24-evolution-ownership-activate/ownership-lease.json",
+    "base_sha": "b71ac22ff54a9f425cfd359a21adf70ca330b5c0", "head_sha": "f560f8eb43c7839f9e218393fe14ddd083b5abb3",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": ["ownership/registry.json", "docs/ADR/0007-evolution-path-activation.md", "docs/receipts/OWNERSHIP_REGISTRY_AMENDMENT_6.json", "docs/receipts/reuse/s24-agenda-portfolio.json", "stages/s24-evolution-ownership-activate/stage-envelope.json", "stages/s24-evolution-ownership-activate/ownership-lease.json"],
+    "audit_results": {
+      "contract_gate": "green", "privacy_secret_scan": "green", "source_mutation": false,
+      "full_core_tests": 684, "stage0b_tests": 25,
+      "ownership_change_exactly_evolution_py": "green", "owner_preserved": "agent-1",
+      "reuse_decision_integrity": "green", "new_dependency": false,
+      "scheduler_store_model_network_or_authority_expansion": false
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29662124539",
+    "integration_commit_sha": "541bbf851cd9073d08da2427cb7ff3f48a877dbf"
+  },
+  "integrity": {"payload_sha256": "da0fcd3687cd88930edceda24a0996cbee2e36e720e499e687c864390def509f", "parent_refs": ["git:f560f8eb43c7839f9e218393fe14ddd083b5abb3", "git:541bbf851cd9073d08da2427cb7ff3f48a877dbf", "ci:29662124539", "git:b71ac22ff54a9f425cfd359a21adf70ca330b5c0"]}
+}
