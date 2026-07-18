@@ -5,12 +5,13 @@ from __future__ import annotations
 from dataclasses import dataclass
 import hashlib
 import json
+import math
 from pathlib import Path
 import re
 from types import MappingProxyType
 from typing import Mapping, Sequence
 
-from .ledger import KnowledgeFabricReport
+from .ledger import FeedbackReplayReport, KnowledgeFabricReport
 
 
 _REF_RE = re.compile(r"^[A-Za-z][A-Za-z0-9+.-]*:[^\s\\]{1,511}$")
@@ -451,6 +452,196 @@ class DeclassificationDryRunResult:
     canonical_writes: int
     grants_authority: bool
     result_sha256: str
+
+
+class MemoryEvaluationPolicy:
+    """Digest-bound S27 shadow measurement and capacity policy."""
+
+    def __init__(self, profile_path: str | Path, *, expected_profile_sha256: str) -> None:
+        profile = _load_exact_json(
+            profile_path, expected_profile_sha256, "memory evaluation profile"
+        )
+        if set(profile) != {
+            "profile_id", "schema_version", "status", "allowed_classifications",
+            "measurement_statuses", "paired_metric", "uncertainty", "false_learn",
+            "calibration", "capacity", "replay", "invariants",
+        }:
+            raise EvolutionError("memory evaluation profile keys drifted")
+        if (
+            profile["profile_id"] != "memory-uplift-replay-capacity-v1"
+            or profile["schema_version"] != "1.0.0"
+            or profile["status"] != "frozen-shadow-evaluation-only"
+            or profile["allowed_classifications"] != ["D0_PUBLIC"]
+            or profile["measurement_statuses"] != [
+                "MEMORY_UPLIFT_MEASURED_SCOPED", "NOT_ESTABLISHED", "PARKED_CAPACITY"
+            ]
+            or profile["paired_metric"] != {
+                "outcomes": ["SUCCESS", "FAILURE"],
+                "uplift_unit": "parts-per-million-of-paired-success-delta",
+                "information_value_unit": "bounded-integer-units",
+                "research_debt_unit": "bounded-integer-units",
+            }
+        ):
+            raise EvolutionError("memory evaluation profile identity drifted")
+        uncertainty = profile["uncertainty"]
+        false_learn = profile["false_learn"]
+        calibration = profile["calibration"]
+        capacity = profile["capacity"]
+        replay = profile["replay"]
+        if uncertainty != {
+            "method": "paired-hoeffding-conservative-integer-bound",
+            "confidence_floor_ppm": 950000,
+            "radius_numerator_ppm": 1358102,
+            "minimum_sample_pairs": 16,
+            "zero_observation_interval_ppm": [-1000000, 1000000],
+        }:
+            raise EvolutionError("memory evaluation uncertainty drifted")
+        if false_learn != {
+            "upper_bound_method": "observed-rate-plus-paired-hoeffding-radius",
+            "zero_observation_upper_bound_ppm": 1000000,
+            "required_for_positive_claim": 0,
+        }:
+            raise EvolutionError("memory evaluation false-learn policy drifted")
+        if calibration != {
+            "collection_only": True,
+            "confidence_bin_width_ppm": 100000,
+            "minimum_observations_for_scoped_summary": 100,
+            "calibrated_claimed": False,
+        }:
+            raise EvolutionError("memory evaluation calibration policy drifted")
+        if capacity != {
+            "max_memory_twin_pairs": 256,
+            "max_calibration_observations": 512,
+            "max_information_value_units_per_observation": 1000000,
+            "max_research_debt_units_per_observation": 1000000,
+            "overload_status": "PARKED_CAPACITY",
+            "backpressure_reason_code": "MEMORY_EVALUATION_CAPACITY_EXHAUSTED",
+            "infrastructure_scale_claimed": False,
+        }:
+            raise EvolutionError("memory evaluation capacity drifted")
+        if replay != {
+            "requires_two_equal_full_feedback_replays": True,
+            "requires_rebuilt_equals_stored": True,
+            "requires_memory_fabrics_bound_to_replay": True,
+            "side_effects": False,
+        }:
+            raise EvolutionError("memory evaluation replay policy drifted")
+        invariants = profile["invariants"]
+        if not isinstance(invariants, Mapping) or set(invariants) != {
+            "same_case_fixture_protocol_and_base_for_each_twin",
+            "memory_off_and_memory_on_observations_are_both_required",
+            "underpowered_or_uncertain_results_are_not_established",
+            "positive_claim_requires_strictly_positive_lower_bound",
+            "positive_claim_requires_zero_observed_false_learn_and_nonincreasing_debt",
+            "calibration_collection_never_claims_calibrated",
+            "full_replay_is_read_only_and_digest_bound",
+            "capacity_is_frozen_and_overload_parks",
+            "scientific_truth_claimed", "grants_authority",
+        }:
+            raise EvolutionError("memory evaluation invariants drifted")
+        required_true = set(invariants) - {"scientific_truth_claimed", "grants_authority"}
+        if any(invariants[name] is not True for name in required_true) or any(
+            invariants[name] is not False for name in ("scientific_truth_claimed", "grants_authority")
+        ):
+            raise EvolutionError("memory evaluation invariants widened")
+        self.profile_sha256 = expected_profile_sha256
+        self.minimum_sample_pairs = 16
+        self.uncertainty_radius_numerator_ppm = 1_358_102
+        self.max_memory_twin_pairs = 256
+        self.max_calibration_observations = 512
+        self.max_information_value_units = 1_000_000
+        self.max_research_debt_units = 1_000_000
+        self.calibration_bin_width_ppm = 100_000
+        self.minimum_calibration_observations = 100
+
+
+@dataclass(frozen=True, slots=True)
+class MemoryTwinPair:
+    pair_id: str
+    case_ref: str
+    fixture_sha256: str
+    protocol_sha256: str
+    base_sha256: str
+    memory_off_success: bool
+    memory_on_success: bool
+    memory_off_false_learn: bool
+    memory_on_false_learn: bool
+    memory_off_information_value_units: int
+    memory_on_information_value_units: int
+    memory_off_research_debt_units: int
+    memory_on_research_debt_units: int
+
+    def __post_init__(self) -> None:
+        _reference(self.pair_id, "memory twin pair_id")
+        _reference(self.case_ref, "memory twin case_ref")
+        for name in ("fixture_sha256", "protocol_sha256", "base_sha256"):
+            _digest(getattr(self, name), name)
+        for name in (
+            "memory_off_success", "memory_on_success",
+            "memory_off_false_learn", "memory_on_false_learn",
+        ):
+            if type(getattr(self, name)) is not bool:
+                raise EvolutionError(f"{name} must be boolean")
+        for name in (
+            "memory_off_information_value_units", "memory_on_information_value_units",
+            "memory_off_research_debt_units", "memory_on_research_debt_units",
+        ):
+            _nonnegative(getattr(self, name), name)
+
+
+@dataclass(frozen=True, slots=True)
+class CalibrationObservation:
+    observation_ref: str
+    confidence_ppm: int
+    correct: bool
+    memory_enabled: bool
+
+    def __post_init__(self) -> None:
+        _reference(self.observation_ref, "calibration observation_ref")
+        value = _nonnegative(self.confidence_ppm, "confidence_ppm")
+        if value > 1_000_000:
+            raise EvolutionError("confidence_ppm exceeds one million")
+        if type(self.correct) is not bool or type(self.memory_enabled) is not bool:
+            raise EvolutionError("calibration flags must be boolean")
+
+
+@dataclass(frozen=True, slots=True)
+class CalibrationBinSnapshot:
+    lower_ppm: int
+    upper_ppm: int
+    observation_count: int
+    mean_confidence_ppm: int | None
+    observed_accuracy_ppm: int | None
+
+
+@dataclass(frozen=True, slots=True)
+class MemoryUpliftSnapshot:
+    version: str
+    policy_sha256: str
+    full_replay_sha256: str
+    memory_off_fabric_sha256: str
+    memory_on_fabric_sha256: str
+    status: str
+    reason_codes: tuple[str, ...]
+    sample_pairs: int
+    uplift_ppm: int
+    uncertainty_low_ppm: int
+    uncertainty_high_ppm: int
+    memory_on_false_learn_rate_ppm: int
+    false_learn_upper_bound_ppm: int
+    information_value_delta_units: int
+    research_debt_delta_units: int
+    calibration_observations: int
+    calibration_status: str
+    calibration_brier_ppm: int | None
+    calibration_bins: tuple[CalibrationBinSnapshot, ...]
+    capacity_envelope: Mapping[str, object]
+    snapshot_sha256: str
+    learned_claimed: bool = False
+    calibrated_claimed: bool = False
+    claims_scientific_truth: bool = False
+    side_effects: bool = False
+    grants_authority: bool = False
 
 
 def build_research_agenda(
@@ -925,6 +1116,357 @@ def declassification_dry_run(
         "grants_authority": False,
     }
     return DeclassificationDryRunResult(**material, result_sha256=_sha(material))
+
+
+def measure_memory_uplift(
+    policy: MemoryEvaluationPolicy,
+    first_replay: FeedbackReplayReport,
+    second_replay: FeedbackReplayReport,
+    memory_off: KnowledgeFabricReport,
+    memory_on: KnowledgeFabricReport,
+    twins: Sequence[MemoryTwinPair],
+    calibration: Sequence[CalibrationObservation] = (),
+) -> MemoryUpliftSnapshot:
+    """Measure a bounded paired shadow uplift without learning or mutation."""
+
+    if not isinstance(policy, MemoryEvaluationPolicy):
+        raise EvolutionError("memory evaluation policy is required")
+    _validate_full_replay(first_replay)
+    _validate_full_replay(second_replay)
+    if first_replay != second_replay:
+        raise EvolutionError("full feedback replay is not deterministic")
+    _validate_memory_fabric(memory_off, expected_enabled=False, replay=first_replay)
+    _validate_memory_fabric(memory_on, expected_enabled=True, replay=first_replay)
+    if (
+        memory_off.ledger_sequence_last != memory_on.ledger_sequence_last
+        or memory_off.query_root_event_ref != memory_on.query_root_event_ref
+    ):
+        raise EvolutionError("memory twins do not share the same ledger and query scope")
+    if not isinstance(twins, Sequence) or isinstance(twins, (str, bytes)):
+        raise EvolutionError("memory twins must be a sequence")
+    if not isinstance(calibration, Sequence) or isinstance(calibration, (str, bytes)):
+        raise EvolutionError("calibration observations must be a sequence")
+    if any(not isinstance(item, MemoryTwinPair) for item in twins):
+        raise EvolutionError("memory twin type is invalid")
+    if any(not isinstance(item, CalibrationObservation) for item in calibration):
+        raise EvolutionError("calibration observation type is invalid")
+    ordered_twins = tuple(sorted(twins, key=lambda item: item.pair_id))
+    ordered_calibration = tuple(sorted(calibration, key=lambda item: item.observation_ref))
+    if len({item.pair_id for item in ordered_twins}) != len(ordered_twins):
+        raise EvolutionError("memory twin identity is duplicated")
+    if len({item.case_ref for item in ordered_twins}) != len(ordered_twins):
+        raise EvolutionError("memory twin case is duplicated")
+    if len({item.observation_ref for item in ordered_calibration}) != len(ordered_calibration):
+        raise EvolutionError("calibration observation identity is duplicated")
+    for item in ordered_twins:
+        if (
+            item.memory_off_information_value_units > policy.max_information_value_units
+            or item.memory_on_information_value_units > policy.max_information_value_units
+            or item.memory_off_research_debt_units > policy.max_research_debt_units
+            or item.memory_on_research_debt_units > policy.max_research_debt_units
+        ):
+            raise EvolutionError("memory twin bounded metric exceeds frozen capacity")
+
+    capacity_overloaded = (
+        len(ordered_twins) > policy.max_memory_twin_pairs
+        or len(ordered_calibration) > policy.max_calibration_observations
+    )
+    sample_size = len(ordered_twins)
+    if capacity_overloaded:
+        status = "PARKED_CAPACITY"
+        reasons = ("MEMORY_EVALUATION_CAPACITY_EXHAUSTED",)
+        uplift = 0
+        low, high = -1_000_000, 1_000_000
+        false_rate = 0
+        false_upper = 1_000_000
+        information_delta = 0
+        debt_delta = 0
+        calibration_status = "NOT_ESTABLISHED"
+        brier = None
+        bins: tuple[CalibrationBinSnapshot, ...] = ()
+    else:
+        deltas = [int(item.memory_on_success) - int(item.memory_off_success) for item in ordered_twins]
+        uplift = _signed_mean(deltas, scale=1_000_000)
+        radius = _paired_uncertainty_radius(policy, sample_size)
+        low = max(-1_000_000, uplift - radius)
+        high = min(1_000_000, uplift + radius)
+        false_count = sum(item.memory_on_false_learn for item in ordered_twins)
+        false_rate = _signed_mean([int(item.memory_on_false_learn) for item in ordered_twins], scale=1_000_000)
+        false_upper = 1_000_000 if sample_size == 0 else min(1_000_000, false_rate + radius)
+        information_delta = _signed_mean(
+            [
+                item.memory_on_information_value_units
+                - item.memory_off_information_value_units
+                for item in ordered_twins
+            ]
+        )
+        debt_delta = _signed_mean(
+            [
+                item.memory_on_research_debt_units
+                - item.memory_off_research_debt_units
+                for item in ordered_twins
+            ]
+        )
+        reasons_set: set[str] = set()
+        if sample_size == 0:
+            reasons_set.add("NO_MEMORY_TWIN_OBSERVATIONS")
+        if sample_size < policy.minimum_sample_pairs:
+            reasons_set.add("MEMORY_UPLIFT_UNDERPOWERED")
+        if low <= 0:
+            reasons_set.add("MEMORY_UPLIFT_LOWER_BOUND_NOT_POSITIVE")
+        if false_count:
+            reasons_set.add("MEMORY_FALSE_LEARN_OBSERVED")
+        if debt_delta > 0:
+            reasons_set.add("MEMORY_RESEARCH_DEBT_INCREASED")
+        if not reasons_set:
+            status = "MEMORY_UPLIFT_MEASURED_SCOPED"
+            reasons_set.add("PASS_FOR_FROZEN_SHADOW_SCOPE")
+        else:
+            status = "NOT_ESTABLISHED"
+        reasons = tuple(sorted(reasons_set))
+        bins, brier = _calibration_summary(policy, ordered_calibration)
+        calibration_status = (
+            "COLLECTED_SCOPED"
+            if len(ordered_calibration) >= policy.minimum_calibration_observations
+            else "NOT_ESTABLISHED"
+        )
+
+    capacity = MappingProxyType(
+        {
+            "scope": "single-process-pure-shadow-evaluation-v1",
+            "max_memory_twin_pairs": policy.max_memory_twin_pairs,
+            "max_calibration_observations": policy.max_calibration_observations,
+            "observed_memory_twin_pairs": sample_size,
+            "observed_calibration_observations": len(ordered_calibration),
+            "remaining_memory_twin_pairs": max(0, policy.max_memory_twin_pairs - sample_size),
+            "remaining_calibration_observations": max(
+                0, policy.max_calibration_observations - len(ordered_calibration)
+            ),
+            "overloaded": capacity_overloaded,
+            "backpressure": capacity_overloaded,
+            "infrastructure_scale_claimed": False,
+        }
+    )
+    material = {
+        "version": "memory-uplift-snapshot-v1",
+        "policy_sha256": policy.profile_sha256,
+        "full_replay_sha256": first_replay.replay_sha256,
+        "memory_off_fabric_sha256": memory_off.fabric_sha256,
+        "memory_on_fabric_sha256": memory_on.fabric_sha256,
+        "status": status,
+        "reason_codes": reasons,
+        "sample_pairs": sample_size,
+        "uplift_ppm": uplift,
+        "uncertainty_low_ppm": low,
+        "uncertainty_high_ppm": high,
+        "memory_on_false_learn_rate_ppm": false_rate,
+        "false_learn_upper_bound_ppm": false_upper,
+        "information_value_delta_units": information_delta,
+        "research_debt_delta_units": debt_delta,
+        "calibration_observations": len(ordered_calibration),
+        "calibration_status": calibration_status,
+        "calibration_brier_ppm": brier,
+        "calibration_bins": [_calibration_bin_material(item) for item in bins],
+        "capacity_envelope": capacity,
+        "learned_claimed": False,
+        "calibrated_claimed": False,
+        "claims_scientific_truth": False,
+        "side_effects": False,
+        "grants_authority": False,
+    }
+    return MemoryUpliftSnapshot(
+        version="memory-uplift-snapshot-v1",
+        policy_sha256=policy.profile_sha256,
+        full_replay_sha256=first_replay.replay_sha256,
+        memory_off_fabric_sha256=memory_off.fabric_sha256,
+        memory_on_fabric_sha256=memory_on.fabric_sha256,
+        status=status,
+        reason_codes=reasons,
+        sample_pairs=sample_size,
+        uplift_ppm=uplift,
+        uncertainty_low_ppm=low,
+        uncertainty_high_ppm=high,
+        memory_on_false_learn_rate_ppm=false_rate,
+        false_learn_upper_bound_ppm=false_upper,
+        information_value_delta_units=information_delta,
+        research_debt_delta_units=debt_delta,
+        calibration_observations=len(ordered_calibration),
+        calibration_status=calibration_status,
+        calibration_brier_ppm=brier,
+        calibration_bins=bins,
+        capacity_envelope=capacity,
+        snapshot_sha256=_sha(material),
+        learned_claimed=False,
+        calibrated_claimed=False,
+        claims_scientific_truth=False,
+        side_effects=False,
+        grants_authority=False,
+    )
+
+
+def _validate_full_replay(report: FeedbackReplayReport) -> None:
+    if not isinstance(report, FeedbackReplayReport) or report.side_effects:
+        raise EvolutionError("full feedback replay is not a read-only typed report")
+    sequence_last = _nonnegative(report.ledger_sequence_last, "replay ledger_sequence_last")
+    bundle_count = _nonnegative(report.feedback_bundle_count, "replay feedback_bundle_count")
+    if bundle_count == 0:
+        if report.first_feedback_sequence is not None or report.last_feedback_sequence is not None:
+            raise EvolutionError("empty feedback replay has sequence bounds")
+    else:
+        first = _positive(report.first_feedback_sequence, "first_feedback_sequence")
+        last = _positive(report.last_feedback_sequence, "last_feedback_sequence")
+        if not first <= last <= sequence_last:
+            raise EvolutionError("feedback replay sequence bounds are invalid")
+    rebuilt = dict(report.rebuilt_projection_sha256)
+    stored = dict(report.stored_projection_sha256)
+    if rebuilt != stored:
+        raise EvolutionError("full feedback replay differs from stored projections")
+    for name, digest in rebuilt.items():
+        _token(name.replace("_", "-"), "replay projection name")
+        _digest(digest, "replay projection sha256")
+    capacity = report.capacity_envelope
+    if not isinstance(capacity, Mapping):
+        raise EvolutionError("feedback replay capacity is invalid")
+    if (
+        capacity.get("writer_count") != 1
+        or capacity.get("second_writer_authorized") is not False
+        or capacity.get("distributed_scale_claimed") is not False
+    ):
+        raise EvolutionError("feedback replay capacity boundary widened")
+    material = {
+        "ledger_sequence_last": sequence_last,
+        "feedback_bundle_count": bundle_count,
+        "first_feedback_sequence": report.first_feedback_sequence,
+        "last_feedback_sequence": report.last_feedback_sequence,
+        "rebuilt_projection_sha256": rebuilt,
+        "stored_projection_sha256": stored,
+        "capacity_envelope": capacity,
+        "side_effects": False,
+    }
+    if report.replay_sha256 != _sha(material):
+        raise EvolutionError("full feedback replay integrity mismatch")
+
+
+def _validate_memory_fabric(
+    fabric: KnowledgeFabricReport,
+    *,
+    expected_enabled: bool,
+    replay: FeedbackReplayReport,
+) -> None:
+    if not isinstance(fabric, KnowledgeFabricReport):
+        raise EvolutionError("memory fabric must be a typed report")
+    if (
+        fabric.fabric_version != "research-knowledge-fabric-v1"
+        or fabric.memory_enabled is not expected_enabled
+        or fabric.ledger_sequence_last != replay.ledger_sequence_last
+        or fabric.side_effects
+        or fabric.claims_scientific_truth
+        or fabric.grants_authority
+    ):
+        raise EvolutionError("memory fabric boundary widened")
+    trace = fabric.retrieval_trace
+    if (
+        not isinstance(trace, Mapping)
+        or trace.get("trace_type") != "KnowledgeRetrievalTrace"
+        or trace.get("memory_enabled") is not expected_enabled
+        or trace.get("source_replay_sha256") != replay.replay_sha256
+        or trace.get("side_effects") is not False
+    ):
+        raise EvolutionError("memory fabric is not bound to full replay")
+    if not expected_enabled and (
+        fabric.idea_nodes
+        or fabric.failure_memory
+        or fabric.conflict_candidates
+        or fabric.root_event_energy
+        or fabric.research_debt
+        or trace.get("selected_records") != 0
+    ):
+        raise EvolutionError("memory-off fabric contains retrieved memory")
+    material = {
+        "fabric_version": fabric.fabric_version,
+        "ledger_sequence_last": fabric.ledger_sequence_last,
+        "memory_enabled": fabric.memory_enabled,
+        "query_root_event_ref": fabric.query_root_event_ref,
+        "idea_nodes": fabric.idea_nodes,
+        "failure_memory": fabric.failure_memory,
+        "conflict_candidates": fabric.conflict_candidates,
+        "root_event_energy": fabric.root_event_energy,
+        "research_debt": fabric.research_debt,
+        "retrieval_trace": fabric.retrieval_trace,
+        "side_effects": False,
+        "claims_scientific_truth": False,
+        "grants_authority": False,
+    }
+    if fabric.fabric_sha256 != _sha(material):
+        raise EvolutionError("memory fabric integrity mismatch")
+
+
+def _paired_uncertainty_radius(policy: MemoryEvaluationPolicy, sample_size: int) -> int:
+    if sample_size == 0:
+        return 1_000_000
+    root = max(1, math.isqrt(sample_size))
+    return min(
+        1_000_000,
+        (policy.uncertainty_radius_numerator_ppm + root - 1) // root,
+    )
+
+
+def _signed_mean(values: Sequence[int], *, scale: int = 1) -> int:
+    if not values:
+        return 0
+    total = sum(values) * scale
+    sign = -1 if total < 0 else 1
+    magnitude = abs(total)
+    return sign * ((magnitude + len(values) // 2) // len(values))
+
+
+def _calibration_summary(
+    policy: MemoryEvaluationPolicy,
+    observations: Sequence[CalibrationObservation],
+) -> tuple[tuple[CalibrationBinSnapshot, ...], int | None]:
+    if not observations:
+        return (), None
+    width = policy.calibration_bin_width_ppm
+    grouped: list[list[CalibrationObservation]] = [[] for _ in range(1_000_000 // width)]
+    squared_error = 0
+    for item in observations:
+        grouped[min(len(grouped) - 1, item.confidence_ppm // width)].append(item)
+        target = 1_000_000 if item.correct else 0
+        squared_error += (item.confidence_ppm - target) ** 2
+    bins: list[CalibrationBinSnapshot] = []
+    for index, items in enumerate(grouped):
+        lower = index * width
+        upper = 1_000_000 if index == len(grouped) - 1 else (index + 1) * width - 1
+        bins.append(
+            CalibrationBinSnapshot(
+                lower_ppm=lower,
+                upper_ppm=upper,
+                observation_count=len(items),
+                mean_confidence_ppm=(
+                    None
+                    if not items
+                    else _signed_mean([item.confidence_ppm for item in items])
+                ),
+                observed_accuracy_ppm=(
+                    None
+                    if not items
+                    else _signed_mean([int(item.correct) for item in items], scale=1_000_000)
+                ),
+            )
+        )
+    denominator = len(observations) * 1_000_000
+    brier_ppm = (squared_error + denominator // 2) // denominator
+    return tuple(bins), brier_ppm
+
+
+def _calibration_bin_material(item: CalibrationBinSnapshot) -> dict[str, object]:
+    return {
+        "lower_ppm": item.lower_ppm,
+        "upper_ppm": item.upper_ppm,
+        "observation_count": item.observation_count,
+        "mean_confidence_ppm": item.mean_confidence_ppm,
+        "observed_accuracy_ppm": item.observed_accuracy_ppm,
+    }
 
 
 def _score(
