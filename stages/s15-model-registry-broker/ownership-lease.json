@@ -1,0 +1,7 @@
+{
+  "lease_id": "lease-s15-model-registry-broker-agent-1", "stage_id": "s15-model-registry-broker", "agent_id": "agent-1",
+  "base_sha": "ce89bdb55879ecb6a093dabdb75cb63fa3807d2e", "branch": "codex/bridge-a1-s15-model-registry-broker",
+  "issued_at": "2026-07-18T16:52:00Z", "expires_at": "2026-07-19T16:52:00Z",
+  "write_set": ["src/research_bridge/model_broker.py", "src/research_bridge/ledger.py", "stages/s15-model-registry-broker/stage-envelope.json", "stages/s15-model-registry-broker/ownership-lease.json"],
+  "exclusive": true, "revoked": false
+}

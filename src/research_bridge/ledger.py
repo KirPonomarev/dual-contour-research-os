@@ -262,6 +262,26 @@ _PROPOSED_OUTCOMES = frozenset(
 _BLAME_AXES = frozenset(
     {"NONE", "INFRASTRUCTURE", "PROVIDER", "INPUT", "EXECUTOR", "UNKNOWN"}
 )
+_MODEL_CALL_STATES = frozenset(
+    {"PROPOSED", "RESERVED", "SENT", "SUCCEEDED", "FAILED_KNOWN", "UNKNOWN", "RECONCILED"}
+)
+_MODEL_CALL_TERMINAL_STATES = frozenset({"SUCCEEDED", "FAILED_KNOWN", "UNKNOWN"})
+_MODEL_CALL_ACTIVE_RESERVATION_STATES = frozenset(
+    {"RESERVED", "SENT", "SUCCEEDED", "FAILED_KNOWN", "UNKNOWN"}
+)
+_MODEL_CALL_FIELDS = frozenset(
+    {
+        "call_id", "previous_state", "state", "request_sha256", "registry_sha256",
+        "binding_revision", "role", "model_binding", "classification",
+        "budget_policy_ref", "budget_scope_ref", "max_active_calls", "max_tokens",
+        "max_cost_units", "max_reserved_tokens", "max_reserved_cost_units", "expires_at",
+        "proposed_at", "reserved_at", "sent_at", "terminal_at", "reconciled_at",
+        "response_ref", "actual_tokens", "actual_cost_units", "provider_receipt_ref",
+        "failure_code", "ambiguous_usage", "budget_released", "auto_retry",
+    }
+)
+_MODEL_CALL_ID_RE = re.compile(r"^model-call:[a-f0-9]{64}$")
+_MODEL_RESPONSE_REF_RE = re.compile(r"^cas:sha256:[a-f0-9]{64}$")
 _A1_RETENTION_BY_KIND = {
     "MaterialEvent": "durable-operational-memory",
     "CandidateSpecDraft": "ephemeral-proposal",
@@ -441,6 +461,20 @@ class FeedbackReplayReport:
     capacity_envelope: Mapping[str, object]
     replay_sha256: str
     side_effects: bool
+
+
+@dataclass(frozen=True, slots=True)
+class ModelCallTransitionRecord:
+    """One conservative model-call transition in the existing global order."""
+
+    event: LedgerEvent
+    snapshot: Mapping[str, object]
+
+    def __post_init__(self) -> None:
+        if self.event.event_type != "a1_bundle":
+            raise LedgerError("model call transition must use the A1 global event")
+        if self.event.payload.get("bundle_kind") != "model_call_transition_v1":
+            raise LedgerError("model call transition bundle kind is invalid")
 
 
 @dataclass(frozen=True, slots=True)
@@ -1297,6 +1331,160 @@ class JobLedger:
             except Exception as exc:
                 self._rollback()
                 self._raise_ledger_error(exc)
+
+    def append_model_call_transition(
+        self,
+        *,
+        snapshot: Mapping[str, object],
+        idempotency_key: str,
+        event_at: str,
+    ) -> ModelCallTransitionRecord:
+        """Append one model-call state change without creating a second event order."""
+
+        normalized = _model_call_snapshot(snapshot)
+        key = _text(idempotency_key, "model call idempotency_key", maximum=256)
+        timestamp = _timestamp("model call event_at", event_at)
+        with self._lock:
+            self._ensure_open()
+            self._begin_immediate()
+            try:
+                replay_row = self._connection.execute(
+                    """
+                    SELECT * FROM bridge_job_ledger
+                    WHERE event_type = 'a1_bundle'
+                      AND json_extract(payload_json, '$.idempotency_key') = ?
+                    """,
+                    (key,),
+                ).fetchone()
+                if replay_row is not None:
+                    replay = self._ledger_event_from_row(replay_row)
+                    if (
+                        replay.payload.get("bundle_kind") != "model_call_transition_v1"
+                        or replay.payload.get("model_call") != normalized
+                    ):
+                        raise LedgerError("model call idempotency key was reused")
+                    self._connection.execute("COMMIT")
+                    return _model_call_record_from_event(replay)
+
+                latest = self._latest_model_call_states_locked()
+                previous = latest.get(normalized["call_id"])
+                _validate_model_call_transition(previous, normalized, timestamp)
+                if normalized["state"] == "RESERVED":
+                    _validate_model_call_budget(latest, normalized)
+
+                projection_states = self._projection_states_locked(_ALL_PROJECTION_NAMES)
+                if frozenset(projection_states) not in {
+                    _A1_PROJECTION_NAMES,
+                    _ALL_PROJECTION_NAMES,
+                }:
+                    raise LedgerError(
+                        "model call transition requires complete A1 projections"
+                    )
+                projection_descriptors = [
+                    {
+                        "projection_name": name,
+                        "state_sha256": _digest(
+                            _canonical_json(projection_states[name]).encode("utf-8")
+                        ),
+                    }
+                    for name in sorted(projection_states)
+                ]
+                payload: dict[str, object] = {
+                    "bundle_kind": "model_call_transition_v1",
+                    "idempotency_key": key,
+                    "objects": [],
+                    "projections": projection_descriptors,
+                    "model_call": normalized,
+                }
+                event = self._append(
+                    event_type="a1_bundle",
+                    job_id="bridge-model-call",
+                    attempt_id=normalized["call_id"],
+                    fencing_epoch=0,
+                    checkpoint_sequence=None,
+                    event_at=timestamp,
+                    payload=payload,
+                )
+                for descriptor in projection_descriptors:
+                    name = descriptor["projection_name"]
+                    self._connection.execute(
+                        """
+                        INSERT INTO bridge_a1_projection_state (
+                            projection_name, last_applied_sequence, state_sha256, state_json
+                        ) VALUES (?, ?, ?, ?)
+                        ON CONFLICT(projection_name) DO UPDATE SET
+                            last_applied_sequence = excluded.last_applied_sequence,
+                            state_sha256 = excluded.state_sha256,
+                            state_json = excluded.state_json
+                        """,
+                        (
+                            name,
+                            event.sequence,
+                            descriptor["state_sha256"],
+                            _canonical_json(projection_states[name]),
+                        ),
+                    )
+                self._connection.execute("COMMIT")
+                return _model_call_record_from_event(event)
+            except Exception as exc:
+                self._rollback()
+                self._raise_ledger_error(exc)
+
+    def model_call_state(self, call_id: str) -> ModelCallTransitionRecord:
+        """Return the latest durable state of one model call without side effects."""
+
+        normalized = _pattern_text("model call_id", call_id, _MODEL_CALL_ID_RE)
+        history = self.model_call_history(normalized)
+        if not history:
+            raise LedgerError("model call is not registered")
+        return history[-1]
+
+    def model_call_history(self, call_id: str) -> tuple[ModelCallTransitionRecord, ...]:
+        """Return the exact ordered state history for one model call."""
+
+        normalized = _pattern_text("model call_id", call_id, _MODEL_CALL_ID_RE)
+        with self._lock:
+            self._ensure_open()
+            rows = self._connection.execute(
+                """
+                SELECT * FROM bridge_job_ledger
+                WHERE event_type = 'a1_bundle'
+                  AND json_extract(payload_json, '$.bundle_kind') = 'model_call_transition_v1'
+                  AND json_extract(payload_json, '$.model_call.call_id') = ?
+                ORDER BY sequence
+                """,
+                (normalized,),
+            ).fetchall()
+        records = tuple(
+            _model_call_record_from_event(self._ledger_event_from_row(row))
+            for row in rows
+        )
+        previous: Mapping[str, object] | None = None
+        for record in records:
+            _validate_model_call_transition(
+                previous, record.snapshot, record.event.event_at
+            )
+            previous = record.snapshot
+        return records
+
+    def _latest_model_call_states_locked(self) -> dict[str, Mapping[str, object]]:
+        rows = self._connection.execute(
+            """
+            SELECT * FROM bridge_job_ledger
+            WHERE event_type = 'a1_bundle'
+              AND json_extract(payload_json, '$.bundle_kind') = 'model_call_transition_v1'
+            ORDER BY sequence
+            """
+        ).fetchall()
+        latest: dict[str, Mapping[str, object]] = {}
+        for row in rows:
+            record = _model_call_record_from_event(self._ledger_event_from_row(row))
+            previous = latest.get(record.snapshot["call_id"])
+            _validate_model_call_transition(
+                previous, record.snapshot, record.event.event_at
+            )
+            latest[record.snapshot["call_id"]] = record.snapshot
+        return latest
 
     def append_feedback_bundle(
         self,
@@ -2828,6 +3016,219 @@ class JobLedger:
         if isinstance(exc, sqlite3.Error):
             raise LedgerError(f"durable ledger transaction failed: {exc}") from exc
         raise exc
+
+
+def _model_call_snapshot(value: Mapping[str, object]) -> dict[str, object]:
+    snapshot = _exact_mapping(value, _MODEL_CALL_FIELDS, "model call snapshot")
+    _pattern_text("model call_id", snapshot["call_id"], _MODEL_CALL_ID_RE)
+    previous_state = snapshot["previous_state"]
+    if previous_state is not None and previous_state not in _MODEL_CALL_STATES:
+        raise LedgerError("model call previous_state is invalid")
+    if snapshot["state"] not in _MODEL_CALL_STATES:
+        raise LedgerError("model call state is invalid")
+    _sha256("model call request_sha256", snapshot["request_sha256"])
+    _sha256("model call registry_sha256", snapshot["registry_sha256"])
+    for name in ("binding_revision", "role", "model_binding"):
+        _text(snapshot[name], f"model call {name}", maximum=256)
+    if snapshot["classification"] not in {"D0", "D1"}:
+        raise LedgerError("model call classification must be D0 or D1")
+    _pattern_text(
+        "model call budget_policy_ref",
+        snapshot["budget_policy_ref"],
+        _ACCOUNTING_POLICY_REF_RE,
+    )
+    _pattern_text(
+        "model call budget_scope_ref",
+        snapshot["budget_scope_ref"],
+        _BUDGET_SCOPE_REF_RE,
+    )
+    for name in (
+        "max_active_calls",
+        "max_tokens",
+        "max_cost_units",
+        "max_reserved_tokens",
+        "max_reserved_cost_units",
+    ):
+        _positive_safe_integer(f"model call {name}", snapshot[name])
+    if snapshot["max_tokens"] > snapshot["max_reserved_tokens"]:
+        raise LedgerError("model call token reservation exceeds its budget scope")
+    if snapshot["max_cost_units"] > snapshot["max_reserved_cost_units"]:
+        raise LedgerError("model call cost reservation exceeds its budget scope")
+    _timestamp("model call expires_at", snapshot["expires_at"])
+    for name in (
+        "proposed_at",
+        "reserved_at",
+        "sent_at",
+        "terminal_at",
+        "reconciled_at",
+    ):
+        if snapshot[name] is not None:
+            _timestamp(f"model call {name}", snapshot[name])
+    response_ref = snapshot["response_ref"]
+    if response_ref is not None:
+        _pattern_text("model response_ref", response_ref, _MODEL_RESPONSE_REF_RE)
+    for name in ("actual_tokens", "actual_cost_units"):
+        if snapshot[name] is not None:
+            _nonnegative_integer(f"model call {name}", snapshot[name])
+    for name in ("provider_receipt_ref", "failure_code"):
+        if snapshot[name] is not None:
+            _text(snapshot[name], f"model call {name}", maximum=512)
+    for name in ("ambiguous_usage", "budget_released", "auto_retry"):
+        if type(snapshot[name]) is not bool:
+            raise LedgerError(f"model call {name} must be boolean")
+    if snapshot["auto_retry"] is not False:
+        raise LedgerError("model call automatic retry is forbidden")
+    return snapshot
+
+
+def _validate_model_call_transition(
+    previous: Mapping[str, object] | None,
+    current: Mapping[str, object],
+    event_at: str,
+) -> None:
+    snapshot = _model_call_snapshot(current)
+    state = snapshot["state"]
+    expected_previous = {
+        "PROPOSED": None,
+        "RESERVED": "PROPOSED",
+        "SENT": "RESERVED",
+        "SUCCEEDED": "SENT",
+        "FAILED_KNOWN": "SENT",
+        "UNKNOWN": "SENT",
+        "RECONCILED": _MODEL_CALL_TERMINAL_STATES,
+    }[state]
+    if previous is None:
+        if state != "PROPOSED" or snapshot["previous_state"] is not None:
+            raise LedgerError("model call must begin at PROPOSED")
+    else:
+        prior = _model_call_snapshot(previous)
+        allowed = (
+            prior["state"] in expected_previous
+            if isinstance(expected_previous, frozenset)
+            else prior["state"] == expected_previous
+        )
+        if not allowed or snapshot["previous_state"] != prior["state"]:
+            raise LedgerError("model call state transition is invalid")
+        immutable = (
+            "call_id", "request_sha256", "registry_sha256", "binding_revision",
+            "role", "model_binding", "classification", "budget_policy_ref",
+            "budget_scope_ref", "max_active_calls", "max_tokens", "max_cost_units",
+            "max_reserved_tokens", "max_reserved_cost_units", "expires_at", "proposed_at",
+        )
+        if any(snapshot[name] != prior[name] for name in immutable):
+            raise LedgerError("model call immutable reservation binding changed")
+
+    timestamp_fields = {
+        "PROPOSED": "proposed_at",
+        "RESERVED": "reserved_at",
+        "SENT": "sent_at",
+        "SUCCEEDED": "terminal_at",
+        "FAILED_KNOWN": "terminal_at",
+        "UNKNOWN": "terminal_at",
+        "RECONCILED": "reconciled_at",
+    }
+    if snapshot[timestamp_fields[state]] != event_at:
+        raise LedgerError("model call transition timestamp is not event-bound")
+    if _timestamp_datetime(event_at) > _timestamp_datetime(snapshot["expires_at"]):
+        raise LedgerError("model call reservation expired")
+
+    ordered = ("proposed_at", "reserved_at", "sent_at", "terminal_at", "reconciled_at")
+    required_count = {
+        "PROPOSED": 1, "RESERVED": 2, "SENT": 3,
+        "SUCCEEDED": 4, "FAILED_KNOWN": 4, "UNKNOWN": 4, "RECONCILED": 5,
+    }[state]
+    if any(snapshot[name] is None for name in ordered[:required_count]) or any(
+        snapshot[name] is not None for name in ordered[required_count:]
+    ):
+        raise LedgerError("model call lifecycle timestamps are incomplete")
+    parsed = [_timestamp_datetime(snapshot[name]) for name in ordered[:required_count]]
+    if parsed != sorted(parsed):
+        raise LedgerError("model call lifecycle timestamps regress")
+
+    if state in {"PROPOSED", "RESERVED", "SENT"}:
+        if any(
+            snapshot[name] is not None
+            for name in (
+                "response_ref", "actual_tokens", "actual_cost_units",
+                "provider_receipt_ref", "failure_code",
+            )
+        ) or snapshot["ambiguous_usage"] or snapshot["budget_released"]:
+            raise LedgerError("nonterminal model call contains terminal material")
+    elif state == "SUCCEEDED":
+        if snapshot["response_ref"] is None or snapshot["failure_code"] is not None:
+            raise LedgerError("successful model call requires a response and no failure")
+        expected_ambiguous = (
+            snapshot["actual_tokens"] is None
+            or snapshot["actual_cost_units"] is None
+        )
+        if snapshot["ambiguous_usage"] is not expected_ambiguous:
+            raise LedgerError("successful model call ambiguity flag is invalid")
+        if snapshot["budget_released"]:
+            raise LedgerError("success cannot release budget before reconciliation")
+    elif state == "FAILED_KNOWN":
+        if snapshot["failure_code"] is None or snapshot["response_ref"] is not None:
+            raise LedgerError("known failure shape is invalid")
+        expected_ambiguous = (
+            snapshot["actual_tokens"] is None
+            or snapshot["actual_cost_units"] is None
+        )
+        if snapshot["ambiguous_usage"] is not expected_ambiguous:
+            raise LedgerError("known failure ambiguity flag is invalid")
+        if snapshot["budget_released"]:
+            raise LedgerError("known failure cannot release before reconciliation")
+    elif state == "UNKNOWN":
+        if (
+            snapshot["failure_code"] != "AMBIGUOUS_PROVIDER_OUTCOME"
+            or snapshot["ambiguous_usage"] is not True
+            or snapshot["budget_released"] is not False
+        ):
+            raise LedgerError("UNKNOWN must retain ambiguous usage and reservation")
+    elif state == "RECONCILED":
+        if (
+            snapshot["actual_tokens"] is None
+            or snapshot["actual_cost_units"] is None
+            or snapshot["provider_receipt_ref"] is None
+            or snapshot["ambiguous_usage"] is not False
+            or snapshot["budget_released"] is not True
+        ):
+            raise LedgerError("RECONCILED requires exact usage and budget release evidence")
+
+
+def _validate_model_call_budget(
+    latest: Mapping[str, Mapping[str, object]],
+    candidate: Mapping[str, object],
+) -> None:
+    active = [
+        _model_call_snapshot(value)
+        for value in latest.values()
+        if value["state"] in _MODEL_CALL_ACTIVE_RESERVATION_STATES
+    ]
+    if any(
+        value["budget_policy_ref"] != candidate["budget_policy_ref"]
+        or value["budget_scope_ref"] != candidate["budget_scope_ref"]
+        or value["max_active_calls"] != candidate["max_active_calls"]
+        or value["max_reserved_tokens"] != candidate["max_reserved_tokens"]
+        or value["max_reserved_cost_units"] != candidate["max_reserved_cost_units"]
+        for value in active
+    ):
+        raise LedgerError("active model reservations use a different budget scope")
+    if len(active) + 1 > candidate["max_active_calls"]:
+        raise LedgerError("model call active reservation limit exceeded")
+    if sum(value["max_tokens"] for value in active) + candidate["max_tokens"] > candidate["max_reserved_tokens"]:
+        raise LedgerError("model call token reservation limit exceeded")
+    if sum(value["max_cost_units"] for value in active) + candidate["max_cost_units"] > candidate["max_reserved_cost_units"]:
+        raise LedgerError("model call cost reservation limit exceeded")
+
+
+def _model_call_record_from_event(event: LedgerEvent) -> ModelCallTransitionRecord:
+    if event.payload.get("bundle_kind") != "model_call_transition_v1":
+        raise LedgerError("ledger event is not a model call transition")
+    snapshot = _model_call_snapshot(
+        _exact_mapping(event.payload, frozenset({"bundle_kind", "idempotency_key", "objects", "projections", "model_call"}), "model call bundle")["model_call"]
+    )
+    if event.payload.get("objects") not in ([], ()):
+        raise LedgerError("model call transition cannot persist A1 objects")
+    return ModelCallTransitionRecord(event=event, snapshot=_deep_freeze(snapshot))
 
 
 def _feedback_request(
