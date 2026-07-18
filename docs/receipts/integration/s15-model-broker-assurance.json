@@ -1,0 +1,31 @@
+{
+  "schema_id": "IntegrationReceipt", "schema_version": "1.0.0",
+  "object_id": "integration-s15-model-broker-assurance-20260718", "issued_at": "2026-07-18T17:21:44Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s15-model-broker-assurance", "agent_id": "agent-5",
+    "ownership_lease_ref": "stages/s15-model-broker-assurance/ownership-lease.json",
+    "base_sha": "8565220789a9932148291042ec900f12a52bdaf6",
+    "head_sha": "1c7b4b41f8732ddc2160215eea2f64687637da8c",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": ["tests/test_s15_model_registry_broker.py", "tests/test_a1_capability_proof.py", "tests/test_stage1_assurance.py", "stages/s15-model-broker-assurance/stage-envelope.json", "stages/s15-model-broker-assurance/ownership-lease.json"],
+    "audit_results": {
+      "contract_gate": "green", "privacy_secret_scan": "green", "source_mutation": false,
+      "focused_tests": 34, "full_core_tests": 615, "stage0b_tests": 25,
+      "privacy_and_unknown_role_zero_event": "green",
+      "crash_before_sent_zero_provider_calls": "green",
+      "sent_crash_unknown_without_retry_or_release": "green",
+      "provider_and_response_commit_ambiguity": "green",
+      "known_failure_and_success_reconciliation": "green",
+      "duplicate_settlement_exact_replay": "green",
+      "budget_oversubscription_and_release": "green", "registry_drift_egress_denied": "green"
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29653689578",
+    "integration_commit_sha": "c2d406b65938575644fe518948360805f0725c16"
+  },
+  "integrity": {"payload_sha256": "db8f84f7e6828891dd799241dee31a7d69fff39d40641d56a473be313be704b1", "parent_refs": [
+    "git:1c7b4b41f8732ddc2160215eea2f64687637da8c", "git:c2d406b65938575644fe518948360805f0725c16",
+    "ci:29653689578", "git:8565220789a9932148291042ec900f12a52bdaf6"
+  ]}
+}

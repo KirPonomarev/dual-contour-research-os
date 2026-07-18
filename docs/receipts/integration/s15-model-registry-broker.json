@@ -1,0 +1,29 @@
+{
+  "schema_id": "IntegrationReceipt", "schema_version": "1.0.0",
+  "object_id": "integration-s15-model-registry-broker-20260718", "issued_at": "2026-07-18T17:21:44Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s15-model-registry-broker", "agent_id": "agent-1",
+    "ownership_lease_ref": "stages/s15-model-registry-broker/ownership-lease.json",
+    "base_sha": "ce89bdb55879ecb6a093dabdb75cb63fa3807d2e",
+    "head_sha": "8565220789a9932148291042ec900f12a52bdaf6",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": ["src/research_bridge/model_broker.py", "src/research_bridge/ledger.py", "stages/s15-model-registry-broker/stage-envelope.json", "stages/s15-model-registry-broker/ownership-lease.json"],
+    "audit_results": {
+      "contract_gate": "green", "privacy_secret_scan": "green", "source_mutation": false,
+      "focused_tests": 34, "full_core_tests": 615, "stage0b_tests": 25,
+      "frozen_roles_bound": 6, "allowed_classifications": ["D0_PUBLIC", "D1_INTERNAL_SANITIZED"],
+      "reservation_before_egress": "green", "sent_before_provider": "green",
+      "unknown_auto_retry": false, "unknown_budget_release": false,
+      "single_global_event_order": "green", "new_table_queue_or_scheduler": false,
+      "parked_budget_retry_idempotent": "green", "real_provider": "UNPROVEN"
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29653689578",
+    "integration_commit_sha": "c2d406b65938575644fe518948360805f0725c16"
+  },
+  "integrity": {"payload_sha256": "e2e1e7461cf90c12ba84e72d127e01e851f2f3f3639129e1a22cd3b72f91a9e8", "parent_refs": [
+    "git:8565220789a9932148291042ec900f12a52bdaf6", "git:c2d406b65938575644fe518948360805f0725c16",
+    "ci:29653689578", "git:ce89bdb55879ecb6a093dabdb75cb63fa3807d2e"
+  ]}
+}

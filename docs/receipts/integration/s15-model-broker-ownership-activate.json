@@ -1,0 +1,27 @@
+{
+  "schema_id": "IntegrationReceipt", "schema_version": "1.0.0",
+  "object_id": "integration-s15-model-broker-ownership-activate-20260718", "issued_at": "2026-07-18T17:21:44Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s15-model-broker-ownership-activate", "agent_id": "agent-0",
+    "ownership_lease_ref": "stages/s15-model-broker-ownership-activate/ownership-lease.json",
+    "base_sha": "ab3fd63b6d1ddb7783c26be226465be5f781496c",
+    "head_sha": "ce89bdb55879ecb6a093dabdb75cb63fa3807d2e",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": ["ownership/registry.json", "docs/ADR/0006-model-broker-path-activation.md", "docs/receipts/OWNERSHIP_REGISTRY_AMENDMENT_5.json", "docs/receipts/reuse/s15-model-registry-broker.json", "stages/s15-model-broker-ownership-activate/stage-envelope.json", "stages/s15-model-broker-ownership-activate/ownership-lease.json"],
+    "audit_results": {
+      "contract_gate": "green", "privacy_secret_scan": "green", "source_mutation": false,
+      "full_core_tests": 615, "stage0b_tests": 25,
+      "ownership_change_exactly_model_broker": "green", "owner_preserved": "agent-1",
+      "reuse_decision_integrity": "green", "new_dependency": false,
+      "provider_or_authority_expansion": false
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29653689578",
+    "integration_commit_sha": "c2d406b65938575644fe518948360805f0725c16"
+  },
+  "integrity": {"payload_sha256": "5de5e6dd28e129aebfc157a554cdf2e22c3a6203674018745b3477660a4e1c76", "parent_refs": [
+    "git:ce89bdb55879ecb6a093dabdb75cb63fa3807d2e", "git:c2d406b65938575644fe518948360805f0725c16",
+    "ci:29653689578", "git:ab3fd63b6d1ddb7783c26be226465be5f781496c"
+  ]}
+}
