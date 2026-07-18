@@ -1,0 +1,34 @@
+{
+  "schema_id": "ReuseDecisionReceipt", "schema_version": "1.0.0",
+  "object_id": "reuse-s12-organism-state-pulse-20260718", "issued_at": "2026-07-18T16:12:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-freeze-authority"},
+  "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "E1C_DURABLE_ORGANISM_STATE_AND_READ_ONLY_PULSE",
+    "candidates": [
+      {"candidate": "reuse-existing-organism-manifest-ledger-replay-capability-assessment-and-environment-profile", "disposition": "selected"},
+      {"candidate": "derive-state-from-existing-durable-projections-without-new-table-ledger-or-writer", "disposition": "selected"},
+      {"candidate": "add-pure-content-addressed-state-and-pulse-projectors-in-existing-organism-module", "disposition": "selected-minimal-missing-glue"},
+      {"candidate": "persist-live-pulse-or-let-pulse-mutate-state", "disposition": "rejected-side-effect-and-authority-risk"},
+      {"candidate": "add-telemetry-service-scheduler-database-network-or-model-call", "disposition": "rejected-duplicate-surface"},
+      {"candidate": "report-green-on-stale-proof-stuck-queue-or-environment-mismatch", "disposition": "rejected-false-health"}
+    ],
+    "selected_mode": "stdlib-only-durable-ledger-derived-state-plus-separate-deterministic-live-sample-under-versioned-pulse-policy",
+    "source_ref": "git:996df95646dcb72872c79544b77570f5486a9776;internal:organism+ledger-replay+capability-assessment+environment-profile",
+    "code_sha256": "1957d278b1efbd368bf3ee2f09932a3fa747b664f5fb3953f4ee1c6f77a665c8",
+    "license_spdx": "NOASSERTION", "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "all-lifecycle-states", "WAIT_AUTHORITY-and-PARKED-survive-restart", "same-input-same-state-and-pulse-ID",
+      "pulse-zero-write", "AI_OFF-core-operational", "WAIT_DATA-and-REJECTED-healthy-explicit",
+      "stale-proof-or-environment-mismatch-never-green", "aging-or-stuck-queue-yellow-red",
+      "manifest-state-pulse-integrity-and-authority-overclaim-denial"
+    ],
+    "canonical_owner": "agent-5-organism-and-ops-with-agent-0-integration",
+    "rollback": "Remove additive state/pulse projectors, pulse policy and focused tests; existing manifest, ledger, runtime and capability proofs remain unchanged."
+  },
+  "integrity": {"payload_sha256": "c96a1e389427e609d122dd14282a3aad21a6b6c3e0e9fec8a06f057f2cb395c9", "parent_refs": [
+    "git:996df95646dcb72872c79544b77570f5486a9776",
+    "reuse:a98b01fcde8d632e740ee3b9146734847f29f42d22759179316e58b25ccff491",
+    "sha256:52f5d7c8715b3027164a2b284ca912357fd2b8f4bf6f2f2ab356e032370d50e7"
+  ]}
+}
