@@ -1,0 +1,87 @@
+{
+  "schema_id": "CapabilityProofReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "capability-proof:07dfd9437366b272aba8194f9395c96f484cccbb9de3f705fececc672c0962c1",
+  "issued_at": "2026-07-18T14:05:00Z",
+  "issuer": "independent-assurance-issuer",
+  "contour": "governance",
+  "classification": "D1",
+  "payload": {
+    "receipt_id": "capability-proof:e1a-discovery-admission-fixture:ca7f31b6",
+    "capability_id": "A1_DISCOVERY_ADMISSION_FIXTURE",
+    "subject_ref": "git:ca7f31b6ebce575af818f34209a2613835efd3e7",
+    "scope": {
+      "proof_state": "SHADOW_PASS_WITH_FIXTURE_MODEL",
+      "data_scope": "D0_PUBLIC_SYNTHETIC_ONLY",
+      "model_route": "LOCAL_FIXTURE_ONLY",
+      "real_provider": "UNPROVEN",
+      "canonical_mutation": "DENIED",
+      "live_trading": "DENIED",
+      "live_security_execution": "DENIED",
+      "domain_application": "SHADOW_UNAPPLIED",
+      "environments": ["linux-ci", "macos-development"]
+    },
+    "status": "PASS_FOR_FROZEN_SCOPE",
+    "proof_basis": [
+      {"integration_ref": "integration:integration-s01-e1a-admission-complete-20260718", "ci_run": 29645921989},
+      {"integration_ref": "integration:integration-s02-scout-ipc-assurance-20260718", "ci_run": 29646646408},
+      {"integration_ref": "integration:integration-s03-synthetic-domain-assurance-20260718", "ci_run": 29647203808},
+      {"full_suite": {"core": 500, "stage0b": 25}, "result": "green"}
+    ],
+    "code_sha256": "6c7bd4bd4925974e200d29d91d4da830331941f36ec568a3bc4e3852a91fca4e",
+    "config_sha256": "d9c541e507188cfdb5af4750a6697751c13621122d5aa81d085c91a85156d8ba",
+    "policy_sha256": "50a3f629d8931262b7cd7109575ddb99f5fc8cacffec1985e1d5793e012dc3b4",
+    "schema_sha256": "c5b21d5b2036c9001375e9251d91186c324c8d09bb3497d3233169c89cf09122",
+    "executor_ref": "fixture:registered-offline-l0-not-invoked",
+    "evaluator_ref": "assurance:agent5-s01-s02-s03-negative-probe-pack",
+    "test_refs": [
+      "test:tests.test_a1_admission_fixture",
+      "test:tests.test_a1_scout_ipc_fixture",
+      "test:tests.test_a1_synthetic_domain_freeze"
+    ],
+    "environment_ref": "environment:macos-development+linux-ci:2026-07-18",
+    "data_refs": ["fixture:public-synthetic-research-item-001"],
+    "issuer_independence": {
+      "issuer_ref": "assurance-role:agent-5",
+      "independent_of_subject": true,
+      "independent_of_executor": true
+    },
+    "critical_dependencies": [
+      "catalog:core:13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+      "catalog:a1:eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1"
+    ],
+    "compatibility_dependencies": ["python:>=3.11", "git:required", "make:required"],
+    "environment_compatibility_ref": "profile:environment-compatibility-v1:52f5d7c8715b3027164a2b284ca912357fd2b8f4bf6f2f2ab356e032370d50e7",
+    "negative_probe_refs": [
+      "probe:canonical-live-authority-absent",
+      "probe:expired-proof-stale",
+      "probe:ipc-role-spoof-denied",
+      "probe:mixed-head-stale",
+      "probe:parser-hostile-pack",
+      "probe:shadow-admission-parked",
+      "probe:writer-spoof-denied"
+    ],
+    "valid_from": "2026-07-18T14:05:00Z",
+    "valid_until": "2026-07-25T14:05:00Z",
+    "invalidation_conditions": [
+      "code-hash-drift", "config-hash-drift", "environment-compatibility-drift",
+      "negative-probe-regression", "policy-hash-drift", "proof-expiry",
+      "schema-hash-drift", "subject-head-drift"
+    ],
+    "grants_authority": false
+  },
+  "integrity": {
+    "profile_id": "core-json-sha256-v1",
+    "payload_sha256": "07dfd9437366b272aba8194f9395c96f484cccbb9de3f705fececc672c0962c1",
+    "parent_refs": [
+      "git:ca7f31b6ebce575af818f34209a2613835efd3e7",
+      "probe:canonical-live-authority-absent", "probe:expired-proof-stale",
+      "probe:ipc-role-spoof-denied", "probe:mixed-head-stale",
+      "probe:parser-hostile-pack", "probe:shadow-admission-parked",
+      "probe:writer-spoof-denied",
+      "profile:environment-compatibility-v1:52f5d7c8715b3027164a2b284ca912357fd2b8f4bf6f2f2ab356e032370d50e7",
+      "test:tests.test_a1_admission_fixture",
+      "test:tests.test_a1_scout_ipc_fixture", "test:tests.test_a1_synthetic_domain_freeze"
+    ]
+  }
+}

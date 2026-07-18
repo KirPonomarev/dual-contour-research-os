@@ -1,0 +1,27 @@
+{
+  "schema_id": "ReuseDecisionReceipt", "schema_version": "1.0.0",
+  "object_id": "reuse-s04-capability-proof-20260718", "issued_at": "2026-07-18T14:05:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-freeze-authority"},
+  "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "issue-and-assess-scoped-A1-CapabilityProofReceipt",
+    "candidates": [
+      {"candidate": "frozen-CapabilityProofReceipt-contract-and-environment-profile", "disposition": "selected"},
+      {"candidate": "owned-stdlib-pure-governance-tool", "disposition": "selected"},
+      {"candidate": "premature-organism-runtime-module", "disposition": "rejected-deferred-to-E1C-and-expands-authority-surface"},
+      {"candidate": "external-attestation-framework", "disposition": "rejected-no-measured-blocker"}
+    ],
+    "selected_mode": "pure-stdlib-governance-issuer-validator-plus-immutable-receipt-no-runtime-service",
+    "source_ref": "git:ca7f31b6ebce575af818f34209a2613835efd3e7;a1-schema:sha256:c5b21d5b2036c9001375e9251d91186c324c8d09bb3497d3233169c89cf09122",
+    "code_sha256": "c5b21d5b2036c9001375e9251d91186c324c8d09bb3497d3233169c89cf09122",
+    "license_spdx": "NOASSERTION",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": ["exact-shape-and-integrity", "mixed-head-stale", "expiry-stale", "dependency-drift-stale", "fixture-scope-no-authority"],
+    "canonical_owner": "governance-agent-0-with-independent-agent-5-assurance",
+    "rollback": "Revert the S04 tool, proof and tests; S01-S03 integrations remain accepted but E1A capability gate returns UNPROVEN."
+  },
+  "integrity": {"payload_sha256": "8db051608e78db8fae80350afd4f66a6dd6b0280aca0d2f0d1f8b57adb5644b6", "parent_refs": [
+    "git:ca7f31b6ebce575af818f34209a2613835efd3e7",
+    "sha256:c5b21d5b2036c9001375e9251d91186c324c8d09bb3497d3233169c89cf09122"
+  ]}
+}
