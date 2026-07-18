@@ -1,0 +1,22 @@
+{
+  "stage_id": "s19-e1-aggregate-gate",
+  "agent_id": "agent-0",
+  "objective": "Assemble an exact-head E1 aggregate capability proof without mixing fixture and real-provider claims or granting authority.",
+  "executable_blocker": "E1 component proofs exist, but no deterministic aggregate gate binds their exact identities, ancestry and provider limitations into EVOLUTION_KERNEL_V1_SHADOW_PASS_FOR_FROZEN_SCOPE.",
+  "base_sha": "475a68abc4ec48148f001d9b614a2b262a0dad69",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a0-s19-e1-aggregate-gate",
+  "worktree": "/private/tmp/dcr-s19-e1-aggregate-gate",
+  "read_set": ["tools/capability_proof.py", "docs/receipts/capability/e1a-discovery-admission-fixture.json", "docs/receipts/capability/e1b-durable-feedback-offline.json", "docs/receipts/capability/e1c-operational-self-model-offline.json", "docs/receipts/integration/s14-provider-independent-hostile.json", "docs/receipts/integration/s18-provider-hostile.json"],
+  "write_set": ["tools/capability_proof.py", "tools/e1_aggregate_gate.py", "tests/test_s19_e1_aggregate_gate.py", "docs/receipts/capability/e1-evolution-kernel-v1-shadow.json", "docs/receipts/reuse/s19-e1-aggregate-gate.json", "stages/s19-e1-aggregate-gate/stage-envelope.json", "stages/s19-e1-aggregate-gate/ownership-lease.json"],
+  "forbidden_scope": ["contract-schema-catalog-freeze-or-runtime-source-edit", "fixture-and-real-provider-claim-mixing", "GPT-availability-or-Kimi-promotion-claim", "provider-call-credential-or-raw-response-access", "canonical-domain-mutation-promotion-deployment-or-live-action", "new-service-dependency-queue-scheduler-or-orchestrator"],
+  "dependency_hashes": {"base_main": "475a68abc4ec48148f001d9b614a2b262a0dad69", "core_contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50", "a1_contract_catalog": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1", "s17_local_proof_sha256": "43fafb2b354813d991da84c1a4757f88b5aee335d4861fa44d2998dcf534a399", "external_dependencies": "none-stdlib-only"},
+  "acceptance_commands": ["make contracts", "python3 tools/e1_aggregate_gate.py --receipt docs/receipts/capability/e1-evolution-kernel-v1-shadow.json", "python3 -m unittest tests.test_s19_e1_aggregate_gate -v", "make test", "git diff --check"],
+  "risk_class": "high-aggregate-overclaim-and-evidence-laundering",
+  "stop_conditions": ["component-receipt-digest-or-ancestry-mismatch", "fixture-provider-claim-laundering", "WAIT_PROVIDER-or-independence-status-widened", "canonical-promotion-deploy-live-or-authority-claim", "secret-private-evidence-or-provider-call-required"],
+  "expected_receipt": "docs/receipts/integration/s19-e1-aggregate-gate.json",
+  "rollback": "Revert the aggregate gate and S19 proof metadata only; component proofs and provider evidence remain unchanged.",
+  "commit_authority": "one-scoped-agent-0-commit",
+  "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent0_integration", "blocked_validation_failed"]
+}
