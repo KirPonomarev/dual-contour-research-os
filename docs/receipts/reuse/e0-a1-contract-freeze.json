@@ -1,0 +1,53 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-e0-a1-contract-freeze-20260718",
+  "issued_at": "2026-07-18T10:41:51Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "reuse-freeze-authority"
+  },
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "a1-authority-freeze-verification",
+    "candidates": [
+      {
+        "candidate": "extend-existing-core-freeze-receipt-verifier-pattern",
+        "disposition": "selected-with-separate-a1-chain"
+      },
+      {
+        "candidate": "python-stdlib-hashlib-json-subprocess",
+        "disposition": "selected-as-minimal-auditable-glue"
+      },
+      {
+        "candidate": "signing-or-transparency-log-dependency",
+        "disposition": "deferred-to-late-hardening-stage"
+      }
+    ],
+    "selected_mode": "separate-additive-freeze-receipt-bound-to-reviewed-bytes-successful-exact-head-ci-and-candidate-integration-chain",
+    "source_ref": "internal:tools/verify_freeze_receipt.py;candidate-integration:sha256:58471ffa9d70a0c437366ead66280901cbb7708e27793626b685a12e592b4ebf",
+    "code_sha256": "95f140c68ba72a30c6d0a9191460d99e21345fb65b666ea6667d881c02f0d6c8",
+    "license_spdx": "NOASSERTION",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "exact-a1-catalog-hash",
+      "schema-and-profile-manifest-hashes",
+      "frozen-status-on-all-profiles",
+      "successful-exact-head-ci-binding",
+      "candidate-integration-chain",
+      "scope-deny-completeness",
+      "frozen-commit-ancestor"
+    ],
+    "canonical_owner": "governance-agent-0",
+    "rollback": "Revert the A1 authority-freeze commit and do not issue E1 worker bases. The reviewed candidate and finalized-byte commits remain immutable evidence but grant no runtime authority."
+  },
+  "integrity": {
+    "payload_sha256": "0815201b879e5aa2cce9bd1a4ea9feaf24ae96f6f9087ec27993849b159d8ac7",
+    "parent_refs": [
+      "git:f6ee4643a07af6e2f92a61a0aa4720bb1b7b1271",
+      "ci:29641254197",
+      "sha256:48f341c76bc5125b48f3c62ad9986b4f848079b67a9760f89474ea0c23a4606f"
+    ]
+  }
+}

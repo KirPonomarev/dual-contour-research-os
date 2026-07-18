@@ -6,9 +6,9 @@ The public repository contains only domain-neutral contracts, control-plane code
 
 ## Current status
 
-`STAGE_0A_CONTRACT_FREEZE`
+`CORE_CONTRACTS_FROZEN + A1_CONTRACTS_FROZEN`
 
-No worker implementation is admitted until the repository emits a verified `CONTRACTS_FROZEN` receipt.
+The Core and additive A1 public contracts are frozen and verified by `make contracts`. The A1 runtime corridor is not yet implemented or enabled; implementation proceeds only through pinned E1 StageEnvelopes. Existing Stage 4 substrate code is present, but production deployment proof and soak evidence remain incomplete until their explicit gates pass.
 
 ## Product boundary
 
@@ -42,6 +42,8 @@ It must never contain:
 make contracts
 make test
 ```
+
+`make contracts` verifies both immutable freeze chains, regenerates schemas deterministically, checks ownership coverage, and rejects A1 profile or authority drift.
 
 See `AGENTS.md` and `docs/DEVELOPMENT_AGENT_CONTRACT.md` before changing the repository.
 

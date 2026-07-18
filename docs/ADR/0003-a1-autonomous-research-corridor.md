@@ -1,9 +1,9 @@
 # RFC 0001: A1 bounded autonomous research corridor
 
-Status: freeze candidate  
+Status: accepted — A1 contracts frozen
 Owner: Agent 0  
 Scope: public, domain-neutral control-plane contracts  
-Runtime status: not yet enabled
+Runtime status: not yet implemented or enabled
 
 ## Decision
 
@@ -106,9 +106,9 @@ Existing integrity behavior is recorded exactly. Sorted JSON is not declared equ
 
 IPC 1.1 remains supported for operators during a measured deprecation window. IPC 1.2 adds separate collector and scout submission roles. Neither role can mint trusted events.
 
-## Acceptance for contract freeze
+## Contract-freeze evidence
 
-The freeze gate requires deterministic schema regeneration, exact profile hashes, strict envelopes and payloads, unchanged Core catalog bytes, authority and taint invariants, focused negative tests, full repository tests, clean diff, public-data scan, exact-head remote CI, and a separate Agent 0 freeze receipt.
+The freeze gate requires deterministic schema regeneration, exact profile hashes, strict envelopes and payloads, unchanged Core catalog bytes, authority and taint invariants, focused negative tests, full repository tests, clean diff, public-data scan, exact-head remote CI, and a separate Agent 0 freeze receipt. These checks are now mandatory through `make contracts` and `A1_CONTRACTS_FROZEN.json`.
 
 No runtime module consumes the A1 contracts until that authority receipt is issued and E1 stage envelopes are pinned to its exact integration base.
 

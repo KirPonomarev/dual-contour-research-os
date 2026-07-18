@@ -1,0 +1,45 @@
+{
+  "receipt_type": "A1_CONTRACTS_FROZEN",
+  "receipt_version": "1.0.0",
+  "status": "A1_CONTRACTS_FROZEN",
+  "issued_at": "2026-07-18T10:41:51Z",
+  "issuer": "agent-0",
+  "frozen_bundle_head_sha": "f6ee4643a07af6e2f92a61a0aa4720bb1b7b1271",
+  "core_catalog_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "a1_catalog_sha256": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+  "generated_schema_manifest_sha256": "ad354cc1b2ab554a20fad9e5a5d673c992c9d022bb08ba8e9049a765e085d1dc",
+  "profile_manifest_sha256": "303faecc5d291b3332f46944296ac6643fd69b8fcb9227a1c46d3e697b5c6a84",
+  "ownership_registry_sha256": "e8095063e94da82ab4a9658d9a7cdefd8d2e50bfa73c7b553b9ca9fdd6022f4a",
+  "candidate_catalog_sha256": "87c0db3fae18f2e15c92bcb9252d820c9a2382afcbe491815a724b55ecd5e556",
+  "candidate_integration_receipt_sha256": "58471ffa9d70a0c437366ead66280901cbb7708e27793626b685a12e592b4ebf",
+  "schema_count": 4,
+  "profile_count": 10,
+  "exact_head_ci": {
+    "workflow": "exact-head-ci",
+    "run_id": 29641254197,
+    "url": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29641254197",
+    "head_sha": "f6ee4643a07af6e2f92a61a0aa4720bb1b7b1271",
+    "conclusion": "success"
+  },
+  "scope": {
+    "allows": [
+      "issue-e1-stage-envelopes-from-an-integrated-freeze-base",
+      "implement-material-event-and-deterministic-admission",
+      "implement-bounded-durable-a1-execution",
+      "implement-organism-state-and-capability-proof",
+      "implement-shadow-model-role-routing"
+    ],
+    "does_not_allow": [
+      "autonomous-canonical-mutation",
+      "promotion-without-human-authority",
+      "publication",
+      "live-trading",
+      "live-security-execution",
+      "true-holdout-access",
+      "d2-d3-payload-in-public-repository",
+      "bridge-write-of-domain-scientific-truth",
+      "deployment",
+      "policy-authority-expansion"
+    ]
+  }
+}
