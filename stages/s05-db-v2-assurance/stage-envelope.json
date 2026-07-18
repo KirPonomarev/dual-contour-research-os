@@ -1,0 +1,43 @@
+{
+  "stage_id": "s05-db-v2-assurance",
+  "agent_id": "agent-5",
+  "objective": "Independently prove exact v1-to-v2 migration, one global sequence, atomic A1 bundles, complete projection coverage and fail-closed classification boundaries.",
+  "executable_blocker": "The S05 source commit requires migration, crash, replay and hostile storage assurance before integration.",
+  "base_sha": "1b33ccedd3f2f354cfab7cc76490d8e9ca717f9a",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "a1_contract_sha256": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+  "branch": "codex/bridge-a5-s05-db-v2-assurance",
+  "worktree": "/Volumes/Work/dual-contour-research-os-s05-db-v2-assurance",
+  "write_set": [
+    "tests/test_stage1_ledger.py",
+    "tests/test_stage1_assurance.py",
+    "tests/test_stage1_control_assurance.py",
+    "tests/test_a1_storage_v2.py",
+    "stages/s05-db-v2-assurance/stage-envelope.json",
+    "stages/s05-db-v2-assurance/ownership-lease.json"
+  ],
+  "forbidden_scope": [
+    "source-edit", "contract-edit", "migration-repair", "D2-or-D3-fixture",
+    "canonical-writer", "live-action", "deployment"
+  ],
+  "dependency_hashes": {
+    "core_contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "a1_contract_catalog": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+    "source_commit": "1b33ccedd3f2f354cfab7cc76490d8e9ca717f9a",
+    "external_dependencies": "none"
+  },
+  "acceptance_commands": [
+    "make contracts", "python3 -m unittest tests.test_stage1_ledger tests.test_a1_storage_v2",
+    "make test", "git diff --check", "public safety scan"
+  ],
+  "risk_class": "independent-storage-migration-and-atomicity-assurance",
+  "stop_conditions": [
+    "schema-mismatch", "migration-data-loss", "fault-leaves-partial-state",
+    "bundle-replay-conflict-accepted", "second-sequence-detected", "D2-or-D3-accepted"
+  ],
+  "expected_receipt": "docs/receipts/integration/s05-db-v2-assurance.json",
+  "rollback": "Revert only assurance files; S05 cannot integrate without replacement evidence.",
+  "commit_authority": "one-scoped-agent-5-commit",
+  "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent0_integration", "blocked_validation_failed"]
+}

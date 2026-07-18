@@ -329,7 +329,14 @@ class PersistentPauseAssuranceTests(unittest.TestCase):
             )
             if not row[0].startswith("sqlite_")
         }
-        self.assertEqual(tables, {"bridge_job_ledger"})
+        self.assertEqual(
+            tables,
+            {
+                "bridge_a1_objects",
+                "bridge_a1_projection_state",
+                "bridge_job_ledger",
+            },
+        )
         self.assertTrue(self.ledger.verify_chain())
 
         self.ledger.close()

@@ -381,7 +381,10 @@ class JobLedgerTests(unittest.TestCase):
         ]
         self.assertEqual(mode.lower(), "wal")
         self.assertEqual(synchronous, 2)
-        self.assertEqual(tables, ["bridge_job_ledger"])
+        self.assertEqual(
+            tables,
+            ["bridge_a1_objects", "bridge_a1_projection_state", "bridge_job_ledger"],
+        )
         indexes = {
             row[0]
             for row in self.ledger._connection.execute(
@@ -603,7 +606,7 @@ class JobLedgerTests(unittest.TestCase):
                     )
 
                 with self.assertRaisesRegex(
-                    LedgerError, "schema fingerprint is not exact version 1"
+                    LedgerError, "schema fingerprint is not exact version 2"
                 ):
                     JobLedger(database)
 
@@ -904,9 +907,9 @@ class JobLedgerTests(unittest.TestCase):
         self.assertEqual(self.ledger.event_count(), before)
         self.assertTrue(self.ledger.verify_chain())
 
-    def test_exact_v1_schema_and_empty_legacy_upgrade(self) -> None:
+    def test_exact_v2_schema_and_empty_legacy_upgrade(self) -> None:
         expected_names = {
-            name for _object_type, name, _sql in ledger_module._SCHEMA_V1_OBJECTS
+            name for _object_type, name, _sql in ledger_module._SCHEMA_V2_OBJECTS
         }
         version = self.ledger._connection.execute("PRAGMA user_version").fetchone()[0]
         names = {
@@ -915,7 +918,7 @@ class JobLedgerTests(unittest.TestCase):
                 "SELECT name FROM sqlite_master WHERE name NOT LIKE 'sqlite_%'"
             )
         }
-        self.assertEqual(version, 1)
+        self.assertEqual(version, 2)
         self.assertEqual(names, expected_names)
 
         database = Path(self.temporary_directory.name) / "empty-legacy.sqlite3"
@@ -927,7 +930,7 @@ class JobLedgerTests(unittest.TestCase):
         upgraded = JobLedger(database)
         try:
             self.assertEqual(
-                upgraded._connection.execute("PRAGMA user_version").fetchone()[0], 1
+                upgraded._connection.execute("PRAGMA user_version").fetchone()[0], 2
             )
             upgraded_names = {
                 row[0]
@@ -972,7 +975,7 @@ class JobLedgerTests(unittest.TestCase):
                         connection.execute(statement)
                 before = identity(database)
                 with self.assertRaisesRegex(
-                    LedgerError, "schema fingerprint is not exact version 1"
+                    LedgerError, "schema fingerprint is not exact version 2"
                 ):
                     JobLedger(database)
                 self.assertEqual(identity(database), before)
