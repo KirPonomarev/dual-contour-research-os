@@ -1,0 +1,25 @@
+{
+  "schema_id": "IntegrationReceipt", "schema_version": "1.0.0",
+  "object_id": "integration-s21-deployment-readiness-20260718", "issued_at": "2026-07-18T21:20:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s21-deployment-readiness", "agent_id": "agent-0",
+    "ownership_lease_ref": "stages/s21-deployment-readiness/ownership-lease.json",
+    "base_sha": "94f203fc2e0fb85a6578d78a22b0f0bcefdf4c9b", "head_sha": "cfb62136c5d3b3bae7c2bf1de6e134412912bd73",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": ["ops/deploy/deployment-readiness-packet.json", "tools/verify_deployment_readiness_packet.py", "tests/test_s21_deployment_readiness.py", "docs/receipts/reuse/s21-deployment-readiness.json", "stages/s21-deployment-readiness/stage-envelope.json", "stages/s21-deployment-readiness/ownership-lease.json"],
+    "audit_results": {
+      "contract_gate": "green", "privacy_secret_scan": "green", "source_mutation": false,
+      "bridge_runtime_source_mutation": false, "agent0_readiness_tool_mutation": true,
+      "focused_tests": 43, "new_readiness_tests": 4, "full_core_tests": 670, "stage0b_tests": 25,
+      "structural_deployability": "PASS_FOR_FROZEN_SCOPE", "backup_restore_path": "EXECUTABLE_SYNTHETIC_PROOF",
+      "actual_backup_receipt": "WAIT_OPERATOR_RUNTIME_EVIDENCE", "actual_restore_receipt": "WAIT_OPERATOR_RUNTIME_EVIDENCE",
+      "deployment_authority": "WAIT_HUMAN_AUTHORITY", "status": "READY_FOR_HUMAN_REVIEW_NOT_READY_TO_DEPLOY",
+      "private_locator_secret_or_password_in_git": 0, "external_actions_performed": 0
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29659963342",
+    "integration_commit_sha": "114dce34d947a9c3087d305bef3b0b86c4eb5065"
+  },
+  "integrity": {"payload_sha256": "b1aa5fe4b44b64bccce9fc66277a80ab9f059494a820b4d53b9bda536a0422b6", "parent_refs": ["git:cfb62136c5d3b3bae7c2bf1de6e134412912bd73", "git:114dce34d947a9c3087d305bef3b0b86c4eb5065", "ci:29659963342", "reuse:reuse-s21-deployment-readiness-20260718"]}
+}
