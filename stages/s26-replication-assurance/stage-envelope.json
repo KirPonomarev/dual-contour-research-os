@@ -1,0 +1,18 @@
+{
+  "stage_id": "s26-replication-assurance", "agent_id": "agent-5",
+  "objective": "Hostile-test S26 D0-only sidecars, five-dimensional correlation semantics, island isolation, evaluator exposure and zero-export declassification dry-run.",
+  "executable_blocker": "S26 cannot integrate until D1/D2/D3, path refs, correlated sources, forged sidecars, overlapping islands, exposure exhaustion and declassification binding failures are proven fail-closed.",
+  "base_sha": "fc94b39f08ba6d53556c64a89885c5005a861a05", "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a5-s26-replication-assurance", "worktree": "/private/tmp/dcr-s26-replication-assurance",
+  "read_set": ["src/research_bridge/evolution.py", "provenance/evidence-replication-matrix-v1.json", "contracts/a1/v1/profiles/evaluator_exposure_v1.json"],
+  "write_set": ["tests/test_s26_evidence_replication.py", "tests/test_stage1_assurance.py", "stages/s26-replication-assurance/stage-envelope.json", "stages/s26-replication-assurance/ownership-lease.json"],
+  "forbidden_scope": ["source-contract-profile-provenance-root-CI-or-lockfile-edit", "real-private-evidence-or-holdout", "network-export-write-model-call-or-new-runtime", "authority-canonical-live-deploy-or-publication-action"],
+  "dependency_hashes": {"implementation_stage": "fc94b39f08ba6d53556c64a89885c5005a861a05", "replication_profile": "4af1043d70a41950b8688806d96ae844cfdc33f6240c3fae8d82a7fcf2aa2966", "evaluator_exposure": "646ef26b37a277b9abb2912f4000d5f9b6c5c754e239ffbbd9aac076c2727f9d", "external_dependencies": "none"},
+  "acceptance_commands": ["make contracts", "python3 -m unittest tests.test_s26_evidence_replication tests.test_stage1_assurance", "make test", "git diff --check"],
+  "risk_class": "critical-privacy-holdout-correlation-isolation-and-export",
+  "stop_conditions": ["forbidden-class-accepted", "correlation-overclaim", "exposure-bypass", "bytes-network-write-or-authority", "static-boundary-weakened"],
+  "expected_receipt": "docs/receipts/integration/s26-replication-assurance.json",
+  "rollback": "Remove S26 tests/static allowlist additions and stage metadata with S26 public types.",
+  "commit_authority": "one-scoped-agent-5-commit", "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent0_s26_integration", "blocked_validation_failed"]
+}
