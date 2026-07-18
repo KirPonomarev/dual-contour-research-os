@@ -9,8 +9,8 @@
     "base_sha": "b47db518aff06209b815416c8414f5917ba81fe5", "head_sha": "fb9821b3ff655972f8f663991f86d36e7f230288",
     "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
     "write_set": ["src/research_bridge/model_broker.py", "stages/s17-raw-response/stage-envelope.json", "stages/s17-raw-response/ownership-lease.json"],
-    "audit_results": {"contract_gate": "green", "privacy_secret_scan": "green", "full_core_tests": 628, "stage0b_tests": 25, "raw_commit_precedes_parse": "green", "commit_fault_parser_calls": 0, "parse_ambiguity": "UNKNOWN_WITH_RESPONSE_REF", "response_bearing_failure": "UNKNOWN_WITH_RESPONSE_REF", "automatic_retry": false, "budget_release_on_unknown": false, "new_ledger_schema_service_queue_or_scheduler": false, "network_calls_or_real_cost": 0},
+    "audit_results": {"contract_gate": "green", "privacy_secret_scan": "green", "source_mutation": false, "full_core_tests": 628, "stage0b_tests": 25, "raw_commit_precedes_parse": "green", "commit_fault_parser_calls": 0, "parse_ambiguity": "UNKNOWN_WITH_RESPONSE_REF", "response_bearing_failure": "UNKNOWN_WITH_RESPONSE_REF", "automatic_retry": false, "budget_release_on_unknown": false, "new_ledger_schema_service_queue_or_scheduler": false, "network_calls_or_real_cost": 0},
     "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29655305985", "integration_commit_sha": "7d9b87fc1710b7c691d2e23bfb779f65b9bbc009"
   },
-  "integrity": {"payload_sha256": "e597dc96fea832ffaf89420d94d61641020a87561c51c4cf75f2b3013704fe4c", "parent_refs": ["git:fb9821b3ff655972f8f663991f86d36e7f230288", "git:7d9b87fc1710b7c691d2e23bfb779f65b9bbc009", "ci:29655305985", "git:b47db518aff06209b815416c8414f5917ba81fe5"]}
+  "integrity": {"payload_sha256": "6db148c4d45ec5d8579170a0029249137303f4f43628d7f09542576ab4bbd761", "parent_refs": ["git:fb9821b3ff655972f8f663991f86d36e7f230288", "git:7d9b87fc1710b7c691d2e23bfb779f65b9bbc009", "ci:29655305985", "git:b47db518aff06209b815416c8414f5917ba81fe5"]}
 }
