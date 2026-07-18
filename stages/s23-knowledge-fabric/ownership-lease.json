@@ -1,0 +1,7 @@
+{
+  "lease_id": "lease-s23-knowledge-fabric-agent-1", "stage_id": "s23-knowledge-fabric", "agent_id": "agent-1",
+  "base_sha": "8a14529e5086723bde7d35f669dc0470efa9c56b", "branch": "codex/bridge-a1-s23-knowledge-fabric",
+  "issued_at": "2026-07-18T21:10:00Z", "expires_at": "2026-07-19T21:10:00Z",
+  "write_set": ["src/research_bridge/ledger.py", "stages/s23-knowledge-fabric/stage-envelope.json", "stages/s23-knowledge-fabric/ownership-lease.json"],
+  "exclusive": true, "revoked": false
+}

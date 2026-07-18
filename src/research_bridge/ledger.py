@@ -464,6 +464,26 @@ class FeedbackReplayReport:
 
 
 @dataclass(frozen=True, slots=True)
+class KnowledgeFabricReport:
+    """Read-only typed research memory derived from verified feedback events."""
+
+    fabric_version: str
+    ledger_sequence_last: int
+    memory_enabled: bool
+    query_root_event_ref: str | None
+    idea_nodes: tuple[Mapping[str, object], ...]
+    failure_memory: tuple[Mapping[str, object], ...]
+    conflict_candidates: tuple[Mapping[str, object], ...]
+    root_event_energy: tuple[Mapping[str, object], ...]
+    research_debt: tuple[Mapping[str, object], ...]
+    retrieval_trace: Mapping[str, object]
+    fabric_sha256: str
+    side_effects: bool
+    claims_scientific_truth: bool
+    grants_authority: bool
+
+
+@dataclass(frozen=True, slots=True)
 class ModelCallTransitionRecord:
     """One conservative model-call transition in the existing global order."""
 
@@ -1756,6 +1776,122 @@ class JobLedger:
             capacity_envelope=_deep_freeze(capacity),
             replay_sha256=_digest(_canonical_json(material).encode("utf-8")),
             side_effects=False,
+        )
+
+    def research_knowledge_fabric(
+        self,
+        *,
+        memory_enabled: bool,
+        root_event_ref: str | None = None,
+        limit: int = 64,
+    ) -> KnowledgeFabricReport:
+        """Retrieve typed operational memory without mutating or promoting it."""
+
+        if type(memory_enabled) is not bool:
+            raise LedgerError("memory_enabled must be boolean")
+        query_root = (
+            None
+            if root_event_ref is None
+            else _feedback_ref(root_event_ref, "knowledge root_event_ref")
+        )
+        if isinstance(limit, bool) or not isinstance(limit, int) or not 1 <= limit <= 256:
+            raise LedgerError("knowledge retrieval limit must be between 1 and 256")
+
+        with self._lock:
+            self._ensure_open()
+            changes_before = self._connection.total_changes
+            replay = self.replay_feedback()
+            rows = self._connection.execute(
+                """
+                SELECT * FROM bridge_job_ledger
+                WHERE event_type = 'a1_bundle'
+                  AND json_extract(payload_json, '$.bundle_kind') = 'atomic_feedback_v1'
+                ORDER BY sequence
+                """
+            ).fetchall()
+            records: list[tuple[LedgerEvent, FeedbackBundleRecord]] = []
+            object_ids: set[str] = set()
+            execution_refs: set[str] = set()
+            for row in rows:
+                event = self._ledger_event_from_row(row)
+                record = _feedback_record_from_event(event)
+                _validate_feedback_knowledge_material(record)
+                execution_ref = str(record.outcome_disposition["execution_ref"])
+                if execution_ref in execution_refs:
+                    raise LedgerError("knowledge fabric contains duplicate execution memory")
+                execution_refs.add(execution_ref)
+                identifiers = {
+                    str(record.outcome_disposition["object_id"]),
+                    str(record.experience_record["object_id"]),
+                    str(record.idea_node["object_id"]),
+                    str(record.outbox_record["object_id"]),
+                }
+                if len(identifiers) != 4 or object_ids.intersection(identifiers):
+                    raise LedgerError("knowledge fabric contains duplicate object identity")
+                object_ids.update(identifiers)
+                records.append((event, record))
+
+            matching = [
+                item
+                for item in records
+                if query_root is None
+                or item[1].idea_node["root_event_ref"] == query_root
+            ]
+            selected = matching[-limit:] if memory_enabled else []
+            idea_nodes, failures, conflicts, energy, debt = _knowledge_views(selected)
+            selected_event_refs = [
+                f"ledger-event:sha256:{event.event_sha256}" for event, _ in selected
+            ]
+            trace: dict[str, object] = {
+                "trace_type": "KnowledgeRetrievalTrace",
+                "memory_enabled": memory_enabled,
+                "query_root_event_ref": query_root,
+                "limit": limit,
+                "ledger_events_scanned": len(records),
+                "matching_records": len(matching),
+                "selected_records": len(selected),
+                "selected_event_refs": selected_event_refs,
+                "excluded": {
+                    "memory_disabled": len(matching) if not memory_enabled else 0,
+                    "limit": max(0, len(matching) - limit) if memory_enabled else 0,
+                    "root_filter": len(records) - len(matching),
+                },
+                "source_replay_sha256": replay.replay_sha256,
+                "side_effects": False,
+            }
+            material: dict[str, object] = {
+                "fabric_version": "research-knowledge-fabric-v1",
+                "ledger_sequence_last": replay.ledger_sequence_last,
+                "memory_enabled": memory_enabled,
+                "query_root_event_ref": query_root,
+                "idea_nodes": idea_nodes,
+                "failure_memory": failures,
+                "conflict_candidates": conflicts,
+                "root_event_energy": energy,
+                "research_debt": debt,
+                "retrieval_trace": trace,
+                "side_effects": False,
+                "claims_scientific_truth": False,
+                "grants_authority": False,
+            }
+            fabric_sha256 = _digest(_canonical_json(material).encode("utf-8"))
+            if self._connection.total_changes != changes_before:
+                raise LedgerError("knowledge retrieval attempted a durable write")
+        return KnowledgeFabricReport(
+            fabric_version="research-knowledge-fabric-v1",
+            ledger_sequence_last=replay.ledger_sequence_last,
+            memory_enabled=memory_enabled,
+            query_root_event_ref=query_root,
+            idea_nodes=tuple(_deep_freeze(item) for item in idea_nodes),
+            failure_memory=tuple(_deep_freeze(item) for item in failures),
+            conflict_candidates=tuple(_deep_freeze(item) for item in conflicts),
+            root_event_energy=tuple(_deep_freeze(item) for item in energy),
+            research_debt=tuple(_deep_freeze(item) for item in debt),
+            retrieval_trace=_deep_freeze(trace),
+            fabric_sha256=fabric_sha256,
+            side_effects=False,
+            claims_scientific_truth=False,
+            grants_authority=False,
         )
 
     def _projection_states_locked(
@@ -3565,6 +3701,316 @@ def _feedback_ref(value: object, name: str) -> str:
     ):
         raise LedgerError(f"{name} must be a portable non-file reference")
     return normalized
+
+
+def _validate_feedback_knowledge_material(record: FeedbackBundleRecord) -> None:
+    outcome = _exact_mapping(
+        record.outcome_disposition,
+        frozenset(
+            {
+                "object_id", "execution_ref", "validation_ref", "mechanical_axis",
+                "epistemic_axis", "blame_axis", "proposed_outcome", "disposition",
+                "domain_application_ref", "shadow_taint", "claims_scientific_truth",
+                "issued_at",
+            }
+        ),
+        "knowledge outcome",
+    )
+    experience = _exact_mapping(
+        record.experience_record,
+        frozenset(
+            {
+                "object_id", "outcome_ref", "memory_class", "mechanical_axis",
+                "epistemic_axis", "blame_axis", "evidence_refs", "reusable_failure",
+                "shadow_taint", "claims_learning", "issued_at",
+            }
+        ),
+        "knowledge experience",
+    )
+    idea = _exact_mapping(
+        record.idea_node,
+        frozenset(
+            {
+                "object_id", "root_event_ref", "parent_event_ref", "outcome_ref",
+                "experience_ref", "outbox_ref", "state", "shadow_taint", "learned",
+                "updated_at",
+            }
+        ),
+        "knowledge idea",
+    )
+    outbox = _exact_mapping(
+        record.outbox_record,
+        frozenset(
+            {
+                "object_id", "outcome_ref", "status", "runnable_count",
+                "internal_event_trigger", "parked_gap_refs", "material_event_minted",
+                "issued_at",
+            }
+        ),
+        "knowledge outbox",
+    )
+    for name, value, prefix in (
+        ("outcome", outcome, "outcome-disposition:"),
+        ("experience", experience, "experience:"),
+        ("idea", idea, "idea-node:"),
+        ("outbox", outbox, "feedback-outbox:"),
+    ):
+        identifier = _text(value["object_id"], f"knowledge {name} object_id", maximum=256)
+        payload = {key: item for key, item in value.items() if key != "object_id"}
+        if identifier != prefix + _digest(_canonical_json(payload).encode("utf-8")):
+            raise LedgerError(f"knowledge {name} identity is poisoned")
+
+    execution_ref = _feedback_ref(outcome["execution_ref"], "knowledge execution_ref")
+    validation_ref = _feedback_ref(outcome["validation_ref"], "knowledge validation_ref")
+    if not execution_ref.startswith("execution:") or not validation_ref.startswith("validation:"):
+        raise LedgerError("knowledge evidence schemes are invalid")
+    _timestamp("knowledge outcome issued_at", outcome["issued_at"])
+    if outcome["mechanical_axis"] not in _MECHANICAL_AXES:
+        raise LedgerError("knowledge mechanical axis is invalid")
+    if outcome["proposed_outcome"] not in _PROPOSED_OUTCOMES:
+        raise LedgerError("knowledge proposed outcome is invalid")
+    if outcome["blame_axis"] not in _BLAME_AXES:
+        raise LedgerError("knowledge blame axis is invalid")
+    if outcome["claims_scientific_truth"] is not False:
+        raise LedgerError("operational memory cannot claim scientific truth")
+    applied = outcome["domain_application_ref"] is not None
+    if applied:
+        _feedback_ref(outcome["domain_application_ref"], "knowledge domain_application_ref")
+    expected_taint = "NONE" if applied else "SHADOW_UNAPPLIED"
+    if (
+        outcome["shadow_taint"] != expected_taint
+        or outcome["disposition"] != ("DOMAIN_APPLIED" if applied else "SHADOW_UNAPPLIED")
+    ):
+        raise LedgerError("knowledge outcome taint or disposition is poisoned")
+    if not applied and outcome["epistemic_axis"] != "UNRESOLVED":
+        raise LedgerError("shadow knowledge cannot contain an epistemic conclusion")
+    if outcome["epistemic_axis"] not in {"UNRESOLVED", "SUPPORTED", "REFUTED", "INCONCLUSIVE"}:
+        raise LedgerError("knowledge epistemic axis is invalid")
+
+    expected_evidence = [execution_ref, validation_ref]
+    if applied:
+        expected_evidence.append(str(outcome["domain_application_ref"]))
+    if (
+        experience["outcome_ref"] != outcome["object_id"]
+        or experience["mechanical_axis"] != outcome["mechanical_axis"]
+        or experience["epistemic_axis"] != outcome["epistemic_axis"]
+        or experience["blame_axis"] != outcome["blame_axis"]
+        or experience["evidence_refs"] != expected_evidence
+        or experience["shadow_taint"] != expected_taint
+        or experience["claims_learning"] is not False
+        or experience["issued_at"] != outcome["issued_at"]
+    ):
+        raise LedgerError("knowledge experience lineage is poisoned")
+    expected_memory = {
+        "SUPPORTED": "POSITIVE", "REFUTED": "NEGATIVE",
+        "INCONCLUSIVE": "INCONCLUSIVE", "UNRESOLVED": "INCONCLUSIVE",
+    }[str(outcome["epistemic_axis"])]
+    if experience["memory_class"] != expected_memory:
+        raise LedgerError("knowledge memory class is poisoned")
+    expected_failure = (
+        expected_memory == "NEGATIVE" or outcome["mechanical_axis"] == "MECHANICAL_FAILURE"
+    )
+    if experience["reusable_failure"] is not expected_failure:
+        raise LedgerError("knowledge failure classification is poisoned")
+
+    root_ref = _feedback_ref(idea["root_event_ref"], "knowledge root_event_ref")
+    parent_ref = _feedback_ref(idea["parent_event_ref"], "knowledge parent_event_ref")
+    if (
+        idea["outcome_ref"] != outcome["object_id"]
+        or idea["experience_ref"] != experience["object_id"]
+        or idea["outbox_ref"] != outbox["object_id"]
+        or idea["shadow_taint"] != expected_taint
+        or idea["learned"] is not False
+        or idea["updated_at"] != outcome["issued_at"]
+    ):
+        raise LedgerError("knowledge idea lineage is poisoned")
+    trigger = outbox["internal_event_trigger"]
+    expected_status = "RUNNABLE" if trigger is not None else "WAIT_AUTHORITY"
+    if (
+        outbox["outcome_ref"] != outcome["object_id"]
+        or outbox["status"] != expected_status
+        or outbox["runnable_count"] != (1 if trigger is not None else 0)
+        or outbox["material_event_minted"] is not False
+        or outbox["issued_at"] != outcome["issued_at"]
+        or idea["state"] != ("GENERATING" if trigger is not None else "WAIT_AUTHORITY")
+    ):
+        raise LedgerError("knowledge outbox state is poisoned")
+    parked = outbox["parked_gap_refs"]
+    if not isinstance(parked, (list, tuple)) or len(parked) > _PARKED_GAP_LIMIT:
+        raise LedgerError("knowledge parked gaps are invalid")
+    normalized_parked = [_feedback_ref(value, "knowledge parked gap") for value in parked]
+    if len(normalized_parked) != len(set(normalized_parked)):
+        raise LedgerError("knowledge parked gaps are duplicated")
+
+    if trigger is not None:
+        trigger_value = _exact_mapping(
+            trigger,
+            frozenset(
+                {
+                    "trigger_id", "source", "outcome_ref", "root_event_ref",
+                    "parent_event_ref", "contour", "classification", "shadow_taint",
+                    "policy_ref", "reason_code", "causal_depth", "remaining_energy",
+                    "grants_authority",
+                }
+            ),
+            "knowledge trigger",
+        )
+        trigger_id = _text(trigger_value["trigger_id"], "knowledge trigger_id", maximum=256)
+        trigger_payload = {
+            key: item for key, item in trigger_value.items() if key != "trigger_id"
+        }
+        if trigger_id != "internal-trigger:" + _digest(
+            _canonical_json(trigger_payload).encode("utf-8")
+        ):
+            raise LedgerError("knowledge trigger identity is poisoned")
+        if (
+            trigger_value["source"] != "trusted-outcome-projector"
+            or trigger_value["outcome_ref"] != outcome["object_id"]
+            or trigger_value["root_event_ref"] != root_ref
+            or trigger_value["parent_event_ref"] != parent_ref
+            or trigger_value["shadow_taint"] != expected_taint
+            or trigger_value["grants_authority"] is not False
+        ):
+            raise LedgerError("knowledge trigger lineage or authority is poisoned")
+        if trigger_value["contour"] not in _CONTOURS or trigger_value["classification"] not in {"D0", "D1"}:
+            raise LedgerError("knowledge trigger scope is invalid")
+        _feedback_ref(trigger_value["policy_ref"], "knowledge trigger policy_ref")
+        _text(trigger_value["reason_code"], "knowledge trigger reason_code", maximum=128)
+        depth = _safe_nonnegative_integer("knowledge trigger causal_depth", trigger_value["causal_depth"])
+        _safe_nonnegative_integer("knowledge trigger remaining_energy", trigger_value["remaining_energy"])
+        if depth > _MAX_CAUSAL_DEPTH:
+            raise LedgerError("knowledge trigger causal depth exceeds the bound")
+
+
+def _knowledge_views(
+    selected: Sequence[tuple[LedgerEvent, FeedbackBundleRecord]],
+) -> tuple[
+    list[dict[str, object]], list[dict[str, object]], list[dict[str, object]],
+    list[dict[str, object]], list[dict[str, object]],
+]:
+    ideas: list[dict[str, object]] = []
+    failures: list[dict[str, object]] = []
+    by_root: dict[str, list[tuple[LedgerEvent, FeedbackBundleRecord]]] = {}
+    latest_by_root: dict[str, tuple[LedgerEvent, FeedbackBundleRecord]] = {}
+    debt_by_key: dict[tuple[str, str], dict[str, object]] = {}
+
+    def add_debt(
+        reason_code: str,
+        subject_ref: str,
+        event: LedgerEvent,
+        taint: str,
+    ) -> None:
+        key = (reason_code, subject_ref)
+        debt_by_key[key] = {
+            "record_type": "ResearchDebt",
+            "reason_code": reason_code,
+            "subject_ref": subject_ref,
+            "provenance_refs": [f"ledger-event:sha256:{event.event_sha256}"],
+            "shadow_taint": taint,
+            "claims_scientific_truth": False,
+        }
+
+    for event, record in selected:
+        outcome = record.outcome_disposition
+        experience = record.experience_record
+        idea = record.idea_node
+        outbox = record.outbox_record
+        event_ref = f"ledger-event:sha256:{event.event_sha256}"
+        root = str(idea["root_event_ref"])
+        by_root.setdefault(root, []).append((event, record))
+        latest_by_root[root] = (event, record)
+        ideas.append(
+            {
+                "record_type": "IdeaNode",
+                "object_id": idea["object_id"],
+                "root_event_ref": root,
+                "parent_event_ref": idea["parent_event_ref"],
+                "outcome_ref": idea["outcome_ref"],
+                "experience_ref": idea["experience_ref"],
+                "outbox_ref": idea["outbox_ref"],
+                "state": idea["state"],
+                "shadow_taint": idea["shadow_taint"],
+                "learned": False,
+                "provenance_refs": [event_ref, outcome["validation_ref"], outcome["execution_ref"]],
+                "ledger_sequence": event.sequence,
+            }
+        )
+        if experience["reusable_failure"] is True:
+            failures.append(
+                {
+                    "record_type": "ReusableFailureMemory",
+                    "object_id": experience["object_id"],
+                    "outcome_ref": outcome["object_id"],
+                    "memory_class": experience["memory_class"],
+                    "mechanical_axis": experience["mechanical_axis"],
+                    "blame_axis": experience["blame_axis"],
+                    "evidence_refs": list(experience["evidence_refs"]),
+                    "shadow_taint": experience["shadow_taint"],
+                    "provenance_refs": [event_ref],
+                    "claims_learning": False,
+                }
+            )
+        if idea["shadow_taint"] == "SHADOW_UNAPPLIED":
+            add_debt("SHADOW_REVIEW_REQUIRED", str(idea["object_id"]), event, "SHADOW_UNAPPLIED")
+        if outcome["epistemic_axis"] == "UNRESOLVED":
+            add_debt("EPISTEMIC_UNRESOLVED", str(outcome["object_id"]), event, str(idea["shadow_taint"]))
+        if outbox["status"] == "WAIT_AUTHORITY":
+            add_debt("WAIT_AUTHORITY", str(outbox["object_id"]), event, str(idea["shadow_taint"]))
+        for parked_ref in outbox["parked_gap_refs"]:
+            add_debt("PARKED_GAP", str(parked_ref), event, str(idea["shadow_taint"]))
+
+    conflicts: list[dict[str, object]] = []
+    for root in sorted(by_root):
+        items = by_root[root]
+        axes = {str(record.outcome_disposition["epistemic_axis"]) for _, record in items}
+        if not {"SUPPORTED", "REFUTED"}.issubset(axes):
+            continue
+        refs = [str(record.outcome_disposition["object_id"]) for _, record in items if record.outcome_disposition["epistemic_axis"] in {"SUPPORTED", "REFUTED"}]
+        event_refs = [f"ledger-event:sha256:{event.event_sha256}" for event, record in items if record.outcome_disposition["epistemic_axis"] in {"SUPPORTED", "REFUTED"}]
+        conflict_payload = {
+            "record_type": "ConflictCandidate",
+            "root_event_ref": root,
+            "axes": ["REFUTED", "SUPPORTED"],
+            "outcome_refs": refs,
+            "provenance_refs": event_refs,
+            "status": "REPLICATION_REQUIRED",
+            "shadow_taint": "NONE",
+            "claims_scientific_truth": False,
+        }
+        conflict_payload["object_id"] = "conflict-candidate:" + _digest(
+            _canonical_json(conflict_payload).encode("utf-8")
+        )
+        conflicts.append(conflict_payload)
+        event, _ = items[-1]
+        add_debt("CONFLICT_REPLICATION_REQUIRED", str(conflict_payload["object_id"]), event, "NONE")
+
+    energy: list[dict[str, object]] = []
+    for root in sorted(latest_by_root):
+        event, record = latest_by_root[root]
+        trigger = record.outbox_record["internal_event_trigger"]
+        if isinstance(trigger, Mapping):
+            remaining = trigger["remaining_energy"]
+            status = "AVAILABLE" if remaining > 0 else "LAST_ALLOWED_TRIGGER"
+            causal_depth = trigger["causal_depth"]
+        else:
+            remaining = None
+            status = "NO_RUNNABLE_TRIGGER"
+            causal_depth = None
+        energy.append(
+            {
+                "record_type": "RootEventEnergy",
+                "root_event_ref": root,
+                "observed_remaining_energy": remaining,
+                "observed_causal_depth": causal_depth,
+                "status": status,
+                "source_outcome_ref": record.outcome_disposition["object_id"],
+                "shadow_taint": record.idea_node["shadow_taint"],
+                "provenance_refs": [f"ledger-event:sha256:{event.event_sha256}"],
+                "grants_authority": False,
+            }
+        )
+    debt = [debt_by_key[key] for key in sorted(debt_by_key)]
+    return ideas, failures, conflicts, energy, debt
 
 
 def _safe_nonnegative_integer(name: str, value: object) -> int:
