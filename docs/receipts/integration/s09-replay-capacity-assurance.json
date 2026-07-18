@@ -1,0 +1,32 @@
+{
+  "schema_id": "IntegrationReceipt", "schema_version": "1.0.0",
+  "object_id": "integration-s09-replay-capacity-assurance-20260718", "issued_at": "2026-07-18T15:37:57Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s09-replay-capacity-assurance", "agent_id": "agent-5",
+    "ownership_lease_ref": "stages/s09-replay-capacity/assurance-ownership-lease.json",
+    "base_sha": "6812927c9e110a0f203def11806e852c845ce95a",
+    "head_sha": "779b71f2c6c362c424c943f3fa18fe8d775cbae1",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "tests/test_s09_feedback_replay_capacity.py", "tests/test_stage1_assurance.py",
+      "stages/s09-replay-capacity/assurance-stage-envelope.json", "stages/s09-replay-capacity/assurance-ownership-lease.json"
+    ],
+    "audit_results": {
+      "contract_gate": "green", "privacy_secret_scan": "green", "source_mutation": false,
+      "focused_tests": 52, "full_core_tests": 541, "stage0b_tests": 25,
+      "repeated_replay_identical": "green", "restart_report_identical": "green",
+      "transition_fault_points": 4, "partial_feedback_after_fault": 0,
+      "concurrent_identical_feedback_events": 1, "sequence_gap_rejected": "green",
+      "descriptor_tamper_rejected": "green", "stored_projection_mismatch_rejected": "green",
+      "empty_replay_rate_claim": false, "immutable_report": "green"
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29650340771",
+    "integration_commit_sha": "23e147f17bc536d181802d068893dc89ca9ad44e"
+  },
+  "integrity": {"payload_sha256": "87652a992e1cf6a94b8368505fd56b6d264ae8b2c6ec0c8c25cc2036109c56b9", "parent_refs": [
+    "git:779b71f2c6c362c424c943f3fa18fe8d775cbae1", "git:23e147f17bc536d181802d068893dc89ca9ad44e",
+    "ci:29650340771", "git:6812927c9e110a0f203def11806e852c845ce95a"
+  ]}
+}
