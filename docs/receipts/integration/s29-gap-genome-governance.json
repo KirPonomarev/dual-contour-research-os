@@ -1,0 +1,51 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s29-gap-genome-governance-20260718",
+  "issued_at": "2026-07-18T23:24:00Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s29-gap-genome-governance",
+    "agent_id": "agent-0",
+    "ownership_lease_ref": "stages/s29-gap-genome-governance/ownership-lease.json",
+    "base_sha": "c5492b596598aecd9fd184a0f0c3972073995628",
+    "head_sha": "097fbafc3206e5d43efc47a07f7a57f793a01355",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "provenance/evolution-genome-gap-miner-v1.json",
+      "docs/receipts/reuse/s29-gap-genome.json",
+      "stages/s29-gap-genome-governance/stage-envelope.json",
+      "stages/s29-gap-genome-governance/ownership-lease.json"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "profile_sha256": "bd35130dc90e252773359973f77e4a8e4cc9cdc5a746c1ff362d1bee8a599c07",
+      "proposal_only": true,
+      "allowed_mutation_kinds": 5,
+      "forbidden_mutation_kinds": 8,
+      "required_deny_invariants": 9,
+      "mutation_applied": false,
+      "generated_code_executed": false,
+      "canonical_writes": 0,
+      "grants_authority": false
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29665114886",
+    "integration_commit_sha": "1cd32009cbdd91c0d38debfe1ac2d5f4bb3e903d"
+  },
+  "integrity": {
+    "payload_sha256": "e6b698d47caac379cda83b59a1de740449dc04220c3072c3ee85878b9f9380f4",
+    "parent_refs": [
+      "git:097fbafc3206e5d43efc47a07f7a57f793a01355",
+      "git:1cd32009cbdd91c0d38debfe1ac2d5f4bb3e903d",
+      "ci:29665114886",
+      "reuse:reuse-s29-gap-genome-20260718"
+    ]
+  }
+}

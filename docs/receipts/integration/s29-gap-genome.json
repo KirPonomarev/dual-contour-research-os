@@ -1,0 +1,54 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s29-gap-genome-20260718",
+  "issued_at": "2026-07-18T23:24:00Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s29-gap-genome",
+    "agent_id": "agent-1",
+    "ownership_lease_ref": "stages/s29-gap-genome/ownership-lease.json",
+    "base_sha": "097fbafc3206e5d43efc47a07f7a57f793a01355",
+    "head_sha": "4372129afb8a9b911c3f8b1b2b2f819e6ccb4611",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "src/research_bridge/evolution.py",
+      "stages/s29-gap-genome/stage-envelope.json",
+      "stages/s29-gap-genome/ownership-lease.json"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "bridge_runtime_source_mutation": true,
+      "genome_digest_bound": true,
+      "dependency_cycle_denied": true,
+      "blast_radius": "transitive-reverse-dependency-closure",
+      "deny_invariants_monotonic": true,
+      "forbidden_kind_state": "PARKED_FORBIDDEN",
+      "archive_provenance_bound": true,
+      "executable_payload_present": false,
+      "mutation_applied": false,
+      "generated_code_executed": false,
+      "canonical_writes": 0,
+      "new_runtime_dependency_or_store": 0,
+      "grants_authority": false
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29665114886",
+    "integration_commit_sha": "1cd32009cbdd91c0d38debfe1ac2d5f4bb3e903d"
+  },
+  "integrity": {
+    "payload_sha256": "b19b0c56f5f76a6ce4bc413c498737fef50804f9f2d92df5f32fbf4e4b930487",
+    "parent_refs": [
+      "git:4372129afb8a9b911c3f8b1b2b2f819e6ccb4611",
+      "git:1cd32009cbdd91c0d38debfe1ac2d5f4bb3e903d",
+      "ci:29665114886",
+      "git:097fbafc3206e5d43efc47a07f7a57f793a01355"
+    ]
+  }
+}
