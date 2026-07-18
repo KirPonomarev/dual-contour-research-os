@@ -1,0 +1,19 @@
+{
+  "lease_id": "lease-s03-synthetic-ownership-activate-agent-0",
+  "stage_id": "s03-synthetic-ownership-activate",
+  "agent_id": "agent-0",
+  "base_sha": "f9592bcaf7b6a94817dfb1937ba9e5f9c8e284ce",
+  "branch": "codex/bridge-a0-s03-synthetic-ownership",
+  "issued_at": "2026-07-18T13:45:00Z",
+  "expires_at": "2026-07-19T13:45:00Z",
+  "write_set": [
+    "ownership/registry.json",
+    "docs/ADR/0004-synthetic-market-fixture-activation.md",
+    "docs/receipts/OWNERSHIP_REGISTRY_AMENDMENT_3.json",
+    "docs/receipts/reuse/s03-synthetic-domain-freeze.json",
+    "stages/s03-synthetic-ownership-activate/stage-envelope.json",
+    "stages/s03-synthetic-ownership-activate/ownership-lease.json"
+  ],
+  "exclusive": true,
+  "revoked": false
+}
