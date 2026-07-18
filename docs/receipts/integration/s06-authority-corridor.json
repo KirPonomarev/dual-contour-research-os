@@ -1,0 +1,33 @@
+{
+  "schema_id": "IntegrationReceipt", "schema_version": "1.0.0",
+  "object_id": "integration-s06-authority-corridor-20260718", "issued_at": "2026-07-18T14:53:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s06-authority-corridor", "agent_id": "agent-1",
+    "ownership_lease_ref": "stages/s06-authority-corridor/ownership-lease.json",
+    "base_sha": "64f7972e99d60a643352fba4e44f6ecda7e8b651",
+    "head_sha": "fc87d86ddf11619c167224ab7a2c78137a32bdba",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "src/research_bridge/authority.py", "src/research_bridge/admission.py",
+      "src/research_bridge/kernel.py", "src/research_bridge/ledger.py",
+      "stages/s06-authority-corridor/stage-envelope.json",
+      "stages/s06-authority-corridor/ownership-lease.json"
+    ],
+    "audit_results": {
+      "contract_gate": "green", "privacy_secret_scan": "green", "source_mutation": false,
+      "focused_tests": 116, "full_core_tests": 522, "stage0b_tests": 25,
+      "admission_receipt_grants_authority": false, "trusted_exact_document_scope": "green",
+      "budget_reservation_parent_binding": "green", "single_use_nonce": "green",
+      "fencing": "green", "model_or_cli_authority": false,
+      "canonical_live_scientific_authority": "DENIED"
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29648839913",
+    "integration_commit_sha": "756d10ce9bf79669f568d2c04dcb6ea82d10acab"
+  },
+  "integrity": {"payload_sha256": "4d9c7a6ebbe5cf6abde75d5006736d16fdfc78c754d3e05e84fe098fd5d49b81", "parent_refs": [
+    "git:fc87d86ddf11619c167224ab7a2c78137a32bdba", "git:756d10ce9bf79669f568d2c04dcb6ea82d10acab",
+    "ci:29648839913", "reuse:240a28169e6faff7c51d1d4d0ae8e6194952f5deca9dbe466aa8c3aed689350f"
+  ]}
+}
