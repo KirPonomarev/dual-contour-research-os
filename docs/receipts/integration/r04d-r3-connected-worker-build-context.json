@@ -1,0 +1,53 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-r04d-r3-connected-worker-build-context-20260719",
+  "issued_at": "2026-07-19T14:39:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "r04d-r3-connected-worker-build-context",
+    "agent_id": "agent-0",
+    "ownership_lease_ref": "stages/r04d-r3-connected-worker-build-context/ownership-lease.json",
+    "base_sha": "07c7fb12698eeb9b7b34063fb9727d9009209b10",
+    "worker_head_sha": "3bec45e0d570dbdaa0c747c4a2a953d3b5f181e6",
+    "head_sha": "60f2099b103f3b21e1798af0fbd5667402e42513",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "a1_contract_sha256": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+    "write_set": [".dockerignore", "tools/verify_release_blueprint.py"],
+    "audit_results": {
+      "contract_gate": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "write_set_exact": true,
+      "deny_by_default_context": true,
+      "unrelated_repository_paths_in_context": false,
+      "direct_no_cache_connected_worker_build": "PASS",
+      "release_blueprint_validator": "PASS",
+      "focused_tests": 15,
+      "full_core_tests": 853,
+      "stage0b_tests": 25,
+      "provider_calls_or_cost": 0,
+      "deployment_or_VPS_mutations": 0,
+      "grants_authority": false
+    },
+    "pull_request_ref": "https://github.com/KirPonomarev/dual-contour-research-os/pull/67",
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29691202936",
+    "integration_commit_sha": "60f2099b103f3b21e1798af0fbd5667402e42513",
+    "known_next_gate": "Repair connected-worker total-token reservation semantics and reject vacuous outputs before a new separately receipted R04D call."
+  },
+  "integrity": {
+    "payload_sha256": "4d7c10124f3262f7220d2785cdf2395e462da4160054959a4e8c88845b12dacc",
+    "parent_refs": [
+      "git:07c7fb12698eeb9b7b34063fb9727d9009209b10",
+      "git:3bec45e0d570dbdaa0c747c4a2a953d3b5f181e6",
+      "git:60f2099b103f3b21e1798af0fbd5667402e42513",
+      "ci:29691166751",
+      "ci:29691172079",
+      "ci:29691202936",
+      "pr:67",
+      "reuse:reuse-r04d-r3-connected-worker-build-context-20260719"
+    ]
+  }
+}
