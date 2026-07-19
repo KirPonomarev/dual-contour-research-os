@@ -73,6 +73,8 @@ _EXPECTED_BUILD_CONTEXT = (
     "!ops/",
     "!ops/connected-worker/",
     "!ops/connected-worker/**",
+    "**/__pycache__/**",
+    "**/*.pyc",
 )
 
 
