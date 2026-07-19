@@ -1,0 +1,37 @@
+{
+  "stage_id": "r04c-connected-worker-runtime-privacy-and-restart",
+  "amendment_id": "r04c-shared-worker-ipc-parent-binding-1",
+  "issued_by": "agent-0",
+  "issued_at": "2026-07-19T12:36:23Z",
+  "base_stage_envelope_ref": "stages/r04c-connected-worker-runtime-privacy-and-restart/stage-envelope.json",
+  "reason": "Re-pin R04C to the accepted least-privilege runtime-parent traversal repair required for distinct UID 10004 to reach the authenticated AF_UNIX socket.",
+  "prior_base_sha": "b3e3dd9b63b4becb23800fa5ad98f2bdc7232aba",
+  "base_sha": "82780fc41bfec08f2b395b26542310ee5fc9c729",
+  "base_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29687261796",
+  "add_read_set": [
+    "docs/receipts/integration/r04c-r2-shared-worker-ipc-parent-mode.json",
+    "stages/r04c-r2-shared-worker-ipc-parent-mode/stage-envelope.json"
+  ],
+  "add_dependency_hashes": {
+    "r04c_r2_integration_head": "82780fc41bfec08f2b395b26542310ee5fc9c729",
+    "r04c_r2_receipt_sha256": "904e5294f9a059990f89a7ff5e8865cd13a030e04a7ba747954c8475a997ff59",
+    "researchd_sha256": "6aa0a071770cf2a73a69a337202427095a1da9574513be0d51e34d450d3d653b"
+  },
+  "required_composition": {
+    "production_runtime_root_mode": "0710",
+    "private_child_directory_mode": "0700",
+    "runtime_file_mode": "0600",
+    "control_socket_mode": "0660",
+    "connected_worker_uid": 10004,
+    "shared_control_gid": 10001
+  },
+  "write_set_unchanged": true,
+  "forbidden_scope_unchanged": true,
+  "lease_unchanged": true,
+  "preservation_contract": [
+    "all original R04C scope acceptance stop conditions and write-set remain active",
+    "worker uses only group traversal to the socket and receives no group read or write access to runtime files",
+    "private response storage remains separate from the researchd runtime volume",
+    "offline L0 remains network none and the worker never opens the ledger"
+  ]
+}
