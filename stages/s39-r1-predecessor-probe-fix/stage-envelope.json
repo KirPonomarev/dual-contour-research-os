@@ -1,0 +1,59 @@
+{
+  "stage_id": "s39-r1-predecessor-probe-fix",
+  "agent_id": "agent-0",
+  "objective": "Repair the malformed read-only predecessor-container shell probe discovered by the real S39 fail-closed deployment attempt, without changing release identity or retrying deployment.",
+  "executable_blocker": "The predecessor probe omitted the closing shell quote after command substitution, so S39 stopped before approval consumption and before any remote deployment mutation.",
+  "base_sha": "9c2f8c0c2d83366db77d2733b5d3e909d7ba118a",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a0-s39-r1-predecessor-probe-fix",
+  "worktree": "/private/tmp/dcr-s39-r1-predecessor-probe-fix",
+  "read_set": [
+    "tools/pre_soak_deploy.py",
+    "tools/final_deployment_rebind.py",
+    "tests/test_s38_r1_final_deployment_rebind.py",
+    "docs/S38_FINAL_DEPLOYMENT_RUNBOOK.md"
+  ],
+  "write_set": [
+    "tools/pre_soak_deploy.py",
+    "tests/test_s38_r1_final_deployment_rebind.py",
+    "docs/receipts/reuse/s39-r1-predecessor-probe-fix.json",
+    "stages/s39-r1-predecessor-probe-fix/"
+  ],
+  "forbidden_scope": [
+    "contract-or-frozen-candidate-change",
+    "approval-receipt-reuse-or-authority-fabrication",
+    "VPS-deploy-reboot-restore-live-or-canonical-action",
+    "automatic-retry-after-unknown-or-consumed-authority"
+  ],
+  "dependency_hashes": {
+    "base_sha": "9c2f8c0c2d83366db77d2733b5d3e909d7ba118a",
+    "pre_repair_controller_sha256": "2cd43d7db701ccdf3eafc83fe40d27f7673ef1cb2001c2861c91d954cf4bf4d7",
+    "pre_repair_test_sha256": "bbba9ac6d083c4eaa5b6c5d4c735bf183ea0de5037039633f71a0849cf822e58",
+    "fail_closed_receipt_sha256": "cc75d82911eccb696c1bce4cddebe8e629e286c7a156759dca44ff4df15692c9",
+    "candidate_release_sha": "b2c2e6a8c4e0a364ef82e8e51540433aa91430d4",
+    "candidate_image_id": "sha256:c654b09504dec237966623088e4dbbbe104d6364cd5760a4cfb145eb388a3844"
+  },
+  "acceptance_commands": [
+    "python3 -m unittest -v tests.test_s38_r1_final_deployment_rebind",
+    "python3 -m unittest -v tests.test_release_deploy_recovery tests.test_deployment_gate tests.test_deployment_approval_issuer",
+    "python3 tools/final_deployment_rebind.py verify-static",
+    "make contracts",
+    "make test",
+    "git diff --check"
+  ],
+  "risk_class": "critical-pre-authority-deployment-probe",
+  "stop_conditions": [
+    "approval-ledger-is-created-by-repair-tests",
+    "remote-deployment-mutation-occurs",
+    "candidate-or-operational-manifest-identity-changes",
+    "probe-no-longer-fails-closed-on-ambiguous-state"
+  ],
+  "expected_receipt": "docs/receipts/integration/s39-r1-predecessor-probe-fix.json",
+  "rollback": "Revert the one-character shell quoting correction and retain S39 in fail-closed pre-authority state; no deployment retry belongs to this repair stage.",
+  "commit_authority": "one-scoped-agent-0-repair-stage",
+  "push_authority": true,
+  "expected_handoff_status": [
+    "ready_for_agent0_integration",
+    "blocked_validation_failed"
+  ]
+}

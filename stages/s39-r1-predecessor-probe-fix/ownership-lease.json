@@ -1,0 +1,16 @@
+{
+  "lease_id": "lease-s39-r1-predecessor-probe-fix-agent-0",
+  "stage_id": "s39-r1-predecessor-probe-fix",
+  "agent_id": "agent-0",
+  "branch": "codex/bridge-a0-s39-r1-predecessor-probe-fix",
+  "issued_at": "2026-07-19T02:36:25Z",
+  "expires_at": "2026-07-21T02:36:25Z",
+  "write_set": [
+    "tools/pre_soak_deploy.py",
+    "tests/test_s38_r1_final_deployment_rebind.py",
+    "docs/receipts/reuse/s39-r1-predecessor-probe-fix.json",
+    "stages/s39-r1-predecessor-probe-fix/"
+  ],
+  "exclusive": true,
+  "revoked": false
+}

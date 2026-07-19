@@ -1,0 +1,48 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-s39-r1-predecessor-probe-fix-20260719",
+  "issued_at": "2026-07-19T02:36:25Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "reuse-freeze-authority"
+  },
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "FAIL_CLOSED_PREDECESSOR_STATE_PROBE_SHELL_REPAIR",
+    "candidates": [
+      {
+        "candidate": "repair-existing-predecessor-probe-shell-quoting",
+        "disposition": "selected-minimal-one-character-correction"
+      },
+      {
+        "candidate": "replace-deployment-controller-or-predecessor-check",
+        "disposition": "rejected-unnecessary-architecture-change"
+      },
+      {
+        "candidate": "bypass-predecessor-probe-or-reuse-first-approval",
+        "disposition": "rejected-authority-and-single-writer-violation"
+      }
+    ],
+    "selected_mode": "retain-existing-controller-and-add-bash-syntax-regression-proof",
+    "source_ref": "git:9c2f8c0c2d83366db77d2733b5d3e909d7ba118a;runtime-failure:sha256:cc75d82911eccb696c1bce4cddebe8e629e286c7a156759dca44ff4df15692c9",
+    "code_sha256": "2cd43d7db701ccdf3eafc83fe40d27f7673ef1cb2001c2861c91d954cf4bf4d7",
+    "license_spdx": "NOASSERTION",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "generated-predecessor-shell-command-passes-bash-syntax",
+      "active-enabled-or-running-predecessor-still-fails-closed",
+      "no-remote-or-authority-action-in-repair"
+    ],
+    "canonical_owner": "agent-0-release-and-deployment",
+    "rollback": "Revert the quoting correction and remain fail-closed before authority consumption."
+  },
+  "integrity": {
+    "payload_sha256": "f548caf6f79fefb89d55a76a5eef4f8349b82887b9ed91c801bdf10c29a088a0",
+    "parent_refs": [
+      "git:9c2f8c0c2d83366db77d2733b5d3e909d7ba118a",
+      "runtime-failure:sha256:cc75d82911eccb696c1bce4cddebe8e629e286c7a156759dca44ff4df15692c9"
+    ]
+  }
+}
