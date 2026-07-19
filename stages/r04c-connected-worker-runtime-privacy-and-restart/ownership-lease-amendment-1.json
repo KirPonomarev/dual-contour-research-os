@@ -1,0 +1,12 @@
+{
+  "lease_id": "lease-r04c-connected-worker-runtime-privacy-and-restart-agent-5-amendment-1",
+  "stage_id": "r04c-connected-worker-runtime-privacy-and-restart",
+  "agent_id": "agent-5",
+  "branch": "codex/bridge-a5-r04c-connected-worker-runtime",
+  "issued_at": "2026-07-19T12:48:59Z",
+  "expires_at": "2026-07-21T12:48:59Z",
+  "add_write_set": ["tests/test_r04b_broker_scout_ipc.py"],
+  "full_write_set_ref": "stages/r04c-connected-worker-runtime-privacy-and-restart/stage-envelope.json plus stage-envelope-amendment-2.json",
+  "exclusive": true,
+  "revoked": false
+}

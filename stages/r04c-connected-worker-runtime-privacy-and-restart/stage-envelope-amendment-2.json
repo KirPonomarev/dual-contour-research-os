@@ -1,0 +1,24 @@
+{
+  "stage_id": "r04c-connected-worker-runtime-privacy-and-restart",
+  "amendment_id": "r04c-shipped-worker-fixture-compatibility-2",
+  "issued_by": "agent-0",
+  "issued_at": "2026-07-19T12:48:59Z",
+  "base_stage_envelope_ref": "stages/r04c-connected-worker-runtime-privacy-and-restart/stage-envelope.json",
+  "prior_amendment_ref": "stages/r04c-connected-worker-runtime-privacy-and-restart/stage-envelope-amendment-1.json",
+  "reason": "The shipped R04C config now includes UID 10004 and its role, while the pre-existing R04B fixture unconditionally appends the same UID and creates an invalid duplicate synthetic config.",
+  "add_write_set": ["tests/test_r04b_broker_scout_ipc.py"],
+  "source_change_limit": "In BrokerScoutIPCHandshakeTests._config only, add UID 10004 and the connected_worker role conditionally when absent; retain the existing model_runtime override and every assertion, scenario and expected outcome unchanged.",
+  "add_dependency_hashes": {
+    "r04b_assurance_test_sha256": "dc11f198ea8f3da36f5f6c6d7959981a41667969e61d8b6725178a873903623b",
+    "base_envelope_sha256": "3f0455d03946d73d09191f79a6d8c449ecf645541d8c3f725620fe5320ca625f",
+    "base_lease_sha256": "74ab45e7d1818132a0b082e29038682fb855b41ab74c50f9952c7b292a255493"
+  },
+  "preservation_contract": [
+    "all original R04C and amendment-1 constraints remain active",
+    "no R04B assertion expected value scenario ordering or model-call behavior changes",
+    "missing worker role and model_runtime negative cases remain fail closed",
+    "the compatibility edit is fixture construction only"
+  ],
+  "forbidden_scope_unchanged": true,
+  "expected_receipt_unchanged": true
+}
