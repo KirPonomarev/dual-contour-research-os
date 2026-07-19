@@ -1,0 +1,68 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-r04d-r4-connected-worker-budget-output-20260719",
+  "issued_at": "2026-07-19T14:46:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "r04d-r4-connected-worker-budget-output",
+    "agent_id": "agent-5",
+    "ownership_lease_ref": "stages/r04d-r4-connected-worker-budget-output/ownership-lease.json",
+    "base_sha": "c7d1284bf81ea9f362def182a902941ac89ef681",
+    "authority_head_sha": "0641e5f6aafa9a14cfb5a306cb48a36301cef7ea",
+    "worker_head_sha": "6fdf83d4d0572e170c1b377f29c0077c26397f29",
+    "head_sha": "a810f284534aca2734cfb05e19d4f91fc680d76a",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "a1_contract_sha256": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+    "write_set": [
+      "ops/connected-worker/model_worker.py",
+      "ops/connected-worker/runtime-policy.json",
+      "tests/test_r04c_connected_worker_runtime.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "write_set_exact": true,
+      "total_reservation_semantics": "ENFORCED",
+      "provider_output_allowance_derived_before_SENT": true,
+      "insufficient_total_budget_before_SENT": "DENIED",
+      "reported_total_over_reservation": "FAILED_KNOWN",
+      "vacuous_output": "FAILED_KNOWN",
+      "automatic_retry": false,
+      "direct_exact_context_image_build": "PASS",
+      "focused_tests": 12,
+      "related_acceptance_tests": 17,
+      "full_core_tests": 855,
+      "stage0b_tests": 25,
+      "model_worker_sha256": "31864bf94b4d827f18e556ee97ebee91cfe86ccc5ee81a3e33cfa034413c4a00",
+      "runtime_policy_sha256": "8de5bbd3b7a680e5af5db99b9735e6337df0cf3055aecdca5017327ef361ca70",
+      "runtime_test_sha256": "fadc4eb8e555902e3d56d7c483466b664a40d3afb22037f20c19234f3f5840f8",
+      "provider_calls_or_cost": 0,
+      "deployment_or_VPS_mutations": 0,
+      "grants_authority": false
+    },
+    "pull_request_ref": "https://github.com/KirPonomarev/dual-contour-research-os/pull/68",
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29691470365",
+    "integration_commit_sha": "a810f284534aca2734cfb05e19d4f91fc680d76a",
+    "known_next_gate": "Run one new separately receipted R04D real-provider call on this repaired exact head without repeating the reconciled prior call."
+  },
+  "integrity": {
+    "payload_sha256": "d46ac0464086204d23bac36b017abe781ddadb30b0e8f886e6175b54b1417790",
+    "parent_refs": [
+      "git:c7d1284bf81ea9f362def182a902941ac89ef681",
+      "git:0641e5f6aafa9a14cfb5a306cb48a36301cef7ea",
+      "git:6fdf83d4d0572e170c1b377f29c0077c26397f29",
+      "git:a810f284534aca2734cfb05e19d4f91fc680d76a",
+      "ci:29691353806",
+      "ci:29691428530",
+      "ci:29691430026",
+      "ci:29691470365",
+      "pr:68",
+      "reuse:reuse-r04d-r4-connected-worker-budget-output-20260719",
+      "integration:integration-r04d-r3-connected-worker-build-context-20260719"
+    ]
+  }
+}
