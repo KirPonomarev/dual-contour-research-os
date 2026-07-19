@@ -56,6 +56,9 @@ _POLICY_KEYS = frozenset(
         "max_dispatch_bytes",
         "max_completion_bytes",
         "max_extracted_output_bytes",
+        "max_provider_output_tokens",
+        "provider_input_token_margin",
+        "minimum_output_bytes",
         "retention_seconds",
         "root_mode",
         "file_mode",
@@ -203,6 +206,9 @@ class RuntimePolicy:
     max_dispatch_bytes: int
     max_completion_bytes: int
     max_extracted_output_bytes: int
+    max_provider_output_tokens: int
+    provider_input_token_margin: int
+    minimum_output_bytes: int
     retention_seconds: int
     worker_uid: int
     worker_gid: int
@@ -244,6 +250,9 @@ class RuntimePolicy:
             ("max_dispatch_bytes", 1_048_576),
             ("max_completion_bytes", 1_048_576),
             ("max_extracted_output_bytes", 1_048_576),
+            ("max_provider_output_tokens", 4096),
+            ("provider_input_token_margin", 4096),
+            ("minimum_output_bytes", 65_536),
             ("retention_seconds", 31_536_000),
         ):
             raw = value[name]
@@ -299,6 +308,9 @@ class RuntimePolicy:
             max_dispatch_bytes=integers["max_dispatch_bytes"],
             max_completion_bytes=integers["max_completion_bytes"],
             max_extracted_output_bytes=integers["max_extracted_output_bytes"],
+            max_provider_output_tokens=integers["max_provider_output_tokens"],
+            provider_input_token_margin=integers["provider_input_token_margin"],
+            minimum_output_bytes=integers["minimum_output_bytes"],
             retention_seconds=integers["retention_seconds"],
             worker_uid=integers["worker_uid"],
             worker_gid=integers["worker_gid"],
@@ -812,6 +824,45 @@ def _validate_lookup(dispatch: Dispatch, state: Mapping[str, object]) -> None:
 AdapterFactory = Callable[[str, Mapping[str, object], str, ConnectedShadowProfile], object]
 
 
+def _bounded_provider_request(
+    binding: Mapping[str, object],
+    prompt: bytes,
+    *,
+    total_token_budget: int,
+    policy: RuntimePolicy,
+) -> tuple[bytes, int]:
+    """Derive a provider output limit below the total durable reservation.
+
+    Canonical request bytes are a conservative upper bound for visible input
+    tokens.  The policy margin covers protocol/provider framing that is not
+    represented in that request.  The calculation is repeated after encoding
+    the chosen output limit so the final request itself is the bound subject.
+    """
+
+    output_limit = 1
+    for _ in range(2):
+        request = build_request_bytes(binding, prompt, output_limit)
+        available = (
+            total_token_budget
+            - len(request)
+            - policy.provider_input_token_margin
+        )
+        output_limit = min(policy.max_provider_output_tokens, available)
+        if output_limit < 1:
+            raise ConnectedWorkerError(
+                "total token reservation cannot cover the provider request"
+            )
+    request = build_request_bytes(binding, prompt, output_limit)
+    if (
+        len(request)
+        + policy.provider_input_token_margin
+        + output_limit
+        > total_token_budget
+    ):
+        raise ConnectedWorkerError("provider token allowance exceeds reservation")
+    return request, output_limit
+
+
 def run_dispatch(
     *,
     policy_path: Path,
@@ -846,8 +897,11 @@ def run_dispatch(
             "call_id": dispatch.call_id,
             "network_calls": 0,
         }
-    provider_request = build_request_bytes(
-        binding, dispatch.request_body.encode("utf-8"), dispatch.max_tokens
+    provider_request, provider_output_tokens = _bounded_provider_request(
+        binding,
+        dispatch.request_body.encode("utf-8"),
+        total_token_budget=dispatch.max_tokens,
+        policy=policy,
     )
     if len(provider_request) > profile.max_request_bytes:
         raise ConnectedWorkerError("provider request exceeds the frozen bound")
@@ -955,7 +1009,7 @@ def run_dispatch(
         raw = adapter.invoke_raw(  # type: ignore[attr-defined]
             call_id=dispatch.call_id,
             request_bytes=provider_request,
-            max_tokens=dispatch.max_tokens,
+            max_tokens=provider_output_tokens,
         )
         if (
             not isinstance(raw, bytes)
@@ -970,7 +1024,24 @@ def run_dispatch(
             response_ref=raw_ref,
             max_tokens=dispatch.max_tokens,
         )
+        if (
+            accounting.actual_tokens is None
+            or accounting.actual_tokens > dispatch.max_tokens
+        ):
+            raise KnownProviderFailure(
+                "TOTAL_TOKEN_LIMIT_EXCEEDED",
+                actual_tokens=accounting.actual_tokens,
+                actual_cost_units=accounting.actual_cost_units,
+                provider_receipt_ref=accounting.provider_receipt_ref,
+            )
         output = _extract_output(raw, protocol=str(binding["protocol"]))
+        if len(output.strip()) < policy.minimum_output_bytes:
+            raise KnownProviderFailure(
+                "VACUOUS_OUTPUT",
+                actual_tokens=accounting.actual_tokens,
+                actual_cost_units=accounting.actual_cost_units,
+                provider_receipt_ref=accounting.provider_receipt_ref,
+            )
         output_ref = store.commit_output(
             output, maximum=policy.max_extracted_output_bytes
         )

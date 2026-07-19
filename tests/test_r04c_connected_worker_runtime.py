@@ -41,11 +41,11 @@ def _canonical(value: object) -> bytes:
     return json.dumps(value, sort_keys=True, separators=(",", ":")).encode()
 
 
-def _raw_response(output: str = OUTPUT) -> bytes:
+def _raw_response(output: str = OUTPUT, *, total_tokens: int = 37) -> bytes:
     body = _canonical(
         {
             "id": "synthetic-response-r04c",
-            "usage": {"total_tokens": 37},
+            "usage": {"total_tokens": total_tokens},
             "choices": [{"message": {"content": output}}],
         }
     )
@@ -86,10 +86,12 @@ class FakeAdapter:
         self.raw = raw
         self.events = events
         self.calls = 0
+        self.invocations: list[dict[str, object]] = []
 
-    def invoke_raw(self, **_keywords: object) -> bytes:
+    def invoke_raw(self, **keywords: object) -> bytes:
         self.events.append("provider")
         self.calls += 1
+        self.invocations.append(dict(keywords))
         return self.raw
 
 
@@ -176,7 +178,7 @@ class ConnectedWorkerRuntimeTests(unittest.TestCase):
             "request_body": "Produce one bounded D0 synthetic proposal.",
             "model_binding": "deepseek-v4-pro",
             "classification": "D0",
-            "max_tokens": 128,
+            "max_tokens": 1024,
             "expires_at": EXPIRES_AT,
             "worker_ipc_extension_sha256": policy[
                 "worker_ipc_extension_sha256"
@@ -344,6 +346,15 @@ class ConnectedWorkerRuntimeTests(unittest.TestCase):
             result = self._run(ipc, adapter)
         self.assertEqual(result["state"], "SUCCEEDED")
         self.assertEqual(adapter.calls, 1)
+        self.assertEqual(len(adapter.invocations), 1)
+        provider_output_tokens = adapter.invocations[0]["max_tokens"]
+        self.assertIs(type(provider_output_tokens), int)
+        self.assertLess(provider_output_tokens, self.dispatch["max_tokens"])
+        self.assertLessEqual(
+            provider_output_tokens, self.policy["max_provider_output_tokens"]
+        )
+        request = json.loads(adapter.invocations[0]["request_bytes"])
+        self.assertEqual(request["max_tokens"], provider_output_tokens)
         self.assertLess(events.index("begin_model_call"), events.index("provider"))
         self.assertLess(events.index("provider"), events.index("parse"))
         self.assertLess(events.index("parse"), events.index("complete_model_call"))
@@ -359,6 +370,43 @@ class ConnectedWorkerRuntimeTests(unittest.TestCase):
         for path in self.store_root.rglob("*"):
             expected = 0o700 if path.is_dir() else 0o600
             self.assertEqual(stat.S_IMODE(path.stat().st_mode), expected)
+
+    def test_total_token_and_vacuous_output_are_known_unusable_results(self) -> None:
+        for label, raw, failure_code in (
+            (
+                "over-total",
+                _raw_response(total_tokens=int(self.dispatch["max_tokens"]) + 1),
+                "TOTAL_TOKEN_LIMIT_EXCEEDED",
+            ),
+            ("vacuous", _raw_response("{}"), "VACUOUS_OUTPUT"),
+        ):
+            with self.subTest(label=label):
+                dispatch = dict(self.dispatch)
+                dispatch["call_id"] = (
+                    "model-call:sha256:"
+                    + hashlib.sha256(label.encode()).hexdigest()
+                )
+                self._write_owner_file(self.dispatch_path, _canonical(dispatch))
+                adapter = FakeAdapter(raw, [])
+                ipc = FakeIPC(dispatch)
+                result = self._run(ipc, adapter)
+                self.assertEqual(result["state"], "FAILED_KNOWN")
+                self.assertEqual(ipc.completion["failure_code"], failure_code)
+                self.assertIsNone(ipc.completion["response_ref"])
+                self.assertEqual(adapter.calls, 1)
+
+    def test_insufficient_total_token_budget_stops_before_sent(self) -> None:
+        self.dispatch["max_tokens"] = 64
+        self._write_owner_file(self.dispatch_path, _canonical(self.dispatch))
+        adapter = FakeAdapter(_raw_response(), [])
+        ipc = FakeIPC(self.dispatch)
+        with self.assertRaisesRegex(
+            worker.ConnectedWorkerError,
+            "total token reservation cannot cover",
+        ):
+            self._run(ipc, adapter)
+        self.assertEqual(ipc.commands, [])
+        self.assertEqual(adapter.calls, 0)
 
     def test_interrupted_callback_replays_completion_without_provider_repeat(self) -> None:
         events: list[str] = []
