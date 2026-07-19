@@ -1,0 +1,39 @@
+{
+  "stage_id": "r08b-r3-additive-worker-entrypoint-v3",
+  "amendment_id": "R08B_R3_ADDITIVE_WORKER_ENTRYPOINT_V3_20260719",
+  "supersedes_amendment_id": "R08B_R3_ADDITIVE_WORKER_POLICY_V3_20260719",
+  "issued_by": "agent-0",
+  "issued_at": "2026-07-19T22:10:29Z",
+  "authority_head": "484d46744990e9655625d4acc6c2f259c2f989ea",
+  "candidate_sha": null,
+  "candidate_tree_sha": null,
+  "leases": [
+    {
+      "owner": "agent-0",
+      "branch": "codex/bridge-a0-r08b-exact-candidate-image-build-sbom",
+      "write_set": [
+        "stages/r08b-exact-candidate-image-build-sbom/stage-envelope-amendment-v2.4-8.json",
+        "stages/r08b-exact-candidate-image-build-sbom/ownership-lease-amendment-v2.4-8.json"
+      ]
+    },
+    {
+      "owner": "agent-5",
+      "branch": "codex/bridge-a5-r08b-r3-additive-provider-profile-v3",
+      "write_set": [
+        "ops/connected-worker/Containerfile",
+        "ops/connected-worker/model_worker_v3.py",
+        "ops/connected-worker/runtime-policy-v3.json",
+        "tests/test_s17_provider_shadow_tool.py"
+      ]
+    }
+  ],
+  "historical_paths_forbidden": [
+    "ops/connected-worker/model_worker.py",
+    "ops/connected-worker/runtime-policy.json"
+  ],
+  "cross_owner_write_set": false,
+  "agent_5_tools_or_provenance_authority": false,
+  "one_mutating_lane_at_a_time": true,
+  "expires_at": "2026-07-20T04:10:29Z",
+  "candidate_cut_permitted": false
+}

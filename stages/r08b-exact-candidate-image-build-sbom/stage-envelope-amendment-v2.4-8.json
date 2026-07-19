@@ -1,0 +1,58 @@
+{
+  "stage_id": "r08b-exact-candidate-image-build-sbom",
+  "repair_stage_id": "r08b-r3-additive-worker-entrypoint-v3",
+  "amendment_id": "R08B_R3_ADDITIVE_WORKER_ENTRYPOINT_V3_20260719",
+  "supersedes_amendment_id": "R08B_R3_ADDITIVE_WORKER_POLICY_V3_20260719",
+  "plan_id": "DCR_OS_AUTONOMOUS_V2_3_NO_BRAKES_20260719",
+  "plan_version": "2.4.0-fast-working-release",
+  "issued_by": "agent-0",
+  "issued_at": "2026-07-19T22:10:29Z",
+  "authority_head": "484d46744990e9655625d4acc6c2f259c2f989ea",
+  "authority_tree": "bdcdf28a12a6929f1488605c80b5dfb0cb343213",
+  "candidate_sha": null,
+  "candidate_tree_sha": null,
+  "candidate_exact_head_ci_run": "NOT_CUT",
+  "observed_blocker": "The immutable R04E verifier binds both historical model_worker.py and runtime-policy.json. Current v3 worker selection and policy therefore require additive paths and a new image entrypoint; neither historical path may be mutated.",
+  "agent_0_write_set": [
+    "stages/r08b-exact-candidate-image-build-sbom/stage-envelope-amendment-v2.4-8.json",
+    "stages/r08b-exact-candidate-image-build-sbom/ownership-lease-amendment-v2.4-8.json"
+  ],
+  "agent_5_write_set": [
+    "ops/connected-worker/Containerfile",
+    "ops/connected-worker/model_worker_v3.py",
+    "ops/connected-worker/runtime-policy-v3.json",
+    "tests/test_s17_provider_shadow_tool.py"
+  ],
+  "required_change": {
+    "historical_model_worker_path": "ops/connected-worker/model_worker.py",
+    "historical_model_worker_sha256": "31864bf94b4d827f18e556ee97ebee91cfe86ccc5ee81a3e33cfa034413c4a00",
+    "historical_model_worker_mutable": false,
+    "historical_runtime_policy_path": "ops/connected-worker/runtime-policy.json",
+    "historical_runtime_policy_sha256": "8de5bbd3b7a680e5af5db99b9735e6337df0cf3055aecdca5017327ef361ca70",
+    "historical_runtime_policy_mutable": false,
+    "current_model_worker_path": "ops/connected-worker/model_worker_v3.py",
+    "current_runtime_policy_path": "ops/connected-worker/runtime-policy-v3.json",
+    "current_profile_sha256": "cd430b1066f6a92c03bff78838ec3d6f223c48283bafc0676646da4f07bd1698",
+    "current_tool_sha256": "7bc761bf2af24b806bf522c9250ad22c73c70121f99a4e576a98bb7756d08480",
+    "model_worker_selection": "The additive v3 worker accepts only the exact historical v2 or exact current v3 profile digest and instantiates the matching explicit path; unknown digest fails closed.",
+    "container_default": "Copy both exact v2 and v3 profiles, enter through model_worker_v3.py, and default to runtime-policy-v3.json while retaining historical artifacts byte-identical.",
+    "endpoint_role_family_provenance_privacy_budget_retry_authority_unchanged": true
+  },
+  "acceptance_commands": [
+    "historical model_worker.py SHA-256 remains 31864bf94b4d827f18e556ee97ebee91cfe86ccc5ee81a3e33cfa034413c4a00",
+    "historical runtime-policy.json SHA-256 remains 8de5bbd3b7a680e5af5db99b9735e6337df0cf3055aecdca5017327ef361ca70",
+    "python3 tools/verify_r04e_provider_proof.py remains green",
+    "python3 -m unittest -v tests.test_s17_provider_shadow_tool tests.test_r04c_connected_worker_runtime tests.test_s24_r2_openrouter_provider",
+    "make contracts and make test",
+    "exact PR-head CI green",
+    "no-cache linux/arm64 image enters model_worker_v3.py, defaults to runtime-policy-v3.json, and validates exact v3/tool hashes",
+    "fresh v3-bound private two-role proof succeeds"
+  ],
+  "stop_conditions": [
+    "historical model_worker.py runtime-policy.json v1/v2 profile or R04E proof bytes change",
+    "Agent 5 mutates tools provenance or stages",
+    "candidate becomes non-null before pre-cut PASS",
+    "old UNKNOWN call is replayed",
+    "force push rebase history rewrite or live action"
+  ]
+}
