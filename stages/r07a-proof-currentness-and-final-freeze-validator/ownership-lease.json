@@ -1,0 +1,18 @@
+{
+  "lease_id": "lease-r07a-proof-currentness-and-final-freeze-validator-agent-0",
+  "stage_id": "r07a-proof-currentness-and-final-freeze-validator",
+  "agent_id": "agent-0",
+  "branch": "codex/bridge-a0-r07a-proof-currentness-and-final-freeze-validator",
+  "issued_at": "2026-07-19T17:18:00Z",
+  "expires_at": "2026-07-21T17:18:00Z",
+  "write_set": [
+    "tools/release_currentness.py",
+    "tools/capability_proof.py",
+    "tools/e1_aggregate_gate.py",
+    "tools/e2_aggregate_gate.py",
+    "tools/e3_aggregate_gate.py",
+    "tools/verify_final_release_freeze.py"
+  ],
+  "exclusive": true,
+  "revoked": false
+}

@@ -1,0 +1,71 @@
+{
+  "stage_id": "r07a-proof-currentness-and-final-freeze-validator",
+  "agent_id": "agent-0",
+  "objective": "Implement mandatory recomputation of release SHA/tree/code/config/policy/catalog/provider/image/SBOM/expiry/invalidation/ancestry/CI/E2E bindings and make historical final-freeze evidence fail closed.",
+  "executable_blocker": "Historical capability and S38 release documents can still pass structural validators without a complete current release context.",
+  "base_sha": "b540fec026c5bef3239f391893f0dee86d03f4ab",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "a1_contract_sha256": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+  "branch": "codex/bridge-a0-r07a-proof-currentness-and-final-freeze-validator",
+  "worktree": "/private/tmp/dcr-r07a-proof-currentness-and-final-freeze-validator",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "ownership/registry.json",
+    "contracts/catalog.json",
+    "contracts/a1/v1/catalog.json",
+    "contracts/e5/v1/catalog.json",
+    "docs/receipts/capability/**",
+    "docs/receipts/integration/**",
+    "docs/receipts/release/**",
+    "ops/release/**",
+    "ops/deploy/**",
+    "tests/test_s19_e1_aggregate_gate.py",
+    "tests/test_s28_e2_aggregate_gate.py",
+    "tests/test_s32_e3_aggregate_gate.py",
+    "tests/test_s38_final_release_freeze.py"
+  ],
+  "write_set": [
+    "tools/release_currentness.py",
+    "tools/capability_proof.py",
+    "tools/e1_aggregate_gate.py",
+    "tools/e2_aggregate_gate.py",
+    "tools/e3_aggregate_gate.py",
+    "tools/verify_final_release_freeze.py"
+  ],
+  "forbidden_scope": [
+    "edit-contract-schema-root-config-CI-lockfile-migration-existing-receipt-or-test",
+    "issue-refresh-or-fabricate-capability-deployment-E2E-or-human-authority-proof",
+    "build-image-deploy-restore-reboot-provider-call-or-start-observation-window",
+    "secret-private-evidence-raw-provider-response-runtime-database-or-account-data-in-Git"
+  ],
+  "dependency_hashes": {
+    "r06b_integration_head": "b540fec026c5bef3239f391893f0dee86d03f4ab",
+    "core_catalog_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "a1_catalog_sha256": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+    "e5_catalog_sha256": "254e6cd624f91e37b0d186937f4b71acb7177c216e44e782540d76ba8c33696b",
+    "ownership_registry_sha256": "e7a6a5158e43cb76c1df0fa28caec36ec9585a0dd05a732eabb94a92e427c9da",
+    "reuse_receipt": "docs/receipts/reuse/r07a-proof-currentness-and-final-freeze-validator.json"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest tests.test_s19_e1_aggregate_gate tests.test_s28_e2_aggregate_gate tests.test_s32_e3_aggregate_gate tests.test_s38_final_release_freeze",
+    "python3 -m unittest discover -s tests",
+    "python3 -m unittest discover -s tests/stage0b -p test_*.py",
+    "git diff --check",
+    "exact-head remote CI"
+  ],
+  "risk_class": "critical-stale-proof-can-approve-release",
+  "stop_conditions": [
+    "dependency-hash-mismatch",
+    "write-outside-declared-agent-0-tools",
+    "historical-or-mixed-subject-passes-current-release-entrypoint",
+    "one-byte-relevant-drift-or-expired-proof-passes",
+    "validator-grants-authority-or-requires-private-evidence"
+  ],
+  "expected_receipt": "docs/receipts/integration/r07a-proof-currentness-and-final-freeze-validator.json",
+  "rollback": "Restore the six validator files to the R06B integration head; no release, runtime or external state is mutated.",
+  "commit_authority": "one-scoped-agent-0-stage",
+  "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent0_audit", "blocked_validation_failed"]
+}
