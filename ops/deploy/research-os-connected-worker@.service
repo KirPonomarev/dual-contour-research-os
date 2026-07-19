@@ -1,0 +1,45 @@
+[Unit]
+Description=Dual-Contour Research OS connected worker dispatch %i
+Documentation=https://github.com/KirPonomarev/dual-contour-research-os
+After=docker.service research-os-a1-final.service
+Requires=docker.service research-os-a1-final.service
+ConditionPathIsSocket=%t/docker.sock
+ConditionPathExists=%h/.config/research-os/connected-worker.env
+ConditionPathExists=%h/.local/share/research-os/connected-dispatch/%i.json
+ConditionPathExists=!%h/.config/research-os/AI_OFF
+
+[Service]
+Type=oneshot
+Environment=DOCKER_HOST=unix://%t/docker.sock
+ExecStartPre=/bin/sh -eu -c 'test "$(/usr/bin/stat -c %%a %h/.config/research-os/connected-worker.env)" = 600; test "$(/usr/bin/stat -c %%a %h/.local/share/research-os/connected-dispatch/%i.json)" = 600'
+ExecStartPre=/usr/bin/docker network inspect research-os-provider-egress
+ExecStartPre=-/usr/bin/docker container rm research-os-connected-worker-%i
+ExecStartPre=-/usr/bin/docker volume rm research-os-connected-dispatch-%i
+ExecStartPre=/usr/bin/docker run --rm --network=none --entrypoint=/bin/sh --user=0:0 --mount=type=volume,source=research-os-connected-private,target=/var/lib/research-os-connected --mount=type=volume,source=research-os-connected-credential,target=/run/credential --mount=type=volume,source=research-os-connected-dispatch-%i,target=/run/dispatch --mount=type=bind,source=%h/.config/research-os/connected-worker.env,target=/source/provider.env,readonly --mount=type=bind,source=%h/.local/share/research-os/connected-dispatch/%i.json,target=/source/dispatch.json,readonly @@CONNECTED_WORKER_IMAGE_ID@@ -eu -c 'chown 10004:10001 /var/lib/research-os-connected; chmod 0700 /var/lib/research-os-connected; install -d -m 0700 -o 10004 -g 10001 /var/lib/research-os-connected/private-cas /run/credential /run/dispatch; install -m 0600 -o 10004 -g 10001 /source/provider.env /run/credential/provider.env; install -m 0600 -o 10004 -g 10001 /source/dispatch.json /run/dispatch/dispatch.json'
+ExecStartPre=/usr/bin/docker container create --name=research-os-connected-worker-%i --user=10004:10001 --group-add=10001 --network=research-os-provider-egress --read-only --cap-drop=ALL --security-opt=no-new-privileges:true --pids-limit=64 --memory=536870912 --cpus=1 --restart=no --tmpfs=/tmp:rw,noexec,nosuid,nodev,size=16777216,mode=0700 --label=org.research-os.release-sha=@@RELEASE_SHA@@ --label=org.research-os.worker-role=connected_worker --label=org.research-os.control-transport=AF_UNIX --mount=type=volume,source=research-os-a1-runtime,target=/var/lib/research-os,readonly --mount=type=volume,source=research-os-connected-private,target=/var/lib/research-os-connected --mount=type=volume,source=research-os-connected-credential,target=/run/research-os-connected,readonly --mount=type=volume,source=research-os-connected-dispatch-%i,target=/run/research-os-connected-dispatch,readonly @@CONNECTED_WORKER_IMAGE_ID@@ run --policy /opt/research-os/ops/connected-worker/runtime-policy.json --dispatch /run/research-os-connected-dispatch/dispatch.json --storage-encryption-attested
+ExecStart=/usr/bin/docker start --attach research-os-connected-worker-%i
+ExecStopPost=-/usr/bin/docker container rm research-os-connected-worker-%i
+ExecStopPost=-/usr/bin/docker volume rm research-os-connected-dispatch-%i
+Restart=no
+TimeoutStartSec=90s
+TimeoutStopSec=30s
+NoNewPrivileges=yes
+RestrictAddressFamilies=AF_UNIX
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+PrivateDevices=yes
+ProtectClock=yes
+ProtectControlGroups=yes
+ProtectKernelLogs=yes
+ProtectKernelModules=yes
+ProtectKernelTunables=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+SystemCallArchitectures=native
+TasksMax=64
+MemoryMax=536870912
+CPUQuota=100%
+UMask=0077
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,29 @@
+{
+  "schema_id": "ConnectedWorkerRuntimePolicy",
+  "schema_version": "1.0.0",
+  "policy_id": "r04c-connected-worker-runtime-v1",
+  "worker_uid": 10004,
+  "worker_gid": 10001,
+  "control_socket": "/var/lib/research-os/researchd.sock",
+  "private_store_root": "/var/lib/research-os-connected/private-cas",
+  "ai_off_path": "/run/research-os-connected/AI_OFF",
+  "credential_file": "/run/research-os-connected/provider.env",
+  "max_dispatch_bytes": 65536,
+  "max_completion_bytes": 16384,
+  "max_extracted_output_bytes": 65536,
+  "retention_seconds": 604800,
+  "root_mode": "0700",
+  "file_mode": "0600",
+  "storage_encryption": "EXTERNAL_VOLUME_REQUIRED",
+  "credential_locators": [
+    "ENVIRONMENT",
+    "MACOS_KEYCHAIN_OPENROUTER",
+    "OWNER_ONLY_ENV_FILE_VPS"
+  ],
+  "allowed_classifications": ["D0", "D1"],
+  "automatic_retry": false,
+  "replay_completion_only": true,
+  "worker_ipc_extension_sha256": "03d91f027bb6975c55d84acaef188546bcd24af9944a72f4ff9314296399d07a",
+  "shadow_profile_sha256": "63ae65247d61b918aced080e6419609459ebcbf4a3384ea29f2617e65597258c",
+  "shadow_tool_sha256": "31254568045a82565e6ab8a77fe198c672d95e66d03f92a82e66af014d17ecfd"
+}

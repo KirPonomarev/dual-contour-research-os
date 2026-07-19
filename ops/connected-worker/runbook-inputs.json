@@ -1,0 +1,83 @@
+{
+  "schema_id": "ConnectedWorkerRunbookInputs",
+  "schema_version": "1.0.0",
+  "input_id": "r04c-connected-worker-v1",
+  "public_classification": "D1_INTERNAL_SANITIZED",
+  "worker_identity": {"uid": 10004, "gid": 10001, "principal_role": "connected_worker"},
+  "paths": {
+    "dispatch_directory": "%h/.local/share/research-os/connected-dispatch",
+    "credential_file": "%h/.config/research-os/connected-worker.env",
+    "ai_off_marker": "%h/.config/research-os/AI_OFF",
+    "control_socket": "/var/lib/research-os/researchd.sock",
+    "private_store": "docker-volume:research-os-connected-private"
+  },
+  "required_modes": {
+    "dispatch_file": "0600",
+    "credential_file": "0600",
+    "runtime_parent": "0710",
+    "control_socket": "0660",
+    "private_store_root": "0700",
+    "private_store_file": "0600"
+  },
+  "researchd_runtime_composition": {
+    "base_config_ref": "ops/release/researchd.config.template.json",
+    "merge_policy": "STRICT_ADDITIVE_BEFORE_PRIVATE_RENDER",
+    "add_allowed_uid": 10004,
+    "add_principal_role": {"10004": "connected_worker"},
+    "add_frozen_binding": {
+      "model_runtime": {
+        "role_registry_sha256": "4faf6765f48a952e4d35540d92797330517938b34b8d2f12cde791e761a32eac",
+        "routing_profile_sha256": "37db8596a8245a6b1ea2bc5bce1495a4e7dadb314876e51397ad11dd194b3dc6",
+        "role_evaluation_sha256": "111a7ac1dc954466b19d5e408debeeefcf65c76b5b025a743a2433be910c1e75",
+        "worker_ipc_extension_sha256": "03d91f027bb6975c55d84acaef188546bcd24af9944a72f4ff9314296399d07a",
+        "binding_revision": "r04c-connected-worker-v1",
+        "budget_policy_ref": "budget-policy:sha256:b8f42db7270c698b1d9300a4a2fc419df4dfc46792c60b84621f11516f49a285",
+        "budget_scope_ref": "budget-scope:sha256:fc5f2e35c1eb3ccb87aecd6afe28a02347bf9131f00b8e4642c394e3927b2770",
+        "max_active_calls": 4,
+        "max_reserved_tokens": 20000,
+        "max_reserved_cost_units": 40,
+        "available_bindings": []
+      }
+    },
+    "rendered_config_classification": "PRIVATE_RUNTIME_INPUT",
+    "rendered_config_in_Git": false
+  },
+  "credential_names_only": [
+    "DEEPSEEK_API_KEY",
+    "ZHIPU_API_KEY",
+    "OPENAI_API_KEY",
+    "OPENROUTER_API_KEY"
+  ],
+  "rootless_network": {
+    "name": "research-os-provider-egress",
+    "attached_processes": ["connected-worker"],
+    "offline_l0_attached": false,
+    "application_endpoint_allowlist_bound_to": "provenance/model-provider-connected-shadow-v2.json"
+  },
+  "storage": {
+    "external_volume_encryption_required": true,
+    "runtime_attestation_flag": "--storage-encryption-attested",
+    "retention_seconds": 604800,
+    "backup_mode": "OWNER_ONLY_ENCRYPTED_VOLUME",
+    "restore_target": "CLEAN_OWNER_ONLY_PRIVATE_STORE",
+    "delete_scope": "EXACT_CONTENT_REFERENCE_ONLY"
+  },
+  "restart": {
+    "service_restart": "no",
+    "automatic_repeat": false,
+    "durable_completion_replay_only": true,
+    "sent_without_completion": "UNKNOWN_NO_REPEAT",
+    "terminal_dispatch": "NO_NETWORK"
+  },
+  "ai_off": {
+    "worker_effect": "NO_START_OR_CALL",
+    "core_effect": "CONTINUES",
+    "removal_authority": "OPERATOR_ONLY"
+  },
+  "public_output_policy": {
+    "credential_values": false,
+    "raw_provider_bytes": false,
+    "private_store_references": false,
+    "sanitized_status_only": true
+  }
+}

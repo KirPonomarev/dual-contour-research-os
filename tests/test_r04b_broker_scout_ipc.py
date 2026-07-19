@@ -115,7 +115,8 @@ class BrokerScoutIPCHandshakeTests(unittest.TestCase):
         config = json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
         config["runtime_root"] = str(self.runtime)
         config["frozen_bindings"]["release_manifest_sha256"] = RELEASE_SHA256
-        config["allowed_uids"].append(WORKER_UID)
+        if WORKER_UID not in config["allowed_uids"]:
+            config["allowed_uids"].append(WORKER_UID)
         config["principal_roles"][str(WORKER_UID)] = "connected_worker"
         config["frozen_bindings"]["model_runtime"] = {
             "role_registry_sha256": ROLE_REGISTRY_SHA256,

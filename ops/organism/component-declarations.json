@@ -2,7 +2,7 @@
   "schema_id": "OrganismManifestSource",
   "schema_version": "1.0.0",
   "source_id": "bridge-a1-organism-source",
-  "subject_ref": "git:2196ba43267e5465e699ae06aa18015e67cd16af",
+  "subject_ref": "git:40d700a7286592859a3ffc669cc13ece07e62f00",
   "policy_ref": "policy:a1-sandbox-policy-v1",
   "components": [
     {
@@ -99,6 +99,22 @@
       "proof_ref": "repo:docs/receipts/integration/s09-replay-capacity.json",
       "evidence": {"stage": "ENFORCEMENT_PROVEN", "observed_ref": "repo:docs/receipts/integration/s08-atomic-feedback.json", "negative_probe_ref": "repo:docs/receipts/integration/s09-replay-capacity-assurance.json", "enforcement_ref": "repo:docs/receipts/capability/e1b-durable-feedback-offline.json"},
       "next_transition": {"state": "WAIT_AUTHORITY", "requires": ["authority:human-for-canonical-mutation"]},
+      "cycle_bound": {"max_iterations": 16, "stop_condition_ref": "policy:a1-root-event-energy"}
+    },
+    {
+      "component_id": "connected-model-worker", "owner": "agent-5", "plane": "bridge-control",
+      "implementation_refs": ["repo:ops/connected-worker/model_worker.py", "repo:ops/connected-worker/runtime-policy.json", "repo:ops/deploy/research-os-connected-worker@.service"],
+      "inputs": ["external:model-call-dispatch", "external:ledger-model-call-sanitized-state"], "outputs": ["terminal:private-response-object", "terminal:sanitized-model-completion"],
+      "dependencies": ["materiality-gate"],
+      "access": {"read_refs": ["dispatch:D0-or-D1", "profile:connected-provider-v2", "ipc:model-call-state"], "write_refs": ["private-cas:raw-response", "private:completion-record", "ipc:model-call-completion"], "network": "CONNECTED_PROVIDER_EGRESS_ONLY"},
+      "authority_ceiling": "UNTRUSTED_MODEL_EGRESS_ONLY", "budget_ref": "budget:model-call-reservation",
+      "policy_refs": ["policy:r04c-connected-worker-runtime-v1", "policy:single-writer-ledger", "policy:no-automatic-repeat"],
+      "heartbeat": {"mode": "ON_INVOCATION", "freshness_seconds": 300},
+      "recovery": {"mode": "REPLAY_DURABLE_LEDGER", "authority_ceiling": "PREAUTHORIZED_R0_ONLY"},
+      "kill_switch": {"ref": "policy:AI_OFF", "effect": "STOP_COMPONENT_CORE_CONTINUES"},
+      "proof_ref": "repo:docs/receipts/integration/r04b-broker-scout-ipc-handshake.json",
+      "evidence": {"stage": "OBSERVED", "observed_ref": "repo:docs/receipts/integration/r04b-broker-scout-ipc-runtime.json", "negative_probe_ref": null, "enforcement_ref": null},
+      "next_transition": {"state": "GENERATING", "requires": ["ledger:model-call-SENT", "credential:owner-only", "policy:AI_ON"]},
       "cycle_bound": {"max_iterations": 16, "stop_condition_ref": "policy:a1-root-event-energy"}
     },
     {
