@@ -506,7 +506,9 @@ def validate_generated_result(
         "status": status, "reason_codes": tuple(sorted(reasons)),
         "output_artifact_refs": tuple(item.artifact_ref for item in result.output_artifacts),
         "rollback_ref": plan.rollback.rollback_ref, "mechanical_only": True,
-        "scientific_truth_claimed": False, "network_calls": 0, "host_writes": 0,
+        "scientific_truth_claimed": False,
+        "network_calls": result.network_calls,
+        "host_writes": result.host_write_attempts,
         "deployment_changed": False, "canonical_writes": 0, "grants_authority": False,
     }
     digest = _sha(material)
@@ -516,6 +518,8 @@ def validate_generated_result(
         status=status, reason_codes=tuple(sorted(reasons)),
         output_artifact_refs=tuple(item.artifact_ref for item in result.output_artifacts),
         rollback=plan.rollback, receipt_sha256=digest,
+        network_calls=result.network_calls,
+        host_writes=result.host_write_attempts,
     )
 
 
