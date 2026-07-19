@@ -1,0 +1,144 @@
+{
+  "profile_id": "model-role-evaluation-v2",
+  "schema_version": "2.0.0",
+  "observed_at": "2026-07-19T11:01:26Z",
+  "status": "WAIT_PROVIDER",
+  "basis": {
+    "role_registry_v1_sha256": "4faf6765f48a952e4d35540d92797330517938b34b8d2f12cde791e761a32eac",
+    "routing_v1_sha256": "37db8596a8245a6b1ea2bc5bce1495a4e7dadb314876e51397ad11dd194b3dc6",
+    "connected_profile_v2_sha256": "63ae65247d61b918aced080e6419609459ebcbf4a3384ea29f2617e65597258c",
+    "local_preflight_sha256": "2879d3f6db378974eb4a642ba3731eb6ac5240fc447eea35cd6e6d4fd6e5c93b",
+    "source_freeze_ref": "source-freeze:source-freeze-r04a-model-role-metadata-20260719",
+    "historical_fixture_eval_ref": "source-freeze:source-freeze-s16-model-provider-routing-fixtures-20260718",
+    "historical_connected_ref": "integration:integration-s24-r2-openrouter-provider-20260718"
+  },
+  "privacy": {
+    "allowed_connected_input_classes": ["D0"],
+    "parked_input_classes": ["D1", "D2", "D3", "sealed-holdout"],
+    "connected_account_controls": "UNVERIFIED",
+    "uniform_provider_retention_claim": false,
+    "provider_content_training_claim": "NOT_ASSERTED_UNIFORMLY",
+    "raw_response_public_storage": false
+  },
+  "budget": {
+    "currency_normalization": "NOT_PERFORMED",
+    "max_council_calls": 4,
+    "max_stage_provider_calls": 0,
+    "stage_provider_calls_observed": 0,
+    "new_payment_authority": false,
+    "automatic_retry": false
+  },
+  "bindings": {
+    "deepseek-v4-flash": {
+      "provider": "deepseek",
+      "family": "deepseek-v4",
+      "provenance_group": "deepseek:deepseek-v4",
+      "api_identifier": "deepseek-v4-flash",
+      "api_identifier_status": "OFFICIAL_METADATA_VERIFIED",
+      "fixture_evaluation": "PASS_HISTORICAL",
+      "connected_evaluation": "WAIT_CREDENTIAL",
+      "allowed_input_classes": ["D0"],
+      "pricing": {"status": "VERIFIED_2026-07-19", "currency": "USD", "unit_tokens": 1000000, "input_cache_hit": 0.0028, "input_cache_miss": 0.14, "output": 0.28},
+      "source_refs": ["source-freeze:source-freeze-r04a-model-role-metadata-20260719#deepseek-models-and-pricing"]
+    },
+    "deepseek-v4-pro": {
+      "provider": "deepseek",
+      "family": "deepseek-v4",
+      "provenance_group": "deepseek:deepseek-v4",
+      "api_identifier": "deepseek-v4-pro",
+      "api_identifier_status": "OFFICIAL_METADATA_VERIFIED",
+      "fixture_evaluation": "PASS_HISTORICAL",
+      "connected_evaluation": "WAIT_CREDENTIAL",
+      "allowed_input_classes": ["D0"],
+      "pricing": {"status": "VERIFIED_2026-07-19", "currency": "USD", "unit_tokens": 1000000, "input_cache_hit": 0.003625, "input_cache_miss": 0.435, "output": 0.87},
+      "source_refs": ["source-freeze:source-freeze-r04a-model-role-metadata-20260719#deepseek-models-and-pricing"]
+    },
+    "glm-5.2-max": {
+      "provider": "zhipu",
+      "family": "glm-5.2",
+      "provenance_group": "zhipu:glm-5.2",
+      "api_identifier": "glm-5.2",
+      "api_identifier_status": "OFFICIAL_METADATA_VERIFIED",
+      "fixture_evaluation": "PASS_HISTORICAL",
+      "connected_evaluation": "WAIT_CREDENTIAL_AND_PRICE",
+      "allowed_input_classes": ["D0"],
+      "pricing": {"status": "UNVERIFIED_CURRENT_PRICE", "currency": null, "unit_tokens": 1000000, "input_cache_hit": null, "input_cache_miss": null, "output": null},
+      "source_refs": ["source-freeze:source-freeze-r04a-model-role-metadata-20260719#zhipu-model", "source-freeze:source-freeze-r04a-model-role-metadata-20260719#zhipu-pricing"]
+    },
+    "gpt-5.6-sol-xhigh": {
+      "provider": "openrouter",
+      "family": "gpt-5.6-sol",
+      "provenance_group": "openai:gpt-5.6-sol",
+      "api_identifier": "openai/gpt-5.6-sol",
+      "api_identifier_status": "OFFICIAL_GATEWAY_METADATA_VERIFIED_UPSTREAM_NOT_ATTESTED",
+      "fixture_evaluation": "PASS_HISTORICAL",
+      "connected_evaluation": "PASS_HISTORICAL_CURRENT_WAIT_CREDENTIAL",
+      "allowed_input_classes": ["D0"],
+      "pricing": {"status": "VERIFIED_2026-07-19", "currency": "USD", "unit_tokens": 1000000, "input_cache_hit": null, "input_cache_miss": 5.0, "output": 30.0, "gateway_fee_percent": 5.5},
+      "source_refs": ["source-freeze:source-freeze-r04a-model-role-metadata-20260719#openrouter-model-and-pricing", "source-freeze:source-freeze-r04a-model-role-metadata-20260719#openrouter-data-controls"]
+    },
+    "gpt-5.6-sol-max": {
+      "provider": "openai",
+      "family": "gpt-5.6-sol",
+      "provenance_group": "openai:gpt-5.6-sol",
+      "api_identifier": "gpt-5.6-sol",
+      "api_identifier_status": "OFFICIAL_METADATA_VERIFIED",
+      "fixture_evaluation": "PASS_HISTORICAL",
+      "connected_evaluation": "WAIT_CREDENTIAL",
+      "allowed_input_classes": ["D0"],
+      "pricing": {"status": "VERIFIED_2026-07-19", "currency": "USD", "unit_tokens": 1000000, "input_cache_hit": 0.5, "input_cache_miss": 5.0, "output": 30.0},
+      "source_refs": ["source-freeze:source-freeze-r04a-model-role-metadata-20260719#openai-model-and-pricing", "source-freeze:source-freeze-r04a-model-role-metadata-20260719#openai-data-controls"]
+    },
+    "qwen3.7-max-reserve": {
+      "provider": "alibaba-model-studio",
+      "family": "qwen3.7",
+      "provenance_group": "alibaba:qwen3.7",
+      "api_identifier": "qwen3.7-max-2026-06-08",
+      "api_identifier_status": "OFFICIAL_METADATA_VERIFIED",
+      "fixture_evaluation": "NOT_RUN",
+      "connected_evaluation": "WAIT_CREDENTIAL_AND_EVAL",
+      "allowed_input_classes": ["D0"],
+      "pricing": {"status": "VERIFIED_2026-07-19", "currency": "CNY", "unit_tokens": 1000000, "input_cache_hit": null, "input_cache_miss": 12.0, "output": 36.0},
+      "source_refs": ["source-freeze:source-freeze-r04a-model-role-metadata-20260719#alibaba-qwen-api-shape", "source-freeze:source-freeze-r04a-model-role-metadata-20260719#alibaba-qwen-pricing", "source-freeze:source-freeze-r04a-model-role-metadata-20260719#alibaba-data-controls"]
+    }
+  },
+  "roles": {
+    "SCOUT_FAST": {"primary": "deepseek-v4-flash", "candidate": null, "fallbacks": ["deepseek-v4-pro"], "evaluation_status": "METADATA_VERIFIED_FIXTURE_PASS_CURRENT_WAIT_PROVIDER", "unavailable_action": "PARKED"},
+    "RESEARCH_WORKER": {"primary": "deepseek-v4-pro", "candidate": null, "fallbacks": ["deepseek-v4-flash"], "evaluation_status": "METADATA_VERIFIED_FIXTURE_PASS_CURRENT_WAIT_PROVIDER", "unavailable_action": "PARKED"},
+    "CRITIC_PRIMARY": {"primary": "glm-5.2-max", "candidate": null, "fallbacks": [], "evaluation_status": "METADATA_VERIFIED_FIXTURE_PASS_PRICE_AND_PROVIDER_WAIT", "unavailable_action": "WAIT_PROVIDER"},
+    "CRITIC_DEEP": {"primary": "gpt-5.6-sol-xhigh", "candidate": null, "fallbacks": ["gpt-5.6-sol-max"], "evaluation_status": "METADATA_VERIFIED_HISTORICAL_PASS_CURRENT_WAIT_PROVIDER", "unavailable_action": "WAIT_PROVIDER"},
+    "CHIEF_SCIENTIST": {"primary": "gpt-5.6-sol-max", "candidate": null, "fallbacks": ["gpt-5.6-sol-xhigh"], "evaluation_status": "METADATA_VERIFIED_FIXTURE_PASS_CURRENT_WAIT_PROVIDER", "unavailable_action": "WAIT_PROVIDER"},
+    "ARBITER_RESERVE": {"primary": null, "candidate": "qwen3.7-max-reserve", "fallbacks": [], "evaluation_status": "METADATA_VERIFIED_EVAL_AND_PROVIDER_WAIT", "unavailable_action": "WAIT_PROVIDER"}
+  },
+  "correlation_groups": {
+    "deepseek-v4": ["deepseek-v4-flash", "deepseek-v4-pro"],
+    "gpt-5.6-sol": ["gpt-5.6-sol-xhigh", "gpt-5.6-sol-max"],
+    "glm-5.2": ["glm-5.2-max"],
+    "qwen3.7": ["qwen3.7-max-reserve"]
+  },
+  "current_preflight": {
+    "configured_bindings": [],
+    "binding_states": {
+      "deepseek-v4-flash": "WAIT_CREDENTIAL",
+      "deepseek-v4-pro": "WAIT_CREDENTIAL",
+      "glm-5.2-max": "WAIT_CREDENTIAL",
+      "gpt-5.6-sol-max": "WAIT_CREDENTIAL",
+      "gpt-5.6-sol-xhigh": "WAIT_CREDENTIAL",
+      "qwen3.7-max-reserve": "WAIT_CREDENTIAL"
+    },
+    "secrets_printed": false,
+    "result": "WAIT_PROVIDER"
+  },
+  "invariants": {
+    "model_outputs_are_untrusted": true,
+    "caller_cannot_select_binding": true,
+    "fallback_cannot_widen_privacy_or_authority": true,
+    "same_family_efforts_are_correlated": true,
+    "gateway_is_not_independence_evidence": true,
+    "consensus_is_not_evidence": true,
+    "reserve_is_not_routable": true,
+    "connected_availability_is_not_claimed": true,
+    "frozen_v1_is_unchanged": true,
+    "grants_authority": false
+  }
+}
