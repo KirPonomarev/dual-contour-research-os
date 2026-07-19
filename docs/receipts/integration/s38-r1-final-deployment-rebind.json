@@ -1,0 +1,74 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s38-r1-final-deployment-rebind-20260719",
+  "issued_at": "2026-07-19T02:00:46Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s38-r1-final-deployment-rebind",
+    "agent_id": "agent-0",
+    "ownership_lease_ref": "stages/s38-r1-final-deployment-rebind/ownership-lease.json",
+    "base_sha": "d28bef12cbf6acd1747ddf0e3ec51671c4ca2dcb",
+    "head_sha": "7d9a6459be07678a57a779118dd328a37eff2855",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "tools/final_deployment_rebind.py",
+      "tools/pre_soak_deploy.py",
+      "ops/deploy/research-os-a1-final.service",
+      "ops/release/final-a1-runtime-policy.json",
+      "docs/S38_FINAL_DEPLOYMENT_RUNBOOK.md",
+      "ops/deploy/s38-r1-final-deployment-rebind.json",
+      "docs/receipts/reuse/s38-r1-final-deployment-rebind.json",
+      "tests/test_s38_r1_final_deployment_rebind.py",
+      "stages/s38-r1-final-deployment-rebind/"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "agent0_operational_deployment_controller_mutation": true,
+      "candidate_release_sha": "b2c2e6a8c4e0a364ef82e8e51540433aa91430d4",
+      "candidate_tree_sha": "7d6bd1e13d651950cced23dfe75a24946a3218fc",
+      "candidate_source_changed": false,
+      "local_image_id": "sha256:c654b09504dec237966623088e4dbbbe104d6364cd5760a4cfb145eb388a3844",
+      "local_image_archive_sha256": "374b8ca553ddf47d40400576589619a6ee5822f6f977ced36e404c0c8b693bea",
+      "local_SPDX_SBOM_sha256": "bd9ce8c1b34f49108f9a6d2c8516be937e6f1af010add78f2b0d6c9e9d790d70",
+      "operational_release_manifest_sha256": "47a3dcac2782fb8e0a03f599f58f778ecbbf7005fd01e7ff140f905648a756ce",
+      "private_runtime_artifacts_in_Git": false,
+      "private_runtime_artifact_mode": "0600",
+      "A1_namespace_and_single_supervisor": "green",
+      "runtime_policy_restart_alignment": "green",
+      "predecessor_active_enabled_running_denial": "green",
+      "approval_consumed_before_first_remote_mutation": "green",
+      "approval_replay_denial": "green",
+      "failure_receipt_and_no_auto_retry": "green",
+      "deployment_approval_receipt_present": false,
+      "deployment_or_VPS_actions": 0,
+      "reboot_or_restore_actions": 0,
+      "live_or_canonical_actions": 0,
+      "grants_authority": false,
+      "focused_tests": 64,
+      "full_core_tests": 799,
+      "stage0b_tests": 25
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29669470705",
+    "integration_commit_sha": "49eb725a6e335551277e9f4c704cef0ec3f0e66a"
+  },
+  "integrity": {
+    "payload_sha256": "1d7df39834f810b58c443cdd7f3b2c5b309079261bb7e7bad9d4b25dc1639ef8",
+    "parent_refs": [
+      "git:d28bef12cbf6acd1747ddf0e3ec51671c4ca2dcb",
+      "git:7d9a6459be07678a57a779118dd328a37eff2855",
+      "git:49eb725a6e335551277e9f4c704cef0ec3f0e66a",
+      "ci:29669470705",
+      "image:sha256:c654b09504dec237966623088e4dbbbe104d6364cd5760a4cfb145eb388a3844",
+      "operational-manifest:sha256:47a3dcac2782fb8e0a03f599f58f778ecbbf7005fd01e7ff140f905648a756ce",
+      "packet:sha256:e57b0f59b420f1f969c6bb8017ed2fee49d8042e4f5b546eab4fdbca0dfa86bf"
+    ]
+  }
+}
