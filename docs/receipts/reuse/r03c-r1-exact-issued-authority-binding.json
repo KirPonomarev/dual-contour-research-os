@@ -1,0 +1,29 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-r03c-r1-exact-issued-authority-binding-20260719",
+  "issued_at": "2026-07-19T10:12:59Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-freeze-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "PRODUCTION_EXACT_ISSUED_AUTHORITY_CHAIN_BINDING",
+    "candidates": [
+      {"candidate": "resolve-the-exact-durable-authority-bundle-from-existing-admission-projection-and-compare-before-staging", "disposition": "selected-minimal-internal-adapter"},
+      {"candidate": "construct-a-scoped-authority-from-the-submitted-documents-themselves", "disposition": "rejected-self-authorizing-and-does-not-stop-altered-document-substitution"},
+      {"candidate": "trust-only-issuer-payload-integrity-and-cross-document-links", "disposition": "rejected-does-not-prove-exact-issued-document-identity"},
+      {"candidate": "new-authority-registry-ledger-schema-database-service-or-queue", "disposition": "rejected-existing-durable-admission-projection-already-stores-and-replays-the-issued-bundle"}
+    ],
+    "selected_mode": "DurableDiscoveryService resolves one unique replay-validated issued bundle by JobSpec reference; ResearchDaemon requires canonical byte equality for all three documents before creating staging or invoking execution",
+    "source_ref": "git:93c21abd70af00b2451612ca3d4dbe39eede88f2;internal:discovery.py+researchd.py",
+    "license_spdx": "NOASSERTION",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": ["exact issued chain succeeds once", "altered lease denied before staging", "mixed and nonmatching chain denied", "missing or ambiguous chain denied", "restart replay remains exact", "AI_OFF legacy compatibility"],
+    "canonical_owner": "agent-1-with-agent-0-integration",
+    "rollback": "Revert the scoped resolver and pre-staging comparison; keep R03C failed and prohibit release/deploy."
+  },
+  "integrity": {
+    "payload_sha256": "0e5d6def63e87332e1997a953b17d717c5f339a6c34532f0d0686275913921d7",
+    "parent_refs": ["git:93c21abd70af00b2451612ca3d4dbe39eede88f2", "stage:r03c-corridor-hostile-assurance"]
+  }
+}
