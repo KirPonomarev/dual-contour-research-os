@@ -1,0 +1,26 @@
+{
+  "stage_id": "r08b-r3-build-context-bytecode-exclusion",
+  "amendment_id": "R08B_R3_BUILD_CONTEXT_BYTECODE_EXCLUSION_20260719",
+  "issued_by": "agent-0",
+  "issued_at": "2026-07-19T22:33:04Z",
+  "authority_head": "b7e538bcd1762b22693a29f90763c5182a5669f5",
+  "candidate_sha": null,
+  "candidate_tree_sha": null,
+  "leases": [
+    {
+      "owner": "agent-0",
+      "branch": "codex/bridge-a0-r08b-exact-candidate-image-build-sbom",
+      "write_set": [
+        "stages/r08b-exact-candidate-image-build-sbom/stage-envelope-amendment-v2.4-12.json",
+        "stages/r08b-exact-candidate-image-build-sbom/ownership-lease-amendment-v2.4-12.json",
+        ".dockerignore",
+        "tools/verify_release_blueprint.py"
+      ]
+    }
+  ],
+  "root_only_mutation_by_agent_0": true,
+  "cross_owner_write_set": false,
+  "one_mutating_lane_at_a_time": true,
+  "expires_at": "2026-07-20T04:33:04Z",
+  "candidate_cut_permitted": false
+}
