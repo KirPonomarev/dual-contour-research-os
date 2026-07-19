@@ -8,8 +8,10 @@
 !provenance/model-provider-routing-v1.json
 !provenance/model-worker-ipc-extension-v1.json
 !contracts/
+!contracts/catalog.json
 !contracts/a1/
 !contracts/a1/v1/
+!contracts/a1/v1/**
 !contracts/a1/v1/profiles/
 !contracts/a1/v1/profiles/model_role_registry_v1.json
 !ops/
