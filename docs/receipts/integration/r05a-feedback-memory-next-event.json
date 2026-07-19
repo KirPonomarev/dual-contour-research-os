@@ -1,0 +1,79 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-r05a-feedback-memory-next-event-20260719",
+  "issued_at": "2026-07-19T15:30:29Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "r05a-feedback-memory-next-event",
+    "agent_id": "agent-1",
+    "ownership_lease_ref": "stages/r05a-feedback-memory-next-event/ownership-lease.json",
+    "base_sha": "07477fca82d0bcdc6eb2879c2771db51c9d8fd9c",
+    "stage_authorization_sha": "4689dec9bc06cba1ee4ab10f2c1fdbcd54c18c9f",
+    "worker_head_sha": "7d4e26d9e9ae63479c734486e4b463968b550ca5",
+    "head_sha": "0006584b675451d7e1e08d5c7628eebb11db1927",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "a1_contract_sha256": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+    "write_set": [
+      "src/research_bridge/ledger.py",
+      "src/research_bridge/discovery.py",
+      "src/research_bridge/admission.py",
+      "src/research_bridge/researchd.py",
+      "tests/test_r05a_feedback_memory_next_event.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "write_set_exact": true,
+      "single_global_ledger_order": true,
+      "second_writer_or_database_added": false,
+      "scheduler_timer_thread_or_network_path_added": false,
+      "feedback_requires_durable_execution_and_independent_validation": true,
+      "feedback_memory_event_outbox_atomic": true,
+      "completed_execution_tail_recovered_before_IPC": true,
+      "execution_repeated_during_recovery": false,
+      "positive_claims_scientific_truth": false,
+      "negative_and_mechanical_failure_memory_reusable": true,
+      "shadow_unapplied_inherited": true,
+      "root_token_and_cost_energy_decrease": true,
+      "maximum_runnable_next_event_per_outcome": 1,
+      "global_existing_runnable_WIP_parks_new_event": true,
+      "depth_limit": 16,
+      "exhausted_state": "WAIT_AUTHORITY",
+      "canonical_or_live_writes": 0,
+      "grants_authority": false,
+      "focused_tests": 40,
+      "full_core_tests": 858,
+      "stage0b_tests": 25
+    },
+    "file_sha256": {
+      "src/research_bridge/admission.py": "5d80a11635b94ec276500f30f0cf2eb67b6fcc2bdbba35dca461e31ca4e6ef86",
+      "src/research_bridge/discovery.py": "c422745908c2e4bb23b5994029a7e06641c07aecbf60133845050642d797a252",
+      "src/research_bridge/ledger.py": "98a7f45d9732960a9467c5ea3664d4353782e97c52058177853f05c0ebede680",
+      "src/research_bridge/researchd.py": "e05a03988237e9328ae2d84efb5db29de27e0b8ef5d8e83af756b5f6a121a086",
+      "tests/test_r05a_feedback_memory_next_event.py": "d759add452c0fa99b7d7f2c2e82906830f2d3f485da5fba861228eea4fed36b3"
+    },
+    "pull_request_ref": "https://github.com/KirPonomarev/dual-contour-research-os/pull/70",
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29692951159",
+    "integration_commit_sha": "0006584b675451d7e1e08d5c7628eebb11db1927",
+    "known_next_gate": "Advance to R05B independent validation closure on this exact accepted head."
+  },
+  "integrity": {
+    "payload_sha256": "1fcb161f2874a85ea8f67617d8f831e87bcd90b155bef1aef81a96c51b2b5f97",
+    "parent_refs": [
+      "git:07477fca82d0bcdc6eb2879c2771db51c9d8fd9c",
+      "git:4689dec9bc06cba1ee4ab10f2c1fdbcd54c18c9f",
+      "git:7d4e26d9e9ae63479c734486e4b463968b550ca5",
+      "git:0006584b675451d7e1e08d5c7628eebb11db1927",
+      "ci:29692916095",
+      "ci:29692921361",
+      "ci:29692951159",
+      "pr:70",
+      "reuse:reuse-r05a-feedback-memory-next-event-20260719",
+      "integration:integration-r04e-provider-proof-integration-20260719"
+    ]
+  }
+}
