@@ -1,10 +1,10 @@
-"""Bounded E1A discovery fixture for IPC 1.2 collector and Scout principals.
+"""Bounded discovery boundaries for IPC 1.2 collector and Scout principals.
 
-The module is deliberately local and non-durable.  It reuses the existing
-AF_UNIX control plane and frozen A1 admission kernel without adding a model
-provider, scheduler, ledger, queue, or scientific writer.  All model-shaped
-bytes remain untrusted and are projected into CandidateSpecDraft only after
-strict parsing and trusted-field replacement.
+The fixture service remains deliberately local and non-durable.  The durable
+service is a thin adapter over the existing single ``JobLedger`` writer; it
+does not add a provider, scheduler, queue, database, or scientific writer.
+All model-shaped bytes remain untrusted and are projected into
+``CandidateSpecDraft`` only after strict parsing and trusted-field replacement.
 """
 
 from __future__ import annotations
@@ -22,6 +22,7 @@ from types import MappingProxyType
 from typing import Callable, Mapping, Sequence
 
 from .admission import A1AdmissionKernel, A1AdmissionSnapshot, canonical_json_sha256
+from .ledger import JobLedger, LedgerError
 
 
 _SHA256_RE = re.compile(r"^[a-f0-9]{64}$")
@@ -120,6 +121,11 @@ _VCS_IDENTITY_KEYS = frozenset(
     }
 )
 _MAX_SAFE_INTEGER = 9_007_199_254_740_991
+_DURABLE_STATE_VERSION = "durable-discovery-v1"
+_DURABLE_ENTRY_LIMIT = 4_096
+_DURABLE_PROJECTION_NAMES = frozenset(
+    {"material_events", "candidates", "admissions", "capabilities"}
+)
 
 
 class DiscoveryError(RuntimeError):
@@ -227,6 +233,74 @@ class DiscoveryFixtureConfig:
             self,
             "remaining_energy",
             _deep_freeze(_json_copy(self.remaining_energy)),
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class DurableDiscoveryConfig:
+    """Trusted runtime bindings for the production durable discovery adapter."""
+
+    policy_sha256: str
+    context_sha256: str
+    classification: str
+    root_energy: Mapping[str, object]
+    remaining_energy: Mapping[str, object]
+    allowed_source_prefixes: tuple[str, ...]
+    collector_bindings: Mapping[str, str]
+    repository_id: str
+    head_sha: str
+    base_sha: str
+    release_manifest_sha256: str
+    claim_ttl_seconds: int = 300
+    maximum_reason_feedback: int = 1
+
+    def __post_init__(self) -> None:
+        for name, value in (
+            ("policy_sha256", self.policy_sha256),
+            ("context_sha256", self.context_sha256),
+            ("release_manifest_sha256", self.release_manifest_sha256),
+        ):
+            _sha256(name, value)
+        for name, value in (("head_sha", self.head_sha), ("base_sha", self.base_sha)):
+            if not isinstance(value, str) or _GIT_SHA_RE.fullmatch(value) is None:
+                raise DiscoveryError(f"{name} must be a 40-hex Git commit")
+        if self.classification not in {"D0", "D1"}:
+            raise DiscoveryError("classification must be D0 or D1")
+        _text("repository_id", self.repository_id, maximum=256)
+        prefixes = _string_sequence(
+            "allowed_source_prefixes",
+            self.allowed_source_prefixes,
+            allow_empty=False,
+            maximum=2_048,
+        )
+        if not isinstance(self.collector_bindings, Mapping) or not self.collector_bindings:
+            raise DiscoveryError("collector_bindings must be a non-empty mapping")
+        bindings: dict[str, str] = {}
+        for actor, collector_id in self.collector_bindings.items():
+            bindings[_text("collector actor", actor, maximum=256)] = _text(
+                "collector_id", collector_id, maximum=256
+            )
+        _resource_budget("root_energy", self.root_energy)
+        _resource_budget("remaining_energy", self.remaining_energy)
+        if (
+            isinstance(self.claim_ttl_seconds, bool)
+            or not isinstance(self.claim_ttl_seconds, int)
+            or not 1 <= self.claim_ttl_seconds <= 3_600
+        ):
+            raise DiscoveryError("claim_ttl_seconds must be between 1 and 3600")
+        if (
+            isinstance(self.maximum_reason_feedback, bool)
+            or not isinstance(self.maximum_reason_feedback, int)
+            or not 0 <= self.maximum_reason_feedback <= 4
+        ):
+            raise DiscoveryError("maximum_reason_feedback must be between 0 and 4")
+        object.__setattr__(self, "allowed_source_prefixes", tuple(prefixes))
+        object.__setattr__(self, "collector_bindings", MappingProxyType(bindings))
+        object.__setattr__(
+            self, "root_energy", _deep_freeze(_json_copy(self.root_energy))
+        )
+        object.__setattr__(
+            self, "remaining_energy", _deep_freeze(_json_copy(self.remaining_energy))
         )
 
 
@@ -797,6 +871,644 @@ class DiscoveryFixtureService:
         return _deep_freeze(candidate)
 
 
+class DurableDiscoveryService:
+    """Production A1 control adapter backed by the one researchd ``JobLedger``.
+
+    The adapter owns no independent event order.  Every source, claim,
+    proposal, rejection, and acknowledgement is committed atomically with all
+    four A1 projections in the existing global ledger sequence.
+    """
+
+    def __init__(
+        self,
+        admission_kernel: A1AdmissionKernel,
+        ledger: JobLedger,
+        config: DurableDiscoveryConfig,
+        *,
+        parser: StrictProposalParser | None = None,
+    ) -> None:
+        if not isinstance(admission_kernel, A1AdmissionKernel):
+            raise DiscoveryError("admission_kernel must be A1AdmissionKernel")
+        if not isinstance(ledger, JobLedger):
+            raise DiscoveryError("ledger must be the researchd JobLedger")
+        if not isinstance(config, DurableDiscoveryConfig):
+            raise DiscoveryError("config must be DurableDiscoveryConfig")
+        if not ledger.verify_chain() or not ledger.verify_a1_coverage():
+            raise DiscoveryError("durable A1 ledger integrity is invalid")
+        self._kernel = admission_kernel
+        self._ledger = ledger
+        self._config = config
+        self._parser = parser or StrictProposalParser()
+        self._lock = RLock()
+        # Parse and authenticate any pre-existing state before accepting IPC.
+        self._states()
+
+    def submit_source_trigger(
+        self,
+        *,
+        source_trigger: Mapping[str, object],
+        actor: str,
+        idempotency_key: str,
+        now: str,
+    ) -> Mapping[str, object]:
+        actor_text = _text("actor", actor, maximum=256)
+        key = _text("idempotency_key", idempotency_key, maximum=256)
+        trusted_collector = self._config.collector_bindings.get(actor_text)
+        if trusted_collector is None:
+            raise DiscoveryError("collector principal is not registered")
+        trigger = _exact_mapping(source_trigger, _SOURCE_TRIGGER_KEYS, "source_trigger")
+        if trigger["collector_id"] != trusted_collector:
+            raise DiscoveryError("collector principal does not match collector_id")
+        _timestamp("now", now)
+        request_sha256 = canonical_json_sha256(
+            {"actor": actor_text, "source_trigger": trigger}
+        )
+        with self._lock:
+            states = self._states()
+            material = states["material_events"]
+            replay = _durable_replay(
+                material["source_replays"], key, request_sha256, "source"
+            )
+            if replay is not None:
+                return replay
+            revision = self._ledger.storage_coverage_manifest()["global_sequence_last"]
+            result = self._kernel.materialize_source_trigger(
+                trigger,
+                issued_at=now,
+                policy_sha256=self._config.policy_sha256,
+                context_sha256=self._config.context_sha256,
+                classification=self._config.classification,
+                ledger_revision=revision,
+                root_energy=self._config.root_energy,
+                remaining_energy=self._config.remaining_energy,
+                allowed_collectors=tuple(self._config.collector_bindings.values()),
+                allowed_source_prefixes=self._config.allowed_source_prefixes,
+                seen_exact_sha256=tuple(material["exact_keys"]),
+            )
+            response: dict[str, object] = {
+                "decision": result.decision,
+                "reason_code": result.reason_code,
+                "model_calls_consumed": result.model_calls_consumed,
+                "material_event": (
+                    _json_copy(result.material_event)
+                    if result.material_event is not None
+                    else None
+                ),
+            }
+            _bounded_insert(
+                material["source_replays"],
+                key,
+                {"request_sha256": request_sha256, "response": response},
+                "source replay",
+            )
+            objects: tuple[Mapping[str, object], ...] = ()
+            if result.material_event is not None:
+                event = _json_copy(result.material_event)
+                event_ref = event["object_id"]
+                _bounded_insert(material["events"], event_ref, event, "material event")
+                material["exact_keys"].append(result.exact_key_sha256)
+                objects = (event,)
+            self._commit(states, key, now, "source", objects=objects)
+            return _deep_freeze(response)
+
+    def claim_proposal(
+        self,
+        *,
+        material_event_ref: str,
+        actor: str,
+        idempotency_key: str,
+        now: str,
+    ) -> Mapping[str, object]:
+        event_ref = _text("material_event_ref", material_event_ref, maximum=512)
+        actor_text = _text("actor", actor, maximum=256)
+        key = _text("idempotency_key", idempotency_key, maximum=256)
+        current = _timestamp("now", now)
+        request_sha256 = canonical_json_sha256(
+            {"actor": actor_text, "material_event_ref": event_ref}
+        )
+        with self._lock:
+            states = self._states()
+            material = states["material_events"]
+            if event_ref not in material["events"]:
+                raise DiscoveryError("material event is not registered")
+            replay = _durable_replay(
+                material["claim_replays"], key, request_sha256, "claim"
+            )
+            if replay is not None:
+                return replay
+            existing_value = material["claims"].get(event_ref)
+            existing = (
+                _claim_from_mapping(existing_value)
+                if existing_value is not None
+                else None
+            )
+            if existing is not None and existing.acknowledged:
+                raise DiscoveryError("material event proposal is already acknowledged")
+            if existing is not None and existing.expires_at > current:
+                if existing.actor != actor_text:
+                    raise DiscoveryError("material event already has an active owner")
+                claim = existing
+            else:
+                generation = 1 if existing is None else existing.generation + 1
+                expires_at = current + timedelta(seconds=self._config.claim_ttl_seconds)
+                token = canonical_json_sha256(
+                    {
+                        "actor": actor_text,
+                        "event_ref": event_ref,
+                        "expires_at": _format_timestamp(expires_at),
+                        "generation": generation,
+                    }
+                )
+                claim = _Claim(actor_text, token, generation, expires_at)
+                material["claims"][event_ref] = _claim_to_mapping(claim)
+            response = _json_copy(self._claim_response(event_ref, claim))
+            _bounded_insert(
+                material["claim_replays"],
+                key,
+                {"request_sha256": request_sha256, "response": response},
+                "claim replay",
+            )
+            self._commit(states, key, now, "claim")
+            return _deep_freeze(response)
+
+    def submit_proposal(
+        self,
+        *,
+        proposal_envelope: Mapping[str, object],
+        actor: str,
+        idempotency_key: str,
+        now: str,
+    ) -> Mapping[str, object]:
+        actor_text = _text("actor", actor, maximum=256)
+        key = _text("idempotency_key", idempotency_key, maximum=256)
+        current = _timestamp("now", now)
+        envelope = _exact_mapping(
+            proposal_envelope, _PROPOSAL_ENVELOPE_KEYS, "proposal_envelope"
+        )
+        event_ref = _text(
+            "proposal_envelope.material_event_ref",
+            envelope["material_event_ref"],
+            maximum=512,
+        )
+        claim_token = _sha256(
+            "proposal_envelope.claim_token", envelope["claim_token"]
+        )
+        model_call_ref = _text(
+            "proposal_envelope.model_call_ref", envelope["model_call_ref"], maximum=512
+        )
+        critique_call_ref = _text(
+            "proposal_envelope.critique_call_ref",
+            envelope["critique_call_ref"],
+            maximum=512,
+        )
+        request_sha256 = canonical_json_sha256(
+            {"actor": actor_text, "proposal_envelope": envelope}
+        )
+        with self._lock:
+            states = self._states()
+            material = states["material_events"]
+            candidates = states["candidates"]
+            replay = _durable_replay(
+                candidates["proposal_replays"], key, request_sha256, "proposal"
+            )
+            if replay is not None:
+                return replay
+            event = material["events"].get(event_ref)
+            if event is None:
+                raise DiscoveryError("material event is not registered")
+            claim_value = material["claims"].get(event_ref)
+            claim = self._active_durable_claim(
+                claim_value,
+                actor=actor_text,
+                token=claim_token,
+                now=current,
+            )
+            existing = candidates["proposals"].get(event_ref)
+            if existing is not None:
+                if not hmac.compare_digest(existing["request_sha256"], request_sha256):
+                    raise DiscoveryError("material event already has a different proposal")
+                response = _json_copy(existing["response"])
+                _bounded_insert(
+                    candidates["proposal_replays"],
+                    key,
+                    {"request_sha256": request_sha256, "response": response},
+                    "proposal replay",
+                )
+                self._commit(states, key, now, "proposal-replay")
+                return _deep_freeze(response)
+
+            model_body = self._parser.parse_model_body(envelope["model_output"])
+            critique = self._parser.parse_critique(envelope["critique_output"])
+            objects: tuple[Mapping[str, object], ...] = ()
+            if critique["accepted"] is not True or critique["falsifier_present"] is not True:
+                used = candidates["feedback_used"].get(event_ref, 0)
+                if used >= self._config.maximum_reason_feedback:
+                    response = {
+                        "decision": "PARKED",
+                        "reason_code": "BUDGET_EXHAUSTED",
+                        "candidate_spec_draft": None,
+                        "feedback_remaining": 0,
+                    }
+                else:
+                    used += 1
+                    candidates["feedback_used"][event_ref] = used
+                    response = {
+                        "decision": "REJECTED",
+                        "reason_code": "MISSING_REQUIRED_FIELD",
+                        "candidate_spec_draft": None,
+                        "feedback_remaining": max(
+                            0, self._config.maximum_reason_feedback - used
+                        ),
+                    }
+            else:
+                candidate = self._project_candidate(
+                    event,
+                    model_body,
+                    issued_at=_format_timestamp(current),
+                    model_call_ref=model_call_ref,
+                    critique_call_ref=critique_call_ref,
+                )
+                response = {
+                    "decision": "CANDIDATE_CREATED",
+                    "candidate_spec_draft": _json_copy(candidate),
+                    "feedback_remaining": self._config.maximum_reason_feedback,
+                }
+                candidates["proposals"][event_ref] = {
+                    "request_sha256": request_sha256,
+                    "response": response,
+                }
+                objects = (candidate,)
+            _bounded_insert(
+                candidates["proposal_replays"],
+                key,
+                {"request_sha256": request_sha256, "response": response},
+                "proposal replay",
+            )
+            material["claims"][event_ref] = _claim_to_mapping(
+                replace(claim, acknowledged=False)
+            )
+            self._commit(states, key, now, "proposal", objects=objects)
+            return _deep_freeze(response)
+
+    def ack_proposal(
+        self,
+        *,
+        material_event_ref: str,
+        claim_token: str,
+        actor: str,
+        idempotency_key: str,
+        now: str,
+    ) -> Mapping[str, object]:
+        event_ref = _text("material_event_ref", material_event_ref, maximum=512)
+        actor_text = _text("actor", actor, maximum=256)
+        token = _sha256("claim_token", claim_token)
+        key = _text("idempotency_key", idempotency_key, maximum=256)
+        current = _timestamp("now", now)
+        request_sha256 = canonical_json_sha256(
+            {
+                "actor": actor_text,
+                "claim_token": token,
+                "material_event_ref": event_ref,
+            }
+        )
+        with self._lock:
+            states = self._states()
+            material = states["material_events"]
+            candidates = states["candidates"]
+            replay = _durable_replay(
+                material["ack_replays"], key, request_sha256, "ack"
+            )
+            if replay is not None:
+                return replay
+            claim = self._active_durable_claim(
+                material["claims"].get(event_ref),
+                actor=actor_text,
+                token=token,
+                now=current,
+                allow_acknowledged=True,
+            )
+            if event_ref not in candidates["proposals"]:
+                raise DiscoveryError("proposal cannot be acknowledged before submission")
+            claim = replace(claim, acknowledged=True)
+            material["claims"][event_ref] = _claim_to_mapping(claim)
+            response = {
+                "material_event_ref": event_ref,
+                "claim_token": claim.token,
+                "acknowledged": True,
+            }
+            _bounded_insert(
+                material["ack_replays"],
+                key,
+                {"request_sha256": request_sha256, "response": response},
+                "ack replay",
+            )
+            self._commit(states, key, now, "ack")
+            return _deep_freeze(response)
+
+    def _states(self) -> dict[str, dict[str, object]]:
+        try:
+            coverage = self._ledger.projection_coverage()
+        except LedgerError as exc:
+            raise DiscoveryError("durable A1 projections are unavailable") from exc
+        if not coverage:
+            return _empty_durable_states()
+        if not _DURABLE_PROJECTION_NAMES.issubset(coverage):
+            raise DiscoveryError("durable A1 projection coverage is incomplete")
+        states: dict[str, dict[str, object]] = {}
+        for name in sorted(_DURABLE_PROJECTION_NAMES):
+            record = coverage[name]
+            state = _json_copy(record["state"])
+            if not isinstance(state, dict):
+                raise DiscoveryError("durable A1 projection is invalid")
+            states[name] = state
+        _validate_durable_states(states, self._ledger)
+        return states
+
+    def _commit(
+        self,
+        states: Mapping[str, Mapping[str, object]],
+        key: str,
+        now: str,
+        operation: str,
+        *,
+        objects: Sequence[Mapping[str, object]] = (),
+    ) -> None:
+        ledger_key = _durable_ledger_key(operation, key)
+        try:
+            if objects:
+                self._ledger.append_a1_bundle(
+                    objects=objects,
+                    projections=states,
+                    idempotency_key=ledger_key,
+                    event_at=now,
+                )
+            else:
+                self._ledger._advance_a1_projections(
+                    projections=states,
+                    idempotency_key=ledger_key,
+                    event_at=now,
+                )
+        except LedgerError as exc:
+            raise DiscoveryError("durable A1 transition failed closed") from exc
+
+    @staticmethod
+    def _active_durable_claim(
+        value: object,
+        *,
+        actor: str,
+        token: str,
+        now: datetime,
+        allow_acknowledged: bool = False,
+    ) -> _Claim:
+        if value is None:
+            raise DiscoveryError("proposal claim is missing")
+        claim = _claim_from_mapping(value)
+        if claim.expires_at <= now:
+            raise DiscoveryError("proposal claim expired")
+        if claim.actor != actor or not hmac.compare_digest(claim.token, token):
+            raise DiscoveryError("proposal claim is stale or transferred")
+        if claim.acknowledged and not allow_acknowledged:
+            raise DiscoveryError("proposal claim is already acknowledged")
+        return claim
+
+    @staticmethod
+    def _claim_response(event_ref: str, claim: _Claim) -> Mapping[str, object]:
+        return {
+            "material_event_ref": event_ref,
+            "claim_token": claim.token,
+            "generation": claim.generation,
+            "expires_at": _format_timestamp(claim.expires_at),
+            "acknowledged": claim.acknowledged,
+        }
+
+    def _project_candidate(
+        self,
+        event: Mapping[str, object],
+        body: Mapping[str, object],
+        *,
+        issued_at: str,
+        model_call_ref: str,
+        critique_call_ref: str,
+    ) -> Mapping[str, object]:
+        event_payload = event["payload"]
+        identity = canonical_json_sha256(
+            {
+                "candidate_id": body["candidate_id"],
+                "draft_revision": body["draft_revision"],
+                "event_ref": event["object_id"],
+                "model_call_ref": model_call_ref,
+                "critique_call_ref": critique_call_ref,
+            }
+        )
+        payload = {
+            **_json_copy(body),
+            "event_ref": event["object_id"],
+            "root_event_ref": event_payload["root_event_ref"],
+            "vcs_identity": {
+                "repository_id": self._config.repository_id,
+                "head_sha": self._config.head_sha,
+                "base_sha": self._config.base_sha,
+                "worktree_clean": True,
+                "contract_catalog_sha256": self._kernel.core_catalog_sha256,
+                "a1_catalog_sha256": self._kernel.catalog_sha256,
+                "release_manifest_sha256": self._config.release_manifest_sha256,
+            },
+            "policy_sha256": event_payload["policy_sha256"],
+            "context_sha256": event_payload["context_sha256"],
+            "shadow_taint": event_payload["shadow_taint"],
+            "model_call_refs": [model_call_ref],
+            "critique_refs": [critique_call_ref],
+        }
+        candidate = {
+            "schema_id": "CandidateSpecDraft",
+            "schema_version": "1.0.0",
+            "object_id": f"candidate:{identity}",
+            "issued_at": issued_at,
+            "issuer": "proposal-ingestor",
+            "contour": "bridge",
+            "classification": event["classification"],
+            "payload": payload,
+            "integrity": {
+                "profile_id": "core-json-sha256-v1",
+                "payload_sha256": canonical_json_sha256(payload),
+                "parent_refs": [
+                    f"event:{event['object_id']}", model_call_ref, critique_call_ref
+                ],
+            },
+        }
+        return _deep_freeze(candidate)
+
+
+def _empty_durable_states() -> dict[str, dict[str, object]]:
+    return {
+        "material_events": {
+            "state_version": _DURABLE_STATE_VERSION,
+            "events": {},
+            "exact_keys": [],
+            "source_replays": {},
+            "claims": {},
+            "claim_replays": {},
+            "ack_replays": {},
+        },
+        "candidates": {
+            "state_version": _DURABLE_STATE_VERSION,
+            "proposals": {},
+            "proposal_replays": {},
+            "feedback_used": {},
+        },
+        "admissions": {"state_version": _DURABLE_STATE_VERSION, "entries": {}},
+        "capabilities": {"state_version": _DURABLE_STATE_VERSION, "entries": {}},
+    }
+
+
+def _validate_durable_states(
+    states: Mapping[str, Mapping[str, object]], ledger: JobLedger
+) -> None:
+    expected = _empty_durable_states()
+    if set(states) != _DURABLE_PROJECTION_NAMES:
+        raise DiscoveryError("durable A1 projection names are invalid")
+    for name, state in states.items():
+        if set(state) != set(expected[name]) or state.get("state_version") != _DURABLE_STATE_VERSION:
+            raise DiscoveryError("durable A1 projection shape is invalid")
+    material = states["material_events"]
+    candidates = states["candidates"]
+    mapping_fields = (
+        (material, "events"),
+        (material, "source_replays"),
+        (material, "claims"),
+        (material, "claim_replays"),
+        (material, "ack_replays"),
+        (candidates, "proposals"),
+        (candidates, "proposal_replays"),
+        (candidates, "feedback_used"),
+        (states["admissions"], "entries"),
+        (states["capabilities"], "entries"),
+    )
+    for parent, field in mapping_fields:
+        value = parent[field]
+        if not isinstance(value, dict) or len(value) > _DURABLE_ENTRY_LIMIT:
+            raise DiscoveryError("durable A1 projection capacity or shape is invalid")
+    exact_keys = material["exact_keys"]
+    if (
+        not isinstance(exact_keys, list)
+        or len(exact_keys) > _DURABLE_ENTRY_LIMIT
+        or len(exact_keys) != len(set(exact_keys))
+    ):
+        raise DiscoveryError("durable exact-key projection is invalid")
+    for digest in exact_keys:
+        _sha256("durable exact key", digest)
+    for event_ref, event in material["events"].items():
+        if (
+            not isinstance(event, dict)
+            or event.get("object_id") != event_ref
+            or event.get("schema_id") != "MaterialEvent"
+        ):
+            raise DiscoveryError("durable material event projection is invalid")
+        try:
+            stored = ledger.read_a1_object(event_ref)
+        except LedgerError as exc:
+            raise DiscoveryError("durable material event object is missing") from exc
+        if canonical_json_sha256(stored) != canonical_json_sha256(event):
+            raise DiscoveryError("durable material event projection diverged")
+    for event_ref, claim in material["claims"].items():
+        if event_ref not in material["events"]:
+            raise DiscoveryError("durable claim references an unknown event")
+        _claim_from_mapping(claim)
+    for event_ref, record in candidates["proposals"].items():
+        if event_ref not in material["events"]:
+            raise DiscoveryError("durable proposal references an unknown event")
+        record = _replay_record(record, "durable proposal")
+        response = record["response"]
+        if not isinstance(response, dict):
+            raise DiscoveryError("durable proposal response is invalid")
+        candidate = response.get("candidate_spec_draft")
+        if not isinstance(candidate, dict) or candidate.get("schema_id") != "CandidateSpecDraft":
+            raise DiscoveryError("durable candidate projection is invalid")
+        try:
+            stored = ledger.read_a1_object(candidate["object_id"])
+        except LedgerError as exc:
+            raise DiscoveryError("durable candidate object is missing") from exc
+        if canonical_json_sha256(stored) != canonical_json_sha256(candidate):
+            raise DiscoveryError("durable candidate projection diverged")
+    for parent, field in (
+        (material, "source_replays"),
+        (material, "claim_replays"),
+        (material, "ack_replays"),
+        (candidates, "proposal_replays"),
+    ):
+        for record in parent[field].values():
+            _replay_record(record, f"durable {field}")
+    for event_ref, used in candidates["feedback_used"].items():
+        if event_ref not in material["events"] or type(used) is not int or used < 0:
+            raise DiscoveryError("durable feedback projection is invalid")
+
+
+def _replay_record(value: object, label: str) -> Mapping[str, object]:
+    if not isinstance(value, dict) or set(value) != {"request_sha256", "response"}:
+        raise DiscoveryError(f"{label} record is invalid")
+    _sha256(f"{label}.request_sha256", value["request_sha256"])
+    if not isinstance(value["response"], dict):
+        raise DiscoveryError(f"{label}.response is invalid")
+    return value
+
+
+def _durable_replay(
+    records: object,
+    key: str,
+    request_sha256: str,
+    label: str,
+) -> Mapping[str, object] | None:
+    if not isinstance(records, dict):
+        raise DiscoveryError(f"{label} replay projection is invalid")
+    value = records.get(key)
+    if value is None:
+        return None
+    record = _replay_record(value, f"{label} replay")
+    if not hmac.compare_digest(record["request_sha256"], request_sha256):
+        raise DiscoveryError(f"{label} idempotency key was reused")
+    return _deep_freeze(_json_copy(record["response"]))
+
+
+def _bounded_insert(
+    target: object, key: str, value: object, label: str
+) -> None:
+    if not isinstance(target, dict):
+        raise DiscoveryError(f"{label} projection is invalid")
+    if key not in target and len(target) >= _DURABLE_ENTRY_LIMIT:
+        raise DiscoveryError(f"{label} projection capacity is exhausted")
+    target[key] = _json_copy(value)
+
+
+def _claim_to_mapping(claim: _Claim) -> dict[str, object]:
+    return {
+        "actor": claim.actor,
+        "token": claim.token,
+        "generation": claim.generation,
+        "expires_at": _format_timestamp(claim.expires_at),
+        "acknowledged": claim.acknowledged,
+    }
+
+
+def _claim_from_mapping(value: object) -> _Claim:
+    mapping = _exact_mapping(
+        value,
+        frozenset({"actor", "token", "generation", "expires_at", "acknowledged"}),
+        "durable claim",
+    )
+    actor = _text("durable claim.actor", mapping["actor"], maximum=256)
+    token = _sha256("durable claim.token", mapping["token"])
+    generation = _positive_integer("durable claim.generation", mapping["generation"])
+    expires_at = _timestamp("durable claim.expires_at", mapping["expires_at"])
+    if type(mapping["acknowledged"]) is not bool:
+        raise DiscoveryError("durable claim.acknowledged must be boolean")
+    return _Claim(actor, token, generation, expires_at, mapping["acknowledged"])
+
+
+def _durable_ledger_key(operation: str, idempotency_key: str) -> str:
+    digest = hashlib.sha256(idempotency_key.encode("utf-8")).hexdigest()
+    return f"durable-discovery:{operation}:{digest}"
+
+
 class FreezeProjector:
     """Project one validated-looking candidate without issuing domain objects.
 
@@ -1161,8 +1873,10 @@ __all__ = [
     "DiscoveryError",
     "ParserLimits",
     "DiscoveryFixtureConfig",
+    "DurableDiscoveryConfig",
     "StrictProposalParser",
     "DiscoveryFixtureService",
+    "DurableDiscoveryService",
     "FreezeProjectionConfig",
     "FreezeProjection",
     "FreezeProjector",

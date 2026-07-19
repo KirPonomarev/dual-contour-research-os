@@ -27,9 +27,11 @@ try:
 except ImportError:  # pragma: no cover - the runtime is explicitly Unix-only
     fcntl = None  # type: ignore[assignment]
 
+from .admission import A1AdmissionKernel, canonical_json_sha256
 from .authority import PinnedOfflineAuthority, TrustedIssuer
 from .cas import ContentAddressedStore
 from .control import ControlRouter
+from .discovery import DurableDiscoveryConfig, DurableDiscoveryService
 from .execution import OfflineExecutionCoordinator
 from .ingestion import TrustedIngestor
 from .ipc import (
@@ -293,6 +295,7 @@ class ResearchDaemon:
         artifact_quota_bytes: int = _DEFAULT_QUOTA_BYTES,
         maximum_input_bytes: int = _DEFAULT_MAXIMUM_INPUT_BYTES,
         deadline_seconds: float = 5.0,
+        contract_root: str | Path | None = None,
         clock: Callable[[], datetime] | None = None,
         credential_resolver: Callable[[Any], PeerCredentials] = resolve_peer_credentials,
     ) -> None:
@@ -350,6 +353,25 @@ class ResearchDaemon:
         self._artifact_quota_bytes = artifact_quota_bytes
         self._maximum_input_bytes = maximum_input_bytes
         self._deadline_seconds = deadline_seconds
+        if (
+            contract_root is not None
+            and (
+                isinstance(contract_root, bytes)
+                or not isinstance(contract_root, (str, Path))
+            )
+        ):
+            raise ResearchdError("contract_root is invalid")
+        default_contract_root = Path(__file__).resolve().parents[2] / "contracts"
+        selected_contract_root = (
+            default_contract_root if contract_root is None else Path(contract_root)
+        )
+        if (
+            not str(selected_contract_root)
+            or "\x00" in str(selected_contract_root)
+            or ".." in selected_contract_root.parts
+        ):
+            raise ResearchdError("contract_root is invalid")
+        self._contract_root = selected_contract_root
         self._clock = clock or (lambda: datetime.now(timezone.utc))
         self._credential_resolver = credential_resolver
 
@@ -364,6 +386,7 @@ class ResearchDaemon:
         self._checkpoint_store: ContentAddressedStore | None = None
         self._artifact_store: ContentAddressedStore | None = None
         self._coordinator: OfflineExecutionCoordinator | None = None
+        self._a1_backend: DurableDiscoveryService | None = None
         self._server: UnixControlServer | None = None
         self._started = False
 
@@ -421,8 +444,29 @@ class ResearchDaemon:
                     ingestor,
                     issuer_id="researchd",
                 )
+                a1_backend: DurableDiscoveryService | None = None
+                if self._a1_enabled:
+                    discovery_config = _discovery_config_from_authority(
+                        self._authority,
+                        frozen_bindings=self._frozen_bindings,
+                        a1_limits=self._a1_limits,
+                        principal_roles=self._principal_roles,
+                        now=self._clock(),
+                    )
+                    kernel = A1AdmissionKernel(
+                        self._contract_root,
+                        expected_a1_catalog_sha256=_A1_CATALOG_SHA256,
+                        expected_core_catalog_sha256=_CORE_CATALOG_SHA256,
+                    )
+                    a1_backend = DurableDiscoveryService(
+                        kernel,
+                        ledger,
+                        discovery_config,
+                    )
+                    self._a1_backend = a1_backend
                 router = ControlRouter(
                     self,
+                    a1_backend=a1_backend,
                     authority=self._authority,
                     clock=self._clock,
                 )
@@ -607,6 +651,7 @@ class ResearchDaemon:
             ledger.close()
 
         self._coordinator = None
+        self._a1_backend = None
         self._fence_ledger = None
         self._input_store = None
         self._checkpoint_store = None
@@ -1152,6 +1197,108 @@ def _a1_limits(
     if daily["max_cost_units"] < cycle["max_cost_units"]:
         raise _ServiceConfigError("daily cost limit is below cycle limit")
     return MappingProxyType({"cycle_limits": cycle, "daily_limits": daily})
+
+
+def _discovery_config_from_authority(
+    authority: PinnedOfflineAuthority,
+    *,
+    frozen_bindings: Mapping[str, object] | None,
+    a1_limits: Mapping[str, object] | None,
+    principal_roles: Mapping[int, str],
+    now: datetime,
+) -> DurableDiscoveryConfig:
+    """Derive discovery trust only from already-frozen runtime inputs."""
+
+    if not isinstance(frozen_bindings, Mapping) or not isinstance(a1_limits, Mapping):
+        raise ResearchdError("A1 discovery requires frozen runtime bindings")
+    policy_sha256 = frozen_bindings.get("policy_sha256")
+    if not _is_sha256(policy_sha256):
+        raise ResearchdError("A1 discovery policy binding is invalid")
+    try:
+        authority.verify_policy_binding(policy_sha256, now=now)
+        # The resolver was fully copied and verified by PinnedOfflineAuthority;
+        # no caller-controlled document is accepted at this boundary.
+        policy = authority._resolve_policy(policy_sha256)  # type: ignore[attr-defined]
+    except Exception as exc:
+        raise ResearchdError("A1 discovery policy is unavailable") from exc
+    payload = policy.get("payload")
+    if not isinstance(payload, Mapping):
+        raise ResearchdError("A1 discovery policy payload is invalid")
+    covered = payload.get("covered_action_classes")
+    required_actions = {"source_trigger_materialization", "scout_proposal"}
+    if not isinstance(covered, (list, tuple)) or not required_actions.issubset(covered):
+        raise ResearchdError("A1 discovery actions are not policy-covered")
+    allow_rules = payload.get("allow_rules")
+    origins: set[str] = set()
+    if isinstance(allow_rules, (list, tuple)):
+        for rule in allow_rules:
+            if isinstance(rule, Mapping):
+                value = rule.get("data_origin")
+                if isinstance(value, (list, tuple)):
+                    origins.update(item for item in value if isinstance(item, str))
+    if not {"public", "already_registered"}.issubset(origins):
+        raise ResearchdError("A1 discovery source origins are not policy-covered")
+
+    source_repo = _text(
+        "policy.payload.source_repo", payload.get("source_repo"), maximum=256
+    )
+    commit_sha = _text(
+        "policy.payload.commit_sha", payload.get("commit_sha"), maximum=40
+    )
+    if len(commit_sha) != 40 or any(character not in _HEX_DIGITS for character in commit_sha):
+        raise ResearchdError("A1 discovery policy commit is invalid")
+    classification_value = policy.get("classification")
+    classification = {
+        "D0_PUBLIC": "D0",
+        "D1_INTERNAL_SANITIZED": "D1",
+    }.get(classification_value)
+    if classification is None:
+        raise ResearchdError("A1 discovery accepts only D0/D1 policy state")
+    cycle = a1_limits.get("cycle_limits")
+    if not isinstance(cycle, Mapping):
+        raise ResearchdError("A1 discovery cycle limits are invalid")
+    energy = {
+        "wall_seconds": cycle.get("max_wall_seconds"),
+        "cpu_seconds": cycle.get("max_cpu_seconds"),
+        "memory_mib": cycle.get("max_memory_mib"),
+        "output_bytes": cycle.get("max_output_bytes"),
+        "tokens": cycle.get("max_tokens"),
+        "cost_units": cycle.get("max_cost_units"),
+    }
+    collectors = {
+        f"collector:uid:{uid}": f"collector:uid:{uid}"
+        for uid, role in principal_roles.items()
+        if role == "collector"
+    }
+    if len(collectors) != 1:
+        raise ResearchdError("A1 discovery requires exactly one collector principal")
+    context_sha256 = canonical_json_sha256(
+        {
+            "a1_limits": a1_limits,
+            "core_catalog_sha256": frozen_bindings.get("core_catalog_sha256"),
+            "a1_catalog_sha256": frozen_bindings.get("a1_catalog_sha256"),
+            "release_manifest_sha256": frozen_bindings.get("release_manifest_sha256"),
+            "policy_sha256": policy_sha256,
+        }
+    )
+    try:
+        return DurableDiscoveryConfig(
+            policy_sha256=policy_sha256,
+            context_sha256=context_sha256,
+            classification=classification,
+            root_energy=energy,
+            remaining_energy=energy,
+            allowed_source_prefixes=("public:", "registered:"),
+            collector_bindings=collectors,
+            repository_id=source_repo,
+            head_sha=commit_sha,
+            base_sha=commit_sha,
+            release_manifest_sha256=str(
+                frozen_bindings.get("release_manifest_sha256")
+            ),
+        )
+    except Exception as exc:
+        raise ResearchdError("A1 discovery runtime binding is invalid") from exc
 
 
 def _bounded_limit_map(
