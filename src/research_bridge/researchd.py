@@ -63,6 +63,7 @@ from .validation import DeterministicL0Validator
 
 
 _ROOT_MODE = 0o700
+_RUNTIME_ROOT_MODES = frozenset({_ROOT_MODE, 0o710})
 _LOCK_MODE = 0o600
 _DEFAULT_QUOTA_BYTES = 16 * 1024 * 1024
 _DEFAULT_MAXIMUM_INPUT_BYTES = 4 * 1024 * 1024
@@ -1303,7 +1304,7 @@ def _verify_l0_validator_source() -> None:
 
 
 def _open_runtime_root(root: Path) -> tuple[int, tuple[int, int]]:
-    _validate_private_directory(root, "runtime root")
+    _validate_runtime_root_directory(root)
     if not hasattr(os, "O_DIRECTORY") or not hasattr(os, "O_NOFOLLOW"):
         raise ResearchdError("platform cannot enforce runtime root ownership")
     flags = os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW
@@ -1320,7 +1321,7 @@ def _open_runtime_root(root: Path) -> tuple[int, tuple[int, int]]:
             raise ResearchdError("runtime root identity changed during open")
         if (
             not stat.S_ISDIR(opened.st_mode)
-            or stat.S_IMODE(opened.st_mode) != _ROOT_MODE
+            or stat.S_IMODE(opened.st_mode) not in _RUNTIME_ROOT_MODES
             or opened.st_uid != os.geteuid()
         ):
             raise ResearchdError("runtime root ownership or mode is invalid")
@@ -1342,7 +1343,7 @@ def _verify_runtime_root(
         or (current.st_dev, current.st_ino) != identity
         or not stat.S_ISDIR(current.st_mode)
         or stat.S_ISLNK(current.st_mode)
-        or stat.S_IMODE(current.st_mode) != _ROOT_MODE
+        or stat.S_IMODE(current.st_mode) not in _RUNTIME_ROOT_MODES
         or current.st_uid != os.geteuid()
     ):
         raise ResearchdError("runtime root changed before socket bind")
@@ -1387,6 +1388,22 @@ def _private_directory(path: Path) -> None:
     except OSError as exc:
         raise ResearchdError("private runtime directory cannot be initialized") from exc
     _validate_private_directory(path, "private runtime directory")
+
+
+def _validate_runtime_root_directory(path: Path) -> None:
+    """Allow only private ownership or group traversal to the 0660 socket."""
+
+    try:
+        metadata = os.lstat(path)
+    except OSError as exc:
+        raise ResearchdError("runtime root is unavailable") from exc
+    if (
+        stat.S_ISLNK(metadata.st_mode)
+        or not stat.S_ISDIR(metadata.st_mode)
+        or stat.S_IMODE(metadata.st_mode) not in _RUNTIME_ROOT_MODES
+        or metadata.st_uid != os.geteuid()
+    ):
+        raise ResearchdError("runtime root ownership or mode is invalid")
 
 
 def _validate_private_directory(path: Path, label: str) -> None:
