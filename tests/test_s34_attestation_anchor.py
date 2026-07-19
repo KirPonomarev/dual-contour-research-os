@@ -29,6 +29,7 @@ REGISTRY_SHA256 = "f85e71a3e472b431d50379a3f6789ea6fb526ade63b87329d119cca3b5d96
 ATTESTATION_PATH = (
     ROOT / "docs" / "receipts" / "attestation" / "e3-evolution-shadow.attestation.json"
 )
+ANCHOR_PATH = ROOT / "docs" / "receipts" / "attestation" / "e3-evolution-shadow.anchor.json"
 SIGNED_AT = "2026-07-19T00:40:00Z"
 EXPIRES_AT = "2026-08-01T00:40:00Z"
 VERIFY_AT = "2026-07-20T00:40:00Z"
@@ -131,6 +132,15 @@ def test_frozen_public_attestation_verifies_offline_and_waits_for_anchor() -> No
     assert result.status == "WAIT_ANCHOR"
     assert result.signature_verified and not result.anchor_verified
     assert result.grants_authority is False
+
+    anchor = json.loads(ANCHOR_PATH.read_text(encoding="ascii"))
+    anchored = verify_attestation(
+        policy, registry, RECEIPT_PATH.read_bytes(), attestation, now=VERIFY_AT,
+        anchor=anchor, repository_root=ROOT,
+    )
+    assert anchored.status == "VERIFIED_AND_ANCHORED"
+    assert anchored.signature_verified and anchored.anchor_verified
+    assert anchored.grants_authority is False
 
 
 def test_signature_substitution_and_expiry_fail_closed(tmp_path: Path) -> None:
