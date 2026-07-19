@@ -1,0 +1,7 @@
+{
+  "profile_id": "recipient-shadow-evaluation-v1", "schema_version": "1.0.0", "status": "frozen-synthetic-recipient-benchmark",
+  "method_policy_sha256": "ecbf5578f85d50b9cdf53f5bead12f00a27c9500474faf50860d952408188628",
+  "benchmark": {"benchmark_id": "recipient-shadow-synthetic-v1", "case_ids": ["CASE_EDGE", "CASE_NEGATIVE", "CASE_STANDARD", "CASE_STRESS"], "case_set_sha256": "6696c070a869fc21f1706d1b47f7bd65ca4ad14a088aac21624ca371a77e9412", "minimum_paired_cases": 4, "score_min": 0, "score_max": 1000},
+  "states": ["POSITIVE_SHADOW_EFFECT_NOT_ADOPTED", "NEGATIVE_TRANSFER", "NOT_ESTABLISHED", "REJECTED_POISONED_MEMORY", "REJECTED_CONFOUND", "REJECTED_BOUNDARY"],
+  "invariants": {"synthetic_D0_only": true, "paired_control_treatment": true, "exact_context_binding": true, "poison_can_promote": false, "recipient_registry_writes": 0, "canonical_adoption": false, "automatic_promotion": false, "rollback_is_proposal_only": true, "grants_authority": false}
+}
