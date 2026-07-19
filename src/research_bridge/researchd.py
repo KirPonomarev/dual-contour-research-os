@@ -19,6 +19,7 @@ import signal
 import stat
 import sys
 import threading
+from types import MappingProxyType
 from typing import Any, TextIO
 
 try:
@@ -50,8 +51,9 @@ _CONFIG_MODE = 0o600
 _MAX_CONFIG_BYTES = 262_144
 _MAX_CONFIG_QUOTA_BYTES = 1 << 40
 _SERVICE_SCHEMA_ID = "ResearchdServiceConfig"
-_SERVICE_SCHEMA_VERSION = "1.0.0"
-_CONFIG_KEYS = frozenset(
+_LEGACY_SERVICE_SCHEMA_VERSION = "1.0.0"
+_A1_SERVICE_SCHEMA_VERSION = "1.1.0"
+_LEGACY_CONFIG_KEYS = frozenset(
     {
         "schema_id",
         "schema_version",
@@ -68,6 +70,49 @@ _CONFIG_KEYS = frozenset(
         "approval_receipts",
     }
 )
+_A1_DISABLED_CONFIG_KEYS = _LEGACY_CONFIG_KEYS | frozenset({"a1_enabled"})
+_A1_ENABLED_CONFIG_KEYS = _A1_DISABLED_CONFIG_KEYS | frozenset(
+    {"principal_roles", "frozen_bindings", "a1_limits"}
+)
+_FROZEN_BINDING_KEYS = frozenset(
+    {
+        "core_catalog_sha256",
+        "a1_catalog_sha256",
+        "release_manifest_sha256",
+        "policy_sha256",
+        "ipc_compatibility_profile_sha256",
+        "executor_capability_refs",
+        "evaluator_capability_refs",
+    }
+)
+_PRINCIPAL_ROLES = frozenset({"operator", "collector", "scout"})
+_A1_REQUIRED_ROLES = frozenset({"operator", "collector", "scout"})
+_CORE_CATALOG_SHA256 = "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50"
+_A1_CATALOG_SHA256 = "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1"
+_IPC_COMPATIBILITY_PROFILE_SHA256 = (
+    "c9cdd8c51616ac843a6729166b6f21c9a44de24fac7559b86f842c7e1930ba04"
+)
+_MAX_CONFIG_UIDS = 16
+_MAX_CONFIG_UID = 2_147_483_647
+_MAX_CAPABILITY_REFS = 32
+_A1_LIMIT_KEYS = frozenset({"cycle_limits", "daily_limits"})
+_A1_CYCLE_LIMITS = {
+    "max_admitted_experiments": 4,
+    "max_model_calls": 12,
+    "max_wall_seconds": 7200,
+    "max_cpu_seconds": 14400,
+    "max_memory_mib": 8192,
+    "max_output_bytes": 1_073_741_824,
+    "max_tokens": 200_000,
+    "max_cost_units": 100,
+}
+_A1_DAILY_LIMITS = {
+    "max_admitted_experiments": 16,
+    "max_model_calls": 64,
+    "max_wall_seconds": 28_800,
+    "max_tokens": 800_000,
+    "max_cost_units": 400,
+}
 _TRUSTED_SCHEMAS = frozenset(
     {
         "JobSpec",
@@ -139,6 +184,10 @@ class _ServiceConfig:
         runtime_root: str,
         authority: PinnedOfflineAuthority,
         allowed_uids: tuple[int, ...],
+        principal_roles: Mapping[int, str],
+        a1_enabled: bool,
+        frozen_bindings: Mapping[str, object] | None,
+        a1_limits: Mapping[str, object] | None,
         runner_identity: str,
         input_quota_bytes: int,
         checkpoint_quota_bytes: int,
@@ -149,6 +198,10 @@ class _ServiceConfig:
         self.runtime_root = runtime_root
         self.authority = authority
         self.allowed_uids = allowed_uids
+        self.principal_roles = MappingProxyType(dict(principal_roles))
+        self.a1_enabled = a1_enabled
+        self.frozen_bindings = frozen_bindings
+        self.a1_limits = a1_limits
         self.runner_identity = runner_identity
         self.input_quota_bytes = input_quota_bytes
         self.checkpoint_quota_bytes = checkpoint_quota_bytes
@@ -230,6 +283,10 @@ class ResearchDaemon:
         *,
         authority: PinnedOfflineAuthority,
         allowed_uids: Iterable[int],
+        principal_roles: Mapping[int, str] | None = None,
+        a1_enabled: bool = False,
+        frozen_bindings: Mapping[str, object] | None = None,
+        a1_limits: Mapping[str, object] | None = None,
         runner_identity: str,
         input_quota_bytes: int = _DEFAULT_QUOTA_BYTES,
         checkpoint_quota_bytes: int = _DEFAULT_QUOTA_BYTES,
@@ -250,6 +307,21 @@ class ResearchDaemon:
             raise ResearchdError("allowed_uids must be an iterable") from exc
         if not allowed or any(type(uid) is not int or uid < 0 for uid in allowed):
             raise ResearchdError("allowed_uids must contain non-negative integers")
+        if type(a1_enabled) is not bool:
+            raise ResearchdError("a1_enabled must be boolean")
+        roles = _runtime_principal_roles(
+            allowed,
+            principal_roles=principal_roles,
+            a1_enabled=a1_enabled,
+        )
+        if a1_enabled and not isinstance(frozen_bindings, Mapping):
+            raise ResearchdError("A1 runtime requires frozen bindings")
+        if a1_enabled and not isinstance(a1_limits, Mapping):
+            raise ResearchdError("A1 runtime requires bounded limits")
+        if not a1_enabled and frozen_bindings is not None:
+            raise ResearchdError("disabled A1 runtime cannot carry frozen bindings")
+        if not a1_enabled and a1_limits is not None:
+            raise ResearchdError("disabled A1 runtime cannot carry A1 limits")
         for name, value in (
             ("input_quota_bytes", input_quota_bytes),
             ("checkpoint_quota_bytes", checkpoint_quota_bytes),
@@ -266,6 +338,10 @@ class ResearchDaemon:
         self._root = root
         self._authority = authority
         self._allowed_uids = allowed
+        self._principal_roles = roles
+        self._a1_enabled = a1_enabled
+        self._frozen_bindings = frozen_bindings
+        self._a1_limits = a1_limits
         self._runner_identity = _text(
             "runner_identity", runner_identity, maximum=256
         )
@@ -354,6 +430,7 @@ class ResearchDaemon:
                     self.socket_path,
                     router,
                     allowed_uids=self._allowed_uids,
+                    principal_roles=self._principal_roles,
                     deadline_seconds=self._deadline_seconds,
                     credential_resolver=self._credential_resolver,
                 )
@@ -731,7 +808,6 @@ def _service_config_from_path(config_path: str) -> _ServiceConfig:
     _ensure_finite_json(decoded)
     if not isinstance(decoded, dict):
         raise _ServiceConfigError("config must be an object")
-    _expect_config_keys(decoded, _CONFIG_KEYS, "config")
     return _service_config_from_mapping(decoded)
 
 
@@ -811,16 +887,63 @@ def _ensure_finite_json(value: object) -> None:
 
 
 def _service_config_from_mapping(config: Mapping[str, object]) -> _ServiceConfig:
+    config_keys = set(config)
+    if config_keys == _LEGACY_CONFIG_KEYS:
+        config_mode = "legacy"
+    elif config_keys == _A1_DISABLED_CONFIG_KEYS:
+        config_mode = "a1-disabled"
+    elif config_keys == _A1_ENABLED_CONFIG_KEYS:
+        config_mode = "a1-enabled"
+    else:
+        raise _ServiceConfigError("config shape is invalid")
     if config.get("schema_id") != _SERVICE_SCHEMA_ID:
         raise _ServiceConfigError("config schema id is invalid")
-    if config.get("schema_version") != _SERVICE_SCHEMA_VERSION:
+    expected_version = (
+        _LEGACY_SERVICE_SCHEMA_VERSION
+        if config_mode == "legacy"
+        else _A1_SERVICE_SCHEMA_VERSION
+    )
+    if config.get("schema_version") != expected_version:
         raise _ServiceConfigError("config schema version is invalid")
 
     runtime_root = _config_text(config.get("runtime_root"), "runtime_root", maximum=4096)
     runner_identity = _config_text(
         config.get("runner_identity"), "runner_identity", maximum=256
     )
-    allowed_uids = _allowed_uids(config.get("allowed_uids"))
+    allowed_uids = _allowed_uids(
+        config.get("allowed_uids"),
+        legacy=config_mode != "a1-enabled",
+    )
+    if config_mode == "a1-enabled":
+        a1_enabled = _config_bool(config.get("a1_enabled"), "a1_enabled")
+        if not a1_enabled:
+            raise _ServiceConfigError("full A1 config requires a1_enabled")
+        principal_roles = _principal_roles(
+            config.get("principal_roles"),
+            allowed_uids=allowed_uids,
+            a1_enabled=a1_enabled,
+        )
+        frozen_bindings = _frozen_bindings(
+            config.get("frozen_bindings"),
+            a1_enabled=a1_enabled,
+            policy_snapshots=config.get("policy_snapshots"),
+        )
+        a1_limits = _a1_limits(
+            config.get("a1_limits"),
+            a1_enabled=a1_enabled,
+        )
+    elif config_mode == "a1-disabled":
+        a1_enabled = _config_bool(config.get("a1_enabled"), "a1_enabled")
+        if a1_enabled:
+            raise _ServiceConfigError("enabled A1 config is incomplete")
+        principal_roles = MappingProxyType({uid: "operator" for uid in allowed_uids})
+        frozen_bindings = None
+        a1_limits = None
+    else:
+        a1_enabled = False
+        principal_roles = MappingProxyType({uid: "operator" for uid in allowed_uids})
+        frozen_bindings = None
+        a1_limits = None
     input_quota_bytes = _quota_bytes(config.get("input_quota_bytes"))
     checkpoint_quota_bytes = _quota_bytes(config.get("checkpoint_quota_bytes"))
     artifact_quota_bytes = _quota_bytes(config.get("artifact_quota_bytes"))
@@ -829,11 +952,23 @@ def _service_config_from_mapping(config: Mapping[str, object]) -> _ServiceConfig
         raise _ServiceConfigError("maximum input exceeds input quota")
     deadline_seconds = _deadline_seconds(config.get("deadline_seconds"))
     authority = _authority_from_config(config)
+    if frozen_bindings is not None:
+        try:
+            authority.verify_policy_binding(
+                str(frozen_bindings["policy_sha256"]),
+                now=datetime.now(timezone.utc),
+            )
+        except Exception as exc:
+            raise _ServiceConfigError("A1 policy binding is invalid") from exc
 
     return _ServiceConfig(
         runtime_root=runtime_root,
         authority=authority,
         allowed_uids=allowed_uids,
+        principal_roles=principal_roles,
+        a1_enabled=a1_enabled,
+        frozen_bindings=frozen_bindings,
+        a1_limits=a1_limits,
         runner_identity=runner_identity,
         input_quota_bytes=input_quota_bytes,
         checkpoint_quota_bytes=checkpoint_quota_bytes,
@@ -843,13 +978,198 @@ def _service_config_from_mapping(config: Mapping[str, object]) -> _ServiceConfig
     )
 
 
-def _allowed_uids(value: object) -> tuple[int, ...]:
-    if not isinstance(value, list) or len(value) != 1:
+def _allowed_uids(value: object, *, legacy: bool) -> tuple[int, ...]:
+    if not isinstance(value, list) or not value or len(value) > _MAX_CONFIG_UIDS:
         raise _ServiceConfigError("allowed uid set is invalid")
-    uid = value[0]
-    if type(uid) is not int or uid != os.geteuid():
+    if any(type(uid) is not int or not 0 <= uid <= _MAX_CONFIG_UID for uid in value):
         raise _ServiceConfigError("allowed uid set is invalid")
-    return (uid,)
+    if len(value) != len(set(value)):
+        raise _ServiceConfigError("allowed uid set is invalid")
+    if legacy and (len(value) != 1 or value[0] != os.geteuid()):
+        raise _ServiceConfigError("allowed uid set is invalid")
+    return tuple(sorted(value))
+
+
+def _principal_roles(
+    value: object,
+    *,
+    allowed_uids: tuple[int, ...],
+    a1_enabled: bool,
+) -> Mapping[int, str]:
+    if not isinstance(value, dict):
+        raise _ServiceConfigError("principal_roles must be an object")
+    roles: dict[int, str] = {}
+    for key, role in value.items():
+        if (
+            not isinstance(key, str)
+            or not key
+            or not key.isascii()
+            or not key.isdecimal()
+        ):
+            raise _ServiceConfigError("principal role UID is invalid")
+        uid = int(key)
+        if str(uid) != key or uid > _MAX_CONFIG_UID:
+            raise _ServiceConfigError("principal role UID is invalid")
+        if uid in roles or role not in _PRINCIPAL_ROLES:
+            raise _ServiceConfigError("principal role mapping is invalid")
+        roles[uid] = role
+    if set(roles) != set(allowed_uids):
+        raise _ServiceConfigError("principal roles must cover allowed UIDs exactly")
+    assigned = frozenset(roles.values())
+    if a1_enabled:
+        if assigned != _A1_REQUIRED_ROLES:
+            raise _ServiceConfigError("A1 principal role set is incomplete")
+    elif assigned != {"operator"}:
+        raise _ServiceConfigError("disabled A1 config must be operator-only")
+    return MappingProxyType(roles)
+
+
+def _runtime_principal_roles(
+    allowed_uids: frozenset[int],
+    *,
+    principal_roles: Mapping[int, str] | None,
+    a1_enabled: bool,
+) -> Mapping[int, str]:
+    if principal_roles is None:
+        roles = {uid: "operator" for uid in allowed_uids}
+    elif isinstance(principal_roles, Mapping):
+        roles = dict(principal_roles)
+    else:
+        raise ResearchdError("principal_roles must map verified UIDs to roles")
+    if set(roles) != set(allowed_uids):
+        raise ResearchdError("principal_roles must cover exactly the allowed UIDs")
+    if any(
+        type(uid) is not int or role not in _PRINCIPAL_ROLES
+        for uid, role in roles.items()
+    ):
+        raise ResearchdError("principal_roles contains an invalid principal")
+    assigned = frozenset(roles.values())
+    if a1_enabled and assigned != _A1_REQUIRED_ROLES:
+        raise ResearchdError("A1 principal role set is incomplete")
+    if not a1_enabled and assigned != {"operator"}:
+        raise ResearchdError("disabled A1 runtime must be operator-only")
+    return MappingProxyType(roles)
+
+
+def _frozen_bindings(
+    value: object,
+    *,
+    a1_enabled: bool,
+    policy_snapshots: object,
+) -> Mapping[str, object] | None:
+    if not a1_enabled:
+        if value is not None:
+            raise _ServiceConfigError("disabled A1 config cannot carry frozen bindings")
+        return None
+    if not isinstance(value, dict):
+        raise _ServiceConfigError("A1 frozen bindings must be an object")
+    _expect_config_keys(value, _FROZEN_BINDING_KEYS, "frozen_bindings")
+    for name in (
+        "core_catalog_sha256",
+        "a1_catalog_sha256",
+        "release_manifest_sha256",
+        "policy_sha256",
+        "ipc_compatibility_profile_sha256",
+    ):
+        if not _is_sha256(value.get(name)):
+            raise _ServiceConfigError("frozen binding digest is invalid")
+    if value["core_catalog_sha256"] != _CORE_CATALOG_SHA256:
+        raise _ServiceConfigError("Core catalog binding is stale")
+    if value["a1_catalog_sha256"] != _A1_CATALOG_SHA256:
+        raise _ServiceConfigError("A1 catalog binding is stale")
+    if value["ipc_compatibility_profile_sha256"] != _IPC_COMPATIBILITY_PROFILE_SHA256:
+        raise _ServiceConfigError("IPC compatibility profile binding is stale")
+    if not isinstance(policy_snapshots, dict) or set(policy_snapshots) != {
+        value["policy_sha256"]
+    }:
+        raise _ServiceConfigError("A1 policy resolver binding is mixed or empty")
+    executor_refs = _capability_refs(
+        value.get("executor_capability_refs"), "executor capability ref"
+    )
+    evaluator_refs = _capability_refs(
+        value.get("evaluator_capability_refs"), "evaluator capability ref"
+    )
+    return MappingProxyType(
+        {
+            "core_catalog_sha256": value["core_catalog_sha256"],
+            "a1_catalog_sha256": value["a1_catalog_sha256"],
+            "release_manifest_sha256": value["release_manifest_sha256"],
+            "policy_sha256": value["policy_sha256"],
+            "ipc_compatibility_profile_sha256": value[
+                "ipc_compatibility_profile_sha256"
+            ],
+            "executor_capability_refs": executor_refs,
+            "evaluator_capability_refs": evaluator_refs,
+        }
+    )
+
+
+def _capability_refs(value: object, label: str) -> tuple[str, ...]:
+    if not isinstance(value, list) or not value or len(value) > _MAX_CAPABILITY_REFS:
+        raise _ServiceConfigError("capability refs are invalid")
+    refs = tuple(_config_text(item, label, maximum=512) for item in value)
+    if len(refs) != len(set(refs)):
+        raise _ServiceConfigError("capability refs are invalid")
+    return refs
+
+
+def _config_bool(value: object, label: str) -> bool:
+    if type(value) is not bool:
+        raise _ServiceConfigError(f"{label} must be boolean")
+    return value
+
+
+def _a1_limits(
+    value: object,
+    *,
+    a1_enabled: bool,
+) -> Mapping[str, object] | None:
+    if not a1_enabled:
+        if value is not None:
+            raise _ServiceConfigError("disabled A1 config cannot carry A1 limits")
+        return None
+    if not isinstance(value, dict):
+        raise _ServiceConfigError("A1 limits must be an object")
+    _expect_config_keys(value, _A1_LIMIT_KEYS, "a1_limits")
+    cycle = _bounded_limit_map(
+        value.get("cycle_limits"),
+        maximums=_A1_CYCLE_LIMITS,
+        label="cycle_limits",
+    )
+    daily = _bounded_limit_map(
+        value.get("daily_limits"),
+        maximums=_A1_DAILY_LIMITS,
+        label="daily_limits",
+    )
+    if daily["max_admitted_experiments"] < cycle["max_admitted_experiments"]:
+        raise _ServiceConfigError("daily admission limit is below cycle limit")
+    if daily["max_model_calls"] < cycle["max_model_calls"]:
+        raise _ServiceConfigError("daily model-call limit is below cycle limit")
+    if daily["max_wall_seconds"] < cycle["max_wall_seconds"]:
+        raise _ServiceConfigError("daily wall-time limit is below cycle limit")
+    if daily["max_tokens"] < cycle["max_tokens"]:
+        raise _ServiceConfigError("daily token limit is below cycle limit")
+    if daily["max_cost_units"] < cycle["max_cost_units"]:
+        raise _ServiceConfigError("daily cost limit is below cycle limit")
+    return MappingProxyType({"cycle_limits": cycle, "daily_limits": daily})
+
+
+def _bounded_limit_map(
+    value: object,
+    *,
+    maximums: Mapping[str, int],
+    label: str,
+) -> Mapping[str, int]:
+    if not isinstance(value, dict):
+        raise _ServiceConfigError(f"{label} must be an object")
+    _expect_config_keys(value, frozenset(maximums), label)
+    bounded: dict[str, int] = {}
+    for name, maximum in maximums.items():
+        item = value.get(name)
+        if type(item) is not int or not 0 < item <= maximum:
+            raise _ServiceConfigError(f"{label} exceeds the frozen policy")
+        bounded[name] = item
+    return MappingProxyType(bounded)
 
 
 def _quota_bytes(value: object) -> int:
@@ -1058,6 +1378,10 @@ def run(argv: Sequence[str] | None = None, *, stderr: TextIO | None = None) -> i
             service.runtime_root,
             authority=service.authority,
             allowed_uids=service.allowed_uids,
+            principal_roles=service.principal_roles,
+            a1_enabled=service.a1_enabled,
+            frozen_bindings=service.frozen_bindings,
+            a1_limits=service.a1_limits,
             runner_identity=service.runner_identity,
             input_quota_bytes=service.input_quota_bytes,
             checkpoint_quota_bytes=service.checkpoint_quota_bytes,

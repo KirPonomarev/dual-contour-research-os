@@ -1,0 +1,17 @@
+{
+  "lease_id": "lease-r01a-runtime-config-and-ipc-code-agent-1",
+  "stage_id": "r01a-runtime-config-and-ipc-code",
+  "agent_id": "agent-1",
+  "branch": "codex/bridge-a1-r01a-runtime-config-and-ipc-code",
+  "issued_at": "2026-07-19T05:20:05Z",
+  "expires_at": "2026-07-21T05:20:05Z",
+  "write_set": [
+    "src/research_bridge/researchd.py",
+    "src/research_bridge/authority.py",
+    "src/research_bridge/control.py",
+    "src/research_bridge/ipc.py",
+    "src/research_bridge/researchctl.py"
+  ],
+  "exclusive": true,
+  "revoked": false
+}

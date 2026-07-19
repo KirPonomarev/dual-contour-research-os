@@ -14,7 +14,8 @@ from .control import ControlError, ControlRequest
 from .ipc import IPCError, decode_message, encode_message
 
 
-_PROTOCOL_VERSION = "1.1"
+_DEFAULT_PROTOCOL_VERSION = "1.1"
+_PROTOCOL_VERSIONS = ("1.1", "1.2")
 _REQUEST_MAXIMUM_BYTES = 65_536
 _RESPONSE_MAXIMUM_BYTES = 262_144
 _DEADLINE_SECONDS = 5.0
@@ -88,6 +89,11 @@ def _parser() -> _Parser:
     parser = _Parser(prog="researchctl", add_help=True)
     parser.add_argument("--socket", dest="socket_path", required=True)
     parser.add_argument("--request-id")
+    parser.add_argument(
+        "--protocol-version",
+        choices=_PROTOCOL_VERSIONS,
+        default=_DEFAULT_PROTOCOL_VERSION,
+    )
     commands = parser.add_subparsers(dest="command", required=True)
 
     commands.add_parser("status")
@@ -139,7 +145,7 @@ def _request(arguments: argparse.Namespace, input_stream: TextIO) -> ControlRequ
         raise _LocalInputError("unsupported command")
 
     return ControlRequest(
-        version=_PROTOCOL_VERSION,
+        version=arguments.protocol_version,
         request_id=request_id,
         idempotency_key=idempotency_key,
         command=wire_command,
@@ -223,7 +229,7 @@ def _validate_success(
     if set(response) != _SUCCESS_KEYS:
         raise _TransportError("success response shape is invalid")
     if (
-        response.get("version") != _PROTOCOL_VERSION
+        response.get("version") != request.version
         or response.get("request_id") != request.request_id
         or response.get("command") != request.command
         or response.get("ok") is not True

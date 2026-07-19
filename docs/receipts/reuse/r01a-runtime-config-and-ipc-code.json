@@ -1,0 +1,62 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-r01a-runtime-config-and-ipc-code-20260719",
+  "issued_at": "2026-07-19T05:20:05Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "reuse-freeze-authority"
+  },
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "STRICT_RESEARCHD_CONFIG_AND_AUTHENTICATED_IPC_ROLE_WIRING",
+    "candidates": [
+      {
+        "candidate": "extend-existing-researchd-service-loader-PinnedOfflineAuthority-ControlRouter-and-UnixControlServer",
+        "disposition": "selected-internal-adapter"
+      },
+      {
+        "candidate": "reuse-frozen-IPC-1.1-1.2-profile-and-existing-OS-peer-credential-resolution",
+        "disposition": "selected"
+      },
+      {
+        "candidate": "new-auth-service-role-token-or-network-control-plane",
+        "disposition": "rejected-unnecessary-authority-and-attack-surface"
+      },
+      {
+        "candidate": "third-party-config-schema-or-IPC-dependency",
+        "disposition": "rejected-stdlib-and-existing-strict-parser-sufficient"
+      },
+      {
+        "candidate": "schema-or-ledger-migration",
+        "disposition": "rejected-out-of-scope-and-not-required-for-additive-existing-contract-wiring"
+      }
+    ],
+    "selected_mode": "minimal-additive-strict-config-fields-with-OS-verified-UID-to-role-map-fail-closed-A1-startup-gate-and-legacy-IPC-1.1-preservation",
+    "source_ref": "git:5dca29add2901d0876ce49fe1c727abf7ab8fc36;internal:researchd+authority+control+ipc+researchctl;contract:ipc-compatibility-v1",
+    "code_sha256": "03b68a645cddc10f69e93362333cdc0517bc1f57580a0ade2d46878eeb87c9b6",
+    "license_spdx": "NOASSERTION",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "strict-config-shape-and-bounds",
+      "a1-enabled-empty-policy-denial",
+      "principal-role-exact-coverage",
+      "unknown-uid-denial",
+      "role-command-matrix",
+      "IPC-1.1-operator-compatibility",
+      "IPC-1.2-collector-scout-routing",
+      "mixed-binding-and-private-classification-denial"
+    ],
+    "canonical_owner": "agent-1-code-with-agent-5-assurance-and-agent-0-integration",
+    "rollback": "Remove additive config/role wiring and retain the existing operator-only fail-closed daemon until a replacement stage is accepted."
+  },
+  "integrity": {
+    "payload_sha256": "74868a414edd50dc2f56b58b63a3748a7ede69c5b6a0538e66b6bd0f328bd4f0",
+    "parent_refs": [
+      "git:5dca29add2901d0876ce49fe1c727abf7ab8fc36",
+      "contract:ipc-compatibility-v1",
+      "reuse:internal-adapter"
+    ]
+  }
+}

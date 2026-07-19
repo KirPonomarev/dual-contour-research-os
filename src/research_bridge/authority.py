@@ -404,6 +404,19 @@ class PinnedOfflineAuthority:
         policy = self._resolve_policy(policy_digest)
         self._verify_policy(policy, expected_digest=policy_digest, now=checked_at)
 
+    def verify_policy_binding(self, policy_digest: str, *, now: datetime | str) -> None:
+        """Verify that one configured policy binding is complete and current.
+
+        Service startup uses this narrow read-only check before opening the runtime
+        root.  It intentionally grants no action authority; action-specific checks
+        still happen at admission, resume, and execution boundaries.
+        """
+
+        _expect_sha256(policy_digest, "policy digest")
+        checked_at = _parse_now(now)
+        policy = self._resolve_policy(policy_digest)
+        self._verify_policy(policy, expected_digest=policy_digest, now=checked_at)
+
     def _trusted_issuer_document(self, schema_id: str) -> dict[str, str]:
         try:
             issuer = self._trusted_issuers[schema_id]
