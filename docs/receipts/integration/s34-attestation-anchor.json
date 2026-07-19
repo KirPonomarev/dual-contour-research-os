@@ -1,0 +1,63 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s34-attestation-anchor-20260719",
+  "issued_at": "2026-07-19T00:41:00Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s34-attestation-anchor",
+    "agent_id": "agent-0",
+    "ownership_lease_ref": "stages/s34-attestation-anchor/ownership-lease.json",
+    "base_sha": "f41ec8cf74f77960bfeb8dc04e5e74fc935e1d4c",
+    "head_sha": "1d3f380ef88ae0f62187970bd29b23a463160562",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "tools/attestation.py",
+      "provenance/selected-receipt-attestation-v1.json",
+      "provenance/attestation-public-keys-v1.json",
+      "docs/ATTESTATION_KEY_THREAT_MODEL.md",
+      "docs/receipts/attestation/",
+      "docs/receipts/reuse/s34-attestation-anchor.json",
+      "tests/test_s34_attestation_anchor.py",
+      "THIRD_PARTY_NOTICES.md",
+      "LICENSES/openssl-Apache-2.0.txt",
+      "stages/s34-attestation-anchor/"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "privacy_secret_scan": "green",
+      "selected_scope_only": true,
+      "exact_receipt_bytes_bound": true,
+      "existing_payload_integrity_bound": true,
+      "Ed25519_signature_verified": true,
+      "public_key_registry_frozen": true,
+      "private_key_in_repository": false,
+      "key_substitution_and_revocation_fail_closed": true,
+      "missing_anchor_state": "WAIT_ANCHOR",
+      "exact_git_commit_anchor_verified": true,
+      "full_tests": "771+25 PASS",
+      "JCS_migration": false,
+      "automatic_promotion": false,
+      "canonical_mutation": false,
+      "grants_authority": false
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29667288508",
+    "integration_commit_sha": "447575790ea7f401c1e904bdfdb015effa47a9de"
+  },
+  "integrity": {
+    "payload_sha256": "ccb2c7e6c67a0a2d1f1d62526fcf26a7f1b5f0ac096e02aed5eb25a7426e0719",
+    "parent_refs": [
+      "git:f41ec8cf74f77960bfeb8dc04e5e74fc935e1d4c",
+      "git:1d3f380ef88ae0f62187970bd29b23a463160562",
+      "git:447575790ea7f401c1e904bdfdb015effa47a9de",
+      "ci:29667288508",
+      "attestation:docs/receipts/attestation/e3-evolution-shadow.attestation.json",
+      "anchor:docs/receipts/attestation/e3-evolution-shadow.anchor.json"
+    ]
+  }
+}
