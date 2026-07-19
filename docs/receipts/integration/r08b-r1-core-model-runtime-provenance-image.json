@@ -1,0 +1,118 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-r08b-r1-core-model-runtime-provenance-image-20260719",
+  "issued_at": "2026-07-19T20:47:29Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "r08b-r1-core-model-runtime-provenance-image",
+    "parent_stage_id": "r08b-exact-candidate-image-build-sbom",
+    "agent_id": "agent-5",
+    "integration_agent_id": "agent-0",
+    "ownership_lease_ref": "stages/r08b-r1-core-model-runtime-provenance-image/ownership-lease.json",
+    "parent_authority_amendment_refs": [
+      "stages/r08b-exact-candidate-image-build-sbom/stage-envelope-amendment-v2.4-1.json",
+      "stages/r08b-exact-candidate-image-build-sbom/stage-envelope-amendment-v2.4-2.json"
+    ],
+    "base_sha": "b0287d7dab9fbe72f4e42a43982d92e2672f0586",
+    "stage_authorization_sha": "3f33b31c2531730d5a78afd68f7817f8e34e806b",
+    "worker_head_sha": "8639e0d1540c572e6e43b5e3348e467203d52fd8",
+    "head_sha": "cd5f0410f254a6a27e76c12d5b56838990036d65",
+    "head_tree_sha": "c7077659badcb7578d2ea24314921412d9a2ed15",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "a1_contract_sha256": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+    "write_set": [
+      "ops/release/Containerfile",
+      "tests/test_r08a_production_image_e2e_harness.py",
+      "tools/verify_release_blueprint.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "write_set_exact": true,
+      "nested_pr_head_exact_ci_green": true,
+      "nested_merge_head_exact_ci_green": true,
+      "direct_buildkit_available": false,
+      "optional_buildkit_absence_blocking": false,
+      "minimal_exact_base_fallback_used": true,
+      "fallback_copy_set_matches_versioned_containerfile": true,
+      "fallback_base_image_id": "sha256:328bf380ac8bb29cb862dc5ebddaec757212b809429cad74a3c8fcfe25adb5d6",
+      "fallback_base_release_sha": "024abd0b747ad378ef4a8ff0328a3e23c386581e",
+      "ephemeral_validation_image_id": "sha256:7e6b17b4b780f4f64302aa2e598844932adeb0e5a42e0d3cd8267a3bd02fe920",
+      "ephemeral_validation_source_sha": "8639e0d1540c572e6e43b5e3348e467203d52fd8",
+      "image_architecture": "linux/amd64",
+      "image_top_level_inventory": [
+        "contracts",
+        "provenance",
+        "src"
+      ],
+      "image_file_count": 54,
+      "image_forbidden_paths": 0,
+      "image_provenance_files": [
+        "provenance/model-provider-routing-v1.json",
+        "provenance/model-role-evaluation-v2.json",
+        "provenance/model-worker-ipc-extension-v1.json"
+      ],
+      "production_image_started": true,
+      "corridor_executor_profile_non_null": true,
+      "available_bindings": [
+        "deepseek-v4-pro",
+        "gpt-5.6-sol-xhigh"
+      ],
+      "actual_af_unix_status": true,
+      "control_socket_mode": "0660",
+      "network_none": true,
+      "read_only_root_filesystem": true,
+      "cap_drop_all": true,
+      "no_new_privileges": true,
+      "provider_calls": 0,
+      "external_actions": 0,
+      "candidate_cut": false,
+      "release_claim_issued": false,
+      "observation_windows_started": false,
+      "grants_authority": false,
+      "focused_tests": 10,
+      "full_core_tests": 893,
+      "stage0b_tests": 25
+    },
+    "file_sha256": {
+      ".dockerignore": "c11ca3000513c96f9ba710d2c63792247a0e62a590d6e963dfa65c0fd36392bb",
+      "ops/release/Containerfile": "19c81a091994fd8fb744780c344164574278cff404c306f7304b9ccedcfa7e47",
+      "tests/test_r08a_production_image_e2e_harness.py": "54c240efec0e0e67ab0289390f5fa489d3b0c1be0a88bb5f2681d60f8c07c26c",
+      "tools/verify_release_blueprint.py": "fa9c73bee62bdba5d1277bc44aa5e186fe296d63d494febebbc0ecc5f7b503cd",
+      "provenance/model-provider-routing-v1.json": "37db8596a8245a6b1ea2bc5bce1495a4e7dadb314876e51397ad11dd194b3dc6",
+      "provenance/model-role-evaluation-v2.json": "111a7ac1dc954466b19d5e408debeeefcf65c76b5b025a743a2433be910c1e75",
+      "provenance/model-worker-ipc-extension-v1.json": "03d91f027bb6975c55d84acaef188546bcd24af9944a72f4ff9314296399d07a"
+    },
+    "pull_request_ref": "https://github.com/KirPonomarev/dual-contour-research-os/pull/79",
+    "remote_ci_refs": [
+      "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29702162708",
+      "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29702304004",
+      "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29703096295"
+    ],
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29703096295",
+    "integration_commit_sha": "cd5f0410f254a6a27e76c12d5b56838990036d65",
+    "known_next_gate": "Resume parent R08B pre-cut readiness, then cut and prove the exact release candidate image and SBOM."
+  },
+  "integrity": {
+    "payload_sha256": "24f23679dd7b9657bb3f52b46e25c52ee6cd68ea8c6a8fdd7d63b924b8221553",
+    "parent_refs": [
+      "git:b0287d7dab9fbe72f4e42a43982d92e2672f0586",
+      "git:3f33b31c2531730d5a78afd68f7817f8e34e806b",
+      "git:8639e0d1540c572e6e43b5e3348e467203d52fd8",
+      "git:cd5f0410f254a6a27e76c12d5b56838990036d65",
+      "ci:29702162708",
+      "ci:29702304004",
+      "ci:29703096295",
+      "pr:79",
+      "reuse:reuse-r08b-r1-core-model-runtime-provenance-image-20260719",
+      "integration:integration-r08a-production-image-e2e-harness-20260719"
+    ]
+  }
+}
