@@ -3,6 +3,7 @@ from __future__ import annotations
 import base64
 from contextlib import redirect_stdout
 import hashlib
+import importlib.util
 import inspect
 import io
 import json
@@ -19,11 +20,23 @@ sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "tools"))
 
 import model_provider_shadow as shadow  # noqa: E402
+from tools import model_provider_shadow_v3 as shadow_v3  # noqa: E402
 from research_bridge.model_broker import (  # noqa: E402
     KnownProviderFailure,
     ModelCallBroker,
     ProviderAccounting,
 )
+
+
+WORKER_V3_PATH = ROOT / "ops" / "connected-worker" / "model_worker_v3.py"
+POLICY_V3_PATH = ROOT / "ops" / "connected-worker" / "runtime-policy-v3.json"
+worker_v3_spec = importlib.util.spec_from_file_location(
+    "r08b_model_worker_v3", WORKER_V3_PATH
+)
+assert worker_v3_spec is not None and worker_v3_spec.loader is not None
+worker_v3 = importlib.util.module_from_spec(worker_v3_spec)
+sys.modules[worker_v3_spec.name] = worker_v3
+worker_v3_spec.loader.exec_module(worker_v3)
 from tests.test_s15_model_registry_broker import (  # noqa: E402
     AT,
     AT_SENT,
@@ -56,6 +69,23 @@ class ProviderShadowToolTests(unittest.TestCase):
         self.addCleanup(self.temporary.cleanup)
         self.temp_path = Path(self.temporary.name)
         self.profile = shadow.ConnectedShadowProfile(shadow.LEGACY_PROFILE_PATH)
+
+    def test_additive_worker_policy_selects_v3_visible_output_profile(self) -> None:
+        profile = shadow_v3.ConnectedShadowProfile(shadow_v3.CURRENT_PROFILE_PATH)
+        policy = worker_v3.RuntimePolicy.load(POLICY_V3_PATH)
+        self.assertEqual(profile.profile_id, "model-provider-connected-shadow-v3")
+        self.assertEqual(policy.shadow_profile_sha256, profile.sha256)
+        self.assertEqual(
+            policy.shadow_tool_sha256,
+            hashlib.sha256(
+                Path(inspect.getfile(shadow_v3)).read_bytes()
+            ).hexdigest(),
+        )
+        self.assertIs(worker_v3.CURRENT_PROFILE_PATH, shadow_v3.CURRENT_PROFILE_PATH)
+        self.assertEqual(
+            profile.binding("deepseek-v4-pro")["request_options"]["thinking"],
+            {"type": "disabled"},
+        )
 
     def test_profile_is_strict_and_exact_official_api_ids_are_separate_from_logical_bindings(self) -> None:
         self.assertEqual(
