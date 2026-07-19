@@ -52,3 +52,47 @@ untrusted SourceTrigger
 Collectors and models cannot mint trusted events, admit their own proposals, issue permits, or write canonical scientific state. `AdmissionReceipt` proves a policy decision, not execution authority. `CapabilityProofReceipt` reports evidence only as `PASS_FOR_FROZEN_SCOPE` and always carries `grants_authority=false`.
 
 Bridge operational memory and domain scientific truth remain separate. `SHADOW_UNAPPLIED` taint is inherited: shadow-derived knowledge can generate only shadow work until an authorized domain writer applies a validated outcome.
+
+## Product intelligence and evolution overlay
+
+The later product stages extend the same ledger and authority corridor; they do not add a second orchestrator, event order, scheduler, writable agent memory, or scientific registry:
+
+```text
+typed operational memory
+→ Knowledge Fabric / Idea Tree / failure and conflict memory
+→ bounded Research Agenda and Portfolio
+→ capped model council with independent critique
+→ falsification and multidimensional replication
+→ outcome-to-next-event feedback
+→ gap miner and MutationProposal
+→ frozen champion/challenger evaluation
+→ shadow/canary regression evaluation
+→ WAIT_AUTHORITY
+```
+
+The model intelligence overlay binds replaceable roles rather than permanent vendor authority. Cheap worker routes perform bounded proposal work; independent critic routes challenge it; deep-review and Chief Scientist routes advise on material cases. The deterministic broker reserves budget before egress, records `SENT` durably, preserves ambiguous calls as `UNKNOWN`, commits raw responses privately before parsing, and requires explicit reconciliation. Models cannot select their own roles, admit candidates, issue permits, change budgets, apply mutations, or write canonical truth.
+
+Generated-execution support is an isolation contract and launch-plan validator, feature-off by default. It contains no embedded process runner, Docker client, network client, dynamic-code primitive, or automatic rollback. E5 transfers only declassified `MethodCard` metadata into recipient shadow evaluation; adoption remains with Human and Domain Authority.
+
+## Operational self-model
+
+The self-model is operational and non-anthropomorphic. Versioned source declarations identify each active runtime cell's owner, plane, inputs, outputs, dependencies, access, authority ceiling, budget, heartbeat, recovery path, kill switch, evidence stage, and next transition. The topology validator rejects orphan edges, duplicate producers, unbounded cycles, mismatched deployment projections, and authority overclaims. `OrganismState` is durable; `PulseSample` is a deterministic read-only projection and cannot turn stale or merely declared evidence green.
+
+Higher-order E2–E5 evaluators are bounded library/tool capabilities referenced by immutable phase receipts. They do not become additional long-running writers merely because their code exists. The deployable topology therefore remains separate from the capability/evidence graph.
+
+## Product and operational evidence
+
+`PRODUCT_IMPLEMENTATION_COMPLETE` means the public code, contracts, documentation, deterministic tests, hostile probes, phase receipts, frozen application candidate, and fail-closed deployment corridor are integrated on one exact remote head. It does not mean the release is deployed or operationally proven.
+
+Operational proof is a later authority-bound sequence:
+
+```text
+fresh Human DeploymentApprovalReceipt
+→ exact offline deployment
+→ backup / restore / restart / rollback drills
+→ separate deterministic-substrate and provider observation windows
+→ 14-day burn-in with at least 200 bounded jobs
+→ final Definition of Done
+```
+
+No product test, model consensus, GitHub review, or local image build may substitute for those operational receipts.
