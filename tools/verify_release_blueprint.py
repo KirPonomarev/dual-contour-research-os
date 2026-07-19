@@ -6,12 +6,50 @@ from __future__ import annotations
 import hashlib
 import json
 from pathlib import Path
+import re
+import sys
 from typing import Any
 
 
 ROOT = Path(__file__).resolve().parents[1]
 OPS = ROOT / "ops" / "release"
+sys.path.insert(0, str(ROOT / "src"))
+
+from research_bridge.researchd import (  # noqa: E402
+    _ServiceConfigError,
+    _service_config_from_mapping,
+)
+
 BASE_DIGEST = "sha256:65a93d69fa75478d554f4ad27c85c1e69fa184956261b4301ebaf6dbb0a3543d"
+_SHA256 = re.compile(r"^[a-f0-9]{64}$")
+_TRUSTED_SCHEMAS = {
+    "JobSpec",
+    "Permit",
+    "AttemptLease",
+    "PolicySnapshot",
+    "ApprovalReceipt",
+}
+_LEGACY_CONFIG_KEYS = {
+    "schema_id",
+    "schema_version",
+    "runtime_root",
+    "runner_identity",
+    "allowed_uids",
+    "input_quota_bytes",
+    "checkpoint_quota_bytes",
+    "artifact_quota_bytes",
+    "maximum_input_bytes",
+    "deadline_seconds",
+    "trusted_issuers",
+    "policy_snapshots",
+    "approval_receipts",
+}
+_A1_CONFIG_KEYS = _LEGACY_CONFIG_KEYS | {
+    "a1_enabled",
+    "principal_roles",
+    "frozen_bindings",
+    "a1_limits",
+}
 
 
 class BlueprintError(RuntimeError):
@@ -33,6 +71,52 @@ def _load(name: str) -> dict[str, Any]:
 
 def _sha(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _config_mode(config: dict[str, Any]) -> str | None:
+    """Classify only an exact legacy boundary or a parseable full A1 boundary."""
+
+    common = (
+        config.get("schema_id") == "ResearchdServiceConfig"
+        and config.get("runtime_root") == "/var/lib/research-os"
+        and set(config.get("trusted_issuers", {})) == _TRUSTED_SCHEMAS
+        and config.get("approval_receipts") == {}
+    )
+    if not common:
+        return None
+    if set(config) == _LEGACY_CONFIG_KEYS:
+        if (
+            config.get("schema_version") == "1.0.0"
+            and config.get("allowed_uids") == [10001]
+            and config.get("policy_snapshots") == {}
+        ):
+            return "legacy-operator-only"
+        return None
+    if set(config) != _A1_CONFIG_KEYS:
+        return None
+    if (
+        config.get("schema_version") != "1.1.0"
+        or config.get("a1_enabled") is not True
+        or config.get("allowed_uids") != [10001, 10002, 10003]
+        or config.get("principal_roles")
+        != {"10001": "operator", "10002": "collector", "10003": "scout"}
+    ):
+        return None
+    bindings = config.get("frozen_bindings")
+    policies = config.get("policy_snapshots")
+    if (
+        not isinstance(bindings, dict)
+        or not isinstance(policies, dict)
+        or len(policies) != 1
+        or _SHA256.fullmatch(str(bindings.get("policy_sha256"))) is None
+        or set(policies) != {bindings.get("policy_sha256")}
+    ):
+        return None
+    try:
+        _service_config_from_mapping(config)
+    except (TypeError, ValueError, _ServiceConfigError):
+        return None
+    return "a1-enabled"
 
 
 def inspect(root: Path = ROOT) -> dict[str, Any]:
@@ -74,14 +158,8 @@ def inspect(root: Path = ROOT) -> dict[str, Any]:
             "network_required_at_runtime": False,
         }:
             failures.append("dependency_lock.drift")
-        if (
-            config.get("schema_id") != "ResearchdServiceConfig"
-            or config.get("allowed_uids") != [10001]
-            or config.get("runtime_root") != "/var/lib/research-os"
-            or config.get("policy_snapshots") != {}
-            or config.get("approval_receipts") != {}
-            or set(config.get("trusted_issuers", {})) != {"JobSpec", "Permit", "AttemptLease", "PolicySnapshot", "ApprovalReceipt"}
-        ):
+        config_mode = _config_mode(config)
+        if config_mode is None:
             failures.append("config.boundary")
         expected_policy = {
             "network": "none",
@@ -106,6 +184,7 @@ def inspect(root: Path = ROOT) -> dict[str, Any]:
             "platform": "linux/amd64",
             "network_at_runtime": False,
             "external_action_authority": False,
+            "config_mode": config_mode,
             "hashes": {
                 name: _sha(OPS / name)
                 for name in (
