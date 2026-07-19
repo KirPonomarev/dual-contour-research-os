@@ -14,3 +14,15 @@ vendored in this repository.
 - License SHA-256: `6f08a01a9fab5b24e139a09f15cc24a73087c7bc09e3bacf099fdf2d767bf897`
 
 Copyright (c) 2014, Alexander Neumann and restic contributors.
+
+## OpenSSL 3.6.2
+
+The selected-receipt attestation adapter interoperates with the separately
+installed OpenSSL command-line tool for Ed25519 signing and verification. No
+OpenSSL source or binary is vendored in this repository.
+
+- Upstream: https://github.com/openssl/openssl/tree/openssl-3.6.2
+- Runtime interface: `openssl pkey` and `openssl pkeyutl`
+- License: Apache-2.0
+- Exact license copy: `LICENSES/openssl-Apache-2.0.txt`
+- License SHA-256: `7d5450cb2d142651b8afa315b5f238efc805dad827d91ba367d8516bc9d49e7a`
