@@ -1,0 +1,64 @@
+{
+  "stage_id": "r01b0-config-validator-decoupling",
+  "agent_id": "agent-0",
+  "objective": "Decouple immutable historical S38 validation from mutable live release inputs and make the release blueprint validator report strict legacy versus A1 config modes before R01B changes ops files.",
+  "executable_blocker": "R01B must replace the inert live researchd config, but the superseded S38 validator hashes that live path as historical evidence, so any correct replacement would create a false historical-drift failure.",
+  "base_sha": "e7217b40cdd6ebfa110935a0e71b09b941b29c6c",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "a1_contract_sha256": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+  "branch": "codex/bridge-a0-r01b0-config-validator",
+  "worktree": "/private/tmp/dcr-r01b0-validator-v8VOWG/repo",
+  "read_set": [
+    "tools/final_deployment_rebind.py",
+    "tools/verify_release_blueprint.py",
+    "ops/release/researchd.config.template.json",
+    "ops/release/final-a1-runtime-policy.json",
+    "ops/deploy/research-os-a1-final.service",
+    "tests/test_s38_r1_final_deployment_rebind.py",
+    "tests/test_release_blueprint.py"
+  ],
+  "write_set": [
+    "tools/final_deployment_rebind.py",
+    "tools/verify_release_blueprint.py",
+    "docs/receipts/reuse/r01b0-config-validator-decoupling.json",
+    "stages/r01b0-config-validator-decoupling/"
+  ],
+  "forbidden_scope": [
+    "ops-test-runtime-code-contract-root-config-CI-or-migration-change",
+    "historical-receipt-or-candidate-mutation",
+    "deployment-provider-VPS-live-canonical-or-private-action",
+    "accepting-empty-A1-policy-as-production-ready"
+  ],
+  "dependency_hashes": {
+    "base_tree_sha": "3908088138b428f288dc77c6c2e904682b276b95",
+    "final_deployment_rebind_sha256": "6bffe57c26624d83d87754ec9d8d713d1aab45b2475a97684c387d9ec82b5694",
+    "release_blueprint_validator_sha256": "a946332e184e42f9c1127eec5853f8462973beb40447818c766a0d1b54c37a07",
+    "legacy_config_sha256": "0b186888a3a1bb8fb028315681bf4073ec4186a0acbdf2f226b5a53d69a9d542",
+    "superseded_candidate_sha": "b2c2e6a8c4e0a364ef82e8e51540433aa91430d4",
+    "external_dependencies": "none-stdlib-and-git-object-database-only"
+  },
+  "acceptance_commands": [
+    "python3 -m unittest -v tests.test_s38_r1_final_deployment_rebind tests.test_release_blueprint",
+    "python3 tools/final_deployment_rebind.py verify-static",
+    "python3 tools/verify_release_blueprint.py",
+    "make contracts",
+    "git diff --check",
+    "exact-head remote CI"
+  ],
+  "risk_class": "critical-historical-evidence-aliasing-and-false-release-green",
+  "stop_conditions": [
+    "historical-check-reads-mutable-live-bytes",
+    "superseded-public-deploy-entrypoint-becomes-usable",
+    "A1-empty-policy-is-reported-as-A1-ready",
+    "write-outside-Agent-0-tool-metadata-scope",
+    "secret-private-or-runtime-data-detected"
+  ],
+  "expected_receipt": "docs/receipts/integration/r01b0-config-validator-decoupling.json",
+  "rollback": "Revert the validator changes; R00 deployment denial remains active, but R01B ops mutation must not proceed until an equivalent historical-subject boundary exists.",
+  "commit_authority": "one-scoped-agent-0-validator-stage",
+  "push_authority": true,
+  "expected_handoff_status": [
+    "ready_for_agent0_integration",
+    "blocked_validation_failed"
+  ]
+}

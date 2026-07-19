@@ -39,6 +39,7 @@ from research_bridge.deployment import (  # noqa: E402
 
 CANDIDATE_SHA = "b2c2e6a8c4e0a364ef82e8e51540433aa91430d4"
 CANDIDATE_TREE = "7d6bd1e13d651950cced23dfe75a24946a3218fc"
+S38_REBIND_SHA = "7d9a6459be07678a57a779118dd328a37eff2855"
 FINAL_MANIFEST = ROOT / "docs/receipts/release/s38-final-release-manifest.json"
 FINAL_MANIFEST_SHA256 = "0439dee8e058914fe8e11416112e4a985e4bfec11502bb2cd0fd5b883295c369"
 SUPERSESSION = ROOT / "docs/receipts/release/r00-superseded-release.json"
@@ -88,6 +89,16 @@ def _digest_file(path: Path) -> str:
     except OSError as exc:
         raise FinalDeploymentRebindError("artifact cannot be hashed") from exc
     return digest.hexdigest()
+
+
+def _historical_text(subject: str, relative: str) -> str:
+    """Read one immutable release input from the superseded Git subject."""
+
+    if not relative or relative.startswith("/") or ".." in Path(relative).parts:
+        raise FinalDeploymentRebindError("historical artifact path is invalid")
+    if _SHA256.fullmatch(subject) is None and re.fullmatch(r"[a-f0-9]{40}", subject) is None:
+        raise FinalDeploymentRebindError("historical artifact subject is invalid")
+    return _run(["git", "show", f"{subject}:{relative}"])
 
 
 def _strict_object(pairs: list[tuple[str, object]]) -> dict[str, object]:
@@ -327,15 +338,32 @@ def _verify_static() -> dict[str, object]:
     manifest = _verify_final_manifest()
     supersession = _verify_supersession()
     expected = {
-        str(POLICY.relative_to(ROOT)): "b3fc58125b3308c723c25461828b914a2f244dfa260dda7d5eea49467a7fc647",
-        str(CONFIG.relative_to(ROOT)): "0b186888a3a1bb8fb028315681bf4073ec4186a0acbdf2f226b5a53d69a9d542",
-        str(DEPENDENCY_LOCK.relative_to(ROOT)): "58cd81aa9e5554e5ae88a0d86822e341a6ac25eb8179cca9a9fb3e4512493be9",
-        str(A1_UNIT.relative_to(ROOT)): "49412c65c0e1e93d455d5b76e0a0516c618ac677fa63173bb9e89c93a7627b84",
+        str(POLICY.relative_to(ROOT)): (
+            S38_REBIND_SHA,
+            "b3fc58125b3308c723c25461828b914a2f244dfa260dda7d5eea49467a7fc647",
+        ),
+        str(CONFIG.relative_to(ROOT)): (
+            CANDIDATE_SHA,
+            "0b186888a3a1bb8fb028315681bf4073ec4186a0acbdf2f226b5a53d69a9d542",
+        ),
+        str(DEPENDENCY_LOCK.relative_to(ROOT)): (
+            CANDIDATE_SHA,
+            "58cd81aa9e5554e5ae88a0d86822e341a6ac25eb8179cca9a9fb3e4512493be9",
+        ),
+        str(A1_UNIT.relative_to(ROOT)): (
+            S38_REBIND_SHA,
+            "49412c65c0e1e93d455d5b76e0a0516c618ac677fa63173bb9e89c93a7627b84",
+        ),
     }
-    for relative, digest in expected.items():
-        if _digest_file(ROOT / relative) != digest:
-            raise FinalDeploymentRebindError(f"static deployment input drifted: {relative}")
-    unit = A1_UNIT.read_text(encoding="utf-8")
+    historical: dict[str, str] = {}
+    for relative, (subject, digest) in expected.items():
+        content = _historical_text(subject, relative)
+        if _digest_bytes(content.encode("utf-8")) != digest:
+            raise FinalDeploymentRebindError(
+                f"historical static deployment input drifted: {relative}"
+            )
+        historical[relative] = content
+    unit = historical[str(A1_UNIT.relative_to(ROOT))]
     required = (
         "research-os-a1-bridge",
         "source=research-os-a1-runtime",
@@ -355,6 +383,7 @@ def _verify_static() -> dict[str, object]:
         "final_manifest_ref": str(manifest["object_id"]),
         "supersession_ref": str(supersession["object_id"]),
         "historical_freeze_valid": True,
+        "historical_static_subjects": [CANDIDATE_SHA, S38_REBIND_SHA],
         "replacement_release_required": True,
         "A1_namespace": True,
         "single_supervisor": True,

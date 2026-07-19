@@ -1,0 +1,16 @@
+{
+  "lease_id": "lease-r01b0-config-validator-decoupling-agent-0",
+  "stage_id": "r01b0-config-validator-decoupling",
+  "agent_id": "agent-0",
+  "branch": "codex/bridge-a0-r01b0-config-validator",
+  "issued_at": "2026-07-19T05:47:00Z",
+  "expires_at": "2026-07-21T05:47:00Z",
+  "write_set": [
+    "tools/final_deployment_rebind.py",
+    "tools/verify_release_blueprint.py",
+    "docs/receipts/reuse/r01b0-config-validator-decoupling.json",
+    "stages/r01b0-config-validator-decoupling/"
+  ],
+  "exclusive": true,
+  "revoked": false
+}

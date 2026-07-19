@@ -1,0 +1,55 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-r01b0-config-validator-decoupling-20260719",
+  "issued_at": "2026-07-19T05:47:00Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "reuse-freeze-authority"
+  },
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "HISTORICAL_SUBJECT_VALIDATION_AND_MODE_AWARE_RELEASE_CONFIG_INSPECTION",
+    "candidates": [
+      {
+        "candidate": "reuse-existing-final-deployment-rebind-and-release-blueprint-validators",
+        "disposition": "selected-internal-adapter"
+      },
+      {
+        "candidate": "read-historical-static-inputs-from-exact-candidate-Git-subject",
+        "disposition": "selected"
+      },
+      {
+        "candidate": "retain-live-path-hashes-and-update-on-every-new-release",
+        "disposition": "rejected-aliases-history-to-mutable-live-state"
+      },
+      {
+        "candidate": "new-release-registry-database-or-dependency",
+        "disposition": "rejected-unnecessary-state-and-surface"
+      }
+    ],
+    "selected_mode": "bounded-git-show-for-historical-bytes-plus-strict-config-mode-classification-without-authority-grant",
+    "source_ref": "git:e7217b40cdd6ebfa110935a0e71b09b941b29c6c;internal:final_deployment_rebind+verify_release_blueprint",
+    "code_sha256": "6bffe57c26624d83d87754ec9d8d713d1aab45b2475a97684c387d9ec82b5694",
+    "license_spdx": "NOASSERTION",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "historical-candidate-static-inputs-read-at-subject",
+      "live-config-drift-does-not-rewrite-history",
+      "superseded-public-entrypoints-remain-denied",
+      "legacy-config-mode-explicit",
+      "A1-config-mode-requires-nonempty-policy-and-exact-role-bindings"
+    ],
+    "canonical_owner": "agent-0-tools-and-integration",
+    "rollback": "Revert validator adapter changes and keep R01B blocked behind the R00 deployment deny gate."
+  },
+  "integrity": {
+    "payload_sha256": "b6e425afbeff510d8939334fdebf22772c6d85f374b1d54c9817e0dbebd9142c",
+    "parent_refs": [
+      "git:e7217b40cdd6ebfa110935a0e71b09b941b29c6c",
+      "git:b2c2e6a8c4e0a364ef82e8e51540433aa91430d4",
+      "reuse:internal-validator-adapter"
+    ]
+  }
+}
