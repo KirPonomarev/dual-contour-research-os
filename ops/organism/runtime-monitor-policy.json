@@ -1,0 +1,15 @@
+{
+  "schema_id": "RuntimeMonitorPolicy",
+  "schema_version": "1.0.0",
+  "policy_id": "runtime-monitor-release-bound-v1",
+  "sample_interval_seconds": 60,
+  "clock_skew_alert_seconds": 5,
+  "heartbeat_stale_seconds": 180,
+  "wip_limit": 1,
+  "storage_warn_percent": 75,
+  "storage_red_percent": 90,
+  "budget_warn_percent": 80,
+  "maximum_records": 30000,
+  "backup_schedule_ref": "systemd:research-os-backup.timer",
+  "grants_authority": false
+}

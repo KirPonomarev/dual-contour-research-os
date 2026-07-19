@@ -118,6 +118,22 @@
       "cycle_bound": {"max_iterations": 16, "stop_condition_ref": "policy:a1-root-event-energy"}
     },
     {
+      "component_id": "runtime-pulse-monitor", "owner": "agent-5", "plane": "governance",
+      "implementation_refs": ["repo:ops/organism/runtime_monitor.py", "repo:ops/organism/runtime-monitor-policy.json", "repo:ops/deploy/research-os-runtime-monitor.service", "repo:ops/deploy/research-os-runtime-monitor.timer"],
+      "inputs": ["external:runtime-monitor-input"], "outputs": ["terminal:runtime-monitor-record"],
+      "dependencies": ["feedback-projector"],
+      "access": {"read_refs": ["pulse:immutable-sample", "runtime:sanitized-counters"], "write_refs": ["monitor:owner-only-journal"], "network": "NONE"},
+      "authority_ceiling": "NON_AUTHORITATIVE_EVIDENCE_ONLY", "budget_ref": "budget:monitor-records",
+      "policy_refs": ["policy:runtime-monitor-release-bound-v1", "policy:single-writer-ledger"],
+      "heartbeat": {"mode": "ON_INVOCATION", "freshness_seconds": 180},
+      "recovery": {"mode": "REBUILD_FROM_SOURCE", "authority_ceiling": "OPERATOR_REQUIRED"},
+      "kill_switch": {"ref": "policy:MONITOR_OFF", "effect": "STOP_COMPONENT_CORE_CONTINUES"},
+      "proof_ref": "repo:docs/receipts/integration/r05c-loop-pulse-and-canonical-assurance.json",
+      "evidence": {"stage": "OBSERVED", "observed_ref": "repo:docs/receipts/integration/r05c-loop-pulse-and-canonical-assurance.json", "negative_probe_ref": null, "enforcement_ref": null},
+      "next_transition": {"state": "WAIT_AUTHORITY", "requires": ["authority:operator-for-alert-action"]},
+      "cycle_bound": null
+    },
+    {
       "component_id": "capability-proof-issuer", "owner": "agent-0", "plane": "governance",
       "implementation_refs": ["repo:tools/capability_proof.py"],
       "inputs": ["external:integration-evidence"], "outputs": ["terminal:capability-proof"],

@@ -1,0 +1,34 @@
+[Unit]
+Description=Dual-Contour Research OS read-only runtime Pulse recorder
+Documentation=https://github.com/KirPonomarev/dual-contour-research-os
+After=research-os-a1-final.service
+Requires=research-os-a1-final.service
+ConditionPathExists=%h/.config/research-os/runtime-identity.json
+ConditionPathExists=%h/.local/share/research-os/monitor-input/current.json
+
+[Service]
+Type=oneshot
+Environment=PYTHONDONTWRITEBYTECODE=1
+ExecStartPre=/bin/sh -eu -c 'test "$(/usr/bin/stat -c %%a %h/.config/research-os/runtime-identity.json)" = 600; test "$(/usr/bin/stat -c %%a %h/.local/share/research-os/monitor-input/current.json)" = 600; install -d -m 0700 %h/.local/state/research-os/monitor-journal'
+ExecStart=/usr/bin/python3 /opt/research-os/ops/organism/runtime_monitor.py --policy /opt/research-os/ops/organism/runtime-monitor-policy.json --expected-identity %h/.config/research-os/runtime-identity.json --input %h/.local/share/research-os/monitor-input/current.json --journal-root %h/.local/state/research-os/monitor-journal
+NoNewPrivileges=yes
+RestrictAddressFamilies=AF_UNIX
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+PrivateDevices=yes
+PrivateTmp=yes
+ProtectClock=yes
+ProtectControlGroups=yes
+ProtectKernelLogs=yes
+ProtectKernelModules=yes
+ProtectKernelTunables=yes
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=%h/.local/state/research-os/monitor-journal
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+SystemCallArchitectures=native
+TasksMax=32
+MemoryMax=134217728
+CPUQuota=25%
+UMask=0077

@@ -1,0 +1,12 @@
+[Unit]
+Description=Collect a release-bound runtime Pulse every minute
+
+[Timer]
+OnBootSec=60s
+OnUnitActiveSec=60s
+AccuracySec=1s
+Persistent=true
+Unit=research-os-runtime-monitor.service
+
+[Install]
+WantedBy=timers.target
