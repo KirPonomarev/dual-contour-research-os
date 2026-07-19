@@ -1,0 +1,46 @@
+{
+  "stage_id": "r08b-exact-candidate-image-build-sbom",
+  "repair_stage_id": "r08b-r3-additive-provider-profile-v3-worker-selection",
+  "amendment_id": "R08B_R3_V3_WORKER_SELECTION_20260719",
+  "plan_id": "DCR_OS_AUTONOMOUS_V2_3_NO_BRAKES_20260719",
+  "plan_version": "2.4.0-fast-working-release",
+  "issued_by": "agent-0",
+  "issued_at": "2026-07-19T22:04:00Z",
+  "authority_head": "85b7851639f084b13fd3b5b443198dc7d05986fd",
+  "candidate_sha": null,
+  "candidate_tree_sha": null,
+  "candidate_exact_head_ci_run": "NOT_CUT",
+  "observed_blocker": "ConnectedShadowProfile default-path compatibility and model_worker hard-coded v2 dependency prevent an exact v3-bound runtime policy from loading; Agent-5 detected this before commit and made no remote mutation.",
+  "agent_0_write_set": [
+    "stages/r08b-exact-candidate-image-build-sbom/stage-envelope-amendment-v2.4-6.json",
+    "stages/r08b-exact-candidate-image-build-sbom/ownership-lease-amendment-v2.4-6.json",
+    "tools/model_provider_shadow.py"
+  ],
+  "agent_5_write_set": [
+    "ops/connected-worker/model_worker.py",
+    "ops/connected-worker/runtime-policy.json",
+    "tests/test_s17_provider_shadow_tool.py"
+  ],
+  "required_change": {
+    "agent_0": "Keep PROFILE_PATH and the ConnectedShadowProfile default pinned to immutable v2 for historical callers; add CURRENT_PROFILE_PATH for v3.",
+    "agent_5": "Import CURRENT_PROFILE_PATH in model_worker and construct the connected runtime profile explicitly from v3; bind policy to exact v3/tool hashes and add only the focused v3 selection assertion.",
+    "historical_v1_v2_semantics_unchanged": true,
+    "endpoint_role_family_provenance_privacy_budget_retry_authority_unchanged": true
+  },
+  "acceptance_commands": [
+    "python3 -m unittest -v tests.test_s17_provider_shadow_tool tests.test_r04c_connected_worker_runtime tests.test_s24_r2_openrouter_provider",
+    "make contracts",
+    "make test",
+    "exact PR-head CI green",
+    "exact connected-worker image dependency validation binds CURRENT_PROFILE_PATH v3",
+    "fresh v3-bound private two-role proof succeeds"
+  ],
+  "stop_conditions": [
+    "Agent 0 mutates ops or tests",
+    "Agent 5 mutates tools provenance or stages",
+    "historical v1 or v2 bytes change",
+    "candidate becomes non-null before pre-cut PASS",
+    "old UNKNOWN call is replayed",
+    "force push rebase history rewrite or live action"
+  ]
+}
