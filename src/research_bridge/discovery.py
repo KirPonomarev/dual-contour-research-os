@@ -22,6 +22,12 @@ from types import MappingProxyType
 from typing import Callable, Mapping, Sequence
 
 from .admission import A1AdmissionKernel, A1AdmissionSnapshot, canonical_json_sha256
+from .authority import (
+    A1AuthorityCorridor,
+    AuthorityError,
+    CorridorExecutorProfile,
+    PinnedOfflineAuthority,
+)
 from .ledger import JobLedger, LedgerError
 
 
@@ -125,6 +131,15 @@ _DURABLE_STATE_VERSION_V1 = "durable-discovery-v1"
 _DURABLE_STATE_VERSION = "durable-discovery-v2"
 _DURABLE_ENTRY_LIMIT = 4_096
 _MAX_SOURCE_RATE_LIMIT = 1_024
+_CAS_INPUT_PREFIX = "cas:sha256:"
+_ADMISSION_ENTRY_KEYS = frozenset(
+    {
+        "candidate_sha256",
+        "snapshot",
+        "snapshot_sha256",
+        "response",
+    }
+)
 _DURABLE_PROJECTION_NAMES = frozenset(
     {"material_events", "candidates", "admissions", "capabilities"}
 )
@@ -239,6 +254,54 @@ class DiscoveryFixtureConfig:
 
 
 @dataclass(frozen=True, slots=True)
+class DurableAdmissionConfig:
+    """Optional trusted inputs for production admission and authority derivation."""
+
+    cycle_limits: Mapping[str, object]
+    daily_limits: Mapping[str, object]
+    executor_capability_refs: tuple[str, ...]
+    evaluator_capability_refs: tuple[str, ...]
+    model_route_proof_ref: str
+    corridor_executor_profile: CorridorExecutorProfile | None = None
+    corridor_lifetime_seconds: int = 120
+
+    def __post_init__(self) -> None:
+        cycle = _admission_limit_map(self.cycle_limits, "cycle_limits")
+        daily = _admission_limit_map(self.daily_limits, "daily_limits")
+        for field in ("max_admitted_experiments", "max_tokens", "max_cost_units"):
+            if daily[field] < cycle[field]:
+                raise DiscoveryError(f"daily {field} is below cycle limit")
+        executor_refs = _string_sequence(
+            "executor_capability_refs",
+            self.executor_capability_refs,
+            allow_empty=False,
+            maximum=512,
+        )
+        evaluator_refs = _string_sequence(
+            "evaluator_capability_refs",
+            self.evaluator_capability_refs,
+            allow_empty=False,
+            maximum=512,
+        )
+        _text("model_route_proof_ref", self.model_route_proof_ref, maximum=512)
+        profile = self.corridor_executor_profile
+        if profile is not None:
+            if type(profile) is not CorridorExecutorProfile:
+                raise DiscoveryError("corridor executor profile is invalid")
+            if profile.capability_ref not in executor_refs:
+                raise DiscoveryError("corridor capability is not frozen")
+        if (
+            type(self.corridor_lifetime_seconds) is not int
+            or not 1 <= self.corridor_lifetime_seconds <= 300
+        ):
+            raise DiscoveryError("corridor lifetime is invalid")
+        object.__setattr__(self, "cycle_limits", _deep_freeze(cycle))
+        object.__setattr__(self, "daily_limits", _deep_freeze(daily))
+        object.__setattr__(self, "executor_capability_refs", tuple(executor_refs))
+        object.__setattr__(self, "evaluator_capability_refs", tuple(evaluator_refs))
+
+
+@dataclass(frozen=True, slots=True)
 class DurableDiscoveryConfig:
     """Trusted runtime bindings for the production durable discovery adapter."""
 
@@ -257,6 +320,8 @@ class DurableDiscoveryConfig:
     maximum_reason_feedback: int = 1
     maximum_source_triggers_per_window: int = 12
     source_rate_window_seconds: int = 60
+    allowed_evidence_prefixes: tuple[str, ...] | None = None
+    admission: DurableAdmissionConfig | None = None
 
     def __post_init__(self) -> None:
         for name, value in (
@@ -277,6 +342,21 @@ class DurableDiscoveryConfig:
             allow_empty=False,
             maximum=2_048,
         )
+        selected_evidence_prefixes = (
+            self.allowed_source_prefixes
+            if self.allowed_evidence_prefixes is None
+            else self.allowed_evidence_prefixes
+        )
+        evidence_prefixes = _string_sequence(
+            "allowed_evidence_prefixes",
+            selected_evidence_prefixes,
+            allow_empty=False,
+            maximum=2_048,
+        )
+        if self.admission is not None and _CAS_INPUT_PREFIX not in evidence_prefixes:
+            raise DiscoveryError("registered CAS evidence prefix is required")
+        if self.admission is not None and type(self.admission) is not DurableAdmissionConfig:
+            raise DiscoveryError("durable admission config is invalid")
         if not isinstance(self.collector_bindings, Mapping) or not self.collector_bindings:
             raise DiscoveryError("collector_bindings must be a non-empty mapping")
         bindings: dict[str, str] = {}
@@ -313,6 +393,7 @@ class DurableDiscoveryConfig:
         ):
             raise DiscoveryError("source trigger rate window is invalid")
         object.__setattr__(self, "allowed_source_prefixes", tuple(prefixes))
+        object.__setattr__(self, "allowed_evidence_prefixes", tuple(evidence_prefixes))
         object.__setattr__(self, "collector_bindings", MappingProxyType(bindings))
         object.__setattr__(
             self, "root_energy", _deep_freeze(_json_copy(self.root_energy))
@@ -904,6 +985,7 @@ class DurableDiscoveryService:
         config: DurableDiscoveryConfig,
         *,
         parser: StrictProposalParser | None = None,
+        authority: PinnedOfflineAuthority | None = None,
     ) -> None:
         if not isinstance(admission_kernel, A1AdmissionKernel):
             raise DiscoveryError("admission_kernel must be A1AdmissionKernel")
@@ -911,15 +993,24 @@ class DurableDiscoveryService:
             raise DiscoveryError("ledger must be the researchd JobLedger")
         if not isinstance(config, DurableDiscoveryConfig):
             raise DiscoveryError("config must be DurableDiscoveryConfig")
+        if authority is not None and type(authority) is not PinnedOfflineAuthority:
+            raise DiscoveryError("authority must be exact PinnedOfflineAuthority")
+        if config.admission is not None and authority is None:
+            raise DiscoveryError("production admission requires pinned authority")
         if not ledger.verify_chain() or not ledger.verify_a1_coverage():
             raise DiscoveryError("durable A1 ledger integrity is invalid")
         self._kernel = admission_kernel
         self._ledger = ledger
         self._config = config
+        self._authority = authority
         self._parser = parser or StrictProposalParser()
         self._lock = RLock()
         # Parse and authenticate any pre-existing state before accepting IPC.
-        self._states()
+        states = self._states()
+        if self._config.admission is not None:
+            self._validate_admission_runtime_state(states)
+        elif states["admissions"]["entries"]:
+            raise DiscoveryError("durable admission state requires its frozen config")
 
     def submit_source_trigger(
         self,
@@ -940,6 +1031,7 @@ class DurableDiscoveryService:
         _validate_production_source_trigger(
             trigger,
             allowed_source_prefixes=self._config.allowed_source_prefixes,
+            allowed_evidence_prefixes=self._config.allowed_evidence_prefixes,
             idempotency_key=key,
         )
         current = _timestamp("now", now)
@@ -1210,7 +1302,47 @@ class DurableDiscoveryService:
                 candidates["proposal_replays"], key, request_sha256, "proposal"
             )
             if replay is not None:
-                return replay
+                if self._config.admission is None or replay.get("admission") is not None:
+                    return replay
+                event = material["events"].get(event_ref)
+                candidate = replay.get("candidate_spec_draft")
+                if not isinstance(event, dict) or not isinstance(candidate, dict):
+                    raise DiscoveryError("legacy proposal replay cannot be admitted")
+                candidate_ref = candidate.get("object_id")
+                stored_entry = states["admissions"]["entries"].get(candidate_ref)
+                receipt: Mapping[str, object] | None = None
+                expected_revision: int | None = None
+                if isinstance(stored_entry, dict):
+                    stored_response = stored_entry.get("response")
+                    if not isinstance(stored_response, dict):
+                        raise DiscoveryError("durable admission response is invalid")
+                    admission = _json_copy(stored_response)
+                else:
+                    admission, receipt, expected_revision = self._admit_candidate(
+                        states,
+                        event,
+                        candidate,
+                        now=now,
+                    )
+                response = _json_copy(replay)
+                response["admission"] = admission
+                existing = candidates["proposals"].get(event_ref)
+                if not isinstance(existing, dict):
+                    raise DiscoveryError("legacy proposal projection is missing")
+                existing["response"] = _json_copy(response)
+                candidates["proposal_replays"][key] = {
+                    "request_sha256": request_sha256,
+                    "response": response,
+                }
+                self._commit(
+                    states,
+                    key,
+                    now,
+                    "proposal-admission-backfill",
+                    objects=(() if receipt is None else (receipt,)),
+                    expected_previous_sequence=expected_revision,
+                )
+                return _deep_freeze(response)
             event = material["events"].get(event_ref)
             if event is None:
                 raise DiscoveryError("material event is not registered")
@@ -1226,18 +1358,50 @@ class DurableDiscoveryService:
                 if not hmac.compare_digest(existing["request_sha256"], request_sha256):
                     raise DiscoveryError("material event already has a different proposal")
                 response = _json_copy(existing["response"])
+                expected_revision: int | None = None
+                objects: tuple[Mapping[str, object], ...] = ()
+                if self._config.admission is not None and response.get("admission") is None:
+                    candidate = response.get("candidate_spec_draft")
+                    if not isinstance(candidate, dict):
+                        raise DiscoveryError("durable candidate response is invalid")
+                    stored_entry = states["admissions"]["entries"].get(
+                        candidate.get("object_id")
+                    )
+                    if isinstance(stored_entry, dict):
+                        stored_response = stored_entry.get("response")
+                        if not isinstance(stored_response, dict):
+                            raise DiscoveryError("durable admission response is invalid")
+                        admission = _json_copy(stored_response)
+                    else:
+                        admission, receipt, expected_revision = self._admit_candidate(
+                            states,
+                            event,
+                            candidate,
+                            now=now,
+                        )
+                        objects = (receipt,)
+                    response["admission"] = admission
+                    existing["response"] = _json_copy(response)
                 _bounded_insert(
                     candidates["proposal_replays"],
                     key,
                     {"request_sha256": request_sha256, "response": response},
                     "proposal replay",
                 )
-                self._commit(states, key, now, "proposal-replay")
+                self._commit(
+                    states,
+                    key,
+                    now,
+                    "proposal-replay",
+                    objects=objects,
+                    expected_previous_sequence=expected_revision,
+                )
                 return _deep_freeze(response)
 
             model_body = self._parser.parse_model_body(envelope["model_output"])
             critique = self._parser.parse_critique(envelope["critique_output"])
             objects: tuple[Mapping[str, object], ...] = ()
+            expected_revision: int | None = None
             if critique["accepted"] is not True or critique["falsifier_present"] is not True:
                 used = candidates["feedback_used"].get(event_ref, 0)
                 if used >= self._config.maximum_reason_feedback:
@@ -1271,11 +1435,23 @@ class DurableDiscoveryService:
                     "candidate_spec_draft": _json_copy(candidate),
                     "feedback_remaining": self._config.maximum_reason_feedback,
                 }
+                if self._config.admission is not None:
+                    admission, receipt, expected_revision = self._admit_candidate(
+                        states,
+                        event,
+                        candidate,
+                        now=now,
+                    )
+                    response["admission"] = admission
                 candidates["proposals"][event_ref] = {
                     "request_sha256": request_sha256,
                     "response": response,
                 }
-                objects = (candidate,)
+                objects = (
+                    (candidate, receipt)
+                    if self._config.admission is not None
+                    else (candidate,)
+                )
             _bounded_insert(
                 candidates["proposal_replays"],
                 key,
@@ -1285,7 +1461,14 @@ class DurableDiscoveryService:
             material["claims"][event_ref] = _claim_to_mapping(
                 replace(claim, acknowledged=False)
             )
-            self._commit(states, key, now, "proposal", objects=objects)
+            self._commit(
+                states,
+                key,
+                now,
+                "proposal",
+                objects=objects,
+                expected_previous_sequence=expected_revision,
+            )
             return _deep_freeze(response)
 
     def ack_proposal(
@@ -1343,6 +1526,285 @@ class DurableDiscoveryService:
             self._commit(states, key, now, "ack")
             return _deep_freeze(response)
 
+    def _admit_candidate(
+        self,
+        states: Mapping[str, Mapping[str, object]],
+        event: Mapping[str, object],
+        candidate: Mapping[str, object],
+        *,
+        now: str,
+    ) -> tuple[dict[str, object], Mapping[str, object], int]:
+        """Freeze, evaluate, and project one exact pre-append admission read."""
+
+        admission_config = self._config.admission
+        if admission_config is None:
+            raise DiscoveryError("production admission is not configured")
+        admissions = states["admissions"]
+        entries = admissions["entries"]
+        if not isinstance(entries, dict):
+            raise DiscoveryError("durable admission projection is invalid")
+        candidate_ref = _text(
+            "candidate.object_id", candidate.get("object_id"), maximum=256
+        )
+        if candidate_ref in entries:
+            raise DiscoveryError("candidate already has a durable admission")
+
+        active_refs: list[str] = []
+        used_cost = 0.0
+        used_tokens = 0
+        for entry_value in entries.values():
+            if not isinstance(entry_value, dict):
+                raise DiscoveryError("durable admission entry is invalid")
+            prior_response = entry_value.get("response")
+            if not isinstance(prior_response, dict):
+                raise DiscoveryError("durable admission response is invalid")
+            prior_receipt = prior_response.get("receipt")
+            if not isinstance(prior_receipt, dict):
+                raise DiscoveryError("durable admission receipt is invalid")
+            payload = prior_receipt.get("payload")
+            if not isinstance(payload, dict) or payload.get("decision") != "ADMIT":
+                continue
+            reservation_ref = payload.get("reservation_ref")
+            active_refs.append(
+                _text("active reservation ref", reservation_ref, maximum=256)
+            )
+            prior_candidate = self._candidate_for_ref(states, payload.get("candidate_ref"))
+            resources = prior_candidate["payload"].get("resource_request")
+            if not isinstance(resources, dict):
+                raise DiscoveryError("admitted resource request is invalid")
+            used_tokens += _nonnegative_integer(
+                "admitted tokens", resources.get("tokens")
+            )
+            cost = resources.get("cost_units")
+            if (
+                isinstance(cost, bool)
+                or not isinstance(cost, (int, float))
+                or not math.isfinite(float(cost))
+                or cost < 0
+            ):
+                raise DiscoveryError("admitted cost is invalid")
+            used_cost += float(cost)
+
+        cycle = admission_config.cycle_limits
+        daily = admission_config.daily_limits
+        maximum_active = min(
+            int(cycle["max_admitted_experiments"]),
+            int(daily["max_admitted_experiments"]),
+        )
+        available_cost = max(
+            0.0,
+            min(float(cycle["max_cost_units"]), float(daily["max_cost_units"]))
+            - used_cost,
+        )
+        available_tokens = max(
+            0,
+            min(int(cycle["max_tokens"]), int(daily["max_tokens"])) - used_tokens,
+        )
+        event_payload = event.get("payload")
+        if not isinstance(event_payload, Mapping):
+            raise DiscoveryError("material event payload is invalid")
+        trusted_evidence_refs = _string_sequence(
+            "material event evidence_refs",
+            event_payload.get("evidence_refs"),
+            allow_empty=True,
+            maximum=4_096,
+        )
+        revision = self._ledger.storage_coverage_manifest()["global_sequence_last"]
+        if type(revision) is not int or revision < 0:
+            raise DiscoveryError("global ledger revision is invalid")
+        snapshot = self._kernel.freeze_admission_snapshot(
+            candidate,
+            ledger_revision=revision,
+            as_of=now,
+            current_head_sha=self._config.head_sha,
+            base_sha=self._config.base_sha,
+            worktree_clean=True,
+            release_manifest_sha256=self._config.release_manifest_sha256,
+            context_sha256=self._config.context_sha256,
+            available_cost_units=available_cost,
+            available_tokens=available_tokens,
+            cycle_admitted=0,
+            daily_admitted=0,
+            wip_available=len(active_refs) < maximum_active,
+            active_reservations=tuple(sorted(active_refs)),
+            executor_capability_refs=admission_config.executor_capability_refs,
+            evaluator_capability_refs=admission_config.evaluator_capability_refs,
+            model_route_proof_ref=admission_config.model_route_proof_ref,
+            trusted_evidence_refs=trusted_evidence_refs,
+        )
+        decision = self._kernel.evaluate_candidate(candidate, snapshot)
+        receipt = decision.to_mapping()
+        authority_status, authority_reason, authority_bundle = self._derive_authority(
+            event,
+            candidate,
+            receipt,
+        )
+        receipt_payload = receipt["payload"]
+        response: dict[str, object] = {
+            "decision": decision.decision,
+            "receipt": receipt,
+            "snapshot_sha256": snapshot.sha256,
+            "reservation_ref": receipt_payload["reservation_ref"],
+            "authority_status": authority_status,
+            "authority_reason": authority_reason,
+            "authority_bundle": authority_bundle,
+        }
+        entry = {
+            "candidate_sha256": canonical_json_sha256(candidate),
+            "snapshot": snapshot.to_mapping(),
+            "snapshot_sha256": snapshot.sha256,
+            "response": response,
+        }
+        _bounded_insert(entries, candidate_ref, entry, "admission entry")
+        return response, receipt, revision
+
+    def _derive_authority(
+        self,
+        event: Mapping[str, object],
+        candidate: Mapping[str, object],
+        receipt: Mapping[str, object],
+    ) -> tuple[str, str, dict[str, object] | None]:
+        payload = receipt.get("payload")
+        if not isinstance(payload, Mapping) or payload.get("decision") != "ADMIT":
+            return "NOT_ISSUED", "ADMISSION_NOT_ADMITTED", None
+        admission_config = self._config.admission
+        if admission_config is None or admission_config.corridor_executor_profile is None:
+            return "WAIT_AUTHORITY", "CORRIDOR_PROFILE_UNAVAILABLE", None
+        event_payload = event.get("payload")
+        materiality = (
+            event_payload.get("materiality_inputs")
+            if isinstance(event_payload, Mapping)
+            else None
+        )
+        source_ref = materiality.get("source_ref") if isinstance(materiality, Mapping) else None
+        candidate_payload = candidate.get("payload")
+        evidence = (
+            candidate_payload.get("evidence_refs")
+            if isinstance(candidate_payload, Mapping)
+            else None
+        )
+        if (
+            not isinstance(source_ref, str)
+            or not source_ref.startswith("registered:")
+            or not isinstance(evidence, (list, tuple))
+            or not evidence
+            or any(
+                not isinstance(reference, str)
+                or not reference.startswith(_CAS_INPUT_PREFIX)
+                for reference in evidence
+            )
+        ):
+            return "WAIT_AUTHORITY", "REGISTERED_CAS_EVIDENCE_REQUIRED", None
+        if self._authority is None:
+            return "WAIT_AUTHORITY", "PINNED_AUTHORITY_UNAVAILABLE", None
+        try:
+            receipt_json = _json_copy(receipt)
+            candidate_json = _json_copy(candidate)
+            if not isinstance(receipt_json, dict) or not isinstance(candidate_json, dict):
+                raise AuthorityError("corridor documents are not JSON objects")
+            corridor = A1AuthorityCorridor(
+                authority=self._authority,
+                executor_profile=admission_config.corridor_executor_profile,
+                trusted_admission_receipts={str(receipt_json["object_id"]): receipt_json},
+                expected_core_catalog_sha256=self._kernel.core_catalog_sha256,
+                expected_a1_catalog_sha256=self._kernel.catalog_sha256,
+            )
+            bundle = corridor.issue(
+                receipt_json,
+                candidate_json,
+                input_refs=evidence,
+                lifetime_seconds=admission_config.corridor_lifetime_seconds,
+            )
+        except AuthorityError:
+            return "WAIT_AUTHORITY", "CORRIDOR_AUTHORITY_UNAVAILABLE", None
+        return "ISSUED", "AUTHORITY_CHAIN_ISSUED", bundle.to_mapping()
+
+    @staticmethod
+    def _candidate_for_ref(
+        states: Mapping[str, Mapping[str, object]], candidate_ref: object
+    ) -> dict[str, object]:
+        reference = _text("candidate_ref", candidate_ref, maximum=256)
+        proposals = states["candidates"].get("proposals")
+        if not isinstance(proposals, Mapping):
+            raise DiscoveryError("durable candidate projection is invalid")
+        for record in proposals.values():
+            replay = _replay_record(record, "durable proposal")
+            candidate = replay["response"].get("candidate_spec_draft")
+            if isinstance(candidate, dict) and candidate.get("object_id") == reference:
+                return candidate
+        raise DiscoveryError("durable admission references an unknown candidate")
+
+    def _validate_admission_runtime_state(
+        self, states: Mapping[str, Mapping[str, object]]
+    ) -> None:
+        entries = states["admissions"].get("entries")
+        if not isinstance(entries, Mapping):
+            raise DiscoveryError("durable admission projection is invalid")
+        for candidate_ref, raw_entry in entries.items():
+            entry = _exact_mapping(raw_entry, _ADMISSION_ENTRY_KEYS, "admission entry")
+            candidate = self._candidate_for_ref(states, candidate_ref)
+            if not hmac.compare_digest(
+                _sha256("admission candidate digest", entry["candidate_sha256"]),
+                canonical_json_sha256(candidate),
+            ):
+                raise DiscoveryError("durable admission candidate binding diverged")
+            snapshot = A1AdmissionSnapshot(
+                payload=entry["snapshot"],
+                sha256=_sha256("admission snapshot digest", entry["snapshot_sha256"]),
+            )
+            frozen_snapshot = snapshot.to_mapping()
+            admission_config = self._config.admission
+            if admission_config is None:  # pragma: no cover - caller requires it.
+                raise DiscoveryError("durable admission config is unavailable")
+            vcs = frozen_snapshot.get("vcs_identity")
+            if (
+                frozen_snapshot.get("policy_sha256") != self._config.policy_sha256
+                or frozen_snapshot.get("context_sha256") != self._config.context_sha256
+                or frozen_snapshot.get("executor_capability_refs")
+                != list(admission_config.executor_capability_refs)
+                or frozen_snapshot.get("evaluator_capability_refs")
+                != list(admission_config.evaluator_capability_refs)
+                or frozen_snapshot.get("model_route_proof_ref")
+                != admission_config.model_route_proof_ref
+                or not isinstance(vcs, dict)
+                or vcs.get("current_head_sha") != self._config.head_sha
+                or vcs.get("base_sha") != self._config.base_sha
+                or vcs.get("release_manifest_sha256")
+                != self._config.release_manifest_sha256
+            ):
+                raise DiscoveryError("durable admission frozen binding drifted")
+            expected = self._kernel.evaluate_candidate(candidate, snapshot).to_mapping()
+            response = entry["response"]
+            if not isinstance(response, dict) or response.get("receipt") != expected:
+                raise DiscoveryError("durable admission receipt diverged")
+            try:
+                stored = self._ledger.read_a1_object(str(expected["object_id"]))
+            except LedgerError as exc:
+                raise DiscoveryError("durable admission receipt object is missing") from exc
+            if canonical_json_sha256(stored) != canonical_json_sha256(expected):
+                raise DiscoveryError("durable admission receipt object diverged")
+            event_ref = candidate["payload"].get("event_ref")
+            event = states["material_events"]["events"].get(event_ref)
+            if not isinstance(event, dict):
+                raise DiscoveryError("durable admission event is missing")
+            event_payload = event.get("payload")
+            if not isinstance(event_payload, dict):
+                raise DiscoveryError("durable admission event payload is invalid")
+            event_evidence = event_payload.get("evidence_refs")
+            if frozen_snapshot.get("trusted_evidence_refs") != event_evidence:
+                raise DiscoveryError("durable admission evidence binding drifted")
+            status, reason, bundle = self._derive_authority(event, candidate, expected)
+            if (
+                response.get("decision") != expected["payload"]["decision"]
+                or response.get("snapshot_sha256") != snapshot.sha256
+                or response.get("reservation_ref")
+                != expected["payload"]["reservation_ref"]
+                or response.get("authority_status") != status
+                or response.get("authority_reason") != reason
+                or response.get("authority_bundle") != bundle
+            ):
+                raise DiscoveryError("durable admission authority replay diverged")
+
     def _states(self) -> dict[str, dict[str, object]]:
         try:
             coverage = self._ledger.projection_coverage()
@@ -1387,6 +1849,7 @@ class DurableDiscoveryService:
         operation: str,
         *,
         objects: Sequence[Mapping[str, object]] = (),
+        expected_previous_sequence: int | None = None,
     ) -> None:
         ledger_key = _durable_ledger_key(operation, key)
         try:
@@ -1396,6 +1859,7 @@ class DurableDiscoveryService:
                     projections=states,
                     idempotency_key=ledger_key,
                     event_at=now,
+                    expected_previous_sequence=expected_previous_sequence,
                 )
             else:
                 self._ledger._advance_a1_projections(
@@ -1652,6 +2116,7 @@ def _validate_production_source_trigger(
     trigger: Mapping[str, object],
     *,
     allowed_source_prefixes: Sequence[str],
+    allowed_evidence_prefixes: Sequence[str],
     idempotency_key: str,
 ) -> str:
     """Require a sanitized ref-only provenance record before materiality.
@@ -1687,6 +2152,10 @@ def _validate_production_source_trigger(
         _text("allowed source prefix", prefix, maximum=512)
         for prefix in allowed_source_prefixes
     )
+    evidence_prefixes = tuple(
+        _text("allowed evidence prefix", prefix, maximum=512)
+        for prefix in allowed_evidence_prefixes
+    )
     matches = tuple(prefix for prefix in prefixes if source_ref.startswith(prefix))
     if len(matches) != 1:
         raise DiscoveryError("source provenance is not exactly allowlisted")
@@ -1698,7 +2167,7 @@ def _validate_production_source_trigger(
     )
     for reference in evidence_refs:
         evidence_matches = tuple(
-            prefix for prefix in prefixes if reference.startswith(prefix)
+            prefix for prefix in evidence_prefixes if reference.startswith(prefix)
         )
         if len(evidence_matches) != 1:
             raise DiscoveryError("source evidence provenance is not allowlisted")
@@ -2135,6 +2604,19 @@ def _positive_integer(name: str, value: object) -> int:
     if type(value) is not int or not 1 <= value <= _MAX_SAFE_INTEGER:
         raise DiscoveryError(f"{name} must be a positive safe integer")
     return value
+
+
+def _admission_limit_map(value: object, name: str) -> dict[str, object]:
+    if not isinstance(value, Mapping):
+        raise DiscoveryError(f"{name} must be an object")
+    copied = _json_copy(value)
+    if not isinstance(copied, dict):  # pragma: no cover - Mapping copied above.
+        raise DiscoveryError(f"{name} must be an object")
+    for field in ("max_admitted_experiments", "max_tokens", "max_cost_units"):
+        _positive_integer(f"{name}.{field}", copied.get(field))
+    for field, item in copied.items():
+        _positive_integer(f"{name}.{field}", item)
+    return copied
 
 
 def _resource_budget(name: str, value: object) -> dict[str, object]:

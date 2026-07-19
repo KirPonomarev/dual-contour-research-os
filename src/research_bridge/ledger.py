@@ -1187,11 +1187,16 @@ class JobLedger:
         projections: Mapping[str, Mapping[str, object]],
         idempotency_key: str,
         event_at: str,
+        expected_previous_sequence: int | None = None,
     ) -> A1BundleRecord:
         """Commit A1 objects and all projections at one global ledger sequence."""
 
         key = _text(idempotency_key, "idempotency_key", maximum=256)
         timestamp = _timestamp("event_at", event_at)
+        if expected_previous_sequence is not None:
+            expected_previous_sequence = _nonnegative_integer(
+                "expected_previous_sequence", expected_previous_sequence
+            )
         if not isinstance(objects, Sequence) or isinstance(objects, (str, bytes)):
             raise LedgerError("A1 bundle objects must be a sequence")
         if not objects or len(objects) > 64:
@@ -1293,6 +1298,14 @@ class JobLedger:
                                 and isinstance(item.get("projection_name"), str)
                             )
                         ),
+                    )
+
+                if (
+                    expected_previous_sequence is not None
+                    and self._ledger_tail_sequence() != expected_previous_sequence
+                ):
+                    raise LedgerError(
+                        "A1 bundle exact pre-append ledger revision drifted"
                     )
 
                 event = self._append(

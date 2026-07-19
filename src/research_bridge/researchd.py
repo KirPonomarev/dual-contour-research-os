@@ -28,10 +28,14 @@ except ImportError:  # pragma: no cover - the runtime is explicitly Unix-only
     fcntl = None  # type: ignore[assignment]
 
 from .admission import A1AdmissionKernel, canonical_json_sha256
-from .authority import PinnedOfflineAuthority, TrustedIssuer
+from .authority import CorridorExecutorProfile, PinnedOfflineAuthority, TrustedIssuer
 from .cas import ContentAddressedStore
 from .control import ControlRouter
-from .discovery import DurableDiscoveryConfig, DurableDiscoveryService
+from .discovery import (
+    DurableAdmissionConfig,
+    DurableDiscoveryConfig,
+    DurableDiscoveryService,
+)
 from .execution import OfflineExecutionCoordinator
 from .ingestion import TrustedIngestor
 from .ipc import (
@@ -85,6 +89,20 @@ _FROZEN_BINDING_KEYS = frozenset(
         "ipc_compatibility_profile_sha256",
         "executor_capability_refs",
         "evaluator_capability_refs",
+    }
+)
+_ADMISSION_RUNTIME_KEY = "admission_runtime"
+_ADMISSION_RUNTIME_KEYS = frozenset(
+    {"model_route_proof_ref", "corridor_executor_profile"}
+)
+_CORRIDOR_EXECUTOR_PROFILE_KEYS = frozenset(
+    {
+        "capability_ref",
+        "protocol_ref",
+        "code_sha256",
+        "image_digest",
+        "runner_identity",
+        "maximum_lifetime_seconds",
     }
 )
 _PRINCIPAL_ROLES = frozenset({"operator", "collector", "scout"})
@@ -462,6 +480,7 @@ class ResearchDaemon:
                         kernel,
                         ledger,
                         discovery_config,
+                        authority=self._authority,
                     )
                     self._a1_backend = a1_backend
                 router = ControlRouter(
@@ -973,6 +992,20 @@ def _service_config_from_mapping(config: Mapping[str, object]) -> _ServiceConfig
             a1_enabled=a1_enabled,
             policy_snapshots=config.get("policy_snapshots"),
         )
+        admission_runtime = frozen_bindings.get(_ADMISSION_RUNTIME_KEY)
+        corridor_profile = (
+            admission_runtime.get("corridor_executor_profile")
+            if isinstance(admission_runtime, Mapping)
+            else None
+        )
+        if (
+            corridor_profile is not None
+            and (
+                type(corridor_profile) is not CorridorExecutorProfile
+                or corridor_profile.runner_identity != runner_identity
+            )
+        ):
+            raise _ServiceConfigError("corridor runner identity is mixed")
         a1_limits = _a1_limits(
             config.get("a1_limits"),
             a1_enabled=a1_enabled,
@@ -1108,7 +1141,12 @@ def _frozen_bindings(
         return None
     if not isinstance(value, dict):
         raise _ServiceConfigError("A1 frozen bindings must be an object")
-    _expect_config_keys(value, _FROZEN_BINDING_KEYS, "frozen_bindings")
+    binding_keys = set(value)
+    if binding_keys not in (
+        set(_FROZEN_BINDING_KEYS),
+        set(_FROZEN_BINDING_KEYS | {_ADMISSION_RUNTIME_KEY}),
+    ):
+        raise _ServiceConfigError("frozen_bindings shape is invalid")
     for name in (
         "core_catalog_sha256",
         "a1_catalog_sha256",
@@ -1134,8 +1172,7 @@ def _frozen_bindings(
     evaluator_refs = _capability_refs(
         value.get("evaluator_capability_refs"), "evaluator capability ref"
     )
-    return MappingProxyType(
-        {
+    frozen: dict[str, object] = {
             "core_catalog_sha256": value["core_catalog_sha256"],
             "a1_catalog_sha256": value["a1_catalog_sha256"],
             "release_manifest_sha256": value["release_manifest_sha256"],
@@ -1146,7 +1183,71 @@ def _frozen_bindings(
             "executor_capability_refs": executor_refs,
             "evaluator_capability_refs": evaluator_refs,
         }
-    )
+    raw_runtime = value.get(_ADMISSION_RUNTIME_KEY)
+    if raw_runtime is not None:
+        if not isinstance(raw_runtime, dict):
+            raise _ServiceConfigError("admission runtime binding is invalid")
+        _expect_config_keys(
+            raw_runtime, _ADMISSION_RUNTIME_KEYS, "admission_runtime"
+        )
+        model_route_proof_ref = _config_text(
+            raw_runtime.get("model_route_proof_ref"),
+            "model_route_proof_ref",
+            maximum=512,
+        )
+        raw_profile = raw_runtime.get("corridor_executor_profile")
+        profile: CorridorExecutorProfile | None = None
+        if raw_profile is not None:
+            if not isinstance(raw_profile, dict):
+                raise _ServiceConfigError("corridor executor profile is invalid")
+            _expect_config_keys(
+                raw_profile,
+                _CORRIDOR_EXECUTOR_PROFILE_KEYS,
+                "corridor_executor_profile",
+            )
+            capability_ref = _config_text(
+                raw_profile.get("capability_ref"),
+                "corridor capability_ref",
+                maximum=512,
+            )
+            if capability_ref not in executor_refs:
+                raise _ServiceConfigError("corridor capability is not frozen")
+            code_sha256 = raw_profile.get("code_sha256")
+            if not _is_sha256(code_sha256):
+                raise _ServiceConfigError("corridor code digest is invalid")
+            maximum_lifetime = raw_profile.get("maximum_lifetime_seconds")
+            if type(maximum_lifetime) is not int or not 1 <= maximum_lifetime <= 300:
+                raise _ServiceConfigError("corridor lifetime is invalid")
+            try:
+                profile = CorridorExecutorProfile(
+                    capability_ref=capability_ref,
+                    protocol_ref=_config_text(
+                        raw_profile.get("protocol_ref"),
+                        "corridor protocol_ref",
+                        maximum=512,
+                    ),
+                    code_sha256=str(code_sha256),
+                    image_digest=_config_text(
+                        raw_profile.get("image_digest"),
+                        "corridor image_digest",
+                        maximum=512,
+                    ),
+                    runner_identity=_config_text(
+                        raw_profile.get("runner_identity"),
+                        "corridor runner_identity",
+                        maximum=256,
+                    ),
+                    maximum_lifetime_seconds=maximum_lifetime,
+                )
+            except Exception as exc:
+                raise _ServiceConfigError("corridor executor profile is invalid") from exc
+        frozen[_ADMISSION_RUNTIME_KEY] = MappingProxyType(
+            {
+                "model_route_proof_ref": model_route_proof_ref,
+                "corridor_executor_profile": profile,
+            }
+        )
+    return MappingProxyType(frozen)
 
 
 def _capability_refs(value: object, label: str) -> tuple[str, ...]:
@@ -1275,16 +1376,67 @@ def _discovery_config_from_authority(
     }
     if len(collectors) != 1:
         raise ResearchdError("A1 discovery requires exactly one collector principal")
-    context_sha256 = canonical_json_sha256(
-        {
-            "a1_limits": a1_limits,
-            "core_catalog_sha256": frozen_bindings.get("core_catalog_sha256"),
-            "a1_catalog_sha256": frozen_bindings.get("a1_catalog_sha256"),
-            "release_manifest_sha256": frozen_bindings.get("release_manifest_sha256"),
-            "policy_sha256": policy_sha256,
+    runtime_context: object = None
+    runtime_binding = frozen_bindings.get(_ADMISSION_RUNTIME_KEY)
+    if isinstance(runtime_binding, Mapping):
+        profile = runtime_binding.get("corridor_executor_profile")
+        profile_context: object = None
+        if type(profile) is CorridorExecutorProfile:
+            profile_context = {
+                "capability_ref": profile.capability_ref,
+                "protocol_ref": profile.protocol_ref,
+                "code_sha256": profile.code_sha256,
+                "image_digest": profile.image_digest,
+                "runner_identity": profile.runner_identity,
+                "maximum_lifetime_seconds": profile.maximum_lifetime_seconds,
+                "runner_profile": profile.runner_profile,
+                "input_ref_prefixes": profile.input_ref_prefixes,
+            }
+        runtime_context = {
+            "model_route_proof_ref": runtime_binding.get("model_route_proof_ref"),
+            "corridor_executor_profile": profile_context,
         }
-    )
+    context_payload: dict[str, object] = {
+        "a1_limits": a1_limits,
+        "core_catalog_sha256": frozen_bindings.get("core_catalog_sha256"),
+        "a1_catalog_sha256": frozen_bindings.get("a1_catalog_sha256"),
+        "release_manifest_sha256": frozen_bindings.get("release_manifest_sha256"),
+        "policy_sha256": policy_sha256,
+    }
+    if runtime_binding is not None:
+        context_payload["admission_runtime"] = runtime_context
+    context_sha256 = canonical_json_sha256(context_payload)
     try:
+        executor_refs = frozen_bindings.get("executor_capability_refs")
+        evaluator_refs = frozen_bindings.get("evaluator_capability_refs")
+        if not isinstance(executor_refs, tuple) or not isinstance(evaluator_refs, tuple):
+            raise ResearchdError("A1 admission capability bindings are invalid")
+        runtime_binding = frozen_bindings.get(_ADMISSION_RUNTIME_KEY)
+        admission_config: DurableAdmissionConfig | None = None
+        evidence_prefixes: tuple[str, ...] | None = None
+        if runtime_binding is not None:
+            if not isinstance(runtime_binding, Mapping):
+                raise ResearchdError("A1 admission runtime binding is invalid")
+            profile = runtime_binding.get("corridor_executor_profile")
+            if profile is not None and type(profile) is not CorridorExecutorProfile:
+                raise ResearchdError("A1 corridor executor profile is invalid")
+            route_ref = runtime_binding.get("model_route_proof_ref")
+            if not isinstance(route_ref, str):
+                raise ResearchdError("A1 model route proof binding is invalid")
+            admission_config = DurableAdmissionConfig(
+                cycle_limits=cycle,
+                daily_limits=a1_limits["daily_limits"],
+                executor_capability_refs=executor_refs,
+                evaluator_capability_refs=evaluator_refs,
+                model_route_proof_ref=route_ref,
+                corridor_executor_profile=profile,
+                corridor_lifetime_seconds=(
+                    profile.maximum_lifetime_seconds
+                    if type(profile) is CorridorExecutorProfile
+                    else 120
+                ),
+            )
+            evidence_prefixes = ("public:", "registered:", "cas:sha256:")
         return DurableDiscoveryConfig(
             policy_sha256=policy_sha256,
             context_sha256=context_sha256,
@@ -1292,6 +1444,7 @@ def _discovery_config_from_authority(
             root_energy=energy,
             remaining_energy=energy,
             allowed_source_prefixes=("public:", "registered:"),
+            allowed_evidence_prefixes=evidence_prefixes,
             collector_bindings=collectors,
             repository_id=source_repo,
             head_sha=commit_sha,
@@ -1301,6 +1454,7 @@ def _discovery_config_from_authority(
             ),
             maximum_source_triggers_per_window=min(1_024, max(1, source_rate_limit)),
             source_rate_window_seconds=60,
+            admission=admission_config,
         )
     except Exception as exc:
         raise ResearchdError("A1 discovery runtime binding is invalid") from exc
