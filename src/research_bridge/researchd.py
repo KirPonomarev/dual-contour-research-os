@@ -818,10 +818,14 @@ class ResearchDaemon:
                     validation_receipt=record.validation_receipt,
                     now=self._clock().astimezone(timezone.utc).isoformat().replace("+00:00", "Z"),
                 )
-            except ExecutionError as exc:
-                raise ResearchdError(
-                    "completed A1 execution feedback recovery failed closed"
-                ) from exc
+            except ExecutionError:
+                # A completed execution can be independently invalid (for
+                # example, vacuous evidence).  It remains durable and
+                # feedback-free; startup must neither reexecute it nor turn
+                # mechanical invalidity into an epistemic outcome.  Ledger,
+                # source-pin, ownership and composition failures occur outside
+                # this narrow validation boundary and remain fatal.
+                continue
 
     def reserve_model_call(
         self,
