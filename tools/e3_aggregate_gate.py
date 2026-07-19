@@ -15,6 +15,11 @@ from capability_proof import (
     canonical_json_sha256,
     validate_capability_proof,
 )
+from release_currentness import (
+    ReleaseCurrentnessError,
+    assess_capability_for_release,
+    validate_release_currentness_context,
+)
 
 
 SUBJECT_SHA = "26eed42993b11551b94e7c9054fdddf0be87ca64"
@@ -115,8 +120,11 @@ def _integration(receipt: Mapping[str, object], stage_id: str) -> dict[str, obje
 def validate_e3_evidence(root: Path, *, subject_ref: str = SUBJECT_REF) -> dict[str, object]:
     """Bind exact S29-S31 assurance without creating evolution authority."""
 
-    if subject_ref != SUBJECT_REF:
-        raise E3AggregateError("aggregate subject is not the frozen exact head")
+    if not isinstance(subject_ref, str) or not subject_ref.startswith("git:") or len(subject_ref) != 44:
+        raise E3AggregateError("aggregate subject is not an exact Git head")
+    subject_sha = subject_ref[4:]
+    if subject_ref != SUBJECT_REF and not _is_ancestor(root, SUBJECT_SHA, subject_sha):
+        raise E3AggregateError("aggregate subject is not a descendant exact head")
     audits: dict[str, dict[str, object]] = {}
     for relative, expected_digest in EVIDENCE_FILES.items():
         try:
@@ -129,7 +137,7 @@ def validate_e3_evidence(root: Path, *, subject_ref: str = SUBJECT_REF) -> dict[
         # Stage heads are immutable audit identities and may have been integrated
         # by a reviewed cherry-pick. The signed IntegrationReceipt binds that head
         # to integration_commit_sha; only the latter must be in main ancestry.
-        if not _is_ancestor(root, str(payload["integration_commit_sha"]), SUBJECT_SHA):
+        if not _is_ancestor(root, str(payload["integration_commit_sha"]), subject_sha):
             raise E3AggregateError("E3 integration_commit_sha is outside exact-head ancestry")
         audit = payload["audit_results"]
         assert isinstance(audit, dict)
@@ -164,7 +172,7 @@ def validate_e3_evidence(root: Path, *, subject_ref: str = SUBJECT_REF) -> dict[
 
     return {
         "status": "EVOLUTION_E3_SHADOW_PASS_FOR_FROZEN_SCOPE",
-        "subject_ref": SUBJECT_REF,
+        "subject_ref": subject_ref,
         "mutation_proposal_status": "MUTATION_PROPOSAL_LOOP_PASS",
         "champion_challenger_status": "CHAMPION_CHALLENGER_PASS_FOR_FROZEN_BENCHMARK",
         "evolution_loop_status": "EVOLUTION_LOOP_SHADOW_PASS",
@@ -189,14 +197,15 @@ def validate_e3_evidence(root: Path, *, subject_ref: str = SUBJECT_REF) -> dict[
     }
 
 
-def validate_aggregate_receipt(root: Path, receipt: Mapping[str, object]) -> dict[str, object]:
-    evidence = validate_e3_evidence(root)
+def _validate_receipt_against_evidence(
+    receipt: Mapping[str, object], evidence: Mapping[str, object]
+) -> dict[str, object]:
     try:
         proof = validate_capability_proof(receipt)
     except CapabilityProofError as exc:
         raise E3AggregateError("aggregate E3 capability proof is invalid") from exc
     payload = proof["payload"]
-    if payload["capability_id"] != "EVOLUTION_E3_SHADOW" or payload["subject_ref"] != SUBJECT_REF:
+    if payload["capability_id"] != "EVOLUTION_E3_SHADOW" or payload["subject_ref"] != evidence["subject_ref"]:
         raise E3AggregateError("aggregate E3 capability identity mismatch")
     scope = payload["scope"]
     if any(scope[field] is not False for field in FORBIDDEN_TRUE_FLAGS):
@@ -214,16 +223,58 @@ def validate_aggregate_receipt(root: Path, receipt: Mapping[str, object]) -> dic
     return proof
 
 
+def validate_historical_aggregate_receipt(
+    root: Path, receipt: Mapping[str, object]
+) -> dict[str, object]:
+    """Validate immutable historical semantics without claiming currentness."""
+
+    return _validate_receipt_against_evidence(receipt, validate_e3_evidence(root))
+
+
+def validate_aggregate_receipt(
+    root: Path,
+    receipt: Mapping[str, object],
+    *,
+    currentness_context: Mapping[str, object],
+) -> dict[str, object]:
+    try:
+        current = validate_release_currentness_context(root, currentness_context)
+    except ReleaseCurrentnessError as exc:
+        raise E3AggregateError("release currentness context is invalid") from exc
+    evidence = validate_e3_evidence(root, subject_ref=f"git:{current['release_sha']}")
+    proof = _validate_receipt_against_evidence(receipt, evidence)
+    try:
+        assess_capability_for_release(
+            root,
+            proof,
+            current,
+            code_sha256=str(evidence["code_sha256"]),
+            config_sha256=str(evidence["config_sha256"]),
+            policy_sha256=str(evidence["policy_sha256"]),
+            schema_sha256=str(evidence["schema_sha256"]),
+        )
+    except ReleaseCurrentnessError as exc:
+        raise E3AggregateError("aggregate E3 proof is not current") from exc
+    return proof
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[1])
     parser.add_argument("--receipt", type=Path)
+    parser.add_argument("--currentness", type=Path)
     args = parser.parse_args()
     root = args.root.resolve()
     evidence = validate_e3_evidence(root)
     if args.receipt:
+        if args.currentness is None:
+            raise E3AggregateError("--currentness is required with --receipt")
         validate_aggregate_receipt(
-            root, _strict_json(args.receipt.read_bytes(), label=str(args.receipt))
+            root,
+            _strict_json(args.receipt.read_bytes(), label=str(args.receipt)),
+            currentness_context=_strict_json(
+                args.currentness.read_bytes(), label=str(args.currentness)
+            ),
         )
     print(json.dumps(evidence, sort_keys=True, separators=(",", ":")))
     return 0

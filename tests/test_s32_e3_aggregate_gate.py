@@ -58,7 +58,7 @@ class E3AggregateGateTests(unittest.TestCase):
         self.assertEqual(evidence["evolution_loop_status"], "EVOLUTION_LOOP_SHADOW_PASS")
         self.assertEqual(evidence["meta_evolution_status"], "META_EVOLUTION_PROPOSAL_ONLY")
         self.assertEqual(evidence["rollback_status"], "DESCRIPTIVE_WAIT_AUTHORITY")
-        gate.validate_aggregate_receipt(ROOT, receipt())
+        gate.validate_historical_aggregate_receipt(ROOT, receipt())
 
     def test_static_receipt_is_deterministically_reproduced(self) -> None:
         value = receipt()
@@ -136,11 +136,11 @@ class E3AggregateGateTests(unittest.TestCase):
                 value = receipt()
                 value["payload"]["scope"][field] = True
                 with self.assertRaises((CapabilityProofError, gate.E3AggregateError)):
-                    gate.validate_aggregate_receipt(ROOT, resign(value))
+                    gate.validate_historical_aggregate_receipt(ROOT, resign(value))
         value = receipt()
         value["payload"]["scope"]["uplift_scope"] = "PRODUCTION_UPLIFT_ESTABLISHED"
         with self.assertRaises((CapabilityProofError, gate.E3AggregateError)):
-            gate.validate_aggregate_receipt(ROOT, resign(value))
+            gate.validate_historical_aggregate_receipt(ROOT, resign(value))
 
     def test_currentness_invalidates_hash_drift_and_expiry(self) -> None:
         payload = receipt()["payload"]

@@ -10,6 +10,13 @@ import re
 import subprocess
 from typing import Mapping
 
+from capability_proof import CapabilityProofError, validate_capability_proof
+from release_currentness import (
+    ReleaseCurrentnessError,
+    assess_capability_for_release,
+    validate_release_currentness_context,
+)
+
 
 ROOT = Path(__file__).resolve().parents[1]
 CANDIDATE = "b2c2e6a8c4e0a364ef82e8e51540433aa91430d4"
@@ -45,7 +52,7 @@ def _payload_sha(value: object) -> str:
     return hashlib.sha256(json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=True, allow_nan=False).encode("ascii")).hexdigest()
 
 
-def validate_manifest(root: Path, manifest: Mapping[str, object]) -> dict[str, object]:
+def validate_manifest_historical(root: Path, manifest: Mapping[str, object]) -> dict[str, object]:
     payload, integrity = manifest.get("payload"), manifest.get("integrity")
     if not isinstance(payload, dict) or not isinstance(integrity, dict) or integrity.get("payload_sha256") != _payload_sha(payload):
         raise FinalReleaseFreezeError("manifest integrity")
@@ -78,6 +85,74 @@ def validate_manifest(root: Path, manifest: Mapping[str, object]) -> dict[str, o
     return dict(payload)
 
 
+def validate_manifest(root: Path, manifest: Mapping[str, object]) -> dict[str, object]:
+    """Validate a release only when every current-subject dimension is present."""
+
+    payload = validate_manifest_historical(root, manifest)
+    context_value = payload.get("currentness_context")
+    if not isinstance(context_value, Mapping):
+        raise FinalReleaseFreezeError("manifest currentness context missing")
+    try:
+        context = validate_release_currentness_context(root, context_value)
+    except ReleaseCurrentnessError as exc:
+        raise FinalReleaseFreezeError("manifest currentness context invalid") from exc
+    if (
+        payload.get("candidate_release_sha") != context["release_sha"]
+        or payload.get("candidate_tree_sha") != context["tree_sha"]
+    ):
+        raise FinalReleaseFreezeError("manifest and current release subject differ")
+    refs = payload.get("capability_proof_refs")
+    if not isinstance(refs, list) or not refs:
+        raise FinalReleaseFreezeError("current capability proof set missing")
+    aggregate_ids = {
+        "EVOLUTION_KERNEL_V1": "e1",
+        "AUTONOMOUS_RESEARCH_E2_SHADOW": "e2",
+        "EVOLUTION_E3_SHADOW": "e3",
+    }
+    seen: set[str] = set()
+    for ref in refs:
+        proof = _load(root / str(ref))
+        try:
+            structured = validate_capability_proof(proof)
+        except CapabilityProofError as exc:
+            raise FinalReleaseFreezeError(f"current capability proof invalid:{ref}") from exc
+        body = structured["payload"]
+        capability_id = str(body["capability_id"])
+        if capability_id in seen:
+            raise FinalReleaseFreezeError("duplicate current capability proof")
+        seen.add(capability_id)
+        aggregate = aggregate_ids.get(capability_id)
+        try:
+            if aggregate == "e1":
+                from e1_aggregate_gate import validate_aggregate_receipt as validate_aggregate
+                validate_aggregate(root, structured, currentness_context=context)
+            elif aggregate == "e2":
+                from e2_aggregate_gate import validate_aggregate_receipt as validate_aggregate
+                validate_aggregate(root, structured, currentness_context=context)
+            elif aggregate == "e3":
+                from e3_aggregate_gate import validate_aggregate_receipt as validate_aggregate
+                validate_aggregate(root, structured, currentness_context=context)
+            elif capability_id == "REAL_PROVIDER_ROUTE_R04D":
+                assess_capability_for_release(
+                    root,
+                    structured,
+                    context,
+                    code_sha256=str(body["code_sha256"]),
+                    config_sha256=str(body["config_sha256"]),
+                    policy_sha256=str(body["policy_sha256"]),
+                    schema_sha256=str(body["schema_sha256"]),
+                )
+            else:
+                raise FinalReleaseFreezeError(
+                    f"capability is not accepted by the current release gate:{capability_id}"
+                )
+        except ReleaseCurrentnessError as exc:
+            raise FinalReleaseFreezeError(f"capability proof is not current:{ref}") from exc
+    if set(aggregate_ids) | {"REAL_PROVIDER_ROUTE_R04D"} != seen:
+        raise FinalReleaseFreezeError("current capability proof coverage incomplete")
+    return payload
+
+
 def validate_inventory(root: Path, inventory: Mapping[str, object]) -> None:
     if inventory.get("candidate_release_sha") != CANDIDATE or inventory.get("private_or_domain_payloads") != 0 or inventory.get("grants_authority") is not False:
         raise FinalReleaseFreezeError("inventory boundary")
@@ -105,7 +180,7 @@ def validate_packet(root: Path, packet: Mapping[str, object]) -> None:
         raise FinalReleaseFreezeError("deployment packet grants authority")
 
 
-def inspect(root: Path = ROOT) -> dict[str, object]:
+def inspect_historical(root: Path = ROOT) -> dict[str, object]:
     if subprocess.run(["git", "cat-file", "-e", CANDIDATE + "^{commit}"], cwd=root, capture_output=True, check=False).returncode:
         raise FinalReleaseFreezeError("candidate commit missing")
     tree = subprocess.run(["git", "rev-parse", CANDIDATE + "^{tree}"], cwd=root, capture_output=True, text=True, check=True).stdout.strip()
@@ -113,11 +188,39 @@ def inspect(root: Path = ROOT) -> dict[str, object]:
     for _, (path, digest) in CATALOGS.items():
         if _sha(root / path) != digest: raise FinalReleaseFreezeError("live catalog drift")
     inventory = _load(root / INVENTORY); manifest = _load(root / MANIFEST); packet = _load(root / PACKET)
-    validate_inventory(root, inventory); payload = validate_manifest(root, manifest); validate_packet(root, packet)
+    validate_inventory(root, inventory); payload = validate_manifest_historical(root, manifest); validate_packet(root, packet)
     sensitive = re.compile(r"BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY|/Users/|/Volumes/|sk-[A-Za-z0-9]{12,}")
     for ref in (MANIFEST, INVENTORY, PACKET):
         if sensitive.search((root / ref).read_text(encoding="utf-8")): raise FinalReleaseFreezeError("public safety scan")
     return {"status": "FINAL_CANDIDATE_FROZEN_WAIT_HUMAN_APPROVAL", "candidate_release_sha": CANDIDATE, "candidate_tree_sha": TREE, "phase_receipts": len(payload["phase_integration_receipts"]), "critical_debt": 0, "deployment_allowed": False, "grants_authority": False}
+
+
+def inspect(root: Path = ROOT) -> dict[str, object]:
+    """Validate current release eligibility; historical S38 must fail here."""
+
+    if subprocess.run(["git", "cat-file", "-e", CANDIDATE + "^{commit}"], cwd=root, capture_output=True, check=False).returncode:
+        raise FinalReleaseFreezeError("candidate commit missing")
+    tree = subprocess.run(["git", "rev-parse", CANDIDATE + "^{tree}"], cwd=root, capture_output=True, text=True, check=True).stdout.strip()
+    if tree != TREE:
+        raise FinalReleaseFreezeError("candidate tree drift")
+    for _, (path, digest) in CATALOGS.items():
+        if _sha(root / path) != digest:
+            raise FinalReleaseFreezeError("live catalog drift")
+    inventory = _load(root / INVENTORY)
+    manifest = _load(root / MANIFEST)
+    packet = _load(root / PACKET)
+    validate_inventory(root, inventory)
+    payload = validate_manifest(root, manifest)
+    validate_packet(root, packet)
+    return {
+        "status": "CURRENT_FINAL_CANDIDATE_FROZEN_WAIT_HUMAN_APPROVAL",
+        "candidate_release_sha": payload["candidate_release_sha"],
+        "candidate_tree_sha": payload["candidate_tree_sha"],
+        "phase_receipts": len(payload["phase_integration_receipts"]),
+        "critical_debt": 0,
+        "deployment_allowed": False,
+        "grants_authority": False,
+    }
 
 
 def main() -> int:

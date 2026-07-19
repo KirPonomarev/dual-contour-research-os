@@ -44,7 +44,7 @@ class E1AggregateGateTests(unittest.TestCase):
     def test_exact_evidence_and_static_receipt_pass(self) -> None:
         evidence = gate.validate_e1_evidence(ROOT)
         self.assertEqual(evidence["status"], "EVOLUTION_KERNEL_V1_SHADOW_PASS_FOR_FROZEN_SCOPE")
-        proof = gate.validate_aggregate_receipt(ROOT, receipt())
+        proof = gate.validate_historical_aggregate_receipt(ROOT, receipt())
         self.assertEqual(proof["payload"]["capability_id"], "EVOLUTION_KERNEL_V1")
 
     def test_static_receipt_is_deterministically_reproduced(self) -> None:
@@ -131,7 +131,7 @@ class E1AggregateGateTests(unittest.TestCase):
                 value = receipt()
                 value["payload"]["scope"][field] = replacement
                 with self.assertRaises((CapabilityProofError, gate.E1AggregateError)):
-                    gate.validate_aggregate_receipt(ROOT, resign(value))
+                    gate.validate_historical_aggregate_receipt(ROOT, resign(value))
 
     def test_cross_capability_issuer_rejects_payload(self) -> None:
         prior = json.loads(

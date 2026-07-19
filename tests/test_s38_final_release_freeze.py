@@ -10,8 +10,10 @@ import unittest
 from tools.verify_final_release_freeze import (
     FinalReleaseFreezeError,
     inspect,
+    inspect_historical,
     validate_inventory,
     validate_manifest,
+    validate_manifest_historical,
     validate_packet,
 )
 
@@ -25,7 +27,7 @@ def _load(path: str) -> dict[str, object]:
 
 class S38FinalReleaseFreezeTests(unittest.TestCase):
     def test_final_candidate_is_exact_frozen_and_non_authoritative(self) -> None:
-        result = inspect(ROOT)
+        result = inspect_historical(ROOT)
         self.assertEqual(result["status"], "FINAL_CANDIDATE_FROZEN_WAIT_HUMAN_APPROVAL")
         self.assertEqual(result["candidate_release_sha"], "b2c2e6a8c4e0a364ef82e8e51540433aa91430d4")
         self.assertEqual(result["phase_receipts"], 16)
@@ -46,7 +48,14 @@ class S38FinalReleaseFreezeTests(unittest.TestCase):
                 json.dumps(forged["payload"], sort_keys=True, separators=(",", ":")).encode()
             ).hexdigest()
             with self.assertRaises(FinalReleaseFreezeError):
-                validate_manifest(ROOT, forged)
+                validate_manifest_historical(ROOT, forged)
+
+    def test_historical_candidate_is_not_current_release_eligible(self) -> None:
+        with self.assertRaisesRegex(FinalReleaseFreezeError, "currentness context missing"):
+            inspect(ROOT)
+        manifest = _load("docs/receipts/release/s38-final-release-manifest.json")
+        with self.assertRaisesRegex(FinalReleaseFreezeError, "currentness context missing"):
+            validate_manifest(ROOT, manifest)
 
     def test_deployment_packet_requires_rebound_human_receipt(self) -> None:
         packet = _load("ops/deploy/s38-final-deployment-packet.json")

@@ -191,7 +191,7 @@ class E2AggregateGateTests(unittest.TestCase):
                 value = receipt()
                 value["payload"]["scope"][field] = replacement
                 with self.assertRaises((CapabilityProofError, gate.E2AggregateError)):
-                    gate.validate_aggregate_receipt(ROOT, resign(value))
+                    gate.validate_historical_aggregate_receipt(ROOT, resign(value))
 
     def test_currentness_invalidates_on_hash_drift_or_expiry(self) -> None:
         payload = receipt()["payload"]
