@@ -1,0 +1,18 @@
+{
+  "schema_id": "IntegrationReceipt", "schema_version": "1.0.0", "object_id": "integration-s35-method-card-20260719", "issued_at": "2026-07-19T00:56:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"}, "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s35-method-card", "agent_id": "agent-0", "ownership_lease_ref": "stages/s35-method-card/ownership-lease.json",
+    "base_sha": "9d4e00a74cf8d9e1fcfd0cfdff6040d91ce941bd", "head_sha": "24fce6008e116c5fd08823d64ed82223ea69f235", "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": ["contracts/e5/", "provenance/method-card-declassification-v1.json", "tools/method_card.py", "tools/validate_e5_contracts.py", "tools/validate_contracts.py", "docs/ADR/0009-e5-method-card-boundary.md", "docs/receipts/reuse/s35-method-card.json", "tests/test_s35_method_card.py", "stages/s35-method-card/"],
+    "audit_results": {
+      "contract_gate": "green", "privacy_secret_scan": "green", "source_mutation": false, "agent0_contract_and_validator_mutation": true,
+      "core_catalog_sha256_unchanged": true, "additive_E5_contracts": 2, "domain_owned_declassification_receipt": true, "Bridge_domain_receipt_writer": false,
+      "D2_D3_denial": "green", "SHADOW_UNAPPLIED_laundering_denial": "green", "raw_evidence_target_strategy_holdout_prompt_denial": "green", "field_metadata_scan": "green",
+      "recipient_status": "ELIGIBLE_FOR_RECIPIENT_SHADOW_ONLY", "recipient_writes": 0, "scientific_truth_transfer": false, "automatic_promotion": false, "canonical_mutation": false, "grants_authority": false,
+      "focused_tests": 6, "full_core_tests": 777, "stage0b_tests": 25
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29667685667", "integration_commit_sha": "98dae727e762339d3b79c7e13e5106be58488ac0"
+  },
+  "integrity": {"payload_sha256": "3a77b07483e625b7c957ec783b466eebcbf350ba388124abeec34cbaa21d7291", "parent_refs": ["git:9d4e00a74cf8d9e1fcfd0cfdff6040d91ce941bd", "git:24fce6008e116c5fd08823d64ed82223ea69f235", "git:98dae727e762339d3b79c7e13e5106be58488ac0", "ci:29667685667", "profile:sha256:ecbf5578f85d50b9cdf53f5bead12f00a27c9500474faf50860d952408188628"]}
+}
