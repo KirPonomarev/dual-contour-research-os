@@ -1,0 +1,194 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-r08b-r2-owner-correct-exact-source-build-20260719",
+  "issued_at": "2026-07-19T21:09:39Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "r08b-r2-owner-correct-exact-source-build",
+    "parent_stage_id": "r08b-exact-candidate-image-build-sbom",
+    "integration_agent_id": "agent-0",
+    "read_only_assurance_agent_id": "agent-5",
+    "ownership_lease_ref": "stages/r08b-exact-candidate-image-build-sbom/ownership-lease-amendment-v2.4-3.json",
+    "stage_envelope_ref": "stages/r08b-exact-candidate-image-build-sbom/stage-envelope-amendment-v2.4-3.json",
+    "base_sha": "9cfcd1f7281d6a1d89b245266dd63ec992c1d94e",
+    "stage_authorization_sha": "b4431cae6495c0bd4b348247ef7eae686ae20846",
+    "tool_revert_sha": "489e3bfc1f6a102b4659b75474b9fb2373ce67a6",
+    "tool_redelivery_sha": "c9d86c8aabe8c1d461c7baff5be6aff92e6b70d6",
+    "head_sha": "c9d86c8aabe8c1d461c7baff5be6aff92e6b70d6",
+    "head_tree_sha": "7ed90ebb29f8717bab0078d95f8ccdb0bebe87b1",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "a1_contract_sha256": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+    "supersedes_for_acceptance": {
+      "receipt_ref": "docs/receipts/integration/r08b-r1-core-model-runtime-provenance-image.json",
+      "receipt_head_sha": "9cfcd1f7281d6a1d89b245266dd63ec992c1d94e",
+      "receipt_sha256": "9a4f0f852ee5155f5ef6df68e403fd5d348284bce00235b714605a842fc9bc53",
+      "historical_worker_sha": "8639e0d1540c572e6e43b5e3348e467203d52fd8",
+      "historical_merge_sha": "cd5f0410f254a6a27e76c12d5b56838990036d65",
+      "immutable": true,
+      "bytes_deleted_or_rewritten": false,
+      "functional_fallback_evidence_retained": true,
+      "terminal_acceptance_reused": false
+    },
+    "ownership_correction": {
+      "registry_sha256": "e7a6a5158e43cb76c1df0fa28caec36ec9585a0dd05a732eabb94a92e427c9da",
+      "agent_5_canonical_write_set": [
+        "ops/release/Containerfile",
+        "tests/test_r08a_production_image_e2e_harness.py"
+      ],
+      "agent_0_canonical_write_set": [
+        "tools/verify_release_blueprint.py"
+      ],
+      "agent_5_tools_authority": false,
+      "agent_0_tool_revert_and_redelivery_additive": true,
+      "agent_0_correction_mutated_ops_or_tests": false,
+      "final_tool_bytes_sha256": "fa9c73bee62bdba5d1277bc44aa5e186fe296d63d494febebbc0ecc5f7b503cd",
+      "final_agent_5_ops_blob_equal_historical_worker": true,
+      "final_agent_5_test_blob_equal_historical_worker": true
+    },
+    "trailer_correction": {
+      "historical_incomplete_parse_preserved": [
+        "9ad08a51dabda38f21e6fd6ced171128ed80d5a4",
+        "8639e0d1540c572e6e43b5e3348e467203d52fd8",
+        "9cfcd1f7281d6a1d89b245266dd63ec992c1d94e"
+      ],
+      "new_commits_with_all_four_contiguous_trailers": [
+        "b4431cae6495c0bd4b348247ef7eae686ae20846",
+        "489e3bfc1f6a102b4659b75474b9fb2373ce67a6",
+        "c9d86c8aabe8c1d461c7baff5be6aff92e6b70d6"
+      ],
+      "required_keys": [
+        "PLAN-ID",
+        "PLAN-VERSION",
+        "AMENDMENT-ID",
+        "SPRINT-ID"
+      ],
+      "interpret_trailers_green": true
+    },
+    "exact_source_build": {
+      "source_head_sha": "c9d86c8aabe8c1d461c7baff5be6aff92e6b70d6",
+      "source_tree_sha": "7ed90ebb29f8717bab0078d95f8ccdb0bebe87b1",
+      "containerfile_ref": "ops/release/Containerfile",
+      "containerfile_sha256": "19c81a091994fd8fb744780c344164574278cff404c306f7304b9ccedcfa7e47",
+      "dockerignore_sha256": "c11ca3000513c96f9ba710d2c63792247a0e62a590d6e963dfa65c0fd36392bb",
+      "command": "buildx-v0.35.0.darwin-arm64 build --builder colima --no-cache --platform linux/amd64 --load --build-arg RELEASE_SHA=c9d86c8aabe8c1d461c7baff5be6aff92e6b70d6 -f ops/release/Containerfile -t dcr-r08b-r2-core:c9d86c8 .",
+      "versioned_containerfile_used": true,
+      "no_cache": true,
+      "derived_fallback_used": false,
+      "buildx_version": "v0.35.0",
+      "buildx_commit": "a319e5b15052cf6557ceb666eb8ff6e32380b782",
+      "buildx_asset_sha256": "fedbcbd488dcdb46414c6119920d8186d406531a1157ceede4e857e25af77ff1",
+      "builder_name": "colima",
+      "builder_driver": "docker",
+      "buildkit_version": "v0.30.0",
+      "builder_platforms_include_linux_amd64": true,
+      "exported_manifest_sha256": "ce62496ca7963d43a2c8fa7fcfd9511b5abb77c34b6045949a0c27fa3d93d0ce",
+      "exported_config_sha256": "2784654883d343642fbaa54a5ba88292647b2ed9f5ca36f91a4dc0b47cdf2033",
+      "image_id": "sha256:ebc07e9c488fb0e5f5767cd7cc38b78172d3c94d35bfc0eaf3e924dd6cd3584b",
+      "image_repo_digest": "dcr-r08b-r2-core@sha256:ebc07e9c488fb0e5f5767cd7cc38b78172d3c94d35bfc0eaf3e924dd6cd3584b",
+      "image_architecture": "linux/amd64",
+      "image_revision_label_matches_source": true,
+      "image_user": "10001:10001",
+      "image_entrypoint": [
+        "python",
+        "-m",
+        "research_bridge.researchd"
+      ],
+      "image_cmd": [
+        "--config",
+        "/run/research-os/researchd.json"
+      ]
+    },
+    "audit_results": {
+      "contract_gate": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "candidate_sha": null,
+      "candidate_tree_sha": null,
+      "candidate_exact_head_ci_run": "NOT_CUT",
+      "write_set_owner_correct": true,
+      "agent_5_read_only_assurance": "green",
+      "agent_5_critical_findings": 0,
+      "agent_5_high_findings": 0,
+      "exact_current_head_remote_equal": true,
+      "exact_current_head_ci_green": true,
+      "exact_current_head_ci_run": 29703709561,
+      "literal_exact_source_build_green": true,
+      "image_file_count": 39,
+      "image_top_level_inventory": [
+        "contracts",
+        "provenance",
+        "src"
+      ],
+      "image_provenance_files": [
+        "provenance/model-provider-routing-v1.json",
+        "provenance/model-role-evaluation-v2.json",
+        "provenance/model-worker-ipc-extension-v1.json"
+      ],
+      "image_forbidden_paths": 0,
+      "production_image_started": true,
+      "corridor_executor_profile_non_null": true,
+      "available_bindings": [
+        "deepseek-v4-pro",
+        "gpt-5.6-sol-xhigh"
+      ],
+      "actual_af_unix_status": true,
+      "control_socket_mode": "0660",
+      "network_none": true,
+      "read_only_root_filesystem": true,
+      "cap_drop_all": true,
+      "no_new_privileges": true,
+      "provider_calls": 0,
+      "external_source_calls": 0,
+      "release_claim_issued": false,
+      "observation_windows_started": false,
+      "grants_authority": false,
+      "focused_tests": 10
+    },
+    "file_sha256": {
+      "stages/r08b-exact-candidate-image-build-sbom/stage-envelope-amendment-v2.4-3.json": "09efd049f2dd0b1da3741e7310858664e6fc28088a12f9cd243f480679e84741",
+      "stages/r08b-exact-candidate-image-build-sbom/ownership-lease-amendment-v2.4-3.json": "d74eb952265dac922ae642c991ca105e029c035ea96e60913f57a2c50061a530",
+      "ops/release/Containerfile": "19c81a091994fd8fb744780c344164574278cff404c306f7304b9ccedcfa7e47",
+      "tests/test_r08a_production_image_e2e_harness.py": "54c240efec0e0e67ab0289390f5fa489d3b0c1be0a88bb5f2681d60f8c07c26c",
+      "tools/verify_release_blueprint.py": "fa9c73bee62bdba5d1277bc44aa5e186fe296d63d494febebbc0ecc5f7b503cd",
+      "provenance/model-provider-routing-v1.json": "37db8596a8245a6b1ea2bc5bce1495a4e7dadb314876e51397ad11dd194b3dc6",
+      "provenance/model-role-evaluation-v2.json": "111a7ac1dc954466b19d5e408debeeefcf65c76b5b025a743a2433be910c1e75",
+      "provenance/model-worker-ipc-extension-v1.json": "03d91f027bb6975c55d84acaef188546bcd24af9944a72f4ff9314296399d07a"
+    },
+    "remote_ci_refs": [
+      "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29702162708",
+      "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29702304004",
+      "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29703096295",
+      "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29703243251",
+      "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29703657199",
+      "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29703709561"
+    ],
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29703709561",
+    "integration_commit_sha": "c9d86c8aabe8c1d461c7baff5be6aff92e6b70d6",
+    "known_next_gate": "After this correction receipt head is green, resume the remaining parent R08B private collector and two-role provider pre-cut gate while candidate fields remain null."
+  },
+  "integrity": {
+    "payload_sha256": "3314946a3b9699440cda16e9c9448abeec9c1c7aa5cad976110694bb612910a7",
+    "parent_refs": [
+      "git:8639e0d1540c572e6e43b5e3348e467203d52fd8",
+      "git:cd5f0410f254a6a27e76c12d5b56838990036d65",
+      "git:9cfcd1f7281d6a1d89b245266dd63ec992c1d94e",
+      "git:b4431cae6495c0bd4b348247ef7eae686ae20846",
+      "git:489e3bfc1f6a102b4659b75474b9fb2373ce67a6",
+      "git:c9d86c8aabe8c1d461c7baff5be6aff92e6b70d6",
+      "ci:29702162708",
+      "ci:29702304004",
+      "ci:29703096295",
+      "ci:29703243251",
+      "ci:29703657199",
+      "ci:29703709561",
+      "pr:79",
+      "integration:integration-r08b-r1-core-model-runtime-provenance-image-20260719"
+    ]
+  }
+}
