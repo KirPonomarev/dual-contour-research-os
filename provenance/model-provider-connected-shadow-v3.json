@@ -1,7 +1,7 @@
 {
   "profile_id": "model-provider-connected-shadow-v3",
   "schema_version": "3.0.0",
-  "status": "OFFICIAL_API_SHAPE_VERIFIED_CONNECTED_VISIBLE_OUTPUT_REPAIR_PENDING",
+  "status": "OFFICIAL_API_SHAPE_VERIFIED_CONNECTED_VISIBLE_OUTPUT_BOUNDED_LOW_REASONING",
   "allowed_input_classes": ["D0", "D1"],
   "forbidden_input_classes": ["D2", "D3", "sealed-holdout"],
   "max_request_bytes": 65536,
@@ -49,7 +49,7 @@
       "protocol": "OPENAI_CHAT_COMPLETIONS",
       "api_model": "openai/gpt-5.6-sol",
       "context_window": 1000000,
-      "request_options": {"reasoning": {"effort": "xhigh"}},
+      "request_options": {"reasoning": {"effort": "low"}},
       "source": "https://openrouter.ai/openai/gpt-5.6-sol/"
     },
     "gpt-5.6-sol-max": {

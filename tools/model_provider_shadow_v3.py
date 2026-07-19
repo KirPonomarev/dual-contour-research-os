@@ -135,7 +135,7 @@ _EXPECTED_BINDING_SHAPES = {
         "endpoint": "https://openrouter.ai/api/v1/chat/completions",
         "protocol": "OPENAI_CHAT_COMPLETIONS", "api_model": "openai/gpt-5.6-sol",
         "context_window": 1_000_000,
-        "request_options": {"reasoning": {"effort": "xhigh"}},
+        "request_options": {"reasoning": {"effort": "low"}},
         "source": "https://openrouter.ai/openai/gpt-5.6-sol/",
     },
     "gpt-5.6-sol-max": {
@@ -150,6 +150,7 @@ _EXPECTED_BINDING_SHAPES = {
 }
 _EXPECTED_BINDING_SHAPES_V2 = copy.deepcopy(_EXPECTED_BINDING_SHAPES)
 _EXPECTED_BINDING_SHAPES_V2["deepseek-v4-pro"]["request_options"]["thinking"]["type"] = "enabled"
+_EXPECTED_BINDING_SHAPES_V2["gpt-5.6-sol-xhigh"]["request_options"]["reasoning"]["effort"] = "xhigh"
 
 _OPENROUTER_CREDENTIAL_ENV = "OPENROUTER_API_KEY"
 _OPENROUTER_KEYCHAIN_SERVICE = "ai.shared.openrouter"
