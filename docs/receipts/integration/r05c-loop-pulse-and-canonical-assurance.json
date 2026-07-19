@@ -1,0 +1,77 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-r05c-loop-pulse-and-canonical-assurance-20260719",
+  "issued_at": "2026-07-19T16:06:28Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "r05c-loop-pulse-and-canonical-assurance",
+    "agent_id": "agent-5",
+    "ownership_lease_ref": "stages/r05c-loop-pulse-and-canonical-assurance/ownership-lease.json",
+    "base_sha": "fda691da38f0c87087f8a3251e9b8856353ab03d",
+    "stage_authorization_sha": "7e5fbf42c32b19796dc62eec701993c070d63e29",
+    "worker_head_sha": "485218cbc3ae1dba38fd36ed1f9332823f3fba84",
+    "head_sha": "3f2c51519862590a3abfbe1978a85d4467d769fd",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "a1_contract_sha256": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+    "write_set": [
+      "src/research_bridge/organism.py",
+      "tests/test_r05c_loop_pulse_and_canonical_assurance.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "write_set_exact": true,
+      "production_AF_UNIX_loop_exercised": true,
+      "completed_without_validated_feedback_visible": true,
+      "completed_without_validated_feedback_lifecycle": "PARKED",
+      "terminal_feedback_imbalance_green": false,
+      "duplicate_runnable_producer_green": false,
+      "invalid_completion_survives_restart_byte_exact": true,
+      "invalid_completion_reexecuted": false,
+      "later_valid_feedback_hides_prior_invalid_completion": false,
+      "WAIT_AUTHORITY_visible_after_restart": true,
+      "stale_source_or_provider_proof_green": false,
+      "observation_durable_writes": 0,
+      "canonical_or_live_writes": 0,
+      "pulse_side_effects": false,
+      "grants_authority": false,
+      "focused_tests": 26,
+      "full_core_tests": 864,
+      "stage0b_tests": 25
+    },
+    "file_sha256": {
+      "src/research_bridge/organism.py": "524fe8503129208734d6897ed6cc908113b3c1fefc3863ffe80d358c2b75955e",
+      "tests/test_r05c_loop_pulse_and_canonical_assurance.py": "bd17bdab5663833c570b0aa2067211adadf66fc486da3bd1b27da18fb69dbd92"
+    },
+    "pull_request_ref": "https://github.com/KirPonomarev/dual-contour-research-os/pull/72",
+    "remote_ci_refs": [
+      "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29693967636",
+      "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29694160351",
+      "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29694166099",
+      "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29694190466"
+    ],
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29694190466",
+    "integration_commit_sha": "3f2c51519862590a3abfbe1978a85d4467d769fd",
+    "known_next_gate": "Advance to R06A observability and recovery controls on this exact accepted head."
+  },
+  "integrity": {
+    "payload_sha256": "e60ea50f34c34332bf96a123485f35cededf553e5692f43975108b86311040bb",
+    "parent_refs": [
+      "git:fda691da38f0c87087f8a3251e9b8856353ab03d",
+      "git:7e5fbf42c32b19796dc62eec701993c070d63e29",
+      "git:485218cbc3ae1dba38fd36ed1f9332823f3fba84",
+      "git:3f2c51519862590a3abfbe1978a85d4467d769fd",
+      "ci:29693967636",
+      "ci:29694160351",
+      "ci:29694166099",
+      "ci:29694190466",
+      "pr:72",
+      "reuse:reuse-r05c-loop-pulse-and-canonical-assurance-20260719",
+      "integration:integration-r05b-independent-validation-closure-20260719"
+    ]
+  }
+}
