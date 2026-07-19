@@ -235,7 +235,7 @@ _CONFIG_ERROR_LINE = "researchd configuration rejected\n"
 _RUNTIME_ERROR_LINE = "researchd runtime failed\n"
 _L0_VALIDATOR_ID = "independent-byte-level-l0"
 _L0_VALIDATOR_SOURCE_SHA256 = (
-    "6377a7d60c0246d38d2fefe5a3a685409a3434342e41d0d88262ece8d326fa51"
+    "ea4a91d3710c6be129ebba9e27eb3bca288722af190d4feab58c0914ed259006"
 )
 _MAX_VALIDATOR_SOURCE_BYTES = 1_048_576
 _MAX_L0_VALIDATION_ARTIFACT_BYTES = 8_388_608
@@ -818,10 +818,14 @@ class ResearchDaemon:
                     validation_receipt=record.validation_receipt,
                     now=self._clock().astimezone(timezone.utc).isoformat().replace("+00:00", "Z"),
                 )
-            except ExecutionError as exc:
-                raise ResearchdError(
-                    "completed A1 execution feedback recovery failed closed"
-                ) from exc
+            except ExecutionError:
+                # A completed execution can be independently invalid (for
+                # example, vacuous evidence).  It remains durable and
+                # feedback-free; startup must neither reexecute it nor turn
+                # mechanical invalidity into an epistemic outcome.  Ledger,
+                # source-pin, ownership and composition failures occur outside
+                # this narrow validation boundary and remain fatal.
+                continue
 
     def reserve_model_call(
         self,
