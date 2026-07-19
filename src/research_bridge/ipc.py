@@ -25,7 +25,9 @@ _MAX_REQUEST_BYTES = 65_536
 _MAX_RESPONSE_BYTES = 262_144
 _MAX_DEADLINE_SECONDS = 5.0
 _SOCKET_MODE = 0o660
-_PRINCIPAL_ROLES = frozenset({"operator", "collector", "scout"})
+_PRINCIPAL_ROLES = frozenset(
+    {"operator", "collector", "scout", "connected_worker"}
+)
 
 
 class IPCError(RuntimeError):

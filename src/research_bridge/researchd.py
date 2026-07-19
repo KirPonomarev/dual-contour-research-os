@@ -11,6 +11,7 @@ from __future__ import annotations
 from collections.abc import Callable, Iterable, Mapping, Sequence
 from datetime import datetime, timezone
 import hashlib
+import hmac
 import json
 import math
 import os
@@ -50,6 +51,14 @@ from .ipc import (
 from .kernel import BridgeKernel
 from .l0 import DeterministicL0Runner
 from .ledger import JobLedger
+from .model_broker import (
+    ModelBrokerError,
+    ModelBudgetPolicy,
+    ModelCallBroker,
+    ModelCallSpec,
+    ModelProviderRouting,
+    ModelRoleRegistry,
+)
 from .validation import DeterministicL0Validator
 
 
@@ -99,6 +108,22 @@ _ADMISSION_RUNTIME_KEY = "admission_runtime"
 _ADMISSION_RUNTIME_KEYS = frozenset(
     {"model_route_proof_ref", "corridor_executor_profile"}
 )
+_MODEL_RUNTIME_KEY = "model_runtime"
+_MODEL_RUNTIME_KEYS = frozenset(
+    {
+        "role_registry_sha256",
+        "routing_profile_sha256",
+        "role_evaluation_sha256",
+        "worker_ipc_extension_sha256",
+        "binding_revision",
+        "budget_policy_ref",
+        "budget_scope_ref",
+        "max_active_calls",
+        "max_reserved_tokens",
+        "max_reserved_cost_units",
+        "available_bindings",
+    }
+)
 _CORRIDOR_EXECUTOR_PROFILE_KEYS = frozenset(
     {
         "capability_ref",
@@ -109,12 +134,27 @@ _CORRIDOR_EXECUTOR_PROFILE_KEYS = frozenset(
         "maximum_lifetime_seconds",
     }
 )
-_PRINCIPAL_ROLES = frozenset({"operator", "collector", "scout"})
+_PRINCIPAL_ROLES = frozenset(
+    {"operator", "collector", "scout", "connected_worker"}
+)
 _A1_REQUIRED_ROLES = frozenset({"operator", "collector", "scout"})
+_MODEL_REQUIRED_ROLES = _A1_REQUIRED_ROLES | {"connected_worker"}
 _CORE_CATALOG_SHA256 = "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50"
 _A1_CATALOG_SHA256 = "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1"
 _IPC_COMPATIBILITY_PROFILE_SHA256 = (
     "c9cdd8c51616ac843a6729166b6f21c9a44de24fac7559b86f842c7e1930ba04"
+)
+_MODEL_ROLE_REGISTRY_SHA256 = (
+    "4faf6765f48a952e4d35540d92797330517938b34b8d2f12cde791e761a32eac"
+)
+_MODEL_ROUTING_PROFILE_SHA256 = (
+    "37db8596a8245a6b1ea2bc5bce1495a4e7dadb314876e51397ad11dd194b3dc6"
+)
+_MODEL_ROLE_EVALUATION_SHA256 = (
+    "111a7ac1dc954466b19d5e408debeeefcf65c76b5b025a743a2433be910c1e75"
+)
+_MODEL_WORKER_IPC_EXTENSION_SHA256 = (
+    "03d91f027bb6975c55d84acaef188546bcd24af9944a72f4ff9314296399d07a"
 )
 _MAX_CONFIG_UIDS = 16
 _MAX_CONFIG_UID = 2_147_483_647
@@ -341,11 +381,6 @@ class ResearchDaemon:
             raise ResearchdError("allowed_uids must contain non-negative integers")
         if type(a1_enabled) is not bool:
             raise ResearchdError("a1_enabled must be boolean")
-        roles = _runtime_principal_roles(
-            allowed,
-            principal_roles=principal_roles,
-            a1_enabled=a1_enabled,
-        )
         if a1_enabled and not isinstance(frozen_bindings, Mapping):
             raise ResearchdError("A1 runtime requires frozen bindings")
         if a1_enabled and not isinstance(a1_limits, Mapping):
@@ -354,6 +389,19 @@ class ResearchDaemon:
             raise ResearchdError("disabled A1 runtime cannot carry frozen bindings")
         if not a1_enabled and a1_limits is not None:
             raise ResearchdError("disabled A1 runtime cannot carry A1 limits")
+        model_runtime_enabled = bool(
+            a1_enabled
+            and isinstance(frozen_bindings, Mapping)
+            and _MODEL_RUNTIME_KEY in frozen_bindings
+        )
+        roles = _runtime_principal_roles(
+            allowed,
+            principal_roles=principal_roles,
+            a1_enabled=a1_enabled,
+            model_runtime_enabled=model_runtime_enabled,
+        )
+        if model_runtime_enabled:
+            _validate_model_runtime_limits(frozen_bindings, a1_limits)
         for name, value in (
             ("input_quota_bytes", input_quota_bytes),
             ("checkpoint_quota_bytes", checkpoint_quota_bytes),
@@ -418,6 +466,9 @@ class ResearchDaemon:
         self._validated_coordinator: ValidatedOfflineExecutionCoordinator | None = None
         self._validation_protocol_ref: str | None = None
         self._a1_backend: DurableDiscoveryService | None = None
+        self._model_broker: ModelCallBroker | None = None
+        self._model_routing: ModelProviderRouting | None = None
+        self._model_available_bindings: frozenset[str] = frozenset()
         self._server: UnixControlServer | None = None
         self._started = False
 
@@ -526,9 +577,11 @@ class ResearchDaemon:
                         authority=self._authority,
                     )
                     self._a1_backend = a1_backend
+                self._start_model_runtime(ledger)
                 router = ControlRouter(
                     self,
                     a1_backend=a1_backend,
+                    model_backend=(self if self._model_broker is not None else None),
                     authority=self._authority,
                     clock=self._clock,
                 )
@@ -721,6 +774,319 @@ class ResearchDaemon:
                 "validation_receipt": _json_copy(record.validation_receipt),
             }
 
+    def reserve_model_call(
+        self,
+        *,
+        role: str,
+        role_assignment_ref: str,
+        classification: str,
+        request_body: str,
+        max_tokens: int,
+        max_cost_units: int,
+        expires_at: str,
+        actor: str,
+        idempotency_key: str,
+        now: str,
+    ) -> Mapping[str, object]:
+        """Reserve one policy-routed call without granting model authority."""
+
+        if not isinstance(actor, str) or not actor.startswith("scout:uid:"):
+            raise ResearchdError("model reservation requires the Scout principal")
+        broker, routing = self._require_model_runtime()
+        try:
+            decision = routing.route(
+                role,
+                classification,
+                available_bindings=self._model_available_bindings,
+            )
+            if decision.status != "ROUTED":
+                return MappingProxyType(
+                    {
+                        "status": decision.status,
+                        "role": decision.role,
+                        "model_binding": None,
+                        "routing_profile_sha256": decision.profile_sha256,
+                        "used_fallback": False,
+                        "durable_transition": None,
+                    }
+                )
+            if decision.used_fallback:
+                raise ResearchdError(
+                    "fallback route lacks an exact durable registry binding"
+                )
+            request_bytes = request_body.encode("utf-8", errors="strict")
+            handle = broker.prepare(
+                ModelCallSpec(
+                    role=role,
+                    role_assignment_ref=role_assignment_ref,
+                    classification=classification,
+                    request_bytes=request_bytes,
+                    max_tokens=max_tokens,
+                    max_cost_units=max_cost_units,
+                    expires_at=expires_at,
+                    idempotency_key=idempotency_key,
+                ),
+                event_at=now,
+            )
+            snapshot = broker.snapshot(handle.call_id)
+            if snapshot["model_binding"] != decision.binding:
+                raise ResearchdError(
+                    "policy route differs from the durable registry binding"
+                )
+            result = dict(self._sanitized_model_state(snapshot))
+            result.update(
+                {
+                    "status": "RESERVED",
+                    "dispatch_token": _model_dispatch_token(snapshot),
+                    "request_body": request_body,
+                    "routing_profile_sha256": decision.profile_sha256,
+                    "used_fallback": decision.used_fallback,
+                    "durable_transition": "PROPOSED_THEN_RESERVED",
+                }
+            )
+            return MappingProxyType(result)
+        except (ModelBrokerError, UnicodeError) as exc:
+            raise ResearchdError("model reservation failed closed") from exc
+
+    def begin_model_call(
+        self,
+        *,
+        call_id: str,
+        dispatch_token: str,
+        request_body: str,
+        actor: str,
+        idempotency_key: str,
+        now: str,
+    ) -> Mapping[str, object]:
+        """Persist SENT before acknowledging one worker egress dispatch."""
+
+        if not isinstance(actor, str) or not actor.startswith("connected_worker:uid:"):
+            raise ResearchdError("model begin requires the connected worker principal")
+        broker, routing = self._require_model_runtime()
+        try:
+            before = broker.snapshot(call_id)
+            _verify_model_dispatch_token(before, dispatch_token)
+            handle = broker.begin_external(
+                call_id,
+                request_bytes=request_body.encode("utf-8", errors="strict"),
+                event_at=now,
+            )
+            snapshot = broker.snapshot(handle.call_id)
+            binding = routing.binding(snapshot["model_binding"])  # type: ignore[arg-type]
+            result = dict(self._sanitized_model_state(snapshot))
+            result.update(
+                {
+                    "egress_authorized": True,
+                    "provider_slot": binding.provider_slot,
+                    "candidate_api_identifier": binding.candidate_api_identifier,
+                    "durable_transition": "RESERVED_TO_SENT_BEFORE_ACK",
+                }
+            )
+            return MappingProxyType(result)
+        except (ModelBrokerError, UnicodeError) as exc:
+            raise ResearchdError("model begin failed closed") from exc
+
+    def complete_model_call(
+        self,
+        *,
+        call_id: str,
+        dispatch_token: str,
+        outcome: str,
+        response_ref: str | None,
+        actual_tokens: int | None,
+        actual_cost_units: int | None,
+        provider_receipt_ref: str | None,
+        failure_code: str | None,
+        actor: str,
+        idempotency_key: str,
+        now: str,
+    ) -> Mapping[str, object]:
+        """Persist sanitized worker completion metadata without raw bytes."""
+
+        if not isinstance(actor, str) or not actor.startswith("connected_worker:uid:"):
+            raise ResearchdError(
+                "model completion requires the connected worker principal"
+            )
+        broker, _ = self._require_model_runtime()
+        try:
+            before = broker.snapshot(call_id)
+            _verify_model_dispatch_token(before, dispatch_token)
+            handle = broker.complete_external(
+                call_id,
+                outcome=outcome,
+                response_ref=response_ref,
+                actual_tokens=actual_tokens,
+                actual_cost_units=actual_cost_units,
+                provider_receipt_ref=provider_receipt_ref,
+                failure_code=failure_code,
+                event_at=now,
+            )
+            return self._sanitized_model_state(broker.snapshot(handle.call_id))
+        except ModelBrokerError as exc:
+            raise ResearchdError("model completion failed closed") from exc
+
+    def lookup_model_call(
+        self, *, call_id: str, actor: str
+    ) -> Mapping[str, object]:
+        """Return one sanitized durable state without changing the ledger."""
+
+        if not isinstance(actor, str) or not actor.startswith(
+            ("scout:uid:", "connected_worker:uid:")
+        ):
+            raise ResearchdError("model lookup principal is invalid")
+        broker, _ = self._require_model_runtime()
+        try:
+            return self._sanitized_model_state(broker.snapshot(call_id))
+        except ModelBrokerError as exc:
+            raise ResearchdError("model lookup failed closed") from exc
+
+    def validate_proposal_envelope(
+        self, proposal_envelope: Mapping[str, object]
+    ) -> None:
+        """Require two distinct successful, role-correct durable call refs."""
+
+        if not isinstance(proposal_envelope, Mapping):
+            raise ResearchdError("proposal envelope must be an object")
+        model_ref = proposal_envelope.get("model_call_ref")
+        critique_ref = proposal_envelope.get("critique_call_ref")
+        if not isinstance(model_ref, str) or not isinstance(critique_ref, str):
+            raise ResearchdError("proposal model-call references are invalid")
+        if model_ref == critique_ref:
+            raise ResearchdError("proposal requires distinct model-call references")
+        broker, _ = self._require_model_runtime()
+        try:
+            model = broker.snapshot(model_ref)
+            critique = broker.snapshot(critique_ref)
+        except ModelBrokerError as exc:
+            raise ResearchdError(
+                "proposal model-call references are not durable"
+            ) from exc
+        if not _successful_model_snapshot(model):
+            raise ResearchdError("proposal model call is not successful")
+        if not _successful_model_snapshot(critique):
+            raise ResearchdError("proposal critique call is not successful")
+        if model["role"] not in {"SCOUT_FAST", "RESEARCH_WORKER"}:
+            raise ResearchdError("proposal model role is invalid")
+        if critique["role"] not in {
+            "CRITIC_PRIMARY",
+            "CRITIC_DEEP",
+            "CHIEF_SCIENTIST",
+        }:
+            raise ResearchdError("proposal critique role is invalid")
+        if model["classification"] != critique["classification"]:
+            raise ResearchdError("proposal model classifications differ")
+        for snapshot, field in (
+            (model, "model_output"),
+            (critique, "critique_output"),
+        ):
+            output = proposal_envelope.get(field)
+            if not isinstance(output, str):
+                raise ResearchdError("proposal model output is invalid")
+            expected_ref = "cas:sha256:" + hashlib.sha256(
+                output.encode("utf-8", errors="strict")
+            ).hexdigest()
+            if not hmac.compare_digest(str(snapshot["response_ref"]), expected_ref):
+                raise ResearchdError(
+                    "proposal model output differs from durable response evidence"
+                )
+
+    def _require_model_runtime(
+        self,
+    ) -> tuple[ModelCallBroker, ModelProviderRouting]:
+        broker = self._model_broker
+        routing = self._model_routing
+        if not self._started or broker is None or routing is None:
+            raise ResearchdError("model runtime is unavailable")
+        return broker, routing
+
+    @staticmethod
+    def _sanitized_model_state(
+        snapshot: Mapping[str, object],
+    ) -> Mapping[str, object]:
+        fields = (
+            "call_id",
+            "state",
+            "request_sha256",
+            "registry_sha256",
+            "binding_revision",
+            "role",
+            "model_binding",
+            "classification",
+            "max_tokens",
+            "max_cost_units",
+            "expires_at",
+            "response_ref",
+            "actual_tokens",
+            "actual_cost_units",
+            "provider_receipt_ref",
+            "failure_code",
+            "ambiguous_usage",
+            "budget_released",
+            "auto_retry",
+        )
+        return MappingProxyType({field: snapshot[field] for field in fields})
+
+    def _start_model_runtime(self, ledger: JobLedger) -> None:
+        runtime = _model_runtime_binding(self._frozen_bindings)
+        if runtime is None:
+            return
+        provenance_root = self._contract_root.parent / "provenance"
+        _verify_bound_file(
+            provenance_root / "model-role-evaluation-v2.json",
+            runtime["role_evaluation_sha256"],
+            "model role evaluation",
+        )
+        _verify_bound_file(
+            provenance_root / "model-worker-ipc-extension-v1.json",
+            runtime["worker_ipc_extension_sha256"],
+            "model worker IPC extension",
+        )
+        try:
+            registry = ModelRoleRegistry(
+                self._contract_root
+                / "a1"
+                / "v1"
+                / "profiles"
+                / "model_role_registry_v1.json",
+                expected_profile_sha256=runtime["role_registry_sha256"],  # type: ignore[arg-type]
+                binding_revision=runtime["binding_revision"],  # type: ignore[arg-type]
+            )
+            routing = ModelProviderRouting(
+                provenance_root / "model-provider-routing-v1.json",
+                expected_profile_sha256=runtime["routing_profile_sha256"],  # type: ignore[arg-type]
+                role_registry=registry,
+            )
+            available = frozenset(runtime["available_bindings"])  # type: ignore[arg-type]
+            for binding in available:
+                if routing.binding(binding).availability != "FIXTURE_ONLY":
+                    raise ModelBrokerError(
+                        "available model binding is not fixture-evaluated"
+                    )
+            broker = ModelCallBroker(
+                registry=registry,
+                ledger=ledger,
+                budget_policy=ModelBudgetPolicy(
+                    policy_ref=runtime["budget_policy_ref"],  # type: ignore[arg-type]
+                    scope_ref=runtime["budget_scope_ref"],  # type: ignore[arg-type]
+                    max_active_calls=runtime["max_active_calls"],  # type: ignore[arg-type]
+                    max_reserved_tokens=runtime["max_reserved_tokens"],  # type: ignore[arg-type]
+                    max_reserved_cost_units=runtime["max_reserved_cost_units"],  # type: ignore[arg-type]
+                ),
+            )
+            for record in ledger._model_call_states():
+                if record.snapshot["state"] == "SENT":
+                    broker.recover_sent(
+                        record.snapshot["call_id"],  # type: ignore[arg-type]
+                        event_at=_bounded_recovery_time(
+                            self._clock(), record.snapshot
+                        ),
+                    )
+        except (ModelBrokerError, TypeError, ValueError) as exc:
+            raise ResearchdError("model runtime binding failed closed") from exc
+        self._model_broker = broker
+        self._model_routing = routing
+        self._model_available_bindings = available
+
     def _fresh_staging_directory(self, attempt_id: str) -> Path:
         digest = hashlib.sha256(attempt_id.encode("utf-8")).hexdigest()
         path = self._root / "staging-by-attempt-digest" / digest
@@ -781,6 +1147,9 @@ class ResearchDaemon:
         self._validated_coordinator = None
         self._validation_protocol_ref = None
         self._a1_backend = None
+        self._model_broker = None
+        self._model_routing = None
+        self._model_available_bindings = frozenset()
         self._fence_ledger = None
         self._input_store = None
         self._checkpoint_store = None
@@ -807,6 +1176,73 @@ class ResearchDaemon:
 
     def __exit__(self, exc_type: object, exc: object, traceback: object) -> None:
         self.close()
+
+
+def _verify_bound_file(path: Path, expected_sha256: object, label: str) -> None:
+    if not isinstance(expected_sha256, str) or not _is_sha256(expected_sha256):
+        raise ResearchdError(f"{label} digest is invalid")
+    try:
+        raw = path.read_bytes()
+    except OSError as exc:
+        raise ResearchdError(f"{label} is unavailable") from exc
+    if not hmac.compare_digest(hashlib.sha256(raw).hexdigest(), expected_sha256):
+        raise ResearchdError(f"{label} digest is stale")
+
+
+def _model_dispatch_token(snapshot: Mapping[str, object]) -> str:
+    fields = (
+        "call_id",
+        "request_sha256",
+        "registry_sha256",
+        "binding_revision",
+        "role",
+        "model_binding",
+        "classification",
+        "max_tokens",
+        "max_cost_units",
+        "expires_at",
+    )
+    material = {field: snapshot[field] for field in fields}
+    material["worker_ipc_extension_sha256"] = _MODEL_WORKER_IPC_EXTENSION_SHA256
+    return hashlib.sha256(_canonical_json_bytes(material)).hexdigest()
+
+
+def _verify_model_dispatch_token(
+    snapshot: Mapping[str, object], supplied: str
+) -> None:
+    if not isinstance(supplied, str) or not hmac.compare_digest(
+        _model_dispatch_token(snapshot), supplied
+    ):
+        raise ResearchdError("model dispatch token is invalid")
+
+
+def _successful_model_snapshot(snapshot: Mapping[str, object]) -> bool:
+    return snapshot.get("state") == "SUCCEEDED" or (
+        snapshot.get("state") == "RECONCILED"
+        and snapshot.get("previous_state") == "SUCCEEDED"
+    )
+
+
+def _bounded_recovery_time(
+    current: datetime, snapshot: Mapping[str, object]
+) -> str:
+    if (
+        not isinstance(current, datetime)
+        or current.tzinfo is None
+        or current.utcoffset() != timezone.utc.utcoffset(current)
+    ):
+        raise ResearchdError("model recovery clock must return aware UTC")
+    sent_raw = snapshot.get("sent_at")
+    expires_raw = snapshot.get("expires_at")
+    if not isinstance(sent_raw, str) or not isinstance(expires_raw, str):
+        raise ResearchdError("model recovery timestamps are invalid")
+    try:
+        sent = datetime.fromisoformat(sent_raw.replace("Z", "+00:00"))
+        expires = datetime.fromisoformat(expires_raw.replace("Z", "+00:00"))
+    except ValueError as exc:
+        raise ResearchdError("model recovery timestamps are invalid") from exc
+    bounded = max(sent, min(current, expires))
+    return bounded.isoformat().replace("+00:00", "Z")
 
 
 def _corridor_executor_profile(
@@ -1177,6 +1613,21 @@ def _service_config_from_mapping(config: Mapping[str, object]) -> _ServiceConfig
             config.get("a1_limits"),
             a1_enabled=a1_enabled,
         )
+        model_runtime_enabled = _MODEL_RUNTIME_KEY in frozen_bindings
+        expected_roles = (
+            _MODEL_REQUIRED_ROLES if model_runtime_enabled else _A1_REQUIRED_ROLES
+        )
+        if frozenset(principal_roles.values()) != expected_roles:
+            raise _ServiceConfigError(
+                "principal role set does not match the frozen runtime bindings"
+            )
+        if model_runtime_enabled:
+            try:
+                _validate_model_runtime_limits(frozen_bindings, a1_limits)
+            except ResearchdError as exc:
+                raise _ServiceConfigError(
+                    "model runtime exceeds the configured A1 boundary"
+                ) from exc
     elif config_mode == "a1-disabled":
         a1_enabled = _config_bool(config.get("a1_enabled"), "a1_enabled")
         if a1_enabled:
@@ -1262,7 +1713,7 @@ def _principal_roles(
         raise _ServiceConfigError("principal roles must cover allowed UIDs exactly")
     assigned = frozenset(roles.values())
     if a1_enabled:
-        if assigned != _A1_REQUIRED_ROLES:
+        if assigned not in {_A1_REQUIRED_ROLES, _MODEL_REQUIRED_ROLES}:
             raise _ServiceConfigError("A1 principal role set is incomplete")
     elif assigned != {"operator"}:
         raise _ServiceConfigError("disabled A1 config must be operator-only")
@@ -1274,6 +1725,7 @@ def _runtime_principal_roles(
     *,
     principal_roles: Mapping[int, str] | None,
     a1_enabled: bool,
+    model_runtime_enabled: bool,
 ) -> Mapping[int, str]:
     if principal_roles is None:
         roles = {uid: "operator" for uid in allowed_uids}
@@ -1289,7 +1741,8 @@ def _runtime_principal_roles(
     ):
         raise ResearchdError("principal_roles contains an invalid principal")
     assigned = frozenset(roles.values())
-    if a1_enabled and assigned != _A1_REQUIRED_ROLES:
+    expected = _MODEL_REQUIRED_ROLES if model_runtime_enabled else _A1_REQUIRED_ROLES
+    if a1_enabled and assigned != expected:
         raise ResearchdError("A1 principal role set is incomplete")
     if not a1_enabled and assigned != {"operator"}:
         raise ResearchdError("disabled A1 runtime must be operator-only")
@@ -1309,9 +1762,10 @@ def _frozen_bindings(
     if not isinstance(value, dict):
         raise _ServiceConfigError("A1 frozen bindings must be an object")
     binding_keys = set(value)
-    if binding_keys not in (
-        set(_FROZEN_BINDING_KEYS),
-        set(_FROZEN_BINDING_KEYS | {_ADMISSION_RUNTIME_KEY}),
+    if (
+        not _FROZEN_BINDING_KEYS.issubset(binding_keys)
+        or binding_keys - _FROZEN_BINDING_KEYS
+        - {_ADMISSION_RUNTIME_KEY, _MODEL_RUNTIME_KEY}
     ):
         raise _ServiceConfigError("frozen_bindings shape is invalid")
     for name in (
@@ -1414,6 +1868,9 @@ def _frozen_bindings(
                 "corridor_executor_profile": profile,
             }
         )
+    raw_model_runtime = value.get(_MODEL_RUNTIME_KEY)
+    if raw_model_runtime is not None:
+        frozen[_MODEL_RUNTIME_KEY] = _model_runtime_from_config(raw_model_runtime)
     return MappingProxyType(frozen)
 
 
@@ -1424,6 +1881,123 @@ def _capability_refs(value: object, label: str) -> tuple[str, ...]:
     if len(refs) != len(set(refs)):
         raise _ServiceConfigError("capability refs are invalid")
     return refs
+
+
+def _model_runtime_from_config(value: object) -> Mapping[str, object]:
+    if not isinstance(value, dict):
+        raise _ServiceConfigError("model runtime binding is invalid")
+    _expect_config_keys(value, _MODEL_RUNTIME_KEYS, "model_runtime")
+    expected_digests = {
+        "role_registry_sha256": _MODEL_ROLE_REGISTRY_SHA256,
+        "routing_profile_sha256": _MODEL_ROUTING_PROFILE_SHA256,
+        "role_evaluation_sha256": _MODEL_ROLE_EVALUATION_SHA256,
+        "worker_ipc_extension_sha256": _MODEL_WORKER_IPC_EXTENSION_SHA256,
+    }
+    for name, expected in expected_digests.items():
+        if value.get(name) != expected:
+            raise _ServiceConfigError(f"{name} binding is stale")
+    binding_revision = _config_text(
+        value.get("binding_revision"), "binding_revision", maximum=128
+    )
+    budget_policy_ref = _config_budget_ref(
+        value.get("budget_policy_ref"), "budget_policy_ref", "budget-policy"
+    )
+    budget_scope_ref = _config_budget_ref(
+        value.get("budget_scope_ref"), "budget_scope_ref", "budget-scope"
+    )
+    limits: dict[str, int] = {}
+    for name in (
+        "max_active_calls",
+        "max_reserved_tokens",
+        "max_reserved_cost_units",
+    ):
+        raw = value.get(name)
+        if type(raw) is not int or not 1 <= raw <= 9_007_199_254_740_991:
+            raise _ServiceConfigError(f"{name} is invalid")
+        limits[name] = raw
+    raw_available = value.get("available_bindings")
+    if not isinstance(raw_available, list) or len(raw_available) > 32:
+        raise _ServiceConfigError("available model bindings are invalid")
+    available = tuple(
+        _config_text(item, "available model binding", maximum=256)
+        for item in raw_available
+    )
+    if len(available) != len(set(available)):
+        raise _ServiceConfigError("available model bindings are invalid")
+    return MappingProxyType(
+        {
+            **expected_digests,
+            "binding_revision": binding_revision,
+            "budget_policy_ref": budget_policy_ref,
+            "budget_scope_ref": budget_scope_ref,
+            **limits,
+            "available_bindings": available,
+        }
+    )
+
+
+def _config_budget_ref(value: object, label: str, prefix: str) -> str:
+    normalized = _config_text(value, label, maximum=96)
+    marker = f"{prefix}:sha256:"
+    if not normalized.startswith(marker) or not _is_sha256(
+        normalized.removeprefix(marker)
+    ):
+        raise _ServiceConfigError(f"{label} is invalid")
+    return normalized
+
+
+def _validate_model_runtime_limits(
+    frozen_bindings: Mapping[str, object] | None,
+    a1_limits: Mapping[str, object] | None,
+) -> None:
+    runtime = _model_runtime_binding(frozen_bindings)
+    if runtime is None or not isinstance(a1_limits, Mapping):
+        raise ResearchdError("model runtime requires bounded A1 limits")
+    cycle = a1_limits.get("cycle_limits")
+    if not isinstance(cycle, Mapping):
+        raise ResearchdError("model runtime cycle limits are invalid")
+    comparisons = (
+        ("max_active_calls", "max_model_calls"),
+        ("max_reserved_tokens", "max_tokens"),
+        ("max_reserved_cost_units", "max_cost_units"),
+    )
+    for runtime_name, cycle_name in comparisons:
+        runtime_value = runtime.get(runtime_name)
+        cycle_value = cycle.get(cycle_name)
+        if (
+            type(runtime_value) is not int
+            or type(cycle_value) is not int
+            or runtime_value > cycle_value
+        ):
+            raise ResearchdError("model runtime exceeds the A1 cycle budget")
+
+
+def _model_runtime_binding(
+    frozen_bindings: Mapping[str, object] | None,
+) -> Mapping[str, object] | None:
+    if not isinstance(frozen_bindings, Mapping):
+        return None
+    runtime = frozen_bindings.get(_MODEL_RUNTIME_KEY)
+    if runtime is None:
+        return None
+    if not isinstance(runtime, Mapping) or set(runtime) != _MODEL_RUNTIME_KEYS:
+        raise ResearchdError("model runtime binding is invalid")
+    expected_digests = {
+        "role_registry_sha256": _MODEL_ROLE_REGISTRY_SHA256,
+        "routing_profile_sha256": _MODEL_ROUTING_PROFILE_SHA256,
+        "role_evaluation_sha256": _MODEL_ROLE_EVALUATION_SHA256,
+        "worker_ipc_extension_sha256": _MODEL_WORKER_IPC_EXTENSION_SHA256,
+    }
+    if any(runtime.get(name) != expected for name, expected in expected_digests.items()):
+        raise ResearchdError("model runtime digest binding is stale")
+    if not isinstance(runtime.get("binding_revision"), str):
+        raise ResearchdError("model runtime binding revision is invalid")
+    available = runtime.get("available_bindings")
+    if not isinstance(available, (list, tuple)) or len(available) > 32:
+        raise ResearchdError("available model bindings are invalid")
+    if any(not isinstance(item, str) or not item for item in available):
+        raise ResearchdError("available model bindings are invalid")
+    return runtime
 
 
 def _config_bool(value: object, label: str) -> bool:
@@ -1572,6 +2146,11 @@ def _discovery_config_from_authority(
     }
     if runtime_binding is not None:
         context_payload["admission_runtime"] = runtime_context
+    model_runtime = frozen_bindings.get(_MODEL_RUNTIME_KEY)
+    if model_runtime is not None:
+        if not isinstance(model_runtime, Mapping):
+            raise ResearchdError("A1 model runtime binding is invalid")
+        context_payload["model_runtime"] = _json_copy(model_runtime)
     context_sha256 = canonical_json_sha256(context_payload)
     try:
         executor_refs = frozen_bindings.get("executor_capability_refs")

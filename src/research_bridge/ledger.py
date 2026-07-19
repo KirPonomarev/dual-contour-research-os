@@ -1610,6 +1610,32 @@ class JobLedger:
             previous = record.snapshot
         return records
 
+    def _model_call_states(self) -> tuple[ModelCallTransitionRecord, ...]:
+        """Return every latest replay-validated model-call state without writes."""
+
+        with self._lock:
+            self._ensure_open()
+            rows = self._connection.execute(
+                """
+                SELECT * FROM bridge_job_ledger
+                WHERE event_type = 'a1_bundle'
+                  AND json_extract(payload_json, '$.bundle_kind') = 'model_call_transition_v1'
+                ORDER BY sequence
+                """
+            ).fetchall()
+        latest: dict[str, ModelCallTransitionRecord] = {}
+        for row in rows:
+            record = _model_call_record_from_event(self._ledger_event_from_row(row))
+            call_id = record.snapshot["call_id"]
+            previous = latest.get(call_id)
+            _validate_model_call_transition(
+                None if previous is None else previous.snapshot,
+                record.snapshot,
+                record.event.event_at,
+            )
+            latest[call_id] = record
+        return tuple(latest[call_id] for call_id in sorted(latest))
+
     def _latest_model_call_states_locked(self) -> dict[str, Mapping[str, object]]:
         rows = self._connection.execute(
             """
