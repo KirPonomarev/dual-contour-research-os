@@ -1,0 +1,63 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-r04a-model-role-eval-and-registry-20260719",
+  "issued_at": "2026-07-19T11:11:04Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "r04a-model-role-eval-and-registry",
+    "agent_id": "agent-0",
+    "ownership_lease_ref": "stages/r04a-model-role-eval-and-registry/ownership-lease.json",
+    "base_sha": "55bfaadac11904ba81596e450dfd652889552e6f",
+    "implementation_dependency_sha": "b35e4fd961cd67293acad2b93e5fd2680044aea5",
+    "head_sha": "33a73c5bfbe2b1546cef9d3a841b42f6a3db344b",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "a1_contract_sha256": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+    "write_set": [
+      "provenance/model-role-evaluation-v2.json",
+      "tools/verify_model_role_evaluation.py",
+      "tests/test_r04a_model_role_eval.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "runtime_or_frozen_v1_mutation": false,
+      "evaluation_profile_sha256": "111a7ac1dc954466b19d5e408debeeefcf65c76b5b025a743a2433be910c1e75",
+      "validator_source_sha256": "2be9bf9dd65947d0502471e0280160bb670961dd023982a89738cc1a4946de6c",
+      "focused_test_source_sha256": "d7684bebc0109217f3aba16a93c6fef4c10298a3f7088ee59868d2127b8d2bd3",
+      "required_roles_recorded": 6,
+      "chief_evaluation_state": "CURRENT_WAIT_PROVIDER",
+      "reserve_evaluation_state": "METADATA_VERIFIED_NOT_ROUTABLE_WAIT_PROVIDER",
+      "same_family_correlation": "EXPLICIT",
+      "allowed_connected_input_classes": ["D0"],
+      "current_sanitized_preflight": "WAIT_PROVIDER",
+      "configured_provider_slots": 0,
+      "provider_calls_or_cost": 0,
+      "focused_tests": 22,
+      "full_core_tests": 834,
+      "stage0b_tests": 25,
+      "deployment_or_VPS_mutations": 0,
+      "grants_authority": false
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29684655910",
+    "pull_request_ref": "https://github.com/KirPonomarev/dual-contour-research-os/pull/59",
+    "integration_commit_sha": "ca9cc783a9730bc3d6f2c6fd8c5e9a338acda2a3",
+    "known_next_gate": "Implement R04B bounded broker-to-Scout IPC handshake while preserving the exact R04A WAIT_PROVIDER state and researchd single-writer authority."
+  },
+  "integrity": {
+    "payload_sha256": "bbd376faadb3d76519d0cafe7ca92b54bfc35f47f7d45a41a7d74d78abbb9bbd",
+    "parent_refs": [
+      "git:55bfaadac11904ba81596e450dfd652889552e6f",
+      "git:b35e4fd961cd67293acad2b93e5fd2680044aea5",
+      "git:33a73c5bfbe2b1546cef9d3a841b42f6a3db344b",
+      "git:ca9cc783a9730bc3d6f2c6fd8c5e9a338acda2a3",
+      "ci:29684655910",
+      "pr:59",
+      "source-freeze:source-freeze-r04a-model-role-metadata-20260719",
+      "reuse:reuse-r04a-model-role-eval-and-registry-20260719"
+    ]
+  }
+}
