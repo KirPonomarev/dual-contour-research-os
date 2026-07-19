@@ -1,0 +1,30 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-r02b-real-source-intake-and-loop-control-20260719",
+  "issued_at": "2026-07-19T07:16:43Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-freeze-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "REAL_SOURCE_INTAKE_AND_BOUNDED_SCOUT_LOOP_CONTROL",
+    "candidates": [
+      {"candidate": "existing-authenticated-IPC-plus-R02A-durable-backend-and-supervisor-tick", "disposition": "selected-internal-adapter"},
+      {"candidate": "domain-connector-code-or-payload-in-public-bridge", "disposition": "rejected-crosses-domain-ownership-and-data-boundary"},
+      {"candidate": "new-scheduler-queue-service-thread-or-process", "disposition": "rejected-duplicates-existing-supervisor-and-ordering"},
+      {"candidate": "direct-domain-write-to-JobLedger", "disposition": "rejected-violates-single-writer-boundary"},
+      {"candidate": "new-external-dependency", "disposition": "rejected-existing-stdlib-components-sufficient"}
+    ],
+    "selected_mode": "thin-domain-neutral-conformance-and-bounded-tick-adapter-inside-researchd-over-authenticated-IPC-and-single-JobLedger-writer",
+    "source_ref": "git:bfd0ec1b8a1e4a6f6b74a65159c2ed24f95c63ff;internal:control.py+discovery.py+ipc.py+researchd.py",
+    "license_spdx": "NOASSERTION",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": ["source spoof and boundary denial", "idempotent replay", "bounded rate and work", "restart/resume", "zero provider calls for non-material input", "single-writer enforcement"],
+    "canonical_owner": "agent-1-with-agent-0-integration",
+    "rollback": "Remove the intake/loop glue and retain R02A explicit authenticated durable IPC behavior."
+  },
+  "integrity": {
+    "payload_sha256": "c96fbc4ea5399a5852921b12a34ed3dd7963a863b41c54f4c59c01be9e70c6ef",
+    "parent_refs": ["git:bfd0ec1b8a1e4a6f6b74a65159c2ed24f95c63ff", "reuse:reuse-r02a-durable-production-a1-backend-20260719"]
+  }
+}

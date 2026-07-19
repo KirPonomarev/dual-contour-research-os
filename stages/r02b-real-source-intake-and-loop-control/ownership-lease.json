@@ -1,0 +1,11 @@
+{
+  "lease_id": "lease-r02b-real-source-intake-and-loop-control-agent-1",
+  "stage_id": "r02b-real-source-intake-and-loop-control",
+  "agent_id": "agent-1",
+  "branch": "codex/bridge-a1-r02b-real-source-intake-and-loop-control",
+  "issued_at": "2026-07-19T07:16:43Z",
+  "expires_at": "2026-07-21T07:16:43Z",
+  "write_set": ["src/research_bridge/control.py", "src/research_bridge/discovery.py", "src/research_bridge/researchd.py"],
+  "exclusive": true,
+  "revoked": false
+}
