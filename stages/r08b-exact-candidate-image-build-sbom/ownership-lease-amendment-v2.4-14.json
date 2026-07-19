@@ -1,0 +1,29 @@
+{
+  "stage_id": "r08b-r4-critic-visible-output-policy-hash-agent-5",
+  "amendment_id": "R08B_R4_CRITIC_VISIBLE_OUTPUT_POLICY_HASH_AGENT_5_20260719",
+  "issued_by": "agent-0",
+  "issued_at": "2026-07-19T23:20:15Z",
+  "authority_head": "939a57928b90b420fc6510d56ee2ac2a0e73c079",
+  "candidate_sha": null,
+  "candidate_tree_sha": null,
+  "leases": [
+    {
+      "owner": "agent-5",
+      "branch": "codex/bridge-a5-r08b-r4-critic-visible-output-policy-hash",
+      "write_set": [
+        "ops/connected-worker/runtime-policy-v3.json",
+        "tests/test_s17_provider_shadow_tool.py"
+      ]
+    }
+  ],
+  "authority_metadata_paths_owned_by_agent_0_not_leased_to_agent_5": [
+    "stages/r08b-exact-candidate-image-build-sbom/stage-envelope-amendment-v2.4-14.json",
+    "stages/r08b-exact-candidate-image-build-sbom/ownership-lease-amendment-v2.4-14.json"
+  ],
+  "cross_owner_write_set": false,
+  "one_mutating_lane_at_a_time": true,
+  "expected_target_branch": "codex/bridge-a0-r08b-exact-candidate-image-build-sbom",
+  "expected_target_head": "939a57928b90b420fc6510d56ee2ac2a0e73c079",
+  "expires_at": "2026-07-20T05:20:15Z",
+  "candidate_cut_permitted": false
+}

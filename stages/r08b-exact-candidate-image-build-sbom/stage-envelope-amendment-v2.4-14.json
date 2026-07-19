@@ -1,0 +1,54 @@
+{
+  "stage_id": "r08b-exact-candidate-image-build-sbom",
+  "repair_stage_id": "r08b-r4-critic-visible-output-policy-hash-agent-5",
+  "amendment_id": "R08B_R4_CRITIC_VISIBLE_OUTPUT_POLICY_HASH_AGENT_5_20260719",
+  "plan_id": "DCR_OS_AUTONOMOUS_V2_3_NO_BRAKES_20260719",
+  "plan_version": "2.4.0-fast-working-release",
+  "issued_by": "agent-0",
+  "issued_at": "2026-07-19T23:20:15Z",
+  "authority_head": "939a57928b90b420fc6510d56ee2ac2a0e73c079",
+  "authority_tree": "a786497e4b258c81ffd723f3ef4442850b522c6b",
+  "candidate_sha": null,
+  "candidate_tree_sha": null,
+  "candidate_exact_head_ci_run": "NOT_CUT",
+  "predecessor": {
+    "agent_0_profile_repair_head": "939a57928b90b420fc6510d56ee2ac2a0e73c079",
+    "provider_profile_sha256": "707b5b2da2e6ae2d735dc51def3cde79683e5467ec3f72e029612dea02564779",
+    "provider_tool_sha256": "a02f33670f6aa13046e6a32bc64defd4b8920c34beb1bad345f1d17344a11692",
+    "failed_private_receipt_sha256": "61a077a72be8e2f2f774253e6b296b0d9412f67617179e57fb685c3b285daa3c"
+  },
+  "authority_metadata_written_by_agent_0": [
+    "stages/r08b-exact-candidate-image-build-sbom/stage-envelope-amendment-v2.4-14.json",
+    "stages/r08b-exact-candidate-image-build-sbom/ownership-lease-amendment-v2.4-14.json"
+  ],
+  "agent_5_resulting_write_set": [
+    "ops/connected-worker/runtime-policy-v3.json",
+    "tests/test_s17_provider_shadow_tool.py"
+  ],
+  "required_change": {
+    "runtime_policy_shadow_profile_sha256": "707b5b2da2e6ae2d735dc51def3cde79683e5467ec3f72e029612dea02564779",
+    "runtime_policy_shadow_tool_sha256": "a02f33670f6aa13046e6a32bc64defd4b8920c34beb1bad345f1d17344a11692",
+    "focused_test_expected_reasoning_effort": "low",
+    "worker_code_unchanged": true,
+    "provider_endpoint_api_model_credential_unchanged": true,
+    "total_token_and_cost_bounds_unchanged": true,
+    "automatic_retry_unchanged": false
+  },
+  "acceptance_commands": [
+    "python3 -m unittest -v tests.test_s17_provider_shadow_tool tests.test_r04c_connected_worker_runtime tests.test_s24_r2_openrouter_provider",
+    "python3 tools/verify_release_blueprint.py",
+    "make contracts",
+    "make test",
+    "exact nested PR-head CI green",
+    "Agent-0 squash integration into the parent R08B branch",
+    "exact parent merge-head CI green",
+    "literal no-cache worker image rebuild and private full pre-cut proof"
+  ],
+  "stop_conditions": [
+    "Agent 5 mutates provenance tools stages root config or any undeclared path",
+    "historical v1 or v2 bytes change",
+    "failed UNKNOWN call is replayed",
+    "candidate becomes non-null before full parent pre-cut PASS",
+    "force push rebase history rewrite or live action"
+  ]
+}
