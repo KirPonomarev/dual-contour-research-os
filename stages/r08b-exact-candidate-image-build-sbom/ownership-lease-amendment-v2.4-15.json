@@ -1,0 +1,28 @@
+{
+  "stage_id": "r08b-r5-trailer-identity-correction",
+  "amendment_id": "R08B_R5_TRAILER_IDENTITY_CORRECTION_20260719",
+  "issued_by": "agent-0",
+  "issued_at": "2026-07-19T23:43:14Z",
+  "authority_head": "30c64bc1eb3e4bbffb1dacb719fede8871b3ca6e",
+  "candidate_sha": null,
+  "candidate_tree_sha": null,
+  "leases": [
+    {
+      "owner": "agent-0",
+      "branch": "codex/bridge-a0-r08b-exact-candidate-image-build-sbom",
+      "write_set": [
+        "stages/r08b-exact-candidate-image-build-sbom/stage-envelope-amendment-v2.4-15.json",
+        "stages/r08b-exact-candidate-image-build-sbom/ownership-lease-amendment-v2.4-15.json",
+        "tools/verify_r08b_trailer_identity.py",
+        "docs/receipts/integration/r08b-r5-trailer-identity-correction.json"
+      ]
+    }
+  ],
+  "cross_owner_write_set": false,
+  "one_mutating_lane_at_a_time": true,
+  "provider_call_budget": 0,
+  "external_source_read_budget": 0,
+  "history_rewrite_authority": false,
+  "candidate_cut_permitted": false,
+  "expires_at": "2026-07-20T05:43:14Z"
+}

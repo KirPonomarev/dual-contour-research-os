@@ -1,0 +1,64 @@
+{
+  "stage_id": "r08b-exact-candidate-image-build-sbom",
+  "repair_stage_id": "r08b-r5-trailer-identity-correction",
+  "amendment_id": "R08B_R5_TRAILER_IDENTITY_CORRECTION_20260719",
+  "plan_id": "DCR_OS_AUTONOMOUS_V2_3_NO_BRAKES_20260719",
+  "plan_version": "2.4.0-fast-working-release",
+  "issued_by": "agent-0",
+  "issued_at": "2026-07-19T23:43:14Z",
+  "authority_head": "30c64bc1eb3e4bbffb1dacb719fede8871b3ca6e",
+  "authority_tree": "43fa493bd2710573e2165433d4a6e52879f1282d",
+  "candidate_sha": null,
+  "candidate_tree_sha": null,
+  "candidate_exact_head_ci_run": "NOT_CUT",
+  "observed_debt": {
+    "affected_commit_count": 17,
+    "inclusive_first_sha": "a332adcea37e75d41bf279b2cd9335721cf54f31",
+    "last_sha": "6ed733ba5c48d33e105019bb074a4a50c1dae15b",
+    "parsed_four_contiguous_trailers": true,
+    "canonical_value_match": false,
+    "history_rewrite_permitted": false,
+    "candidate_cut_permitted": false
+  },
+  "canonical_control_values": {
+    "PLAN-ID": "DCR_OS_AUTONOMOUS_V2_3_NO_BRAKES_20260719",
+    "PLAN-VERSION": "2.4.0-fast-working-release",
+    "AMENDMENT-ID": "FAST_RELEASE_NO_TIMED_WINDOWS_NO_HUMAN_WAIT_20260719"
+  },
+  "agent_0_write_set": [
+    "stages/r08b-exact-candidate-image-build-sbom/stage-envelope-amendment-v2.4-15.json",
+    "stages/r08b-exact-candidate-image-build-sbom/ownership-lease-amendment-v2.4-15.json",
+    "tools/verify_r08b_trailer_identity.py",
+    "docs/receipts/integration/r08b-r5-trailer-identity-correction.json"
+  ],
+  "private_predecessor": {
+    "failed_low_reasoning_receipt_sha256": "b6ef2f7ed4c22526785af9002f81e3dab87496a062c21a7c6f0571759ff886a1",
+    "worker_and_critic_calls_reconciled": true,
+    "provider_calls_repeated_for_metadata_correction": false,
+    "pre_cut_pass": false
+  },
+  "required_change": {
+    "immutable_additive_receipt_enumerates_all_17_sha_values": true,
+    "receipt_records_each_noncanonical_parsed_value": true,
+    "receipt_binds_canonical_control_values": true,
+    "validator_rejects_missing_duplicate_noncontiguous_or_value_mismatched_trailers": true,
+    "historical_commits_preserved_byte_for_byte": true,
+    "future_commit_values_canonical": true,
+    "candidate_remains_null": true
+  },
+  "acceptance_commands": [
+    "python3 tools/verify_r08b_trailer_identity.py",
+    "git interpret-trailers --parse recognizes the exact canonical four-line block on every new commit",
+    "make contracts",
+    "make test",
+    "non-force push and exact remote equality",
+    "exact correction-receipt-head CI green"
+  ],
+  "stop_conditions": [
+    "any rebase force-push amend cherry-pick rewrite or historical commit deletion",
+    "affected SHA inventory differs from the exact inclusive 17-commit set",
+    "validator accepts parse-only trailers with wrong values",
+    "provider call source read candidate cut or release claim",
+    "foreign owner live VPS timed destructive or irreversible action"
+  ]
+}
