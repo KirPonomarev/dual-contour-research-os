@@ -1,0 +1,27 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-r05b-r1-validator-source-rebind-20260719",
+  "issued_at": "2026-07-19T15:39:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-review-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "r05b-r1-validator-source-rebind",
+    "capability": "exact-validator-source-currentness-rebind",
+    "candidates": [
+      {"candidate": "disable-source-verification", "disposition": "rejected-removes-currentness-control"},
+      {"candidate": "retain-stale-digest", "disposition": "rejected-runtime-correctly-fails-closed"},
+      {"candidate": "reuse-existing-pinned-SHA-constant-with-new-exact-source-digest", "disposition": "selected-one-literal-repository-native-rebind"}
+    ],
+    "selected_candidate": "replace-only-_L0_VALIDATOR_SOURCE_SHA256-with-ea4a91d3710c6be129ebba9e27eb3bca288722af190d4feab58c0914ed259006",
+    "source_ref": "git:53cb694073600e3b6278ff8640be1f32b28e8572;internal:researchd._verify_l0_validator_source",
+    "selected_source_sha": "e05a03988237e9328ae2d84efb5db29de27e0b8ef5d8e83af756b5f6a121a086",
+    "license": "repository-native-code-only",
+    "tests": ["old-source-denied", "new-exact-source-starts", "full-corridor-nonempty-pass", "empty-input-feedback-absent"],
+    "security_review": "One exact digest literal changes. Verification remains mandatory and no identity, protocol, authority, data, network or runtime topology changes.",
+    "dependency_review": "No dependency, package, contract, schema, migration, lockfile, SBOM or notice change.",
+    "rollback": "Revert together with the R05B validator implementation."
+  },
+  "integrity": {"payload_sha256": "c62628fd4c335592f3189785f3aa3e21338dc8928f3e563e8eafa42b88e29457", "parent_refs": ["git:53cb694073600e3b6278ff8640be1f32b28e8572", "source:sha256:ea4a91d3710c6be129ebba9e27eb3bca288722af190d4feab58c0914ed259006", "reuse:reuse-r05b-independent-validation-closure-20260719"]}
+}
