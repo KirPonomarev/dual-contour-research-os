@@ -1,0 +1,69 @@
+{
+  "stage_id": "r04b-broker-scout-ipc-handshake",
+  "agent_id": "agent-1",
+  "objective": "Compose the existing durable model-call broker into researchd and authenticated AF_UNIX roles so Scout reserves policy-selected work, a connected worker receives a hash-bound dispatch only after durable SENT, completion remains untrusted ledger evidence, and only Scout can submit successful call references into proposal intake.",
+  "executable_blocker": "The repository already has durable model-call state and connected adapters, but researchd exposes no worker handshake and proposal intake does not bind model call references to successful durable states.",
+  "base_sha": "76b07ea1032e4754183a8c625d064564d5fad350",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "a1_contract_sha256": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+  "branch": "codex/bridge-a1-r04b-broker-scout-ipc-handshake",
+  "worktree": "/private/tmp/dcr-r04b-broker-scout-ipc-handshake",
+  "read_set": [
+    "contracts/a1/v1/profiles/model_role_registry_v1.json",
+    "provenance/model-provider-routing-v1.json",
+    "provenance/model-role-evaluation-v2.json",
+    "tests/test_s15_model_registry_broker.py",
+    "tests/test_s16_provider_routing.py",
+    "tests/test_s17_cost_reconciliation.py",
+    "tests/test_s18_provider_hostile.py",
+    "tests/test_stage1_control.py",
+    "tests/test_stage1_researchd.py",
+    "tests/test_r03a_admission_runtime_ops.py"
+  ],
+  "write_set": [
+    "src/research_bridge/model_broker.py",
+    "src/research_bridge/control.py",
+    "src/research_bridge/ipc.py",
+    "src/research_bridge/ledger.py",
+    "src/research_bridge/researchd.py"
+  ],
+  "forbidden_scope": [
+    "test-contract-profile-provenance-doc-ops-tool-root-config-CI-lockfile-migration-or-other-source-edit",
+    "provider-network-credential-raw-response-bytes-private-account-billing-D2-D3-or-holdout-material",
+    "worker-ledger-database-CAS-write-second-writer-new-service-queue-scheduler-or-dependency",
+    "automatic-retry-caller-selected-binding-model-authority-admission-permit-canonical-write-or-deployment-claim"
+  ],
+  "dependency_hashes": {
+    "r04a_integration_head": "76b07ea1032e4754183a8c625d064564d5fad350",
+    "model_broker_sha256": "72850f112fb5ceac71cbaf116f4e7f7e6c69f66524e4012a795890a61fe9faad",
+    "control_sha256": "bf84bb4babadb44b81a32b311f79c38adccac7e8a1013c66dcca56c4a1b49c53",
+    "ipc_sha256": "b10a6138cac4ce8892a9bdfba115912472d6f8e871b39c705801a03d22fd331f",
+    "ledger_sha256": "2c3121eb635d73d4f2a806a657f59540f22c37673c099aa9bee42cd133c0b8f9",
+    "researchd_sha256": "0ccda2cebdb79b529fdb8f40bf4410922385208904eaf8ce80391bcb5bcbb4a8",
+    "role_registry_v1_sha256": "4faf6765f48a952e4d35540d92797330517938b34b8d2f12cde791e761a32eac",
+    "routing_v1_sha256": "37db8596a8245a6b1ea2bc5bce1495a4e7dadb314876e51397ad11dd194b3dc6",
+    "reuse_receipt": "docs/receipts/reuse/r04b-broker-scout-ipc-handshake.json",
+    "external_dependencies": "none"
+  },
+  "acceptance_commands": [
+    "python3 -m unittest -v tests.test_s15_model_registry_broker tests.test_s16_provider_routing tests.test_s17_cost_reconciliation tests.test_s18_provider_hostile tests.test_stage1_control tests.test_stage1_researchd tests.test_r03a_admission_runtime_ops",
+    "python3 -m unittest -v tests.test_r04b_broker_scout_ipc",
+    "make contracts",
+    "make test",
+    "git diff --check",
+    "exact-head remote CI"
+  ],
+  "risk_class": "critical-second-writer-duplicate-spend-unbound-result-or-ambiguous-retry",
+  "stop_conditions": [
+    "reservation-does-not-precede-worker-begin-or-SENT-does-not-precede-egress-ack",
+    "worker-can-open-ledger-write-Core-submit-proposal-or-select-a-binding",
+    "duplicate-crash-restart-or-stale-request-can-repeat-egress-or-release-ambiguous-budget",
+    "proposal-intake-accepts-missing-nonsuccessful-mixed-or-wrong-role-model-call-references-when-handshake-is-enabled",
+    "write-outside-five-Agent-1-runtime-files-or-public-safety-boundary-breach"
+  ],
+  "expected_receipt": "docs/receipts/integration/r04b-broker-scout-ipc-handshake.json",
+  "rollback": "Revert the five runtime files to the accepted R04A head; the existing ledger schema and earlier records remain valid.",
+  "commit_authority": "one-scoped-agent-1-runtime-stage",
+  "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent0_audit", "blocked_validation_failed"]
+}

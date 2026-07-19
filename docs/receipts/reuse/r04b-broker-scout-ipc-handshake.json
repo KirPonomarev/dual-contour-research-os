@@ -1,0 +1,46 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-r04b-broker-scout-ipc-handshake-20260719",
+  "issued_at": "2026-07-19T11:16:36Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-review-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "r04b-broker-scout-ipc-handshake",
+    "capability": "single-writer-bounded-model-call-handshake-through-authenticated-local-IPC",
+    "candidates": [
+      {"candidate": "extend-existing-ModelCallBroker-JobLedger-ControlRouter-UnixControlServer-and-ResearchDaemon", "disposition": "selected-preserve-durable-global-order-and-one-writer"},
+      {"candidate": "new-model-ledger-database-queue-or-scheduler", "disposition": "rejected-duplicate-state-authority"},
+      {"candidate": "worker-opens-JobLedger-or-runtime-CAS-directly", "disposition": "rejected-worker-must-remain-IPC-only"},
+      {"candidate": "automatic-retry-after-SENT-or-ambiguous-outcome", "disposition": "rejected-preserve-UNKNOWN-and-reconciliation"},
+      {"candidate": "new-provider-SDK-or-network-client-in-Bridge-runtime", "disposition": "rejected-R04B-is-local-handshake-only"}
+    ],
+    "selected_candidate": "existing-internal-components-with-minimal-five-file-glue",
+    "source_ref": "git:76b07ea1032e4754183a8c625d064564d5fad350;internal:model_broker+ledger+control+ipc+researchd;integration:integration-r04a-model-role-eval-and-registry-20260719",
+    "selected_source_sha": "72850f112fb5ceac71cbaf116f4e7f7e6c69f66524e4012a795890a61fe9faad",
+    "license": "repository-native-code-only",
+    "tests": [
+      "reservation-before-worker-begin",
+      "durable-SENT-before-egress-ack",
+      "restart-SENT-to-UNKNOWN",
+      "duplicate-begin-and-completion-idempotency",
+      "stale-request-worker-identity-and-role-policy-denial",
+      "unavailable-role-and-budget-exhaustion",
+      "Scout-only-successful-call-reference-validation",
+      "AI-OFF-and-existing-protocol-preservation"
+    ],
+    "security_review": "local-AF_UNIX-only-no-network-no-credential-no-raw-response-bytes-no-new-authority",
+    "dependency_review": "stdlib-and-existing-repository-components-only-no-lockfile-SBOM-or-notice-change",
+    "rollback": "Revert the five runtime files to the accepted R04A head; durable model-call records remain replay-valid under their existing schema."
+  },
+  "integrity": {
+    "payload_sha256": "9e6534e0484b988733429282c440c8ba9ab03dfd95f2199063958d1b8bd4284d",
+    "parent_refs": [
+      "git:76b07ea1032e4754183a8c625d064564d5fad350",
+      "reuse:reuse-s15-model-registry-broker-20260718",
+      "reuse:reuse-s16-provider-adapters-routing-20260718",
+      "integration:integration-r04a-model-role-eval-and-registry-20260719"
+    ]
+  }
+}
