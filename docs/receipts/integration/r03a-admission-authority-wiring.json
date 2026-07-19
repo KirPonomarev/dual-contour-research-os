@@ -24,6 +24,7 @@
     "audit_results": {
       "contract_gate": "green",
       "privacy_secret_scan": "green",
+      "source_mutation": false,
       "ownership_and_diff_boundary": "green",
       "candidate_and_receipt_same_atomic_A1_bundle": "green",
       "exact_pre_append_global_revision_CAS": "green",
@@ -47,7 +48,7 @@
     "known_next_gate": "Agent-5 ops repair must populate exact admission_runtime and frozen admission-controller/researchd issuer roles before R03B physical execution wiring."
   },
   "integrity": {
-    "payload_sha256": "cf016911b901f3fca70a8ab3fc8d43388aa72aa2c62746f050eb098879faddd0",
+    "payload_sha256": "1949470dbec5f16d5eb7784e42f8f1ab92aa43e5c28e87bfab291c618fe33fd0",
     "parent_refs": [
       "git:dbbb3516ad1532eddd13ec7d8b31dc42d880170d",
       "git:a138f8384e9a2f1fb6ae5835dfeae72854c32e67",
