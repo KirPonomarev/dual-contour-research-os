@@ -1,0 +1,35 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-r04e-provider-proof-integration-20260719",
+  "issued_at": "2026-07-19T15:02:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-review-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "r04e-provider-proof-integration",
+    "capability": "sanitized-expiring-real-provider-route-proof",
+    "candidates": [
+      {"candidate": "commit-private-provider-response-or-runtime-state", "disposition": "rejected-public-boundary-violation"},
+      {"candidate": "treat-fixture-routing-profile-as-real-provider-proof", "disposition": "rejected-claim-layer-confusion"},
+      {"candidate": "invent-a-new-capability-receipt-contract", "disposition": "rejected-frozen-contract-duplication"},
+      {"candidate": "reuse-frozen-CapabilityProofReceipt-and-currentness-framework-with-one-additive-exact-scope", "disposition": "selected-minimal-repository-native-extension"}
+    ],
+    "selected_candidate": "additive-sanitized-provenance-manifest-plus-frozen-capability-proof-currentness-validation",
+    "source_ref": "git:e5f613e1604bd1f6ff4537a7747c037a49816307;internal:CapabilityProofReceipt+capability_proof.py+R04D-sanitized-manifest",
+    "selected_source_sha": "690be42244441b062e94534225781faa260fe3df0df5961c132c0581d1a0dd35",
+    "license": "repository-native-code-and-data-only",
+    "tests": ["exact-subject-and-tree", "route-layer-binding", "expiry-and-drift", "fixture-real-separation", "privacy-negative-scan", "zero-authority"],
+    "security_review": "Only hashes, public route metadata, bounded counts and state labels are admitted. Raw bytes, credential material, account data, runtime storage and private locations remain outside Git. Gateway transport is explicitly distinct from requested model-family and upstream identity is not attested.",
+    "dependency_review": "No new dependency, contract, schema, service, queue, database, package, license, SBOM or notice change.",
+    "rollback": "Remove the additive proof registration, manifest, verifier and receipt; no runtime or private evidence is changed."
+  },
+  "integrity": {
+    "payload_sha256": "87364f44b171b399f4a2b653dafb7670b3c9c54ca8b0c5aaa00a6aad84b3318a",
+    "parent_refs": [
+      "git:e5f613e1604bd1f6ff4537a7747c037a49816307",
+      "schema:sha256:c5b21d5b2036c9001375e9251d91186c324c8d09bb3497d3233169c89cf09122",
+      "tool:sha256:690be42244441b062e94534225781faa260fe3df0df5961c132c0581d1a0dd35"
+    ]
+  }
+}
