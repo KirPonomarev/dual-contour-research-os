@@ -1,0 +1,12 @@
+[Unit]
+Description=Schedule encrypted verified Research OS backups
+
+[Timer]
+OnCalendar=*-*-* 03:15:00 UTC
+Persistent=true
+RandomizedDelaySec=900s
+AccuracySec=60s
+Unit=research-os-backup.service
+
+[Install]
+WantedBy=timers.target

@@ -35,6 +35,14 @@
       "isolation": "PURE_OFFLINE_ZERO_AUTHORITY",
       "lifecycle": "ON_DEMAND_OFFLINE_TOOL",
       "observed_ref": "repo:docs/receipts/integration/s10-durable-feedback-capability-assurance.json"
+    },
+    {
+      "process_id": "runtime-pulse-monitor-timer",
+      "service_ref": "repo:ops/deploy/research-os-runtime-monitor.service",
+      "component_ids": ["runtime-pulse-monitor"],
+      "isolation": "OWNER_ONLY_MONITOR_JOURNAL_NO_RESEARCH_STATE_WRITE",
+      "lifecycle": "ON_DEMAND_OFFLINE_TOOL",
+      "observed_ref": "repo:docs/receipts/integration/r05c-loop-pulse-and-canonical-assurance.json"
     }
   ]
 }

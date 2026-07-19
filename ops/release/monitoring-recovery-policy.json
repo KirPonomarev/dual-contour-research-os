@@ -1,0 +1,36 @@
+{
+  "schema_id": "MonitoringRecoveryPolicy",
+  "schema_version": "1.0.0",
+  "policy_id": "release-bound-monitoring-recovery-v1",
+  "monitor": {
+    "unit": "research-os-runtime-monitor.timer",
+    "interval_seconds": 60,
+    "research_state_access": "READ_ONLY_SANITIZED_INPUT",
+    "write_namespace": "OWNER_ONLY_MONITOR_JOURNAL",
+    "counter_model": "HASH_CHAIN_REPLAY",
+    "maximum_records": 30000,
+    "external_paging": false,
+    "grants_authority": false
+  },
+  "backup": {
+    "unit": "research-os-backup.timer",
+    "calendar": "*-*-* 03:15:00 UTC",
+    "persistent": true,
+    "randomized_delay_seconds": 900,
+    "controller": "tools/release_backup_restore.py",
+    "command": "backup",
+    "restore_scheduled": false,
+    "delete_or_prune_scheduled": false,
+    "credentials_in_unit": false
+  },
+  "supervisor": {
+    "owner": "systemd-user",
+    "core_container_restart": "no",
+    "core_systemd_restart": "on-failure",
+    "monitor_and_backup": "systemd-timer-oneshot",
+    "research_state_writers": 1,
+    "monitor_is_control_plane": false
+  },
+  "observation_windows_started": false,
+  "external_action_authority": false
+}

@@ -1,0 +1,37 @@
+[Unit]
+Description=Dual-Contour Research OS encrypted verified scheduled backup
+Documentation=https://github.com/KirPonomarev/dual-contour-research-os
+After=research-os-a1-final.service network-online.target
+Wants=network-online.target
+ConditionPathExists=%h/.config/research-os/backup.env
+ConditionPathExists=%h/.config/research-os/release-manifest.json
+
+[Service]
+Type=oneshot
+EnvironmentFile=%h/.config/research-os/backup.env
+Environment=PYTHONDONTWRITEBYTECODE=1
+Environment=XDG_CACHE_HOME=%t/research-os-restic
+RuntimeDirectory=research-os-restic
+RuntimeDirectoryMode=0700
+ExecStartPre=/bin/sh -eu -c 'test "$(/usr/bin/stat -c %%a %h/.config/research-os/backup.env)" = 600; test "$(/usr/bin/stat -c %%a %h/.config/research-os/release-manifest.json)" = 600; install -d -m 0700 %h/.local/state/research-os/backup-receipts'
+ExecStart=/usr/bin/flock -n %h/.local/state/research-os/backup.lock /usr/bin/python3 /opt/research-os/tools/release_backup_restore.py backup --restic-binary ${RESEARCH_OS_RESTIC_BINARY} --repository-file ${RESEARCH_OS_REPOSITORY_FILE} --password-command ${RESEARCH_OS_PASSWORD_COMMAND} --destination-ref ${RESEARCH_OS_BACKUP_DESTINATION_REF} --source-root %h/.local/share/research-os/runtime-backup-source --release-manifest %h/.config/research-os/release-manifest.json --receipt %h/.local/state/research-os/backup-receipts/backup-${INVOCATION_ID}.json
+NoNewPrivileges=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+PrivateDevices=yes
+PrivateTmp=yes
+ProtectClock=yes
+ProtectControlGroups=yes
+ProtectKernelLogs=yes
+ProtectKernelModules=yes
+ProtectKernelTunables=yes
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=%h/.local/state/research-os/backup-receipts %h/.local/state/research-os/backup.lock
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+SystemCallArchitectures=native
+TasksMax=64
+MemoryMax=536870912
+CPUQuota=100%
+UMask=0077
