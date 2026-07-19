@@ -27,14 +27,17 @@ class S22AuthorityRequestTests(unittest.TestCase):
         value = verifier.validate()
         self.assertEqual(value["status"], "WAIT_HUMAN_REVIEW")
         self.assertFalse(value["grants_authority"])
-        self.assertTrue(value["release_proposal"]["final_release_rebind_required"])
+        self.assertFalse(value["release_proposal"]["final_release_rebind_required"])
+        self.assertEqual(value["release_proposal"]["release_sha"], verifier.RELEASE_SHA)
+        self.assertEqual(value["release_proposal"]["release_tree_sha"], verifier.RELEASE_TREE)
 
     def test_resealed_approval_or_scope_widening_fails(self) -> None:
         cases = (
             lambda v: v.__setitem__("status", "APPROVED"),
             lambda v: v.__setitem__("grants_authority", True),
             lambda v: v.__setitem__("review_decision", "APPROVE"),
-            lambda v: v["release_proposal"].__setitem__("final_release_rebind_required", False),
+            lambda v: v["release_proposal"].__setitem__("final_release_rebind_required", True),
+            lambda v: v["release_proposal"].__setitem__("release_sha", "0" * 40),
             lambda v: v["blast_radius"].__setitem__("network", "host"),
             lambda v: v["hard_denies"].remove("AUTO_EXECUTE"),
         )

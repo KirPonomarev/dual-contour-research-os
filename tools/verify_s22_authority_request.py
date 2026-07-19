@@ -13,7 +13,9 @@ from typing import Mapping
 
 ROOT = Path(__file__).resolve().parents[1]
 REQUEST = ROOT / "docs/receipts/requests/s22-final-deployment-authority-request.json"
-BASE_SHA = "343ef0611a501e4f58cbdd1f2bc55b1d121400a5"
+BASE_SHA = "d28bef12cbf6acd1747ddf0e3ec51671c4ca2dcb"
+RELEASE_SHA = "b2c2e6a8c4e0a364ef82e8e51540433aa91430d4"
+RELEASE_TREE = "7d6bd1e13d651950cced23dfe75a24946a3218fc"
 
 
 class AuthorityRequestError(RuntimeError):
@@ -60,19 +62,26 @@ def validate(root: Path = ROOT, request: Mapping[str, object] | None = None) -> 
     integrity = value.get("integrity")
     if any(not isinstance(item, Mapping) for item in (release, evidence, blast, integrity)):
         raise AuthorityRequestError("request section shape mismatch")
-    for ref_key, hash_key in (
-        ("manifest_ref", "manifest_sha256"),
-    ):
+    for ref_key, hash_key in (("manifest_ref", "manifest_sha256"),):
         if digest(root / str(release[ref_key])) != release.get(hash_key):
             raise AuthorityRequestError("release proposal drift")
     for ref_key, hash_key in (
+        ("final_deployment_packet_ref", "final_deployment_packet_sha256"),
+        ("final_freeze_receipt_ref", "final_freeze_receipt_sha256"),
         ("readiness_packet_ref", "readiness_packet_sha256"),
         ("isolation_packet_ref", "isolation_packet_sha256"),
         ("runbook_ref", "runbook_sha256"),
     ):
         if digest(root / str(evidence[ref_key])) != evidence.get(hash_key):
             raise AuthorityRequestError("request evidence drift")
-    if release.get("final_release_rebind_required") is not True or evidence.get("exact_head_ci_sha") != BASE_SHA:
+    if (
+        release.get("final_release_rebind_required") is not False
+        or release.get("release_sha") != RELEASE_SHA
+        or release.get("release_tree_sha") != RELEASE_TREE
+        or release.get("image_build_state") != "WAIT_AUTHORIZED_DEPLOYMENT_PREFLIGHT"
+        or evidence.get("exact_head_ci_sha") != BASE_SHA
+        or evidence.get("exact_head_ci_run") != 29668388814
+    ):
         raise AuthorityRequestError("request could authorize a stale final release")
     if blast != {"service": "research-os-a1-bridge.service", "container": "research-os-a1-bridge", "network": "none", "published_ports": 0, "live_capability": False, "canonical_mutation": False, "concurrent_predecessor_writer": False}:
         raise AuthorityRequestError("blast radius widened")
@@ -80,7 +89,7 @@ def validate(root: Path = ROOT, request: Mapping[str, object] | None = None) -> 
     if set(value.get("hard_denies", [])) != required_denies:
         raise AuthorityRequestError("hard-deny set drifted")
     preconditions = set(value.get("mandatory_preconditions", []))
-    if not {"S38_FINAL_RELEASE_FREEZE_COMPLETE", "UNCONSUMED_MAX_300_SECOND_DEPLOYMENT_APPROVAL_RECEIPT", "CURRENT_ENCRYPTED_BACKUP_RECEIPT_PRESENT", "CURRENT_CLEAN_RESTORE_RECEIPT_PRESENT"} <= preconditions:
+    if not {"S38_FINAL_RELEASE_FREEZE_COMPLETE", "EXACT_FINAL_SHA_TREE_AND_RELEASE_MANIFEST_REVIEWED", "EXACT_IMAGE_BUILD_AND_LABELS_VERIFIED", "UNCONSUMED_MAX_300_SECOND_DEPLOYMENT_APPROVAL_RECEIPT", "CURRENT_ENCRYPTED_BACKUP_RECEIPT_PRESENT", "CLEAN_RESTORE_CONTROLLER_SYNTHETIC_PROOF_PRESENT"} <= preconditions:
         raise AuthorityRequestError("mandatory human/deployment preconditions missing")
     if integrity.get("profile") != "core-json-sha256-v1" or integrity.get("payload_sha256") != payload_digest(value):
         raise AuthorityRequestError("request integrity mismatch")

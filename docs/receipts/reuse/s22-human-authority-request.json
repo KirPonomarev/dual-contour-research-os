@@ -11,12 +11,12 @@
       {"candidate": "issue-or-consume-DeploymentApprovalReceipt-now", "disposition": "rejected-human-authority-and-runtime-evidence-missing"},
       {"candidate": "automatic-deploy-reboot-restore-or-rollback", "disposition": "rejected-night-contour-and-plan-boundary"}
     ],
-    "selected_mode": "PR_HUMAN-WAIT_HUMAN_REVIEW-with-final-release-rebind-required",
-    "source_ref": "git:343ef0611a501e4f58cbdd1f2bc55b1d121400a5;readiness:sha256:0085672bd78590fe96aa91b4a70bd2f09fa0ea81cb4405bde6596588ecdb0c48",
-    "code_sha256": "bf524d093bc52912234904c51eaa28659f78754e4f246e275dab8363082d8929", "license_spdx": "NOASSERTION", "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "selected_mode": "PR_HUMAN-WAIT_HUMAN_REVIEW-bound-to-exact-S38-final-candidate",
+    "source_ref": "git:d28bef12cbf6acd1747ddf0e3ec51671c4ca2dcb;candidate:b2c2e6a8c4e0a364ef82e8e51540433aa91430d4;manifest:sha256:0439dee8e058914fe8e11416112e4a985e4bfec11502bb2cd0fd5b883295c369",
+    "code_sha256": "05871e14caf800b9b5578a187e8ee91e3dc1663c4e2145748069d9685e20b9b7", "license_spdx": "NOASSERTION", "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "tests": ["request-integrity", "exact-release-evidence", "authority-impersonation", "blast-radius", "hard-denies", "public-safety"],
     "canonical_owner": "agent-0-release-governance",
     "rollback": "Close the unmerged request PR and delete only its plan-owned branch/worktree; no authority or external state was created."
   },
-  "integrity": {"payload_sha256": "c02742904b54cad15efb05e4bf51bdcfd70e8def277e47d7a4fd47853e14bab0", "parent_refs": ["git:343ef0611a501e4f58cbdd1f2bc55b1d121400a5", "integration:integration-s21-deployment-readiness-20260718"]}
+  "integrity": {"payload_sha256": "cac6a0738638630c27b57a0eea0c8fab12d5fcba78704c7f64a619c5b16d5cb3", "parent_refs": ["git:d28bef12cbf6acd1747ddf0e3ec51671c4ca2dcb", "integration:integration-s38-final-release-freeze-20260719"]}
 }
