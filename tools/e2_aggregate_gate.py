@@ -11,6 +11,11 @@ import subprocess
 from typing import Mapping
 
 from capability_proof import CapabilityProofError, canonical_json_sha256, validate_capability_proof
+from release_currentness import (
+    ReleaseCurrentnessError,
+    assess_capability_for_release,
+    validate_release_currentness_context,
+)
 
 
 SUBJECT_SHA = "b9fa2944c35f7edc1474c2e42c91680f1d177e19"
@@ -121,8 +126,11 @@ def _is_ancestor(root: Path, ancestor: str, descendant: str) -> bool:
 def validate_e2_evidence(root: Path, *, subject_ref: str = SUBJECT_REF) -> dict[str, object]:
     """Validate exact S23-S27 evidence without converting it into authority."""
 
-    if subject_ref != SUBJECT_REF:
-        raise E2AggregateError("aggregate subject is not the frozen exact head")
+    if not isinstance(subject_ref, str) or not subject_ref.startswith("git:") or len(subject_ref) != 44:
+        raise E2AggregateError("aggregate subject is not an exact Git head")
+    subject_sha = subject_ref[4:]
+    if subject_ref != SUBJECT_REF and not _is_ancestor(root, SUBJECT_SHA, subject_sha):
+        raise E2AggregateError("aggregate subject is not a descendant exact head")
     loaded: dict[str, dict[str, object]] = {}
     payloads: dict[str, dict[str, object]] = {}
     for relative, expected in EVIDENCE_FILES.items():
@@ -136,7 +144,7 @@ def validate_e2_evidence(root: Path, *, subject_ref: str = SUBJECT_REF) -> dict[
         payload = _integration(loaded[relative], stage_id=STAGE_IDS[relative])
         payloads[relative] = payload
         for field in ("head_sha", "integration_commit_sha"):
-            if not _is_ancestor(root, str(payload[field]), SUBJECT_SHA):
+            if not _is_ancestor(root, str(payload[field]), subject_sha):
                 raise E2AggregateError(f"E2 {field} is outside exact-head ancestry: {relative}")
 
     audits = {path: payload["audit_results"] for path, payload in payloads.items()}
@@ -182,7 +190,7 @@ def validate_e2_evidence(root: Path, *, subject_ref: str = SUBJECT_REF) -> dict[
 
     return {
         "status": "AUTONOMOUS_RESEARCH_E2_SHADOW_PASS_FOR_FROZEN_SCOPE",
-        "subject_ref": SUBJECT_REF,
+        "subject_ref": subject_ref,
         "agenda_status": "AUTONOMOUS_RESEARCH_AGENDA_SHADOW_PASS",
         "portfolio_status": "AUTONOMOUS_PORTFOLIO_SELECTION_SHADOW_PASS",
         "falsification_status": "AUTONOMOUS_FALSIFICATION_SHADOW_PASS",
@@ -204,8 +212,9 @@ def validate_e2_evidence(root: Path, *, subject_ref: str = SUBJECT_REF) -> dict[
     }
 
 
-def validate_aggregate_receipt(root: Path, receipt: Mapping[str, object]) -> dict[str, object]:
-    evidence = validate_e2_evidence(root)
+def _validate_receipt_against_evidence(
+    receipt: Mapping[str, object], evidence: Mapping[str, object]
+) -> dict[str, object]:
     try:
         proof = validate_capability_proof(receipt)
     except CapabilityProofError as exc:
@@ -213,7 +222,7 @@ def validate_aggregate_receipt(root: Path, receipt: Mapping[str, object]) -> dic
     payload = proof["payload"]
     if (
         payload["capability_id"] != "AUTONOMOUS_RESEARCH_E2_SHADOW"
-        or payload["subject_ref"] != SUBJECT_REF
+        or payload["subject_ref"] != evidence["subject_ref"]
     ):
         raise E2AggregateError("aggregate E2 capability identity mismatch")
     scope = payload["scope"]
@@ -231,16 +240,55 @@ def validate_aggregate_receipt(root: Path, receipt: Mapping[str, object]) -> dic
     return proof
 
 
+def validate_historical_aggregate_receipt(
+    root: Path, receipt: Mapping[str, object]
+) -> dict[str, object]:
+    """Validate immutable historical semantics without claiming currentness."""
+
+    return _validate_receipt_against_evidence(receipt, validate_e2_evidence(root))
+
+
+def validate_aggregate_receipt(
+    root: Path,
+    receipt: Mapping[str, object],
+    *,
+    currentness_context: Mapping[str, object],
+) -> dict[str, object]:
+    try:
+        current = validate_release_currentness_context(root, currentness_context)
+    except ReleaseCurrentnessError as exc:
+        raise E2AggregateError("release currentness context is invalid") from exc
+    evidence = validate_e2_evidence(root, subject_ref=f"git:{current['release_sha']}")
+    proof = _validate_receipt_against_evidence(receipt, evidence)
+    try:
+        assess_capability_for_release(
+            root,
+            proof,
+            current,
+            code_sha256=str(evidence["code_sha256"]),
+            config_sha256=str(evidence["config_sha256"]),
+            policy_sha256=str(evidence["policy_sha256"]),
+            schema_sha256=str(evidence["schema_sha256"]),
+        )
+    except ReleaseCurrentnessError as exc:
+        raise E2AggregateError("aggregate E2 proof is not current") from exc
+    return proof
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[1])
     parser.add_argument("--receipt", type=Path)
+    parser.add_argument("--currentness", type=Path)
     args = parser.parse_args()
     root = args.root.resolve()
     evidence = validate_e2_evidence(root)
     if args.receipt:
+        if args.currentness is None:
+            raise E2AggregateError("--currentness is required with --receipt")
         value = _strict_json(args.receipt.read_bytes(), label=str(args.receipt))
-        validate_aggregate_receipt(root, value)
+        context = _strict_json(args.currentness.read_bytes(), label=str(args.currentness))
+        validate_aggregate_receipt(root, value, currentness_context=context)
     print(json.dumps(evidence, sort_keys=True, separators=(",", ":")))
     return 0
 

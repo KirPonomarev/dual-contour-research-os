@@ -16,6 +16,11 @@ from capability_proof import (
     issue_evolution_kernel_v1_proof,
     validate_capability_proof,
 )
+from release_currentness import (
+    ReleaseCurrentnessError,
+    assess_capability_for_release,
+    validate_release_currentness_context,
+)
 
 
 SUBJECT_SHA = "475a68abc4ec48148f001d9b614a2b262a0dad69"
@@ -32,6 +37,16 @@ CAPABILITY_IDS = (
     "A1_DISCOVERY_ADMISSION_FIXTURE",
     "A1_DURABLE_FEEDBACK",
     "OPERATIONAL_SELF_MODEL",
+)
+CODE_FILES = (
+    "src/research_bridge/ledger.py",
+    "src/research_bridge/evolution.py",
+    "src/research_bridge/model_broker.py",
+)
+POLICY_FILES = (
+    "provenance/model-provider-routing-v1.json",
+    "provenance/model-provider-connected-shadow-v2.json",
+    "provenance/selected-receipt-attestation-v1.json",
 )
 FORBIDDEN_TRUE_FLAGS = (
     "autonomous_canonical_mutation",
@@ -90,6 +105,17 @@ def _integration(receipt: Mapping[str, object], *, stage_id: str) -> dict[str, o
     return payload
 
 
+def _bundle_sha256(root: Path, paths: tuple[str, ...]) -> str:
+    try:
+        material = {
+            path: hashlib.sha256((root / path).read_bytes()).hexdigest()
+            for path in paths
+        }
+    except OSError as exc:
+        raise E1AggregateError("missing E1 bundle file") from exc
+    return canonical_json_sha256(material)
+
+
 def _is_ancestor(root: Path, ancestor: str, descendant: str) -> bool:
     result = subprocess.run(
         ["git", "merge-base", "--is-ancestor", ancestor, descendant],
@@ -104,8 +130,11 @@ def _is_ancestor(root: Path, ancestor: str, descendant: str) -> bool:
 def validate_e1_evidence(root: Path, *, subject_ref: str = SUBJECT_REF) -> dict[str, object]:
     """Validate the exact frozen evidence set and return its bounded claims."""
 
-    if subject_ref != SUBJECT_REF:
-        raise E1AggregateError("aggregate subject is not the frozen exact head")
+    if not isinstance(subject_ref, str) or not subject_ref.startswith("git:") or len(subject_ref) != 44:
+        raise E1AggregateError("aggregate subject is not an exact Git head")
+    subject_sha = subject_ref[4:]
+    if subject_ref != SUBJECT_REF and not _is_ancestor(root, SUBJECT_SHA, subject_sha):
+        raise E1AggregateError("aggregate subject is not a descendant exact head")
     loaded: dict[str, dict[str, object]] = {}
     for relative, expected in EVIDENCE_FILES.items():
         path = root / relative
@@ -129,7 +158,7 @@ def validate_e1_evidence(root: Path, *, subject_ref: str = SUBJECT_REF) -> dict[
         if payload["grants_authority"] is not False:
             raise E1AggregateError("component capability grants authority")
         ancestor = str(payload["subject_ref"])[4:]
-        if not _is_ancestor(root, ancestor, SUBJECT_SHA):
+        if not _is_ancestor(root, ancestor, subject_sha):
             raise E1AggregateError(f"capability subject is not in exact-head ancestry: {path}")
 
     hostile = _integration(
@@ -143,7 +172,7 @@ def validate_e1_evidence(root: Path, *, subject_ref: str = SUBJECT_REF) -> dict[
     for payload, label in ((hostile, "S14"), (provider, "S18")):
         for field in ("head_sha", "integration_commit_sha"):
             sha = str(payload[field])
-            if not _is_ancestor(root, sha, SUBJECT_SHA):
+            if not _is_ancestor(root, sha, subject_sha):
                 raise E1AggregateError(f"{label} {field} is not in exact-head ancestry")
 
     audits = provider["audit_results"]
@@ -165,7 +194,7 @@ def validate_e1_evidence(root: Path, *, subject_ref: str = SUBJECT_REF) -> dict[
 
     return {
         "status": "EVOLUTION_KERNEL_V1_SHADOW_PASS_FOR_FROZEN_SCOPE",
-        "subject_ref": SUBJECT_REF,
+        "subject_ref": subject_ref,
         "fixture_capabilities": list(CAPABILITY_IDS),
         "real_provider_scope": "AVAILABLE_EVALUATED_BINDINGS_ONLY",
         "mandatory_gpt": "WAIT_PROVIDER",
@@ -181,23 +210,72 @@ def validate_e1_evidence(root: Path, *, subject_ref: str = SUBJECT_REF) -> dict[
         "live_trading": False,
         "live_security_execution": False,
         "grants_authority": False,
+        "code_sha256": _bundle_sha256(root, CODE_FILES),
+        "config_sha256": canonical_json_sha256(EVIDENCE_FILES),
+        "policy_sha256": _bundle_sha256(root, POLICY_FILES),
+        "schema_sha256": canonical_json_sha256({
+            "core": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+            "a1": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+        }),
     }
 
 
-def validate_aggregate_receipt(root: Path, receipt: Mapping[str, object]) -> dict[str, object]:
-    evidence = validate_e1_evidence(root)
+def _validate_receipt_against_evidence(
+    receipt: Mapping[str, object], evidence: Mapping[str, object], *, require_hashes: bool
+) -> dict[str, object]:
     try:
         proof = validate_capability_proof(receipt)
     except CapabilityProofError as exc:
         raise E1AggregateError("aggregate capability proof is invalid") from exc
     payload = proof["payload"]
-    if payload["capability_id"] != "EVOLUTION_KERNEL_V1" or payload["subject_ref"] != SUBJECT_REF:
+    if payload["capability_id"] != "EVOLUTION_KERNEL_V1" or payload["subject_ref"] != evidence["subject_ref"]:
         raise E1AggregateError("aggregate capability identity mismatch")
     scope = payload["scope"]
     if any(scope[field] is not False for field in FORBIDDEN_TRUE_FLAGS):
         raise E1AggregateError("aggregate capability claims forbidden authority or action")
     if scope["mandatory_gpt"] != evidence["mandatory_gpt"] or scope["temporary_kimi"] != evidence["temporary_kimi"]:
         raise E1AggregateError("aggregate provider claims do not match evidence")
+    if require_hashes:
+        for field in ("code_sha256", "config_sha256", "policy_sha256", "schema_sha256"):
+            if payload[field] != evidence[field]:
+                raise E1AggregateError(f"aggregate E1 {field} is stale")
+    return proof
+
+
+def validate_historical_aggregate_receipt(
+    root: Path, receipt: Mapping[str, object]
+) -> dict[str, object]:
+    """Validate immutable historical semantics without claiming currentness."""
+
+    return _validate_receipt_against_evidence(
+        receipt, validate_e1_evidence(root), require_hashes=False
+    )
+
+
+def validate_aggregate_receipt(
+    root: Path,
+    receipt: Mapping[str, object],
+    *,
+    currentness_context: Mapping[str, object],
+) -> dict[str, object]:
+    try:
+        current = validate_release_currentness_context(root, currentness_context)
+    except ReleaseCurrentnessError as exc:
+        raise E1AggregateError("release currentness context is invalid") from exc
+    evidence = validate_e1_evidence(root, subject_ref=f"git:{current['release_sha']}")
+    proof = _validate_receipt_against_evidence(receipt, evidence, require_hashes=True)
+    try:
+        assess_capability_for_release(
+            root,
+            proof,
+            current,
+            code_sha256=str(evidence["code_sha256"]),
+            config_sha256=str(evidence["config_sha256"]),
+            policy_sha256=str(evidence["policy_sha256"]),
+            schema_sha256=str(evidence["schema_sha256"]),
+        )
+    except ReleaseCurrentnessError as exc:
+        raise E1AggregateError("aggregate E1 proof is not current") from exc
     return proof
 
 
@@ -205,12 +283,18 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[1])
     parser.add_argument("--receipt", type=Path)
+    parser.add_argument("--currentness", type=Path)
     args = parser.parse_args()
     root = args.root.resolve()
     evidence = validate_e1_evidence(root)
     if args.receipt:
+        if args.currentness is None:
+            raise E1AggregateError("--currentness is required with --receipt")
         receipt = _strict_json(args.receipt.read_bytes(), label=str(args.receipt))
-        validate_aggregate_receipt(root, receipt)
+        currentness = _strict_json(
+            args.currentness.read_bytes(), label=str(args.currentness)
+        )
+        validate_aggregate_receipt(root, receipt, currentness_context=currentness)
     print(json.dumps(evidence, sort_keys=True, separators=(",", ":")))
     return 0
 
