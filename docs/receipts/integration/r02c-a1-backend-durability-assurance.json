@@ -1,0 +1,62 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-r02c-a1-backend-durability-assurance-20260719",
+  "issued_at": "2026-07-19T07:52:29Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "r02c-a1-backend-durability-assurance",
+    "agent_id": "agent-5",
+    "ownership_lease_ref": "stages/r02c-a1-backend-durability-assurance/ownership-lease.json",
+    "base_sha": "770e54863af6bcef5b0faba5993883b4e7603915",
+    "implementation_dependency_sha": "9ddb3d5f5bb17eca32ecec5976834832c9350f92",
+    "head_sha": "fbb801f1f49ee5034f7500fb4b91693f12446a8b",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "a1_contract_sha256": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+    "write_set": ["tests/test_r02c_a1_backend_durability_assurance.py"],
+    "audit_results": {
+      "contract_gate": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "production_config_parser_used": true,
+      "production_researchd_composition_used": true,
+      "composed_a1_backend": "DurableDiscoveryService",
+      "DiscoveryFixtureService_instances": 0,
+      "manual_a1_backend_injections": 0,
+      "real_AF_UNIX_collector_to_scout_path": "green",
+      "wait_data_ledger_writes_and_model_calls": 0,
+      "exact_source_and_claim_replay_after_reopen": "green",
+      "genuine_v1_startup_writes": 0,
+      "first_authorized_v1_to_v2_projection_transition": "atomic-four-projection-green",
+      "mixed_and_corrupt_projection_startup_denial": "green",
+      "private_live_unpinned_transport_and_role_spoof_denial": "green",
+      "frozen_rate_overflow_denial": "green",
+      "expired_claim_refencing_and_stale_token_denial": "green",
+      "second_writer_denial_and_resource_cleanup": "green",
+      "new_focused_tests": 6,
+      "legacy_focused_tests": 27,
+      "full_core_tests": 814,
+      "stage0b_tests": 25,
+      "provider_network_canonical_or_live_actions": 0,
+      "deployment_or_VPS_mutations": 0,
+      "grants_authority": false
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29678825268",
+    "pull_request_ref": "https://github.com/KirPonomarev/dual-contour-research-os/pull/52",
+    "integration_commit_sha": "5cc10843cf7d2da0f7684c74eeac626f18e64f80"
+  },
+  "integrity": {
+    "payload_sha256": "1fda99e907358039991d3b08fa8a3230e790f869254d3d07109e878bdde7c487",
+    "parent_refs": [
+      "git:770e54863af6bcef5b0faba5993883b4e7603915",
+      "git:9ddb3d5f5bb17eca32ecec5976834832c9350f92",
+      "git:fbb801f1f49ee5034f7500fb4b91693f12446a8b",
+      "git:5cc10843cf7d2da0f7684c74eeac626f18e64f80",
+      "ci:29678825268",
+      "pr:52",
+      "reuse:reuse-r02c-a1-backend-durability-assurance-20260719"
+    ]
+  }
+}
