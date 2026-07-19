@@ -1,0 +1,11 @@
+{
+  "lease_id": "lease-r03a-r2-admission-runtime-ops-activation-agent-5",
+  "stage_id": "r03a-r2-admission-runtime-ops-activation",
+  "agent_id": "agent-5",
+  "branch": "codex/bridge-a5-r03a-r2-admission-runtime-ops-activation",
+  "issued_at": "2026-07-19T08:43:00Z",
+  "expires_at": "2026-07-21T08:43:00Z",
+  "write_set": ["ops/release/researchd.config.template.json", "tests/test_r03a_admission_runtime_ops.py"],
+  "exclusive": true,
+  "revoked": false
+}

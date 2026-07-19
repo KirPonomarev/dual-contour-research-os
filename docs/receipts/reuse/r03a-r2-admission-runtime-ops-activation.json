@@ -1,0 +1,29 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-r03a-r2-admission-runtime-ops-activation-20260719",
+  "issued_at": "2026-07-19T08:43:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-freeze-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "SHIPPED_ADMISSION_RUNTIME_AND_FROZEN_CORRIDOR_ROLE_ACTIVATION",
+    "candidates": [
+      {"candidate": "add-explicit-fixture-route-proof-and-null-pre-image-executor-profile-to-existing-config", "disposition": "selected-truthful-pre-freeze-ops-binding"},
+      {"candidate": "invent-or-reuse-stale-image-digest-before-new-candidate-cut", "disposition": "rejected-false-exact-image-claim"},
+      {"candidate": "retain-job-authority-and-lease-authority-classes", "disposition": "rejected-incompatible-with-frozen-A1AuthorityCorridor-and-L0"},
+      {"candidate": "new-service-ledger-scheduler-or-dependency", "disposition": "rejected-no-capability-gap"}
+    ],
+    "selected_mode": "activate-deterministic-admission-with-exact-hashed-fixture-route-and-correct-frozen-issuer-roles-while-holding-execution-at-WAIT_AUTHORITY-until-exact-image-profile-exists",
+    "source_ref": "git:9b6ffe5645ca84db9963157ebbaa5b76a472e881;internal:ops-release-config+production-assurance",
+    "license_spdx": "NOASSERTION",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": ["exact config parse and startup", "registered CAS deterministic admission", "null profile WAIT_AUTHORITY", "issuer role matrix", "route/profile tamper denial", "legacy AI_OFF compatibility"],
+    "canonical_owner": "agent-5-with-agent-0-integration",
+    "rollback": "Revert the ops template and additive assurance module; R03A code remains dormant behind absent admission_runtime."
+  },
+  "integrity": {
+    "payload_sha256": "e3fec05df951a648de91bac5d91ec4012d38297f8547eb664433e23330ec70d9",
+    "parent_refs": ["git:9b6ffe5645ca84db9963157ebbaa5b76a472e881", "integration:integration-r03a-admission-authority-wiring-20260719"]
+  }
+}
