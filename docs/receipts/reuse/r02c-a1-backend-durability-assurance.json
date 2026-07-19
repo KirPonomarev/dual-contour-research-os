@@ -1,0 +1,29 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-r02c-a1-backend-durability-assurance-20260719",
+  "issued_at": "2026-07-19T07:40:22Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-freeze-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "PRODUCTION_A1_DURABILITY_HOSTILE_ASSURANCE",
+    "candidates": [
+      {"candidate": "existing-unittest-production-config-ResearchDaemon-AF_UNIX-JobLedger", "disposition": "selected-internal-assurance-adapter"},
+      {"candidate": "DiscoveryFixtureService-or-manual-a1-backend-injection", "disposition": "rejected-cannot-prove-production-composition"},
+      {"candidate": "new-fault-framework-container-or-service", "disposition": "rejected-existing-stdlib-fixtures-sufficient"},
+      {"candidate": "new-external-dependency", "disposition": "rejected-no-capability-gap"}
+    ],
+    "selected_mode": "single-additive-unittest-module-over-production-config-parser-ResearchDaemon-composition-real-AF_UNIX-and-durable-ledger-reopen",
+    "source_ref": "git:9ddb3d5f5bb17eca32ecec5976834832c9350f92;internal:existing-stage1-assurance-patterns",
+    "license_spdx": "NOASSERTION",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": ["production composition without fixture backend", "authenticated role matrix", "v1 compatibility and corrupt mixed denial", "restart/replay/rate/fence", "two-writer and resource cleanup"],
+    "canonical_owner": "agent-5-with-agent-0-integration",
+    "rollback": "Remove the additive assurance module without altering runtime behavior."
+  },
+  "integrity": {
+    "payload_sha256": "54854799b5af453f50f43725aee798b6cb74e90c95a2925bf4b427f3bf5b81eb",
+    "parent_refs": ["git:9ddb3d5f5bb17eca32ecec5976834832c9350f92", "reuse:reuse-r02b-real-source-intake-and-loop-control-20260719"]
+  }
+}

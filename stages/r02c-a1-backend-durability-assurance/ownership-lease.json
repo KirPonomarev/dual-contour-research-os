@@ -1,0 +1,11 @@
+{
+  "lease_id": "lease-r02c-a1-backend-durability-assurance-agent-5",
+  "stage_id": "r02c-a1-backend-durability-assurance",
+  "agent_id": "agent-5",
+  "branch": "codex/bridge-a5-r02c-a1-backend-durability-assurance",
+  "issued_at": "2026-07-19T07:40:22Z",
+  "expires_at": "2026-07-21T07:40:22Z",
+  "write_set": ["tests/test_r02c_a1_backend_durability_assurance.py"],
+  "exclusive": true,
+  "revoked": false
+}
