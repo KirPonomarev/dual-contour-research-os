@@ -121,8 +121,10 @@ _VCS_IDENTITY_KEYS = frozenset(
     }
 )
 _MAX_SAFE_INTEGER = 9_007_199_254_740_991
-_DURABLE_STATE_VERSION = "durable-discovery-v1"
+_DURABLE_STATE_VERSION_V1 = "durable-discovery-v1"
+_DURABLE_STATE_VERSION = "durable-discovery-v2"
 _DURABLE_ENTRY_LIMIT = 4_096
+_MAX_SOURCE_RATE_LIMIT = 1_024
 _DURABLE_PROJECTION_NAMES = frozenset(
     {"material_events", "candidates", "admissions", "capabilities"}
 )
@@ -253,6 +255,8 @@ class DurableDiscoveryConfig:
     release_manifest_sha256: str
     claim_ttl_seconds: int = 300
     maximum_reason_feedback: int = 1
+    maximum_source_triggers_per_window: int = 12
+    source_rate_window_seconds: int = 60
 
     def __post_init__(self) -> None:
         for name, value in (
@@ -294,6 +298,20 @@ class DurableDiscoveryConfig:
             or not 0 <= self.maximum_reason_feedback <= 4
         ):
             raise DiscoveryError("maximum_reason_feedback must be between 0 and 4")
+        if (
+            isinstance(self.maximum_source_triggers_per_window, bool)
+            or not isinstance(self.maximum_source_triggers_per_window, int)
+            or not 1
+            <= self.maximum_source_triggers_per_window
+            <= _MAX_SOURCE_RATE_LIMIT
+        ):
+            raise DiscoveryError("source trigger rate limit is invalid")
+        if (
+            isinstance(self.source_rate_window_seconds, bool)
+            or not isinstance(self.source_rate_window_seconds, int)
+            or not 1 <= self.source_rate_window_seconds <= 3_600
+        ):
+            raise DiscoveryError("source trigger rate window is invalid")
         object.__setattr__(self, "allowed_source_prefixes", tuple(prefixes))
         object.__setattr__(self, "collector_bindings", MappingProxyType(bindings))
         object.__setattr__(
@@ -919,7 +937,12 @@ class DurableDiscoveryService:
         trigger = _exact_mapping(source_trigger, _SOURCE_TRIGGER_KEYS, "source_trigger")
         if trigger["collector_id"] != trusted_collector:
             raise DiscoveryError("collector principal does not match collector_id")
-        _timestamp("now", now)
+        _validate_production_source_trigger(
+            trigger,
+            allowed_source_prefixes=self._config.allowed_source_prefixes,
+            idempotency_key=key,
+        )
+        current = _timestamp("now", now)
         request_sha256 = canonical_json_sha256(
             {"actor": actor_text, "source_trigger": trigger}
         )
@@ -931,6 +954,13 @@ class DurableDiscoveryService:
             )
             if replay is not None:
                 return replay
+            _consume_source_rate(
+                material,
+                actor=actor_text,
+                now=current,
+                maximum=self._config.maximum_source_triggers_per_window,
+                window_seconds=self._config.source_rate_window_seconds,
+            )
             revision = self._ledger.storage_coverage_manifest()["global_sequence_last"]
             result = self._kernel.materialize_source_trigger(
                 trigger,
@@ -969,6 +999,114 @@ class DurableDiscoveryService:
                 material["exact_keys"].append(result.exact_key_sha256)
                 objects = (event,)
             self._commit(states, key, now, "source", objects=objects)
+            return _deep_freeze(response)
+
+    def claim_next_proposal(
+        self,
+        *,
+        actor: str,
+        idempotency_key: str,
+        now: str,
+    ) -> Mapping[str, object]:
+        """Claim at most one oldest eligible event for one supervisor tick.
+
+        The authenticated IPC boundary supplies the Scout actor.  An empty
+        queue returns ``WAIT_DATA`` without a ledger transition, model call,
+        timer, thread, scheduler, or external side effect.  Consequently a
+        WAIT_DATA idempotency key is a poll token and may claim later work;
+        only a state-changing claim creates a durable replay receipt.
+        """
+
+        actor_text = _text("actor", actor, maximum=256)
+        key = _text("idempotency_key", idempotency_key, maximum=256)
+        current = _timestamp("now", now)
+        request_sha256 = canonical_json_sha256(
+            {"actor": actor_text, "claim_mode": "next-proposal-v1"}
+        )
+        with self._lock:
+            states = self._states()
+            material = states["material_events"]
+            candidates = states["candidates"]
+            replay = _durable_replay(
+                material["claim_replays"], key, request_sha256, "claim"
+            )
+            if replay is not None:
+                return replay
+
+            eligible: list[tuple[int, str, _Claim | None]] = []
+            for event_ref, event_value in material["events"].items():
+                if not isinstance(event_value, dict):
+                    raise DiscoveryError("durable material event projection is invalid")
+                payload = event_value.get("payload")
+                if not isinstance(payload, dict):
+                    raise DiscoveryError("durable material event payload is invalid")
+                sequence = payload.get("created_from_ledger_sequence")
+                if type(sequence) is not int or sequence < 0:
+                    raise DiscoveryError("material event ledger sequence is invalid")
+                existing_value = material["claims"].get(event_ref)
+                existing = (
+                    _claim_from_mapping(existing_value)
+                    if existing_value is not None
+                    else None
+                )
+                if existing is not None and existing.acknowledged:
+                    continue
+                if (
+                    existing is not None
+                    and existing.expires_at > current
+                    and existing.actor != actor_text
+                ):
+                    continue
+                # An accepted candidate remains eligible until its durable ack;
+                # returning the same claim lets the same Scout resume after restart.
+                if event_ref in candidates["proposals"] and existing is None:
+                    raise DiscoveryError("durable proposal is missing its claim")
+                eligible.append((sequence, event_ref, existing))
+
+            if not eligible:
+                return _deep_freeze(
+                    {
+                        "decision": "WAIT_DATA",
+                        "reason_code": "WAIT_DATA",
+                        "model_calls_consumed": 0,
+                        "claim": None,
+                    }
+                )
+
+            _, event_ref, existing = min(eligible, key=lambda value: (value[0], value[1]))
+            if existing is not None and existing.expires_at > current:
+                if _claim_has_durable_tick_replay(
+                    material["claim_replays"], existing.token
+                ):
+                    raise DiscoveryError(
+                        "active Scout cycle requires its original idempotency key"
+                    )
+                claim = existing
+            else:
+                generation = 1 if existing is None else existing.generation + 1
+                expires_at = current + timedelta(seconds=self._config.claim_ttl_seconds)
+                token = canonical_json_sha256(
+                    {
+                        "actor": actor_text,
+                        "event_ref": event_ref,
+                        "expires_at": _format_timestamp(expires_at),
+                        "generation": generation,
+                    }
+                )
+                claim = _Claim(actor_text, token, generation, expires_at)
+                material["claims"][event_ref] = _claim_to_mapping(claim)
+            response = {
+                "decision": "CLAIMED",
+                "model_calls_consumed": 0,
+                "claim": _json_copy(self._claim_response(event_ref, claim)),
+            }
+            _bounded_insert(
+                material["claim_replays"],
+                key,
+                {"request_sha256": request_sha256, "response": response},
+                "claim replay",
+            )
+            self._commit(states, key, now, "claim-next")
             return _deep_freeze(response)
 
     def claim_proposal(
@@ -1221,7 +1359,24 @@ class DurableDiscoveryService:
             if not isinstance(state, dict):
                 raise DiscoveryError("durable A1 projection is invalid")
             states[name] = state
-        _validate_durable_states(states, self._ledger)
+        versions = {state.get("state_version") for state in states.values()}
+        if versions == {_DURABLE_STATE_VERSION_V1}:
+            # Validate the complete genuine R02A shape before a private,
+            # additive in-memory normalization.  Reads/startup never persist
+            # this upgrade; the first authorized transition commits it atomically.
+            _validate_durable_states(
+                states,
+                self._ledger,
+                state_version=_DURABLE_STATE_VERSION_V1,
+            )
+            states = _upgrade_v1_durable_states(states)
+        elif versions != {_DURABLE_STATE_VERSION}:
+            raise DiscoveryError("durable A1 projection versions are mixed or invalid")
+        _validate_durable_states(
+            states,
+            self._ledger,
+            state_version=_DURABLE_STATE_VERSION,
+        )
         return states
 
     def _commit(
@@ -1339,36 +1494,63 @@ class DurableDiscoveryService:
         return _deep_freeze(candidate)
 
 
-def _empty_durable_states() -> dict[str, dict[str, object]]:
+def _empty_durable_states(
+    *, state_version: str = _DURABLE_STATE_VERSION
+) -> dict[str, dict[str, object]]:
+    if state_version not in {_DURABLE_STATE_VERSION_V1, _DURABLE_STATE_VERSION}:
+        raise DiscoveryError("durable state version is invalid")
+    material: dict[str, object] = {
+        "state_version": state_version,
+        "events": {},
+        "exact_keys": [],
+        "source_replays": {},
+        "claims": {},
+        "claim_replays": {},
+        "ack_replays": {},
+    }
+    if state_version == _DURABLE_STATE_VERSION:
+        material["source_rate_windows"] = {}
     return {
         "material_events": {
-            "state_version": _DURABLE_STATE_VERSION,
-            "events": {},
-            "exact_keys": [],
-            "source_replays": {},
-            "claims": {},
-            "claim_replays": {},
-            "ack_replays": {},
+            **material,
         },
         "candidates": {
-            "state_version": _DURABLE_STATE_VERSION,
+            "state_version": state_version,
             "proposals": {},
             "proposal_replays": {},
             "feedback_used": {},
         },
-        "admissions": {"state_version": _DURABLE_STATE_VERSION, "entries": {}},
-        "capabilities": {"state_version": _DURABLE_STATE_VERSION, "entries": {}},
+        "admissions": {"state_version": state_version, "entries": {}},
+        "capabilities": {"state_version": state_version, "entries": {}},
     }
 
 
+def _upgrade_v1_durable_states(
+    states: Mapping[str, Mapping[str, object]],
+) -> dict[str, dict[str, object]]:
+    upgraded = _json_copy(states)
+    if not isinstance(upgraded, dict):  # pragma: no cover - caller validated shape.
+        raise DiscoveryError("durable A1 projection is invalid")
+    for state in upgraded.values():
+        if not isinstance(state, dict):
+            raise DiscoveryError("durable A1 projection is invalid")
+        state["state_version"] = _DURABLE_STATE_VERSION
+    material = upgraded["material_events"]
+    material["source_rate_windows"] = {}
+    return upgraded
+
+
 def _validate_durable_states(
-    states: Mapping[str, Mapping[str, object]], ledger: JobLedger
+    states: Mapping[str, Mapping[str, object]],
+    ledger: JobLedger,
+    *,
+    state_version: str = _DURABLE_STATE_VERSION,
 ) -> None:
-    expected = _empty_durable_states()
+    expected = _empty_durable_states(state_version=state_version)
     if set(states) != _DURABLE_PROJECTION_NAMES:
         raise DiscoveryError("durable A1 projection names are invalid")
     for name, state in states.items():
-        if set(state) != set(expected[name]) or state.get("state_version") != _DURABLE_STATE_VERSION:
+        if set(state) != set(expected[name]) or state.get("state_version") != state_version:
             raise DiscoveryError("durable A1 projection shape is invalid")
     material = states["material_events"]
     candidates = states["candidates"]
@@ -1384,6 +1566,8 @@ def _validate_durable_states(
         (states["admissions"], "entries"),
         (states["capabilities"], "entries"),
     )
+    if state_version == _DURABLE_STATE_VERSION:
+        mapping_fields = mapping_fields + ((material, "source_rate_windows"),)
     for parent, field in mapping_fields:
         value = parent[field]
         if not isinstance(value, dict) or len(value) > _DURABLE_ENTRY_LIMIT:
@@ -1441,6 +1625,18 @@ def _validate_durable_states(
     for event_ref, used in candidates["feedback_used"].items():
         if event_ref not in material["events"] or type(used) is not int or used < 0:
             raise DiscoveryError("durable feedback projection is invalid")
+    if state_version == _DURABLE_STATE_VERSION:
+        rate_windows = material["source_rate_windows"]
+        for actor, timestamps in rate_windows.items():
+            _text("durable rate actor", actor, maximum=256)
+            if not isinstance(timestamps, list) or len(timestamps) > _MAX_SOURCE_RATE_LIMIT:
+                raise DiscoveryError("durable source rate window is invalid")
+            previous: datetime | None = None
+            for timestamp in timestamps:
+                current = _timestamp("durable source rate timestamp", timestamp)
+                if previous is not None and current < previous:
+                    raise DiscoveryError("durable source rate window is unordered")
+                previous = current
 
 
 def _replay_record(value: object, label: str) -> Mapping[str, object]:
@@ -1450,6 +1646,93 @@ def _replay_record(value: object, label: str) -> Mapping[str, object]:
     if not isinstance(value["response"], dict):
         raise DiscoveryError(f"{label}.response is invalid")
     return value
+
+
+def _validate_production_source_trigger(
+    trigger: Mapping[str, object],
+    *,
+    allowed_source_prefixes: Sequence[str],
+    idempotency_key: str,
+) -> str:
+    """Require a sanitized ref-only provenance record before materiality.
+
+    Trust is conjunctive: an OS-verified collector binding is checked by the
+    caller, this function checks the exact frozen provenance allowlist and
+    transport binding, and the kernel checks content digest, time, evidence,
+    classification, policy, budget and exact novelty.  A prefix alone never
+    mints trusted state.
+    """
+
+    transport_key = _text(
+        "source_trigger.transport_idempotency_key",
+        trigger.get("transport_idempotency_key"),
+        maximum=256,
+    )
+    if not hmac.compare_digest(transport_key, idempotency_key):
+        raise DiscoveryError("source transport idempotency binding is invalid")
+    source_ref = _text(
+        "source_trigger.source_ref", trigger.get("source_ref"), maximum=4_096
+    )
+    _sha256(
+        "source_trigger.source_content_sha256",
+        trigger.get("source_content_sha256"),
+    )
+    _timestamp("source_trigger.observed_at", trigger.get("observed_at"))
+    summary = _text(
+        "source_trigger.summary", trigger.get("summary"), maximum=1_024
+    )
+    if any(ord(character) < 32 and character not in "\t" for character in summary):
+        raise DiscoveryError("source summary is not sanitized text")
+    prefixes = tuple(
+        _text("allowed source prefix", prefix, maximum=512)
+        for prefix in allowed_source_prefixes
+    )
+    matches = tuple(prefix for prefix in prefixes if source_ref.startswith(prefix))
+    if len(matches) != 1:
+        raise DiscoveryError("source provenance is not exactly allowlisted")
+    evidence_refs = _string_sequence(
+        "source_trigger.evidence_refs",
+        trigger.get("evidence_refs"),
+        allow_empty=True,
+        maximum=4_096,
+    )
+    for reference in evidence_refs:
+        evidence_matches = tuple(
+            prefix for prefix in prefixes if reference.startswith(prefix)
+        )
+        if len(evidence_matches) != 1:
+            raise DiscoveryError("source evidence provenance is not allowlisted")
+    return matches[0]
+
+
+def _consume_source_rate(
+    material: Mapping[str, object],
+    *,
+    actor: str,
+    now: datetime,
+    maximum: int,
+    window_seconds: int,
+) -> None:
+    rate_windows = material.get("source_rate_windows")
+    if not isinstance(rate_windows, dict):
+        raise DiscoveryError("durable source rate projection is invalid")
+    raw_timestamps = rate_windows.get(actor, [])
+    if not isinstance(raw_timestamps, list):
+        raise DiscoveryError("durable source rate window is invalid")
+    boundary = now - timedelta(seconds=window_seconds)
+    retained: list[str] = []
+    for value in raw_timestamps:
+        parsed = _timestamp("durable source rate timestamp", value)
+        if parsed > now:
+            raise DiscoveryError("source rate clock moved backwards")
+        if parsed > boundary:
+            retained.append(_format_timestamp(parsed))
+    if len(retained) >= maximum:
+        raise DiscoveryError("source intake rate limit exceeded")
+    retained.append(_format_timestamp(now))
+    if len(retained) > _MAX_SOURCE_RATE_LIMIT:
+        raise DiscoveryError("durable source rate window capacity is exhausted")
+    rate_windows[actor] = retained
 
 
 def _durable_replay(
@@ -1467,6 +1750,25 @@ def _durable_replay(
     if not hmac.compare_digest(record["request_sha256"], request_sha256):
         raise DiscoveryError(f"{label} idempotency key was reused")
     return _deep_freeze(_json_copy(record["response"]))
+
+
+def _claim_has_durable_tick_replay(records: object, claim_token: str) -> bool:
+    if not isinstance(records, dict):
+        raise DiscoveryError("claim replay projection is invalid")
+    for value in records.values():
+        record = _replay_record(value, "claim replay")
+        response = record["response"]
+        if response.get("decision") != "CLAIMED":
+            continue
+        claim = response.get("claim")
+        if not isinstance(claim, dict):
+            raise DiscoveryError("durable Scout tick response is invalid")
+        token = claim.get("claim_token")
+        if not isinstance(token, str):
+            raise DiscoveryError("durable Scout tick claim token is invalid")
+        if hmac.compare_digest(token, claim_token):
+            return True
+    return False
 
 
 def _bounded_insert(

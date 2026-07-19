@@ -35,6 +35,7 @@ _COMMAND_PAYLOAD_KEYS = {
     "submit": frozenset({"job_spec", "permit", "lease"}),
     "lookup": frozenset({"job_spec_ref"}),
     "submit_source_trigger": frozenset({"source_trigger"}),
+    "claim_next_proposal": frozenset(),
     "claim_proposal": frozenset({"material_event_ref"}),
     "submit_proposal": frozenset({"proposal_envelope"}),
     "ack_proposal": frozenset({"material_event_ref", "claim_token"}),
@@ -44,7 +45,12 @@ _OPERATOR_COMMANDS = frozenset(
 )
 _COLLECTOR_COMMANDS = frozenset({"submit_source_trigger"})
 _SCOUT_COMMANDS = frozenset(
-    {"claim_proposal", "submit_proposal", "ack_proposal"}
+    {
+        "claim_next_proposal",
+        "claim_proposal",
+        "submit_proposal",
+        "ack_proposal",
+    }
 )
 _ROLE_COMMANDS = {
     "operator": _OPERATOR_COMMANDS,
@@ -111,6 +117,14 @@ class _A1ControlBackend(Protocol):
         self,
         *,
         material_event_ref: str,
+        actor: str,
+        idempotency_key: str,
+        now: str,
+    ) -> Mapping[str, object]: ...
+
+    def claim_next_proposal(
+        self,
+        *,
         actor: str,
         idempotency_key: str,
         now: str,
@@ -185,6 +199,8 @@ class ControlRequest:
             if not isinstance(value, Mapping):
                 raise ControlError("source_trigger must be an object")
             copied_payload["source_trigger"] = _json_copy(value)
+        elif self.command == "claim_next_proposal":
+            pass
         elif self.command == "claim_proposal":
             _normalized_text(
                 "material_event_ref",
@@ -376,6 +392,12 @@ class ControlRouter:
             elif request.command == "claim_proposal":
                 result = self._require_a1_backend().claim_proposal(
                     material_event_ref=request.payload["material_event_ref"],  # type: ignore[arg-type]
+                    actor=actor,
+                    idempotency_key=request.idempotency_key,
+                    now=self._event_at(),
+                )
+            elif request.command == "claim_next_proposal":
+                result = self._require_a1_backend().claim_next_proposal(
                     actor=actor,
                     idempotency_key=request.idempotency_key,
                     now=self._event_at(),
