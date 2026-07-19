@@ -1,0 +1,23 @@
+{
+  "stage_id": "r05b-r2-independent-validation-assurance",
+  "agent_id": "agent-5",
+  "objective": "Independently prove production non-vacuity, exact mechanical-only handoff, no feedback on invalid evidence, evaluator immutability and zero holdout access.",
+  "executable_blocker": "R05B implementation and source rebind pass existing suites but need owner-independent production-path negative evidence for the newly closed zero-byte and forged-handoff cases.",
+  "base_sha": "f7f29212ec11afe736068caf7c7ff29f8d115983",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "a1_contract_sha256": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+  "branch": "codex/bridge-a5-r05b-r2-independent-validation-assurance",
+  "worktree": "/private/tmp/dcr-r05b-r2-independent-validation-assurance",
+  "read_set": ["AGENTS.md", "docs/DEVELOPMENT_AGENT_CONTRACT.md", "ownership/registry.json", "src/research_bridge/validation.py", "src/research_bridge/execution.py", "src/research_bridge/researchd.py", "tests/test_r03c_corridor_hostile_assurance.py", "tests/test_r05a_feedback_memory_next_event.py", "stages/r05b-independent-validation-closure/stage-envelope.json", "stages/r05b-r1-validator-source-rebind/stage-envelope.json"],
+  "write_set": ["tests/test_r05b_independent_validation_closure.py"],
+  "forbidden_scope": ["source-contract-config-ops-tool-CI-migration-lockfile-or-existing-test-edit", "private-real-provider-domain-holdout-network-canonical-or-live-data", "fixture-bypass-of-production-AF_UNIX-researchd-composition"],
+  "dependency_hashes": {"r05b_combined_head": "f7f29212ec11afe736068caf7c7ff29f8d115983", "validator_sha256": "ea4a91d3710c6be129ebba9e27eb3bca288722af190d4feab58c0914ed259006", "execution_sha256": "180c65490d677b695e71313d5ea54463b29bc543ef9c99b5457eeba4dc23cf9c", "reuse_receipt": "docs/receipts/reuse/r05b-r2-independent-validation-assurance.json"},
+  "acceptance_commands": ["make contracts", "python3 -m unittest tests.test_r05b_independent_validation_closure tests.test_r03c_corridor_hostile_assurance tests.test_r05a_feedback_memory_next_event", "python3 -m unittest discover -s tests", "git diff --check", "exact-head remote CI"],
+  "risk_class": "critical-independent-validator-vacuity-and-handoff-assurance",
+  "stop_conditions": ["dependency-hash-mismatch", "write-outside-one-test-file", "empty-evidence-reaches-feedback", "forged-metrics-tolerance-holdout-outcome-or-check-profile-passes", "assurance-path-injects-a-validator-or-bypasses-AF_UNIX"],
+  "expected_receipt": "docs/receipts/integration/r05b-independent-validation-closure.json",
+  "rollback": "Remove the additive assurance file and keep R05B unaccepted.",
+  "commit_authority": "one-scoped-agent-5-assurance-stage",
+  "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent0_audit", "blocked_validation_failed"]
+}

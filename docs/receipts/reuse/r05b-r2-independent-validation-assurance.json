@@ -1,0 +1,23 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-r05b-r2-independent-validation-assurance-20260719",
+  "issued_at": "2026-07-19T15:42:43Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-review-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "r05b-r2-independent-validation-assurance",
+    "capability": "production-independent-validation-hostile-assurance",
+    "candidates": [{"candidate": "new-fixture-validator", "disposition": "rejected-would-bypass-production-composition"}, {"candidate": "reuse-existing-AF_UNIX-corridor-harness-and-public-synthetic-CAS", "disposition": "selected-production-exact-test-adapter"}],
+    "selected_candidate": "extend-the-existing-production-corridor-harness-with-empty-input-no-feedback-and-exact-handoff-mutation-matrix",
+    "source_ref": "git:f7f29212ec11afe736068caf7c7ff29f8d115983;internal:tests.test_r03c_corridor_hostile_assurance",
+    "selected_source_sha": "2c1175e793f11c125b5eb5ff56d485d93d1ea2ad904e55d6fda5e89bc8670e02",
+    "license": "repository-native-test-code-only",
+    "tests": ["empty-input-no-receipt-no-feedback", "valid-nonempty-exact-profile", "metric-zero-denial", "nonzero-tolerance-denial", "holdout-denial", "scientific-outcome-denial", "model-output-not-evidence"],
+    "security_review": "Only public synthetic bytes and local AF_UNIX are used. No provider, private evidence, domain payload, hidden holdout, network egress or external mutation is involved.",
+    "dependency_review": "No dependency, package, contract, schema, migration, lockfile, SBOM or notice change.",
+    "rollback": "Remove the one additive assurance file."
+  },
+  "integrity": {"payload_sha256": "ef7df8389a2b1fa7048a162e40fda60945a7d6ef89d9bf3cd26235fb66c1d7bb", "parent_refs": ["git:f7f29212ec11afe736068caf7c7ff29f8d115983", "reuse:reuse-r05b-independent-validation-closure-20260719", "reuse:reuse-r05b-r1-validator-source-rebind-20260719"]}
+}
