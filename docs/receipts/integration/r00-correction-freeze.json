@@ -1,0 +1,59 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-r00-correction-freeze-20260719",
+  "issued_at": "2026-07-19T05:13:00Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "r00-correction-freeze",
+    "agent_id": "agent-0",
+    "ownership_lease_ref": "stages/r00-correction-freeze/ownership-lease.json",
+    "base_sha": "37f671269adc5a15c6f6571c0cf1731eccb3fc38",
+    "head_sha": "cfb2c5ec43ccbd82df865b6a2d9472e977887d14",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "README.md",
+      "docs/PRODUCT_COMPLETION.md",
+      "docs/receipts/release/r00-superseded-release.json",
+      "docs/receipts/reuse/r00-correction-freeze.json",
+      "tools/final_deployment_rebind.py",
+      "stages/r00-correction-freeze/",
+      "stages/r00-correction-freeze-assurance/"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "privacy_secret_scan": "green",
+      "previous_candidate_status": "SUPERSEDED_REPAIR_REQUIRED",
+      "replacement_release_required": true,
+      "public_prepare_denied": true,
+      "public_verify_prepared_denied": true,
+      "public_deploy_denied": true,
+      "denial_before_side_effects": true,
+      "historical_evidence_preserved": true,
+      "stale_authority_request_pr_closed": 25,
+      "deployment_or_VPS_mutations": 0,
+      "model_calls": 0,
+      "canonical_or_live_actions": 0,
+      "grants_authority": false
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29674452995",
+    "pull_request_ref": "https://github.com/KirPonomarev/dual-contour-research-os/pull/46",
+    "integration_commit_sha": "2bb917a611d755d1934900f3b456e7ae860a7764"
+  },
+  "integrity": {
+    "payload_sha256": "0dbda2daabe4b6d6ba1ad73cf849630d592a915844e5f54dd35af2dd65269c80",
+    "parent_refs": [
+      "git:37f671269adc5a15c6f6571c0cf1731eccb3fc38",
+      "git:cfb2c5ec43ccbd82df865b6a2d9472e977887d14",
+      "git:2bb917a611d755d1934900f3b456e7ae860a7764",
+      "ci:29674452995",
+      "pr:46",
+      "supersession:r00-superseded-release-20260719"
+    ]
+  }
+}
