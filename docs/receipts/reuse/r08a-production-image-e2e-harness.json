@@ -1,0 +1,22 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-r08a-production-image-e2e-harness-20260719",
+  "issued_at": "2026-07-19T17:51:36Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "decision": "REUSE_INTERNAL_AND_STANDARD_LIBRARY",
+  "objective": "Drive the exact release image through its production AF_UNIX boundary without placing test code or private inputs inside the image.",
+  "evaluation_order": ["internal-adapter", "owned-versioned-package", "pinned-permissive-dependency", "small-audited-vendor-import", "minimal-missing-glue"],
+  "selected": [
+    "ops/release/Containerfile:pinned-minimal-production-image",
+    "ops/release/researchd.config.template.json:frozen-A1-service-input",
+    "ops/release/final-a1-runtime-policy.json:frozen-rootless-boundary",
+    "ops/deploy/research-os-a1-final.service:single-writer-container-topology",
+    "ops/deploy/research-os-connected-worker@.service:separate-connected-worker-topology",
+    "src/research_bridge.ipc:canonical-newline-framing",
+    "python-standard-library:argparse-dataclasses-hashlib-json-pathlib-secrets-subprocess-time"
+  ],
+  "new_dependency": false,
+  "external_code": false,
+  "rationale": "A small external orchestrator over the existing Docker CLI and frozen AF_UNIX protocol is sufficient; it keeps the production image minimal and introduces no package or vendored code."
+}

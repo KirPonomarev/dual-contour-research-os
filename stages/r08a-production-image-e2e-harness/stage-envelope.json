@@ -1,0 +1,70 @@
+{
+  "stage_id": "r08a-production-image-e2e-harness",
+  "agent_id": "agent-5",
+  "objective": "Finalize a production-shaped, exact-image AF_UNIX harness that proves the frozen image, configuration, policy, units, principal topology, single-writer boundary and restart identity before candidate cut.",
+  "executable_blocker": "The release image definition exists, but no reusable harness yet drives its real AF_UNIX socket with OS-verified production principals or rejects image, policy, topology and second-writer drift.",
+  "base_sha": "3b6b46efc4348a0b25758623b7db0fef9ec75f58",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "a1_contract_sha256": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+  "branch": "codex/bridge-a5-r08a-production-image-e2e-harness",
+  "worktree": "/private/tmp/dcr-r08a-production-image-e2e-harness",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "ownership/registry.json",
+    ".dockerignore",
+    "ops/release/**",
+    "ops/deploy/research-os-a1-final.service",
+    "ops/deploy/research-os-connected-worker@.service",
+    "ops/connected-worker/**",
+    "src/research_bridge/control.py",
+    "src/research_bridge/ipc.py",
+    "src/research_bridge/researchd.py",
+    "tests/test_release_blueprint.py",
+    "tests/test_r03c_corridor_hostile_assurance.py",
+    "tests/test_r04c_connected_worker_runtime.py"
+  ],
+  "write_set": [
+    "ops/release/image_e2e_harness.py",
+    "tests/test_r08a_production_image_e2e_harness.py"
+  ],
+  "forbidden_scope": [
+    "edit-source-contract-schema-canonical-doc-root-config-CI-lockfile-migration-or-existing-test",
+    "cut-candidate-issue-image-claim-deploy-restore-reboot-call-provider-or-start-observation-window",
+    "embed-harness-test-data-credential-private-evidence-runtime-database-or-account-data-in-image-or-Git"
+  ],
+  "dependency_hashes": {
+    "r07b_integration_head": "3b6b46efc4348a0b25758623b7db0fef9ec75f58",
+    "r07b_integration_receipt_sha256": "1680072929bf3f0b2d686d38de86c9827b7863bc5814586368f948cd63b63674",
+    "containerfile_sha256": "5df26852f491232b67431e3c684b82442da0f8fda7dcbb3d4622060b0d24c0b6",
+    "config_sha256": "c97a5b03942edf5746a1362a418b3d7ecad9d5e45620d80305475cefebf7591f",
+    "runtime_policy_sha256": "665bfb70a82d3aa5988d45fa299fb14d2b28926e6267a15ae440e3c03fbb0cd9",
+    "core_unit_sha256": "db05e39acbfef28c6cc9076d5a35a2a9dd4802f242ccfa9dabadd82396f15b06",
+    "connected_unit_sha256": "b3287005312adaf7acf70f981765b0c75ebeb0aabf6da268df47a0e376ded2c5",
+    "connected_containerfile_sha256": "5e748ab7e8fd5418bfbbe5f2ee19053ee74cba38330fe8058f90f63299e8b8ef",
+    "connected_runbook_inputs_sha256": "1a3bcee50ec1191c384bee7e7d1a28e41181b3cb3a3106929160624d6a772aba",
+    "dockerignore_sha256": "6592800e717a2eab8519544dd612311d5fab18d6b984f23d73059520a7296d4b",
+    "reuse_receipt": "docs/receipts/reuse/r08a-production-image-e2e-harness.json"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest tests.test_r08a_production_image_e2e_harness tests.test_release_blueprint tests.test_r04c_connected_worker_runtime",
+    "python3 -m unittest discover -s tests",
+    "python3 -m unittest discover -s tests/stage0b -p test_*.py",
+    "git diff --check",
+    "exact-head remote CI"
+  ],
+  "risk_class": "critical-production-image-e2e-gap",
+  "stop_conditions": [
+    "dependency-hash-mismatch",
+    "write-outside-two-declared-agent-5-files",
+    "harness-can-run-with-nonexact-image-or-expanded-network",
+    "harness-bypasses-AF_UNIX-or-OS-peer-credentials",
+    "harness-embeds-private-data-or-grants-external-action-authority"
+  ],
+  "expected_receipt": "docs/receipts/integration/r08a-production-image-e2e-harness.json",
+  "rollback": "Remove the additive external harness and its assurance test; the production image, source, frozen inputs and runtime state remain unchanged.",
+  "commit_authority": "one-scoped-agent-5-stage",
+  "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent0_audit", "blocked_validation_failed"]
+}

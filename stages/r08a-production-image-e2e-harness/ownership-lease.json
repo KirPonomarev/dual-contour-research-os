@@ -1,0 +1,14 @@
+{
+  "lease_id": "lease-r08a-production-image-e2e-harness-agent-5",
+  "stage_id": "r08a-production-image-e2e-harness",
+  "agent_id": "agent-5",
+  "branch": "codex/bridge-a5-r08a-production-image-e2e-harness",
+  "issued_at": "2026-07-19T17:51:36Z",
+  "expires_at": "2026-07-21T17:51:36Z",
+  "write_set": [
+    "ops/release/image_e2e_harness.py",
+    "tests/test_r08a_production_image_e2e_harness.py"
+  ],
+  "exclusive": true,
+  "revoked": false
+}
