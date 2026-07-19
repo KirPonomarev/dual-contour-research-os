@@ -1,0 +1,25 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-r05c-loop-pulse-and-canonical-assurance-20260719",
+  "issued_at": "2026-07-19T15:58:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "decision": "REUSE_INTERNAL_ADAPTERS",
+  "objective": "Close Pulse false-green cases using the existing read-only JobLedger replay, organism projection and immutable Pulse policy surfaces.",
+  "evaluation_order": [
+    "internal-adapter",
+    "owned-versioned-package",
+    "pinned-permissive-dependency",
+    "small-audited-vendor-import",
+    "minimal-missing-glue"
+  ],
+  "selected": [
+    "src/research_bridge/organism.py:project_organism_state_from_ledger",
+    "src/research_bridge/organism.py:sample_pulse",
+    "src/research_bridge/ledger.py:event_count",
+    "src/research_bridge/ledger.py:replay_feedback"
+  ],
+  "new_dependency": false,
+  "external_code": false,
+  "rationale": "The repository already exposes sufficient zero-write durable counts and replay evidence; only bounded projection glue and independent assurance are missing."
+}

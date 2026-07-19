@@ -1,0 +1,61 @@
+{
+  "stage_id": "r05c-loop-pulse-and-canonical-assurance",
+  "agent_id": "agent-5",
+  "objective": "Independently prove that Pulse reflects durable loop transitions, never reports a terminal-feedback imbalance or duplicate runnable producer as green, preserves WAIT_AUTHORITY across restart, and performs no canonical or live action.",
+  "executable_blocker": "R05B intentionally preserves independently invalid completions without feedback, while the current ledger projector treats an empty feedback projection as healthy WAIT_DATA and therefore can emit a false GREEN Pulse.",
+  "base_sha": "fda691da38f0c87087f8a3251e9b8856353ab03d",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "a1_contract_sha256": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+  "branch": "codex/bridge-a5-r05c-loop-pulse-and-canonical-assurance",
+  "worktree": "/private/tmp/dcr-r05c-loop-pulse-and-canonical-assurance",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "ownership/registry.json",
+    "src/research_bridge/organism.py",
+    "src/research_bridge/ledger.py",
+    "src/research_bridge/researchd.py",
+    "ops/organism/pulse-policy.json",
+    "tests/test_s12_state_pulse.py",
+    "tests/test_r05a_feedback_memory_next_event.py",
+    "tests/test_r05b_independent_validation_closure.py"
+  ],
+  "write_set": [
+    "src/research_bridge/organism.py",
+    "tests/test_r05c_loop_pulse_and_canonical_assurance.py"
+  ],
+  "forbidden_scope": [
+    "ledger-schema-contract-config-ops-CI-migration-lockfile-or-existing-test-edit",
+    "canonical-domain-or-live-writer-call",
+    "network-image-VPS-observation-window-or-deployment-change",
+    "projection-that-hides-terminal-feedback-imbalance-or-resets-a-durable-healthy-state"
+  ],
+  "dependency_hashes": {
+    "r05b_integration_head": "fda691da38f0c87087f8a3251e9b8856353ab03d",
+    "organism_sha256": "c20b4a14c6f48097e98f1a05e560de9a317edf771661e22f2a9345b2dc491780",
+    "pulse_policy_sha256": "8965074fe642582ac5513e96d1ad1cdc565d33bbc6da761c4413d68ab083e224",
+    "ownership_registry_sha256": "e7a6a5158e43cb76c1df0fa28caec36ec9585a0dd05a732eabb94a92e427c9da",
+    "reuse_receipt": "docs/receipts/reuse/r05c-loop-pulse-and-canonical-assurance.json"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest tests.test_r05c_loop_pulse_and_canonical_assurance tests.test_s12_state_pulse tests.test_r05a_feedback_memory_next_event tests.test_r05b_independent_validation_closure",
+    "python3 -m unittest discover -s tests",
+    "git diff --check",
+    "exact-head remote CI"
+  ],
+  "risk_class": "critical-false-green-and-invisible-durable-loop-state",
+  "stop_conditions": [
+    "dependency-hash-mismatch",
+    "write-outside-two-file-set",
+    "observer-performs-a-durable-write",
+    "terminal-feedback-imbalance-or-duplicate-runnable-state-can-be-green",
+    "WAIT_AUTHORITY-disappears-after-restart",
+    "canonical-or-live-action-is-requested"
+  ],
+  "expected_receipt": "docs/receipts/integration/r05c-loop-pulse-and-canonical-assurance.json",
+  "rollback": "Remove the bounded projector changes and additive assurance file; retain R05B as accepted and R05C as not green.",
+  "commit_authority": "one-scoped-agent-5-stage",
+  "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent0_audit", "blocked_validation_failed"]
+}

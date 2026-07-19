@@ -1,0 +1,14 @@
+{
+  "lease_id": "lease-r05c-loop-pulse-and-canonical-assurance-agent-5",
+  "stage_id": "r05c-loop-pulse-and-canonical-assurance",
+  "agent_id": "agent-5",
+  "branch": "codex/bridge-a5-r05c-loop-pulse-and-canonical-assurance",
+  "issued_at": "2026-07-19T15:58:00Z",
+  "expires_at": "2026-07-21T15:58:00Z",
+  "write_set": [
+    "src/research_bridge/organism.py",
+    "tests/test_r05c_loop_pulse_and_canonical_assurance.py"
+  ],
+  "exclusive": true,
+  "revoked": false
+}
