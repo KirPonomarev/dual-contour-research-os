@@ -42,8 +42,9 @@ from research_bridge.model_broker import (  # noqa: E402
 
 
 LEGACY_PROFILE_PATH = ROOT / "provenance" / "model-provider-connected-shadow-v1.json"
-PROFILE_V2_PATH = ROOT / "provenance" / "model-provider-connected-shadow-v2.json"
-PROFILE_PATH = ROOT / "provenance" / "model-provider-connected-shadow-v3.json"
+PROFILE_PATH = ROOT / "provenance" / "model-provider-connected-shadow-v2.json"
+PROFILE_V2_PATH = PROFILE_PATH
+CURRENT_PROFILE_PATH = ROOT / "provenance" / "model-provider-connected-shadow-v3.json"
 ROUTING_PATH = ROOT / "provenance" / "model-provider-routing-v1.json"
 ROLE_PATH = ROOT / "contracts" / "a1" / "v1" / "profiles" / "model_role_registry_v1.json"
 _PROFILE_KEYS = {
