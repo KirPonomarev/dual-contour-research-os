@@ -15,6 +15,7 @@
     "src/research_bridge/kernel.py",
     "src/research_bridge/control.py",
     "tests/test_r03a_admission_runtime_ops.py",
+    "tests/test_r02c_a1_backend_durability_assurance.py",
     "tests/test_stage1_researchd.py",
     "/private/tmp/dcr-r03c-corridor-hostile-assurance/tests/test_r03c_corridor_hostile_assurance.py"
   ],
@@ -37,7 +38,7 @@
     "external_dependencies": "none-existing-durable-admission-projection-and-stdlib-only"
   },
   "acceptance_commands": [
-    "python3 -m unittest -v tests.test_r03a_admission_runtime_ops tests.test_stage1_researchd tests.test_r02a_durable_discovery",
+    "python3 -m unittest -v tests.test_r03a_admission_runtime_ops tests.test_stage1_researchd tests.test_r02c_a1_backend_durability_assurance",
     "R03C AF_UNIX exact-issued-chain negative-case probe after integration",
     "make contracts",
     "git diff --check",
