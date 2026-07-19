@@ -11,7 +11,7 @@
   "read_set": [
     "README.md",
     "docs/PRODUCT_COMPLETION.md",
-    "docs/receipts/audit/s38-r2-product-completion-audit.json",
+    "docs/receipts/product/s38-r2-product-completion-audit.json",
     "docs/receipts/release/r00-superseded-release.json",
     "tools/final_deployment_rebind.py",
     "tests/test_s38_r2_product_completion.py",
