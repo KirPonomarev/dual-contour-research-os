@@ -647,6 +647,41 @@ def _validate_plan(policy: GeneratedIsolationPolicy, plan: SandboxLaunchPlan) ->
     expected_caps["cost_units"] = cost
     if dict(plan.resource_caps) != expected_caps:
         raise GeneratedExecutionError("sandbox launch resource caps drifted")
+    material = {
+        "policy_sha256": plan.policy_sha256, "level": plan.level,
+        "artifact_ref": plan.artifact_ref, "backend_ref": plan.backend_ref,
+        "backend_attestation_sha256": plan.backend_attestation_sha256,
+        "job_ref": plan.job_ref, "permit_ref": plan.permit_ref,
+        "lease_ref": plan.lease_ref, "attempt_id": plan.attempt_id,
+        "fencing_epoch": plan.fencing_epoch,
+        "fencing_token_sha256": plan.fencing_token_sha256,
+        "image_digest": plan.image_digest, "input_refs": plan.input_refs,
+        "resource_caps": plan.resource_caps, "isolation": plan.isolation,
+        "status": "READY_FOR_ISOLATED_EXECUTOR", "feature_enabled": True,
+        "embedded_executor": False, "network_enabled": False,
+        "host_paths_exposed": False, "private_or_live_data": False,
+        "automatic_deploy": False, "canonical_writes": 0,
+        "grants_authority": False,
+    }
+    if plan.plan_sha256 != _sha(material) or plan.plan_ref != "sandbox-plan:sha256:" + plan.plan_sha256:
+        raise GeneratedExecutionError("sandbox launch plan integrity mismatch")
+    rollback_material = {
+        "plan_sha256": plan.plan_sha256, "artifact_ref": plan.artifact_ref,
+        "backend_ref": plan.backend_ref,
+        "actions": ("disable-feature", "invalidate-artifact", "revoke-backend-attestation"),
+        "state": "WAIT_AUTHORITY", "executable_payload_present": False,
+        "rollback_applied": False, "deployment_changed": False,
+        "canonical_writes": 0, "grants_authority": False,
+    }
+    if (
+        plan.rollback.plan_sha256 != plan.plan_sha256
+        or plan.rollback.artifact_ref != plan.artifact_ref
+        or plan.rollback.backend_ref != plan.backend_ref
+        or plan.rollback.actions != rollback_material["actions"]
+        or plan.rollback.state != "WAIT_AUTHORITY"
+        or plan.rollback.rollback_ref != "isolation-rollback:sha256:" + _sha(rollback_material)
+    ):
+        raise GeneratedExecutionError("sandbox rollback integrity mismatch")
 
 
 def _load_profile(path: str | Path, expected_sha256: str) -> dict[str, object]:
