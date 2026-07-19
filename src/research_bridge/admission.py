@@ -550,6 +550,7 @@ _A1_SNAPSHOT_KEYS = {
     "executor_capability_refs",
     "evaluator_capability_refs",
     "model_route_proof_ref",
+    "trusted_evidence_refs",
     "algorithm_version",
 }
 _A1_BUDGET_STATE_KEYS = {
@@ -901,6 +902,7 @@ class _A1AdmissionKernel:
         executor_capability_refs: Sequence[str],
         evaluator_capability_refs: Sequence[str],
         model_route_proof_ref: str,
+        trusted_evidence_refs: Sequence[str] | None = None,
     ) -> A1AdmissionSnapshot:
         """Freeze consistent read inputs; E1B will supply them from one transaction."""
 
@@ -933,6 +935,15 @@ class _A1AdmissionKernel:
             evaluator_capability_refs, "evaluator_capability_refs", allow_empty=True
         )
         _a1_text(model_route_proof_ref, "model_route_proof_ref", maximum=512)
+        evidence_refs = _a1_string_array(
+            (
+                candidate_payload["evidence_refs"]
+                if trusted_evidence_refs is None
+                else trusted_evidence_refs
+            ),
+            "trusted_evidence_refs",
+            allow_empty=True,
+        )
 
         vcs = candidate_payload["vcs_identity"]
         snapshot_payload: dict[str, object] = {
@@ -969,6 +980,7 @@ class _A1AdmissionKernel:
             "executor_capability_refs": executor_refs,
             "evaluator_capability_refs": evaluator_refs,
             "model_route_proof_ref": model_route_proof_ref,
+            "trusted_evidence_refs": evidence_refs,
             "algorithm_version": "a1-admission-v1",
         }
         return A1AdmissionSnapshot(
@@ -1112,6 +1124,10 @@ class _A1AdmissionKernel:
 
         if not payload["evidence_refs"]:
             return "REJECT", "EMPTY_EVIDENCE_REFS"
+        if not set(payload["evidence_refs"]).issubset(
+            set(snapshot["trusted_evidence_refs"])
+        ):
+            return "REJECT", "FORBIDDEN_DATA_CLASS"
         if payload["experiment_type"] not in set(policy["allowed_experiment_types"]):
             return "REJECT", "FORBIDDEN_DATA_CLASS"
         if not set(payload["data_classes"]) <= set(policy["allowed_data_classes"]):
