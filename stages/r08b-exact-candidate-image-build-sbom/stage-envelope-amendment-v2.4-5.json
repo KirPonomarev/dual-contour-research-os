@@ -1,0 +1,58 @@
+{
+  "stage_id": "r08b-exact-candidate-image-build-sbom",
+  "repair_stage_id": "r08b-r3-additive-provider-profile-v3",
+  "amendment_id": "R08B_R3_ADDITIVE_PROVIDER_PROFILE_V3_20260719",
+  "plan_id": "DCR_OS_AUTONOMOUS_V2_3_NO_BRAKES_20260719",
+  "plan_version": "2.4.0-fast-working-release",
+  "issued_by": "agent-0",
+  "issued_at": "2026-07-19T21:56:00Z",
+  "authority_head": "5ea58ea763cc308badc5a3e88faa5c19699a4b12",
+  "base_sha": "7e6c4cb56da3aad70ccc403cac04f47e8da9f492",
+  "candidate_sha": null,
+  "candidate_tree_sha": null,
+  "candidate_exact_head_ci_run": "NOT_CUT",
+  "supersedes_unaccepted_approach": {
+    "commit": "5ea58ea763cc308badc5a3e88faa5c19699a4b12",
+    "reason": "In-place mutation of the historical v2 profile invalidated immutable R04E dependency verification at exact-head CI 29705129284.",
+    "history_rewritten": false,
+    "additive_restore_required": true
+  },
+  "objective": "Restore historical provider profile v2 byte-for-byte, add a new v3 profile containing only the DeepSeek Pro visible-output option change, make v3 the connected-worker default while preserving explicit v1/v2 validation, and rebind the Agent-5 runtime policy to exact v3/tool hashes.",
+  "agent_0_write_set": [
+    "stages/r08b-exact-candidate-image-build-sbom/stage-envelope-amendment-v2.4-5.json",
+    "stages/r08b-exact-candidate-image-build-sbom/ownership-lease-amendment-v2.4-5.json",
+    "provenance/model-provider-connected-shadow-v2.json",
+    "provenance/model-provider-connected-shadow-v3.json",
+    "tools/model_provider_shadow.py"
+  ],
+  "agent_5_write_set": [
+    "ops/connected-worker/runtime-policy.json",
+    "tests/test_s17_provider_shadow_tool.py"
+  ],
+  "preservation": {
+    "historical_v2_sha256": "63ae65247d61b918aced080e6419609459ebcbf4a3384ea29f2617e65597258c",
+    "r04e_receipt_immutable": true,
+    "v1_semantics_unchanged": true,
+    "v2_semantics_unchanged": true,
+    "v3_only_semantic_delta": "deepseek-v4-pro request_options.thinking.type disabled",
+    "model_endpoint_role_family_provenance_privacy_budget_retry_authority_unchanged": true
+  },
+  "acceptance_commands": [
+    "historical v2 file SHA-256 equals 63ae65247d61b918aced080e6419609459ebcbf4a3384ea29f2617e65597258c",
+    "tools/verify_r04e_provider_proof.py remains green",
+    "ConnectedShadowProfile validates v1 v2 and v3 and defaults to v3",
+    "Agent-5 runtime policy binds exact v3 and tool hashes without tools/provenance mutation",
+    "python3 -m unittest -v tests.test_s17_provider_shadow_tool tests.test_r04c_connected_worker_runtime",
+    "make contracts and exact-head CI green",
+    "no-cache exact linux/arm64 connected-worker image build and dependency validation",
+    "fresh v3-bound two-role private proof succeeds before candidate cut"
+  ],
+  "stop_conditions": [
+    "historical v1 or v2 profile bytes remain changed",
+    "R04E immutable proof is weakened or rewritten",
+    "Agent-5 receives tools or provenance authority",
+    "candidate becomes non-null before v3-bound pre-cut PASS",
+    "old UNKNOWN call is replayed",
+    "force push rebase history rewrite or live action"
+  ]
+}
