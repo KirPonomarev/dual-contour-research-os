@@ -1,0 +1,30 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-r03b-r1-researchd-validation-composition-20260719",
+  "issued_at": "2026-07-19T09:29:27Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-freeze-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "PRODUCTION_RESEARCHD_PINNED_EXECUTION_VALIDATION_COMPOSITION",
+    "candidates": [
+      {"candidate": "compose-R03B-ValidatedOfflineExecutionCoordinator-and-existing-DeterministicL0Validator-inside-ResearchDaemon", "disposition": "selected-minimal-internal-adapter"},
+      {"candidate": "return-ExecutionReceipt-only-and-defer-validation-to-an-external-operator", "disposition": "rejected-inert-autonomous-runtime"},
+      {"candidate": "validator-access-to-runner-staging-or-mutable-artifact-state", "disposition": "rejected-breaks-independent-durable-reopen-boundary"},
+      {"candidate": "new-service-ledger-database-queue-scheduler-schema-config-key-or-dependency", "disposition": "rejected-existing-corridor-profile-and-stores-are-sufficient"},
+      {"candidate": "enable-validation-without-a-non-null-frozen-corridor-profile", "disposition": "rejected-profile-missing-must-remain-WAIT_AUTHORITY"}
+    ],
+    "selected_mode": "conditionally-compose-the-exact-pinned-L0-validator-only-when-A1-has-a-non-null-frozen-corridor-profile-and-return-replayable-ExecutionReceipt-plus-ValidationReceipt-from-submit-and-lookup",
+    "source_ref": "git:6fc8841c8de47a500c327c6f0216b9f5383201e0;internal:researchd.py+execution.py+validation.py",
+    "license_spdx": "NOASSERTION",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": ["non-null profile production composition", "submit returns exact execution and validation receipts", "lookup zero-write byte-identical pair", "validator source/id/protocol pin", "null profile WAIT_AUTHORITY", "legacy AI_OFF compatibility"],
+    "canonical_owner": "agent-1-with-agent-0-integration",
+    "rollback": "Revert the scoped ResearchDaemon composition; R03B primitives remain valid while A1 execution-to-validation returns to fail-closed/uncomposed state."
+  },
+  "integrity": {
+    "payload_sha256": "45f6bbcabfbaf8e78bf905ddcc6681a80ef938c6697a6c858ca698f9b31278b2",
+    "parent_refs": ["git:6fc8841c8de47a500c327c6f0216b9f5383201e0", "integration:integration-r03b-execution-validation-wiring-20260719"]
+  }
+}
