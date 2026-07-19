@@ -1,0 +1,69 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-r02b-real-source-intake-and-loop-control-20260719",
+  "issued_at": "2026-07-19T07:37:14Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "r02b-real-source-intake-and-loop-control",
+    "agent_id": "agent-1",
+    "ownership_lease_ref": "stages/r02b-real-source-intake-and-loop-control/ownership-lease.json",
+    "base_sha": "bb23ac1d888d771e04708b54d13c9e326642c2ad",
+    "head_sha": "84c620f94ea4b7275204335fe55fb564ad066f74",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "a1_contract_sha256": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+    "write_set": [
+      "src/research_bridge/control.py",
+      "src/research_bridge/discovery.py",
+      "src/research_bridge/researchd.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "authenticated_collector_identity_source": "verified_AF_UNIX_peer_UID",
+      "source_transport_idempotency_binding": "green",
+      "source_and_evidence_provenance_allowlist": "green",
+      "private_live_canonical_or_unknown_source_denial": "green",
+      "restart_safe_source_rate_window": "green",
+      "source_rate_bound_source": "frozen_a1_cycle_max_model_calls",
+      "scout_claim_next_role": "verified_scout_only_IPC_1_2",
+      "claim_next_order": "oldest_created_from_ledger_sequence_then_event_ref",
+      "maximum_claims_per_tick": 1,
+      "wait_data_model_calls_and_writes": 0,
+      "private_projection_compatibility": "durable-discovery-v1-to-v2-validate-then-first-authorized-atomic-transition",
+      "database_schema_or_new_store": false,
+      "mixed_projection_version_denial": "green",
+      "manual_v1_reopen_rate_claim_next_hostile_probe": "green",
+      "focused_tests": 36,
+      "full_core_tests": 808,
+      "stage0b_tests": 25,
+      "new_scheduler_thread_process_service_queue": 0,
+      "provider_or_model_calls": 0,
+      "deployment_or_VPS_mutations": 0,
+      "canonical_or_live_actions": 0,
+      "ops_timer_activation_deferred": "later-Agent-5-owned-ops-stage",
+      "real_domain_collector_evidence_claimed": false,
+      "grants_authority": false
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29678394357",
+    "pull_request_ref": "https://github.com/KirPonomarev/dual-contour-research-os/pull/51",
+    "integration_commit_sha": "23516acad669f807549c165f0624178f4c2e10f2"
+  },
+  "integrity": {
+    "payload_sha256": "c407af43d76ded73ac1f78e4ee4facdaba81552114edd0f1b5194691a9d3af58",
+    "parent_refs": [
+      "git:bb23ac1d888d771e04708b54d13c9e326642c2ad",
+      "git:84c620f94ea4b7275204335fe55fb564ad066f74",
+      "git:23516acad669f807549c165f0624178f4c2e10f2",
+      "ci:29678394357",
+      "pr:51",
+      "reuse:reuse-r02b-real-source-intake-and-loop-control-20260719"
+    ]
+  }
+}
