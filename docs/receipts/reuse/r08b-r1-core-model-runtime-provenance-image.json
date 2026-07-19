@@ -1,0 +1,36 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-r08b-r1-core-model-runtime-provenance-image-20260719",
+  "issued_at": "2026-07-19T20:05:52Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "decision": "REUSE_EXISTING_RUNTIME_BOUND_FILES_AND_R08A_IMAGE_ASSURANCE",
+  "objective": "Close the missing Core-image provenance packaging gap without adding a dependency service or new runtime component.",
+  "evaluation_order": [
+    "internal-adapter",
+    "owned-versioned-package",
+    "pinned-permissive-dependency",
+    "small-audited-vendor-import",
+    "minimal-missing-glue"
+  ],
+  "selected": [
+    "internal:researchd._start_model_runtime exact bound-file contract",
+    "internal:existing public provenance/model-role-evaluation-v2.json",
+    "internal:existing public provenance/model-worker-ipc-extension-v1.json",
+    "internal:existing public provenance/model-provider-routing-v1.json",
+    "internal:existing R08A image inventory and physical startup harness"
+  ],
+  "rejected": [
+    "new model runtime service or second control plane",
+    "runtime network fetch of provenance",
+    "baking rendered private config credential or provider output into the image",
+    "copying the full provenance tests docs tools or repository tree"
+  ],
+  "new_dependency": false,
+  "external_code": false,
+  "external_data": false,
+  "rationale": "The missing bytes are already-owned immutable public inputs required by the existing startup verifier. Three exact COPY directives plus extension of the existing assurance test are the minimal auditable repair."
+}
