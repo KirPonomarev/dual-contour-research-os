@@ -1,0 +1,66 @@
+{
+  "stage_id": "r07a-r1-proof-currentness-assurance",
+  "agent_id": "agent-5",
+  "objective": "Prove valid exact context acceptance and deterministic rejection of historical, expired, mixed, drifted, incomplete or authority-bearing release evidence across all aggregate and final-freeze entrypoints.",
+  "executable_blocker": "The R07A Agent-0 validator commit exists, but its changed current-versus-historical semantics and full mutation matrix are not yet represented in the tests ownership lane.",
+  "base_sha": "b3db083236560d2eb811d9295a3e750d97c60b01",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "a1_contract_sha256": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+  "branch": "codex/bridge-a5-r07a-r1-proof-currentness-assurance",
+  "worktree": "/private/tmp/dcr-r07a-r1-proof-currentness-assurance",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "ownership/registry.json",
+    "tools/release_currentness.py",
+    "tools/capability_proof.py",
+    "tools/e1_aggregate_gate.py",
+    "tools/e2_aggregate_gate.py",
+    "tools/e3_aggregate_gate.py",
+    "tools/verify_final_release_freeze.py",
+    "docs/receipts/capability/**",
+    "docs/receipts/release/**"
+  ],
+  "write_set": [
+    "tests/test_r07a_proof_currentness.py",
+    "tests/test_s19_e1_aggregate_gate.py",
+    "tests/test_s28_e2_aggregate_gate.py",
+    "tests/test_s32_e3_aggregate_gate.py",
+    "tests/test_s38_final_release_freeze.py"
+  ],
+  "forbidden_scope": [
+    "edit-source-tool-policy-config-contract-schema-receipt-root-CI-lockfile-or-migration",
+    "issue-real-proof-build-image-deploy-restore-reboot-provider-call-or-start-window",
+    "secret-private-evidence-raw-provider-response-runtime-database-or-account-data-in-Git"
+  ],
+  "dependency_hashes": {
+    "r07a_primary_worker_head": "9463470d0c9ad914d33b51c0b318410a2fc3d185",
+    "release_currentness_sha256": "27088b44dc1a2140f2bd4924f3bba3e86226fe6106c7aabb1167d26e6ebdaa6d",
+    "e1_gate_sha256": "85ac953b46accacdd4cda711064b479eaa590674c4eb3f413f724560a7d244fd",
+    "e2_gate_sha256": "d52ad8f44357805e994d2b8a417212e5dee5604a2a89b8db0b706a6cc652ec67",
+    "e3_gate_sha256": "d5145d59723630997865e694575c213b0702acfdab2d0bc55a2af7d30e92ef3b",
+    "final_freeze_sha256": "14cc2a0490d2ac01f61fc2ddc2a0309fd70782fea5217bcbd639856ac5d7c66e",
+    "reuse_receipt": "docs/receipts/reuse/r07a-r1-proof-currentness-assurance.json"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest tests.test_r07a_proof_currentness tests.test_s19_e1_aggregate_gate tests.test_s28_e2_aggregate_gate tests.test_s32_e3_aggregate_gate tests.test_s38_final_release_freeze",
+    "python3 -m unittest discover -s tests",
+    "python3 -m unittest discover -s tests/stage0b -p test_*.py",
+    "git diff --check",
+    "exact-head remote CI"
+  ],
+  "risk_class": "critical-alternate-integrity-only-release-path",
+  "stop_conditions": [
+    "primary-worker-hash-mismatch",
+    "write-outside-declared-test-set",
+    "valid-exact-context-fails",
+    "any-required-currentness-mutation-passes",
+    "historical-helper-is-used-by-current-final-freeze-entrypoint"
+  ],
+  "expected_receipt": "docs/receipts/integration/r07a-proof-currentness-and-final-freeze-validator.json",
+  "rollback": "Remove the additive currentness suite and restore only the four migrated historical tests; product and external state are untouched.",
+  "commit_authority": "one-scoped-agent-5-stage",
+  "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent0_audit", "blocked_validation_failed"]
+}

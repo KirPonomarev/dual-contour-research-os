@@ -1,0 +1,18 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-r07a-r1-proof-currentness-assurance-20260719",
+  "issued_at": "2026-07-19T17:28:46Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "decision": "REUSE_INTERNAL_AND_STANDARD_LIBRARY",
+  "objective": "Independently prove exact release currentness and migrate legacy aggregate/freeze tests to explicit historical-only entrypoints.",
+  "evaluation_order": ["internal-adapter", "owned-versioned-package", "pinned-permissive-dependency", "small-audited-vendor-import", "minimal-missing-glue"],
+  "selected": [
+    "tools/release_currentness.py:strict pure currentness validator",
+    "existing S19/S28/S32/S38 synthetic fixtures",
+    "python-standard-library:unittest-copy-json-hashlib-subprocess-tempfile"
+  ],
+  "new_dependency": false,
+  "external_code": false,
+  "rationale": "Additive and narrowly migrated synthetic tests cover the complete boundary without new packages or external evidence."
+}

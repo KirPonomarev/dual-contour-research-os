@@ -1,0 +1,17 @@
+{
+  "lease_id": "lease-r07a-r1-proof-currentness-assurance-agent-5",
+  "stage_id": "r07a-r1-proof-currentness-assurance",
+  "agent_id": "agent-5",
+  "branch": "codex/bridge-a5-r07a-r1-proof-currentness-assurance",
+  "issued_at": "2026-07-19T17:28:46Z",
+  "expires_at": "2026-07-21T17:28:46Z",
+  "write_set": [
+    "tests/test_r07a_proof_currentness.py",
+    "tests/test_s19_e1_aggregate_gate.py",
+    "tests/test_s28_e2_aggregate_gate.py",
+    "tests/test_s32_e3_aggregate_gate.py",
+    "tests/test_s38_final_release_freeze.py"
+  ],
+  "exclusive": true,
+  "revoked": false
+}
