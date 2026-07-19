@@ -1,0 +1,15 @@
+{
+  "lease_id": "lease-s33-generated-isolation-assurance-agent-5",
+  "stage_id": "s33-generated-isolation-assurance",
+  "agent_id": "agent-5",
+  "branch": "codex/bridge-a5-s33-generated-isolation-assurance",
+  "issued_at": "2026-07-19T00:10:00Z",
+  "expires_at": "2026-07-21T00:10:00Z",
+  "write_set": [
+    "tests/test_s33_generated_isolation.py",
+    "stages/s33-generated-isolation-assurance/stage-envelope.json",
+    "stages/s33-generated-isolation-assurance/ownership-lease.json"
+  ],
+  "exclusive": true,
+  "revoked": false
+}

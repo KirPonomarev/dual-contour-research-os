@@ -1,0 +1,51 @@
+{
+  "stage_id": "s33-generated-isolation-assurance",
+  "agent_id": "agent-5",
+  "objective": "Hostile-test S33 authority inheritance, L3 denial, backend isolation, resource/path/network boundaries, CAS provenance, fencing, plan integrity and rollback proposal-only semantics.",
+  "executable_blocker": "Generated execution cannot integrate without independent escape and authority probes.",
+  "base_sha": "8f1889c87619cb0f25308791e9fbeb8424727591",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a5-s33-generated-isolation-assurance",
+  "worktree": "/private/tmp/dcr-s33-generated-isolation-assurance",
+  "read_set": [
+    "provenance/generated-code-isolation-ladder-v1.json",
+    "src/research_bridge/generated_execution.py",
+    "src/research_bridge/authority.py",
+    "src/research_bridge/execution.py"
+  ],
+  "write_set": [
+    "tests/test_s33_generated_isolation.py",
+    "stages/s33-generated-isolation-assurance/stage-envelope.json",
+    "stages/s33-generated-isolation-assurance/ownership-lease.json"
+  ],
+  "forbidden_scope": [
+    "source-contract-profile-canonical-doc-root-CI-lockfile-migration-edit",
+    "real-code-execution-container-daemon-network-private-live-or-host-action",
+    "deploy-rollback-apply-canonical-write-or-authority"
+  ],
+  "dependency_hashes": {
+    "implementation_commit": "8f1889c87619cb0f25308791e9fbeb8424727591",
+    "profile": "a02fb9bb7e328f355cae083193f4ae63bfb299bf2e4c633ae496ccf31ca0ef89"
+  },
+  "acceptance_commands": [
+    "python3 -m pytest -q tests/test_s33_generated_isolation.py",
+    "make contracts",
+    "make test",
+    "git diff --check"
+  ],
+  "risk_class": "critical-hostile-sandbox-and-authority-assurance",
+  "stop_conditions": [
+    "L3-or-parent-bypass",
+    "network-path-resource-or-fence-bypass",
+    "unattested-backend-or-CAS-forgery",
+    "embedded-execution-deploy-rollback-apply-or-authority"
+  ],
+  "expected_receipt": "docs/receipts/integration/s33-generated-isolation-assurance.json",
+  "rollback": "Revert additive S33 hostile tests and stage metadata.",
+  "commit_authority": "one-scoped-agent-5-commit",
+  "push_authority": true,
+  "expected_handoff_status": [
+    "ready_for_agent0_audit",
+    "blocked_validation_failed"
+  ]
+}
