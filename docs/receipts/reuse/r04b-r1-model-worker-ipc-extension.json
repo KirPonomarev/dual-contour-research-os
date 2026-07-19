@@ -1,0 +1,31 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-r04b-r1-model-worker-ipc-extension-20260719",
+  "issued_at": "2026-07-19T11:21:47Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-review-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "r04b-r1-model-worker-ipc-extension",
+    "capability": "additive-hash-bound-local-worker-role-extension",
+    "candidates": [
+      {"candidate": "modify-frozen-ipc-compatibility-v1", "disposition": "rejected-immutable-profile"},
+      {"candidate": "full-A1-v2-contract-catalog", "disposition": "rejected-no-payload-schema-or-authority-contract-change-required"},
+      {"candidate": "unversioned-runtime-role-and-command-addition", "disposition": "rejected-false-compatibility"},
+      {"candidate": "additive-provenance-profile-bound-beside-frozen-v1", "disposition": "selected-minimal-operational-extension"}
+    ],
+    "selected_candidate": "versioned-additive-provenance-profile-with-exact-digest-runtime-binding",
+    "source_ref": "git:cfe080c27fe9c58e11e886bde347e5e5fbbb7e56;internal:ipc_compatibility_v1+control+ipc+researchd",
+    "selected_source_sha": "c9cdd8c51616ac843a6729166b6f21c9a44de24fac7559b86f842c7e1930ba04",
+    "license": "repository-native-configuration-only",
+    "tests": ["base-profile-byte-identity", "strict-extension-shape", "role-command-separation", "SENT-before-ack", "UNKNOWN-on-restart", "no-authority-grant"],
+    "security_review": "no-runtime-code-no-network-no-credential-no-contract-mutation-no-authority-expansion",
+    "dependency_review": "no-new-package-code-license-SBOM-or-notice-change",
+    "rollback": "Remove the additive extension profile and R04B amendment; frozen IPC v1 remains the only active profile."
+  },
+  "integrity": {
+    "payload_sha256": "bcc0785762bb2de78d2c374f100c4014960b102e3ac121b1e7e8ec0f0f834e37",
+    "parent_refs": ["git:cfe080c27fe9c58e11e886bde347e5e5fbbb7e56", "profile:sha256:c9cdd8c51616ac843a6729166b6f21c9a44de24fac7559b86f842c7e1930ba04"]
+  }
+}

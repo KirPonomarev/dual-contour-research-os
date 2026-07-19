@@ -1,0 +1,13 @@
+{
+  "stage_id": "r04b-broker-scout-ipc-handshake",
+  "amendment_id": "r04b-worker-ipc-extension-binding-1",
+  "issued_by": "agent-0",
+  "issued_at": "2026-07-19T11:21:47Z",
+  "base_stage_envelope_ref": "stages/r04b-broker-scout-ipc-handshake/stage-envelope.json",
+  "reason": "Bind the runtime handshake to a versioned least-privilege worker IPC extension without changing frozen IPC v1.",
+  "add_read_set": ["provenance/model-worker-ipc-extension-v1.json"],
+  "add_dependency_hashes": {"model_worker_ipc_extension_sha256": "03d91f027bb6975c55d84acaef188546bcd24af9944a72f4ff9314296399d07a"},
+  "write_set_unchanged": true,
+  "forbidden_scope_unchanged": true,
+  "lease_unchanged": true
+}

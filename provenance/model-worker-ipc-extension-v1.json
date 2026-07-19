@@ -1,0 +1,42 @@
+{
+  "profile_id": "model-worker-ipc-extension-v1",
+  "schema_version": "1.0.0",
+  "status": "frozen",
+  "base_profile_ref": "contracts/a1/v1/profiles/ipc_compatibility_v1.json#sha256:c9cdd8c51616ac843a6729166b6f21c9a44de24fac7559b86f842c7e1930ba04",
+  "protocol_version": "1.2",
+  "roles": {
+    "scout": {
+      "additive_commands": ["reserve_model_call", "lookup_model_call"],
+      "purpose": "request policy-selected bounded model work and read sanitized durable state"
+    },
+    "connected_worker": {
+      "commands": ["begin_model_call", "complete_model_call", "lookup_model_call"],
+      "purpose": "receive one hash-bound dispatch and return untrusted completion metadata",
+      "forbidden_commands": ["submit_source_trigger", "claim_next_proposal", "claim_proposal", "submit_proposal", "ack_proposal", "submit", "pause_global", "resume_global"]
+    }
+  },
+  "commands": {
+    "reserve_model_call": {"request_fields": ["role", "role_assignment_ref", "classification", "request_body", "max_tokens", "max_cost_units", "expires_at"], "durable_transition": "PROPOSED_THEN_RESERVED"},
+    "begin_model_call": {"request_fields": ["call_id", "dispatch_token", "request_body"], "durable_transition": "RESERVED_TO_SENT_BEFORE_ACK"},
+    "complete_model_call": {"request_fields": ["call_id", "dispatch_token", "outcome", "response_ref", "actual_tokens", "actual_cost_units", "provider_receipt_ref", "failure_code"], "durable_transition": "SENT_TO_TERMINAL"},
+    "lookup_model_call": {"request_fields": ["call_id"], "durable_transition": "NONE_READ_ONLY"}
+  },
+  "limits": {
+    "maximum_request_body_bytes": 1048576,
+    "maximum_response_frame_bytes": 262144,
+    "automatic_retry": false,
+    "one_writer": "researchd"
+  },
+  "invariants": {
+    "base_v1_profile_is_unchanged": true,
+    "existing_clients_and_commands_are_preserved": true,
+    "worker_identity_is_OS_verified": true,
+    "worker_cannot_select_binding": true,
+    "worker_cannot_write_ledger_or_Core_directly": true,
+    "SENT_precedes_egress_ack": true,
+    "ambiguous_restart_becomes_UNKNOWN": true,
+    "result_enters_proposal_intake_only_through_scout": true,
+    "provider_network_or_credentials_are_absent": true,
+    "grants_scientific_or_deployment_authority": false
+  }
+}

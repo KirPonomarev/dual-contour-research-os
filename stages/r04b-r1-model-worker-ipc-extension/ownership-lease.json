@@ -1,0 +1,11 @@
+{
+  "lease_id": "lease-r04b-r1-model-worker-ipc-extension-agent-0",
+  "stage_id": "r04b-r1-model-worker-ipc-extension",
+  "agent_id": "agent-0",
+  "branch": "main",
+  "issued_at": "2026-07-19T11:21:47Z",
+  "expires_at": "2026-07-21T11:21:47Z",
+  "write_set": ["provenance/model-worker-ipc-extension-v1.json", "stages/r04b-broker-scout-ipc-handshake/stage-envelope-amendment-1.json"],
+  "exclusive": true,
+  "revoked": false
+}

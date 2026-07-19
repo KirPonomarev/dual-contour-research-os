@@ -1,0 +1,23 @@
+{
+  "stage_id": "r04b-r1-model-worker-ipc-extension",
+  "agent_id": "agent-0",
+  "objective": "Freeze an additive operational IPC extension for the connected-worker role while keeping the A1 IPC compatibility v1 profile byte-identical.",
+  "executable_blocker": "R04B requires a distinct least-privilege worker role, but the frozen v1 profile names only operator, collector and scout.",
+  "base_sha": "cfe080c27fe9c58e11e886bde347e5e5fbbb7e56",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "a1_contract_sha256": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+  "branch": "main",
+  "worktree": "/Volumes/Work/dual-contour-research-os",
+  "read_set": ["contracts/a1/v1/profiles/ipc_compatibility_v1.json", "src/research_bridge/control.py", "src/research_bridge/ipc.py", "src/research_bridge/researchd.py"],
+  "write_set": ["provenance/model-worker-ipc-extension-v1.json", "stages/r04b-broker-scout-ipc-handshake/stage-envelope-amendment-1.json"],
+  "forbidden_scope": ["contract-runtime-test-ops-tool-root-config-CI-lockfile-migration-or-other-provenance-edit", "provider-network-credential-private-data-or-cost", "worker-Core-ledger-direct-write-or-authority-grant"],
+  "dependency_hashes": {"r04b_authorization_head": "cfe080c27fe9c58e11e886bde347e5e5fbbb7e56", "base_ipc_profile_sha256": "c9cdd8c51616ac843a6729166b6f21c9a44de24fac7559b86f842c7e1930ba04", "reuse_receipt": "docs/receipts/reuse/r04b-r1-model-worker-ipc-extension.json"},
+  "acceptance_commands": ["make contracts", "strict JSON and exact profile digest", "git diff --check", "exact-head remote CI"],
+  "risk_class": "high-unversioned-role-expansion-or-false-backward-compatibility",
+  "stop_conditions": ["frozen-v1-bytes-change", "extension-grants-worker-proposal-ledger-Core-or-provider-authority", "write-outside-profile-and-R04B-amendment"],
+  "expected_receipt": "docs/receipts/integration/r04b-r1-model-worker-ipc-extension.json",
+  "rollback": "Remove the additive extension profile and R04B amendment; frozen v1 remains unchanged.",
+  "commit_authority": "one-scoped-agent-0-direct-stage",
+  "push_authority": true,
+  "expected_handoff_status": ["ready_for_r04b_runtime", "blocked_validation_failed"]
+}
