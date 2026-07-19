@@ -1,0 +1,43 @@
+{
+  "lease_amendment_id": "lease-r08b-exact-candidate-image-build-sbom-agent-0-v2.4-3",
+  "lease_id": "lease-r08b-exact-candidate-image-build-sbom-agent-0",
+  "stage_id": "r08b-exact-candidate-image-build-sbom",
+  "correction_stage_id": "r08b-r2-owner-correct-exact-source-build",
+  "amendment_id": "R08B_R2_OWNER_CORRECT_EXACT_SOURCE_BUILD_20260719",
+  "agent_id": "agent-0",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-19T21:01:16Z",
+  "expires_at": "2026-07-26T21:01:16Z",
+  "base_sha": "7e6c4cb56da3aad70ccc403cac04f47e8da9f492",
+  "authority_head": "9cfcd1f7281d6a1d89b245266dd63ec992c1d94e",
+  "prior_lease_amendment_ref": "stages/r08b-exact-candidate-image-build-sbom/ownership-lease-amendment-v2.4-2.json",
+  "prior_lease_amendment_sha256": "bde782b4a3317463a7dd5f1b9661e0f67f83f3371ae2634d4efc3cf9e4d8dc2c",
+  "branch": "codex/bridge-a0-r08b-exact-candidate-image-build-sbom",
+  "worktree": "/private/tmp/dcr-r08b-exact-candidate-image-build-sbom",
+  "add_write_set": [
+    "stages/r08b-exact-candidate-image-build-sbom/stage-envelope-amendment-v2.4-3.json",
+    "stages/r08b-exact-candidate-image-build-sbom/ownership-lease-amendment-v2.4-3.json",
+    "tools/verify_release_blueprint.py",
+    "docs/receipts/integration/r08b-r2-owner-correct-exact-source-build.json"
+  ],
+  "agent_5_read_only_paths": [
+    "ops/release/Containerfile",
+    "tests/test_r08a_production_image_e2e_harness.py"
+  ],
+  "agent_5_write_set": [],
+  "agent_5_tools_authority": false,
+  "forbidden_write_set": [
+    "ops/**",
+    "tests/**",
+    "src/research_bridge/**",
+    "contracts/**",
+    ".github/**",
+    "ownership/registry.json",
+    "pyproject.toml",
+    "any path not enumerated in add_write_set"
+  ],
+  "exclusive": true,
+  "delegation_allowed": false,
+  "revoked": false,
+  "state": "active"
+}
