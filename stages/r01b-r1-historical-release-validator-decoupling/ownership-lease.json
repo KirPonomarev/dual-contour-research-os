@@ -1,0 +1,11 @@
+{
+  "lease_id": "lease-r01b-r1-historical-release-validator-decoupling-agent-0",
+  "stage_id": "r01b-r1-historical-release-validator-decoupling",
+  "agent_id": "agent-0",
+  "branch": "codex/bridge-a5-r01b-runtime-config-ops-and-assurance",
+  "issued_at": "2026-07-19T06:20:00Z",
+  "expires_at": "2026-07-21T06:20:00Z",
+  "write_set": ["tools/verify_release_identity.py", "tests/test_release_identity.py", "tests/test_release_deploy_recovery.py", "stages/r01b-runtime-config-ops-and-assurance/ownership-lease.json", "stages/r01b-r1-historical-release-validator-decoupling/**", "docs/receipts/reuse/r01b-r1-historical-release-validator-decoupling.json"],
+  "exclusive": true,
+  "revoked": false
+}

@@ -1,0 +1,12 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-decision:r01b-r1-historical-release-validator-decoupling",
+  "decision": "internal_adapter",
+  "selected_component": "existing Git object database plus immutable ReleaseManifest bindings",
+  "alternatives_considered": ["mutate historical receipts", "duplicate historical configs in a new tracked snapshot", "disable drift checks"],
+  "rationale": "Read the already-owned exact Git subject with subprocess argv and keep tamper tests; no dependency, snapshot artifact, or historical rewrite is required.",
+  "external_dependencies_added": [],
+  "license_review_required": false,
+  "rollback": "Revert the validator/test adapter with the combined R01B branch."
+}

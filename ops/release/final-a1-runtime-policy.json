@@ -16,15 +16,38 @@
   "memory_bytes": 2147483648,
   "cpus": 2,
   "restart_policy": "no",
+  "supervisor_topology": {
+    "owner": "systemd-user",
+    "container_restart": "no",
+    "systemd_restart": "on-failure",
+    "single_writer": true
+  },
+  "principal_topology": {
+    "operator_uid": 10001,
+    "collector_uid": 10002,
+    "scout_uid": 10003,
+    "shared_control_gid": 10001,
+    "role_source": "verified_peer_credentials"
+  },
+  "control_socket": {
+    "path": "/var/lib/research-os/researchd.sock",
+    "transport": "AF_UNIX",
+    "owner_uid": 10001,
+    "owner_gid": 10001,
+    "mode": "0660",
+    "protocol_versions": ["1.1", "1.2"]
+  },
   "runtime_mount": {
     "container_path": "/var/lib/research-os",
     "mode": "rw",
-    "owner_uid": 10001
+    "owner_uid": 10001,
+    "owner_gid": 10001
   },
   "config_mount": {
     "container_path": "/run/research-os/researchd.json",
     "mode": "ro",
     "owner_uid": 10001,
+    "owner_gid": 10001,
     "file_mode": "0600"
   },
   "control_transport": "AF_UNIX",

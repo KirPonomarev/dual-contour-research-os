@@ -1,0 +1,23 @@
+{
+  "stage_id": "r01b-r1-historical-release-validator-decoupling",
+  "agent_id": "agent-0",
+  "objective": "Finish R01B and preserve immutable historical release verification after intentional live ops config evolution.",
+  "executable_blocker": "The R01B live config correctly changes bytes, but verify_release_identity and legacy recovery fixtures still compare immutable historical manifests with the mutable live config, causing 20 deterministic regressions.",
+  "base_sha": "ac7b777285e4294ad35e22ef1d9d855e9f111f14",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "a1_contract_sha256": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+  "branch": "codex/bridge-a5-r01b-runtime-config-ops-and-assurance",
+  "worktree": "/private/tmp/dcr-r01b-runtime-config-ops-and-assurance",
+  "read_set": ["tools/verify_release_identity.py", "tools/pre_soak_deploy.py", "tests/test_release_identity.py", "tests/test_release_deploy_recovery.py"],
+  "write_set": ["tools/verify_release_identity.py", "tests/test_release_identity.py", "tests/test_release_deploy_recovery.py", "stages/r01b-runtime-config-ops-and-assurance/ownership-lease.json", "stages/r01b-r1-historical-release-validator-decoupling/**", "docs/receipts/reuse/r01b-r1-historical-release-validator-decoupling.json"],
+  "forbidden_scope": ["runtime-code-contract-schema-migration-or-deployment-change", "historical-receipt-or-manifest-mutation", "secret-private-data-live-action-or-authority-expansion"],
+  "dependency_hashes": {"r01b_agent5_patch": "uncommitted-exact-worktree-handoff", "external_dependencies": "none-stdlib-git-only"},
+  "acceptance_commands": ["python3 -m unittest -v tests.test_release_identity tests.test_release_deploy_recovery tests.test_s38_final_release_freeze", "make contracts", "make test", "git diff --check", "exact-head remote CI"],
+  "risk_class": "critical-historical-proof-rewrite-or-vacuous-validator",
+  "stop_conditions": ["historical-manifest-is-mutated", "live-config-is-treated-as-old-release-input", "tampered-historical-subject-passes", "write-outside-combined-R01B-repair-scope"],
+  "expected_receipt": "docs/receipts/integration/r01b-runtime-config-ops-and-assurance.json",
+  "rollback": "Revert the combined R01B/R01B-R1 branch; R00 keeps the superseded release undeployable.",
+  "commit_authority": "agent-0-integration-repair-after-agent-5-handoff",
+  "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent0_audit", "blocked_validation_failed"]
+}

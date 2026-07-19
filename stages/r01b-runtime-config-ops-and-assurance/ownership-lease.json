@@ -14,5 +14,6 @@
     "tests/test_s38_r1_final_deployment_rebind.py"
   ],
   "exclusive": true,
-  "revoked": false
+  "revoked": true,
+  "revoked_reason": "Agent 5 produced the scoped patch and tests but stalled before validation/commit; Agent 0 accepted the handoff and inserted R01B-R1 after full-suite exposed residual historical-validator coupling."
 }
