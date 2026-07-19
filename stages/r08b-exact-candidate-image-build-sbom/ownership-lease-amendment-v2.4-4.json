@@ -1,0 +1,34 @@
+{
+  "stage_id": "r08b-r3-deepseek-visible-output-profile",
+  "amendment_id": "R08B_R3_DEEPSEEK_VISIBLE_OUTPUT_PROFILE_20260719",
+  "issued_by": "agent-0",
+  "issued_at": "2026-07-19T21:49:00Z",
+  "authority_head": "c74d9f611081880629816517b7d3c507bc8ae284",
+  "candidate_sha": null,
+  "candidate_tree_sha": null,
+  "leases": [
+    {
+      "owner": "agent-0",
+      "write_set": [
+        "stages/r08b-exact-candidate-image-build-sbom/stage-envelope-amendment-v2.4-4.json",
+        "stages/r08b-exact-candidate-image-build-sbom/ownership-lease-amendment-v2.4-4.json",
+        "provenance/model-provider-connected-shadow-v2.json",
+        "tools/model_provider_shadow.py"
+      ],
+      "branch": "codex/bridge-a0-r08b-exact-candidate-image-build-sbom"
+    },
+    {
+      "owner": "agent-5",
+      "write_set": [
+        "ops/connected-worker/runtime-policy.json",
+        "tests/test_s17_provider_shadow_tool.py"
+      ],
+      "branch_pattern": "codex/bridge-a5-r08b-r3-deepseek-visible-output-profile"
+    }
+  ],
+  "cross_owner_write_set": false,
+  "agent_5_tools_or_provenance_authority": false,
+  "one_mutating_lane_at_a_time": true,
+  "expires_at": "2026-07-20T03:49:00Z",
+  "candidate_cut_permitted": false
+}
