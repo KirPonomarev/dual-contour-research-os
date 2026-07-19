@@ -1,0 +1,14 @@
+{
+  "lease_id": "lease-r04d-r1-model-reconciliation-ipc-agent-1",
+  "stage_id": "r04d-r1-model-reconciliation-ipc",
+  "agent_id": "agent-1",
+  "branch": "codex/bridge-a1-r04d-r1-model-reconciliation-ipc",
+  "issued_at": "2026-07-19T13:22:31Z",
+  "expires_at": "2026-07-21T13:22:31Z",
+  "write_set": [
+    "src/research_bridge/control.py",
+    "src/research_bridge/researchd.py"
+  ],
+  "exclusive": true,
+  "revoked": false
+}

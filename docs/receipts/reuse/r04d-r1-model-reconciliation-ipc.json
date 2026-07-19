@@ -1,0 +1,56 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-r04d-r1-model-reconciliation-ipc-20260719",
+  "issued_at": "2026-07-19T13:22:31Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "reuse-review-authority"
+  },
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "r04d-r1-model-reconciliation-ipc",
+    "capability": "operator-only-durable-model-call-cost-reconciliation",
+    "candidates": [
+      {
+        "candidate": "write-provider-accounting-directly-from-worker",
+        "disposition": "rejected-second-writer-and-worker-authority-expansion"
+      },
+      {
+        "candidate": "leave-successful-provider-cost-unreconciled",
+        "disposition": "rejected-r04d-accounting-acceptance-remains-open"
+      },
+      {
+        "candidate": "add-a-new-accounting-service-or-database",
+        "disposition": "rejected-unnecessary-state-owner"
+      },
+      {
+        "candidate": "reuse-ModelCallBroker-reconcile-through-existing-researchd-control-router",
+        "disposition": "selected-minimal-repository-native-adapter"
+      }
+    ],
+    "selected_candidate": "additive-operator-only-reconcile_model_call-command-delegating-to-existing-broker",
+    "source_ref": "git:cd6e03fde6ee3d1ffcd2dd6b5fa151c2b025aa11;internal:ModelCallBroker.reconcile+ControlRouter+ResearchDaemon",
+    "selected_source_sha": "0ec53e1a5e677d198987057b2c07d2ea58748a6d5e9507b0cfae0c886e655ebe",
+    "license": "repository-native-code-only",
+    "tests": [
+      "operator-only-role-routing",
+      "terminal-to-reconciled-budget-release",
+      "exact-replay-zero-write-after-restart",
+      "conflicting-replay-denial",
+      "nonterminal-reconciliation-denial"
+    ],
+    "security_review": "OS-derived operator identity only; exact usage/cost/portable receipt required; worker and Scout denied; researchd remains the only writer; no network or credential access.",
+    "dependency_review": "No new dependency, contract, schema, service, queue, database, package, license, SBOM or notice change.",
+    "rollback": "Remove the additive control route and ResearchDaemon adapter; existing durable model-call states remain valid."
+  },
+  "integrity": {
+    "payload_sha256": "858dcc89641c491a44e215e55b0b3a1b7cb1a81091d02f9111053ba82633458b",
+    "parent_refs": [
+      "git:cd6e03fde6ee3d1ffcd2dd6b5fa151c2b025aa11",
+      "source:sha256:0ec53e1a5e677d198987057b2c07d2ea58748a6d5e9507b0cfae0c886e655ebe",
+      "profile:sha256:c9cdd8c51616ac843a6729166b6f21c9a44de24fac7559b86f842c7e1930ba04"
+    ]
+  }
+}

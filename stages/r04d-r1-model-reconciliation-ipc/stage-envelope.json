@@ -1,0 +1,69 @@
+{
+  "stage_id": "r04d-r1-model-reconciliation-ipc",
+  "agent_id": "agent-1",
+  "objective": "Expose the existing durable ModelCallBroker reconciliation operation through an exact operator-only IPC command so R04D can close provider accounting without a second writer.",
+  "executable_blocker": "R04C can reserve, send and complete a physical provider call, but current researchd IPC has no route to reconcile exact provider billing evidence; successful connected calls therefore retain unresolved cost accounting.",
+  "base_sha": "cd6e03fde6ee3d1ffcd2dd6b5fa151c2b025aa11",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "a1_contract_sha256": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+  "branch": "codex/bridge-a1-r04d-r1-model-reconciliation-ipc",
+  "worktree": "/private/tmp/dcr-r04d-r1-model-reconciliation-ipc",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "ownership/registry.json",
+    "contracts/a1/v1/profiles/ipc_compatibility_v1.json",
+    "provenance/model-worker-ipc-extension-v1.json",
+    "src/research_bridge/control.py",
+    "src/research_bridge/researchd.py",
+    "src/research_bridge/model_broker.py",
+    "src/research_bridge/ledger.py",
+    "tests/test_r04b_broker_scout_ipc.py",
+    "tests/test_r04c_connected_worker_runtime.py"
+  ],
+  "write_set": [
+    "src/research_bridge/control.py",
+    "src/research_bridge/researchd.py"
+  ],
+  "forbidden_scope": [
+    "contract-canonical-doc-root-config-CI-migration-provenance-test-or-ops-edit",
+    "new-ledger-writer-provider-call-credential-access-route-selection-or-automatic-repeat",
+    "worker-or-scout-reconciliation-authority",
+    "reconciliation-without-exact-nonnegative-usage-cost-and-portable-provider-receipt",
+    "deployment-VPS-mutation-payment-top-up-or-private-evidence-in-Git"
+  ],
+  "dependency_hashes": {
+    "r04c_integration_head": "cd6e03fde6ee3d1ffcd2dd6b5fa151c2b025aa11",
+    "control_sha256": "fb38865d8862e01755e52c3540304c43b9975ede8e301650aac4c6a66939c506",
+    "researchd_sha256": "6aa0a071770cf2a73a69a337202427095a1da9574513be0d51e34d450d3d653b",
+    "model_broker_sha256": "0ec53e1a5e677d198987057b2c07d2ea58748a6d5e9507b0cfae0c886e655ebe",
+    "ipc_profile_sha256": "c9cdd8c51616ac843a6729166b6f21c9a44de24fac7559b86f842c7e1930ba04",
+    "worker_ipc_extension_sha256": "03d91f027bb6975c55d84acaef188546bcd24af9944a72f4ff9314296399d07a",
+    "ownership_registry_sha256": "e7a6a5158e43cb76c1df0fa28caec36ec9585a0dd05a732eabb94a92e427c9da",
+    "reuse_receipt": "docs/receipts/reuse/r04d-r1-model-reconciliation-ipc.json"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "private temporary operator/Scout/worker reconciliation IPC probe",
+    "python3 -m unittest tests.test_r04b_broker_scout_ipc tests.test_r04c_connected_worker_runtime",
+    "python3 -m unittest discover -s tests",
+    "git diff --check",
+    "exact-head remote CI"
+  ],
+  "risk_class": "critical-accounting-authority-and-idempotency",
+  "stop_conditions": [
+    "base-contract-owner-or-dependency-hash-mismatch",
+    "write-outside-control-and-researchd",
+    "non-operator-reconciliation-or-caller-selected-route",
+    "conflicting-replay-or-unreconciled-budget-reported-closed",
+    "provider-call-credential-access-or-external-mutation"
+  ],
+  "expected_receipt": "docs/receipts/integration/r04d-r1-model-reconciliation-ipc.json",
+  "rollback": "Remove the additive operator reconciliation command and retain the existing broker state as terminal but unreconciled.",
+  "commit_authority": "one-scoped-agent-1-branch-stage",
+  "push_authority": true,
+  "expected_handoff_status": [
+    "ready_for_agent0_audit",
+    "blocked_validation_failed"
+  ]
+}
