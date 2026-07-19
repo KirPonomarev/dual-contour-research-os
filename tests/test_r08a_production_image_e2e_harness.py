@@ -157,6 +157,7 @@ class ProductionImageE2EHarnessTests(unittest.TestCase):
         self.assertIn("--user=10002:10001", joined)
         self.assertIn("--user=10003:10001", joined)
         self.assertIn("chmod 0710 /var/lib/research-os", joined)
+        self.assertIn("/var/lib/research-os/.runtime-initialized", joined)
         self.assertIn("socket.AF_UNIX", joined)
         self.assertIn("docker stop --time=10", joined)
         self.assertTrue(any("contender" in " ".join(argv) for argv in commands))

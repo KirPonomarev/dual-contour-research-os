@@ -228,6 +228,7 @@ def verify_frozen_inputs(root: Path = ROOT) -> dict[str, str]:
         "--cap-drop=ALL",
         "--security-opt=no-new-privileges:true",
         "--restart=no",
+        "/var/lib/research-os/.runtime-initialized",
         "RestrictAddressFamilies=AF_UNIX",
         "Restart=on-failure",
     )
@@ -347,6 +348,7 @@ class ImageE2EHarness:
                 self.subject.image_id, "-eu", "-c",
                 "chown 10001:10001 /var/lib/research-os /run/research-os; "
                 "chmod 0710 /var/lib/research-os; chmod 0700 /run/research-os; "
+                "install -m 0600 -o 10001 -g 10001 /dev/null /var/lib/research-os/.runtime-initialized; "
                 "umask 077; cat > /run/research-os/researchd.json; "
                 "chown 10001:10001 /run/research-os/researchd.json; "
                 "chmod 0600 /run/research-os/researchd.json",
