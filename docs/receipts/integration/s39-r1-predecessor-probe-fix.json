@@ -25,6 +25,7 @@
     "audit_results": {
       "contract_gate": "green",
       "privacy_secret_scan": "green",
+      "source_mutation": false,
       "candidate_release_sha": "b2c2e6a8c4e0a364ef82e8e51540433aa91430d4",
       "candidate_image_id": "sha256:c654b09504dec237966623088e4dbbbe104d6364cd5760a4cfb145eb388a3844",
       "candidate_source_changed": false,
@@ -47,7 +48,7 @@
     "integration_commit_sha": "207d2af730487b4981a6cc166d5e591c35911e36"
   },
   "integrity": {
-    "payload_sha256": "0ba4b6999fccacbef201c37eb5a7472c5ffc95f6760b6475460a47d1efec11c3",
+    "payload_sha256": "90b22de82120bae4d9c73ba640fe277729b8ab33f8953a6da58d5ee300e599c5",
     "parent_refs": [
       "git:9c2f8c0c2d83366db77d2733b5d3e909d7ba118a",
       "git:b484e7e1309b4b086355195f81e486bf8381ff74",
