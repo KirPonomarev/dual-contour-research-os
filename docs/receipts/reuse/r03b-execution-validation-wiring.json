@@ -1,0 +1,30 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-r03b-execution-validation-wiring-20260719",
+  "issued_at": "2026-07-19T09:07:52Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-freeze-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "ATOMIC_OFFLINE_EXECUTION_TO_INDEPENDENT_VALIDATION_HANDOFF",
+    "candidates": [
+      {"candidate": "thin-composition-over-OfflineExecutionCoordinator-and-DeterministicL0Validator", "disposition": "selected-internal-adapter"},
+      {"candidate": "validation-inside-runner-or-before-durable-completion", "disposition": "rejected-destroys-independent-receipt-last-boundary"},
+      {"candidate": "new-service-ledger-database-queue-scheduler-or-schema", "disposition": "rejected-existing-CAS-ledger-execution-and-validator-are-sufficient"},
+      {"candidate": "networked-or-privileged-executor", "disposition": "rejected-L0-must-remain-deterministic-offline-and-unprivileged"},
+      {"candidate": "new-external-dependency", "disposition": "rejected-existing-runtime-and-stdlib-sufficient"}
+    ],
+    "selected_mode": "one-Agent-2-owned-composition-that-executes-once-commits-artifacts-and-terminal-ledger-state-then-independently-recomputes-the-frozen-L0-result-and-returns-both-bound-receipts",
+    "source_ref": "git:103d01b0aee2c4ce34bd100a5fed0ff0b1205d57;internal:execution.py+l0.py+cas.py+ingestion.py+validation.py",
+    "license_spdx": "NOASSERTION",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": ["exact admitted authority bundle executes once", "artifact publication precedes terminal receipt", "independent byte recomputation", "stale-corrupt-missing input denial", "crash-retry fencing and lookup", "offline no-network boundary"],
+    "canonical_owner": "agent-2-with-agent-0-integration",
+    "rollback": "Revert the scoped Agent-2 adapter; R03A admission remains fail-closed at WAIT_AUTHORITY and existing execution plus validation primitives remain independently usable."
+  },
+  "integrity": {
+    "payload_sha256": "489cccc7dccdd2340a0c5bc73d3e9b1b7a73b9128d5f731d6240a2035dbf8cb3",
+    "parent_refs": ["git:103d01b0aee2c4ce34bd100a5fed0ff0b1205d57", "integration:integration-r03a-r2-admission-runtime-ops-activation-20260719"]
+  }
+}
