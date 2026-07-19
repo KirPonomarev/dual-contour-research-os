@@ -6,6 +6,7 @@ import io
 import json
 import os
 from pathlib import Path
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -208,6 +209,38 @@ class FinalDeploymentRebindTests(unittest.TestCase):
                 self.assertFalse(
                     any("install -d -m 0700" in argv[-1] for argv, _ in runner.commands)
                 )
+
+    def test_absent_predecessor_probe_is_valid_shell_before_authority(self) -> None:
+        class ProbeRunner:
+            def __init__(self) -> None:
+                self.probe = ""
+
+            def run(self, arguments, *, input_bytes=None, timeout=60.0):
+                del input_bytes, timeout
+                command = arguments[-1]
+                if command.startswith("systemctl --user is-active --quiet"):
+                    return deploy.CommandResult(4)
+                if command.startswith("systemctl --user is-enabled --quiet"):
+                    return deploy.CommandResult(4)
+                self.probe = command
+                return deploy.CommandResult(0, "ABSENT\n")
+
+        runner = ProbeRunner()
+        controller = deploy.PreSoakDeployController(
+            ssh_alias="synthetic_lab",
+            known_hosts_path=self.known_hosts,
+            runner=runner,
+            target=deploy.FINAL_A1_TARGET,
+        )
+        controller._assert_no_conflicting_writer()
+        syntax = subprocess.run(
+            ["bash", "-n", "-c", runner.probe],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        self.assertEqual(syntax.returncode, 0, syntax.stderr)
+        self.assertIn(")\"; then printf 'PRESENT:%s", runner.probe)
 
     def _authority_documents(self):
         _old_release, backup, restore, _old_approval = fixtures()

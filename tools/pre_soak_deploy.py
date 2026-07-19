@@ -1469,7 +1469,7 @@ class PreSoakDeployController:
         inspected = self._ssh(
             "set -eu; if state=\"$("
             f"{_DOCKER} container inspect {container} --format '{{{{json .State.Running}}}}' 2>/dev/null"
-            "); then printf 'PRESENT:%s\\n' \"$state\"; "
+            ")\"; then printf 'PRESENT:%s\\n' \"$state\"; "
             f"else {_DOCKER} info --format '{{{{.OSType}}}}' >/dev/null; printf 'ABSENT\\n'; fi"
         ).stdout.strip()
         if inspected in {"ABSENT", "PRESENT:false"}:
