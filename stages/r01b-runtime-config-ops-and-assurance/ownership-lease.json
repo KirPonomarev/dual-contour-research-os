@@ -1,0 +1,18 @@
+{
+  "lease_id": "lease-r01b-runtime-config-ops-and-assurance-agent-5",
+  "stage_id": "r01b-runtime-config-ops-and-assurance",
+  "agent_id": "agent-5",
+  "branch": "codex/bridge-a5-r01b-runtime-config-ops-and-assurance",
+  "issued_at": "2026-07-19T05:58:00Z",
+  "expires_at": "2026-07-21T05:58:00Z",
+  "write_set": [
+    "ops/release/researchd.config.template.json",
+    "ops/release/final-a1-runtime-policy.json",
+    "ops/deploy/research-os-a1-final.service",
+    "tests/test_r01b_runtime_config_ops.py",
+    "tests/test_release_blueprint.py",
+    "tests/test_s38_r1_final_deployment_rebind.py"
+  ],
+  "exclusive": true,
+  "revoked": false
+}

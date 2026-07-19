@@ -1,0 +1,75 @@
+{
+  "stage_id": "r01b-runtime-config-ops-and-assurance",
+  "agent_id": "agent-5",
+  "objective": "Replace the inert production config template with a strict A1-enabled policy/role/limit binding and prove physical config plus hostile IPC behavior without claiming the still-unimplemented durable backend.",
+  "executable_blocker": "The code can now parse strict A1 config, but canonical ops still ships empty policy and operator-only UID topology, so the frozen deployment artifact would remain inert.",
+  "base_sha": "f73f2ce83a3146b96f0f18d8b0b32aae5fefc6f2",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "a1_contract_sha256": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+  "branch": "codex/bridge-a5-r01b-runtime-config-ops-and-assurance",
+  "worktree": "/private/tmp/dcr-r01b-runtime-config-ops-and-assurance",
+  "read_set": [
+    "src/research_bridge/researchd.py",
+    "src/research_bridge/control.py",
+    "src/research_bridge/ipc.py",
+    "tools/verify_release_blueprint.py",
+    "tools/final_deployment_rebind.py",
+    "contracts/a1/v1/profiles/a1_sandbox_policy_v1.json",
+    "contracts/a1/v1/profiles/ipc_compatibility_v1.json",
+    "ops/release/researchd.config.template.json",
+    "ops/release/final-a1-runtime-policy.json",
+    "ops/deploy/research-os-a1-final.service",
+    "tests/test_release_blueprint.py",
+    "tests/test_s38_r1_final_deployment_rebind.py"
+  ],
+  "write_set": [
+    "ops/release/researchd.config.template.json",
+    "ops/release/final-a1-runtime-policy.json",
+    "ops/deploy/research-os-a1-final.service",
+    "tests/test_r01b_runtime_config_ops.py",
+    "tests/test_release_blueprint.py",
+    "tests/test_s38_r1_final_deployment_rebind.py"
+  ],
+  "forbidden_scope": [
+    "runtime-code-tool-contract-doc-receipt-stage-root-config-CI-lockfile-or-migration-change",
+    "durable-A1-backend-model-worker-provider-call-or-new-service",
+    "embedded-secret-raw-response-private-data-live-canonical-deploy-or-VPS-action",
+    "fixture-backend-injection-used-to-claim-production-backend-readiness",
+    "finite-historical-approval-presented-as-reusable-runtime-authority"
+  ],
+  "dependency_hashes": {
+    "base_tree_sha": "e3df2508af70f0ff4b68892f3c0aafebdb296e8e",
+    "legacy_config_sha256": "0b186888a3a1bb8fb028315681bf4073ec4186a0acbdf2f226b5a53d69a9d542",
+    "final_policy_sha256": "b3fc58125b3308c723c25461828b914a2f244dfa260dda7d5eea49467a7fc647",
+    "final_unit_sha256": "49412c65c0e1e93d455d5b76e0a0516c618ac677fa63173bb9e89c93a7627b84",
+    "researchd_code_integration": "e7d34599dba33fe5ea789d238810c5fdd731f432",
+    "validator_integration": "0ea7534f0f9c92a581f84c3a9edc4da4a1cfca8c",
+    "external_dependencies": "none-existing-runtime-and-stdlib-only"
+  },
+  "acceptance_commands": [
+    "python3 -m unittest -v tests.test_r01b_runtime_config_ops tests.test_release_blueprint tests.test_s38_r1_final_deployment_rebind tests.test_stage1_control_assurance",
+    "python3 tools/verify_release_blueprint.py",
+    "python3 tools/final_deployment_rebind.py verify-static",
+    "make contracts",
+    "make test",
+    "git diff --check",
+    "exact-head remote CI"
+  ],
+  "risk_class": "critical-physical-role-topology-empty-policy-and-false-green",
+  "stop_conditions": [
+    "canonical-config-remains-legacy-or-empty-policy",
+    "mixed-policy-catalog-IPC-release-or-capability-binding-is-accepted",
+    "operator-collector-scout-cross-role-command-is-accepted",
+    "AI_OFF-prevents-Core-startup",
+    "historical-S38-proof-changes-with-live-ops-bytes",
+    "write-outside-Agent-5-ops-test-scope-or-secret-private-data-detected"
+  ],
+  "expected_receipt": "docs/receipts/integration/r01b-runtime-config-ops-and-assurance.json",
+  "rollback": "Revert the live A1 config/policy/unit projection and hostile tests; deployment stays denied by R00 and R02 cannot begin until an equivalent non-inert ops binding is accepted.",
+  "commit_authority": "one-scoped-agent-5-ops-assurance-stage",
+  "push_authority": true,
+  "expected_handoff_status": [
+    "ready_for_agent0_audit",
+    "blocked_validation_failed"
+  ]
+}
