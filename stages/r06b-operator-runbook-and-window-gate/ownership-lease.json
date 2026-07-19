@@ -7,7 +7,7 @@
   "expires_at": "2026-07-21T16:29:57Z",
   "write_set": [
     "tools/observation_window_gate.py",
-    "docs/OBSERVATION_WINDOW_POLICY.json",
+    "provenance/observation-window-policy-v1.json",
     "docs/OPERATOR_OBSERVATION_RUNBOOK.md"
   ],
   "exclusive": true,

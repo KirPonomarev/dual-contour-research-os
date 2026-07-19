@@ -21,7 +21,7 @@
   ],
   "write_set": [
     "tools/observation_window_gate.py",
-    "docs/OBSERVATION_WINDOW_POLICY.json",
+    "provenance/observation-window-policy-v1.json",
     "docs/OPERATOR_OBSERVATION_RUNBOOK.md"
   ],
   "forbidden_scope": [
@@ -41,7 +41,7 @@
   },
   "acceptance_commands": [
     "make contracts",
-    "python3 tools/observation_window_gate.py validate-policy --policy docs/OBSERVATION_WINDOW_POLICY.json",
+    "python3 tools/observation_window_gate.py validate-policy --policy provenance/observation-window-policy-v1.json",
     "python3 -m unittest discover -s tests",
     "python3 -m unittest discover -s tests/stage0b -p test_*.py",
     "git diff --check",
