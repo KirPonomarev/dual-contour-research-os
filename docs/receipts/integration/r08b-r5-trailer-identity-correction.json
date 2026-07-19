@@ -1,0 +1,277 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-r08b-r5-trailer-identity-correction-20260719",
+  "issued_at": "2026-07-19T23:45:37Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "r08b-r5-trailer-identity-correction",
+    "parent_stage_id": "r08b-exact-candidate-image-build-sbom",
+    "integration_agent_id": "agent-0",
+    "base_sha": "30c64bc1eb3e4bbffb1dacb719fede8871b3ca6e",
+    "head_sha": "9cf0e9da2307404b89c4cdf4402c92665dc36d44",
+    "integration_commit_sha": "9cf0e9da2307404b89c4cdf4402c92665dc36d44",
+    "stage_authority_sha": "9cf0e9da2307404b89c4cdf4402c92665dc36d44",
+    "stage_authority_tree_sha": "52467dd8652352780939dd9bbbab691e9380afae",
+    "stage_envelope_ref": "stages/r08b-exact-candidate-image-build-sbom/stage-envelope-amendment-v2.4-15.json",
+    "ownership_lease_ref": "stages/r08b-exact-candidate-image-build-sbom/ownership-lease-amendment-v2.4-15.json",
+    "inclusive_first_sha": "a332adcea37e75d41bf279b2cd9335721cf54f31",
+    "last_affected_sha": "6ed733ba5c48d33e105019bb074a4a50c1dae15b",
+    "canonical_history_start_sha": "3488c0da2a1a25949382773601ee0beab9f17f13",
+    "canonical_control_values": {
+      "PLAN-ID": "DCR_OS_AUTONOMOUS_V2_3_NO_BRAKES_20260719",
+      "PLAN-VERSION": "2.4.0-fast-working-release",
+      "AMENDMENT-ID": "FAST_RELEASE_NO_TIMED_WINDOWS_NO_HUMAN_WAIT_20260719"
+    },
+    "affected_historical_commits": [
+      {
+        "sha": "a332adcea37e75d41bf279b2cd9335721cf54f31",
+        "parsed_trailers": {
+          "PLAN-ID": "dual-contour-autonomous-research-os-v2.4",
+          "PLAN-VERSION": "2.4",
+          "AMENDMENT-ID": "R08B_R3_DEEPSEEK_VISIBLE_OUTPUT_PROFILE_20260719",
+          "SPRINT-ID": "R08B-R3"
+        },
+        "canonical_match": false
+      },
+      {
+        "sha": "5ea58ea763cc308badc5a3e88faa5c19699a4b12",
+        "parsed_trailers": {
+          "PLAN-ID": "dual-contour-autonomous-research-os-v2.4",
+          "PLAN-VERSION": "2.4",
+          "AMENDMENT-ID": "R08B_R3_DEEPSEEK_VISIBLE_OUTPUT_PROFILE_20260719",
+          "SPRINT-ID": "R08B-R3-A0"
+        },
+        "canonical_match": false
+      },
+      {
+        "sha": "72764f453db77e4f770d4f44a7ef22a4461edb83",
+        "parsed_trailers": {
+          "PLAN-ID": "dual-contour-autonomous-research-os-v2.4",
+          "PLAN-VERSION": "2.4",
+          "AMENDMENT-ID": "R08B_R3_ADDITIVE_PROVIDER_PROFILE_V3_20260719",
+          "SPRINT-ID": "R08B-R3-V3"
+        },
+        "canonical_match": false
+      },
+      {
+        "sha": "85b7851639f084b13fd3b5b443198dc7d05986fd",
+        "parsed_trailers": {
+          "PLAN-ID": "dual-contour-autonomous-research-os-v2.4",
+          "PLAN-VERSION": "2.4",
+          "AMENDMENT-ID": "R08B_R3_ADDITIVE_PROVIDER_PROFILE_V3_20260719",
+          "SPRINT-ID": "R08B-R3-V3-A0"
+        },
+        "canonical_match": false
+      },
+      {
+        "sha": "c82d43fd0f04fa961bc3fef9d7c0b051d6a75766",
+        "parsed_trailers": {
+          "PLAN-ID": "dual-contour-autonomous-research-os-v2.4",
+          "PLAN-VERSION": "2.4",
+          "AMENDMENT-ID": "R08B_R3_V3_WORKER_SELECTION_20260719",
+          "SPRINT-ID": "R08B-R3-V3-SELECT"
+        },
+        "canonical_match": false
+      },
+      {
+        "sha": "742acc37bbcfea3784dc2a7ab87960f28fcfeb9e",
+        "parsed_trailers": {
+          "PLAN-ID": "dual-contour-autonomous-research-os-v2.4",
+          "PLAN-VERSION": "2.4",
+          "AMENDMENT-ID": "R08B_R3_V3_WORKER_SELECTION_20260719",
+          "SPRINT-ID": "R08B-R3-V3-SELECT-A0"
+        },
+        "canonical_match": false
+      },
+      {
+        "sha": "484d46744990e9655625d4acc6c2f259c2f989ea",
+        "parsed_trailers": {
+          "PLAN-ID": "dual-contour-autonomous-research-os-v2.4",
+          "PLAN-VERSION": "2.4",
+          "AMENDMENT-ID": "R08B_R3_ADDITIVE_WORKER_POLICY_V3_20260719",
+          "SPRINT-ID": "R08B-R3-POLICY-V3"
+        },
+        "canonical_match": false
+      },
+      {
+        "sha": "0d14060d03229158fd907e0c6ede08a094e41611",
+        "parsed_trailers": {
+          "PLAN-ID": "dual-contour-autonomous-research-os-v2.4",
+          "PLAN-VERSION": "2.4",
+          "AMENDMENT-ID": "R08B_R3_ADDITIVE_WORKER_ENTRYPOINT_V3_20260719",
+          "SPRINT-ID": "R08B-R3-ENTRYPOINT-V3"
+        },
+        "canonical_match": false
+      },
+      {
+        "sha": "efa66813c1018fa2b893d2c548c3456c5890d916",
+        "parsed_trailers": {
+          "PLAN-ID": "dual-contour-autonomous-research-os-v2.4",
+          "PLAN-VERSION": "2.4",
+          "AMENDMENT-ID": "R08B_R3_ADDITIVE_PROVIDER_TOOL_V3_20260719",
+          "SPRINT-ID": "R08B-R3-TOOL-V3-AUTHORITY"
+        },
+        "canonical_match": false
+      },
+      {
+        "sha": "4f7016f693fd3bc2975d70e2b5b2b6031eddca2b",
+        "parsed_trailers": {
+          "PLAN-ID": "dual-contour-autonomous-research-os-v2.4",
+          "PLAN-VERSION": "2.4",
+          "AMENDMENT-ID": "R08B_R3_ADDITIVE_PROVIDER_TOOL_V3_20260719",
+          "SPRINT-ID": "R08B-R3-A0-TOOL-V3"
+        },
+        "canonical_match": false
+      },
+      {
+        "sha": "3823983f84fddb206ef9184b6a5ee3d9589df3c9",
+        "parsed_trailers": {
+          "PLAN-ID": "dual-contour-autonomous-research-os-v2.4",
+          "PLAN-VERSION": "2.4",
+          "AMENDMENT-ID": "R08B_R3_ADDITIVE_PROVIDER_TOOL_V3_20260719",
+          "SPRINT-ID": "R08B-R3-A5-ADDITIVE-V3"
+        },
+        "canonical_match": false
+      },
+      {
+        "sha": "8fe3cfdb0b3b4d113d9e4facde3197f8b06cd3f2",
+        "parsed_trailers": {
+          "PLAN-ID": "dual-contour-autonomous-research-os-v2.4",
+          "PLAN-VERSION": "2.4",
+          "AMENDMENT-ID": "R08B_R3_BUILD_CONTEXT_V3_20260719",
+          "SPRINT-ID": "R08B-R3-BUILD-CONTEXT-AUTHORITY"
+        },
+        "canonical_match": false
+      },
+      {
+        "sha": "102b0afdbb2a719b81fba323c4cc9971102125f9",
+        "parsed_trailers": {
+          "PLAN-ID": "dual-contour-autonomous-research-os-v2.4",
+          "PLAN-VERSION": "2.4",
+          "AMENDMENT-ID": "R08B_R3_BUILD_CONTEXT_V3_20260719",
+          "SPRINT-ID": "R08B-R3-BUILD-CONTEXT"
+        },
+        "canonical_match": false
+      },
+      {
+        "sha": "a95f89f64d128713f46acf4b86771dcf75f068d9",
+        "parsed_trailers": {
+          "PLAN-ID": "dual-contour-autonomous-research-os-v2.4",
+          "PLAN-VERSION": "2.4",
+          "AMENDMENT-ID": "R08B_R3_BUILD_CONTEXT_VERIFIER_V3_20260719",
+          "SPRINT-ID": "R08B-R3-CONTEXT-VERIFIER-AUTHORITY"
+        },
+        "canonical_match": false
+      },
+      {
+        "sha": "b7e538bcd1762b22693a29f90763c5182a5669f5",
+        "parsed_trailers": {
+          "PLAN-ID": "dual-contour-autonomous-research-os-v2.4",
+          "PLAN-VERSION": "2.4",
+          "AMENDMENT-ID": "R08B_R3_BUILD_CONTEXT_VERIFIER_V3_20260719",
+          "SPRINT-ID": "R08B-R3-CONTEXT-VERIFIER"
+        },
+        "canonical_match": false
+      },
+      {
+        "sha": "9ef8876c8f14c365dd0017fba79b6c04c6885da1",
+        "parsed_trailers": {
+          "PLAN-ID": "dual-contour-autonomous-research-os-v2.4",
+          "PLAN-VERSION": "2.4",
+          "AMENDMENT-ID": "R08B_R3_BUILD_CONTEXT_BYTECODE_EXCLUSION_20260719",
+          "SPRINT-ID": "R08B-R3-BYTECODE-EXCLUSION-AUTHORITY"
+        },
+        "canonical_match": false
+      },
+      {
+        "sha": "6ed733ba5c48d33e105019bb074a4a50c1dae15b",
+        "parsed_trailers": {
+          "PLAN-ID": "dual-contour-autonomous-research-os-v2.4",
+          "PLAN-VERSION": "2.4",
+          "AMENDMENT-ID": "R08B_R3_BUILD_CONTEXT_BYTECODE_EXCLUSION_20260719",
+          "SPRINT-ID": "R08B-R3-BYTECODE-EXCLUSION"
+        },
+        "canonical_match": false
+      }
+    ],
+    "correction_semantics": {
+      "defect_additively_corrected": true,
+      "historical_commits_still_noncanonical": true,
+      "historical_commits_rewritten": false,
+      "history_rewrite_authority": false,
+      "candidate_cut_permitted_by_this_receipt": false,
+      "release_claim_issued": false
+    },
+    "focused_validation": {
+      "validator_ref": "tools/verify_r08b_trailer_identity.py",
+      "validator_sha256": "b6fa2808514f5abb7c866d472307cccdd14ae3b7d943ef04cf6f02044f656408",
+      "rejects_missing_fields": true,
+      "rejects_duplicate_fields": true,
+      "rejects_noncontiguous_block": true,
+      "rejects_value_mismatch": true,
+      "parse_only_acceptance": false
+    },
+    "private_predecessor": {
+      "xhigh_failed_receipt_sha256": "61a077a72be8e2f2f774253e6b296b0d9412f67617179e57fb685c3b285daa3c",
+      "low_reasoning_failed_receipt_sha256": "b6ef2f7ed4c22526785af9002f81e3dab87496a062c21a7c6f0571759ff886a1",
+      "latest_worker_state": "SUCCEEDED_RECONCILED",
+      "latest_critic_provider_state": "SUCCEEDED_RECONCILED",
+      "latest_critic_role_output_state": "INVALID_TRUNCATED_JSON",
+      "valid_proposal_envelope_formed": false,
+      "provider_calls_for_metadata_correction": 0,
+      "raw_or_credential_bytes_public": false
+    },
+    "delivery_state": {
+      "outer_branch": "codex/bridge-a0-r08b-exact-candidate-image-build-sbom",
+      "predecessor_head_sha": "30c64bc1eb3e4bbffb1dacb719fede8871b3ca6e",
+      "predecessor_exact_head_ci_run": 29707868503,
+      "pr_81_state": "MERGED",
+      "pr_81_head_sha": "16ced42c1a42be88c2a6c49de3d9259f1bcff041",
+      "pr_81_push_ci_run": 29707836156,
+      "pr_81_pull_request_ci_run": 29707839955,
+      "pr_81_outer_merge_sha": "30c64bc1eb3e4bbffb1dacb719fede8871b3ca6e",
+      "candidate_sha": null,
+      "candidate_tree_sha": null,
+      "candidate_exact_head_ci_run": "NOT_CUT",
+      "product_done": false,
+      "release_done": false,
+      "grants_authority": false
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29707868503",
+    "audit_results": {
+      "contract_gate": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "history_rewritten": false,
+      "affected_commit_count": 17,
+      "canonical_value_validation": "green",
+      "candidate_sha": null,
+      "candidate_tree_sha": null,
+      "candidate_exact_head_ci_run": "NOT_CUT",
+      "provider_calls_for_metadata_correction": 0,
+      "release_claim_issued": false,
+      "grants_authority": false
+    },
+    "known_next_gate": "After exact correction-receipt-head CI is green, perform a minimal owner-scoped Critic structured-output repair and repeat the fully receipted current-head pre-cut proof; candidate remains null."
+  },
+  "integrity": {
+    "payload_sha256": "39eaa64405b2aacd8a9d19360dfee60d9eb8d0438208c64f624721fb2897960e",
+    "parent_refs": [
+      "git:a332adcea37e75d41bf279b2cd9335721cf54f31",
+      "git:6ed733ba5c48d33e105019bb074a4a50c1dae15b",
+      "git:30c64bc1eb3e4bbffb1dacb719fede8871b3ca6e",
+      "git:9cf0e9da2307404b89c4cdf4402c92665dc36d44",
+      "ci:29707836156",
+      "ci:29707839955",
+      "ci:29707868503",
+      "private-receipt:sha256:61a077a72be8e2f2f774253e6b296b0d9412f67617179e57fb685c3b285daa3c",
+      "private-receipt:sha256:b6ef2f7ed4c22526785af9002f81e3dab87496a062c21a7c6f0571759ff886a1"
+    ]
+  }
+}
