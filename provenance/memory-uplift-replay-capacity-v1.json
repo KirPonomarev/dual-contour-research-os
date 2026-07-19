@@ -1,0 +1,58 @@
+{
+  "profile_id": "memory-uplift-replay-capacity-v1",
+  "schema_version": "1.0.0",
+  "status": "frozen-shadow-evaluation-only",
+  "allowed_classifications": ["D0_PUBLIC"],
+  "measurement_statuses": ["MEMORY_UPLIFT_MEASURED_SCOPED", "NOT_ESTABLISHED", "PARKED_CAPACITY"],
+  "paired_metric": {
+    "outcomes": ["SUCCESS", "FAILURE"],
+    "uplift_unit": "parts-per-million-of-paired-success-delta",
+    "information_value_unit": "bounded-integer-units",
+    "research_debt_unit": "bounded-integer-units"
+  },
+  "uncertainty": {
+    "method": "paired-hoeffding-conservative-integer-bound",
+    "confidence_floor_ppm": 950000,
+    "radius_numerator_ppm": 1358102,
+    "minimum_sample_pairs": 16,
+    "zero_observation_interval_ppm": [-1000000, 1000000]
+  },
+  "false_learn": {
+    "upper_bound_method": "observed-rate-plus-paired-hoeffding-radius",
+    "zero_observation_upper_bound_ppm": 1000000,
+    "required_for_positive_claim": 0
+  },
+  "calibration": {
+    "collection_only": true,
+    "confidence_bin_width_ppm": 100000,
+    "minimum_observations_for_scoped_summary": 100,
+    "calibrated_claimed": false
+  },
+  "capacity": {
+    "max_memory_twin_pairs": 256,
+    "max_calibration_observations": 512,
+    "max_information_value_units_per_observation": 1000000,
+    "max_research_debt_units_per_observation": 1000000,
+    "overload_status": "PARKED_CAPACITY",
+    "backpressure_reason_code": "MEMORY_EVALUATION_CAPACITY_EXHAUSTED",
+    "infrastructure_scale_claimed": false
+  },
+  "replay": {
+    "requires_two_equal_full_feedback_replays": true,
+    "requires_rebuilt_equals_stored": true,
+    "requires_memory_fabrics_bound_to_replay": true,
+    "side_effects": false
+  },
+  "invariants": {
+    "same_case_fixture_protocol_and_base_for_each_twin": true,
+    "memory_off_and_memory_on_observations_are_both_required": true,
+    "underpowered_or_uncertain_results_are_not_established": true,
+    "positive_claim_requires_strictly_positive_lower_bound": true,
+    "positive_claim_requires_zero_observed_false_learn_and_nonincreasing_debt": true,
+    "calibration_collection_never_claims_calibrated": true,
+    "full_replay_is_read_only_and_digest_bound": true,
+    "capacity_is_frozen_and_overload_parks": true,
+    "scientific_truth_claimed": false,
+    "grants_authority": false
+  }
+}

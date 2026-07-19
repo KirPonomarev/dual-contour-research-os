@@ -1,0 +1,15 @@
+{
+  "lease_id": "lease-s32-e3-aggregate-assurance-agent-5",
+  "stage_id": "s32-e3-aggregate-assurance",
+  "agent_id": "agent-5",
+  "branch": "codex/bridge-a5-s32-e3-aggregate-assurance",
+  "issued_at": "2026-07-18T23:53:00Z",
+  "expires_at": "2026-07-20T23:53:00Z",
+  "write_set": [
+    "tests/test_s32_e3_aggregate_gate.py",
+    "stages/s32-e3-aggregate-assurance/stage-envelope.json",
+    "stages/s32-e3-aggregate-assurance/ownership-lease.json"
+  ],
+  "exclusive": true,
+  "revoked": false
+}

@@ -1,0 +1,6 @@
+{
+  "lease_id": "lease-s29-gap-genome-agent-1", "stage_id": "s29-gap-genome", "agent_id": "agent-1",
+  "branch": "codex/bridge-a1-s29-gap-genome", "issued_at": "2026-07-18T23:15:00Z", "expires_at": "2026-07-20T23:15:00Z",
+  "write_set": ["src/research_bridge/evolution.py", "stages/s29-gap-genome/stage-envelope.json", "stages/s29-gap-genome/ownership-lease.json"],
+  "exclusive": true, "revoked": false
+}

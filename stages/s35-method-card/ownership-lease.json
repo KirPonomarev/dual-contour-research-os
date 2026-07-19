@@ -1,0 +1,4 @@
+{
+  "lease_id": "lease-s35-method-card-agent-0", "stage_id": "s35-method-card", "agent_id": "agent-0", "branch": "codex/bridge-a0-s35-method-card", "issued_at": "2026-07-19T00:46:00Z", "expires_at": "2026-07-21T00:46:00Z",
+  "write_set": ["contracts/e5/", "provenance/method-card-declassification-v1.json", "tools/method_card.py", "tools/validate_e5_contracts.py", "tools/validate_contracts.py", "docs/ADR/0009-e5-method-card-boundary.md", "docs/receipts/reuse/s35-method-card.json", "tests/test_s35_method_card.py", "stages/s35-method-card/"], "exclusive": true, "revoked": false
+}

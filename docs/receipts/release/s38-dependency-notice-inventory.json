@@ -1,0 +1,16 @@
+{
+  "schema_id": "FinalDependencyNoticeInventory", "schema_version": "1.0.0", "object_id": "s38-dependency-notice-inventory-20260719", "candidate_release_sha": "b2c2e6a8c4e0a364ef82e8e51540433aa91430d4",
+  "python_dependency_manifest": {"path": "pyproject.toml", "sha256": "b49f4635cad95d774ea6b270f614247f83c2c58fa1d6a86b47620aeec84f9a3c", "new_runtime_dependencies_S23_S37": 0},
+  "release_dependency_lock": {"path": "ops/release/dependency-lock.json", "sha256": "58cd81aa9e5554e5ae88a0d86822e341a6ac25eb8179cca9a9fb3e4512493be9"},
+  "notices": {"path": "THIRD_PARTY_NOTICES.md", "sha256": "25be5a0bed36320e20f632f55fd7bf3a9bac0556934f5184d39e9d3b2fa883af"},
+  "licenses": [
+    {"path": "LICENSES/openssl-Apache-2.0.txt", "spdx": "Apache-2.0", "sha256": "7d5450cb2d142651b8afa315b5f238efc805dad827d91ba367d8516bc9d49e7a"},
+    {"path": "LICENSES/restic-BSD-2-Clause.txt", "spdx": "BSD-2-Clause", "sha256": "6f08a01a9fab5b24e139a09f15cc24a73087c7bc09e3bacf099fdf2d767bf897"}
+  ],
+  "sboms": [
+    {"path": "docs/receipts/release/s4-release-sbom.spdx.json", "sha256": "60f9261a9dad06a8723c5c17bb77d2e34e8608586c19bd28049921ea028d5c15", "scope": "predecessor-container-runtime"},
+    {"path": "docs/receipts/release/restic-tool-sbom.spdx.json", "sha256": "279dc5ecaf6bcc4028ad73308e643eb9f0facc8b95d20fc40581378d347af77e", "scope": "backup-tool"}
+  ],
+  "system_tool_interfaces": [{"tool": "OpenSSL", "minimum_version": "3.0.0", "purpose": "selected-receipt-Ed25519", "binary_vendored": false}, {"tool": "restic", "version": "0.19.0", "purpose": "approved-backup-restore", "binary_vendored": false}],
+  "private_or_domain_payloads": 0, "grants_authority": false
+}

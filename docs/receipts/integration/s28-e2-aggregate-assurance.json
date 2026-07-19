@@ -1,0 +1,12 @@
+{
+  "schema_id": "IntegrationReceipt", "schema_version": "1.0.0", "object_id": "integration-s28-e2-aggregate-assurance-20260718", "issued_at": "2026-07-18T23:10:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"}, "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s28-e2-aggregate-assurance", "agent_id": "agent-5", "ownership_lease_ref": "stages/s28-e2-aggregate-assurance/ownership-lease.json",
+    "base_sha": "2ec7aeac182c863179762ad32119d635d47469ed", "head_sha": "c146c549a78272f81fc3783844ef2c3e22ae82d4", "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": ["tests/test_s28_e2_aggregate_gate.py", "stages/s28-e2-aggregate-assurance/stage-envelope.json", "stages/s28-e2-aggregate-assurance/ownership-lease.json"],
+    "audit_results": {"contract_gate": "green", "privacy_secret_scan": "green", "source_mutation": false, "new_hostile_tests": 9, "full_core_tests": 727, "stage0b_tests": 25, "exact_evidence_and_receipt": "green", "deterministic_receipt_reproduction": "green", "council_evidence_laundering_denied": "green", "replication_global_independence_denied": "green", "memory_uplift_and_calibration_overclaim_denied": "green", "mixed_or_stale_head_denied": "green", "hash_drift_and_expiry_invalidation": "green", "canonical_live_or_authority_claim": false, "real_private_data_model_calls_or_external_actions": 0, "grants_authority": false},
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29664711419", "integration_commit_sha": "5695d6cc9d5006a9a392fa5d62c337e8a2486978"
+  },
+  "integrity": {"payload_sha256": "2f9913abf4039c61f0891d146308a59a7834529959384e5a5d6d34d01e4a0259", "parent_refs": ["git:c146c549a78272f81fc3783844ef2c3e22ae82d4", "git:5695d6cc9d5006a9a392fa5d62c337e8a2486978", "ci:29664711419", "git:2ec7aeac182c863179762ad32119d635d47469ed"]}
+}

@@ -1,0 +1,23 @@
+{
+  "schema_id": "ReuseDecisionReceipt", "schema_version": "1.0.0",
+  "object_id": "reuse-s23-knowledge-fabric-20260718", "issued_at": "2026-07-18T21:09:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-freeze-authority"},
+  "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "TYPED_READ_ONLY_RESEARCH_KNOWLEDGE_FABRIC",
+    "candidates": [
+      {"candidate": "reuse-existing-atomic-feedback-global-ledger-and-four-durable-projections", "disposition": "selected"},
+      {"candidate": "additive-read-only-fabric-query-with-exact-retrieval-trace", "disposition": "selected-minimal-missing-glue"},
+      {"candidate": "new-vector-database-or-shared-writable-agent-memory", "disposition": "rejected-no-measured-blocker-and-second-truth-domain"},
+      {"candidate": "derive-domain-scientific-truth-or-remove-shadow-taint", "disposition": "rejected-domain-writer-authority-boundary"}
+    ],
+    "selected_mode": "derive-typed-idea-provenance-conflict-failure-energy-and-debt-views-from-verified-existing-ledger-with-zero-writes",
+    "source_ref": "git:343ef0611a501e4f58cbdd1f2bc55b1d121400a5;internal:src/research_bridge/ledger.py@cb22ee7d",
+    "code_sha256": "cb22ee7dff13152ce8356e40df7cc70f81127efed61f04e70afc91ccba72a209",
+    "license_spdx": "NOASSERTION", "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": ["typed-provenance", "taint-inheritance", "conflict-candidates", "reusable-failure-memory", "root-energy-and-research-debt", "memory-off-on-trace", "duplicate-and-poisoned-memory", "replay-zero-side-effects"],
+    "canonical_owner": "bridge-ledger-agent-1-with-agent-5-hostile-assurance",
+    "rollback": "Revert the additive read-only fabric report/query and its tests; no schema, migration, projection, service or stored data changes exist."
+  },
+  "integrity": {"payload_sha256": "dacb0e8941cba640fa2651a2b6a3c70f79c7619edf87db8818257517e5781044", "parent_refs": ["git:343ef0611a501e4f58cbdd1f2bc55b1d121400a5", "integration:s19-e1-aggregate-gate", "integration:s09-replay-capacity"]}
+}

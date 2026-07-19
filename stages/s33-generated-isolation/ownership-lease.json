@@ -1,0 +1,15 @@
+{
+  "lease_id": "lease-s33-generated-isolation-agent-2",
+  "stage_id": "s33-generated-isolation",
+  "agent_id": "agent-2",
+  "branch": "codex/bridge-a2-s33-generated-isolation",
+  "issued_at": "2026-07-19T00:04:00Z",
+  "expires_at": "2026-07-21T00:04:00Z",
+  "write_set": [
+    "src/research_bridge/generated_execution.py",
+    "stages/s33-generated-isolation/stage-envelope.json",
+    "stages/s33-generated-isolation/ownership-lease.json"
+  ],
+  "exclusive": true,
+  "revoked": false
+}

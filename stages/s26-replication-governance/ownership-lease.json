@@ -1,0 +1,6 @@
+{
+  "lease_id": "lease-s26-replication-governance-agent-0", "stage_id": "s26-replication-governance", "agent_id": "agent-0",
+  "branch": "codex/bridge-a0-s26-replication-governance", "issued_at": "2026-07-18T22:28:00Z", "expires_at": "2026-07-20T22:28:00Z",
+  "write_set": ["provenance/evidence-replication-matrix-v1.json", "docs/receipts/reuse/s26-evidence-replication.json", "stages/s26-replication-governance/stage-envelope.json", "stages/s26-replication-governance/ownership-lease.json"],
+  "exclusive": true, "revoked": false
+}

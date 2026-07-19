@@ -1,0 +1,14 @@
+{
+  "profile_id": "method-card-declassification-v1",
+  "schema_version": "1.0.0",
+  "status": "frozen-additive",
+  "core_catalog_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "e5_catalog_sha256": "254e6cd624f91e37b0d186937f4b71acb7177c216e44e782540d76ba8c33696b",
+  "schema_sha256": {"DeclassificationReceipt": "569dc434456e069304296aff9f293bf63dd569894bf0134aa4edb7cbb77f3e75", "MethodCard": "37add66431f60223f22f80abdcb1ccb4d10442869009a1c237d5196ddd8b17d4"},
+  "allowed_classifications": ["D0_PUBLIC", "D1_INTERNAL_SANITIZED"],
+  "allowed_method_families": ["EXPERIMENT_DESIGN", "EVIDENCE_TRIAGE", "FALSIFICATION", "REPLICATION", "ROBUSTNESS", "CALIBRATION"],
+  "allowed_recipient_classes": ["MARKET_RESEARCH", "SECURITY_RESEARCH", "GENERIC_RESEARCH"],
+  "forbidden_field_names": ["raw_evidence", "evidence_payload", "target", "target_id", "strategy", "holdout", "prompt", "secret", "credential", "api_key", "private_data", "exploit", "order"],
+  "forbidden_value_patterns": ["URL", "LOCAL_PATH", "IP_ADDRESS", "EMAIL", "SECRET_TOKEN", "PRIVATE_KEY"],
+  "invariants": {"shadow_taint_must_be_NONE": true, "domain_receipt_required": true, "raw_payload_allowed": false, "recipient_adoption": false, "scientific_truth_transfer": false, "automatic_promotion": false, "canonical_mutation": false, "grants_authority": false}
+}

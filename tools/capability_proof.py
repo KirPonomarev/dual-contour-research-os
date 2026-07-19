@@ -79,11 +79,47 @@ _EVOLUTION_KERNEL_V1_REQUIRED_SCOPE = {
     "live_trading": False,
     "live_security_execution": False,
 }
+_AUTONOMOUS_RESEARCH_E2_REQUIRED_SCOPE = {
+    "proof_state": "AUTONOMOUS_RESEARCH_E2_SHADOW_PASS_FOR_FROZEN_SCOPE",
+    "data_scope": "D0_PUBLIC_SYNTHETIC_SHADOW_ONLY",
+    "agenda_status": "AUTONOMOUS_RESEARCH_AGENDA_SHADOW_PASS",
+    "portfolio_status": "AUTONOMOUS_PORTFOLIO_SELECTION_SHADOW_PASS",
+    "falsification_status": "AUTONOMOUS_FALSIFICATION_SHADOW_PASS",
+    "replication_status": "AUTONOMOUS_REPLICATION_SHADOW_PASS",
+    "memory_status": "MEASUREMENT_SCOPED_POPULATION_UPLIFT_NOT_ESTABLISHED",
+    "replication_independence": "PER_PAIR_FROZEN_SCOPE_NOT_GLOBAL",
+    "domain_application": "SHADOW_UNAPPLIED",
+    "autonomous_canonical_mutation": False,
+    "human_required_for_promotion": True,
+    "deployment": False,
+    "live_trading": False,
+    "live_security_execution": False,
+}
+_EVOLUTION_E3_REQUIRED_SCOPE = {
+    "proof_state": "EVOLUTION_E3_SHADOW_PASS_FOR_FROZEN_SCOPE",
+    "data_scope": "D0_PUBLIC_SYNTHETIC_SHADOW_ONLY",
+    "mutation_proposal_status": "MUTATION_PROPOSAL_LOOP_PASS",
+    "champion_challenger_status": "CHAMPION_CHALLENGER_PASS_FOR_FROZEN_BENCHMARK",
+    "evolution_loop_status": "EVOLUTION_LOOP_SHADOW_PASS",
+    "meta_evolution_status": "META_EVOLUTION_PROPOSAL_ONLY",
+    "uplift_scope": "FROZEN_BENCHMARK_AND_SHADOW_NOT_PRODUCTION",
+    "rollback_status": "DESCRIPTIVE_WAIT_AUTHORITY",
+    "domain_application": "SHADOW_UNAPPLIED",
+    "autonomous_canonical_mutation": False,
+    "automatic_promotion": False,
+    "human_required_for_promotion": True,
+    "policy_application": False,
+    "deployment": False,
+    "live_trading": False,
+    "live_security_execution": False,
+}
 _CAPABILITY_SCOPES = {
     "A1_DISCOVERY_ADMISSION_FIXTURE": _E1A_REQUIRED_SCOPE,
     "A1_DURABLE_FEEDBACK": _DURABLE_FEEDBACK_REQUIRED_SCOPE,
     "OPERATIONAL_SELF_MODEL": _OPERATIONAL_SELF_MODEL_REQUIRED_SCOPE,
     "EVOLUTION_KERNEL_V1": _EVOLUTION_KERNEL_V1_REQUIRED_SCOPE,
+    "AUTONOMOUS_RESEARCH_E2_SHADOW": _AUTONOMOUS_RESEARCH_E2_REQUIRED_SCOPE,
+    "EVOLUTION_E3_SHADOW": _EVOLUTION_E3_REQUIRED_SCOPE,
 }
 _REQUIRED_NEGATIVE_PROBES = frozenset(
     {
@@ -189,6 +225,40 @@ def issue_evolution_kernel_v1_proof(
 
     if payload.get("capability_id") != "EVOLUTION_KERNEL_V1":
         raise CapabilityProofError("evolution kernel issuer received a different capability")
+    return issue_capability_proof(
+        payload,
+        issued_at=issued_at,
+        classification=classification,
+    )
+
+
+def issue_e2_autonomous_research_proof(
+    payload: Mapping[str, object],
+    *,
+    issued_at: str,
+    classification: str = "D1",
+) -> Mapping[str, object]:
+    """Issue only the aggregate E2 shadow research proof with zero authority."""
+
+    if payload.get("capability_id") != "AUTONOMOUS_RESEARCH_E2_SHADOW":
+        raise CapabilityProofError("E2 research issuer received a different capability")
+    return issue_capability_proof(
+        payload,
+        issued_at=issued_at,
+        classification=classification,
+    )
+
+
+def issue_e3_evolution_proof(
+    payload: Mapping[str, object],
+    *,
+    issued_at: str,
+    classification: str = "D1",
+) -> Mapping[str, object]:
+    """Issue only the aggregate E3 proposal-only evolution proof."""
+
+    if payload.get("capability_id") != "EVOLUTION_E3_SHADOW":
+        raise CapabilityProofError("E3 evolution issuer received a different capability")
     return issue_capability_proof(
         payload,
         issued_at=issued_at,
@@ -325,7 +395,10 @@ def _validate_payload(payload: object) -> dict[str, object]:
     proof_basis = value["proof_basis"]
     if not isinstance(proof_basis, list) or not proof_basis or any(not isinstance(item, Mapping) or not item for item in proof_basis):
         raise CapabilityProofError("proof_basis must contain evidence objects")
-    if capability_id in {"OPERATIONAL_SELF_MODEL", "EVOLUTION_KERNEL_V1"}:
+    if capability_id in {
+        "OPERATIONAL_SELF_MODEL", "EVOLUTION_KERNEL_V1",
+        "AUTONOMOUS_RESEARCH_E2_SHADOW", "EVOLUTION_E3_SHADOW",
+    }:
         _reject_anthropomorphic_overclaim(proof_basis)
     for name in ("code_sha256", "config_sha256", "policy_sha256", "schema_sha256"):
         _sha256(name, value[name])
@@ -448,5 +521,6 @@ __all__ = [
     "CapabilityProofError", "CapabilityAssessment", "issue_capability_proof",
     "issue_e1a_fixture_proof", "issue_durable_feedback_proof", "issue_operational_self_model_proof",
     "issue_evolution_kernel_v1_proof",
+    "issue_e2_autonomous_research_proof", "issue_e3_evolution_proof",
     "validate_capability_proof", "assess_capability_proof", "canonical_json_sha256",
 ]

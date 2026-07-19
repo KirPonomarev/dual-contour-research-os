@@ -193,6 +193,14 @@ def main() -> int:
     if result.returncode:
         return result.returncode
 
+    e5_result = subprocess.run(
+        [sys.executable, str(ROOT / "tools" / "validate_e5_contracts.py")],
+        cwd=ROOT,
+        check=False,
+    )
+    if e5_result.returncode:
+        return e5_result.returncode
+
     print("contract_validation=GREEN")
     print(f"required_contracts={len(REQUIRED_CONTRACTS)}")
     print(f"catalog_contracts={len(contracts)}")

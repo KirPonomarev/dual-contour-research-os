@@ -1,0 +1,20 @@
+{
+  "stage_id": "s25-council-tournament", "agent_id": "agent-1",
+  "objective": "Implement the frozen S25 advisory tournament in the existing provider-neutral model broker using policy-assigned council roles and no new runtime service or authority.",
+  "executable_blocker": "The existing ModelCouncilPlan caps and routes calls but cannot yet validate multi-candidate critic outputs, reject self-review, preserve dissent or emit a deterministic non-evidentiary ranking.",
+  "base_sha": "51a30ed3b536b5d4b39a48425ca5b463b04448f5",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a1-s25-council-tournament",
+  "worktree": "/private/tmp/dcr-s25-council-tournament",
+  "read_set": ["provenance/model-council-tournament-v1.json", "provenance/model-provider-routing-v1.json", "contracts/a1/v1/profiles/model_role_registry_v1.json", "src/research_bridge/model_broker.py"],
+  "write_set": ["src/research_bridge/model_broker.py", "stages/s25-council-tournament/stage-envelope.json", "stages/s25-council-tournament/ownership-lease.json"],
+  "forbidden_scope": ["contract-profile-provenance-test-root-CI-lockfile-or-other-source-edit", "network-provider-call-credential-cost-ledger-schema-or-durable-write", "new-service-queue-scheduler-database-or-framework", "caller-selected-evaluator", "consensus-ranking-or-model-output-as-evidence", "authority-canonical-live-deploy-or-publication-action"],
+  "dependency_hashes": {"governance_stage": "51a30ed3b536b5d4b39a48425ca5b463b04448f5", "tournament_profile": "e27222fe820912b7dd0abf725bf1c1825115e8f51bfb50ce44666bc8c8f27d81", "provider_routing": "37db8596a8245a6b1ea2bc5bce1495a4e7dadb314876e51397ad11dd194b3dc6", "core_contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50", "external_dependencies": "none"},
+  "acceptance_commands": ["make contracts", "python3 -m py_compile src/research_bridge/model_broker.py", "Agent-5 S25 assurance", "git diff --check"],
+  "risk_class": "high-role-forgery-correlated-consensus-cost-and-ranking-overclaim",
+  "stop_conditions": ["unbounded-call-or-candidate-count", "self-review-or-caller-selected-evaluator", "consensus-ranking-as-evidence", "durable-network-or-authority-side-effect", "new-service-or-dependency"],
+  "expected_receipt": "docs/receipts/integration/s25-council-tournament.json",
+  "rollback": "Revert additive S25 model-broker classes and stage metadata; S16 planner and S15 durable broker remain unchanged.",
+  "commit_authority": "one-scoped-agent-1-commit", "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent5_s25_council_assurance", "blocked_validation_failed"]
+}

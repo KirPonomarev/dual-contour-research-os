@@ -1,0 +1,25 @@
+{
+  "schema_id": "ReuseDecisionReceipt", "schema_version": "1.0.0",
+  "object_id": "reuse-s26-evidence-replication-20260718", "issued_at": "2026-07-18T22:28:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-freeze-authority"},
+  "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "D0_EVIDENCE_SIDECAR_MULTIDIMENSIONAL_REPLICATION_ISLANDS_AND_DECLASSIFICATION_DRY_RUN",
+    "candidates": [
+      {"candidate": "reuse-existing-evolution-module-portable-ref-hash-pure-snapshot-patterns", "disposition": "selected"},
+      {"candidate": "reuse-frozen-evaluator-exposure-v1-budgets-and-domain-owned-ReplicationReceipt-boundary", "disposition": "selected"},
+      {"candidate": "add-small-stdlib-only-metadata-sidecar-matrix-island-and-dry-run-primitives", "disposition": "selected-minimal-missing-glue"},
+      {"candidate": "store-raw-evidence-D1-D2-D3-or-holdout-bytes-in-Bridge", "disposition": "rejected-trust-boundary"},
+      {"candidate": "vector-database-new-registry-service-queue-scheduler-or-island-runtime", "disposition": "rejected-no-measured-blocker-and-duplicate-surface"},
+      {"candidate": "linear-R1-R5-or-different-id-equals-independence", "disposition": "rejected-overclaim"}
+    ],
+    "selected_mode": "D0-ref-hash-group-only-sidecar-five-dimension-scoped-matrix-distinct-source-proof-disjoint-island-metadata-evaluator-exposure-and-zero-export-dry-run",
+    "source_ref": "git:d22bdb37193e2b55be27887c8df22849370b9544;internal:evolution+evaluator-exposure-v1+ReplicationReceipt-owner-boundary;profile:sha256:4af1043d70a41950b8688806d96ae844cfdc33f6240c3fae8d82a7fcf2aa2966",
+    "code_sha256": "4af1043d70a41950b8688806d96ae844cfdc33f6240c3fae8d82a7fcf2aa2966",
+    "license_spdx": "NOASSERTION", "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": ["D0-metadata-only-sidecar", "source-correlation", "five-dimension-status", "scoped-not-absolute-independence", "island-namespace-and-trial-disjointness", "lineage-family-day-exposure", "true-holdout-zero", "D1-D2-D3-and-local-path-denial", "declassification-zero-bytes-write-network-authority", "deterministic-replay"],
+    "canonical_owner": "agent-0-profile-agent-1-existing-evolution-module-agent-5-assurance-domain-writers-retain-scientific-truth",
+    "rollback": "Remove S26 additive profile and pure evolution primitives; existing domain ReplicationReceipt and all E2 prior stages remain unchanged."
+  },
+  "integrity": {"payload_sha256": "303bb086c76140265f74b4704d2c2b7db09e0abd9043ac0351c8b6d4f760ed47", "parent_refs": ["git:d22bdb37193e2b55be27887c8df22849370b9544", "profile:sha256:4af1043d70a41950b8688806d96ae844cfdc33f6240c3fae8d82a7fcf2aa2966", "contract-profile:sha256:646ef26b37a277b9abb2912f4000d5f9b6c5c754e239ffbbd9aac076c2727f9d"]}
+}

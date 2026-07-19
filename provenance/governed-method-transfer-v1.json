@@ -1,0 +1,7 @@
+{
+  "profile_id": "governed-method-transfer-v1", "schema_version": "1.0.0", "status": "frozen-request-only",
+  "method_policy_sha256": "ecbf5578f85d50b9cdf53f5bead12f00a27c9500474faf50860d952408188628", "recipient_shadow_policy_sha256": "4e55fad9e3b8db6d20dd1bfcf7d24565ca7c5f340992e6a0181016845e830d6e",
+  "request": {"maximum_validity_seconds": 86400, "required_shadow_status": "POSITIVE_SHADOW_EFFECT_NOT_ADOPTED", "terminal_state": "WAIT_HUMAN_DOMAIN_AUTHORITY", "replay_state": "REJECTED_REPLAY", "expiry_state": "REJECTED_EXPIRED"},
+  "capability_status": "METHOD_TRANSFER_PASS_FOR_FROZEN_SCOPE",
+  "invariants": {"declassification_chain_required": true, "recipient_shadow_required": true, "request_grants_authority": false, "promotion_receipt_issued": false, "promotion_applied": false, "recipient_registry_writes": 0, "scientific_truth_transfer": false, "policy_mutation": false, "canonical_mutation": false, "grants_authority": false}
+}

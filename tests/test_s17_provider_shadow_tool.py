@@ -55,7 +55,7 @@ class ProviderShadowToolTests(unittest.TestCase):
         self.temporary = tempfile.TemporaryDirectory()
         self.addCleanup(self.temporary.cleanup)
         self.temp_path = Path(self.temporary.name)
-        self.profile = shadow.ConnectedShadowProfile()
+        self.profile = shadow.ConnectedShadowProfile(shadow.LEGACY_PROFILE_PATH)
 
     def test_profile_is_strict_and_exact_official_api_ids_are_separate_from_logical_bindings(self) -> None:
         self.assertEqual(

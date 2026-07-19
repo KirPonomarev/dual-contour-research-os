@@ -1,0 +1,10 @@
+{
+  "schema_id": "research-os.final-deployment-packet.v1", "packet_id": "s38-final-candidate-b2c2e6a8", "candidate_release_sha": "b2c2e6a8c4e0a364ef82e8e51540433aa91430d4", "candidate_tree_sha": "7d6bd1e13d651950cced23dfe75a24946a3218fc",
+  "release_manifest": {"ref": "docs/receipts/release/s38-final-release-manifest.json", "sha256": "0439dee8e058914fe8e11416112e4a985e4bfec11502bb2cd0fd5b883295c369", "state": "FROZEN_AWAITING_HUMAN_DEPLOYMENT_APPROVAL"},
+  "predecessor_readiness": {"ref": "ops/deploy/deployment-readiness-packet.json", "sha256": "0085672bd78590fe96aa91b4a70bd2f09fa0ea81cb4405bde6596588ecdb0c48", "structural_deployability": "PASS_FOR_FROZEN_SCOPE"},
+  "isolation": {"ref": "ops/deploy/stage4-a1-isolation-release-packet.json", "sha256": "2038a4fe49e018d58832df5dd1028c5cd2e49e5075f98f805e393abbe14557f0", "single_supervisor_required": true, "concurrent_writers": false, "live_capability": false},
+  "rollback": {"target": "release:none-service-stopped", "receipt_required": true, "automatic_changed_release_rollback": false},
+  "authority": {"request_pr": "https://github.com/KirPonomarev/dual-contour-research-os/pull/25", "request_head": "c8fdd8b20b93d4df33b3855e3b04d2d6401722e7", "requires_rebind_to_candidate": true, "deployment_approval_receipt_ref": null, "status": "WAIT_HUMAN_APPROVAL_REBIND_REQUIRED", "deployment_allowed": false, "reboot_allowed": false, "restore_allowed": false, "VPS_mutation_allowed": false, "canonical_mutation_allowed": false, "live_action_allowed": false, "grants_authority": false},
+  "operational_prerequisites": {"exact_candidate_checkout": true, "candidate_image_build": "WAIT_AUTHORIZED_PREFLIGHT", "backup_receipt": "WAIT_OPERATOR_RUNTIME_EVIDENCE", "restore_receipts": "WAIT_OPERATOR_RUNTIME_EVIDENCE", "deployment_receipt": "ABSENT", "burn_in": "NOT_STARTED"},
+  "integrity": {"profile": "core-json-sha256-v1", "payload_sha256": "2b88114f001e131e5fa357d739091948d304d88264e3a860e193ed7070d3443b"}
+}

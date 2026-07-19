@@ -1,0 +1,27 @@
+{
+  "schema_id": "IntegrationReceipt", "schema_version": "1.0.0",
+  "object_id": "integration-s24-r2-openrouter-assurance-20260718", "issued_at": "2026-07-18T22:04:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s24-r2-openrouter-assurance", "agent_id": "agent-5",
+    "ownership_lease_ref": "stages/s24-r2-openrouter-assurance/ownership-lease.json",
+    "base_sha": "c832c3ffa0cc5d04f99f5a97584f34de526200de", "head_sha": "4e0b978d051a65cc8648aafebccff053a07cfe4c",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": ["tests/test_s17_provider_shadow_tool.py", "tests/test_s24_r2_openrouter_provider.py", "stages/s24-r2-openrouter-assurance/stage-envelope.json", "stages/s24-r2-openrouter-assurance/ownership-lease.json"],
+    "audit_results": {
+      "contract_gate": "green", "privacy_secret_scan": "green", "source_mutation": false,
+      "focused_tests": 23, "new_openrouter_tests": 8,
+      "full_core_tests": 692, "stage0b_tests": 25,
+      "legacy_v1_compatibility": "green", "exact_v2_profile_and_request": "green",
+      "environment_precedence": "green", "Keychain_exact_captured_command": "green",
+      "credential_error_redaction": "green", "preflight_secret_emission": false,
+      "D0_D1_only": true, "redirect_denial": "green", "bounded_response_envelope": "green",
+      "durable_SENT_before_egress": "green", "private_CAS_before_parse": "green",
+      "cost_reservation_retained": true, "automatic_retry": false,
+      "gateway_independence_overclaim": false, "grants_authority": false
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29662751852", "integration_commit_sha": "f159b70ba963f110e6b6c2b18ddafc63d7182774"
+  },
+  "integrity": {"payload_sha256": "f7c2afb99b80ac4a99e4718ba2346adcf2b83b63469a176cdc204d0b0b9aa082", "parent_refs": ["git:4e0b978d051a65cc8648aafebccff053a07cfe4c", "git:f159b70ba963f110e6b6c2b18ddafc63d7182774", "ci:29662751852", "git:c832c3ffa0cc5d04f99f5a97584f34de526200de"]}
+}

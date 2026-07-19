@@ -1,0 +1,22 @@
+{
+  "schema_id": "ReuseDecisionReceipt", "schema_version": "1.0.0", "object_id": "reuse-s28-e2-aggregate-gate-20260718", "issued_at": "2026-07-18T23:00:59Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-freeze-authority"}, "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "E2_EXACT_HEAD_AUTONOMOUS_RESEARCH_SHADOW_AGGREGATE_PROOF",
+    "candidates": [
+      {"candidate": "reuse-existing-CapabilityProofReceipt-issuer-currentness-and-invalidation-framework", "disposition": "selected"},
+      {"candidate": "reuse-S23-through-S27-immutable-integration-assurance-receipts", "disposition": "selected"},
+      {"candidate": "add-one-stdlib-only-exact-digest-ancestry-and-semantic-aggregate-validator", "disposition": "selected-minimal-missing-glue"},
+      {"candidate": "new-runtime-service-store-scheduler-or-model-evaluator", "disposition": "rejected-no-runtime-capability-needed"},
+      {"candidate": "promote-shadow-results-or-claim-global-replication-memory-uplift-or-calibration", "disposition": "rejected-overclaim"}
+    ],
+    "selected_mode": "exact-file-digest-integration-integrity-git-ancestry-semantic-negative-probes-plus-scoped-expiring-capability-proof",
+    "source_ref": "git:b9fa2944c35f7edc1474c2e42c91680f1d177e19;internal:capability_proof+S23-S27-integration-assurance",
+    "code_sha256": "1b15b5918efa09354da2c2a4a32c80198506c76fecc13d22a719c3612244fc77",
+    "license_spdx": "NOASSERTION", "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": ["exact-evidence-digest", "integration-payload-integrity", "subject-ancestry", "agenda-portfolio-overclaim", "council-evidence-laundering", "replication-global-independence", "memory-uplift-calibration-overclaim", "stale-head-policy-code-config-schema", "canonical-live-authority-absent"],
+    "canonical_owner": "agent-0-proof-framework-and-receipt-agent-5-hostile-assurance",
+    "rollback": "Remove S28 additive gate, registered E2 proof scope, receipt and tests; all S23-S27 component evidence remains unchanged."
+  },
+  "integrity": {"payload_sha256": "8544f880e93c0168b9066b76a4540fe48ebdbae6fa8d57fdde29f4068b1bdd47", "parent_refs": ["git:b9fa2944c35f7edc1474c2e42c91680f1d177e19", "capability:CapabilityProofReceipt"]}
+}

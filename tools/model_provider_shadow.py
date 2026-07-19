@@ -17,6 +17,7 @@ import json
 import os
 from pathlib import Path
 import ssl
+import subprocess
 import sys
 import tempfile
 from typing import Callable, Mapping
@@ -40,7 +41,8 @@ from research_bridge.model_broker import (  # noqa: E402
 )
 
 
-PROFILE_PATH = ROOT / "provenance" / "model-provider-connected-shadow-v1.json"
+LEGACY_PROFILE_PATH = ROOT / "provenance" / "model-provider-connected-shadow-v1.json"
+PROFILE_PATH = ROOT / "provenance" / "model-provider-connected-shadow-v2.json"
 ROUTING_PATH = ROOT / "provenance" / "model-provider-routing-v1.json"
 ROLE_PATH = ROOT / "contracts" / "a1" / "v1" / "profiles" / "model_role_registry_v1.json"
 _PROFILE_KEYS = {
@@ -48,17 +50,19 @@ _PROFILE_KEYS = {
     "forbidden_input_classes", "max_request_bytes", "max_response_bytes",
     "timeout_seconds", "bindings", "invariants",
 }
-_BINDING_KEYS = {
+_LEGACY_BINDING_KEYS = {
     "provider_slot", "credential_env", "endpoint", "protocol", "api_model",
     "request_options", "source",
 }
+_BINDING_KEYS = _LEGACY_BINDING_KEYS | {"provider", "context_window"}
 _ALLOWED_ENDPOINTS = {
     "https://api.deepseek.com/chat/completions",
     "https://open.bigmodel.cn/api/paas/v4/chat/completions",
     "https://api.openai.com/v1/responses",
+    "https://openrouter.ai/api/v1/chat/completions",
 }
 _ALLOWED_PROTOCOLS = {"OPENAI_CHAT_COMPLETIONS", "OPENAI_RESPONSES"}
-_EXPECTED_BINDING_SHAPES = {
+_EXPECTED_LEGACY_BINDING_SHAPES = {
     "deepseek-v4-flash": {
         "provider_slot": "DEEPSEEK_API", "credential_env": "DEEPSEEK_API_KEY",
         "endpoint": "https://api.deepseek.com/chat/completions",
@@ -95,10 +99,107 @@ _EXPECTED_BINDING_SHAPES = {
         "source": "https://developers.openai.com/api/docs/models/gpt-5.6-sol",
     },
 }
+_EXPECTED_BINDING_SHAPES = {
+    "deepseek-v4-flash": {
+        "provider": "deepseek", "provider_slot": "DEEPSEEK_API",
+        "credential_env": "DEEPSEEK_API_KEY",
+        "endpoint": "https://api.deepseek.com/chat/completions",
+        "protocol": "OPENAI_CHAT_COMPLETIONS", "api_model": "deepseek-v4-flash",
+        "context_window": None,
+        "request_options": {"thinking": {"type": "disabled"}, "reasoning_effort": "high"},
+        "source": "https://api-docs.deepseek.com/api/create-chat-completion",
+    },
+    "deepseek-v4-pro": {
+        "provider": "deepseek", "provider_slot": "DEEPSEEK_API",
+        "credential_env": "DEEPSEEK_API_KEY",
+        "endpoint": "https://api.deepseek.com/chat/completions",
+        "protocol": "OPENAI_CHAT_COMPLETIONS", "api_model": "deepseek-v4-pro",
+        "context_window": None,
+        "request_options": {"thinking": {"type": "enabled"}, "reasoning_effort": "high"},
+        "source": "https://api-docs.deepseek.com/api/create-chat-completion",
+    },
+    "glm-5.2-max": {
+        "provider": "zhipu", "provider_slot": "GLM_API",
+        "credential_env": "ZHIPU_API_KEY",
+        "endpoint": "https://open.bigmodel.cn/api/paas/v4/chat/completions",
+        "protocol": "OPENAI_CHAT_COMPLETIONS", "api_model": "glm-5.2",
+        "context_window": None,
+        "request_options": {"thinking": {"type": "enabled"}, "reasoning_effort": "max"},
+        "source": "https://docs.bigmodel.cn/cn/guide/models/text/glm-5.2",
+    },
+    "gpt-5.6-sol-xhigh": {
+        "provider": "openrouter", "provider_slot": "OPENROUTER_API",
+        "credential_env": "OPENROUTER_API_KEY",
+        "endpoint": "https://openrouter.ai/api/v1/chat/completions",
+        "protocol": "OPENAI_CHAT_COMPLETIONS", "api_model": "openai/gpt-5.6-sol",
+        "context_window": 1_000_000,
+        "request_options": {"reasoning": {"effort": "xhigh"}},
+        "source": "https://openrouter.ai/openai/gpt-5.6-sol/",
+    },
+    "gpt-5.6-sol-max": {
+        "provider": "openai", "provider_slot": "OPENAI_API",
+        "credential_env": "OPENAI_API_KEY",
+        "endpoint": "https://api.openai.com/v1/responses",
+        "protocol": "OPENAI_RESPONSES", "api_model": "gpt-5.6-sol",
+        "context_window": None,
+        "request_options": {"reasoning": {"effort": "max"}, "store": False},
+        "source": "https://developers.openai.com/api/docs/models/gpt-5.6-sol",
+    },
+}
+
+_OPENROUTER_CREDENTIAL_ENV = "OPENROUTER_API_KEY"
+_OPENROUTER_KEYCHAIN_SERVICE = "ai.shared.openrouter"
+_OPENROUTER_KEYCHAIN_ACCOUNT = "OPENROUTER_API_KEY"
+_KEYCHAIN_COMMAND = (
+    "/usr/bin/security", "find-generic-password",
+    "-s", _OPENROUTER_KEYCHAIN_SERVICE,
+    "-a", _OPENROUTER_KEYCHAIN_ACCOUNT,
+    "-w",
+)
 
 
 class ShadowProviderError(RuntimeError):
     pass
+
+
+def _valid_credential(value: str) -> bool:
+    return bool(value) and len(value) <= 16_384 and not any(
+        character.isspace() or ord(character) < 32 or ord(character) == 127
+        for character in value
+    )
+
+
+class CredentialResolver:
+    """Resolve credentials without ever serializing values or error details."""
+
+    def __init__(self, environment: Mapping[str, str] | None = None) -> None:
+        self._environment = os.environ if environment is None else environment
+        self._cache: dict[str, str] = {}
+
+    def resolve(self, credential_env: str) -> str:
+        if credential_env in self._cache:
+            return self._cache[credential_env]
+        environment_value = self._environment.get(credential_env)
+        if environment_value is not None:
+            value = environment_value if _valid_credential(environment_value) else ""
+            self._cache[credential_env] = value
+            return value
+        value = ""
+        if credential_env == _OPENROUTER_CREDENTIAL_ENV and sys.platform == "darwin":
+            try:
+                result = subprocess.run(
+                    list(_KEYCHAIN_COMMAND),
+                    capture_output=True,
+                    text=True,
+                    check=False,
+                    timeout=5,
+                )
+            except (OSError, subprocess.SubprocessError) as exc:
+                raise ShadowProviderError("provider credential lookup failed closed") from None
+            candidate = result.stdout.rstrip("\r\n") if result.returncode == 0 else ""
+            value = candidate if _valid_credential(candidate) else ""
+        self._cache[credential_env] = value
+        return value
 
 
 def _canonical_bytes(value: object) -> bytes:
@@ -147,7 +248,11 @@ class ConnectedShadowProfile:
         value = _load_json_object(path)
         if set(value) != _PROFILE_KEYS:
             raise ShadowProviderError("provider shadow profile keys drifted")
-        if value["profile_id"] != "model-provider-connected-shadow-v1":
+        profile_id = value["profile_id"]
+        if profile_id not in {
+            "model-provider-connected-shadow-v1",
+            "model-provider-connected-shadow-v2",
+        }:
             raise ShadowProviderError("provider shadow profile id drifted")
         if value["allowed_input_classes"] != ["D0", "D1"]:
             raise ShadowProviderError("provider shadow privacy scope widened")
@@ -156,6 +261,16 @@ class ConnectedShadowProfile:
         for name in ("max_request_bytes", "max_response_bytes", "timeout_seconds"):
             if type(value[name]) is not int or not 1 <= value[name] <= 16_777_216:
                 raise ShadowProviderError(f"provider shadow {name} is invalid")
+        binding_keys = (
+            _LEGACY_BINDING_KEYS
+            if profile_id == "model-provider-connected-shadow-v1"
+            else _BINDING_KEYS
+        )
+        expected_shapes = (
+            _EXPECTED_LEGACY_BINDING_SHAPES
+            if profile_id == "model-provider-connected-shadow-v1"
+            else _EXPECTED_BINDING_SHAPES
+        )
         bindings = value["bindings"]
         if not isinstance(bindings, dict) or set(bindings) != {
             "deepseek-v4-flash", "deepseek-v4-pro", "glm-5.2-max",
@@ -164,13 +279,13 @@ class ConnectedShadowProfile:
             raise ShadowProviderError("provider shadow binding set drifted")
         normalized: dict[str, dict[str, object]] = {}
         for name, item in bindings.items():
-            if not isinstance(item, dict) or set(item) != _BINDING_KEYS:
+            if not isinstance(item, dict) or set(item) != binding_keys:
                 raise ShadowProviderError("provider shadow binding shape drifted")
             if item["endpoint"] not in _ALLOWED_ENDPOINTS:
                 raise ShadowProviderError("provider shadow endpoint is not allowlisted")
             if item["protocol"] not in _ALLOWED_PROTOCOLS:
                 raise ShadowProviderError("provider shadow protocol is not allowlisted")
-            if item != _EXPECTED_BINDING_SHAPES[name]:
+            if item != expected_shapes[name]:
                 raise ShadowProviderError("provider shadow binding semantics drifted")
             credential = item["credential_env"]
             if not isinstance(credential, str) or not credential.endswith("_API_KEY"):
@@ -185,7 +300,15 @@ class ConnectedShadowProfile:
             raise ShadowProviderError("provider shadow invariant drifted")
         if invariants.get("automatic_retry") is not False:
             raise ShadowProviderError("provider shadow cannot retry automatically")
+        if profile_id == "model-provider-connected-shadow-v2" and (
+            invariants.get("openrouter_credential_precedence")
+            != "environment_then_macos_keychain"
+            or invariants.get("openrouter_gateway_is_not_model_independence_evidence") is not True
+            or invariants.get("actual_upstream_provider_is_not_attested_by_requested_model_slug") is not True
+        ):
+            raise ShadowProviderError("OpenRouter safety invariant drifted")
         self.path = path
+        self.profile_id = str(profile_id)
         self.sha256 = hashlib.sha256(path.read_bytes()).hexdigest()
         self.max_request_bytes = int(value["max_request_bytes"])
         self.max_response_bytes = int(value["max_response_bytes"])
@@ -202,6 +325,12 @@ class ConnectedShadowProfile:
         return frozenset(
             name for name, item in self.bindings.items()
             if bool(environment.get(str(item["credential_env"]), "").strip())
+        )
+
+    def resolved_available_bindings(self, resolver: CredentialResolver) -> frozenset[str]:
+        return frozenset(
+            name for name, item in self.bindings.items()
+            if bool(resolver.resolve(str(item["credential_env"])))
         )
 
 
@@ -384,8 +513,16 @@ def _outside_repository(path: Path) -> Path:
     raise ShadowProviderError("private runtime storage must be outside the public repository")
 
 
+def _stage_tag(profile: ConnectedShadowProfile) -> str:
+    return (
+        "s17"
+        if profile.profile_id == "model-provider-connected-shadow-v1"
+        else "s24-r2-openrouter"
+    )
+
+
 def _preflight(profile: ConnectedShadowProfile) -> int:
-    available = profile.available_bindings(os.environ)
+    available = profile.resolved_available_bindings(CredentialResolver())
     bindings = {
         name: ("CONFIGURED_UNPROVEN" if name in available else "WAIT_CREDENTIAL")
         for name in sorted(profile.bindings)
@@ -401,8 +538,9 @@ def _init_ledger(args: argparse.Namespace, profile: ConnectedShadowProfile) -> i
     if ledger_path.exists():
         raise ShadowProviderError("shadow ledger bootstrap requires a new path")
     ledger_path.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
+    stage_tag = _stage_tag(profile)
     payload = {
-        "capability": "S17_CONNECTED_SHADOW_LEDGER_BOOTSTRAP",
+        "capability": stage_tag.upper().replace("-", "_") + "_CONNECTED_SHADOW_LEDGER_BOOTSTRAP",
         "fixture_only": True,
         "grants_authority": False,
         "profile_sha256": profile.sha256,
@@ -413,10 +551,10 @@ def _init_ledger(args: argparse.Namespace, profile: ConnectedShadowProfile) -> i
     document = {
         "schema_id": "CapabilityProofReceipt",
         "schema_version": "1.0.0",
-        "object_id": "capability-proof:s17-shadow-bootstrap:" + profile.sha256,
+        "object_id": "capability-proof:" + stage_tag + "-shadow-bootstrap:" + profile.sha256,
         "issued_at": args.event_at,
         "issuer": {
-            "id": "agent-0-s17-shadow-bootstrap",
+            "id": "agent-0-" + stage_tag + "-shadow-bootstrap",
             "authority_class": "fixture-only-non-authoritative",
         },
         "contour": "governance",
@@ -433,7 +571,7 @@ def _init_ledger(args: argparse.Namespace, profile: ConnectedShadowProfile) -> i
             "count": 1 if name == "capabilities" else 0,
             "fixture_only": True,
             "grants_authority": False,
-            "marker": "s17-connected-shadow-bootstrap-v1",
+            "marker": stage_tag + "-connected-shadow-bootstrap-v1",
             "shadow_only": True,
         }
         for name in ("admissions", "candidates", "capabilities", "material_events")
@@ -443,7 +581,7 @@ def _init_ledger(args: argparse.Namespace, profile: ConnectedShadowProfile) -> i
             record = ledger.append_a1_bundle(
                 objects=[document],
                 projections=projections,
-                idempotency_key="s17-shadow-bootstrap:" + profile.sha256,
+                idempotency_key=stage_tag + "-shadow-bootstrap:" + profile.sha256,
                 event_at=args.event_at,
             )
             if not ledger.verify_chain() or not ledger.verify_a1_coverage():
@@ -477,10 +615,12 @@ def _run(args: argparse.Namespace, profile: ConnectedShadowProfile) -> int:
     prompt_path = Path(args.prompt_file)
     if prompt_path.is_symlink() or not prompt_path.is_file():
         raise ShadowProviderError("prompt file must be a regular non-symlink file")
-    available = profile.available_bindings(os.environ)
+    credential_resolver = CredentialResolver()
+    available = profile.resolved_available_bindings(credential_resolver)
     role_sha = hashlib.sha256(ROLE_PATH.read_bytes()).hexdigest()
     routing_sha = hashlib.sha256(ROUTING_PATH.read_bytes()).hexdigest()
-    base_registry = ModelRoleRegistry(ROLE_PATH, expected_profile_sha256=role_sha, binding_revision="s17-connected-" + profile.sha256[:16])
+    stage_tag = _stage_tag(profile)
+    base_registry = ModelRoleRegistry(ROLE_PATH, expected_profile_sha256=role_sha, binding_revision=stage_tag + "-connected-" + profile.sha256[:16])
     router = ModelProviderRouting(ROUTING_PATH, expected_profile_sha256=routing_sha, role_registry=base_registry)
     decision = router.route(args.role, args.classification, available_bindings=available)
     if decision.status != "ROUTED" or decision.binding is None:
@@ -492,14 +632,14 @@ def _run(args: argparse.Namespace, profile: ConnectedShadowProfile) -> int:
         raise ShadowProviderError("provider request exceeds frozen bound")
     registry = ModelRoleRegistry(
         ROLE_PATH, expected_profile_sha256=role_sha,
-        binding_revision="s17-connected-" + profile.sha256[:16],
+        binding_revision=stage_tag + "-connected-" + profile.sha256[:16],
         binding_overrides={args.role: decision.binding},
     )
     ledger_path = _outside_repository(Path(args.ledger))
     cas_root = _outside_repository(Path(args.cas_root))
     policy_digest = hashlib.sha256((profile.sha256 + ":policy").encode()).hexdigest()
     scope_digest = hashlib.sha256(str(cas_root).encode()).hexdigest()
-    credential = os.environ.get(str(binding["credential_env"]), "")
+    credential = credential_resolver.resolve(str(binding["credential_env"]))
     with JobLedger(ledger_path) as ledger:
         broker = ModelCallBroker(
             registry=registry, ledger=ledger,
@@ -511,7 +651,7 @@ def _run(args: argparse.Namespace, profile: ConnectedShadowProfile) -> int:
         )
         spec = ModelCallSpec(
             role=args.role,
-            role_assignment_ref="role-assignment:s17-shadow:" + profile.sha256,
+            role_assignment_ref="role-assignment:" + stage_tag + "-shadow:" + profile.sha256,
             classification=args.classification,
             request_bytes=request_bytes,
             max_tokens=args.max_tokens,
@@ -535,6 +675,9 @@ def _run(args: argparse.Namespace, profile: ConnectedShadowProfile) -> int:
     print(json.dumps({
         "call_id": completed.call_id, "state": completed.state,
         "binding": decision.binding, "used_fallback": decision.used_fallback,
+        "provider_gateway": binding.get("provider", "legacy-unrecorded"),
+        "requested_model": binding["api_model"],
+        "actual_upstream_provider_status": "NOT_ATTESTED",
         "response_ref": snapshot["response_ref"], "actual_tokens": snapshot["actual_tokens"],
         "actual_cost_units": snapshot["actual_cost_units"],
         "requires_cost_reconciliation": snapshot["actual_cost_units"] is None,
@@ -557,7 +700,7 @@ def _reconcile(args: argparse.Namespace, profile: ConnectedShadowProfile) -> int
     registry = ModelRoleRegistry(
         ROLE_PATH,
         expected_profile_sha256=role_sha,
-        binding_revision="s17-connected-" + profile.sha256[:16],
+        binding_revision=_stage_tag(profile) + "-connected-" + profile.sha256[:16],
     )
     policy_digest = hashlib.sha256((profile.sha256 + ":reconcile-policy").encode()).hexdigest()
     scope_digest = hashlib.sha256(str(ledger_path).encode()).hexdigest()

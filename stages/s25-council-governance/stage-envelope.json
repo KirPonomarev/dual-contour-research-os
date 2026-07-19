@@ -1,0 +1,20 @@
+{
+  "stage_id": "s25-council-governance", "agent_id": "agent-0",
+  "objective": "Freeze a bounded advisory tournament rubric that reuses the existing deterministic council plan and cannot turn model agreement or ranking into evidence or authority.",
+  "executable_blocker": "S16 plans capped council calls but has no frozen candidate cap, rubric, evaluator-assignment or dissent-preserving aggregation contract for S25.",
+  "base_sha": "b4f3de8dfa57494cba88782b45f70c14896aaaf6",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a0-s25-council-governance",
+  "worktree": "/private/tmp/dcr-s25-council-governance",
+  "read_set": ["src/research_bridge/model_broker.py", "provenance/model-provider-routing-v1.json", "contracts/a1/v1/profiles/model_role_registry_v1.json", "docs/receipts/reuse/s16-provider-adapters-routing.json"],
+  "write_set": ["provenance/model-council-tournament-v1.json", "docs/receipts/reuse/s25-council-tournament.json", "stages/s25-council-governance/stage-envelope.json", "stages/s25-council-governance/ownership-lease.json"],
+  "forbidden_scope": ["contract-root-CI-lockfile-or-Bridge-source-edit", "network-model-call-credential-or-cost", "new-framework-service-queue-scheduler-database-or-vector-store", "consensus-ranking-or-model-output-as-evidence", "model-self-assignment", "authority-canonical-live-deploy-or-publication-action"],
+  "dependency_hashes": {"base_main": "b4f3de8dfa57494cba88782b45f70c14896aaaf6", "provider_routing": "37db8596a8245a6b1ea2bc5bce1495a4e7dadb314876e51397ad11dd194b3dc6", "role_registry": "4faf6765f48a952e4d35540d92797330517938b34b8d2f12cde791e761a32eac", "tournament_profile": "e27222fe820912b7dd0abf725bf1c1825115e8f51bfb50ce44666bc8c8f27d81", "external_dependencies": "none"},
+  "acceptance_commands": ["make contracts", "profile integrity validation", "Agent-1 implementation", "Agent-5 focused assurance", "git diff --check"],
+  "risk_class": "high-correlated-consensus-cost-and-role-authority-confusion",
+  "stop_conditions": ["unbounded-calls-or-candidates", "caller-selected-evaluator", "consensus-or-ranking-as-evidence", "authority-expansion", "new-service-or-dependency"],
+  "expected_receipt": "docs/receipts/integration/s25-council-governance.json",
+  "rollback": "Remove additive S25 profile/reuse/stage metadata; S16 frozen council planner remains unchanged.",
+  "commit_authority": "one-scoped-agent-0-commit", "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent1_s25_tournament", "blocked_validation_failed"]
+}

@@ -1,0 +1,53 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s31-shadow-canary-assurance-20260718",
+  "issued_at": "2026-07-18T23:47:20Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s31-shadow-canary-assurance",
+    "agent_id": "agent-5",
+    "ownership_lease_ref": "stages/s31-shadow-canary-assurance/ownership-lease.json",
+    "base_sha": "70f02b3503d55ffb2f55c4e6f921b51596b979b9",
+    "head_sha": "9c37aec883e09b1825fb78ee7b112402f42f3c64",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "tests/test_s31_shadow_canary.py",
+      "tests/test_stage1_assurance.py",
+      "stages/s31-shadow-canary-assurance/"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "focused_tests": 9,
+      "focused_subtests": 8,
+      "full_core_tests": 747,
+      "stage0b_tests": 25,
+      "scope_report_archive_tamper_denied": "green",
+      "foreign_candidate_case_scope_denied": "green",
+      "maturity_and_capacity": "green",
+      "all_regression_dimensions_and_failure": "green",
+      "typed_rollback_repair": "green",
+      "zero_write_execution_promotion_apply_authority": "green",
+      "real_private_data_model_calls_or_external_actions": 0,
+      "grants_authority": false
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29665822775",
+    "integration_commit_sha": "14c3f0bdfcf6ce02bbf47a52cac9c8eef8745323"
+  },
+  "integrity": {
+    "payload_sha256": "f855021ccf57c7b65ec627c0f456bb99486695c01e94f149c0ad45f7cf4f5299",
+    "parent_refs": [
+      "git:9c37aec883e09b1825fb78ee7b112402f42f3c64",
+      "git:14c3f0bdfcf6ce02bbf47a52cac9c8eef8745323",
+      "ci:29665822775",
+      "git:70f02b3503d55ffb2f55c4e6f921b51596b979b9"
+    ]
+  }
+}

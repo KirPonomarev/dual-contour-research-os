@@ -1,0 +1,18 @@
+{
+  "stage_id": "s29-gap-genome", "agent_id": "agent-1",
+  "objective": "Implement pure versioned genome, deterministic gap mining, complete blast radius, monotonic deny invariants and zero-apply candidate archive in the existing evolution module.",
+  "executable_blocker": "The frozen S29 proposal-only policy requires typed deterministic primitives absent from the E2 evolution surface.",
+  "base_sha": "097fbafc3206e5d43efc47a07f7a57f793a01355", "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a1-s29-gap-genome", "worktree": "/private/tmp/dcr-s29-gap-genome",
+  "read_set": ["src/research_bridge/evolution.py", "provenance/evolution-genome-gap-miner-v1.json"],
+  "write_set": ["src/research_bridge/evolution.py", "stages/s29-gap-genome/stage-envelope.json", "stages/s29-gap-genome/ownership-lease.json"],
+  "forbidden_scope": ["contract-profile-provenance-test-root-CI-lockfile-or-other-source-edit", "generated-code-command-patch-or-executable-payload", "mutation-application-policy-change-authority-expansion-or-deny-removal", "durable-write-network-model-call-new-runtime-service-store-queue-scheduler-or-dependency", "canonical-deploy-live-publication-or-private-data-action"],
+  "dependency_hashes": {"governance_stage": "097fbafc3206e5d43efc47a07f7a57f793a01355", "genome_profile": "bd35130dc90e252773359973f77e4a8e4cc9cdc5a746c1ff362d1bee8a599c07", "external_dependencies": "none"},
+  "acceptance_commands": ["make contracts", "python3 -m py_compile src/research_bridge/evolution.py", "Agent-5 S29 hostile assurance", "git diff --check"],
+  "risk_class": "critical-self-modification-authority-policy-executable-payload-and-blast-radius",
+  "stop_conditions": ["mutation-applied-or-executable-payload", "deny-removal-or-policy-authority-expansion", "incomplete-blast-radius", "durable-or-external-action", "new-runtime-or-dependency"],
+  "expected_receipt": "docs/receipts/integration/s29-gap-genome.json",
+  "rollback": "Revert additive S29 evolution types/functions and stage metadata; E2 runtime remains unchanged.",
+  "commit_authority": "one-scoped-agent-1-commit", "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent5_s29_gap-genome-assurance", "blocked_validation_failed"]
+}

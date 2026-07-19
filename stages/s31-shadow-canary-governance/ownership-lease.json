@@ -1,0 +1,16 @@
+{
+  "lease_id": "lease-s31-shadow-canary-governance-agent-0",
+  "stage_id": "s31-shadow-canary-governance",
+  "agent_id": "agent-0",
+  "branch": "codex/bridge-a0-s31-shadow-canary-governance",
+  "issued_at": "2026-07-18T23:38:08Z",
+  "expires_at": "2026-07-20T23:38:08Z",
+  "write_set": [
+    "provenance/shadow-canary-evolution-loop-v1.json",
+    "docs/receipts/reuse/s31-shadow-canary.json",
+    "stages/s31-shadow-canary-governance/stage-envelope.json",
+    "stages/s31-shadow-canary-governance/ownership-lease.json"
+  ],
+  "exclusive": true,
+  "revoked": false
+}

@@ -1,0 +1,25 @@
+{
+  "schema_id": "IntegrationReceipt", "schema_version": "1.0.0",
+  "object_id": "integration-s24-agenda-portfolio-assurance-20260718", "issued_at": "2026-07-18T21:46:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s24-agenda-portfolio-assurance", "agent_id": "agent-5",
+    "ownership_lease_ref": "stages/s24-agenda-portfolio/assurance-ownership-lease.json",
+    "base_sha": "c056dd65042a323cf1579e14140e8058720c5a6c", "head_sha": "4fea7b68a8c45108c6fca4bf612f3726d422b99a",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": ["tests/test_s24_agenda_portfolio.py", "tests/test_stage1_assurance.py", "stages/s24-agenda-portfolio/assurance-stage-envelope.json", "stages/s24-agenda-portfolio/assurance-ownership-lease.json"],
+    "audit_results": {
+      "contract_gate": "green", "privacy_secret_scan": "green", "source_mutation": false,
+      "focused_tests": 22, "new_agenda_tests": 7, "full_core_tests": 684, "stage0b_tests": 25,
+      "proposal_order_independence": "green", "replay_identical": "green",
+      "budget_slot_risk_diversity_breach": 0, "unsafe_or_exhausted_selected": 0,
+      "duplicate_debt_or_outcome_rejected": "green", "forged_integrity_rejected": "green",
+      "unbounded_slots_or_items_rejected": "green", "durable_side_effects": 0,
+      "public_surface_boundary": "green", "grants_authority": false
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29662124539",
+    "integration_commit_sha": "541bbf851cd9073d08da2427cb7ff3f48a877dbf"
+  },
+  "integrity": {"payload_sha256": "30370f6f753daeb3e6a69ad84f303e2707b928a8a3277c04d0bdc167f373394e", "parent_refs": ["git:4fea7b68a8c45108c6fca4bf612f3726d422b99a", "git:541bbf851cd9073d08da2427cb7ff3f48a877dbf", "ci:29662124539", "git:c056dd65042a323cf1579e14140e8058720c5a6c"]}
+}

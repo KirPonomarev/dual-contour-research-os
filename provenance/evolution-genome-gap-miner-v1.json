@@ -1,0 +1,24 @@
+{
+  "profile_id": "evolution-genome-gap-miner-v1",
+  "schema_version": "1.0.0",
+  "status": "frozen-proposal-only",
+  "allowed_classifications": ["D0_PUBLIC"],
+  "allowed_mutation_kinds": ["OBSERVABILITY_ADDITION", "PARAMETER_TIGHTENING", "REPLAY_HARDENING", "TEST_ADDITION", "VALIDATOR_HARDENING"],
+  "forbidden_mutation_kinds": ["AUTHORITY_EXPANSION", "CANONICAL_WRITE", "DEPLOYMENT", "GENERATED_CODE_EXECUTION", "POLICY_RELAXATION", "PUBLICATION", "LIVE_SECURITY_EXECUTION", "LIVE_TRADING"],
+  "required_deny_invariants": ["authority-expansion-denied", "canonical-mutation-denied", "d2-d3-private-data-denied", "deployment-denied", "generated-code-execution-denied", "live-security-execution-denied", "live-trading-denied", "policy-relaxation-denied", "publication-denied"],
+  "limits": {"max_components": 128, "max_dependencies_per_component": 16, "max_gap_signals": 256, "max_evidence_refs_per_gap": 16, "max_blast_radius_components": 64, "max_added_deny_invariants": 16, "max_archive_candidates": 256},
+  "proposal_states": ["RESEARCH_CANDIDATE", "PARKED_FORBIDDEN", "PARKED_CAPACITY", "WAIT_AUTHORITY"],
+  "invariants": {
+    "genome_is_versioned_and_digest_bound": true,
+    "blast_radius_is_transitive_reverse_dependency_closure": true,
+    "all_required_deny_invariants_are_retained": true,
+    "deny_invariants_may_only_grow": true,
+    "policy_and_authority_may_not_expand": true,
+    "mutation_payload_is_descriptive_not_executable": true,
+    "candidate_archive_is_deterministic_and_provenance_bound": true,
+    "mutation_applied": false,
+    "generated_code_executed": false,
+    "canonical_writes": 0,
+    "grants_authority": false
+  }
+}

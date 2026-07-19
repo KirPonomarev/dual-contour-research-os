@@ -1,0 +1,8 @@
+{
+  "lease_id": "lease-s24-r2-openrouter-assurance-agent-5",
+  "stage_id": "s24-r2-openrouter-assurance", "agent_id": "agent-5",
+  "branch": "codex/bridge-a5-s24-r2-openrouter-assurance",
+  "issued_at": "2026-07-18T21:55:00Z", "expires_at": "2026-07-20T21:55:00Z",
+  "write_set": ["tests/test_s17_provider_shadow_tool.py", "tests/test_s24_r2_openrouter_provider.py", "stages/s24-r2-openrouter-assurance/stage-envelope.json", "stages/s24-r2-openrouter-assurance/ownership-lease.json"],
+  "exclusive": true, "revoked": false
+}

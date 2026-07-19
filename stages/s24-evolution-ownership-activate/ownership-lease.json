@@ -1,0 +1,7 @@
+{
+  "lease_id": "lease-s24-evolution-ownership-agent-0", "stage_id": "s24-evolution-ownership-activate", "agent_id": "agent-0",
+  "base_sha": "b71ac22ff54a9f425cfd359a21adf70ca330b5c0", "branch": "codex/bridge-a0-s24-evolution-ownership",
+  "issued_at": "2026-07-18T21:32:00Z", "expires_at": "2026-07-19T21:32:00Z",
+  "write_set": ["ownership/registry.json", "docs/ADR/0007-evolution-path-activation.md", "docs/receipts/OWNERSHIP_REGISTRY_AMENDMENT_6.json", "docs/receipts/reuse/s24-agenda-portfolio.json", "stages/s24-evolution-ownership-activate/stage-envelope.json", "stages/s24-evolution-ownership-activate/ownership-lease.json"],
+  "exclusive": true, "revoked": false
+}

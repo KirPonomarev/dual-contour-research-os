@@ -1,0 +1,51 @@
+{
+  "stage_id": "s31-shadow-canary-governance",
+  "agent_id": "agent-0",
+  "objective": "Freeze a bounded D0 no-write shadow/canary reducer with maturity gating, regression signals, descriptive rollback and human-only promotion.",
+  "executable_blocker": "S30 compares a candidate on a frozen benchmark but does not define a bounded post-evaluation canary loop or regression rollback proposal.",
+  "base_sha": "1f438d26538fa563a147c882a08800f37462584c",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a0-s31-shadow-canary-governance",
+  "worktree": "/private/tmp/dcr-s31-shadow-canary-governance",
+  "read_set": [
+    "src/research_bridge/evolution.py",
+    "provenance/champion-challenger-evaluation-v1.json"
+  ],
+  "write_set": [
+    "provenance/shadow-canary-evolution-loop-v1.json",
+    "docs/receipts/reuse/s31-shadow-canary.json",
+    "stages/s31-shadow-canary-governance/stage-envelope.json",
+    "stages/s31-shadow-canary-governance/ownership-lease.json"
+  ],
+  "forbidden_scope": [
+    "contract-runtime-source-test-root-CI-lockfile-edit",
+    "generated-code-execution-network-filesystem-or-canonical-write",
+    "automatic-promotion-policy-application-rollback-or-authority-mutation"
+  ],
+  "dependency_hashes": {
+    "base_main": "1f438d26538fa563a147c882a08800f37462584c",
+    "profile": "81440253d296d04a42bacca18b259f715236444a7b4c068fda54bd382d6b9c5e"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "profile and reuse integrity",
+    "Agent-1 implementation",
+    "Agent-5 hostile assurance",
+    "git diff --check"
+  ],
+  "risk_class": "critical-silent-promotion-and-canary-blast-radius",
+  "stop_conditions": [
+    "scope-or-report-binding-drift",
+    "regression-passes-shadow",
+    "generated-code-or-side-effect",
+    "promotion-rollback-apply-or-authority"
+  ],
+  "expected_receipt": "docs/receipts/integration/s31-shadow-canary-governance.json",
+  "rollback": "Remove S31 additive governance files.",
+  "commit_authority": "one-scoped-agent-0-commit",
+  "push_authority": true,
+  "expected_handoff_status": [
+    "ready_for_agent1_s31-shadow-canary",
+    "blocked_validation_failed"
+  ]
+}

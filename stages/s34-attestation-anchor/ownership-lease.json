@@ -1,0 +1,22 @@
+{
+  "lease_id": "lease-s34-attestation-anchor-agent-0",
+  "stage_id": "s34-attestation-anchor",
+  "agent_id": "agent-0",
+  "branch": "codex/bridge-a0-s34-attestation-anchor",
+  "issued_at": "2026-07-19T00:30:00Z",
+  "expires_at": "2026-07-21T00:30:00Z",
+  "write_set": [
+    "tools/attestation.py",
+    "provenance/selected-receipt-attestation-v1.json",
+    "provenance/attestation-public-keys-v1.json",
+    "docs/ATTESTATION_KEY_THREAT_MODEL.md",
+    "docs/receipts/attestation/",
+    "docs/receipts/reuse/s34-attestation-anchor.json",
+    "tests/test_s34_attestation_anchor.py",
+    "THIRD_PARTY_NOTICES.md",
+    "LICENSES/openssl-Apache-2.0.txt",
+    "stages/s34-attestation-anchor/"
+  ],
+  "exclusive": true,
+  "revoked": false
+}

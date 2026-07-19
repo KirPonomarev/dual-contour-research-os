@@ -1,0 +1,21 @@
+{
+  "integrity": {
+    "payload_sha256": "48a2579bec72c8f4a909c61ca49ed974e9f073403d6fc1e9f3adb6ef1603baa1"
+  },
+  "issued_at": "2026-07-19T00:36:00Z",
+  "object_id": "anchor-receipt:sha256:48a2579bec72c8f4a909c61ca49ed974e9f073403d6fc1e9f3adb6ef1603baa1",
+  "payload": {
+    "anchor_ref": "https://github.com/KirPonomarev/dual-contour-research-os/commit/9151f20e09c1851ddf57717e7a0964b8389b3f9b",
+    "anchored_at": "2026-07-19T00:36:00Z",
+    "attestation_object_id": "selected-attestation:sha256:9332b5842a7bd6e15740ac5afe96c258b79922497b7bcc71ba46b38f4d63a20f",
+    "attestation_path": "docs/receipts/attestation/e3-evolution-shadow.attestation.json",
+    "attestation_sha256": "3e647d61b5bbbc264d7ff8ac64d2ed6fb0e899288c5a2247f13e7603b3e84cb5",
+    "backend": "GITHUB_GIT_COMMIT",
+    "branch": "codex/bridge-a0-s34-attestation-anchor",
+    "git_commit_sha": "9151f20e09c1851ddf57717e7a0964b8389b3f9b",
+    "grants_authority": false,
+    "receipt_sha256": "ae52fca17de0059f095d30fd0361a482fd312a3d1dc5bbe67dede84aef737b01"
+  },
+  "schema_id": "AnchorReceipt",
+  "schema_version": "1.0.0"
+}

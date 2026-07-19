@@ -1,0 +1,132 @@
+{
+  "schema_id": "CapabilityProofReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "capability-proof:df7828e64d3a5238e6d0720576cbf5638176cc145c2465b3af9bb85a1eb962dd",
+  "issued_at": "2026-07-18T23:50:00Z",
+  "issuer": "independent-assurance-issuer",
+  "contour": "governance",
+  "classification": "D1",
+  "payload": {
+    "receipt_id": "capability-proof:e3-evolution-shadow:26eed429",
+    "capability_id": "EVOLUTION_E3_SHADOW",
+    "subject_ref": "git:26eed42993b11551b94e7c9054fdddf0be87ca64",
+    "scope": {
+      "proof_state": "EVOLUTION_E3_SHADOW_PASS_FOR_FROZEN_SCOPE",
+      "data_scope": "D0_PUBLIC_SYNTHETIC_SHADOW_ONLY",
+      "mutation_proposal_status": "MUTATION_PROPOSAL_LOOP_PASS",
+      "champion_challenger_status": "CHAMPION_CHALLENGER_PASS_FOR_FROZEN_BENCHMARK",
+      "evolution_loop_status": "EVOLUTION_LOOP_SHADOW_PASS",
+      "meta_evolution_status": "META_EVOLUTION_PROPOSAL_ONLY",
+      "uplift_scope": "FROZEN_BENCHMARK_AND_SHADOW_NOT_PRODUCTION",
+      "rollback_status": "DESCRIPTIVE_WAIT_AUTHORITY",
+      "domain_application": "SHADOW_UNAPPLIED",
+      "autonomous_canonical_mutation": false,
+      "automatic_promotion": false,
+      "human_required_for_promotion": true,
+      "policy_application": false,
+      "deployment": false,
+      "live_trading": false,
+      "live_security_execution": false,
+      "environments": [
+        "linux-ci",
+        "macos-development"
+      ]
+    },
+    "status": "PASS_FOR_FROZEN_SCOPE",
+    "proof_basis": [
+      {
+        "integration_ref": "integration-s29-gap-genome-assurance-20260718",
+        "claim_scope": "BOUNDED_PROPOSAL_ONLY_MUTATION_GENOME"
+      },
+      {
+        "integration_ref": "integration-s30-challenger-assurance-20260718",
+        "claim_scope": "FROZEN_BENCHMARK_PARETO_UPLIFT_NOT_PRODUCTION"
+      },
+      {
+        "integration_ref": "integration-s31-shadow-canary-assurance-20260718",
+        "claim_scope": "NO_WRITE_SHADOW_CANARY_WAIT_AUTHORITY"
+      }
+    ],
+    "code_sha256": "ded5d677ffacb4b5838a664fc29ab3ed3cf731d4da9fd8cc9581b8e74c8a7097",
+    "config_sha256": "d3996e9487bd716685a72c1aed737f90ad321d8f34290c0c9d85df6a8188f18a",
+    "policy_sha256": "60064d13f1984205675679a5394593816aae6b066afb05711dc285976d91a8b6",
+    "schema_sha256": "d262099ef5993d9064717ac03ca58eb5d1c393cf69161746b96017a67470e379",
+    "executor_ref": "aggregate:deterministic-e3-evidence-gate",
+    "evaluator_ref": "assurance:agent5-fail-closed-e3-validator",
+    "test_refs": [
+      "test:tests.test_s29_gap_genome",
+      "test:tests.test_s30_champion_challenger",
+      "test:tests.test_s31_shadow_canary",
+      "test:tests.test_s32_e3_aggregate_gate"
+    ],
+    "environment_ref": "environment:macos-development+linux-ci:2026-07-18",
+    "data_refs": [
+      "fixture:D0-public-synthetic",
+      "evidence:D0-ref-hash-metric-only"
+    ],
+    "issuer_independence": {
+      "issuer_ref": "assurance-role:agent-5-deterministic-validator",
+      "independent_of_subject": true,
+      "independent_of_executor": true
+    },
+    "critical_dependencies": [
+      "catalog:core:13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+      "catalog:a1:eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1"
+    ],
+    "compatibility_dependencies": [
+      "python:>=3.11",
+      "git:required",
+      "make:required"
+    ],
+    "environment_compatibility_ref": "profile:environment-compatibility-v1:52f5d7c8715b3027164a2b284ca912357fd2b8f4bf6f2f2ab356e032370d50e7",
+    "negative_probe_refs": [
+      "probe:canonical-live-authority-absent",
+      "probe:e3-evidence-digest-tamper",
+      "probe:e3-stage-mixed-head",
+      "probe:expired-proof-stale",
+      "probe:ipc-role-spoof-denied",
+      "probe:mixed-head-stale",
+      "probe:parser-hostile-pack",
+      "probe:promotion-and-rollback-apply-absent",
+      "probe:shadow-admission-parked",
+      "probe:uplift-overclaim-denied",
+      "probe:writer-spoof-denied"
+    ],
+    "valid_from": "2026-07-18T23:50:00Z",
+    "valid_until": "2026-07-25T23:50:00Z",
+    "invalidation_conditions": [
+      "code-hash-drift",
+      "config-hash-drift",
+      "environment-compatibility-drift",
+      "negative-probe-regression",
+      "policy-hash-drift",
+      "proof-expiry",
+      "schema-hash-drift",
+      "subject-head-drift"
+    ],
+    "grants_authority": false
+  },
+  "integrity": {
+    "profile_id": "core-json-sha256-v1",
+    "payload_sha256": "df7828e64d3a5238e6d0720576cbf5638176cc145c2465b3af9bb85a1eb962dd",
+    "parent_refs": [
+      "git:26eed42993b11551b94e7c9054fdddf0be87ca64",
+      "probe:canonical-live-authority-absent",
+      "probe:e3-evidence-digest-tamper",
+      "probe:e3-stage-mixed-head",
+      "probe:expired-proof-stale",
+      "probe:ipc-role-spoof-denied",
+      "probe:mixed-head-stale",
+      "probe:parser-hostile-pack",
+      "probe:promotion-and-rollback-apply-absent",
+      "probe:shadow-admission-parked",
+      "probe:uplift-overclaim-denied",
+      "probe:writer-spoof-denied",
+      "profile:environment-compatibility-v1:52f5d7c8715b3027164a2b284ca912357fd2b8f4bf6f2f2ab356e032370d50e7",
+      "test:tests.test_s29_gap_genome",
+      "test:tests.test_s30_champion_challenger",
+      "test:tests.test_s31_shadow_canary",
+      "test:tests.test_s32_e3_aggregate_gate"
+    ]
+  }
+}
