@@ -31,6 +31,7 @@
     "audit_results": {
       "contract_gate": "green",
       "privacy_secret_scan": "green",
+      "source_mutation": false,
       "selected_scope_only": true,
       "exact_receipt_bytes_bound": true,
       "existing_payload_integrity_bound": true,
@@ -50,7 +51,7 @@
     "integration_commit_sha": "447575790ea7f401c1e904bdfdb015effa47a9de"
   },
   "integrity": {
-    "payload_sha256": "ccb2c7e6c67a0a2d1f1d62526fcf26a7f1b5f0ac096e02aed5eb25a7426e0719",
+    "payload_sha256": "2d1ff6a18124d1c61dc689c312586c3df742ffdce9dad4810bbc9b958aa4def2",
     "parent_refs": [
       "git:f41ec8cf74f77960bfeb8dc04e5e74fc935e1d4c",
       "git:1d3f380ef88ae0f62187970bd29b23a463160562",
