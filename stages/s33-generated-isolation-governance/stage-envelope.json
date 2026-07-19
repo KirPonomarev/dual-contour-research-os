@@ -13,19 +13,24 @@
     "src/research_bridge/l0.py"
   ],
   "write_set": [
+    "ownership/registry.json",
+    "docs/ADR/0008-generated-execution-path-activation.md",
+    "docs/receipts/OWNERSHIP_REGISTRY_AMENDMENT_7.json",
+    "src/research_bridge/generated_execution.py",
     "provenance/generated-code-isolation-ladder-v1.json",
     "docs/receipts/reuse/s33-generated-isolation.json",
     "stages/s33-generated-isolation-governance/stage-envelope.json",
     "stages/s33-generated-isolation-governance/ownership-lease.json"
   ],
   "forbidden_scope": [
-    "runtime-source-tests-contract-root-CI-lockfile-migration-edit",
+    "runtime-behavior-tests-contract-CI-lockfile-migration-edit",
     "L3-live-private-network-host-mount-device-or-daemon",
     "embedded-subprocess-executor-deploy-canonical-write-or-authority"
   ],
   "dependency_hashes": {
     "base_main": "98415d56044bc406ec7303df00a4ee19bbc1359f",
-    "profile": "a02fb9bb7e328f355cae083193f4ae63bfb299bf2e4c633ae496ccf31ca0ef89"
+    "profile": "a02fb9bb7e328f355cae083193f4ae63bfb299bf2e4c633ae496ccf31ca0ef89",
+    "previous_ownership_registry": "c2b67f6c9de257ddfe3686c86311d11d2d69b15632d0278706a98f14d6f3a2d8"
   },
   "acceptance_commands": [
     "make contracts",
@@ -43,7 +48,7 @@
     "automatic-deploy-rollback-apply-or-authority"
   ],
   "expected_receipt": "docs/receipts/integration/s33-generated-isolation-governance.json",
-  "rollback": "Remove S33 additive governance files and keep generated execution feature disabled.",
+  "rollback": "Restore ownership registry 1.1.0/ADR 0007, remove amendment 7, the inert reserved module and S33 governance files, and keep generated execution feature disabled.",
   "commit_authority": "one-scoped-agent-0-commit",
   "push_authority": true,
   "expected_handoff_status": [
