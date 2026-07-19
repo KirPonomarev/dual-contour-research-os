@@ -1,0 +1,51 @@
+{
+  "stage_id": "s33-generated-isolation",
+  "agent_id": "agent-2",
+  "objective": "Implement a feature-off D0-only L1/L2 authority gate, rootless backend registry, immutable launch plan, result validator and descriptive rollback without embedding an executor.",
+  "executable_blocker": "The frozen S33 isolation policy lacks typed enforcement and result validation.",
+  "base_sha": "d74ae299d08e6218681aaa62ddb2a38930fadde4",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a2-s33-generated-isolation",
+  "worktree": "/private/tmp/dcr-s33-generated-isolation",
+  "read_set": [
+    "provenance/generated-code-isolation-ladder-v1.json",
+    "src/research_bridge/authority.py",
+    "src/research_bridge/execution.py",
+    "src/research_bridge/l0.py"
+  ],
+  "write_set": [
+    "src/research_bridge/generated_execution.py",
+    "stages/s33-generated-isolation/stage-envelope.json",
+    "stages/s33-generated-isolation/ownership-lease.json"
+  ],
+  "forbidden_scope": [
+    "contracts-canonical-docs-existing-runtime-tests-root-CI-lockfiles-migrations",
+    "subprocess-Docker-daemon-interpreter-network-or-filesystem-execution",
+    "L3-private-live-host-mount-deploy-canonical-write-or-authority"
+  ],
+  "dependency_hashes": {
+    "governance_commit": "d74ae299d08e6218681aaa62ddb2a38930fadde4",
+    "profile": "a02fb9bb7e328f355cae083193f4ae63bfb299bf2e4c633ae496ccf31ca0ef89"
+  },
+  "acceptance_commands": [
+    "python3 -m pytest -q tests/test_s33_generated_isolation.py",
+    "python3 -m py_compile src/research_bridge/generated_execution.py",
+    "make contracts",
+    "git diff --check"
+  ],
+  "risk_class": "critical-sandbox-escape-and-code-execution-authority",
+  "stop_conditions": [
+    "parent-binding-bypass",
+    "L3-network-private-live-host-path-or-device-reachable",
+    "unattested-backend-or-resource-bypass",
+    "executor-side-effect-deploy-rollback-apply-or-authority"
+  ],
+  "expected_receipt": "docs/receipts/integration/s33-generated-isolation.json",
+  "rollback": "Disable feature and revert the additive generated_execution module and stage metadata.",
+  "commit_authority": "one-scoped-agent-2-commit",
+  "push_authority": true,
+  "expected_handoff_status": [
+    "ready_for_agent0_audit",
+    "blocked_validation_failed"
+  ]
+}
