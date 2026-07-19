@@ -1211,7 +1211,6 @@ class JobLedger:
             if not isinstance(copied, dict) or not copied:
                 raise LedgerError("A1 projection state must be non-empty")
             projection_states[name] = copied
-
         with self._lock:
             self._ensure_open()
             self._begin_immediate()
@@ -1348,6 +1347,117 @@ class JobLedger:
                     object_ids=tuple(sorted(object_ids)),
                     projection_names=tuple(sorted(projection_states)),
                 )
+            except Exception as exc:
+                self._rollback()
+                self._raise_ledger_error(exc)
+
+    def _advance_a1_projections(
+        self,
+        *,
+        projections: Mapping[str, Mapping[str, object]],
+        idempotency_key: str,
+        event_at: str,
+    ) -> LedgerEvent:
+        """Atomically advance durable A1 state without minting a new object.
+
+        Claim, rejection, and acknowledgement are state transitions rather than
+        Core/A1 contract objects.  They still share the one global ledger order
+        and advance every registered projection, so a restart cannot observe a
+        partially applied control transition.
+        """
+
+        key = _text(idempotency_key, "idempotency_key", maximum=256)
+        timestamp = _timestamp("event_at", event_at)
+        if not isinstance(projections, Mapping) or set(projections) != _A1_PROJECTION_NAMES:
+            raise LedgerError("A1 projection transition must provide every registered projection")
+        projection_states: dict[str, dict[str, object]] = {}
+        for name in sorted(_A1_PROJECTION_NAMES):
+            state = projections[name]
+            if not isinstance(state, Mapping):
+                raise LedgerError("A1 projection state must be an object")
+            copied = _json_copy(state, f"projection.{name}")
+            if not isinstance(copied, dict) or not copied:
+                raise LedgerError("A1 projection state must be non-empty")
+            projection_states[name] = copied
+        request_sha256 = _digest(
+            _canonical_json(projection_states).encode("utf-8")
+        )
+
+        with self._lock:
+            self._ensure_open()
+            self._begin_immediate()
+            try:
+                carried_feedback = self._projection_states_locked(
+                    _FEEDBACK_PROJECTION_NAMES
+                )
+                if carried_feedback and set(carried_feedback) != _FEEDBACK_PROJECTION_NAMES:
+                    raise LedgerError("feedback projection coverage is partial")
+                projection_states.update(carried_feedback)
+                projection_descriptors = [
+                    {
+                        "projection_name": name,
+                        "state_sha256": _digest(
+                            _canonical_json(projection_states[name]).encode("utf-8")
+                        ),
+                    }
+                    for name in sorted(projection_states)
+                ]
+                payload: dict[str, object] = {
+                    "bundle_kind": "a1_projection_transition_v1",
+                    "idempotency_key": key,
+                    "request_sha256": request_sha256,
+                    "objects": [],
+                    "projections": projection_descriptors,
+                }
+                replay_row = self._connection.execute(
+                    """
+                    SELECT * FROM bridge_job_ledger
+                    WHERE event_type = 'a1_bundle'
+                      AND json_extract(payload_json, '$.idempotency_key') = ?
+                    """,
+                    (key,),
+                ).fetchone()
+                if replay_row is not None:
+                    replay = self._ledger_event_from_row(replay_row)
+                    if (
+                        replay.payload.get("bundle_kind")
+                        != "a1_projection_transition_v1"
+                        or replay.payload.get("request_sha256") != request_sha256
+                    ):
+                        raise LedgerError("A1 projection idempotency key was reused")
+                    self._connection.execute("COMMIT")
+                    return replay
+
+                event = self._append(
+                    event_type="a1_bundle",
+                    job_id="bridge-a1-projection-transition",
+                    attempt_id=f"a1-projection:{_digest(key.encode('utf-8'))}",
+                    fencing_epoch=0,
+                    checkpoint_sequence=None,
+                    event_at=timestamp,
+                    payload=payload,
+                )
+                for descriptor in projection_descriptors:
+                    name = descriptor["projection_name"]
+                    self._connection.execute(
+                        """
+                        INSERT INTO bridge_a1_projection_state (
+                            projection_name, last_applied_sequence, state_sha256, state_json
+                        ) VALUES (?, ?, ?, ?)
+                        ON CONFLICT(projection_name) DO UPDATE SET
+                            last_applied_sequence = excluded.last_applied_sequence,
+                            state_sha256 = excluded.state_sha256,
+                            state_json = excluded.state_json
+                        """,
+                        (
+                            name,
+                            event.sequence,
+                            descriptor["state_sha256"],
+                            _canonical_json(projection_states[name]),
+                        ),
+                    )
+                self._connection.execute("COMMIT")
+                return event
             except Exception as exc:
                 self._rollback()
                 self._raise_ledger_error(exc)
