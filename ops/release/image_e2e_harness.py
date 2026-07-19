@@ -489,7 +489,7 @@ class ImageE2EHarness:
                         "source_content_sha256": content_sha,
                         "observed_at": observed,
                         "summary": "Bounded sanitized production-image harness event.",
-                        "evidence_refs": [],
+                        "evidence_refs": [f"public:synthetic/evidence/{content_sha}"],
                         "transport_idempotency_key": key,
                     }
                 },

@@ -164,6 +164,15 @@ class ProductionImageE2EHarnessTests(unittest.TestCase):
         client_frames = [body for argv, body in runner.commands if "--entrypoint=python" in argv]
         self.assertTrue(client_frames)
         self.assertTrue(all(frame and frame.endswith(b"\n") for frame in client_frames))
+        source_frames = [
+            json.loads(frame)
+            for frame in client_frames
+            if frame and b'"command":"submit_source_trigger"' in frame
+        ]
+        self.assertTrue(source_frames)
+        self.assertTrue(
+            source_frames[0]["payload"]["source_trigger"]["evidence_refs"]
+        )
 
     def copied_root(self):
         temporary = tempfile.TemporaryDirectory()
