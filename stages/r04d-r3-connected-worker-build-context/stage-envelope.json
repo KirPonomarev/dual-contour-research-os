@@ -1,0 +1,54 @@
+{
+  "stage_id": "r04d-r3-connected-worker-build-context",
+  "agent_id": "agent-0",
+  "objective": "Make the shipped connected-worker Containerfile reproducibly buildable from the canonical repository context without admitting unrelated repository files.",
+  "executable_blocker": "The root deny-by-default Docker context admits only src, while the shipped Containerfile requires exact tool, provenance, profile and connected-worker inputs; direct exact-head image construction therefore fails.",
+  "base_sha": "07c7fb12698eeb9b7b34063fb9727d9009209b10",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "a1_contract_sha256": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+  "branch": "codex/bridge-a0-r04d-r3-build-context",
+  "worktree": "/private/tmp/dcr-r04d-r3-build-context",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "ownership/registry.json",
+    ".dockerignore",
+    "ops/connected-worker/Containerfile",
+    "tools/verify_release_blueprint.py"
+  ],
+  "write_set": [".dockerignore", "tools/verify_release_blueprint.py"],
+  "forbidden_scope": [
+    "contract-canonical-doc-CI-migration-source-ops-test-or-runtime-code-edit",
+    "broad-repository-context-secret-private-evidence-database-or-checkpoint-inclusion",
+    "dependency-image-base-or-container-runtime-policy-change",
+    "provider-call-credential-access-deployment-or-external-mutation"
+  ],
+  "dependency_hashes": {
+    "r04d_r2_integration_head": "07c7fb12698eeb9b7b34063fb9727d9009209b10",
+    "dockerignore_sha256": "34214cef7eef1f48133d7e9634e9c4fc9e255a1894a4b0a763a1517c52a5342d",
+    "connected_worker_containerfile_sha256": "5e748ab7e8fd5418bfbbe5f2ee19053ee74cba38330fe8058f90f63299e8b8ef",
+    "release_blueprint_verifier_sha256": "aa2fca4534cfbf8912cd477bc69de79511ffcedd975877ffd4a8d64980b39c91",
+    "ownership_registry_sha256": "e7a6a5158e43cb76c1df0fa28caec36ec9585a0dd05a732eabb94a92e427c9da",
+    "reuse_receipt": "docs/receipts/reuse/r04d-r3-connected-worker-build-context.json"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "docker build --no-cache -f ops/connected-worker/Containerfile --build-arg RELEASE_SHA=<exact-head> .",
+    "inspect exact Docker build context for allowlisted paths only",
+    "git diff --check",
+    "python3 -m unittest discover -s tests",
+    "exact-head remote CI"
+  ],
+  "risk_class": "high-release-image-reproducibility-and-public-context-boundary",
+  "stop_conditions": [
+    "base-contract-owner-or-dependency-hash-mismatch",
+    "write-outside-root-dockerignore-and-release-blueprint-verifier",
+    "unrelated-private-secret-runtime-or-database-path-enters-build-context",
+    "containerfile-input-remains-unavailable-or-image-identity-drifts"
+  ],
+  "expected_receipt": "docs/receipts/integration/r04d-r3-connected-worker-build-context.json",
+  "rollback": "Restore the prior root Docker ignore list; the connected-worker image returns to an explicitly non-buildable state until a narrower replacement context is frozen.",
+  "commit_authority": "one-scoped-agent-0-branch-stage",
+  "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent0_audit", "blocked_validation_failed"]
+}

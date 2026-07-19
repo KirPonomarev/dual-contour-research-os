@@ -1,0 +1,11 @@
+{
+  "lease_id": "lease-r04d-r3-connected-worker-build-context-agent-0",
+  "stage_id": "r04d-r3-connected-worker-build-context",
+  "agent_id": "agent-0",
+  "branch": "codex/bridge-a0-r04d-r3-build-context",
+  "issued_at": "2026-07-19T14:36:00Z",
+  "expires_at": "2026-07-21T14:36:00Z",
+  "write_set": [".dockerignore", "tools/verify_release_blueprint.py"],
+  "exclusive": true,
+  "revoked": false
+}

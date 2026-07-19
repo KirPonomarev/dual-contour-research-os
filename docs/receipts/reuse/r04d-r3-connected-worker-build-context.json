@@ -1,0 +1,35 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-r04d-r3-connected-worker-build-context-20260719",
+  "issued_at": "2026-07-19T14:36:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-review-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "r04d-r3-connected-worker-build-context",
+    "capability": "deny-by-default-exact-connected-worker-image-context",
+    "candidates": [
+      {"candidate": "private-out-of-tree-copy-context", "disposition": "rejected-not-reproducible-from-exact-repository-head"},
+      {"candidate": "include-the-entire-repository", "disposition": "rejected-unnecessary-public-context-expansion"},
+      {"candidate": "new-build-system-or-vendored-context-tool", "disposition": "rejected-unnecessary-dependency"},
+      {"candidate": "extend-existing-root-dockerignore-with-exact-containerfile-inputs", "disposition": "selected-minimal-repository-native-config-repair"}
+    ],
+    "selected_candidate": "exact-parent-and-file-negations-for-existing-connected-worker-containerfile-inputs",
+    "source_ref": "git:07c7fb12698eeb9b7b34063fb9727d9009209b10;internal:.dockerignore+ops/connected-worker/Containerfile",
+    "selected_source_sha": "5e748ab7e8fd5418bfbbe5f2ee19053ee74cba38330fe8058f90f63299e8b8ef",
+    "license": "repository-native-config-only",
+    "tests": ["direct-no-cache-image-build", "exact-context-allowlist", "image-revision-label", "public-boundary-scan"],
+    "security_review": "The context remains deny-by-default and admits only the existing Containerfile inputs and their required parent directories; credentials, runtime state, private evidence and unrelated repository paths remain excluded.",
+    "dependency_review": "No new package, image base, service, schema, license, SBOM component or external code.",
+    "rollback": "Restore the previous three-line deny-by-default context while retaining the recorded non-buildable finding."
+  },
+  "integrity": {
+    "payload_sha256": "21a02fe52c715ff4f7240a4841833295e22d27fe01710be3b41ddde526218102",
+    "parent_refs": [
+      "git:07c7fb12698eeb9b7b34063fb9727d9009209b10",
+      "source:sha256:34214cef7eef1f48133d7e9634e9c4fc9e255a1894a4b0a763a1517c52a5342d",
+      "containerfile:sha256:5e748ab7e8fd5418bfbbe5f2ee19053ee74cba38330fe8058f90f63299e8b8ef"
+    ]
+  }
+}
