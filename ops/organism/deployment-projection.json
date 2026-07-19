@@ -2,7 +2,7 @@
   "schema_id": "OrganismDeploymentProjection",
   "schema_version": "1.0.0",
   "projection_id": "bridge-a1-deployment-projection",
-  "subject_ref": "git:2196ba43267e5465e699ae06aa18015e67cd16af",
+  "subject_ref": "git:40d700a7286592859a3ffc669cc13ece07e62f00",
   "processes": [
     {
       "process_id": "researchd-single-writer",
@@ -19,6 +19,14 @@
       "isolation": "NO_NETWORK_BOUNDED_D0_SYNTHETIC",
       "lifecycle": "ON_DEMAND_IN_PROCESS",
       "observed_ref": "repo:docs/receipts/integration/s07-l0-validation-assurance.json"
+    },
+    {
+      "process_id": "connected-model-worker",
+      "service_ref": "repo:ops/deploy/research-os-connected-worker@.service",
+      "component_ids": ["connected-model-worker"],
+      "isolation": "ROOTLESS_DISTINCT_UID_PROVIDER_EGRESS_PRIVATE_STORE_NO_LEDGER",
+      "lifecycle": "ON_DEMAND_CONNECTED_WORKER",
+      "observed_ref": "repo:docs/receipts/integration/r04b-broker-scout-ipc-handshake.json"
     },
     {
       "process_id": "governance-proof-tool",

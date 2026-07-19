@@ -1,0 +1,28 @@
+FROM python@sha256:65a93d69fa75478d554f4ad27c85c1e69fa184956261b4301ebaf6dbb0a3543d
+
+ARG RELEASE_SHA
+LABEL org.opencontainers.image.title="Dual-Contour Research OS Connected Worker" \
+      org.opencontainers.image.source="https://github.com/KirPonomarev/dual-contour-research-os" \
+      org.opencontainers.image.revision="${RELEASE_SHA}"
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONHASHSEED=0 \
+    PYTHONPATH=/opt/research-os/src:/opt/research-os \
+    PYTHONUNBUFFERED=1
+
+RUN groupadd --gid 10001 research-os \
+    && useradd --uid 10004 --gid 10001 --no-create-home --no-log-init --shell /usr/sbin/nologin connected-worker \
+    && install -d -m 0700 -o 10004 -g 10001 /var/lib/research-os-connected /var/lib/research-os-connected/private-cas /run/research-os-connected
+
+WORKDIR /opt/research-os
+COPY --chown=10004:10001 src/ /opt/research-os/src/
+COPY --chown=10004:10001 tools/model_provider_shadow.py /opt/research-os/tools/model_provider_shadow.py
+COPY --chown=10004:10001 provenance/model-provider-connected-shadow-v2.json /opt/research-os/provenance/model-provider-connected-shadow-v2.json
+COPY --chown=10004:10001 provenance/model-provider-routing-v1.json /opt/research-os/provenance/model-provider-routing-v1.json
+COPY --chown=10004:10001 provenance/model-worker-ipc-extension-v1.json /opt/research-os/provenance/model-worker-ipc-extension-v1.json
+COPY --chown=10004:10001 contracts/a1/v1/profiles/model_role_registry_v1.json /opt/research-os/contracts/a1/v1/profiles/model_role_registry_v1.json
+COPY --chown=10004:10001 ops/connected-worker/ /opt/research-os/ops/connected-worker/
+
+USER 10004:10001
+ENTRYPOINT ["python", "/opt/research-os/ops/connected-worker/model_worker.py"]
+CMD ["run", "--policy", "/opt/research-os/ops/connected-worker/runtime-policy.json", "--storage-encryption-attested"]
