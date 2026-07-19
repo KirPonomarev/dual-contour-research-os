@@ -1,0 +1,59 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-r03b-execution-validation-wiring-20260719",
+  "issued_at": "2026-07-19T09:25:35Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "r03b-execution-validation-wiring",
+    "agent_id": "agent-2",
+    "ownership_lease_ref": "stages/r03b-execution-validation-wiring/ownership-lease.json",
+    "base_sha": "103d01b0aee2c4ce34bd100a5fed0ff0b1205d57",
+    "implementation_dependency_sha": "09a4e33a9c0c3354b42eaac81bbef9f59c490a0c",
+    "head_sha": "ef02ac8585a5225f3777196a1aad4391e784a4ea",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "a1_contract_sha256": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+    "write_set": ["src/research_bridge/execution.py"],
+    "audit_results": {
+      "contract_gate": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "worker_source_change_integrated": true,
+      "execution_source_sha256": "3cbb9cf48e49fec952b14e03629ff0546c0ef888f6a78e24f243c95f99cdbb7c",
+      "validation_source_sha256": "6377a7d60c0246d38d2fefe5a3a685409a3434342e41d0d88262ece8d326fa51",
+      "durable_receipt_reopen_before_validation": "enforced",
+      "validator_identity_digest_and_protocol_pinning": "enforced",
+      "runner_or_staging_state_visible_to_validator": false,
+      "ambiguous_response_recovery": "zero-write-validate-completed",
+      "manual_probe_sha256": "60800979d297c011ab3310804d6c32436199be7ab609343bbf9debba2731b5cc",
+      "manual_probe_result": "R03B_HOSTILE_AND_CRASH_RECOVERY_OK",
+      "manual_probe_durable_counts": {"ledger_events": 3, "checkpoint_cas_objects": 2, "artifact_cas_objects": 1},
+      "hostile_validator_id_sha_or_protocol": "DENIED",
+      "focused_tests": 21,
+      "adjacent_tests": 33,
+      "full_core_tests": 820,
+      "stage0b_tests": 25,
+      "provider_network_canonical_or_live_actions": 0,
+      "deployment_or_VPS_mutations": 0,
+      "grants_authority": false
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29681535269",
+    "pull_request_ref": "https://github.com/KirPonomarev/dual-contour-research-os/pull/55",
+    "integration_commit_sha": "e4b2a2bc07c5aaf5fd40c6b4c22fa011793d3849",
+    "known_next_gate": "Agent-1 must compose the pinned validator handoff inside ResearchDaemon before R03C may claim production execution-to-validation wiring; R08 remains responsible for the non-null exact-image executor profile."
+  },
+  "integrity": {
+    "payload_sha256": "3d89abec7f928c0c6560c459b38e8aca13991030b03c69dfc57b50cbf3956397",
+    "parent_refs": [
+      "git:103d01b0aee2c4ce34bd100a5fed0ff0b1205d57",
+      "git:09a4e33a9c0c3354b42eaac81bbef9f59c490a0c",
+      "git:ef02ac8585a5225f3777196a1aad4391e784a4ea",
+      "git:e4b2a2bc07c5aaf5fd40c6b4c22fa011793d3849",
+      "ci:29681535269",
+      "pr:55",
+      "reuse:reuse-r03b-execution-validation-wiring-20260719"
+    ]
+  }
+}
