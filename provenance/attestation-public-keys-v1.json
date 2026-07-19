@@ -1,0 +1,18 @@
+{
+  "registry_id": "attestation-public-keys-v1",
+  "schema_version": "1.0.0",
+  "status": "frozen-public-verification-registry",
+  "keys": [
+    {
+      "key_id": "ed25519:3fe796e3a6f932adaeb51de6cbde4c9af8170fe8321f17d00a2d48166dc532b8",
+      "algorithm": "ED25519",
+      "public_key_der_sha256": "3fe796e3a6f932adaeb51de6cbde4c9af8170fe8321f17d00a2d48166dc532b8",
+      "public_key_pem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEA+HcOMYezMa50V6CoBxh5MetfVXQX720MrOakiBH574o=\n-----END PUBLIC KEY-----\n",
+      "active_from": "2026-07-19T00:20:00Z",
+      "active_until": "2027-07-19T00:20:00Z",
+      "revoked_at": null,
+      "purpose": "selected-high-value-receipt-attestation",
+      "private_key_present": false
+    }
+  ]
+}

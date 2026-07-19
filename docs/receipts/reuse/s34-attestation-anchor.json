@@ -1,0 +1,59 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-s34-attestation-anchor-20260719",
+  "issued_at": "2026-07-19T00:30:00Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "reuse-freeze-authority"
+  },
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "SELECTED_ED25519_RECEIPT_ATTESTATION_AND_GIT_COMMIT_ANCHOR",
+    "candidates": [
+      {
+        "candidate": "reuse-existing-receipt-payload-integrity-and-git-exact-head-model",
+        "disposition": "selected"
+      },
+      {
+        "candidate": "separately-installed-OpenSSL-3-Ed25519-CLI",
+        "disposition": "selected-pinned-interface"
+      },
+      {
+        "candidate": "stdlib-only-policy-registry-signature-and-anchor-adapter",
+        "disposition": "selected-minimal-missing-glue"
+      },
+      {
+        "candidate": "new-Python-cryptography-dependency-or-vendored-crypto",
+        "disposition": "rejected-unnecessary-transitive-TCB"
+      },
+      {
+        "candidate": "universal-receipt-rewrite-JCS-or-key-material-in-Git",
+        "disposition": "rejected-out-of-scope-and-key-risk"
+      }
+    ],
+    "selected_mode": "exact-receipt-bytes-plus-existing-payload-hash-signed-by-external-Ed25519-key-and-anchored-to-exact-non-force-GitHub-commit",
+    "source_ref": "git:f41ec8cf74f77960bfeb8dc04e5e74fc935e1d4c;system:OpenSSL-3.6.2;profile:sha256:2f31ee0636d17975bc944931ed8830eb1562bf6ddc983788b2032ea6cce14d6b",
+    "code_sha256": "2f31ee0636d17975bc944931ed8830eb1562bf6ddc983788b2032ea6cce14d6b",
+    "license_spdx": "Apache-2.0",
+    "license_sha256": "7d5450cb2d142651b8afa315b5f238efc805dad827d91ba367d8516bc9d49e7a",
+    "tests": [
+      "known-signature-vector",
+      "exact-byte-and-payload-binding",
+      "key-substitution-and-revocation",
+      "missing-invalid-and-valid-anchor",
+      "expiry-and-selected-scope-denial",
+      "private-key-non-disclosure"
+    ],
+    "canonical_owner": "agent-0-governance-and-attestation-adapter-agent-5-assurance",
+    "rollback": "Stop signing, revoke or retire the public registry entry and remove S34 additive attestations; existing receipt integrity and authority remain unchanged."
+  },
+  "integrity": {
+    "payload_sha256": "ec9d72130290376d6432140df16b0b76719471e9f91c6d58459ad0b9988f1866",
+    "parent_refs": [
+      "git:f41ec8cf74f77960bfeb8dc04e5e74fc935e1d4c",
+      "profile:sha256:2f31ee0636d17975bc944931ed8830eb1562bf6ddc983788b2032ea6cce14d6b"
+    ]
+  }
+}

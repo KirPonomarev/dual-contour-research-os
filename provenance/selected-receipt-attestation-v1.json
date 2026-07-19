@@ -1,0 +1,57 @@
+{
+  "profile_id": "selected-receipt-attestation-v1",
+  "schema_version": "1.0.0",
+  "status": "frozen-selected-scope",
+  "signature_algorithm": "ED25519",
+  "signing_backend": "OPENSSL_CLI_3_PLUS",
+  "domain_separator": "DCAROS-ATTESTATION-V1",
+  "selected_receipts": [
+    {
+      "schema_id": "CapabilityProofReceipt",
+      "object_id_prefix": "capability-proof:"
+    },
+    {
+      "schema_id": "IntegrationReceipt",
+      "object_id_prefix": "integration-s32-"
+    },
+    {
+      "schema_id": "IntegrationReceipt",
+      "object_id_prefix": "integration-s33-"
+    }
+  ],
+  "validity": {
+    "max_attestation_days": 30,
+    "clock_skew_seconds": 60,
+    "anchor_required": true
+  },
+  "integrity": {
+    "bind_exact_receipt_bytes_sha256": true,
+    "bind_existing_payload_sha256": true,
+    "canonicalization_migration": false,
+    "JCS_required": false
+  },
+  "key_policy": {
+    "private_key_in_repository": false,
+    "minimum_active_keys": 1,
+    "maximum_active_keys": 2,
+    "rotation_overlap_days": 7,
+    "revoked_key_fails_closed": true,
+    "unknown_key_fails_closed": true
+  },
+  "anchor_policy": {
+    "allowed_backends": [
+      "GITHUB_GIT_COMMIT"
+    ],
+    "missing_anchor_state": "WAIT_ANCHOR",
+    "invalid_anchor_state": "REJECTED_ANCHOR"
+  },
+  "invariants": {
+    "signature_grants_authority": false,
+    "anchor_grants_authority": false,
+    "automatic_promotion": false,
+    "canonical_mutation": false,
+    "private_key_output": false,
+    "universal_receipt_rewrite": false,
+    "grants_authority": false
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "grants_authority": false,
+  "integrity": {
+    "document_sha256": "9332b5842a7bd6e15740ac5afe96c258b79922497b7bcc71ba46b38f4d63a20f",
+    "statement_sha256": "a5aae4102c9d840a5c3f75b0d634e99caf3e8b39755854c8957604a0e2aee637"
+  },
+  "object_id": "selected-attestation:sha256:9332b5842a7bd6e15740ac5afe96c258b79922497b7bcc71ba46b38f4d63a20f",
+  "private_key_present": false,
+  "schema_id": "SelectedReceiptAttestation",
+  "schema_version": "1.0.0",
+  "signature_b64": "ScrPZ0zILfs17FsBMelYyu4I5BjVkcppqI4TKPmevt9Ni8CSageBV73e1ngFohGN7rx8ilfQ/SHb1P1cJRFtAw==",
+  "statement": {
+    "anchor_required": true,
+    "attestation_profile_sha256": "2f31ee0636d17975bc944931ed8830eb1562bf6ddc983788b2032ea6cce14d6b",
+    "expires_at": "2026-08-18T00:32:00Z",
+    "grants_authority": false,
+    "key_id": "ed25519:3fe796e3a6f932adaeb51de6cbde4c9af8170fe8321f17d00a2d48166dc532b8",
+    "key_registry_sha256": "f85e71a3e472b431d50379a3f6789ea6fb526ade63b87329d119cca3b5d965e5",
+    "payload_sha256": "df7828e64d3a5238e6d0720576cbf5638176cc145c2465b3af9bb85a1eb962dd",
+    "receipt_object_id": "capability-proof:df7828e64d3a5238e6d0720576cbf5638176cc145c2465b3af9bb85a1eb962dd",
+    "receipt_schema_id": "CapabilityProofReceipt",
+    "receipt_sha256": "ae52fca17de0059f095d30fd0361a482fd312a3d1dc5bbe67dede84aef737b01",
+    "signature_algorithm": "ED25519",
+    "signed_at": "2026-07-19T00:32:00Z"
+  }
+}

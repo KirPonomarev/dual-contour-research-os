@@ -1,0 +1,58 @@
+{
+  "stage_id": "s34-attestation-anchor",
+  "agent_id": "agent-0",
+  "objective": "Bind selected high-value receipt bytes and existing integrity to external Ed25519 signatures and exact Git commit anchors without granting authority.",
+  "executable_blocker": "Selected E3 evidence has no independently verifiable signature, key lifecycle or off-host exact-commit anchor.",
+  "base_sha": "f41ec8cf74f77960bfeb8dc04e5e74fc935e1d4c",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a0-s34-attestation-anchor",
+  "worktree": "/private/tmp/dcr-s34-attestation-anchor",
+  "read_set": [
+    "docs/receipts/capability/e3-evolution-shadow.json",
+    "tools/capability_proof.py",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md"
+  ],
+  "write_set": [
+    "tools/attestation.py",
+    "provenance/selected-receipt-attestation-v1.json",
+    "provenance/attestation-public-keys-v1.json",
+    "docs/ATTESTATION_KEY_THREAT_MODEL.md",
+    "docs/receipts/attestation/",
+    "docs/receipts/reuse/s34-attestation-anchor.json",
+    "tests/test_s34_attestation_anchor.py",
+    "THIRD_PARTY_NOTICES.md",
+    "LICENSES/openssl-Apache-2.0.txt",
+    "stages/s34-attestation-anchor/"
+  ],
+  "forbidden_scope": [
+    "private-key-bytes-repository-log-exception-receipt-or-snapshot",
+    "universal-signature-rewrite-JCS-migration-root-CI-lockfile-or-contract-edit",
+    "automatic-authority-promotion-deploy-live-action-or-canonical-mutation"
+  ],
+  "dependency_hashes": {
+    "subject_main": "f41ec8cf74f77960bfeb8dc04e5e74fc935e1d4c",
+    "attestation_profile": "2f31ee0636d17975bc944931ed8830eb1562bf6ddc983788b2032ea6cce14d6b",
+    "public_key_registry": "f85e71a3e472b431d50379a3f6789ea6fb526ade63b87329d119cca3b5d965e5"
+  },
+  "acceptance_commands": [
+    "python3 -m pytest -q tests/test_s34_attestation_anchor.py",
+    "python3 -m py_compile tools/attestation.py",
+    "make contracts",
+    "git diff --check"
+  ],
+  "risk_class": "critical-key-compromise-and-unverifiable-evidence-claim",
+  "stop_conditions": [
+    "private-key-material-entered-repository-output-or-receipt",
+    "invalid-revoked-substituted-or-expired-key-accepted",
+    "receipt-or-anchor-binding-bypass",
+    "signature-or-anchor-grants-authority"
+  ],
+  "expected_receipt": "docs/receipts/integration/s34-attestation-anchor.json",
+  "rollback": "Revoke signing key and remove additive S34 attestation documents and adapter; preserve underlying receipts.",
+  "commit_authority": "one-scoped-agent-0-stage",
+  "push_authority": true,
+  "expected_handoff_status": [
+    "ready_for_agent0_integration",
+    "blocked_validation_failed"
+  ]
+}
