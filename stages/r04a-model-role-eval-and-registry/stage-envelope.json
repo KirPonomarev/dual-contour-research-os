@@ -1,0 +1,64 @@
+{
+  "stage_id": "r04a-model-role-eval-and-registry",
+  "agent_id": "agent-0",
+  "objective": "Create a versioned, validated role-evaluation snapshot from current official model metadata and the existing sanitized credential preflight while preserving the frozen v1 registry and reporting exact WAIT_PROVIDER until connected evaluation is authorized.",
+  "executable_blocker": "R03C is accepted, but the historical fixture registry does not record current model identifiers, prices, privacy limits, Chief/reserve evaluation state or current credential availability in one machine-validated object.",
+  "base_sha": "55bfaadac11904ba81596e450dfd652889552e6f",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "a1_contract_sha256": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+  "branch": "codex/bridge-a0-r04a-model-role-eval-and-registry",
+  "worktree": "/private/tmp/dcr-r04a-model-role-eval-and-registry",
+  "read_set": [
+    "contracts/a1/v1/profiles/model_role_registry_v1.json",
+    "provenance/model-provider-routing-v1.json",
+    "provenance/model-provider-connected-shadow-v2.json",
+    "src/research_bridge/model_broker.py",
+    "tools/model_provider_shadow.py",
+    "tests/test_s16_provider_routing.py",
+    "docs/receipts/source-freeze/r04a-model-role-metadata.json",
+    "docs/receipts/reuse/r04a-model-role-eval-and-registry.json"
+  ],
+  "write_set": [
+    "provenance/model-role-evaluation-v2.json",
+    "tools/verify_model_role_evaluation.py",
+    "tests/test_r04a_model_role_eval.py"
+  ],
+  "forbidden_scope": [
+    "frozen-v1-contract-profile-catalog-ownership-root-config-CI-lockfile-migration-or-runtime-source-edit",
+    "credential-value-endpoint-token-raw-response-private-account-billing-or-D2-D3-material",
+    "provider-call-spend-new-payment-new-dependency-service-database-queue-or-scheduler",
+    "connected-availability-independence-authority-admission-permit-canonical-write-or-deployment-claim"
+  ],
+  "dependency_hashes": {
+    "r03c_integration_head": "55bfaadac11904ba81596e450dfd652889552e6f",
+    "role_registry_v1_sha256": "4faf6765f48a952e4d35540d92797330517938b34b8d2f12cde791e761a32eac",
+    "routing_v1_sha256": "37db8596a8245a6b1ea2bc5bce1495a4e7dadb314876e51397ad11dd194b3dc6",
+    "connected_profile_v2_sha256": "63ae65247d61b918aced080e6419609459ebcbf4a3384ea29f2617e65597258c",
+    "local_sanitized_preflight_sha256": "2879d3f6db378974eb4a642ba3731eb6ac5240fc447eea35cd6e6d4fd6e5c93b",
+    "reuse_receipt": "docs/receipts/reuse/r04a-model-role-eval-and-registry.json",
+    "source_freeze_receipt": "docs/receipts/source-freeze/r04a-model-role-metadata.json",
+    "external_code_dependencies": "none"
+  },
+  "acceptance_commands": [
+    "python3 tools/verify_model_role_evaluation.py provenance/model-role-evaluation-v2.json",
+    "python3 tools/verify_model_role_evaluation.py provenance/model-role-evaluation-v2.json --local-preflight",
+    "python3 -m unittest -v tests.test_r04a_model_role_eval tests.test_s16_provider_routing tests.test_s24_r2_openrouter_provider",
+    "make contracts",
+    "make test",
+    "git diff --check",
+    "exact-head remote CI"
+  ],
+  "risk_class": "critical-false-route-availability-privacy-widening-correlated-review-or-cost-overclaim",
+  "stop_conditions": [
+    "official-model-identifier-or-pricing-source-cannot-be-pinned",
+    "local-preflight-exposes-secret-or-disagrees-with-recorded-current-wait-state",
+    "profile-makes-an-unevaluated-or-unconfigured-route-routable",
+    "frozen-v1-contract-or-runtime-source-mutation-is-required",
+    "write-outside-three-file-stage-write-set-or-public-safety-boundary-breach"
+  ],
+  "expected_receipt": "docs/receipts/integration/r04a-model-role-eval-and-registry.json",
+  "rollback": "Remove the additive v2 evaluation profile, verifier and focused test; the accepted R03C head and frozen v1 runtime remain unchanged.",
+  "commit_authority": "one-scoped-agent-0-evaluation-stage",
+  "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent0_audit", "blocked_validation_failed"]
+}

@@ -1,0 +1,46 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-r04a-model-role-eval-and-registry-20260719",
+  "issued_at": "2026-07-19T11:01:26Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-review-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "r04a-model-role-eval-and-registry",
+    "capability": "versioned-current-model-role-evaluation-and-exact-wait-state",
+    "candidates": [
+      {"candidate": "reuse-frozen-v1-role-registry-routing-and-connected-preflight", "disposition": "selected-preserve-runtime-and-contract-boundaries"},
+      {"candidate": "mutate-frozen-v1-role-registry-in-place", "disposition": "rejected-immutable-contract"},
+      {"candidate": "add-provider-SDK-or-new-network-client", "disposition": "rejected-no-new-dependency-or-egress-required"},
+      {"candidate": "claim-current-connected-availability-from-historical-call", "disposition": "rejected-current-preflight-is-wait-credential"},
+      {"candidate": "public-metadata-evaluation-with-static-validator-and-local-preflight", "disposition": "selected-minimal-missing-governance-glue"}
+    ],
+    "selected_candidate": "existing-internal-profiles-plus-small-stdlib-validator-and-focused-tests",
+    "source_ref": "source-freeze:source-freeze-r04a-model-role-metadata-20260719;git:55bfaadac11904ba81596e450dfd652889552e6f;internal:model_provider_routing+model_role_registry+connected_shadow_preflight",
+    "selected_source_sha": "2879d3f6db378974eb4a642ba3731eb6ac5240fc447eea35cd6e6d4fd6e5c93b",
+    "license": "repository-native-code-only; official documentation is referenced and not copied",
+    "tests": [
+      "strict-profile-shape-and-digest",
+      "exact-role-and-family-mapping",
+      "pricing-and-privacy-caps",
+      "caller-choice-and-council-cap-invariants",
+      "same-family-correlation-explicit",
+      "reserve-evaluation-recorded-but-not-routable",
+      "current-local-preflight-yields-exact-wait-provider",
+      "secret-endpoint-and-private-material-absence"
+    ],
+    "security_review": "no-network-no-credential-values-no-provider-call-no-contract-mutation-no-authority-grant",
+    "dependency_review": "stdlib-only-no-new-package-lockfile-SBOM-or-notice-change",
+    "rollback": "Remove the additive v2 evaluation profile, verifier and focused test; frozen v1 runtime profiles remain unchanged."
+  },
+  "integrity": {
+    "payload_sha256": "bbb2bc4507556eb7886eeb1b27e2547640a565abc6fff765dd58fa33e57ff5e7",
+    "parent_refs": [
+      "git:55bfaadac11904ba81596e450dfd652889552e6f",
+      "source-freeze:source-freeze-r04a-model-role-metadata-20260719",
+      "reuse:reuse-s16-provider-adapters-routing-20260718",
+      "reuse:reuse-s24-r2-openrouter-provider-20260718"
+    ]
+  }
+}

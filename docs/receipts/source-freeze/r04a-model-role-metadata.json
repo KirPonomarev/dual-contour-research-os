@@ -1,0 +1,42 @@
+{
+  "schema_id": "SourceFreezeReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "source-freeze-r04a-model-role-metadata-20260719",
+  "issued_at": "2026-07-19T11:01:26Z",
+  "issuer": {"id": "agent-0", "authority_class": "source-freeze-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "source_repo": "official-provider-documentation-plus-dual-contour-research-os",
+    "remote": "sha256:793cd6df31b4d1c0f4518041a8ab08941654f4cf55097b368389bf2245419861",
+    "branch": "sha256:0d6e4079e36703ebd37c00722f5891d28b0e2811dc114b129215123adcce3605",
+    "head_sha": "55bfaadac11904ba81596e450dfd652889552e6f",
+    "upstream_sha": "55bfaadac11904ba81596e450dfd652889552e6f",
+    "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "untracked_manifest_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "path_dispositions": [
+      {"category": "openai-model-and-pricing", "path": "https://developers.openai.com/api/docs/models/gpt-5.6-sol", "count": 1, "sha256": "NO_LOCAL_COPY", "disposition": "selected-model-id-context-reasoning-and-token-pricing"},
+      {"category": "openai-data-controls", "path": "https://platform.openai.com/docs/models/default-usage-policies-by-endpoint", "count": 1, "sha256": "NO_LOCAL_COPY", "disposition": "selected-no-training-default-retention-and-store-false-boundary"},
+      {"category": "deepseek-models-and-pricing", "path": "https://api-docs.deepseek.com/quick_start/pricing", "count": 1, "sha256": "NO_LOCAL_COPY", "disposition": "selected-v4-flash-v4-pro-identifiers-context-and-token-pricing"},
+      {"category": "deepseek-api-shape", "path": "https://api-docs.deepseek.com/api/create-chat-completion", "count": 1, "sha256": "NO_LOCAL_COPY", "disposition": "selected-openai-compatible-chat-shape"},
+      {"category": "zhipu-model", "path": "https://docs.bigmodel.cn/cn/guide/models/text/glm-5.2", "count": 1, "sha256": "NO_LOCAL_COPY", "disposition": "selected-glm-5.2-id-context-and-reasoning-options"},
+      {"category": "zhipu-pricing", "path": "https://open.bigmodel.cn/pricing", "count": 1, "sha256": "NO_LOCAL_COPY", "disposition": "pricing-page-present-but-machine-readable-current-price-unverified"},
+      {"category": "openrouter-model-and-pricing", "path": "https://openrouter.ai/openai/gpt-5.6-sol/", "count": 1, "sha256": "NO_LOCAL_COPY", "disposition": "selected-gateway-slug-context-and-token-pricing"},
+      {"category": "openrouter-data-controls", "path": "https://openrouter.ai/docs/guides/privacy/data-collection", "count": 1, "sha256": "NO_LOCAL_COPY", "disposition": "selected-default-content-logging-and-sharing-controls"},
+      {"category": "alibaba-qwen-api-shape", "path": "https://help.aliyun.com/en/model-studio/compatibility-with-openai-responses-api", "count": 1, "sha256": "NO_LOCAL_COPY", "disposition": "selected-qwen3.7-plus-api-identifier"},
+      {"category": "alibaba-qwen-pricing", "path": "https://help.aliyun.com/en/model-studio/model-pricing", "count": 1, "sha256": "NO_LOCAL_COPY", "disposition": "selected-current-qwen3.7-pricing-and-context-cap"},
+      {"category": "alibaba-data-controls", "path": "https://help.aliyun.com/en/model-studio/what-is-model-studio", "count": 1, "sha256": "NO_LOCAL_COPY", "disposition": "selected-no-training-and-encrypted-transport-claim-with-retention-caveat"},
+      {"category": "local-sanitized-preflight", "path": "tools/model_provider_shadow.py preflight", "count": 1, "sha256": "2879d3f6db378974eb4a642ba3731eb6ac5240fc447eea35cd6e6d4fd6e5c93b", "disposition": "all-five-existing-bindings-wait-credential-secrets-not-printed"},
+      {"category": "credential-values-raw-responses-private-account-or-billing-data", "count": 0, "disposition": "absent"}
+    ],
+    "selected_source_sha": "2879d3f6db378974eb4a642ba3731eb6ac5240fc447eea35cd6e6d4fd6e5c93b"
+  },
+  "integrity": {
+    "payload_sha256": "f85f12b665ba5a281d9979df81d50760c9346a757eaa61d2766ab4eb8472f605",
+    "parent_refs": [
+      "git:55bfaadac11904ba81596e450dfd652889552e6f",
+      "profile:sha256:37db8596a8245a6b1ea2bc5bce1495a4e7dadb314876e51397ad11dd194b3dc6",
+      "connected-profile:sha256:63ae65247d61b918aced080e6419609459ebcbf4a3384ea29f2617e65597258c"
+    ]
+  }
+}

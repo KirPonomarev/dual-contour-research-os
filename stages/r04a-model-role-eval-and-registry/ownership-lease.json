@@ -1,0 +1,15 @@
+{
+  "lease_id": "lease-r04a-model-role-eval-and-registry-agent-0",
+  "stage_id": "r04a-model-role-eval-and-registry",
+  "agent_id": "agent-0",
+  "branch": "codex/bridge-a0-r04a-model-role-eval-and-registry",
+  "issued_at": "2026-07-19T11:01:26Z",
+  "expires_at": "2026-07-21T11:01:26Z",
+  "write_set": [
+    "provenance/model-role-evaluation-v2.json",
+    "tools/verify_model_role_evaluation.py",
+    "tests/test_r04a_model_role_eval.py"
+  ],
+  "exclusive": true,
+  "revoked": false
+}
