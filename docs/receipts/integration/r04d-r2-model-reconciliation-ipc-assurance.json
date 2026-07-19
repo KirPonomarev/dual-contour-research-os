@@ -1,0 +1,67 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-r04d-r2-model-reconciliation-ipc-assurance-20260719",
+  "issued_at": "2026-07-19T13:38:20Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "r04d-r2-model-reconciliation-ipc-assurance",
+    "agent_id": "agent-5",
+    "ownership_lease_ref": "stages/r04d-r2-model-reconciliation-ipc-assurance/ownership-lease.json",
+    "base_sha": "61a5f96561e2b8c9cb8bd41ab49c3e21fc3daa97",
+    "authority_head_sha": "0e7ced14f9130286e9604dec14f8d7c75e9c024b",
+    "worker_head_sha": "b72cd4c6cc8dc50755c63d268331c51f53e890d2",
+    "head_sha": "400f827a8875f893329b36369dbc38834fc1c467",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "a1_contract_sha256": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+    "write_set": [
+      "tests/test_r04d_model_reconciliation_ipc.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "test_only": true,
+      "write_set_exact": true,
+      "real_AF_UNIX": true,
+      "durable_reopen": true,
+      "operator_only_reconciliation": "PROVEN",
+      "budget_release_after_exact_accounting": "PROVEN",
+      "restart_exact_replay": "ZERO_WRITE",
+      "conflicting_replay": "DENIED_ZERO_WRITE",
+      "nonterminal_reconciliation": "DENIED_ZERO_WRITE",
+      "Scout_and_connected_worker_reconciliation": "DENIED",
+      "protocol_1_1_reconciliation": "DENIED",
+      "focused_tests": 2,
+      "related_acceptance_tests": 19,
+      "full_core_tests": 853,
+      "test_sha256": "5f0ba0c67773e87648663847dc2d635f1c0a473a1ed09e877b809ed82e32c410",
+      "provider_calls_or_cost": 0,
+      "deployment_or_VPS_mutations": 0,
+      "grants_authority": false
+    },
+    "pull_request_ref": "https://github.com/KirPonomarev/dual-contour-research-os/pull/66",
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29689245679",
+    "integration_commit_sha": "400f827a8875f893329b36369dbc38834fc1c467",
+    "known_next_gate": "Resume R04D local-only physical provider proof with one existing credential, one receipted bounded call and no new payment."
+  },
+  "integrity": {
+    "payload_sha256": "dfde9cc553c2be1d89e2148c9dc38fe38974e9058a967361ac8f83ac2cf34052",
+    "parent_refs": [
+      "git:61a5f96561e2b8c9cb8bd41ab49c3e21fc3daa97",
+      "git:0e7ced14f9130286e9604dec14f8d7c75e9c024b",
+      "git:b72cd4c6cc8dc50755c63d268331c51f53e890d2",
+      "git:400f827a8875f893329b36369dbc38834fc1c467",
+      "ci:29689210366",
+      "ci:29689216464",
+      "ci:29689245679",
+      "pr:66",
+      "integration:integration-r04d-r1-model-reconciliation-ipc-20260719"
+    ]
+  }
+}
