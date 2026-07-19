@@ -1,0 +1,53 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-r00-correction-freeze-20260719",
+  "issued_at": "2026-07-19T04:54:26Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "reuse-freeze-authority"
+  },
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "IMMUTABLE_RELEASE_SUPERSESSION_AND_DEPLOYMENT_DENY_GATE",
+    "candidates": [
+      {
+        "candidate": "extend-existing-final-deployment-rebind-with-additive-supersession-receipt",
+        "disposition": "selected-minimal-internal-adapter"
+      },
+      {
+        "candidate": "rewrite-or-delete-historical-S38-receipts",
+        "disposition": "rejected-immutable-history-violation"
+      },
+      {
+        "candidate": "rely-on-documentation-or-human-memory-only",
+        "disposition": "rejected-not-machine-enforced"
+      },
+      {
+        "candidate": "deploy-old-candidate-and-repair-in-place",
+        "disposition": "rejected-known-critical-product-defects"
+      }
+    ],
+    "selected_mode": "reuse-existing-release-parser-and-add-one-frozen-deny-receipt",
+    "source_ref": "git:37f671269adc5a15c6f6571c0cf1731eccb3fc38;manifest:sha256:0439dee8e058914fe8e11416112e4a985e4bfec11502bb2cd0fd5b883295c369",
+    "code_sha256": "40c60cdcfdc9006a220c772e943d54bb2b6cda850e0cfd2a4085437db1062649",
+    "license_spdx": "NOASSERTION",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "old-candidate-static-status-is-superseded",
+      "old-candidate-prepare-fails-before-image-build",
+      "supersession-receipt-integrity-and-exact-identity",
+      "historical-release-remains-readable-and-non-authoritative"
+    ],
+    "canonical_owner": "agent-0-release-and-deployment",
+    "rollback": "Remove only the additive deny adapter and retain the historical release as deployment_allowed=false; no production action is part of rollback."
+  },
+  "integrity": {
+    "payload_sha256": "44ebd71c24d532c1847802d4242bb2f6d075866d38c333ce135c6095ed27a5bb",
+    "parent_refs": [
+      "git:37f671269adc5a15c6f6571c0cf1731eccb3fc38",
+      "artifact:sha256:0439dee8e058914fe8e11416112e4a985e4bfec11502bb2cd0fd5b883295c369"
+    ]
+  }
+}
