@@ -1,0 +1,22 @@
+{
+  "lease_id": "lease-r06a-observability-and-recovery-controls-agent-5",
+  "stage_id": "r06a-observability-and-recovery-controls",
+  "agent_id": "agent-5",
+  "branch": "codex/bridge-a5-r06a-observability-and-recovery-controls",
+  "issued_at": "2026-07-19T16:12:04Z",
+  "expires_at": "2026-07-21T16:12:04Z",
+  "write_set": [
+    "ops/organism/runtime_monitor.py",
+    "ops/organism/runtime-monitor-policy.json",
+    "ops/organism/component-declarations.json",
+    "ops/organism/deployment-projection.json",
+    "ops/release/monitoring-recovery-policy.json",
+    "ops/deploy/research-os-runtime-monitor.service",
+    "ops/deploy/research-os-runtime-monitor.timer",
+    "ops/deploy/research-os-backup.service",
+    "ops/deploy/research-os-backup.timer",
+    "tests/test_r06a_observability_recovery_controls.py"
+  ],
+  "exclusive": true,
+  "revoked": false
+}

@@ -1,0 +1,75 @@
+{
+  "stage_id": "r06a-observability-and-recovery-controls",
+  "agent_id": "agent-5",
+  "objective": "Implement continuous read-only Pulse recording, fail-closed operational alerts, restart-stable immutable counters and incidents, plus non-restoring backup scheduling under the existing single-supervisor topology.",
+  "executable_blocker": "R05C emits truthful immutable Pulse samples, but no durable monitor, release-bound alert policy, window-counter input, monitor schedule or backup timer is packaged for the candidate image.",
+  "base_sha": "d006ca22b35002a06c1fb0b259612df97d964788",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "a1_contract_sha256": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+  "branch": "codex/bridge-a5-r06a-observability-and-recovery-controls",
+  "worktree": "/private/tmp/dcr-r06a-observability-and-recovery-controls",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "ownership/registry.json",
+    "src/research_bridge/organism.py",
+    "ops/organism/component-declarations.json",
+    "ops/organism/deployment-projection.json",
+    "ops/organism/pulse-policy.json",
+    "ops/release/final-a1-runtime-policy.json",
+    "ops/deploy/research-os-a1-final.service",
+    "ops/deploy/research-os-connected-worker@.service",
+    "tools/release_backup_restore.py",
+    "tests/test_r05c_loop_pulse_and_canonical_assurance.py",
+    "tests/test_release_backup_restore.py"
+  ],
+  "write_set": [
+    "ops/organism/runtime_monitor.py",
+    "ops/organism/runtime-monitor-policy.json",
+    "ops/organism/component-declarations.json",
+    "ops/organism/deployment-projection.json",
+    "ops/release/monitoring-recovery-policy.json",
+    "ops/deploy/research-os-runtime-monitor.service",
+    "ops/deploy/research-os-runtime-monitor.timer",
+    "ops/deploy/research-os-backup.service",
+    "ops/deploy/research-os-backup.timer",
+    "tests/test_r06a_observability_recovery_controls.py"
+  ],
+  "forbidden_scope": [
+    "src-tools-contract-schema-root-config-CI-migration-lockfile-or-existing-test-edit",
+    "research-ledger-CAS-runtime-config-or-provider-state-write",
+    "restore-delete-prune-deploy-window-start-or-external-paging-action",
+    "secret-repository-locator-password-command-private-evidence-or-runtime-database-in-Git"
+  ],
+  "dependency_hashes": {
+    "r05c_integration_head": "d006ca22b35002a06c1fb0b259612df97d964788",
+    "component_source_sha256": "89afa5b2a3e302d05ed8c3f4ce643b879340805d33f8d46e6b9c1bd95ebb7c86",
+    "deployment_projection_sha256": "c2694106f47cdf7695f5b5afacdf6c1c29856836d7067f917d7f5f3e99ce333f",
+    "runtime_policy_sha256": "665bfb70a82d3aa5988d45fa299fb14d2b28926e6267a15ae440e3c03fbb0cd9",
+    "backup_controller_sha256": "9e9c0d2d8a1be70e27c3d6d6c6dbf522a3fe0f331f4cc2d186968c1b60515a74",
+    "ownership_registry_sha256": "e7a6a5158e43cb76c1df0fa28caec36ec9585a0dd05a732eabb94a92e427c9da",
+    "reuse_receipt": "docs/receipts/reuse/r06a-observability-and-recovery-controls.json"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest tests.test_r06a_observability_recovery_controls tests.test_r05c_loop_pulse_and_canonical_assurance tests.test_release_backup_restore",
+    "python3 -m unittest discover -s tests",
+    "python3 -m unittest discover -s tests/stage0b -p test_*.py",
+    "git diff --check",
+    "exact-head remote CI"
+  ],
+  "risk_class": "high-false-operational-green-and-second-control-plane",
+  "stop_conditions": [
+    "dependency-hash-mismatch",
+    "write-outside-declared-ops-and-additive-test-set",
+    "monitor-mutates-research-state-or-grants-action-authority",
+    "counter-or-chain-tamper-survives-restart",
+    "stale-failed-drift-quota-or-second-writer-condition-is-green",
+    "backup-unit-can-restore-delete-prune-or-print-secret-input"
+  ],
+  "expected_receipt": "docs/receipts/integration/r06a-observability-and-recovery-controls.json",
+  "rollback": "Disable and remove the two new timers and their services, remove the monitoring-only journal implementation/policies and restore the prior organism topology; research state is untouched.",
+  "commit_authority": "one-scoped-agent-5-stage",
+  "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent0_audit", "blocked_validation_failed"]
+}

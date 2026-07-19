@@ -1,0 +1,25 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-r06a-observability-and-recovery-controls-20260719",
+  "issued_at": "2026-07-19T16:12:04Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "decision": "REUSE_INTERNAL_AND_STANDARD_LIBRARY",
+  "objective": "Add release-bound read-only monitoring, durable counters, incident references and scheduled backup controls without another research-state writer.",
+  "evaluation_order": [
+    "internal-adapter",
+    "owned-versioned-package",
+    "pinned-permissive-dependency",
+    "small-audited-vendor-import",
+    "minimal-missing-glue"
+  ],
+  "selected": [
+    "src/research_bridge/organism.py:validate_pulse_sample",
+    "tools/release_backup_restore.py:receipt-last encrypted backup controller",
+    "ops/release/final-a1-runtime-policy.json:single-supervisor boundary",
+    "python-standard-library:json-hashlib-fcntl-os-pathlib"
+  ],
+  "new_dependency": false,
+  "external_code": false,
+  "rationale": "Existing immutable Pulse validation and backup controller cover the privileged semantics; a small owner-only hash-chained monitoring journal and systemd scheduling glue are the only missing pieces."
+}
