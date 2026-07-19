@@ -1,0 +1,11 @@
+{
+  "lease_id": "lease-r07b-currentness-path-assurance-agent-5",
+  "stage_id": "r07b-currentness-path-assurance",
+  "agent_id": "agent-5",
+  "branch": "codex/bridge-a5-r07b-currentness-path-assurance",
+  "issued_at": "2026-07-19T17:39:00Z",
+  "expires_at": "2026-07-21T17:39:00Z",
+  "write_set": ["tests/test_r07b_currentness_path_assurance.py"],
+  "exclusive": true,
+  "revoked": false
+}

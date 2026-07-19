@@ -1,0 +1,57 @@
+{
+  "stage_id": "r07b-currentness-path-assurance",
+  "agent_id": "agent-5",
+  "objective": "Independently prove every current release entrypoint rejects old, expired, mixed, malformed, wrong-ancestry, drifted, vacuous or authority-bearing evidence and never delegates to a historical-only helper.",
+  "executable_blocker": "R07A currentness is integrated, but alternate-entrypoint and complete mutation-path assurance is not yet independently frozen.",
+  "base_sha": "d8a4d6a9eab76a053f13cf60b532063bd4fbc3c4",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "a1_contract_sha256": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+  "branch": "codex/bridge-a5-r07b-currentness-path-assurance",
+  "worktree": "/private/tmp/dcr-r07b-currentness-path-assurance",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "ownership/registry.json",
+    "tools/release_currentness.py",
+    "tools/e1_aggregate_gate.py",
+    "tools/e2_aggregate_gate.py",
+    "tools/e3_aggregate_gate.py",
+    "tools/verify_final_release_freeze.py",
+    "tests/test_r07a_proof_currentness.py",
+    "docs/receipts/capability/**",
+    "docs/receipts/release/**"
+  ],
+  "write_set": ["tests/test_r07b_currentness_path_assurance.py"],
+  "forbidden_scope": [
+    "edit-source-tool-policy-config-contract-schema-existing-test-receipt-root-CI-lockfile-or-migration",
+    "issue-proof-build-image-deploy-restore-reboot-provider-call-or-start-window",
+    "secret-private-evidence-raw-provider-response-runtime-database-or-account-data-in-Git"
+  ],
+  "dependency_hashes": {
+    "r07a_integration_head": "d8a4d6a9eab76a053f13cf60b532063bd4fbc3c4",
+    "r07a_integration_receipt_sha256": "1f41b7868faf7ae58249e630d092992da8fcbbc2656b3b011389185331256a9b",
+    "release_currentness_sha256": "418728f6a2b5310028f979fef50cce6ff1f135a402a7dc9041339d9e6af1ce93",
+    "reuse_receipt": "docs/receipts/reuse/r07b-currentness-path-assurance.json"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest tests.test_r07b_currentness_path_assurance tests.test_r07a_proof_currentness",
+    "python3 -m unittest discover -s tests",
+    "python3 -m unittest discover -s tests/stage0b -p test_*.py",
+    "git diff --check",
+    "exact-head remote CI"
+  ],
+  "risk_class": "critical-alternate-currentness-bypass",
+  "stop_conditions": [
+    "dependency-hash-mismatch",
+    "write-outside-additive-test-file",
+    "any-current-entrypoint-accepts-required-negative-case",
+    "final-freeze-current-path-references-historical-validation",
+    "test-needs-private-evidence-or-external-action"
+  ],
+  "expected_receipt": "docs/receipts/integration/r07b-currentness-path-assurance.json",
+  "rollback": "Remove the additive R07B assurance file; validators and external state remain unchanged.",
+  "commit_authority": "one-scoped-agent-5-stage",
+  "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent0_audit", "blocked_validation_failed"]
+}

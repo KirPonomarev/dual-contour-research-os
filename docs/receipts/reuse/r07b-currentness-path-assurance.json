@@ -1,0 +1,22 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-r07b-currentness-path-assurance-20260719",
+  "issued_at": "2026-07-19T17:39:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "decision": "REUSE_INTERNAL_AND_STANDARD_LIBRARY",
+  "objective": "Independently prove no release-facing validator path can bypass the R07A current-subject context.",
+  "evaluation_order": ["internal-adapter", "owned-versioned-package", "pinned-permissive-dependency", "small-audited-vendor-import", "minimal-missing-glue"],
+  "selected": [
+    "tests/test_r07a_proof_currentness.py:exact synthetic context builder",
+    "tools/release_currentness.py:current release entrypoint",
+    "tools/e1_aggregate_gate.py:current E1 entrypoint",
+    "tools/e2_aggregate_gate.py:current E2 entrypoint",
+    "tools/e3_aggregate_gate.py:current E3 entrypoint",
+    "tools/verify_final_release_freeze.py:current final-freeze entrypoint",
+    "python-standard-library:unittest-ast-copy-json-pathlib-subprocess"
+  ],
+  "new_dependency": false,
+  "external_code": false,
+  "rationale": "An additive source-inspection and mutation suite over the integrated validators is sufficient; no new runtime component is required."
+}
