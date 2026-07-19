@@ -1,0 +1,71 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-r04d-r1-model-reconciliation-ipc-20260719",
+  "issued_at": "2026-07-19T13:30:40Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "r04d-r1-model-reconciliation-ipc",
+    "agent_id": "agent-1",
+    "ownership_lease_ref": "stages/r04d-r1-model-reconciliation-ipc/ownership-lease.json",
+    "base_sha": "cd6e03fde6ee3d1ffcd2dd6b5fa151c2b025aa11",
+    "authority_head_sha": "7e0ec63737c7fbc6049abc491fb2da4fc0148585",
+    "worker_head_sha": "a227d8aa35fa8ba52dc9a9ddadc6207b4182660c",
+    "head_sha": "61a5f96561e2b8c9cb8bd41ab49c3e21fc3daa97",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "a1_contract_sha256": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+    "write_set": [
+      "src/research_bridge/control.py",
+      "src/research_bridge/researchd.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "bridge_runtime_source_mutation": true,
+      "write_set_exact": true,
+      "operator_only_reconciliation": "PROVEN",
+      "protocol_1_2_required": true,
+      "protocol_1_1_rejected": true,
+      "Scout_reconciliation": "DENIED",
+      "connected_worker_reconciliation": "DENIED",
+      "researchd_single_writer_preserved": true,
+      "terminal_exact_accounting_required": true,
+      "reconciled_budget_released": true,
+      "restart_exact_replay": "ZERO_WRITE",
+      "conflicting_replay": "DENIED",
+      "nonterminal_reconciliation": "DENIED",
+      "private_AF_UNIX_probe_tests": 16,
+      "related_acceptance_tests": 17,
+      "full_core_tests": 851,
+      "control_sha256": "6363f53f526c9a750f93fce48a9fa66732347472d1164855aa1793d1507df225",
+      "researchd_sha256": "02fce69be9320fff20c3e42085c460bb69cb1b7706b3ad263af68faaa877f178",
+      "provider_calls_or_cost": 0,
+      "deployment_or_VPS_mutations": 0,
+      "grants_authority": false
+    },
+    "pull_request_ref": "https://github.com/KirPonomarev/dual-contour-research-os/pull/65",
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29688991539",
+    "integration_commit_sha": "61a5f96561e2b8c9cb8bd41ab49c3e21fc3daa97",
+    "known_next_gate": "Add an independent Agent-5 permanent reconciliation IPC assurance suite before any R04D provider spend."
+  },
+  "integrity": {
+    "payload_sha256": "3e72d7b3bf3b572709b05136f7eb37b3762adb2c4592221981ee805086b9ecec",
+    "parent_refs": [
+      "git:cd6e03fde6ee3d1ffcd2dd6b5fa151c2b025aa11",
+      "git:7e0ec63737c7fbc6049abc491fb2da4fc0148585",
+      "git:a227d8aa35fa8ba52dc9a9ddadc6207b4182660c",
+      "git:61a5f96561e2b8c9cb8bd41ab49c3e21fc3daa97",
+      "ci:29688949941",
+      "ci:29688951111",
+      "ci:29688991539",
+      "pr:65",
+      "reuse:reuse-r04d-r1-model-reconciliation-ipc-20260719"
+    ]
+  }
+}

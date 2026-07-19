@@ -1,0 +1,13 @@
+{
+  "lease_id": "lease-r04d-r2-model-reconciliation-ipc-assurance-agent-5",
+  "stage_id": "r04d-r2-model-reconciliation-ipc-assurance",
+  "agent_id": "agent-5",
+  "branch": "codex/bridge-a5-r04d-r2-model-reconciliation-assurance",
+  "issued_at": "2026-07-19T13:30:40Z",
+  "expires_at": "2026-07-21T13:30:40Z",
+  "write_set": [
+    "tests/test_r04d_model_reconciliation_ipc.py"
+  ],
+  "exclusive": true,
+  "revoked": false
+}
