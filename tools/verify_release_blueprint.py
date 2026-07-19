@@ -59,7 +59,6 @@ _EXPECTED_BUILD_CONTEXT = (
     "!provenance/",
     "!provenance/model-provider-connected-shadow-v2.json",
     "!provenance/model-provider-routing-v1.json",
-    "!provenance/model-role-evaluation-v2.json",
     "!provenance/model-worker-ipc-extension-v1.json",
     "!contracts/",
     "!contracts/catalog.json",
