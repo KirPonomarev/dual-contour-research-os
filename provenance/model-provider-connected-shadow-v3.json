@@ -1,7 +1,7 @@
 {
-  "profile_id": "model-provider-connected-shadow-v2",
-  "schema_version": "2.0.0",
-  "status": "OFFICIAL_API_SHAPE_VERIFIED_CONNECTED_AVAILABILITY_UNPROVEN",
+  "profile_id": "model-provider-connected-shadow-v3",
+  "schema_version": "3.0.0",
+  "status": "OFFICIAL_API_SHAPE_VERIFIED_CONNECTED_VISIBLE_OUTPUT_REPAIR_PENDING",
   "allowed_input_classes": ["D0", "D1"],
   "forbidden_input_classes": ["D2", "D3", "sealed-holdout"],
   "max_request_bytes": 65536,
@@ -27,7 +27,7 @@
       "protocol": "OPENAI_CHAT_COMPLETIONS",
       "api_model": "deepseek-v4-pro",
       "context_window": null,
-      "request_options": {"thinking": {"type": "enabled"}, "reasoning_effort": "high"},
+      "request_options": {"thinking": {"type": "disabled"}, "reasoning_effort": "high"},
       "source": "https://api-docs.deepseek.com/api/create-chat-completion"
     },
     "glm-5.2-max": {
@@ -74,6 +74,6 @@
     "openrouter_credential_precedence": "environment_then_macos_keychain",
     "openrouter_gateway_is_not_model_independence_evidence": true,
     "actual_upstream_provider_is_not_attested_by_requested_model_slug": true,
-    "connected_capability_status": "UNPROVEN_UNTIL_S24_R2_LOCAL_SHADOW"
+    "connected_capability_status": "UNPROVEN_UNTIL_R08B_PRE_CUT"
   }
 }

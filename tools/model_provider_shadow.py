@@ -42,7 +42,8 @@ from research_bridge.model_broker import (  # noqa: E402
 
 
 LEGACY_PROFILE_PATH = ROOT / "provenance" / "model-provider-connected-shadow-v1.json"
-PROFILE_PATH = ROOT / "provenance" / "model-provider-connected-shadow-v2.json"
+PROFILE_V2_PATH = ROOT / "provenance" / "model-provider-connected-shadow-v2.json"
+PROFILE_PATH = ROOT / "provenance" / "model-provider-connected-shadow-v3.json"
 ROUTING_PATH = ROOT / "provenance" / "model-provider-routing-v1.json"
 ROLE_PATH = ROOT / "contracts" / "a1" / "v1" / "profiles" / "model_role_registry_v1.json"
 _PROFILE_KEYS = {
@@ -146,6 +147,8 @@ _EXPECTED_BINDING_SHAPES = {
         "source": "https://developers.openai.com/api/docs/models/gpt-5.6-sol",
     },
 }
+_EXPECTED_BINDING_SHAPES_V2 = copy.deepcopy(_EXPECTED_BINDING_SHAPES)
+_EXPECTED_BINDING_SHAPES_V2["deepseek-v4-pro"]["request_options"]["thinking"]["type"] = "enabled"
 
 _OPENROUTER_CREDENTIAL_ENV = "OPENROUTER_API_KEY"
 _OPENROUTER_KEYCHAIN_SERVICE = "ai.shared.openrouter"
@@ -252,6 +255,7 @@ class ConnectedShadowProfile:
         if profile_id not in {
             "model-provider-connected-shadow-v1",
             "model-provider-connected-shadow-v2",
+            "model-provider-connected-shadow-v3",
         }:
             raise ShadowProviderError("provider shadow profile id drifted")
         if value["allowed_input_classes"] != ["D0", "D1"]:
@@ -269,6 +273,8 @@ class ConnectedShadowProfile:
         expected_shapes = (
             _EXPECTED_LEGACY_BINDING_SHAPES
             if profile_id == "model-provider-connected-shadow-v1"
+            else _EXPECTED_BINDING_SHAPES_V2
+            if profile_id == "model-provider-connected-shadow-v2"
             else _EXPECTED_BINDING_SHAPES
         )
         bindings = value["bindings"]
@@ -300,7 +306,7 @@ class ConnectedShadowProfile:
             raise ShadowProviderError("provider shadow invariant drifted")
         if invariants.get("automatic_retry") is not False:
             raise ShadowProviderError("provider shadow cannot retry automatically")
-        if profile_id == "model-provider-connected-shadow-v2" and (
+        if profile_id in {"model-provider-connected-shadow-v2", "model-provider-connected-shadow-v3"} and (
             invariants.get("openrouter_credential_precedence")
             != "environment_then_macos_keychain"
             or invariants.get("openrouter_gateway_is_not_model_independence_evidence") is not True
