@@ -36,7 +36,10 @@ from .discovery import (
     DurableDiscoveryConfig,
     DurableDiscoveryService,
 )
-from .execution import OfflineExecutionCoordinator
+from .execution import (
+    OfflineExecutionCoordinator,
+    ValidatedOfflineExecutionCoordinator,
+)
 from .ingestion import TrustedIngestor
 from .ipc import (
     IPCError,
@@ -47,6 +50,7 @@ from .ipc import (
 from .kernel import BridgeKernel
 from .l0 import DeterministicL0Runner
 from .ledger import JobLedger
+from .validation import DeterministicL0Validator
 
 
 _ROOT_MODE = 0o700
@@ -187,6 +191,13 @@ _PUBLIC_AUTHORITY_CLASSES = frozenset({"D0_PUBLIC", "D1_INTERNAL_SANITIZED"})
 _HEX_DIGITS = frozenset("0123456789abcdef")
 _CONFIG_ERROR_LINE = "researchd configuration rejected\n"
 _RUNTIME_ERROR_LINE = "researchd runtime failed\n"
+_L0_VALIDATOR_ID = "independent-byte-level-l0"
+_L0_VALIDATOR_SOURCE_SHA256 = (
+    "6377a7d60c0246d38d2fefe5a3a685409a3434342e41d0d88262ece8d326fa51"
+)
+_MAX_VALIDATOR_SOURCE_BYTES = 1_048_576
+_MAX_L0_VALIDATION_ARTIFACT_BYTES = 8_388_608
+_MAX_L0_VALIDATION_INPUT_BYTES = 67_108_864
 
 
 class ResearchdError(RuntimeError):
@@ -404,6 +415,8 @@ class ResearchDaemon:
         self._checkpoint_store: ContentAddressedStore | None = None
         self._artifact_store: ContentAddressedStore | None = None
         self._coordinator: OfflineExecutionCoordinator | None = None
+        self._validated_coordinator: ValidatedOfflineExecutionCoordinator | None = None
+        self._validation_protocol_ref: str | None = None
         self._a1_backend: DurableDiscoveryService | None = None
         self._server: UnixControlServer | None = None
         self._started = False
@@ -454,7 +467,7 @@ class ResearchDaemon:
                     clock=self._clock,
                     issuer_id="researchd-trusted-ingestor",
                 )
-                self._coordinator = OfflineExecutionCoordinator(
+                coordinator = OfflineExecutionCoordinator(
                     BridgeKernel(fence_ledger, authority=self._authority),
                     fence_ledger,
                     runner,
@@ -462,6 +475,36 @@ class ResearchDaemon:
                     ingestor,
                     issuer_id="researchd",
                 )
+                self._coordinator = coordinator
+                corridor_profile = _corridor_executor_profile(
+                    a1_enabled=self._a1_enabled,
+                    frozen_bindings=self._frozen_bindings,
+                )
+                if corridor_profile is not None:
+                    _verify_l0_validator_source()
+                    validator = DeterministicL0Validator(
+                        validator_id=_L0_VALIDATOR_ID,
+                        validator_sha256=_L0_VALIDATOR_SOURCE_SHA256,
+                        protocol_ref=corridor_profile.protocol_ref,
+                        artifact_store=self._artifact_store,
+                        input_store=self._input_store,
+                        maximum_artifact_bytes=min(
+                            self._artifact_quota_bytes,
+                            _MAX_L0_VALIDATION_ARTIFACT_BYTES,
+                        ),
+                        maximum_input_bytes=min(
+                            self._maximum_input_bytes,
+                            _MAX_L0_VALIDATION_INPUT_BYTES,
+                        ),
+                    )
+                    self._validated_coordinator = ValidatedOfflineExecutionCoordinator(
+                        coordinator,
+                        validator,
+                        expected_validator_id=_L0_VALIDATOR_ID,
+                        expected_validator_sha256=_L0_VALIDATOR_SOURCE_SHA256,
+                        expected_protocol_ref=corridor_profile.protocol_ref,
+                    )
+                    self._validation_protocol_ref = corridor_profile.protocol_ref
                 a1_backend: DurableDiscoveryService | None = None
                 if self._a1_enabled:
                     discovery_config = _discovery_config_from_authority(
@@ -576,23 +619,58 @@ class ResearchDaemon:
                 lease_payload.get("attempt_id"),
                 maximum=256,
             )
+            validation_protocol_ref = self._validation_protocol_ref
+            if validation_protocol_ref is not None:
+                submitted_protocol_ref = _text(
+                    "job_spec.payload.protocol_ref",
+                    job_payload.get("protocol_ref"),
+                    maximum=512,
+                )
+                if submitted_protocol_ref != validation_protocol_ref:
+                    raise ResearchdError(
+                        "submit protocol differs from frozen validation protocol"
+                    )
             staging_root = self._fresh_staging_directory(attempt_id)
             try:
-                record = coordinator.execute(
+                validated_coordinator = self._validated_coordinator
+                if validated_coordinator is None:
+                    record = coordinator.execute(
+                        job_spec,
+                        permit,
+                        lease,
+                        staging_root,
+                        now=now,
+                    )
+                    immediate = coordinator.lookup_execution_receipt(job_spec_ref)
+                    if _canonical_json_bytes(
+                        record.execution_receipt
+                    ) != _canonical_json_bytes(immediate):
+                        raise ResearchdError(
+                            "submit receipt differs from canonical terminal lookup"
+                        )
+                    return {"execution_receipt": _json_copy(immediate)}
+
+                record = validated_coordinator.execute_and_validate(
                     job_spec,
                     permit,
                     lease,
                     staging_root,
                     now=now,
                 )
-                immediate = coordinator.lookup_execution_receipt(job_spec_ref)
-                if _canonical_json_bytes(record.execution_receipt) != _canonical_json_bytes(
-                    immediate
+                immediate = validated_coordinator.validate_completed(job_spec_ref)
+                if (
+                    _canonical_json_bytes(record.execution_receipt)
+                    != _canonical_json_bytes(immediate.execution_receipt)
+                    or _canonical_json_bytes(record.validation_receipt)
+                    != _canonical_json_bytes(immediate.validation_receipt)
                 ):
                     raise ResearchdError(
-                        "submit receipt differs from canonical terminal lookup"
+                        "submit receipts differ from canonical terminal validation"
                     )
-                return {"execution_receipt": _json_copy(immediate)}
+                return {
+                    "execution_receipt": _json_copy(immediate.execution_receipt),
+                    "validation_receipt": _json_copy(immediate.validation_receipt),
+                }
             except ResearchdError:
                 raise
             except Exception as exc:
@@ -606,12 +684,19 @@ class ResearchDaemon:
         with self._dispatch_lock:
             reference = _text("job_spec_ref", job_spec_ref, maximum=256)
             try:
-                receipt = self._require_coordinator().lookup_execution_receipt(
-                    reference
-                )
+                validated_coordinator = self._validated_coordinator
+                if validated_coordinator is None:
+                    receipt = self._require_coordinator().lookup_execution_receipt(
+                        reference
+                    )
+                    return {"execution_receipt": _json_copy(receipt)}
+                record = validated_coordinator.validate_completed(reference)
             except Exception as exc:
                 raise ResearchdError("terminal receipt lookup failed closed") from exc
-            return {"execution_receipt": _json_copy(receipt)}
+            return {
+                "execution_receipt": _json_copy(record.execution_receipt),
+                "validation_receipt": _json_copy(record.validation_receipt),
+            }
 
     def _fresh_staging_directory(self, attempt_id: str) -> Path:
         digest = hashlib.sha256(attempt_id.encode("utf-8")).hexdigest()
@@ -670,6 +755,8 @@ class ResearchDaemon:
             ledger.close()
 
         self._coordinator = None
+        self._validated_coordinator = None
+        self._validation_protocol_ref = None
         self._a1_backend = None
         self._fence_ledger = None
         self._input_store = None
@@ -697,6 +784,63 @@ class ResearchDaemon:
 
     def __exit__(self, exc_type: object, exc: object, traceback: object) -> None:
         self.close()
+
+
+def _corridor_executor_profile(
+    *,
+    a1_enabled: bool,
+    frozen_bindings: Mapping[str, object] | None,
+) -> CorridorExecutorProfile | None:
+    if not a1_enabled:
+        return None
+    if not isinstance(frozen_bindings, Mapping):
+        raise ResearchdError("A1 validation requires frozen runtime bindings")
+    runtime_binding = frozen_bindings.get(_ADMISSION_RUNTIME_KEY)
+    if runtime_binding is None:
+        return None
+    if not isinstance(runtime_binding, Mapping):
+        raise ResearchdError("A1 validation runtime binding is invalid")
+    profile = runtime_binding.get("corridor_executor_profile")
+    if profile is None:
+        return None
+    if type(profile) is not CorridorExecutorProfile:
+        raise ResearchdError("A1 validation corridor profile is invalid")
+    return profile
+
+
+def _verify_l0_validator_source() -> None:
+    module = sys.modules.get(DeterministicL0Validator.__module__)
+    source_location = getattr(module, "__file__", None)
+    if not isinstance(source_location, str) or not source_location.endswith(".py"):
+        raise ResearchdError("pinned L0 validator source is unavailable")
+    if not hasattr(os, "O_NOFOLLOW"):
+        raise ResearchdError("platform cannot verify the pinned L0 validator source")
+    flags = os.O_RDONLY | os.O_NOFOLLOW
+    flags |= getattr(os, "O_CLOEXEC", 0)
+    try:
+        descriptor = os.open(source_location, flags)
+    except OSError as exc:
+        raise ResearchdError("pinned L0 validator source cannot be opened") from exc
+    try:
+        metadata = os.fstat(descriptor)
+        if (
+            not stat.S_ISREG(metadata.st_mode)
+            or metadata.st_size <= 0
+            or metadata.st_size > _MAX_VALIDATOR_SOURCE_BYTES
+        ):
+            raise ResearchdError("pinned L0 validator source is invalid")
+        digest = hashlib.sha256()
+        remaining = metadata.st_size
+        while remaining:
+            chunk = os.read(descriptor, min(65_536, remaining))
+            if not chunk:
+                raise ResearchdError("pinned L0 validator source is truncated")
+            digest.update(chunk)
+            remaining -= len(chunk)
+        if digest.hexdigest() != _L0_VALIDATOR_SOURCE_SHA256:
+            raise ResearchdError("pinned L0 validator source digest is stale")
+    finally:
+        os.close(descriptor)
 
 
 def _open_runtime_root(root: Path) -> tuple[int, tuple[int, int]]:
