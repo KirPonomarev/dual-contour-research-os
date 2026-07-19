@@ -86,6 +86,10 @@ class ProviderShadowToolTests(unittest.TestCase):
             profile.binding("deepseek-v4-pro")["request_options"]["thinking"],
             {"type": "disabled"},
         )
+        self.assertEqual(
+            profile.binding("gpt-5.6-sol-xhigh")["request_options"]["reasoning"],
+            {"effort": "low"},
+        )
 
     def test_profile_is_strict_and_exact_official_api_ids_are_separate_from_logical_bindings(self) -> None:
         self.assertEqual(

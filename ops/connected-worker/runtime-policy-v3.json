@@ -27,6 +27,6 @@
   "automatic_retry": false,
   "replay_completion_only": true,
   "worker_ipc_extension_sha256": "03d91f027bb6975c55d84acaef188546bcd24af9944a72f4ff9314296399d07a",
-  "shadow_profile_sha256": "cd430b1066f6a92c03bff78838ec3d6f223c48283bafc0676646da4f07bd1698",
-  "shadow_tool_sha256": "7bc761bf2af24b806bf522c9250ad22c73c70121f99a4e576a98bb7756d08480"
+  "shadow_profile_sha256": "707b5b2da2e6ae2d735dc51def3cde79683e5467ec3f72e029612dea02564779",
+  "shadow_tool_sha256": "a02f33670f6aa13046e6a32bc64defd4b8920c34beb1bad345f1d17344a11692"
 }
