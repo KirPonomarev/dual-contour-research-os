@@ -1,0 +1,11 @@
+{
+  "lease_id": "lease-r03a-admission-authority-wiring-agent-1",
+  "stage_id": "r03a-admission-authority-wiring",
+  "agent_id": "agent-1",
+  "branch": "codex/bridge-a1-r03a-admission-authority-wiring",
+  "issued_at": "2026-07-19T07:57:46Z",
+  "expires_at": "2026-07-21T07:57:46Z",
+  "write_set": ["src/research_bridge/admission.py", "src/research_bridge/authority.py", "src/research_bridge/discovery.py", "src/research_bridge/kernel.py", "src/research_bridge/ledger.py", "src/research_bridge/researchd.py"],
+  "exclusive": true,
+  "revoked": false
+}

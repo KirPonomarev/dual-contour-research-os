@@ -1,0 +1,30 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-r03a-admission-authority-wiring-20260719",
+  "issued_at": "2026-07-19T07:57:46Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-freeze-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "PRODUCTION_DETERMINISTIC_ADMISSION_AND_A1_AUTHORITY_WIRING",
+    "candidates": [
+      {"candidate": "thin-composition-over-A1AdmissionKernel-A1AuthorityCorridor-DurableDiscoveryService-JobLedger", "disposition": "selected-internal-adapter"},
+      {"candidate": "LLM-or-model-self-admission", "disposition": "rejected-deterministic-kernel-is-sole-admission-authority"},
+      {"candidate": "new-ledger-database-queue-scheduler-service-or-schema", "disposition": "rejected-existing-v2-A1-projection-and-authority-documents-sufficient"},
+      {"candidate": "weaken-frozen-issuer-roles-to-match-stale-ops-template", "disposition": "rejected-ops-owner-must-correct-template"},
+      {"candidate": "new-external-dependency", "disposition": "rejected-existing-runtime-and-stdlib-sufficient"}
+    ],
+    "selected_mode": "one-researchd-composed-production-admission-adapter-with-durable-snapshot-receipt-state-and-deterministic-one-shot-authority-bundle",
+    "source_ref": "git:dbbb3516ad1532eddd13ec7d8b31dc42d880170d;internal:admission.py+authority.py+discovery.py+ledger.py+researchd.py",
+    "license_spdx": "NOASSERTION",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": ["valid-admit-and-exact-replay", "stale-mixed-forged-private-live-denial", "budget-park", "one-shot-permit-and-lease", "restart-reconstruction", "issuer-role-fail-closed"],
+    "canonical_owner": "agent-1-with-agent-0-integration",
+    "rollback": "Revert the scoped Agent-1 adapter changes; R02C production discovery remains durable and admission stays unavailable fail-closed."
+  },
+  "integrity": {
+    "payload_sha256": "297d52796a192273b05e2029cbccc073fd34c9281850552f15150167c7ba0186",
+    "parent_refs": ["git:dbbb3516ad1532eddd13ec7d8b31dc42d880170d", "reuse:reuse-r02c-a1-backend-durability-assurance-20260719"]
+  }
+}

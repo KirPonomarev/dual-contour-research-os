@@ -1,0 +1,71 @@
+{
+  "stage_id": "r03a-admission-authority-wiring",
+  "agent_id": "agent-1",
+  "objective": "Connect each production CandidateSpecDraft to one deterministic exact-ledger AdmissionSnapshot and AdmissionReceipt, then derive the existing bounded one-shot A1 authority corridor for admitted D0/D1 work.",
+  "executable_blocker": "R02C production discovery durably stores candidates, but researchd does not evaluate or persist admission and cannot derive a JobSpec, Permit and AttemptLease from an admitted candidate.",
+  "base_sha": "dbbb3516ad1532eddd13ec7d8b31dc42d880170d",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "a1_contract_sha256": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+  "branch": "codex/bridge-a1-r03a-admission-authority-wiring",
+  "worktree": "/private/tmp/dcr-r03a-admission-authority-wiring",
+  "read_set": [
+    "contracts/a1/v1/profiles/a1_sandbox_policy_v1.json",
+    "contracts/a1/v1/profiles/authority_corridor_v1.json",
+    "src/research_bridge/admission.py",
+    "src/research_bridge/authority.py",
+    "src/research_bridge/control.py",
+    "src/research_bridge/discovery.py",
+    "src/research_bridge/kernel.py",
+    "src/research_bridge/ledger.py",
+    "src/research_bridge/researchd.py",
+    "tests/test_a1_admission_fixture.py",
+    "tests/test_a1_authority_corridor.py",
+    "tests/test_a1_storage_v2.py",
+    "tests/test_stage1_researchd.py"
+  ],
+  "write_set": [
+    "src/research_bridge/admission.py",
+    "src/research_bridge/authority.py",
+    "src/research_bridge/discovery.py",
+    "src/research_bridge/kernel.py",
+    "src/research_bridge/ledger.py",
+    "src/research_bridge/researchd.py"
+  ],
+  "forbidden_scope": [
+    "LLM-model-or-candidate-controlled-admission-authority-budget-or-issuer-selection",
+    "new-database-ledger-schema-migration-queue-scheduler-service-thread-process-or-dependency",
+    "execution-validation-feedback-provider-model-deploy-ops-test-doc-tool-root-config-CI-lockfile-or-receipt-change",
+    "weakening-A1AuthorityCorridor-frozen-issuer-classes-or-accepting-stale-ops-template-roles",
+    "private-live-unseen-holdout-D2-D3-canonical-mutation-network-or-external-action"
+  ],
+  "dependency_hashes": {
+    "r02c_integration_head": "dbbb3516ad1532eddd13ec7d8b31dc42d880170d",
+    "policy_profile": "contracts/a1/v1/profiles/a1_sandbox_policy_v1.json",
+    "authority_profile": "contracts/a1/v1/profiles/authority_corridor_v1.json",
+    "storage_order": "single-bridge-global-sequence-and-four-v2-A1-projections",
+    "reuse_receipt": "docs/receipts/reuse/r03a-admission-authority-wiring.json",
+    "external_dependencies": "none-existing-runtime-and-stdlib-only"
+  },
+  "acceptance_commands": [
+    "python3 -m unittest -v tests.test_a1_admission_fixture tests.test_a1_authority_corridor tests.test_a1_storage_v2 tests.test_stage1_researchd",
+    "manual production valid-admit duplicate-replay budget-park restart and one-shot authority probe",
+    "manual stale-mixed-forged-private-live-issuer-spoof and expired-authority denial probes",
+    "make contracts",
+    "git diff --check",
+    "exact-head remote CI"
+  ],
+  "risk_class": "critical-authority-escalation-budget-bypass-duplicate-admission-or-replayable-permit",
+  "stop_conditions": [
+    "candidate-or-model-can-select-trusted-issuer-policy-capability-budget-or-authority",
+    "duplicate-transport-key-produces-a-different-receipt-reservation-or-authority-chain",
+    "stale-mixed-forged-private-live-or-empty-evidence-candidate-is-admitted",
+    "permit-or-lease-can-be-reused-or-resealed-outside-the-exact-parent-chain",
+    "implementation-requires-new-schema-service-writer-or-weakened-frozen-authority-role",
+    "write-outside-Agent-1-code-scope-or-secret-private-data-detected"
+  ],
+  "expected_receipt": "docs/receipts/integration/r03a-admission-authority-wiring.json",
+  "rollback": "Revert the scoped Agent-1 code files; R02C discovery remains functional while production admission stays fail-closed.",
+  "commit_authority": "one-scoped-agent-1-runtime-stage",
+  "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent0_audit", "blocked_validation_failed"]
+}
