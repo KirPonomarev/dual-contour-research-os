@@ -1,0 +1,61 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-r03a-admission-authority-wiring-20260719",
+  "issued_at": "2026-07-19T08:38:51Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "r03a-admission-authority-wiring",
+    "agent_id": "agent-1",
+    "ownership_lease_ref": "stages/r03a-admission-authority-wiring/ownership-lease.json",
+    "base_sha": "dbbb3516ad1532eddd13ec7d8b31dc42d880170d",
+    "implementation_dependency_sha": "a138f8384e9a2f1fb6ae5835dfeae72854c32e67",
+    "head_sha": "807382249e81a0de78d27905776b6bd5f9ee7ad9",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "a1_contract_sha256": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+    "write_set": [
+      "src/research_bridge/admission.py",
+      "src/research_bridge/discovery.py",
+      "src/research_bridge/ledger.py",
+      "src/research_bridge/researchd.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "privacy_secret_scan": "green",
+      "ownership_and_diff_boundary": "green",
+      "candidate_and_receipt_same_atomic_A1_bundle": "green",
+      "exact_pre_append_global_revision_CAS": "green",
+      "trusted_material_event_evidence_binding": "green",
+      "explicit_model_route_and_executor_profile_only": "green",
+      "legacy_config_and_fixture_compatibility": "green",
+      "same_key_and_new_key_replay_after_reopen": "byte-identical-zero-write-green",
+      "registered_CAS_ADMIT_and_one_shot_authority": "green",
+      "spoofed_evidence_durable_REJECT": "green",
+      "budget_overflow_durable_PARK": "green",
+      "stale_shipped_issuer_roles": "ADMIT_WAIT_AUTHORITY_NO_DOCUMENTS",
+      "focused_tests": 41,
+      "manual_probe_sha256": "2968419945cf146e2ad2ceedcec8c5e9de5a931c1a51b47a875299ae11ee9af4",
+      "provider_network_canonical_or_live_actions": 0,
+      "deployment_or_VPS_mutations": 0,
+      "grants_authority": false
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29680165173",
+    "pull_request_ref": "https://github.com/KirPonomarev/dual-contour-research-os/pull/53",
+    "integration_commit_sha": "a3bec7674e4b3b2a646aa47c4d9e2fbd5e750317",
+    "known_next_gate": "Agent-5 ops repair must populate exact admission_runtime and frozen admission-controller/researchd issuer roles before R03B physical execution wiring."
+  },
+  "integrity": {
+    "payload_sha256": "cf016911b901f3fca70a8ab3fc8d43388aa72aa2c62746f050eb098879faddd0",
+    "parent_refs": [
+      "git:dbbb3516ad1532eddd13ec7d8b31dc42d880170d",
+      "git:a138f8384e9a2f1fb6ae5835dfeae72854c32e67",
+      "git:807382249e81a0de78d27905776b6bd5f9ee7ad9",
+      "git:a3bec7674e4b3b2a646aa47c4d9e2fbd5e750317",
+      "ci:29680165173",
+      "pr:53",
+      "reuse:reuse-r03a-admission-authority-wiring-20260719"
+    ]
+  }
+}
