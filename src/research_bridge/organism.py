@@ -40,10 +40,15 @@ _AUTHORITY_CEILINGS = frozenset(
         "IMMUTABLE_VALIDATION_RECEIPT_ONLY",
         "SHADOW_OPERATIONAL_MEMORY_ONLY",
         "NON_AUTHORITATIVE_EVIDENCE_ONLY",
+        "UNTRUSTED_MODEL_EGRESS_ONLY",
     }
 )
-_NETWORK_MODES = frozenset({"NONE", "LOCAL_IPC_ONLY", "PUBLIC_SOURCE_FETCH_ONLY"})
-_LIFECYCLES = frozenset({"DAEMON", "ON_DEMAND_IN_PROCESS", "ON_DEMAND_OFFLINE_TOOL", "SYNTHETIC_FIXTURE"})
+_NETWORK_MODES = frozenset(
+    {"NONE", "LOCAL_IPC_ONLY", "PUBLIC_SOURCE_FETCH_ONLY", "CONNECTED_PROVIDER_EGRESS_ONLY"}
+)
+_LIFECYCLES = frozenset(
+    {"DAEMON", "ON_DEMAND_IN_PROCESS", "ON_DEMAND_OFFLINE_TOOL", "ON_DEMAND_CONNECTED_WORKER", "SYNTHETIC_FIXTURE"}
+)
 _SOURCE_KEYS = frozenset({"schema_id", "schema_version", "source_id", "subject_ref", "policy_ref", "components"})
 _PROJECTION_KEYS = frozenset({"schema_id", "schema_version", "projection_id", "subject_ref", "processes"})
 _COMPONENT_KEYS = frozenset(
