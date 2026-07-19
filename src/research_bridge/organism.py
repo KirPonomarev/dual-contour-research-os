@@ -582,13 +582,82 @@ def project_organism_state_from_ledger(
     storage = ledger.storage_coverage_manifest()
     feedback = ledger.feedback_projection_coverage()
     replay = ledger.replay_feedback()
-    after = ledger.event_count()
-    if before != after or replay.side_effects is not False:
-        raise OrganismStateError("organism state observation attempted a durable write")
     if storage["global_sequence_last"] != replay.ledger_sequence_last:
         raise OrganismStateError("ledger coverage and replay sequence disagree")
     environment = _reference(environment_ref, "environment_ref")
     projected = _format_time(_parse_time(projected_at, "projected_at"))
+    completion_count = ledger.event_count("complete")
+    after = ledger.event_count()
+    if before != after or replay.side_effects is not False:
+        raise OrganismStateError("organism state observation attempted a durable write")
+    feedback_count = replay.feedback_bundle_count
+    if (
+        isinstance(completion_count, bool)
+        or not isinstance(completion_count, int)
+        or completion_count < 0
+        or isinstance(feedback_count, bool)
+        or not isinstance(feedback_count, int)
+        or feedback_count < 0
+    ):
+        raise OrganismStateError("terminal and feedback counts are invalid")
+
+    idea: dict[str, object] | None = None
+    outbox: dict[str, object] | None = None
+    queue: dict[str, object] | None = None
+    if feedback:
+        if set(feedback) != {"outcome_dispositions", "experiences", "idea_tree", "feedback_outbox"}:
+            raise OrganismStateError("durable feedback coverage is incomplete")
+        idea = _latest_projection_entry(feedback["idea_tree"], "idea_tree")
+        outbox = _latest_projection_entry(feedback["feedback_outbox"], "feedback_outbox")
+        outbox_entries = feedback["feedback_outbox"]["entries"]
+        if not isinstance(outbox_entries, Mapping):
+            raise OrganismStateError("feedback outbox entries are invalid")
+        queue = _queue_from_outbox(outbox_entries)
+
+    terminal_imbalance = completion_count > feedback_count
+    duplicate_runnable = queue is not None and queue["runnable"] > 1
+    if terminal_imbalance or duplicate_runnable:
+        parked = max(0, completion_count - feedback_count) + int(duplicate_runnable)
+        assert parked > 0
+        observed_queue = (
+            {"runnable": 0, "waiting_authority": 0, "parked": parked, "oldest_event_at": projected}
+            if queue is None
+            else {
+                **queue,
+                "parked": int(queue["parked"]) + parked,
+            }
+        )
+        reasons = ["TERMINAL_FEEDBACK_IMBALANCE"] if terminal_imbalance else []
+        if completion_count > feedback_count:
+            reasons.append("COMPLETED_WITHOUT_VALIDATED_FEEDBACK")
+        if duplicate_runnable:
+            reasons.append("MULTIPLE_RUNNABLE_PRODUCERS")
+        facts = {
+            "ledger_sequence": replay.ledger_sequence_last,
+            "lifecycle_state": "PARKED",
+            "state_ref": (
+                str(outbox["object_id"])
+                if outbox is not None
+                else f"ledger:sequence-{replay.ledger_sequence_last}"
+            ),
+            "reason_codes": reasons,
+            "queue": observed_queue,
+            "shadow_taint": (
+                str(idea["shadow_taint"]) if idea is not None else "SHADOW_UNAPPLIED"
+            ),
+            "ai_enabled": ai_enabled,
+            "source": "DURABLE_LEDGER_REPLAY",
+            "proof_refs": [
+                f"replay:{replay.replay_sha256}",
+                f"ledger:terminal-balance-{completion_count}-{feedback_count}",
+            ],
+            "environment_ref": environment,
+            "updated_at": (
+                str(outbox["issued_at"]) if outbox is not None else projected
+            ),
+        }
+        return project_organism_state(facts, manifest, projected_at=projected)
+
     if not feedback:
         facts = {
             "ledger_sequence": replay.ledger_sequence_last,
@@ -605,14 +674,7 @@ def project_organism_state_from_ledger(
         }
         return project_organism_state(facts, manifest, projected_at=projected)
 
-    if set(feedback) != {"outcome_dispositions", "experiences", "idea_tree", "feedback_outbox"}:
-        raise OrganismStateError("durable feedback coverage is incomplete")
-    idea = _latest_projection_entry(feedback["idea_tree"], "idea_tree")
-    outbox = _latest_projection_entry(feedback["feedback_outbox"], "feedback_outbox")
-    outbox_entries = feedback["feedback_outbox"]["entries"]
-    if not isinstance(outbox_entries, Mapping):
-        raise OrganismStateError("feedback outbox entries are invalid")
-    queue = _queue_from_outbox(outbox_entries)
+    assert idea is not None and outbox is not None and queue is not None
     if outbox.get("status") == "RUNNABLE" and outbox.get("runnable_count") == 1:
         lifecycle = "GENERATING"
         reasons = ["DURABLE_RUNNABLE_TRIGGER"]
