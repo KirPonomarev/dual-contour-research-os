@@ -1,0 +1,17 @@
+{
+  "lease_id": "lease-r05a-feedback-memory-next-event-agent-1",
+  "stage_id": "r05a-feedback-memory-next-event",
+  "agent_id": "agent-1",
+  "branch": "codex/bridge-a1-r05a-feedback-memory-next-event",
+  "issued_at": "2026-07-19T15:18:30Z",
+  "expires_at": "2026-07-21T15:18:30Z",
+  "write_set": [
+    "src/research_bridge/ledger.py",
+    "src/research_bridge/discovery.py",
+    "src/research_bridge/admission.py",
+    "src/research_bridge/researchd.py",
+    "tests/test_r05a_feedback_memory_next_event.py"
+  ],
+  "exclusive": true,
+  "revoked": false
+}

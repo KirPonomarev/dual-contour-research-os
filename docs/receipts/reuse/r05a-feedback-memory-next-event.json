@@ -1,0 +1,41 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-r05a-feedback-memory-next-event-20260719",
+  "issued_at": "2026-07-19T15:18:30Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-review-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "r05a-feedback-memory-next-event",
+    "capability": "durable-validated-feedback-memory-and-bounded-next-event-closure",
+    "candidates": [
+      {"candidate": "new-feedback-database-or-background-scheduler", "disposition": "rejected-second-ordering-domain-and-unnecessary-runtime-owner"},
+      {"candidate": "treat-existing-internal-trigger-as-a-material-event", "disposition": "rejected-existing-outbox-explicitly-records-material-event-minted-false"},
+      {"candidate": "caller-supplied-feedback-references", "disposition": "rejected-not-bound-to-durable-execution-and-independent-validation"},
+      {"candidate": "reuse-single-JobLedger-DurableDiscoveryService-A1AdmissionKernel-and-researchd-startup-composition", "disposition": "selected-minimal-repository-native-adapter"}
+    ],
+    "selected_candidate": "extend-existing-single-writer-components-with-one-atomic-validated-feedback-and-next-event-transition-plus-pre-IPC-idempotent-recovery",
+    "source_ref": "git:07477fca82d0bcdc6eb2879c2771db51c9d8fd9c;internal:JobLedger+DurableDiscoveryService+A1AdmissionKernel+ValidatedOfflineExecutionCoordinator+ResearchDaemon",
+    "selected_source_sha": "8ef7bc1e7c94da0afdb1b92a90e5699df213aa6b0a13a6010d6f302716c11356",
+    "license": "repository-native-code-only",
+    "tests": [
+      "validated-receipt-binding-before-feedback",
+      "atomic-feedback-memory-event-and-outbox",
+      "idempotent-crash-tail-recovery-before-IPC",
+      "positive-negative-inconclusive-and-shadow-separation",
+      "depth-energy-WIP-and-one-next-event-bounds",
+      "exact-WAIT_AUTHORITY-after-exhaustion"
+    ],
+    "security_review": "The selected adapter stays inside the existing single-writer daemon and frozen D0/D1 contract boundary. It adds no network path, provider retry, domain application, canonical writer, timer, scheduler, second database or new authority.",
+    "dependency_review": "No dependency, package, vendor code, schema migration, lockfile, SBOM or notice change.",
+    "rollback": "Revert the additive adapter and focused tests and keep R05A incomplete; no existing stored event is rewritten."
+  },
+  "integrity": {
+    "payload_sha256": "85543c3a584702487c61bae74674f4fcb77531fa13c1fda3a94f57c0afaa34a9",
+    "parent_refs": [
+      "git:07477fca82d0bcdc6eb2879c2771db51c9d8fd9c",
+      "source:sha256:8ef7bc1e7c94da0afdb1b92a90e5699df213aa6b0a13a6010d6f302716c11356"
+    ]
+  }
+}

@@ -1,0 +1,72 @@
+{
+  "stage_id": "r05a-feedback-memory-next-event",
+  "agent_id": "agent-1",
+  "objective": "Close the durable production execution-to-validation-to-feedback-to-memory-to-bounded-next-MaterialEvent path and recover any missing idempotent tail before researchd accepts IPC.",
+  "executable_blocker": "Historical feedback, memory and portfolio primitives are isolated from the production validated execution path; the durable outbox records an internal trigger but does not mint a MaterialEvent or recover a completed execution whose feedback tail was interrupted.",
+  "base_sha": "07477fca82d0bcdc6eb2879c2771db51c9d8fd9c",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "a1_contract_sha256": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+  "branch": "codex/bridge-a1-r05a-feedback-memory-next-event",
+  "worktree": "/private/tmp/dcr-r05a-feedback-memory-next-event",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "ownership/registry.json",
+    "contracts/a1/v1/MaterialEvent.schema.json",
+    "src/research_bridge/ledger.py",
+    "src/research_bridge/discovery.py",
+    "src/research_bridge/admission.py",
+    "src/research_bridge/execution.py",
+    "src/research_bridge/validation.py",
+    "src/research_bridge/researchd.py",
+    "src/research_bridge/control.py",
+    "src/research_bridge/organism.py",
+    "tests/test_s08_atomic_feedback.py",
+    "tests/test_s09_feedback_replay_capacity.py",
+    "tests/test_s23_knowledge_fabric.py",
+    "tests/test_s24_agenda_portfolio.py"
+  ],
+  "write_set": [
+    "src/research_bridge/ledger.py",
+    "src/research_bridge/discovery.py",
+    "src/research_bridge/admission.py",
+    "src/research_bridge/researchd.py",
+    "tests/test_r05a_feedback_memory_next_event.py"
+  ],
+  "forbidden_scope": [
+    "frozen-contract-canonical-doc-root-config-CI-lockfile-or-migration-edit",
+    "second-ledger-writer-database-scheduler-thread-timer-or-unbounded-loop",
+    "scientific-truth-domain-application-canonical-write-live-action-or-authority-expansion",
+    "raw-provider-output-private-payload-secret-account-or-domain-data-in-public-Git",
+    "execution-repeat-automatic-provider-retry-or-more-than-one-next-event-per-outcome"
+  ],
+  "dependency_hashes": {
+    "accepted_base_head": "07477fca82d0bcdc6eb2879c2771db51c9d8fd9c",
+    "ledger_sha256": "8ef7bc1e7c94da0afdb1b92a90e5699df213aa6b0a13a6010d6f302716c11356",
+    "discovery_sha256": "d8aa66269863e3926404082b1e629d3f2bbdce39cd8cd10209e4b26194eba87c",
+    "admission_sha256": "bad958ed697734c714e1b413cb131bac6c1811f37a5aba9dca6c60b3b8ebaa3e",
+    "researchd_sha256": "02fce69be9320fff20c3e42085c460bb69cb1b7706b3ad263af68faaa877f178",
+    "ownership_registry_sha256": "e7a6a5158e43cb76c1df0fa28caec36ec9585a0dd05a732eabb94a92e427c9da",
+    "reuse_receipt": "docs/receipts/reuse/r05a-feedback-memory-next-event.json"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest tests.test_r05a_feedback_memory_next_event tests.test_s08_atomic_feedback tests.test_s09_feedback_replay_capacity tests.test_s23_knowledge_fabric tests.test_s24_agenda_portfolio",
+    "python3 -m unittest discover -s tests",
+    "git diff --check",
+    "exact-head remote CI"
+  ],
+  "risk_class": "critical-durability-loop-bound-and-epistemic-integrity",
+  "stop_conditions": [
+    "base-contract-owner-or-dependency-hash-mismatch",
+    "write-outside-five-file-lease",
+    "feedback-can-precede-independent-validation-or-reference-unregistered-execution",
+    "outcome-event-memory-or-outbox-can-partially-commit-or-duplicate",
+    "energy-does-not-decrease-more-than-one-next-event-is-runnable-or-WAIT_AUTHORITY-is-not-exact"
+  ],
+  "expected_receipt": "docs/receipts/integration/r05a-feedback-memory-next-event.json",
+  "rollback": "Revert the additive production closure adapter and focused tests; retain the accepted isolated feedback primitives and keep R05A incomplete.",
+  "commit_authority": "one-scoped-agent-1-branch-stage",
+  "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent0_audit", "blocked_validation_failed"]
+}
