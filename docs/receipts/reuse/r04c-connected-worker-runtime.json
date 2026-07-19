@@ -1,0 +1,46 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-r04c-connected-worker-runtime-20260719",
+  "issued_at": "2026-07-19T12:21:01Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-review-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "r04c-connected-worker-runtime-privacy-and-restart",
+    "capability": "bounded-connected-worker-process-private-response-store-and-restart-policy",
+    "candidates": [
+      {"candidate": "run-model-provider-shadow-directly", "disposition": "rejected-opens-an-independent-ledger"},
+      {"candidate": "add-external-worker-framework-or-database", "disposition": "rejected-unnecessary-dependency-and-second-state-owner"},
+      {"candidate": "embed-worker-in-offline-l0-container", "disposition": "rejected-network-boundary-must-remain-separate"},
+      {"candidate": "reuse-shadow-profile-credential-codec-transport-and-parser-with-small-ops-worker", "disposition": "selected-minimal-internal-adapter"}
+    ],
+    "selected_candidate": "one-shot-rootless-ops-worker-reusing-frozen-shadow-adapters-and-researchd-IPC",
+    "source_ref": "git:b3e3dd9b63b4becb23800fa5ad98f2bdc7232aba;internal:model_provider_shadow+ipc+R04B-handshake",
+    "selected_source_sha": "31254568045a82565e6ab8a77fe198c672d95e66d03f92a82e66af014d17ecfd",
+    "license": "repository-native-code-and-configuration-only",
+    "tests": [
+      "exact-config-and-policy-bindings",
+      "owner-only-dispatch-and-private-store-permissions",
+      "AI_OFF-and-missing-credential-zero-egress",
+      "raw-commit-before-parse",
+      "completion-replay-without-egress",
+      "SENT-without-completion-becomes-UNKNOWN-without-egress",
+      "retention-backup-restore-delete",
+      "service-and-container-network-separation",
+      "log-and-environment-redaction"
+    ],
+    "security_review": "credential-values-remain-process-private-raw-responses-remain-owner-only-worker-never-opens-ledger-no-automatic-repeat-offline-L0-network-none",
+    "dependency_review": "standard-library-and-repository-native-components-only-no-new-package-license-SBOM-or-notice-change",
+    "rollback": "Disable and remove the connected-worker unit/image, keep available_bindings empty, and retain the offline Core service unchanged."
+  },
+  "integrity": {
+    "payload_sha256": "46251de075c90e32c1a5e6054e1b6b679f22f7daa670ab10a7199d80b3780086",
+    "parent_refs": [
+      "git:b3e3dd9b63b4becb23800fa5ad98f2bdc7232aba",
+      "source:sha256:31254568045a82565e6ab8a77fe198c672d95e66d03f92a82e66af014d17ecfd",
+      "profile:sha256:63ae65247d61b918aced080e6419609459ebcbf4a3384ea29f2617e65597258c",
+      "ipc-extension:sha256:03d91f027bb6975c55d84acaef188546bcd24af9944a72f4ff9314296399d07a"
+    ]
+  }
+}
