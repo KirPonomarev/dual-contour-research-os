@@ -1,0 +1,32 @@
+{
+  "schema_version": "research-os.rootless-runtime-policy.v1",
+  "environment": "pre-soak",
+  "platform": "linux/amd64",
+  "user": "10001:10001",
+  "network": "none",
+  "published_ports": [],
+  "read_only_root_filesystem": true,
+  "cap_drop": [
+    "ALL"
+  ],
+  "security_options": [
+    "no-new-privileges:true"
+  ],
+  "pids_limit": 256,
+  "memory_bytes": 2147483648,
+  "cpus": 2,
+  "restart_policy": "no",
+  "runtime_mount": {
+    "container_path": "/var/lib/research-os",
+    "mode": "rw",
+    "owner_uid": 10001
+  },
+  "config_mount": {
+    "container_path": "/run/research-os/researchd.json",
+    "mode": "ro",
+    "owner_uid": 10001,
+    "file_mode": "0600"
+  },
+  "control_transport": "AF_UNIX",
+  "external_action_authority": false
+}

@@ -1,0 +1,75 @@
+{
+  "stage_id": "s38-r1-final-deployment-rebind",
+  "agent_id": "agent-0",
+  "objective": "Rebind the existing fail-closed deployment, approval, backup and restore substrate to the frozen S38 application candidate without changing that candidate or contacting a VPS.",
+  "executable_blocker": "The S38 manifest has no built image digest, the deploy controller is frozen to the historical S4 release and Bridge namespace, and the approval gate is not causally connected to the first S39 remote mutation.",
+  "base_sha": "d28bef12cbf6acd1747ddf0e3ec51671c4ca2dcb",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a0-s38-r1-final-deployment-rebind",
+  "worktree": "/private/tmp/dcr-s38-r1-final-deployment-rebind",
+  "read_set": [
+    "docs/receipts/release/s38-final-release-manifest.json",
+    "ops/deploy/s38-final-deployment-packet.json",
+    "ops/deploy/stage4-a1-isolation-release-packet.json",
+    "ops/deploy/research-os-a1-bridge.service",
+    "tools/pre_soak_deploy.py",
+    "ops/deploy/research-os-a1-final.service",
+    "ops/release/final-a1-runtime-policy.json",
+    "tools/issue_deployment_approval.py",
+    "tools/release_backup_restore.py",
+    "src/research_bridge/deployment.py"
+  ],
+  "write_set": [
+    "tools/final_deployment_rebind.py",
+    "tools/pre_soak_deploy.py",
+    "ops/deploy/research-os-a1-final.service",
+    "ops/release/final-a1-runtime-policy.json",
+    "docs/S38_FINAL_DEPLOYMENT_RUNBOOK.md",
+    "ops/deploy/s38-r1-final-deployment-rebind.json",
+    "docs/receipts/reuse/s38-r1-final-deployment-rebind.json",
+    "tests/test_s38_r1_final_deployment_rebind.py",
+    "stages/s38-r1-final-deployment-rebind/"
+  ],
+  "forbidden_scope": [
+    "change-to-frozen-application-candidate-b2c2e6a8",
+    "VPS-network-deploy-reboot-restore-or-production-action",
+    "approval-issuance-or-human-review-forgery",
+    "live-domain-or-canonical-scientific-mutation"
+  ],
+  "dependency_hashes": {
+    "base_sha": "d28bef12cbf6acd1747ddf0e3ec51671c4ca2dcb",
+    "candidate_release_sha": "b2c2e6a8c4e0a364ef82e8e51540433aa91430d4",
+    "candidate_tree_sha": "7d6bd1e13d651950cced23dfe75a24946a3218fc",
+    "final_manifest_sha256": "0439dee8e058914fe8e11416112e4a985e4bfec11502bb2cd0fd5b883295c369",
+    "final_A1_policy_sha256": "b3fc58125b3308c723c25461828b914a2f244dfa260dda7d5eea49467a7fc647",
+    "final_A1_unit_sha256": "49412c65c0e1e93d455d5b76e0a0516c618ac677fa63173bb9e89c93a7627b84",
+    "prepared_image_id": "sha256:c654b09504dec237966623088e4dbbbe104d6364cd5760a4cfb145eb388a3844",
+    "prepared_image_archive_sha256": "374b8ca553ddf47d40400576589619a6ee5822f6f977ced36e404c0c8b693bea",
+    "prepared_operational_manifest_sha256": "47a3dcac2782fb8e0a03f599f58f778ecbbf7005fd01e7ff140f905648a756ce",
+    "legacy_deploy_controller_sha256": "74c1733975e3d8f8be30a102b481c7ec43917ac779502a0c9263b098ba061d54",
+    "deployment_gate_sha256": "4d3c2051ee78968615926c755865b694d15b9d1442713dec8a1ffc0abf2cb52f"
+  },
+  "acceptance_commands": [
+    "python3 -m unittest -v tests.test_s38_r1_final_deployment_rebind",
+    "python3 -m unittest -v tests.test_release_deploy_recovery tests.test_deployment_gate tests.test_deployment_approval_issuer tests.test_release_backup_restore",
+    "python3 tools/final_deployment_rebind.py verify-static",
+    "make contracts",
+    "make test",
+    "git diff --check"
+  ],
+  "risk_class": "critical-operational-authority-and-release-identity",
+  "stop_conditions": [
+    "frozen-candidate-identity-changes",
+    "remote-action-can-occur-before-durable-approval-consumption",
+    "old-and-new-writers-can-run-concurrently",
+    "runtime-evidence-or-human-authority-is-fabricated"
+  ],
+  "expected_receipt": "docs/receipts/integration/s38-r1-final-deployment-rebind.json",
+  "rollback": "Remove the additive operational rebind and retain the frozen S38 candidate in WAIT_HUMAN_APPROVAL; no external state is changed by this stage.",
+  "commit_authority": "one-scoped-agent-0-repair-stage",
+  "push_authority": true,
+  "expected_handoff_status": [
+    "ready_for_agent0_integration",
+    "blocked_validation_failed"
+  ]
+}

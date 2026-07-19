@@ -1,0 +1,59 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-s38-r1-final-deployment-rebind-20260719",
+  "issued_at": "2026-07-19T01:28:50Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "reuse-freeze-authority"
+  },
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "FINAL_CANDIDATE_OPERATIONAL_RELEASE_REBIND_AND_AUTHORIZED_DEPLOY_GATE",
+    "candidates": [
+      {
+        "candidate": "reuse-existing-pre-soak-rootless-deploy-controller",
+        "disposition": "selected-and-generalized-with-legacy-default-preserved"
+      },
+      {
+        "candidate": "reuse-existing-deployment-approval-consumer-and-issuer",
+        "disposition": "selected-with-causal-gate-before-first-remote-mutation"
+      },
+      {
+        "candidate": "reuse-existing-restic-backup-restore-receipts",
+        "disposition": "selected-as-pre-approval-runtime-evidence"
+      },
+      {
+        "candidate": "rewrite-frozen-S4-manifest-or-S38-application-candidate",
+        "disposition": "rejected-immutable-history-and-candidate-boundary"
+      },
+      {
+        "candidate": "new-orchestrator-service-queue-or-remote-agent",
+        "disposition": "rejected-unnecessary-architecture-expansion"
+      }
+    ],
+    "selected_mode": "minimal-additive-operational-rebind-plus-profile-parameterization-and-durable-one-shot-approval-callback",
+    "source_ref": "git:d28bef12cbf6acd1747ddf0e3ec51671c4ca2dcb;internal:pre_soak_deploy+deployment+release_backup_restore",
+    "code_sha256": "74c1733975e3d8f8be30a102b481c7ec43917ac779502a0c9263b098ba061d54",
+    "license_spdx": "NOASSERTION",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "candidate-and-tree-exact-binding",
+      "derived-operational-manifest",
+      "A1-namespace-and-single-supervisor",
+      "approval-consumed-before-first-mutation",
+      "missing-expired-replayed-or-mismatched-approval-denied",
+      "legacy-S4-controller-regression"
+    ],
+    "canonical_owner": "agent-0-release-and-deployment",
+    "rollback": "Discard additive S38-R1 tooling and keep S38 WAIT_HUMAN_APPROVAL; no VPS or runtime state is changed by this repair."
+  },
+  "integrity": {
+    "payload_sha256": "5c925701f895866c2ab0a9bfefff828926e36999872f669f1d4a3efa821a6f89",
+    "parent_refs": [
+      "git:d28bef12cbf6acd1747ddf0e3ec51671c4ca2dcb",
+      "artifact:sha256:0439dee8e058914fe8e11416112e4a985e4bfec11502bb2cd0fd5b883295c369"
+    ]
+  }
+}
