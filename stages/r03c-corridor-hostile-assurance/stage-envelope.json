@@ -1,0 +1,64 @@
+{
+  "stage_id": "r03c-corridor-hostile-assurance",
+  "agent_id": "agent-5",
+  "objective": "Independently prove the production-shaped Collector-to-Scout admission and JobSpec-to-L0-to-Validation corridor through real AF_UNIX roles, durable CAS/ledger state, restart and hostile authority probes without fixture backend injection.",
+  "executable_blocker": "R03A/R03B code and owner probes are green, but no Agent-5 test exercises the entire production composition with a non-null corridor profile and proves forged/stale/mixed/duplicate/private/live/canonical cases stop at the correct boundary.",
+  "base_sha": "22c2f042197c3897aa93a3d5e4e64944da0cb549",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "a1_contract_sha256": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+  "branch": "codex/bridge-a5-r03c-corridor-hostile-assurance",
+  "worktree": "/private/tmp/dcr-r03c-corridor-hostile-assurance",
+  "read_set": [
+    "ops/release/researchd.config.template.json",
+    "src/research_bridge/admission.py",
+    "src/research_bridge/authority.py",
+    "src/research_bridge/control.py",
+    "src/research_bridge/discovery.py",
+    "src/research_bridge/execution.py",
+    "src/research_bridge/ipc.py",
+    "src/research_bridge/ledger.py",
+    "src/research_bridge/researchd.py",
+    "src/research_bridge/validation.py",
+    "tests/test_r02c_a1_backend_durability_assurance.py",
+    "tests/test_r03a_admission_runtime_ops.py",
+    "tests/test_stage1_researchd.py"
+  ],
+  "write_set": ["tests/test_r03c_corridor_hostile_assurance.py"],
+  "forbidden_scope": [
+    "production-source-contract-profile-provenance-doc-ops-tool-root-config-CI-lockfile-migration-or-other-test-edit",
+    "DiscoveryFixtureService-manual-a1-backend-direct-kernel-or-direct-validator-as-corridor-proof",
+    "network-provider-credential-cost-private-raw-response-D2-D3-holdout-or-domain-payload",
+    "new-database-ledger-queue-scheduler-service-thread-dependency-or-schema",
+    "authority-canonical-live-deployment-VPS-production-image-or-external-mutation"
+  ],
+  "dependency_hashes": {
+    "r03b_r1_integration_head": "22c2f042197c3897aa93a3d5e4e64944da0cb549",
+    "researchd_source_sha256": "3c6629cb9e5a2015fcfb5600cab752bfe1a11c3fc15813b104598deba7b4b6c1",
+    "execution_source_sha256": "3cbb9cf48e49fec952b14e03629ff0546c0ef888f6a78e24f243c95f99cdbb7c",
+    "validation_source_sha256": "6377a7d60c0246d38d2fefe5a3a685409a3434342e41d0d88262ece8d326fa51",
+    "reuse_receipt": "docs/receipts/reuse/r03c-corridor-hostile-assurance.json",
+    "proof_backend": "production-config-parser+ResearchDaemon+real-AF_UNIX+durable-CAS-ledger-only",
+    "external_dependencies": "none-stdlib-unittest-and-existing-runtime-only"
+  },
+  "acceptance_commands": [
+    "python3 -m unittest -v tests.test_r03c_corridor_hostile_assurance",
+    "python3 -m unittest -v tests.test_r03a_admission_runtime_ops tests.test_stage1_researchd tests.test_stage1_execution tests.test_s07_l0_independent_validation",
+    "make contracts",
+    "make test",
+    "git diff --check",
+    "exact-head remote CI"
+  ],
+  "risk_class": "critical-false-authority-green-duplicate-execution-validator-bypass-or-fixture-only-proof",
+  "stop_conditions": [
+    "valid-production-shaped-corridor-does-not-return-exact-execution-and-validation-receipts-once",
+    "forged-stale-mixed-expired-private-live-canonical-or-Scout-submit-reaches-runner-when-it-must-not",
+    "duplicate-crash-restart-or-second-writer-duplicates-attempt-artifact-budget-or-validation-state",
+    "test-proof-requires-manual-a1-backend-direct-kernel-network-secret-private-data-or-source-change",
+    "write-outside-single-Agent-5-test-file-or-public-safety-boundary-breach"
+  ],
+  "expected_receipt": "docs/receipts/integration/r03c-corridor-hostile-assurance.json",
+  "rollback": "Remove the one additive Agent-5 hostile test module; accepted production code remains unchanged.",
+  "commit_authority": "one-scoped-agent-5-assurance-stage",
+  "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent0_audit", "blocked_validation_failed"]
+}

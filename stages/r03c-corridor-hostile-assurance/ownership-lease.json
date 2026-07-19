@@ -1,0 +1,11 @@
+{
+  "lease_id": "lease-r03c-corridor-hostile-assurance-agent-5",
+  "stage_id": "r03c-corridor-hostile-assurance",
+  "agent_id": "agent-5",
+  "branch": "codex/bridge-a5-r03c-corridor-hostile-assurance",
+  "issued_at": "2026-07-19T09:52:50Z",
+  "expires_at": "2026-07-21T09:52:50Z",
+  "write_set": ["tests/test_r03c_corridor_hostile_assurance.py"],
+  "exclusive": true,
+  "revoked": false
+}
