@@ -346,7 +346,7 @@ class ImageE2EHarness:
                 f"--mount=type=volume,source={self.config_volume},target=/run/research-os",
                 self.subject.image_id, "-eu", "-c",
                 "chown 10001:10001 /var/lib/research-os /run/research-os; "
-                "chmod 0700 /var/lib/research-os /run/research-os; "
+                "chmod 0710 /var/lib/research-os; chmod 0700 /run/research-os; "
                 "umask 077; cat > /run/research-os/researchd.json; "
                 "chown 10001:10001 /run/research-os/researchd.json; "
                 "chmod 0600 /run/research-os/researchd.json",
