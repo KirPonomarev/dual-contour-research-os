@@ -1673,8 +1673,29 @@ class JobLedger:
         parked_gap_refs: Sequence[str],
         idempotency_key: str,
         event_at: str,
+        next_material_event: Mapping[str, object] | None = None,
+        a1_projections: Mapping[str, Mapping[str, object]] | None = None,
     ) -> FeedbackBundleRecord:
         """Atomically preserve operational feedback without asserting scientific truth."""
+
+        documents: list[dict[str, object]] = []
+        supplied_a1_states: dict[str, dict[str, object]] | None = None
+        if next_material_event is not None:
+            document = self._validate_a1_document(next_material_event)
+            if document["schema_id"] != "MaterialEvent":
+                raise LedgerError("feedback can mint only one MaterialEvent")
+            documents = [document]
+            if not isinstance(a1_projections, Mapping) or set(a1_projections) != _A1_PROJECTION_NAMES:
+                raise LedgerError("minted feedback event requires every A1 projection")
+            supplied_a1_states = {}
+            for name in sorted(_A1_PROJECTION_NAMES):
+                state = a1_projections[name]
+                copied = _json_copy(state, f"feedback projection.{name}")
+                if not isinstance(copied, dict) or not copied:
+                    raise LedgerError("feedback A1 projection state must be non-empty")
+                supplied_a1_states[name] = copied
+        elif a1_projections is not None:
+            raise LedgerError("feedback A1 projections require a minted MaterialEvent")
 
         request = _feedback_request(
             execution_ref=execution_ref,
@@ -1692,6 +1713,7 @@ class JobLedger:
             parked_gap_refs=parked_gap_refs,
             idempotency_key=idempotency_key,
             event_at=event_at,
+            next_material_event=next_material_event,
         )
         request_sha256 = _digest(_canonical_json(request).encode("utf-8"))
 
@@ -1729,7 +1751,11 @@ class JobLedger:
                 if prior:
                     raise LedgerError("execution already has a feedback bundle")
 
-                base_states = self._projection_states_locked(_A1_PROJECTION_NAMES)
+                base_states = (
+                    supplied_a1_states
+                    if supplied_a1_states is not None
+                    else self._projection_states_locked(_A1_PROJECTION_NAMES)
+                )
                 if set(base_states) != _A1_PROJECTION_NAMES:
                     raise LedgerError("feedback requires complete A1 base projections")
                 feedback_states = self._projection_states_locked(
@@ -1754,7 +1780,14 @@ class JobLedger:
                     "bundle_kind": "atomic_feedback_v1",
                     "idempotency_key": request["idempotency_key"],
                     "request_sha256": request_sha256,
-                    "objects": [],
+                    "objects": [
+                        {
+                            "object_id": document["object_id"],
+                            "object_kind": document["schema_id"],
+                            "payload_sha256": document["integrity"]["payload_sha256"],
+                        }
+                        for document in documents
+                    ],
                     "projections": projection_descriptors,
                     "feedback": feedback,
                 }
@@ -1767,6 +1800,24 @@ class JobLedger:
                     event_at=request["event_at"],
                     payload=bundle_payload,
                 )
+                for document in documents:
+                    self._connection.execute(
+                        """
+                        INSERT INTO bridge_a1_objects (
+                            object_id, object_kind, ledger_sequence, classification,
+                            payload_sha256, document_json, retention_class
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                        """,
+                        (
+                            document["object_id"],
+                            document["schema_id"],
+                            event.sequence,
+                            document["classification"],
+                            document["integrity"]["payload_sha256"],
+                            _canonical_json(document),
+                            _A1_RETENTION_BY_KIND[document["schema_id"]],
+                        ),
+                    )
                 for descriptor in projection_descriptors:
                     name = descriptor["projection_name"]
                     self._connection.execute(
@@ -3516,6 +3567,47 @@ def _model_call_record_from_event(event: LedgerEvent) -> ModelCallTransitionReco
     return ModelCallTransitionRecord(event=event, snapshot=_deep_freeze(snapshot))
 
 
+def _preview_feedback_material(
+    *,
+    execution_ref: str,
+    validation_ref: str,
+    root_event_ref: str,
+    parent_event_ref: str,
+    contour: str,
+    classification: str,
+    shadow_taint: str,
+    mechanical_axis: str,
+    proposed_outcome: str,
+    blame_axis: str,
+    domain_application_ref: str | None,
+    next_event_candidate: Mapping[str, object] | None,
+    parked_gap_refs: Sequence[str],
+    idempotency_key: str,
+    event_at: str,
+) -> Mapping[str, object]:
+    """Preview deterministic feedback identities without reading or writing state."""
+
+    request = _feedback_request(
+        execution_ref=execution_ref,
+        validation_ref=validation_ref,
+        root_event_ref=root_event_ref,
+        parent_event_ref=parent_event_ref,
+        contour=contour,
+        classification=classification,
+        shadow_taint=shadow_taint,
+        mechanical_axis=mechanical_axis,
+        proposed_outcome=proposed_outcome,
+        blame_axis=blame_axis,
+        domain_application_ref=domain_application_ref,
+        next_event_candidate=next_event_candidate,
+        parked_gap_refs=parked_gap_refs,
+        idempotency_key=idempotency_key,
+        event_at=event_at,
+        next_material_event=None,
+    )
+    return _deep_freeze(_construct_feedback_material(request))
+
+
 def _feedback_request(
     *,
     execution_ref: str,
@@ -3533,6 +3625,7 @@ def _feedback_request(
     parked_gap_refs: Sequence[str],
     idempotency_key: str,
     event_at: str,
+    next_material_event: Mapping[str, object] | None,
 ) -> dict[str, object]:
     execution = _feedback_ref(execution_ref, "execution_ref")
     if not execution.startswith("execution:"):
@@ -3624,6 +3717,11 @@ def _feedback_request(
             idempotency_key, "feedback idempotency_key", maximum=256
         ),
         "event_at": _timestamp("feedback event_at", event_at),
+        "next_material_event": (
+            None
+            if next_material_event is None
+            else _json_copy(next_material_event, "next_material_event")
+        ),
     }
 
 
@@ -3696,13 +3794,22 @@ def _construct_feedback_material(request: Mapping[str, object]) -> dict[str, obj
         if len(parked_refs) >= _PARKED_GAP_LIMIT:
             raise LedgerError("derived parked gap exceeds the bound")
         parked_refs.append(derived_parked)
+    material_event = request.get("next_material_event")
+    if material_event is not None:
+        _validate_next_material_event(
+            material_event,
+            request=request,
+            outcome_ref=outcome_id,
+            trigger=trigger,
+            shadow_taint=inherited_shadow,
+        )
     outbox_payload = {
         "outcome_ref": outcome_id,
         "status": "RUNNABLE" if trigger is not None else "WAIT_AUTHORITY",
         "runnable_count": 1 if trigger is not None else 0,
         "internal_event_trigger": trigger,
         "parked_gap_refs": parked_refs,
-        "material_event_minted": False,
+        "material_event_minted": material_event is not None,
         "issued_at": request["event_at"],
     }
     outbox_id = f"feedback-outbox:{_digest(_canonical_json(outbox_payload).encode('utf-8'))}"
@@ -3762,6 +3869,48 @@ def _next_internal_trigger(
         "trigger_id": f"internal-trigger:{_digest(_canonical_json(payload).encode('utf-8'))}",
         **payload,
     }, None
+
+
+def _validate_next_material_event(
+    value: object,
+    *,
+    request: Mapping[str, object],
+    outcome_ref: str,
+    trigger: Mapping[str, object] | None,
+    shadow_taint: str,
+) -> None:
+    if trigger is None or not isinstance(value, Mapping):
+        raise LedgerError("minted MaterialEvent requires one runnable trigger")
+    payload = value.get("payload")
+    if not isinstance(payload, Mapping):
+        raise LedgerError("minted MaterialEvent payload is invalid")
+    materiality = payload.get("materiality_inputs")
+    if not isinstance(materiality, Mapping):
+        raise LedgerError("minted MaterialEvent materiality is invalid")
+    expected_policy = str(trigger["policy_ref"])
+    if expected_policy.startswith("policy:sha256:"):
+        expected_policy_sha256 = expected_policy.removeprefix("policy:sha256:")
+    else:
+        expected_policy_sha256 = None
+    if (
+        value.get("schema_id") != "MaterialEvent"
+        or value.get("classification") != request["classification"]
+        or value.get("contour") != request["contour"]
+        or payload.get("origin_class") != "ENDOGENOUS"
+        or payload.get("event_kind") != "VALIDATED_FEEDBACK"
+        or payload.get("root_event_ref") != request["root_event_ref"]
+        or payload.get("parent_event_ref") != request["parent_event_ref"]
+        or payload.get("causal_depth") != trigger["causal_depth"]
+        or payload.get("shadow_taint") != shadow_taint
+        or materiality.get("outcome_ref") != outcome_ref
+        or materiality.get("execution_ref") != request["execution_ref"]
+        or materiality.get("validation_ref") != request["validation_ref"]
+        or (
+            expected_policy_sha256 is not None
+            and payload.get("policy_sha256") != expected_policy_sha256
+        )
+    ):
+        raise LedgerError("minted MaterialEvent is not bound to feedback")
 
 
 def _advance_feedback_states(
@@ -4002,7 +4151,8 @@ def _validate_feedback_knowledge_material(record: FeedbackBundleRecord) -> None:
         outbox["outcome_ref"] != outcome["object_id"]
         or outbox["status"] != expected_status
         or outbox["runnable_count"] != (1 if trigger is not None else 0)
-        or outbox["material_event_minted"] is not False
+        or type(outbox["material_event_minted"]) is not bool
+        or (trigger is None and outbox["material_event_minted"] is not False)
         or outbox["issued_at"] != outcome["issued_at"]
         or idea["state"] != ("GENERATING" if trigger is not None else "WAIT_AUTHORITY")
     ):

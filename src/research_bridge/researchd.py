@@ -38,6 +38,7 @@ from .discovery import (
     DurableDiscoveryService,
 )
 from .execution import (
+    ExecutionError,
     OfflineExecutionCoordinator,
     ValidatedOfflineExecutionCoordinator,
 )
@@ -50,7 +51,7 @@ from .ipc import (
 )
 from .kernel import BridgeKernel
 from .l0 import DeterministicL0Runner
-from .ledger import JobLedger
+from .ledger import JobLedger, LedgerError
 from .model_broker import (
     ModelBrokerError,
     ModelBudgetPolicy,
@@ -578,6 +579,7 @@ class ResearchDaemon:
                         authority=self._authority,
                     )
                     self._a1_backend = a1_backend
+                self._recover_validated_feedback_tail()
                 self._start_model_runtime(ledger)
                 router = ControlRouter(
                     self,
@@ -744,9 +746,18 @@ class ResearchDaemon:
                     raise ResearchdError(
                         "submit receipts differ from canonical terminal validation"
                     )
+                feedback = None
+                if self._a1_backend is not None:
+                    feedback = self._a1_backend.close_validated_execution(
+                        job_spec_ref=job_spec_ref,
+                        execution_receipt=immediate.execution_receipt,
+                        validation_receipt=immediate.validation_receipt,
+                        now=self._clock().astimezone(timezone.utc).isoformat().replace("+00:00", "Z"),
+                    )
                 return {
                     "execution_receipt": _json_copy(immediate.execution_receipt),
                     "validation_receipt": _json_copy(immediate.validation_receipt),
+                    "feedback": _json_copy(feedback),
                 }
             except ResearchdError:
                 raise
@@ -773,7 +784,44 @@ class ResearchDaemon:
             return {
                 "execution_receipt": _json_copy(record.execution_receipt),
                 "validation_receipt": _json_copy(record.validation_receipt),
+                "feedback": (
+                    None
+                    if self._a1_backend is None
+                    else _json_copy(
+                        self._a1_backend.lookup_validated_feedback(
+                            execution_ref=(
+                                "execution:" + str(record.execution_receipt["object_id"])
+                            )
+                        )
+                    )
+                ),
             }
+
+    def _recover_validated_feedback_tail(self) -> None:
+        """Close only completed validated A1 jobs before the IPC socket is bound."""
+
+        backend = self._a1_backend
+        coordinator = self._validated_coordinator
+        ledger = self._ledger
+        if backend is None or coordinator is None or ledger is None:
+            return
+        for job_spec_ref in backend.issued_job_refs():
+            try:
+                ledger.completed_event(job_spec_ref)
+            except LedgerError:
+                continue
+            try:
+                record = coordinator.validate_completed(job_spec_ref)
+                backend.close_validated_execution(
+                    job_spec_ref=job_spec_ref,
+                    execution_receipt=record.execution_receipt,
+                    validation_receipt=record.validation_receipt,
+                    now=self._clock().astimezone(timezone.utc).isoformat().replace("+00:00", "Z"),
+                )
+            except ExecutionError as exc:
+                raise ResearchdError(
+                    "completed A1 execution feedback recovery failed closed"
+                ) from exc
 
     def reserve_model_call(
         self,

@@ -28,7 +28,12 @@ from .authority import (
     CorridorExecutorProfile,
     PinnedOfflineAuthority,
 )
-from .ledger import JobLedger, LedgerError
+from .ledger import (
+    FeedbackBundleRecord,
+    JobLedger,
+    LedgerError,
+    _preview_feedback_material,
+)
 
 
 _SHA256_RE = re.compile(r"^[a-f0-9]{64}$")
@@ -1570,6 +1575,221 @@ class DurableDiscoveryService:
                 )
             return _deep_freeze(matches[0])
 
+    def issued_job_refs(self) -> tuple[str, ...]:
+        """List exact issued JobSpecs for bounded startup-tail recovery."""
+
+        with self._lock:
+            states = self._states()
+            self._validate_admission_runtime_state(states)
+            entries = states["admissions"].get("entries")
+            if not isinstance(entries, Mapping):
+                raise DiscoveryError("durable admission projection is invalid")
+            refs: list[str] = []
+            for raw_entry in entries.values():
+                entry = _exact_mapping(raw_entry, _ADMISSION_ENTRY_KEYS, "admission entry")
+                response = entry.get("response")
+                bundle = response.get("authority_bundle") if isinstance(response, Mapping) else None
+                job = bundle.get("job_spec") if isinstance(bundle, Mapping) else None
+                if isinstance(job, Mapping):
+                    refs.append(_text("issued job ref", job.get("object_id"), maximum=256))
+            return tuple(sorted(refs))
+
+    def close_validated_execution(
+        self,
+        *,
+        job_spec_ref: str,
+        execution_receipt: Mapping[str, object],
+        validation_receipt: Mapping[str, object],
+        now: str,
+    ) -> Mapping[str, object]:
+        """Atomically bind validated execution to feedback, memory and zero/one event."""
+
+        reference = _text("job_spec_ref", job_spec_ref, maximum=256)
+        current = _timestamp("now", now)
+        execution = _validated_receipt(
+            execution_receipt, schema_id="ExecutionReceipt"
+        )
+        validation = _validated_receipt(
+            validation_receipt, schema_id="ValidationReceipt"
+        )
+        execution_ref = f"execution:{execution['object_id']}"
+        validation_ref = f"validation:{validation['object_id']}"
+        validation_payload = validation["payload"]
+        execution_payload = execution["payload"]
+        if (
+            not isinstance(validation_payload, Mapping)
+            or not isinstance(execution_payload, Mapping)
+            or validation_payload.get("execution_ref") != execution_ref
+            or execution_payload.get("job_spec_ref") != reference
+            or validation_payload.get("proposed_outcome") != "VALIDATED_MECHANICAL"
+            or validation["classification"] != execution["classification"]
+            or validation["contour"] != execution["contour"]
+        ):
+            raise DiscoveryError("validated feedback receipt binding is invalid")
+        event_at = _format_timestamp(current)
+        with self._lock:
+            coverage = self._ledger.feedback_projection_coverage()
+            outcomes = coverage.get("outcome_dispositions", {}).get("entries", {})
+            if isinstance(outcomes, Mapping) and execution_ref in outcomes:
+                return self.lookup_validated_feedback(execution_ref=execution_ref)
+
+            states = self._states()
+            self._validate_admission_runtime_state(states)
+            entry, candidate, source_event = self._execution_lineage(
+                states, job_spec_ref=reference
+            )
+            response = entry.get("response")
+            bundle = response.get("authority_bundle") if isinstance(response, Mapping) else None
+            issued_job = bundle.get("job_spec") if isinstance(bundle, Mapping) else None
+            if not isinstance(issued_job, Mapping) or canonical_json_sha256(issued_job) != canonical_json_sha256(
+                self.resolve_issued_authority_bundle(job_spec_ref=reference)["job_spec"]
+            ):
+                raise DiscoveryError("validated feedback JobSpec lineage diverged")
+            source_payload = source_event.get("payload")
+            if not isinstance(source_payload, Mapping):
+                raise DiscoveryError("validated feedback source event is invalid")
+            root_ref = _text(
+                "source_event.root_event_ref",
+                source_payload.get("root_event_ref"),
+                maximum=512,
+            )
+            source_ref = _text("source_event.object_id", source_event.get("object_id"), maximum=512)
+            depth = _nonnegative_integer(
+                "source_event.causal_depth", source_payload.get("causal_depth")
+            )
+            policy_sha256 = _sha256(
+                "source_event.policy_sha256", source_payload.get("policy_sha256")
+            )
+            candidate_for_next: Mapping[str, object] | None = None
+            if depth < 16:
+                candidate_for_next = {
+                    "reason_code": "VALIDATED_MECHANICAL_FOLLOWUP",
+                    "policy_ref": f"policy:sha256:{policy_sha256}",
+                    "remaining_energy": 16 - depth,
+                    "causal_depth": depth,
+                }
+            feedback_key = "feedback:" + canonical_json_sha256(
+                {"execution_ref": execution_ref, "validation_ref": validation_ref}
+            )
+            kwargs: dict[str, object] = {
+                "execution_ref": execution_ref,
+                "validation_ref": validation_ref,
+                "root_event_ref": root_ref,
+                "parent_event_ref": source_ref,
+                "contour": source_event["contour"],
+                "classification": source_event["classification"],
+                "shadow_taint": source_payload.get("shadow_taint"),
+                "mechanical_axis": "MECHANICAL_SUCCESS",
+                "proposed_outcome": "VALIDATED_MECHANICAL",
+                "blame_axis": "NONE",
+                "domain_application_ref": None,
+                "next_event_candidate": candidate_for_next,
+                "parked_gap_refs": [],
+                "idempotency_key": feedback_key,
+                "event_at": event_at,
+            }
+            preview = _preview_feedback_material(**kwargs)  # type: ignore[arg-type]
+            outcome = preview.get("outcome_disposition")
+            if not isinstance(outcome, Mapping):
+                raise DiscoveryError("validated feedback preview is invalid")
+            existing_runnable = 0
+            outbox_entries = coverage.get("feedback_outbox", {}).get("entries", {})
+            if isinstance(outbox_entries, Mapping):
+                existing_runnable = sum(
+                    1
+                    for item in outbox_entries.values()
+                    if isinstance(item, Mapping) and item.get("status") == "RUNNABLE"
+                )
+            revision = self._ledger.storage_coverage_manifest()["global_sequence_last"]
+            material = self._kernel.materialize_validated_feedback(
+                current_event=source_event,
+                candidate=candidate,
+                execution_ref=execution_ref,
+                validation_ref=validation_ref,
+                outcome_ref=str(outcome["object_id"]),
+                issued_at=event_at,
+                ledger_revision=revision,
+                wip_available=existing_runnable == 0,
+            )
+            next_event = material.material_event
+            if next_event is None:
+                kwargs["next_event_candidate"] = None
+                kwargs["parked_gap_refs"] = [
+                    "agenda-gap:" + material.exact_key_sha256
+                ]
+            else:
+                event_copy = _json_copy(next_event)
+                if not isinstance(event_copy, dict):
+                    raise DiscoveryError("validated feedback event is invalid")
+                event_ref = _text("next event ref", event_copy.get("object_id"), maximum=512)
+                _bounded_insert(
+                    states["material_events"]["events"],
+                    event_ref,
+                    event_copy,
+                    "material event",
+                )
+                states["material_events"]["exact_keys"].append(material.exact_key_sha256)
+                kwargs["next_material_event"] = event_copy
+                kwargs["a1_projections"] = states
+            record = self._ledger.append_feedback_bundle(**kwargs)  # type: ignore[arg-type]
+            return _feedback_close_response(
+                record,
+                material_event=next_event,
+            )
+
+    def lookup_validated_feedback(self, *, execution_ref: str) -> Mapping[str, object]:
+        """Return one closed feedback tail without writes or state advancement."""
+
+        reference = _text("execution_ref", execution_ref, maximum=512)
+        with self._lock:
+            record = self._ledger.feedback_for_execution(reference)
+            states = self._states()
+            matches: list[Mapping[str, object]] = []
+            events = states["material_events"].get("events")
+            if not isinstance(events, Mapping):
+                raise DiscoveryError("durable material event projection is invalid")
+            for event in events.values():
+                payload = event.get("payload") if isinstance(event, Mapping) else None
+                materiality = payload.get("materiality_inputs") if isinstance(payload, Mapping) else None
+                if isinstance(materiality, Mapping) and materiality.get("execution_ref") == reference:
+                    matches.append(event)
+            if len(matches) > 1:
+                raise DiscoveryError("validated feedback has multiple next events")
+            return _feedback_close_response(
+                record,
+                material_event=(matches[0] if matches else None),
+            )
+
+    def _execution_lineage(
+        self,
+        states: Mapping[str, Mapping[str, object]],
+        *,
+        job_spec_ref: str,
+    ) -> tuple[Mapping[str, object], Mapping[str, object], Mapping[str, object]]:
+        entries = states["admissions"].get("entries")
+        if not isinstance(entries, Mapping):
+            raise DiscoveryError("durable admission projection is invalid")
+        matches: list[tuple[Mapping[str, object], Mapping[str, object], Mapping[str, object]]] = []
+        for raw_entry in entries.values():
+            entry = _exact_mapping(raw_entry, _ADMISSION_ENTRY_KEYS, "admission entry")
+            response = entry.get("response")
+            bundle = response.get("authority_bundle") if isinstance(response, Mapping) else None
+            job = bundle.get("job_spec") if isinstance(bundle, Mapping) else None
+            if not isinstance(job, Mapping) or job.get("object_id") != job_spec_ref:
+                continue
+            receipt = response.get("receipt") if isinstance(response, Mapping) else None
+            payload = receipt.get("payload") if isinstance(receipt, Mapping) else None
+            candidate_ref = payload.get("candidate_ref") if isinstance(payload, Mapping) else None
+            candidate = self._candidate_for_ref(states, candidate_ref)
+            event_ref = candidate.get("payload", {}).get("event_ref")
+            event = states["material_events"]["events"].get(event_ref)
+            if not isinstance(event, Mapping):
+                raise DiscoveryError("validated feedback source event is missing")
+            matches.append((entry, candidate, event))
+        if len(matches) != 1:
+            raise DiscoveryError("validated execution lineage is not unique")
+        return matches[0]
+
     def _admit_candidate(
         self,
         states: Mapping[str, Mapping[str, object]],
@@ -2154,6 +2374,52 @@ def _replay_record(value: object, label: str) -> Mapping[str, object]:
     if not isinstance(value["response"], dict):
         raise DiscoveryError(f"{label}.response is invalid")
     return value
+
+
+def _validated_receipt(
+    value: Mapping[str, object], *, schema_id: str
+) -> dict[str, object]:
+    copied = _json_copy(value)
+    if not isinstance(copied, dict) or set(copied) != _CANDIDATE_KEYS:
+        raise DiscoveryError(f"{schema_id} shape is invalid")
+    if copied.get("schema_id") != schema_id or copied.get("schema_version") != "1.0.0":
+        raise DiscoveryError(f"{schema_id} identity is invalid")
+    _text(f"{schema_id}.object_id", copied.get("object_id"), maximum=512)
+    _timestamp(f"{schema_id}.issued_at", copied.get("issued_at"))
+    payload = copied.get("payload")
+    integrity = copied.get("integrity")
+    if not isinstance(payload, dict) or not isinstance(integrity, dict):
+        raise DiscoveryError(f"{schema_id} payload or integrity is invalid")
+    digest = integrity.get("payload_sha256")
+    if not isinstance(digest, str) or not hmac.compare_digest(
+        _sha256(f"{schema_id}.payload_sha256", digest),
+        canonical_json_sha256(payload),
+    ):
+        raise DiscoveryError(f"{schema_id} payload integrity diverged")
+    return copied
+
+
+def _feedback_close_response(
+    record: FeedbackBundleRecord,
+    *,
+    material_event: Mapping[str, object] | None,
+) -> Mapping[str, object]:
+    return _deep_freeze(
+        {
+            "execution_ref": record.outcome_disposition["execution_ref"],
+            "validation_ref": record.outcome_disposition["validation_ref"],
+            "feedback_event_sha256": record.event.event_sha256,
+            "outcome_disposition": _json_copy(record.outcome_disposition),
+            "experience_record": _json_copy(record.experience_record),
+            "idea_node": _json_copy(record.idea_node),
+            "outbox_record": _json_copy(record.outbox_record),
+            "next_material_event": (
+                None if material_event is None else _json_copy(material_event)
+            ),
+            "claims_scientific_truth": False,
+            "grants_authority": False,
+        }
+    )
 
 
 def _validate_production_source_trigger(
