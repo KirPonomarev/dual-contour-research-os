@@ -46,6 +46,16 @@ class IndependentValidationClosureTests(unittest.TestCase):
         reopened.start()
         self.assertEqual(reopened._ledger.feedback_projection_coverage(), {})  # type: ignore[union-attr]
         self.assertTrue(reopened._ledger.verify_chain())  # type: ignore[union-attr]
+        valid_bundle, _ = self.harness._authority_bundle(
+            reopened,
+            suffix="r05b-after-invalid",
+        )
+        valid = self.harness._submit(reopened, valid_bundle)
+        self.assertEqual(
+            valid.result["validation_receipt"]["payload"]["proposed_outcome"],
+            "VALIDATED_MECHANICAL",
+        )
+        self.assertIsNotNone(valid.result["feedback"])
 
     def test_valid_nonempty_receipt_is_exact_mechanical_only_and_non_vacuous(self) -> None:
         daemon = self.harness._daemon()
