@@ -1,0 +1,22 @@
+{
+  "lease_id": "lease-s38-r2-product-completion-agent-0",
+  "stage_id": "s38-r2-product-completion",
+  "agent_id": "agent-0",
+  "branch": "codex/bridge-a0-s38-r2-product-completion",
+  "issued_at": "2026-07-19T03:01:48Z",
+  "expires_at": "2026-07-21T03:01:48Z",
+  "write_set": [
+    "README.md",
+    "docs/ARCHITECTURE.md",
+    "docs/ADR/0003-a1-autonomous-research-corridor.md",
+    "docs/PRODUCT_COMPLETION.md",
+    "docs/receipts/product/s38-r2-product-completion-audit.json",
+    "docs/receipts/reuse/s38-r2-product-completion.json",
+    "tests/test_s07_l0_independent_validation.py",
+    "tests/test_s14_provider_independent_hostile_core.py",
+    "tests/test_s38_r2_product_completion.py",
+    "stages/s38-r2-product-completion/"
+  ],
+  "exclusive": true,
+  "revoked": false
+}

@@ -309,43 +309,46 @@ class ProviderIndependentHostileCoreTests(unittest.TestCase):
     def test_known_invalid_control_prevents_a_vacuous_evaluator(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             environment = _environment(Path(temporary), "D1_INTERNAL_SANITIZED")
-            record = environment.coordinator.execute(
-                environment.job_spec,
-                environment.permit,
-                environment.lease,
-                environment.staging_root,
-                now=EXECUTION_NOW,
-            )
-            artifact_ref = record.artifact_records[0].artifact_ref
-            valid_artifact = environment.artifact_store.read_bytes(
-                artifact_ref, maximum_size_bytes=8_388_608
-            )
-            invalid_artifact = valid_artifact.replace(
-                b'"chunk_index":0', b'"chunk_index":9', 1
-            )
-            inputs = MemoryStore(dict(zip(INPUT_REFS, (INPUT_A, INPUT_B), strict=True)))
-
-            def validator(store: object) -> DeterministicL0Validator:
-                return DeterministicL0Validator(
-                    validator_id=VALIDATOR_ID,
-                    validator_sha256=VALIDATOR_SHA256,
-                    protocol_ref=PROTOCOL_REF,
-                    artifact_store=store,  # type: ignore[arg-type]
-                    input_store=inputs,
-                    chunk_size=7,
+            try:
+                record = environment.coordinator.execute(
+                    environment.job_spec,
+                    environment.permit,
+                    environment.lease,
+                    environment.staging_root,
+                    now=EXECUTION_NOW,
                 )
+                artifact_ref = record.artifact_records[0].artifact_ref
+                valid_artifact = environment.artifact_store.read_bytes(
+                    artifact_ref, maximum_size_bytes=8_388_608
+                )
+                invalid_artifact = valid_artifact.replace(
+                    b'"chunk_index":0', b'"chunk_index":9', 1
+                )
+                inputs = MemoryStore(dict(zip(INPUT_REFS, (INPUT_A, INPUT_B), strict=True)))
 
-            valid = validator(environment.artifact_store).validate(record.execution_receipt)
-            self.assertIn("chunk-byte-recomputation", valid["payload"]["checks_performed"])
-            self.assertEqual(valid["payload"]["tolerances"]["byte_mismatches"], 0)
-            invalid_ref_store = MemoryStore({artifact_ref: invalid_artifact})
-            with self.assertRaises(ValidationBoundaryError):
-                validator(invalid_ref_store).validate(record.execution_receipt)
-            self.assertEqual(invalid_ref_store.calls, [(artifact_ref, 8_388_608)])
-            self.assertEqual(
-                valid["integrity"]["payload_sha256"],
-                canonical_json_sha256(valid["payload"]),
-            )
+                def validator(store: object) -> DeterministicL0Validator:
+                    return DeterministicL0Validator(
+                        validator_id=VALIDATOR_ID,
+                        validator_sha256=VALIDATOR_SHA256,
+                        protocol_ref=PROTOCOL_REF,
+                        artifact_store=store,  # type: ignore[arg-type]
+                        input_store=inputs,
+                        chunk_size=7,
+                    )
+
+                valid = validator(environment.artifact_store).validate(record.execution_receipt)
+                self.assertIn("chunk-byte-recomputation", valid["payload"]["checks_performed"])
+                self.assertEqual(valid["payload"]["tolerances"]["byte_mismatches"], 0)
+                invalid_ref_store = MemoryStore({artifact_ref: invalid_artifact})
+                with self.assertRaises(ValidationBoundaryError):
+                    validator(invalid_ref_store).validate(record.execution_receipt)
+                self.assertEqual(invalid_ref_store.calls, [(artifact_ref, 8_388_608)])
+                self.assertEqual(
+                    valid["integrity"]["payload_sha256"],
+                    canonical_json_sha256(valid["payload"]),
+                )
+            finally:
+                environment.raw_ledger.close()
 
 
 if __name__ == "__main__":

@@ -1,0 +1,73 @@
+{
+  "stage_id": "s38-r2-product-completion",
+  "agent_id": "agent-0",
+  "objective": "Close the product implementation checkpoint after an independent repository audit by correcting stale canonical status documentation and eliminating deterministic test-harness SQLite resource leaks, without starting operational deployment or burn-in.",
+  "executable_blocker": "The frozen product implementation is integrated, but README and the A1 corridor ADR still claim that the runtime is unimplemented, while two acceptance modules leak durable-ledger connections under Python resource diagnostics.",
+  "base_sha": "a00390bf9997c68204855b88c7a87b4f69b5800c",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a0-s38-r2-product-completion",
+  "worktree": "/private/tmp/dcr-s38-r2-product-completion",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "README.md",
+    "docs/ARCHITECTURE.md",
+    "docs/ADR/0003-a1-autonomous-research-corridor.md",
+    "docs/receipts/release/s38-final-release-manifest.json",
+    "docs/receipts/integration/",
+    "tests/test_s07_l0_independent_validation.py",
+    "tests/test_s14_provider_independent_hostile_core.py"
+  ],
+  "write_set": [
+    "README.md",
+    "docs/ARCHITECTURE.md",
+    "docs/ADR/0003-a1-autonomous-research-corridor.md",
+    "docs/PRODUCT_COMPLETION.md",
+    "docs/receipts/product/s38-r2-product-completion-audit.json",
+    "docs/receipts/reuse/s38-r2-product-completion.json",
+    "tests/test_s07_l0_independent_validation.py",
+    "tests/test_s14_provider_independent_hostile_core.py",
+    "tests/test_s38_r2_product_completion.py",
+    "stages/s38-r2-product-completion/"
+  ],
+  "forbidden_scope": [
+    "Core-A1-or-E5-contract-mutation",
+    "new-feature-or-architecture-expansion",
+    "scientific-canonical-or-domain-truth-mutation",
+    "deployment-approval-VPS-reboot-restore-live-or-burn-in-action",
+    "claim-that-product-complete-equals-operationally-proven-or-final-DONE"
+  ],
+  "dependency_hashes": {
+    "base_sha": "a00390bf9997c68204855b88c7a87b4f69b5800c",
+    "core_catalog_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "a1_catalog_sha256": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+    "readme_sha256": "b6a4021bb6b007991f146839e2f7589fe77d5f6742ba5d1bbcf5eb35f7c14cfa",
+    "architecture_sha256": "4f02ecbb88011240ad7e180a14dcc5665bedc63140ef51b3e1c6788fecf7f50a",
+    "a1_adr_sha256": "38ca602ca0bb4d4eca28562e36e7f8bdf49462c0c1c0a9cb7422a2c7af4d8973"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "PYTHONDEVMODE=1 python3 -m unittest -v tests.test_s07_l0_independent_validation tests.test_s14_provider_independent_hostile_core",
+    "python3 -m unittest -v tests.test_s38_r2_product_completion tests.test_integration_receipts tests.test_s38_final_release_freeze tests.test_s38_r1_final_deployment_rebind",
+    "python3 tools/verify_release_blueprint.py",
+    "python3 tools/verify_release_identity.py",
+    "python3 tools/verify_stage4_release_packet.py",
+    "python3 tools/verify_deployment_readiness_packet.py",
+    "python3 tools/verify_final_release_freeze.py",
+    "python3 tools/final_deployment_rebind.py verify-static",
+    "make test",
+    "git diff --check"
+  ],
+  "risk_class": "high-product-closure-and-public-status-accuracy",
+  "stop_conditions": [
+    "contract-or-frozen-application-candidate-drift",
+    "new-runtime-authority-or-external-action",
+    "secret-private-D2-D3-or-provider-response-detected",
+    "product-complete-overclaims-deployment-soak-or-final-DONE"
+  ],
+  "expected_receipt": "docs/receipts/integration/s38-r2-product-completion.json",
+  "rollback": "Revert the documentation and test-harness-only stage; retain the already frozen S38 application candidate and S39-R1 operational repair unchanged.",
+  "commit_authority": "one-scoped-agent-0-product-closeout-stage",
+  "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent0_integration", "blocked_validation_failed"]
+}

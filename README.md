@@ -6,13 +6,17 @@ The public repository contains only domain-neutral contracts, control-plane code
 
 ## Current status
 
-`CORE_CONTRACTS_FROZEN + A1_CONTRACTS_FROZEN`
+`PRODUCT_IMPLEMENTATION_COMPLETE_CANDIDATE + OPERATIONAL_PROOF_PENDING`
 
-The Core and additive A1 public contracts are frozen and verified by `make contracts`. The A1 runtime corridor is not yet implemented or enabled; implementation proceeds only through pinned E1 StageEnvelopes. Existing Stage 4 substrate code is present, but production deployment proof and soak evidence remain incomplete until their explicit gates pass.
+The Core and additive A1 public contracts are frozen and verified by `make contracts`. The bounded product implementation through E1–E5 is integrated: trusted discovery and admission, durable offline execution, operational self-model, model-role routing, research portfolio and replication, shadow evolution, generated-execution isolation metadata, attestation, and governed MethodCard transfer. Every model or evolutionary output remains untrusted and non-authoritative.
+
+Product completion is distinct from operational proof. The frozen application candidate and its deployment corridor are prepared, but final A1 deployment, recovery drills, observation windows, the 14-day burn-in, and the final `DONE` transition remain pending their explicit human and operational gates. See [Product completion boundary](docs/PRODUCT_COMPLETION.md).
 
 ## Product boundary
 
 - Autonomous reasoning and offline research are allowed inside bounded policy.
+- Autonomous agenda selection, falsification, replication, failure memory, and shadow mutation evaluation are bounded and proposal-only.
+- Model roles are versioned and replaceable; provider output never grants admission, budget, permit, promotion, or canonical authority.
 - Generated code has no network access.
 - Validators issue receipts but do not write canonical scientific outcomes.
 - Domain-owned registry writers remain the only scientific-truth writers.
@@ -44,6 +48,8 @@ make test
 ```
 
 `make contracts` verifies both immutable freeze chains, regenerates schemas deterministically, checks ownership coverage, and rejects A1 profile or authority drift.
+
+`make test` additionally exercises the complete public product acceptance suite. Passing local tests or CI proves the frozen product scope only; it does not claim deployment or burn-in evidence.
 
 See `AGENTS.md` and `docs/DEVELOPMENT_AGENT_CONTRACT.md` before changing the repository.
 

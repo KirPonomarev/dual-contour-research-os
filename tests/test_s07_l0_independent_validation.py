@@ -61,6 +61,7 @@ class IndependentL0ValidationTests(unittest.TestCase):
         self.environment = _environment(
             Path(self.temporary.name), "D1_INTERNAL_SANITIZED"
         )
+        self.addCleanup(self.environment.raw_ledger.close)
         self.record = self.environment.coordinator.execute(
             self.environment.job_spec,
             self.environment.permit,

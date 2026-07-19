@@ -3,7 +3,7 @@
 Status: accepted — A1 contracts frozen
 Owner: Agent 0  
 Scope: public, domain-neutral control-plane contracts  
-Runtime status: not yet implemented or enabled
+Runtime status: implemented and acceptance-tested for the frozen offline/shadow product scope; final deployment and operational proof remain pending
 
 ## Decision
 

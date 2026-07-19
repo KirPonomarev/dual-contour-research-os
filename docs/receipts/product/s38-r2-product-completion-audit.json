@@ -1,0 +1,85 @@
+{
+  "schema_id": "ProductCompletionAuditReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "product-completion-audit-s38-r2-20260719",
+  "issued_at": "2026-07-19T03:01:48Z",
+  "issuer": {"id": "agent-0-independent-closeout", "authority_class": "integration-assurance"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "plan_id": "DCR_OS_AUTONOMOUS_V2_3_20260718",
+    "stage_id": "s38-r2-product-completion",
+    "audit_base_sha": "a00390bf9997c68204855b88c7a87b4f69b5800c",
+    "application_candidate_sha": "b2c2e6a8c4e0a364ef82e8e51540433aa91430d4",
+    "application_candidate_tree_sha": "7d6bd1e13d651950cced23dfe75a24946a3218fc",
+    "status": "PRODUCT_IMPLEMENTATION_AUDIT_PASS",
+    "scope": "PUBLIC_PRODUCT_IMPLEMENTATION_E0_THROUGH_E5_AND_FAIL_CLOSED_OPERATIONAL_CORRIDOR",
+    "catalog_sha256": {
+      "core": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+      "a1": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+      "e5": "254e6cd624f91e37b0d186937f4b71acb7177c216e44e782540d76ba8c33696b"
+    },
+    "audit_findings": [
+      {
+        "finding_id": "PC-001",
+        "severity": "HIGH_DOCUMENTATION_ACCURACY",
+        "finding": "Canonical public status still claimed that the A1 runtime corridor was unimplemented after E1-E5 integration.",
+        "disposition": "FIXED",
+        "paths": ["README.md", "docs/ARCHITECTURE.md", "docs/ADR/0003-a1-autonomous-research-corridor.md", "docs/PRODUCT_COMPLETION.md"]
+      },
+      {
+        "finding_id": "PC-002",
+        "severity": "MEDIUM_RESOURCE_HYGIENE",
+        "finding": "Two hostile/validation acceptance modules left synthetic JobLedger connections open under Python resource diagnostics.",
+        "disposition": "FIXED",
+        "paths": ["tests/test_s07_l0_independent_validation.py", "tests/test_s14_provider_independent_hostile_core.py"]
+      }
+    ],
+    "unresolved_critical_findings": 0,
+    "unresolved_high_findings": 0,
+    "verification": {
+      "contracts": "GREEN",
+      "core_tests": 803,
+      "stage0b_tests": 25,
+      "resource_warning_count_in_repaired_modules": 0,
+      "integration_receipt_graph": "GREEN",
+      "release_blueprint": "PASS",
+      "release_identity": "PASS",
+      "stage4_isolation": "GREEN",
+      "deployment_readiness": "READY_FOR_HUMAN_REVIEW_NOT_READY_TO_DEPLOY",
+      "final_application_freeze": "FINAL_CANDIDATE_FROZEN_WAIT_HUMAN_APPROVAL",
+      "final_operational_rebind_static": "PASS_FOR_FROZEN_SCOPE",
+      "secret_private_D2_D3_scan": "GREEN",
+      "source_mutation": false
+    },
+    "file_sha256": {
+      "README.md": "c470a0367bbb881e60aa1eff8988fc0ef165bfa32ffb7531d0fdf34a791c510a",
+      "docs/ARCHITECTURE.md": "2fcc005c2355018ae8fb46bf3e9726728d715f73b7cd7784af8488d0f033956b",
+      "docs/ADR/0003-a1-autonomous-research-corridor.md": "32c8a8b32a933e49c62934f3bef6238a4286d56d330796c40375dc6825c37050",
+      "docs/PRODUCT_COMPLETION.md": "ae64518f7e8e368cb945f4a3228fcb02939c57d733eb47fbea6283087bb22454",
+      "tests/test_s07_l0_independent_validation.py": "96d7b078a36370ddc16a070ab00e17d78620c7313f256e559c8880f01ca18b16",
+      "tests/test_s14_provider_independent_hostile_core.py": "31aacf82edf620170fb27adb146500368097a4cd56988d62908544770174efa1",
+      "tests/test_s38_r2_product_completion.py": "91aa55781d44a3b6892295c1685bb9c7c74c955ec51b07d3cfd5f75d854d6c28"
+    },
+    "product_implementation_complete": true,
+    "operationally_proven": false,
+    "final_done": false,
+    "remaining_stage_ids": ["S39", "S40", "S41", "S42"],
+    "deployment_actions": 0,
+    "VPS_mutations": 0,
+    "model_calls": 0,
+    "canonical_mutations": 0,
+    "grants_authority": false
+  },
+  "integrity": {
+    "profile_id": "core-json-sha256-v1",
+    "payload_sha256": "8d56bf79a35a347762203ceee71e35061f45d45e8de5d3ad5c57137081fb8fca",
+    "parent_refs": [
+      "git:a00390bf9997c68204855b88c7a87b4f69b5800c",
+      "final-candidate-release:b2c2e6a8c4e0a364ef82e8e51540433aa91430d4",
+      "integration:integration-s38-r1-final-deployment-rebind-20260719",
+      "integration:integration-s39-r1-predecessor-probe-fix-20260719",
+      "reuse:reuse-s38-r2-product-completion-20260719"
+    ]
+  }
+}

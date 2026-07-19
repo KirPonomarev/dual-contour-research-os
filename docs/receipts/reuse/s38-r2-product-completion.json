@@ -1,0 +1,34 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-s38-r2-product-completion-20260719",
+  "issued_at": "2026-07-19T03:01:48Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-freeze-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "PRODUCT_COMPLETION_AUDIT_AND_STATUS_CLOSEOUT",
+    "candidates": [
+      {"candidate": "reuse-existing-contract-release-receipt-and-test-validators", "disposition": "selected-minimal-internal-closeout"},
+      {"candidate": "new-orchestrator-tracker-or-runtime-service", "disposition": "rejected-unnecessary-architecture-expansion"},
+      {"candidate": "declare-final-DONE-before-operational-proof", "disposition": "rejected-definition-of-done-overclaim"}
+    ],
+    "selected_mode": "read-only-independent-audit-plus-minimal-doc-and-test-harness-repairs",
+    "source_ref": "git:a00390bf9997c68204855b88c7a87b4f69b5800c;internal:contracts+release-verifiers+integration-receipt-validator+unittest-resource-diagnostics",
+    "code_sha256": "e3b0c44298fc1c149afbf4d8996fb92427ae41e4649b934ca495991b7852b855",
+    "license_spdx": "NOASSERTION",
+    "license_sha256": "e3b0c44298fc1c149afbf4d8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "canonical-status-does-not-claim-unimplemented-A1",
+      "product-and-operational-checkpoints-remain-distinct",
+      "resource-diagnostic-modules-close-durable-ledgers",
+      "full-contract-release-receipt-and-authority-regression"
+    ],
+    "canonical_owner": "agent-0-integration-release-and-canonical-docs",
+    "rollback": "Revert only this closeout stage and retain prior frozen product and operational evidence."
+  },
+  "integrity": {
+    "payload_sha256": "337485f841ce6121bfa4f9f39c2d14c306f439441bc3b53883d1ad66c7a81947",
+    "parent_refs": ["git:a00390bf9997c68204855b88c7a87b4f69b5800c"]
+  }
+}
