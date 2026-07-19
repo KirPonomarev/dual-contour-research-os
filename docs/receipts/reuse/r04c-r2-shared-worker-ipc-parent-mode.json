@@ -1,0 +1,34 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-r04c-r2-shared-worker-ipc-parent-mode-20260719",
+  "issued_at": "2026-07-19T12:27:56Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-review-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "r04c-r2-shared-worker-ipc-parent-mode",
+    "capability": "least-privilege-runtime-parent-traversal-for-local-worker-IPC",
+    "candidates": [
+      {"candidate": "reuse-0700-runtime-parent", "disposition": "rejected-distinct-worker-UID-cannot-reach-socket"},
+      {"candidate": "run-worker-as-operator-UID", "disposition": "rejected-peer-role-separation-would-be-lost"},
+      {"candidate": "grant-container-filesystem-override-capability", "disposition": "rejected-unnecessary-privilege"},
+      {"candidate": "allow-exact-0710-runtime-parent-with-private-children-unchanged", "disposition": "selected-minimal-permission-adapter"}
+    ],
+    "selected_candidate": "accept-exact-0700-or-0710-runtime-root-while-retaining-0600-files-0700-private-subdirectories-and-0660-socket",
+    "source_ref": "git:b2e0c62c1baecc759b71585ad180b31bd4b57490;internal:researchd-runtime-root-validator",
+    "selected_source_sha": "761085906cdb11fb620fef78e8d93a62c1a27c249b8ef3c5cd955a3b09a552d7",
+    "license": "repository-native-code-only",
+    "tests": ["legacy-0700-runtime-suite", "exact-0710-runtime-start", "non-exact-mode-denial", "private-child-mode-preservation", "full-core-suite"],
+    "security_review": "0710-adds-group-traverse-only-no-directory-listing-write-or-other-access-and-does-not-change-ledger-CAS-lock-or-socket-modes",
+    "dependency_review": "no-new-package-code-license-SBOM-or-notice-change",
+    "rollback": "Return the runtime-root accepted mode set to 0700 before enabling the distinct connected worker."
+  },
+  "integrity": {
+    "payload_sha256": "2e69f42af4be1ce7e2a8c11f4794c420915ee190b20ad9050054aa19b3763727",
+    "parent_refs": [
+      "git:b2e0c62c1baecc759b71585ad180b31bd4b57490",
+      "source:sha256:761085906cdb11fb620fef78e8d93a62c1a27c249b8ef3c5cd955a3b09a552d7"
+    ]
+  }
+}
