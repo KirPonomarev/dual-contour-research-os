@@ -1,0 +1,61 @@
+{
+  "stage_id": "r08b-exact-candidate-image-build-sbom",
+  "amendment_id": "R08B_R1_BLUEPRINT_ALLOWLIST_CONSISTENCY_20260719",
+  "plan_id": "DCR_OS_AUTONOMOUS_V2_3_NO_BRAKES_20260719",
+  "plan_version": "2.4.0-fast-working-release",
+  "issued_by": "agent-0",
+  "issued_at": "2026-07-19T20:11:20Z",
+  "base_stage_envelope_ref": "stages/r08b-exact-candidate-image-build-sbom/stage-envelope.json",
+  "prior_amendment_ref": "stages/r08b-exact-candidate-image-build-sbom/stage-envelope-amendment-v2.4-1.json",
+  "prior_amendment_sha256": "34700b22b7628512426bf54952d26328cf6ba35e09aa6945b76c0f62232cf4d8",
+  "prior_authority_remote_sha": "b0287d7dab9fbe72f4e42a43982d92e2672f0586",
+  "base_sha": "7e6c4cb56da3aad70ccc403cac04f47e8da9f492",
+  "branch_head_at_issue": "b0287d7dab9fbe72f4e42a43982d92e2672f0586",
+  "candidate_sha": null,
+  "candidate_tree_sha": null,
+  "candidate_exact_head_ci_run": "NOT_CUT",
+  "reason": "The additive minimal build-context allowlist authorized by the prior amendment makes the canonical release blueprint verifier fail closed until its exact expected allowlist includes model-role-evaluation-v2.json. This is a consistency repair in the same nested owner lane and changes no runtime, contract, route, policy or authority semantics.",
+  "evidence": {
+    "failing_command": "make test",
+    "failing_test": "tests.test_release_blueprint.ReleaseBlueprintTests.test_canonical_blueprint_is_rootless_pinned_and_offline",
+    "failure_code": "build_context.not_minimal",
+    "unrelated_sandbox_failure_class": "AF_UNIX_BIND_OPERATION_NOT_PERMITTED",
+    "candidate_cut": false
+  },
+  "add_write_set": [
+    "stages/r08b-exact-candidate-image-build-sbom/stage-envelope-amendment-v2.4-2.json",
+    "stages/r08b-exact-candidate-image-build-sbom/ownership-lease-amendment-v2.4-2.json"
+  ],
+  "owner_split_amendment": {
+    "stage_id": "r08b-r1-core-model-runtime-provenance-image",
+    "owner": "agent-5",
+    "add_write_set": [
+      "tools/verify_release_blueprint.py"
+    ],
+    "resulting_write_set": [
+      "ops/release/Containerfile",
+      "tools/verify_release_blueprint.py",
+      "tests/test_r08a_production_image_e2e_harness.py"
+    ],
+    "limit": "Add exactly model-role-evaluation-v2.json to the canonical expected minimal build-context tuple; do not relax exact tuple equality or any other blueprint boundary."
+  },
+  "acceptance_commands": [
+    "python3 -m unittest -v tests.test_release_blueprint tests.test_r08a_production_image_e2e_harness",
+    "make contracts",
+    "make test outside the restricted AF_UNIX sandbox",
+    "git diff --check",
+    "all prior nested repair physical image acceptance commands"
+  ],
+  "stop_conditions": [
+    "the verifier ceases to require exact tuple equality",
+    "any build-context path beyond the prior exact additive file is admitted",
+    "any source contract policy route config provider or authority semantics change",
+    "candidate is cut before the nested repair is accepted"
+  ],
+  "preservation_contract": [
+    "all prior amendments and their remote commits remain immutable",
+    "the original stage envelope and lease remain byte-identical",
+    "the untracked candidate draft remains preserved",
+    "all prior V2.4 pre-cut requirements remain active"
+  ]
+}
