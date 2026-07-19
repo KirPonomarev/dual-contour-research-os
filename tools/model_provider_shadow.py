@@ -115,7 +115,7 @@ _EXPECTED_BINDING_SHAPES = {
         "endpoint": "https://api.deepseek.com/chat/completions",
         "protocol": "OPENAI_CHAT_COMPLETIONS", "api_model": "deepseek-v4-pro",
         "context_window": None,
-        "request_options": {"thinking": {"type": "enabled"}, "reasoning_effort": "high"},
+        "request_options": {"thinking": {"type": "disabled"}, "reasoning_effort": "high"},
         "source": "https://api-docs.deepseek.com/api/create-chat-completion",
     },
     "glm-5.2-max": {
