@@ -1,0 +1,33 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s33-generated-isolation-governance-20260719",
+  "issued_at": "2026-07-19T00:17:07Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s33-generated-isolation-governance",
+    "agent_id": "agent-0",
+    "ownership_lease_ref": "stages/s33-generated-isolation-governance/ownership-lease.json",
+    "base_sha": "98415d56044bc406ec7303df00a4ee19bbc1359f",
+    "head_sha": "a3650c76cdb1169571bdb08f5ccf06c8354d1dbf",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": ["ownership/registry.json", "docs/ADR/0008-generated-execution-path-activation.md", "docs/receipts/OWNERSHIP_REGISTRY_AMENDMENT_7.json", "src/research_bridge/generated_execution.py", "provenance/generated-code-isolation-ladder-v1.json", "docs/receipts/reuse/s33-generated-isolation.json", "stages/s33-generated-isolation-governance/"],
+    "audit_results": {
+      "contract_gate": "green", "privacy_secret_scan": "green", "source_mutation": false,
+      "profile_sha256": "a02fb9bb7e328f355cae083193f4ae63bfb299bf2e4c633ae496ccf31ca0ef89",
+      "ownership_registry_sha256": "e7a6a5158e43cb76c1df0fa28caec36ec9585a0dd05a732eabb94a92e427c9da",
+      "ownership_path_activated": "src/research_bridge/generated_execution.py:agent-2",
+      "feature_enabled_by_default": false, "levels": ["L1", "L2"], "L3_registered": false,
+      "embedded_executor_or_subprocess": false, "network_private_live_or_host_mount": false,
+      "automatic_deploy": false, "canonical_writes": 0, "grants_authority": false
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29666684893",
+    "integration_commit_sha": "2177f6cf9ca0d13915d669e697d5b2a78e12ab51"
+  },
+  "integrity": {
+    "payload_sha256": "6092012d25d39caad1ac10909dcc63c36250996648462cada65915a02e7e6d97",
+    "parent_refs": ["git:a3650c76cdb1169571bdb08f5ccf06c8354d1dbf", "git:2177f6cf9ca0d13915d669e697d5b2a78e12ab51", "ci:29666684893", "sha256:e7a6a5158e43cb76c1df0fa28caec36ec9585a0dd05a732eabb94a92e427c9da", "reuse:reuse-s33-generated-isolation-20260719"]
+  }
+}
