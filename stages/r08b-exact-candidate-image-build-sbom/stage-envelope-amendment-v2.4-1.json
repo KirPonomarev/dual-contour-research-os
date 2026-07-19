@@ -1,0 +1,70 @@
+{
+  "stage_id": "r08b-exact-candidate-image-build-sbom",
+  "amendment_id": "R08B_CORE_MODEL_RUNTIME_PROVENANCE_CONTEXT_20260719",
+  "plan_id": "DCR_OS_AUTONOMOUS_V2_3_NO_BRAKES_20260719",
+  "plan_version": "2.4.0-fast-working-release",
+  "issued_by": "agent-0",
+  "issued_at": "2026-07-19T20:03:00Z",
+  "base_stage_envelope_ref": "stages/r08b-exact-candidate-image-build-sbom/stage-envelope.json",
+  "prior_amendment_ref": "stages/r08b-exact-candidate-image-build-sbom/stage-envelope-amendment-v2.4.json",
+  "prior_amendment_remote_sha": "4c803973bbf6af21d7598e82bac5b5362d63230f",
+  "base_sha": "7e6c4cb56da3aad70ccc403cac04f47e8da9f492",
+  "branch_head_at_issue": "4c803973bbf6af21d7598e82bac5b5362d63230f",
+  "candidate_sha": null,
+  "candidate_tree_sha": null,
+  "candidate_exact_head_ci_run": "NOT_CUT",
+  "reason": "A physical startup of the exact R08A Core image with the required non-null executor profile and two real route bindings failed before AF_UNIX readiness because researchd requires model-role-evaluation-v2.json, model-worker-ipc-extension-v1.json and model-provider-routing-v1.json under /opt/research-os/provenance while the Core image contains only src and contracts.",
+  "evidence": {
+    "exact_core_image_id": "sha256:328bf380ac8bb29cb862dc5ebddaec757212b809429cad74a3c8fcfe25adb5d6",
+    "exact_core_source_head": "024abd0b747ad378ef4a8ff0328a3e23c386581e",
+    "runtime_source_equal_through_head": "4c803973bbf6af21d7598e82bac5b5362d63230f",
+    "failure_class": "MISSING_REQUIRED_SHIPPED_MODEL_RUNTIME_PROVENANCE",
+    "missing_first_path": "/opt/research-os/provenance/model-role-evaluation-v2.json",
+    "provider_calls_during_failure": 0,
+    "candidate_cut": false
+  },
+  "add_read_set": [
+    "provenance/model-role-evaluation-v2.json",
+    "provenance/model-worker-ipc-extension-v1.json",
+    "ops/release/Containerfile",
+    "tests/test_r08a_production_image_e2e_harness.py"
+  ],
+  "add_write_set": [
+    "stages/r08b-exact-candidate-image-build-sbom/stage-envelope-amendment-v2.4-1.json",
+    "stages/r08b-exact-candidate-image-build-sbom/ownership-lease-amendment-v2.4-1.json",
+    ".dockerignore"
+  ],
+  "resulting_write_set_ref": "stages/r08b-exact-candidate-image-build-sbom/ownership-lease-amendment-v2.4-1.json",
+  "owner_split": {
+    "required": true,
+    "stage_id": "r08b-r1-core-model-runtime-provenance-image",
+    "owner": "agent-5",
+    "write_set": [
+      "ops/release/Containerfile",
+      "tests/test_r08a_production_image_e2e_harness.py"
+    ],
+    "limit": "Copy exactly the three required public non-secret provenance files into the Core image and extend existing R08A image inventory/startup assurance; no source contract policy provider route config or authority change."
+  },
+  "acceptance_commands": [
+    "git diff --check",
+    "make contracts",
+    "python3 -m unittest -v tests.test_r08a_production_image_e2e_harness",
+    "direct no-cache linux/amd64 Core image build from the exact branch context",
+    "non-null executor plus two-binding model runtime reaches exact AF_UNIX readiness",
+    "image inventory contains only src contracts and the three exact provenance files",
+    "current nested repair PR-head exact-head CI and accepted IntegrationReceipt before R08B resumes"
+  ],
+  "stop_conditions": [
+    "any file beyond the three required provenance inputs enters the Core image",
+    "any provenance contract policy route runtime source or config semantics change",
+    "any secret raw provider response private evidence test fixture or repository metadata enters the image",
+    "Agent-0 edits Agent-5-owned Containerfile or test paths",
+    "candidate is cut before the nested owner repair is accepted and revalidated"
+  ],
+  "preservation_contract": [
+    "the first remote V2.4 bootstrap commit 4c803973bbf6af21d7598e82bac5b5362d63230f remains immutable",
+    "the original stage envelope and lease remain byte-identical",
+    "the failed no-call startup attempt grants no release or capability claim",
+    "all prior V2.4 pre-cut requirements remain active"
+  ]
+}
