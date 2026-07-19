@@ -65,10 +65,25 @@ _COMMAND_PAYLOAD_KEYS = {
             "failure_code",
         }
     ),
+    "reconcile_model_call": frozenset(
+        {
+            "call_id",
+            "actual_tokens",
+            "actual_cost_units",
+            "provider_receipt_ref",
+        }
+    ),
     "lookup_model_call": frozenset({"call_id"}),
 }
 _OPERATOR_COMMANDS = frozenset(
-    {"status", "pause_global", "resume_global", "submit", "lookup"}
+    {
+        "status",
+        "pause_global",
+        "resume_global",
+        "submit",
+        "lookup",
+        "reconcile_model_call",
+    }
 )
 _COLLECTOR_COMMANDS = frozenset({"submit_source_trigger"})
 _SCOUT_COMMANDS = frozenset(
@@ -234,6 +249,18 @@ class _ModelControlBackend(Protocol):
         actor: str,
     ) -> Mapping[str, object]: ...
 
+    def reconcile_model_call(
+        self,
+        *,
+        call_id: str,
+        actual_tokens: int,
+        actual_cost_units: int,
+        provider_receipt_ref: str,
+        actor: str,
+        idempotency_key: str,
+        now: str,
+    ) -> Mapping[str, object]: ...
+
     def validate_proposal_envelope(
         self, proposal_envelope: Mapping[str, object]
     ) -> None: ...
@@ -258,6 +285,11 @@ class ControlRequest:
             raise ControlError("unsupported control command")
         if self.version == _LEGACY_PROTOCOL_VERSION and self.command not in _OPERATOR_COMMANDS:
             raise ControlError("protocol 1.1 supports operator commands only")
+        if (
+            self.version == _LEGACY_PROTOCOL_VERSION
+            and self.command == "reconcile_model_call"
+        ):
+            raise ControlError("model reconciliation requires protocol 1.2")
         if not isinstance(self.payload, Mapping):
             raise ControlError("payload must be an object")
 
@@ -344,6 +376,19 @@ class ControlRequest:
                     _normalized_text(name, value, maximum=512)
             for name in ("actual_tokens", "actual_cost_units"):
                 _optional_nonnegative_integer(name, copied_payload[name])
+        elif self.command == "reconcile_model_call":
+            _normalized_text("call_id", copied_payload["call_id"], maximum=128)
+            _nonnegative_integer(
+                "actual_tokens", copied_payload["actual_tokens"]
+            )
+            _nonnegative_integer(
+                "actual_cost_units", copied_payload["actual_cost_units"]
+            )
+            _normalized_text(
+                "provider_receipt_ref",
+                copied_payload["provider_receipt_ref"],
+                maximum=512,
+            )
         elif self.command == "lookup_model_call":
             _normalized_text("call_id", copied_payload["call_id"], maximum=128)
         object.__setattr__(self, "payload", MappingProxyType(copied_payload))
@@ -577,6 +622,16 @@ class ControlRouter:
                     idempotency_key=request.idempotency_key,
                     now=self._event_at(),
                 )
+            elif request.command == "reconcile_model_call":
+                result = self._require_model_backend().reconcile_model_call(
+                    call_id=request.payload["call_id"],  # type: ignore[arg-type]
+                    actual_tokens=request.payload["actual_tokens"],  # type: ignore[arg-type]
+                    actual_cost_units=request.payload["actual_cost_units"],  # type: ignore[arg-type]
+                    provider_receipt_ref=request.payload["provider_receipt_ref"],  # type: ignore[arg-type]
+                    actor=actor,
+                    idempotency_key=request.idempotency_key,
+                    now=self._event_at(),
+                )
             elif request.command == "lookup_model_call":
                 result = self._require_model_backend().lookup_model_call(
                     call_id=request.payload["call_id"],  # type: ignore[arg-type]
@@ -656,6 +711,12 @@ def _model_request_body(value: object) -> str:
 def _positive_integer(name: str, value: object) -> int:
     if type(value) is not int or value <= 0:
         raise ControlError(f"{name} must be a positive integer")
+    return value
+
+
+def _nonnegative_integer(name: str, value: object) -> int:
+    if type(value) is not int or value < 0:
+        raise ControlError(f"{name} must be a non-negative integer")
     return value
 
 
