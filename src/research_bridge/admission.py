@@ -882,6 +882,132 @@ class _A1AdmissionKernel:
             _a1_deep_freeze(_a1_json_copy(event, "material_event")),
         )
 
+    def materialize_validated_feedback(
+        self,
+        *,
+        current_event: Mapping[str, object],
+        candidate: Mapping[str, object],
+        execution_ref: str,
+        validation_ref: str,
+        outcome_ref: str,
+        issued_at: datetime | str,
+        ledger_revision: int,
+        wip_available: bool,
+    ) -> MaterialityResult:
+        """Mint at most one bounded endogenous event from validated feedback."""
+
+        event_value = _a1_exact_mapping(current_event, _COMMON_KEYS, "current_event")
+        candidate_value = _a1_exact_mapping(candidate, _COMMON_KEYS, "candidate")
+        if (
+            event_value["schema_id"] != "MaterialEvent"
+            or candidate_value["schema_id"] != "CandidateSpecDraft"
+        ):
+            raise A1AdmissionError("validated feedback inputs have invalid types")
+        event_payload = event_value.get("payload")
+        candidate_payload = candidate_value.get("payload")
+        if not isinstance(event_payload, Mapping) or not isinstance(candidate_payload, Mapping):
+            raise A1AdmissionError("validated feedback payload is invalid")
+        current_ref = _a1_text(event_value["object_id"], "current_event.object_id", maximum=512)
+        if candidate_payload.get("event_ref") != current_ref:
+            raise A1AdmissionError("validated feedback candidate is not bound to its event")
+        root_ref = _a1_text(
+            event_payload.get("root_event_ref"), "current_event.root_event_ref", maximum=512
+        )
+        policy_sha256 = _a1_sha(
+            event_payload.get("policy_sha256"), "current_event.policy_sha256"
+        )
+        context_sha256 = _a1_sha(
+            event_payload.get("context_sha256"), "current_event.context_sha256"
+        )
+        current_depth = _a1_nonnegative_integer(
+            event_payload.get("causal_depth"), "current_event.causal_depth"
+        )
+        if current_depth > 32:
+            raise A1AdmissionError("current event causal depth exceeds the contract")
+        root_energy = _a1_resource_budget(
+            event_payload.get("root_energy"), "current_event.root_energy"
+        )
+        remaining = _a1_resource_budget(
+            event_payload.get("remaining_energy"), "current_event.remaining_energy"
+        )
+        requested = _a1_resource_budget(
+            candidate_payload.get("resource_request"), "candidate.resource_request"
+        )
+        for field in _A1_RESOURCE_KEYS:
+            if requested[field] > remaining[field]:
+                raise A1AdmissionError("validated candidate exceeds remaining root energy")
+        after = dict(remaining)
+        after["tokens"] = int(remaining["tokens"]) - int(requested["tokens"])
+        after["cost_units"] = remaining["cost_units"] - requested["cost_units"]
+        execution = _a1_text(execution_ref, "execution_ref", maximum=512)
+        validation = _a1_text(validation_ref, "validation_ref", maximum=512)
+        outcome = _a1_text(outcome_ref, "outcome_ref", maximum=512)
+        _a1_nonnegative_integer(ledger_revision, "ledger_revision")
+        if type(wip_available) is not bool:
+            raise A1AdmissionError("wip_available must be boolean")
+        exact_key = canonical_json_sha256(
+            {
+                "execution_ref": execution,
+                "validation_ref": validation,
+                "outcome_ref": outcome,
+                "root_event_ref": root_ref,
+                "parent_event_ref": current_ref,
+            }
+        )
+        if (
+            not wip_available
+            or current_depth >= 16
+            or after["tokens"] <= 0
+            or after["cost_units"] <= 0
+        ):
+            return MaterialityResult("WAIT_BUDGET", "WAIT_BUDGET", exact_key, None)
+        minted_at = _parse_now(issued_at)
+        event_id = f"material-event:{exact_key}"
+        payload: dict[str, object] = {
+            "event_id": event_id,
+            "origin_class": "ENDOGENOUS",
+            "origin_trigger_ref": outcome,
+            "event_kind": "VALIDATED_FEEDBACK",
+            "root_event_ref": root_ref,
+            "parent_event_ref": current_ref,
+            "policy_sha256": policy_sha256,
+            "context_sha256": context_sha256,
+            "root_energy": root_energy,
+            "remaining_energy": after,
+            "causal_depth": current_depth + 1,
+            "shadow_taint": "SHADOW_UNAPPLIED",
+            "evidence_refs": [execution, validation, outcome],
+            "materiality_inputs": {
+                "execution_ref": execution,
+                "validation_ref": validation,
+                "outcome_ref": outcome,
+                "resource_request_sha256": canonical_json_sha256(requested),
+                "wip_available": True,
+            },
+            "created_from_ledger_sequence": ledger_revision,
+        }
+        material_event = {
+            "schema_id": "MaterialEvent",
+            "schema_version": "1.0.0",
+            "object_id": event_id,
+            "issued_at": _format_timestamp(minted_at),
+            "issuer": "trusted-event-minter",
+            "contour": event_value["contour"],
+            "classification": event_value["classification"],
+            "payload": payload,
+            "integrity": {
+                "profile_id": "core-json-sha256-v1",
+                "payload_sha256": canonical_json_sha256(payload),
+                "parent_refs": [outcome, execution, validation],
+            },
+        }
+        return MaterialityResult(
+            "MATERIAL",
+            "MATERIAL",
+            exact_key,
+            _a1_deep_freeze(_a1_json_copy(material_event, "material_event")),
+        )
+
     def freeze_admission_snapshot(
         self,
         candidate: Mapping[str, object],
