@@ -1,0 +1,21 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-r08b-exact-candidate-image-build-sbom-20260719",
+  "issued_at": "2026-07-19T18:23:13Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "decision": "REUSE_INTERNAL_BUILD_AND_PUBLIC_PRIMARY_ADVISORY_DATA",
+  "objective": "Create a complete exact-candidate image/SBOM inventory without adding a shipped runtime or development dependency.",
+  "evaluation_order": ["internal-adapter", "owned-versioned-package", "pinned-permissive-dependency", "small-audited-vendor-import", "minimal-missing-glue"],
+  "selected": [
+    "tools/final_deployment_rebind.py:owner-only-artifact-write-image-inspection-dpkg-and-SPDX-patterns",
+    "docs/receipts/release/s4-release-sbom.spdx.json:pinned-base-image-package-inventory",
+    "ops/release/dependency-lock.json:pinned-runtime-dependency-boundary",
+    "Debian-Security-Tracker:public-primary-advisory-snapshot-data-only",
+    "python-standard-library:argparse-datetime-hashlib-json-os-pathlib-re-shutil-stat-subprocess-tempfile"
+  ],
+  "new_dependency": false,
+  "external_code": false,
+  "external_data_only": true,
+  "rationale": "The repository already owns all build, inspection and SPDX assembly patterns. A fresh official public advisory data snapshot is input evidence, not executable or shipped code."
+}

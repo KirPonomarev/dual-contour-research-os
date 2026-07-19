@@ -1,0 +1,73 @@
+{
+  "stage_id": "r08b-exact-candidate-image-build-sbom",
+  "agent_id": "agent-0",
+  "objective": "Cut the exact R08B candidate, reproducibly build its linux/amd64 Core and connected-worker image set, bind deterministic archives, complete SPDX/dependency inventory and a fresh public advisory snapshot without issuing a deployment or final-freeze claim.",
+  "executable_blocker": "R08A proved the production image definition, but no immutable candidate image set, archive, current SBOM or candidate inventory exists for exact-image E2E.",
+  "base_sha": "25ae9a5a0f9e4b3551b489963ec2c33c27c7cd41",
+  "candidate_sha": "25ae9a5a0f9e4b3551b489963ec2c33c27c7cd41",
+  "candidate_tree_sha": "70aa10f512919cee868251ff4b88f360e3a44b5b",
+  "candidate_exact_head_ci_run": 29698472163,
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "a1_contract_sha256": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+  "branch": "codex/bridge-a0-r08b-exact-candidate-image-build-sbom",
+  "worktree": "/private/tmp/dcr-r08b-exact-candidate-image-build-sbom",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "ownership/registry.json",
+    ".dockerignore",
+    "ops/release/**",
+    "ops/connected-worker/**",
+    "ops/deploy/research-os-a1-final.service",
+    "ops/deploy/research-os-connected-worker@.service",
+    "provenance/model-provider-routing-v1.json",
+    "provenance/model-provider-connected-shadow-v2.json",
+    "docs/receipts/release/s4-release-sbom.spdx.json",
+    "tools/final_deployment_rebind.py",
+    "tools/verify_release_blueprint.py"
+  ],
+  "write_set": [
+    "tools/candidate_image_build.py",
+    "docs/receipts/release/r08b-candidate-sbom.spdx.json",
+    "docs/receipts/release/r08b-candidate-inventory.json",
+    "docs/receipts/release/r08b-candidate-cut.json"
+  ],
+  "forbidden_scope": [
+    "edit-candidate-subject-source-contract-policy-config-unit-root-CI-lockfile-migration-or-existing-test",
+    "commit-image-archive-raw-advisory-dataset-secret-private-evidence-runtime-database-or-account-data",
+    "deploy-call-provider-issue-final-capability-or-freeze-claim-consume-authority-or-start-observation-window"
+  ],
+  "dependency_hashes": {
+    "r08a_integration_receipt_sha256": "b6268ad462847f3163ca22f5b16bfc9a82b1625850c7cb648c851344d638ef1e",
+    "dependency_lock_sha256": "58cd81aa9e5554e5ae88a0d86822e341a6ac25eb8179cca9a9fb3e4512493be9",
+    "runtime_notice_sha256": "f3683a82df4e25de6a748270abd351342bc69796eddfa519ef1fe5f1f2fa9ebd",
+    "base_spdx_sha256": "60f9261a9dad06a8723c5c17bb77d2e34e8608586c19bd28049921ea028d5c15",
+    "provider_routing_sha256": "37db8596a8245a6b1ea2bc5bce1495a4e7dadb314876e51397ad11dd194b3dc6",
+    "provider_profile_sha256": "63ae65247d61b918aced080e6419609459ebcbf4a3384ea29f2617e65597258c",
+    "connected_containerfile_sha256": "5e748ab7e8fd5418bfbbe5f2ee19053ee74cba38330fe8058f90f63299e8b8ef",
+    "reuse_receipt": "docs/receipts/reuse/r08b-exact-candidate-image-build-sbom.json"
+  },
+  "acceptance_commands": [
+    "python3 tools/candidate_image_build.py prepare --candidate-sha 25ae9a5a0f9e4b3551b489963ec2c33c27c7cd41 --candidate-ci-run 29698472163 --output-dir <owner-only-outside-repository> --advisory-snapshot <owner-only-official-Debian-snapshot>",
+    "python3 tools/candidate_image_build.py verify --output-dir <owner-only-outside-repository>",
+    "python3 tools/verify_release_blueprint.py",
+    "make contracts",
+    "make test",
+    "git diff --check",
+    "exact-head remote CI"
+  ],
+  "risk_class": "critical-mixed-candidate-image-identity",
+  "stop_conditions": [
+    "candidate-SHA-tree-or-CI-mismatch",
+    "independent-repeat-build-produces-different-image-ID",
+    "repeat-save-produces-different-archive-hash",
+    "image-platform-entrypoint-user-label-package-or-file-inventory-drift",
+    "SBOM-license-notice-or-advisory-coverage-incomplete",
+    "private-artifact-not-owner-only-or-output-inside-repository"
+  ],
+  "expected_receipt": "docs/receipts/integration/r08b-exact-candidate-image-build-sbom.json",
+  "rollback": "Remove the additive build tool and three sanitized candidate evidence files; delete only the exact local R08B images/artifacts, leaving the candidate Git subject unchanged.",
+  "commit_authority": "one-scoped-agent-0-stage",
+  "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent0_audit", "blocked_validation_failed"]
+}
