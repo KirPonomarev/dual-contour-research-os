@@ -168,6 +168,7 @@ class SubprocessRunner:
 class ReleaseBundle:
     release_sha: str
     image_id: str
+    previous_release_ref: str
     policy_sha256: str
     config_sha256: str
     archive_sha256: str | None
@@ -176,6 +177,53 @@ class ReleaseBundle:
     config_path: Path
     archive_path: Path | None
     capsule: CapsuleSeed | None = None
+
+
+@dataclass(frozen=True)
+class DeploymentTarget:
+    """Exact mutable namespace and supervisor boundary for one deployment lane."""
+
+    service_name: str
+    container_name: str
+    runtime_volume: str
+    config_volume: str
+    remote_slug: str
+    docker_restart_policy: str
+    conflicting_service_name: str | None = None
+    conflicting_container_name: str | None = None
+
+    @property
+    def remote_base(self) -> str:
+        return f"$HOME/.local/share/{self.remote_slug}"
+
+    @property
+    def remote_config(self) -> str:
+        return f"$HOME/.config/{self.remote_slug}"
+
+    @property
+    def remote_unit(self) -> str:
+        return f"$HOME/.config/systemd/user/{self.service_name}"
+
+
+LEGACY_TARGET = DeploymentTarget(
+    service_name=SERVICE_NAME,
+    container_name=CONTAINER_NAME,
+    runtime_volume=RUNTIME_VOLUME,
+    config_volume=CONFIG_VOLUME,
+    remote_slug="research-os-bridge",
+    docker_restart_policy="unless-stopped",
+)
+
+FINAL_A1_TARGET = DeploymentTarget(
+    service_name="research-os-a1-bridge.service",
+    container_name="research-os-a1-bridge",
+    runtime_volume="research-os-a1-runtime",
+    config_volume="research-os-a1-config",
+    remote_slug="research-os-a1-bridge",
+    docker_restart_policy="no",
+    conflicting_service_name="research-os-bridge.service",
+    conflicting_container_name="research-os-bridge",
+)
 
 
 @dataclass(frozen=True)
@@ -285,6 +333,12 @@ def _payload_sha(value: object) -> str:
 def _sha256(value: object, label: str) -> str:
     if not isinstance(value, str) or _SHA256.fullmatch(value) is None:
         raise DeploymentError(f"{label} is not a SHA-256")
+    return value
+
+
+def _git_sha(value: object, label: str) -> str:
+    if not isinstance(value, str) or _GIT_SHA.fullmatch(value) is None:
+        raise DeploymentError(f"{label} is not a Git SHA")
     return value
 
 
@@ -660,6 +714,12 @@ def _load_bundle(
     archive_path: Path | None = None,
     archive_sha256: str | None = None,
     capsule: CapsuleSeed | None = None,
+    expected_release_sha: str = RELEASE_SHA,
+    expected_image_id: str = IMAGE_ID,
+    expected_previous_release: str = PREVIOUS_RELEASE,
+    expected_config_sha256: str = _FROZEN_RELEASE_CONFIG_SHA256,
+    expected_unit_template_sha256: str = _LEGACY_UNIT_SHA256,
+    expected_policy: Mapping[str, object] = _EXPECTED_POLICY,
 ) -> ReleaseBundle:
     manifest, _, _, _ = _json_bound_file(manifest_path, "ReleaseManifest")
     policy, policy_sha, _, _ = _json_bound_file(policy_path, "runtime policy")
@@ -670,7 +730,7 @@ def _load_bundle(
     )
     unit_template = _regular_file(unit_path, "service unit template", maximum=256_000)
 
-    if policy != _EXPECTED_POLICY:
+    if policy != expected_policy:
         raise DeploymentError("runtime policy drifted from the frozen boundary")
     if set(manifest) != {
         "schema_id",
@@ -696,9 +756,18 @@ def _load_bundle(
     if not isinstance(release_sha, str) or _GIT_SHA.fullmatch(release_sha) is None:
         raise DeploymentError("release SHA is invalid")
     images = payload.get("image_digests")
-    if not isinstance(images, list) or images != [IMAGE_ID]:
+    expected_release_sha = _git_sha(expected_release_sha, "expected release SHA")
+    if not isinstance(expected_image_id, str) or not expected_image_id.startswith("sha256:"):
+        raise DeploymentError("expected image identity is not an image SHA-256")
+    expected_image_id = "sha256:" + _sha256(
+        expected_image_id.removeprefix("sha256:"), "expected image identity"
+    )
+    if not isinstance(images, list) or images != [expected_image_id]:
         raise DeploymentError("release image identity is not the frozen candidate")
-    if release_sha != RELEASE_SHA or payload.get("previous_release_ref") != PREVIOUS_RELEASE:
+    if (
+        release_sha != expected_release_sha
+        or payload.get("previous_release_ref") != expected_previous_release
+    ):
         raise DeploymentError("release or rollback identity is not frozen")
     if payload.get("policy_sha256") != policy_sha or payload.get("config_sha256") != config_sha:
         raise DeploymentError("release policy or config binding is invalid")
@@ -712,8 +781,8 @@ def _load_bundle(
         ):
             raise DeploymentError("functional release does not bind the sealed capsule")
     elif (
-        config_sha != _FROZEN_RELEASE_CONFIG_SHA256
-        or _digest_bytes(unit_template) != _LEGACY_UNIT_SHA256
+        config_sha != expected_config_sha256
+        or _digest_bytes(unit_template) != expected_unit_template_sha256
     ):
         raise DeploymentError("legacy deployment profile is not the exact frozen profile")
 
@@ -724,7 +793,7 @@ def _load_bundle(
     if observed_tokens != expected_tokens:
         raise DeploymentError("service unit template tokens are invalid")
     rendered = (
-        template.replace("@@IMAGE_ID@@", IMAGE_ID)
+        template.replace("@@IMAGE_ID@@", expected_image_id)
         .replace("@@RELEASE_SHA@@", release_sha)
         .replace("@@POLICY_SHA256@@", policy_sha)
         .replace("@@CONFIG_SHA256@@", config_sha)
@@ -753,7 +822,8 @@ def _load_bundle(
 
     return ReleaseBundle(
         release_sha=release_sha,
-        image_id=IMAGE_ID,
+        image_id=expected_image_id,
+        previous_release_ref=expected_previous_release,
         policy_sha256=policy_sha,
         config_sha256=config_sha,
         archive_sha256=actual_archive_sha,
@@ -775,6 +845,7 @@ class PreSoakDeployController:
         known_hosts_path: Path,
         runner: Runner | None = None,
         clock: Callable[[], datetime] | None = None,
+        target: DeploymentTarget = LEGACY_TARGET,
     ) -> None:
         if _ALIAS.fullmatch(ssh_alias) is None:
             raise DeploymentError("target must be a normalized SSH config alias")
@@ -783,6 +854,9 @@ class PreSoakDeployController:
         self._known_hosts = str(known_hosts_path.resolve())
         self._runner = runner or SubprocessRunner()
         self._clock = clock or (lambda: datetime.now(timezone.utc))
+        if target not in {LEGACY_TARGET, FINAL_A1_TARGET}:
+            raise DeploymentError("deployment target is not a frozen profile")
+        self._target = target
 
     def _ssh_arguments(self) -> list[str]:
         return [
@@ -929,15 +1003,15 @@ class PreSoakDeployController:
     def _stage_capsule_objects(self, capsule: CapsuleSeed) -> str:
         nonce = _digest_bytes(os.urandom(32))
         incoming_name = f"capsule-{nonce}"
-        incoming_relative = f".local/share/research-os-bridge/incoming/{incoming_name}"
-        incoming_remote = f"{_REMOTE_BASE}/incoming/{incoming_name}"
+        incoming_relative = f".local/share/{self._target.remote_slug}/incoming/{incoming_name}"
+        incoming_remote = f"{self._target.remote_base}/incoming/{incoming_name}"
         created = self._ssh(
             "set -eu; umask 077; directory=" + incoming_remote + "; "
-            f"for parent in \"$HOME\" \"$HOME/.local\" \"$HOME/.local/share\" {_REMOTE_BASE} {_REMOTE_BASE}/incoming; do "
+            f"for parent in \"$HOME\" \"$HOME/.local\" \"$HOME/.local/share\" {self._target.remote_base} {self._target.remote_base}/incoming; do "
             "test ! -L \"$parent\"; test -d \"$parent\"; test -O \"$parent\"; "
             "mode=\"$(stat -c %a \"$parent\")\"; test \"$((0$mode & 0022))\" = 0; done; "
-            f"test \"$(stat -c %a {_REMOTE_BASE})\" = 700; "
-            f"test \"$(stat -c %a {_REMOTE_BASE}/incoming)\" = 700; "
+            f"test \"$(stat -c %a {self._target.remote_base})\" = 700; "
+            f"test \"$(stat -c %a {self._target.remote_base}/incoming)\" = 700; "
             "mkdir -m 0700 -- \"$directory\"; "
             "test ! -L \"$directory\"; test -d \"$directory\"; test -O \"$directory\"; "
             "test \"$(stat -c %a \"$directory\")\" = 700; "
@@ -1112,19 +1186,19 @@ class PreSoakDeployController:
             raise DeploymentError("deployment requires a content-addressed archive")
         self._ssh(
             "set -eu; umask 077; "
-            f"install -d -m 0700 {_REMOTE_BASE}/incoming {_REMOTE_CONFIG} "
+            f"install -d -m 0700 {self._target.remote_base}/incoming {self._target.remote_config} "
             '"$HOME/.config/systemd/user"'
         )
-        archive_relative = f".local/share/research-os-bridge/incoming/release-{bundle.archive_sha256}.tar"
-        archive_remote = f"{_REMOTE_BASE}/incoming/release-{bundle.archive_sha256}.tar"
+        archive_relative = f".local/share/{self._target.remote_slug}/incoming/release-{bundle.archive_sha256}.tar"
+        archive_remote = f"{self._target.remote_base}/incoming/release-{bundle.archive_sha256}.tar"
         self._scp(bundle.archive_path, archive_relative)
         if self._remote_sha(archive_remote) != bundle.archive_sha256:
             raise DeploymentError("remote release archive SHA-256 does not match")
         self._ssh(f"{_DOCKER} load --input {archive_remote}", timeout=600.0)
         self._image_inspect(bundle)
 
-        config_relative = f".config/research-os-bridge/researchd-{bundle.config_sha256}.json"
-        config_remote = f"{_REMOTE_CONFIG}/researchd-{bundle.config_sha256}.json"
+        config_relative = f".config/{self._target.remote_slug}/researchd-{bundle.config_sha256}.json"
+        config_remote = f"{self._target.remote_config}/researchd-{bundle.config_sha256}.json"
         self._scp(bundle.config_path, config_relative)
         if self._remote_sha(config_remote) != bundle.config_sha256:
             raise DeploymentError("remote service config SHA-256 does not match")
@@ -1132,17 +1206,17 @@ class PreSoakDeployController:
         capsule_remote = None
         if bundle.capsule is not None:
             capsule_remote = self._stage_capsule_objects(bundle.capsule)
-        self._ssh(f"{_DOCKER} volume create {RUNTIME_VOLUME}")
-        self._ssh(f"{_DOCKER} volume create {CONFIG_VOLUME}")
+        self._ssh(f"{_DOCKER} volume create {self._target.runtime_volume}")
+        self._ssh(f"{_DOCKER} volume create {self._target.config_volume}")
         if bundle.capsule is None:
             init_command = (
-            f"{_DOCKER} run --rm --name=research-os-bridge-volume-init "
+            f"{_DOCKER} run --rm --name={self._target.container_name}-volume-init "
             "--user=0:0 --network=none --read-only "
             "--security-opt=no-new-privileges:true --pids-limit=32 "
             "--memory=134217728 --cpus=0.25 "
             f"--mount=type=bind,source={config_remote},target=/source/researchd.json,readonly "
-            f"--mount=type=volume,source={CONFIG_VOLUME},target=/target-config "
-            f"--mount=type=volume,source={RUNTIME_VOLUME},target=/target-runtime "
+            f"--mount=type=volume,source={self._target.config_volume},target=/target-config "
+            f"--mount=type=volume,source={self._target.runtime_volume},target=/target-runtime "
             f"--entrypoint=/bin/sh {bundle.image_id} -eu -c "
             + shlex.quote(
                 "install -m 0600 -o 10001 -g 10001 /source/researchd.json "
@@ -1155,8 +1229,8 @@ class PreSoakDeployController:
             f"{_DOCKER} run --rm --network=none --read-only --cap-drop=ALL "
             "--security-opt=no-new-privileges:true --pids-limit=16 "
             "--memory=67108864 --cpus=0.25 --user=10001:10001 "
-            f"--mount=type=volume,source={CONFIG_VOLUME},target=/target-config,readonly "
-            f"--mount=type=volume,source={RUNTIME_VOLUME},target=/target-runtime "
+            f"--mount=type=volume,source={self._target.config_volume},target=/target-config,readonly "
+            f"--mount=type=volume,source={self._target.runtime_volume},target=/target-runtime "
             f"--entrypoint=/bin/sh {bundle.image_id} -eu -c "
             + shlex.quote(
                 "test \"$(stat -c %u:%g:%a /target-config/researchd.json)\" "
@@ -1171,15 +1245,15 @@ class PreSoakDeployController:
         else:
             assert capsule_remote is not None
             init_command = (
-                f"{_DOCKER} run --rm --name=research-os-bridge-capsule-volume-init "
+                f"{_DOCKER} run --rm --name={self._target.container_name}-capsule-volume-init "
                 "--user=0:0 --network=none --read-only --cap-drop=ALL "
                 "--cap-add=CHOWN --cap-add=DAC_OVERRIDE "
                 "--security-opt=no-new-privileges:true --pids-limit=32 "
                 "--memory=134217728 --cpus=0.25 "
                 f"--mount=type=bind,source={config_remote},target=/source-config/researchd.json,readonly "
                 f"--mount=type=bind,source={capsule_remote},target=/source-cas,readonly "
-                f"--mount=type=volume,source={CONFIG_VOLUME},target=/target-config "
-                f"--mount=type=volume,source={RUNTIME_VOLUME},target=/target-runtime "
+                f"--mount=type=volume,source={self._target.config_volume},target=/target-config "
+                f"--mount=type=volume,source={self._target.runtime_volume},target=/target-runtime "
                 f"--entrypoint=python {bundle.image_id} -c "
                 + shlex.quote(self._capsule_volume_init_script(bundle.capsule))
             )
@@ -1198,36 +1272,36 @@ class PreSoakDeployController:
             raise DeploymentError("remote rendered unit SHA-256 does not match")
 
     def _saved_unit(self, bundle: ReleaseBundle) -> str:
-        return f"{_REMOTE_CONFIG}/research-os-bridge.{bundle.release_sha}.service"
+        return f"{self._target.remote_config}/{self._target.remote_slug}.{bundle.release_sha}.service"
 
     def _install_saved_unit(self, bundle: ReleaseBundle) -> None:
         saved = self._saved_unit(bundle)
-        next_unit = f"{_REMOTE_UNIT}.next"
+        next_unit = f"{self._target.remote_unit}.next"
         self._ssh(f"install -m 0600 {saved} {next_unit}")
         if self._remote_sha(next_unit) != bundle.unit_sha256:
             raise DeploymentError("staged systemd unit SHA-256 does not match")
         try:
-            self._ssh(f"mv -f -- {next_unit} {_REMOTE_UNIT}")
+            self._ssh(f"mv -f -- {next_unit} {self._target.remote_unit}")
             self._ssh("systemctl --user daemon-reload")
-            self._ssh(f"systemctl --user enable --now {SERVICE_NAME}", timeout=120.0)
+            self._ssh(f"systemctl --user enable --now {self._target.service_name}", timeout=120.0)
         except DeploymentError:
             self._force_stopped(bundle, suffix="activation-failed")
             raise
 
     def _force_stopped(self, bundle: ReleaseBundle, *, suffix: str) -> None:
-        self._ssh(f"systemctl --user disable --now {SERVICE_NAME}", check=False)
-        self._ssh(f"{_DOCKER} stop --time=30 {CONTAINER_NAME}", check=False)
-        destination = f"{_REMOTE_CONFIG}/{suffix}.{bundle.release_sha}.service"
+        self._ssh(f"systemctl --user disable --now {self._target.service_name}", check=False)
+        self._ssh(f"{_DOCKER} stop --time=30 {self._target.container_name}", check=False)
+        destination = f"{self._target.remote_config}/{suffix}.{bundle.release_sha}.service"
         self._ssh(
-            f"set -eu; if test -f {_REMOTE_UNIT}; then mv -f -- {_REMOTE_UNIT} {destination}; fi; "
+            f"set -eu; if test -f {self._target.remote_unit}; then mv -f -- {self._target.remote_unit} {destination}; fi; "
             "systemctl --user daemon-reload"
         )
 
     def _systemd_running(self) -> None:
-        active = self._ssh(f"systemctl --user is-active {SERVICE_NAME}")
+        active = self._ssh(f"systemctl --user is-active {self._target.service_name}")
         if active.stdout.strip() != "active":
             raise DeploymentError("Bridge user service is not active")
-        enabled = self._ssh(f"systemctl --user is-enabled {SERVICE_NAME}")
+        enabled = self._ssh(f"systemctl --user is-enabled {self._target.service_name}")
         if enabled.stdout.strip() not in {"enabled", "enabled-runtime"}:
             raise DeploymentError("Bridge user service is not enabled")
 
@@ -1239,7 +1313,7 @@ class PreSoakDeployController:
         missing_ok: bool = False,
     ) -> dict[str, Any] | None:
         result = self._ssh(
-            f"{_DOCKER} container inspect {CONTAINER_NAME} --format '{{{{json .}}}}'",
+            f"{_DOCKER} container inspect {self._target.container_name} --format '{{{{json .}}}}'",
             check=False,
         )
         if result.returncode != 0:
@@ -1290,7 +1364,7 @@ class PreSoakDeployController:
             and "org.research-os.capsule-manifest-sha256" not in labels
         )
         if (
-            value.get("Name") not in {CONTAINER_NAME, f"/{CONTAINER_NAME}"}
+            value.get("Name") not in {self._target.container_name, f"/{self._target.container_name}"}
             or value.get("Image") != bundle.image_id
             or config.get("Image") != bundle.image_id
             or config.get("User") != "10001:10001"
@@ -1322,7 +1396,7 @@ class PreSoakDeployController:
             or host.get("Memory") != 2147483648
             or host.get("NanoCpus") != 2_000_000_000
             or not isinstance(restart, dict)
-            or restart.get("Name") != "unless-stopped"
+            or restart.get("Name") != self._target.docker_restart_policy
             or host.get("PortBindings") not in (None, {})
             or running is not require_running
         ):
@@ -1342,11 +1416,11 @@ class PreSoakDeployController:
         if (
             not isinstance(runtime_mount, dict)
             or runtime_mount.get("Type") != "volume"
-            or runtime_mount.get("Name") != RUNTIME_VOLUME
+            or runtime_mount.get("Name") != self._target.runtime_volume
             or runtime_mount.get("RW") is not True
             or not isinstance(config_mount, dict)
             or config_mount.get("Type") != "volume"
-            or config_mount.get("Name") != CONFIG_VOLUME
+            or config_mount.get("Name") != self._target.config_volume
             or config_mount.get("RW") is not False
         ):
             raise DeploymentError("container mounts drifted from the frozen runtime policy")
@@ -1357,7 +1431,7 @@ class PreSoakDeployController:
 
     def _pause_snapshot(self) -> tuple[dict[str, Any], str]:
         result = self._ssh(
-            f"{_DOCKER} exec --user=10001:10001 {CONTAINER_NAME} python -m "
+            f"{_DOCKER} exec --user=10001:10001 {self._target.container_name} python -m "
             "research_bridge.researchctl --socket /var/lib/research-os/researchd.sock "
             "--request-id deployment-verification status"
         )
@@ -1381,15 +1455,44 @@ class PreSoakDeployController:
             raise DeploymentError("boot identity is invalid")
         return _digest_bytes(value.lower().encode("ascii"))
 
+    def _assert_no_conflicting_writer(self) -> None:
+        service = self._target.conflicting_service_name
+        container = self._target.conflicting_container_name
+        if service is None and container is None:
+            return
+        if not service or not container:
+            raise DeploymentError("conflicting writer profile is incomplete")
+        if self._ssh(f"systemctl --user is-active --quiet {service}", check=False).returncode == 0:
+            raise DeploymentError("conflicting predecessor service is active")
+        if self._ssh(f"systemctl --user is-enabled --quiet {service}", check=False).returncode == 0:
+            raise DeploymentError("conflicting predecessor service is enabled")
+        inspected = self._ssh(
+            "set -eu; if state=\"$("
+            f"{_DOCKER} container inspect {container} --format '{{{{json .State.Running}}}}' 2>/dev/null"
+            "); then printf 'PRESENT:%s\\n' \"$state\"; "
+            f"else {_DOCKER} info --format '{{{{.OSType}}}}' >/dev/null; printf 'ABSENT\\n'; fi"
+        ).stdout.strip()
+        if inspected in {"ABSENT", "PRESENT:false"}:
+            return
+        if inspected == "PRESENT:true":
+            raise DeploymentError("conflicting predecessor container is running")
+        raise DeploymentError("conflicting predecessor state is invalid")
+
     def _verify_running(self, bundle: ReleaseBundle) -> tuple[dict[str, Any], str]:
         self._systemd_running()
         self._container_inspect(bundle, require_running=True)
         return self._pause_snapshot()
 
-    def deploy(self, bundle: ReleaseBundle) -> dict[str, Any]:
+    def deploy(
+        self,
+        bundle: ReleaseBundle,
+        *,
+        authorization: Callable[[], Mapping[str, object]] | None = None,
+    ) -> dict[str, Any]:
         preflight = self.preflight()
+        self._assert_no_conflicting_writer()
         inactive = self._ssh(
-            f"systemctl --user is-active --quiet {SERVICE_NAME}", check=False
+            f"systemctl --user is-active --quiet {self._target.service_name}", check=False
         )
         if inactive.returncode == 0:
             raise DeploymentError("first-release deploy requires the stopped prior state")
@@ -1397,6 +1500,13 @@ class PreSoakDeployController:
         if existing is not None:
             # An interrupted retry may retain only the exact stopped candidate.
             self._container_inspect(bundle, require_running=False)
+        authorization_evidence: dict[str, object] | None = None
+        if authorization is not None:
+            supplied = authorization()
+            if not isinstance(supplied, Mapping) or supplied.get("consumed") is not True:
+                raise DeploymentError("deployment authorization was not durably consumed")
+            authorization_evidence = dict(supplied)
+            self._assert_no_conflicting_writer()
         self._stage_content(bundle)
         self._install_saved_unit(bundle)
         snapshot, pause_sha = self._verify_running(bundle)
@@ -1408,11 +1518,13 @@ class PreSoakDeployController:
             "pause_state": snapshot,
             "pause_state_sha256": pause_sha,
             "runtime_policy_enforced": True,
-            "rollback_target": PREVIOUS_RELEASE,
+            "rollback_target": bundle.previous_release_ref,
             "automatic_sudo_executed": False,
             "automatic_reboot_executed": False,
             "declares_ready_for_72h_soak": False,
         }
+        if authorization_evidence is not None:
+            evidence["deployment_authorization"] = authorization_evidence
         if bundle.capsule is not None:
             evidence.update(
                 {
@@ -1488,16 +1600,16 @@ class PreSoakDeployController:
     def rollback(self, bundle: ReleaseBundle) -> dict[str, Any]:
         preflight = self.preflight()
         snapshot, pause_sha = self._verify_running(bundle)
-        self._ssh(f"systemctl --user disable --now {SERVICE_NAME}", timeout=120.0)
-        self._ssh(f"{_DOCKER} stop --time=30 {CONTAINER_NAME}", check=False)
-        rolled_back = f"{_REMOTE_CONFIG}/rolled-back.{bundle.release_sha}.service"
+        self._ssh(f"systemctl --user disable --now {self._target.service_name}", timeout=120.0)
+        self._ssh(f"{_DOCKER} stop --time=30 {self._target.container_name}", check=False)
+        rolled_back = f"{self._target.remote_config}/rolled-back.{bundle.release_sha}.service"
         self._ssh(
-            f"set -eu; if test -f {_REMOTE_UNIT}; then mv -f -- {_REMOTE_UNIT} {rolled_back}; fi; "
+            f"set -eu; if test -f {self._target.remote_unit}; then mv -f -- {self._target.remote_unit} {rolled_back}; fi; "
             "systemctl --user daemon-reload; systemctl --user reset-failed >/dev/null 2>&1 || true"
         )
-        if self._ssh(f"systemctl --user is-active --quiet {SERVICE_NAME}", check=False).returncode == 0:
+        if self._ssh(f"systemctl --user is-active --quiet {self._target.service_name}", check=False).returncode == 0:
             raise DeploymentError("rollback did not stop the Bridge user service")
-        if self._ssh(f"systemctl --user is-enabled --quiet {SERVICE_NAME}", check=False).returncode == 0:
+        if self._ssh(f"systemctl --user is-enabled --quiet {self._target.service_name}", check=False).returncode == 0:
             raise DeploymentError("rollback did not disable the Bridge user service")
         self._container_inspect(bundle, require_running=False)
         return _receipt(
@@ -1505,7 +1617,7 @@ class PreSoakDeployController:
             bundle,
             {
                 "preflight": preflight,
-                "rollback_target": PREVIOUS_RELEASE,
+                "rollback_target": bundle.previous_release_ref,
                 "service_state": "none-service-stopped",
                 "state_volumes_preserved": True,
                 "saved_unit_sha256": bundle.unit_sha256,
@@ -1531,7 +1643,7 @@ class PreSoakDeployController:
         if rollback.get("service_state") != "none-service-stopped":
             raise DeploymentError("rollback receipt is not the stopped prior state")
         preflight = self.preflight()
-        if self._ssh(f"systemctl --user is-active --quiet {SERVICE_NAME}", check=False).returncode == 0:
+        if self._ssh(f"systemctl --user is-active --quiet {self._target.service_name}", check=False).returncode == 0:
             raise DeploymentError("redeploy requires the stopped rollback state")
         if self._remote_sha(self._saved_unit(bundle)) != bundle.unit_sha256:
             raise DeploymentError("saved redeploy unit SHA-256 does not match")
@@ -1547,7 +1659,7 @@ class PreSoakDeployController:
             bundle,
             {
                 "preflight": preflight,
-                "rollback_target": PREVIOUS_RELEASE,
+                "rollback_target": bundle.previous_release_ref,
                 "exact_release_restored": True,
                 "unit_sha256": bundle.unit_sha256,
                 "pause_state": snapshot,

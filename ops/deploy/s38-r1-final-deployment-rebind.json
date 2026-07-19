@@ -1,0 +1,72 @@
+{
+  "schema_id": "research-os.final-deployment-rebind.v1",
+  "packet_id": "s38-r1-final-deployment-rebind-b2c2e6a8",
+  "candidate_release_sha": "b2c2e6a8c4e0a364ef82e8e51540433aa91430d4",
+  "candidate_tree_sha": "7d6bd1e13d651950cced23dfe75a24946a3218fc",
+  "source_candidate_changed": false,
+  "operational_inputs": {
+    "final_manifest_ref": "docs/receipts/release/s38-final-release-manifest.json",
+    "final_manifest_sha256": "0439dee8e058914fe8e11416112e4a985e4bfec11502bb2cd0fd5b883295c369",
+    "policy_sha256": "b3fc58125b3308c723c25461828b914a2f244dfa260dda7d5eea49467a7fc647",
+    "config_sha256": "0b186888a3a1bb8fb028315681bf4073ec4186a0acbdf2f226b5a53d69a9d542",
+    "dependency_lock_sha256": "58cd81aa9e5554e5ae88a0d86822e341a6ac25eb8179cca9a9fb3e4512493be9",
+    "A1_unit_ref": "ops/deploy/research-os-a1-final.service",
+    "A1_unit_sha256": "49412c65c0e1e93d455d5b76e0a0516c618ac677fa63173bb9e89c93a7627b84"
+  },
+  "target_boundary": {
+    "service": "research-os-a1-bridge.service",
+    "container": "research-os-a1-bridge",
+    "runtime_volume": "research-os-a1-runtime",
+    "config_volume": "research-os-a1-config",
+    "predecessor_service": "research-os-bridge.service",
+    "predecessor_container": "research-os-bridge",
+    "concurrent_writers": false,
+    "docker_restart": "no",
+    "systemd_restart": "on-failure",
+    "network": "none",
+    "published_ports": 0,
+    "external_domain_action_authority": false
+  },
+  "prepared_artifacts": {
+    "image_id": "sha256:c654b09504dec237966623088e4dbbbe104d6364cd5760a4cfb145eb388a3844",
+    "image_archive_sha256": "374b8ca553ddf47d40400576589619a6ee5822f6f977ced36e404c0c8b693bea",
+    "SPDX_SBOM_sha256": "bd9ce8c1b34f49108f9a6d2c8516be937e6f1af010add78f2b0d6c9e9d790d70",
+    "operational_release_manifest_sha256": "47a3dcac2782fb8e0a03f599f58f778ecbbf7005fd01e7ff140f905648a756ce",
+    "image_build_receipt_sha256": "be057422cd6f4449fd86ed40a9d463f8acca51f02b9dd3ec75ffecc10f9c7824",
+    "private_artifacts_committed_to_git": false,
+    "remote_actions": 0,
+    "grants_authority": false
+  },
+  "causal_order": [
+    "STATIC_EXACT_BINDING",
+    "LOCAL_IMAGE_SBOM_AND_OPERATIONAL_MANIFEST",
+    "HUMAN_REVIEWED_VPS_SCOPE",
+    "CURRENT_ENCRYPTED_BACKUP_AND_CLEAN_RESTORE",
+    "MAX_300_SECOND_EXACT_DEPLOYMENT_APPROVAL",
+    "READ_ONLY_REMOTE_PREFLIGHT_AND_PREDECESSOR_STOP_PROOF",
+    "DURABLE_ONE_SHOT_APPROVAL_CONSUMPTION",
+    "FIRST_REMOTE_MUTATION",
+    "DEPLOYMENT_RECEIPT"
+  ],
+  "current_state": {
+    "static_rebind": "PASS_FOR_FROZEN_SCOPE",
+    "local_image_build": "PASS_LOCAL_EXACT_CANDIDATE",
+    "human_review": "WAIT_PR_25_REVIEW",
+    "runtime_backup_restore": "WAIT_REVIEWED_SCOPE",
+    "deployment_approval": "ABSENT",
+    "deployment": "NOT_STARTED"
+  },
+  "authority": {
+    "deployment_allowed": false,
+    "reboot_allowed": false,
+    "restore_allowed": false,
+    "VPS_mutation_allowed": false,
+    "canonical_mutation_allowed": false,
+    "live_action_allowed": false,
+    "grants_authority": false
+  },
+  "integrity": {
+    "profile": "core-json-sha256-v1",
+    "payload_sha256": "a88b5af913f4b6db3640d5679df78c0bdfe2498f08e7241e8449c18dae4c9c8d"
+  }
+}
