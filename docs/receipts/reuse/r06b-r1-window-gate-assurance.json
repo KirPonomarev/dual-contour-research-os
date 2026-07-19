@@ -1,0 +1,24 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-r06b-r1-window-gate-assurance-20260719",
+  "issued_at": "2026-07-19T16:44:30Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "decision": "REUSE_INTERNAL_AND_STANDARD_LIBRARY",
+  "objective": "Independently exercise the R06B observation gate against valid synthetic receipt graphs and deterministic boundary mutations.",
+  "evaluation_order": [
+    "internal-adapter",
+    "owned-versioned-package",
+    "pinned-permissive-dependency",
+    "small-audited-vendor-import",
+    "minimal-missing-glue"
+  ],
+  "selected": [
+    "tools/observation_window_gate.py:public validator entrypoints",
+    "provenance/observation-window-policy-v1.json:frozen thresholds",
+    "python-standard-library:unittest-copy-datetime-json-subprocess-tempfile"
+  ],
+  "new_dependency": false,
+  "external_code": false,
+  "rationale": "The gate already exposes deterministic pure validation functions and a CLI; additive synthetic tests are the only missing assurance artifact."
+}
