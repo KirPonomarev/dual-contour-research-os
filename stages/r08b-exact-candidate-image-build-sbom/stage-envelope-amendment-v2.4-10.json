@@ -1,0 +1,41 @@
+{
+  "stage_id": "r08b-exact-candidate-image-build-sbom",
+  "repair_stage_id": "r08b-r3-build-context-v3",
+  "amendment_id": "R08B_R3_BUILD_CONTEXT_V3_20260719",
+  "plan_id": "DCR_OS_AUTONOMOUS_V2_3_NO_BRAKES_20260719",
+  "plan_version": "2.4.0-fast-working-release",
+  "issued_by": "agent-0",
+  "issued_at": "2026-07-19T22:25:32Z",
+  "authority_head": "3823983f84fddb206ef9184b6a5ee3d9589df3c9",
+  "authority_tree": "719f82fa5a75028dd7e36d97f67e4f70c1c5e734",
+  "candidate_sha": null,
+  "candidate_tree_sha": null,
+  "candidate_exact_head_ci_run": "NOT_CUT",
+  "observed_blocker": "The deny-first root .dockerignore does not admit the newly versioned v3 provider tool and v3 provider profile, so the literal connected-worker Containerfile build from the exact current head cannot consume its declared COPY inputs.",
+  "agent_0_write_set": [
+    "stages/r08b-exact-candidate-image-build-sbom/stage-envelope-amendment-v2.4-10.json",
+    "stages/r08b-exact-candidate-image-build-sbom/ownership-lease-amendment-v2.4-10.json",
+    ".dockerignore"
+  ],
+  "required_change": {
+    "preserve_deny_first_default": true,
+    "add_exact_allowlist_entries": [
+      "tools/model_provider_shadow_v3.py",
+      "provenance/model-provider-connected-shadow-v3.json"
+    ],
+    "no_other_context_expansion": true,
+    "candidate_remains_null": true
+  },
+  "acceptance_commands": [
+    "git diff proves exactly two additive allowlist lines in .dockerignore",
+    "make contracts and make test",
+    "exact-head CI green",
+    "literal no-cache linux/arm64 build from current versioned Containerfile succeeds"
+  ],
+  "stop_conditions": [
+    "any other root frozen or owner path changes",
+    "build context admits a directory wildcard or unrelated file",
+    "candidate becomes non-null before full parent pre-cut PASS",
+    "force push rebase history rewrite or live action"
+  ]
+}
