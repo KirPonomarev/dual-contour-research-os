@@ -1,0 +1,23 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-r05b-r3-invalid-validation-recovery-20260719",
+  "issued_at": "2026-07-19T15:46:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-review-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "r05b-r3-invalid-validation-recovery",
+    "capability": "feedback-free-invalid-completion-reopen",
+    "candidates": [{"candidate": "repeat-execution-or-mint-failure-feedback", "disposition": "rejected-violates-exactly-once-and-validation-before-feedback"}, {"candidate": "fail-every-start-forever", "disposition": "rejected-unrecoverable-availability"}, {"candidate": "reuse-completed-event-check-and-skip-only-ExecutionError-from-independent-revalidation", "disposition": "selected-minimal-fail-closed-recovery"}],
+    "selected_candidate": "leave-invalid-completion-durable-and-feedback-free-skip-only-its-revalidation-error-and-continue-pre-IPC-recovery",
+    "source_ref": "git:f7f29212ec11afe736068caf7c7ff29f8d115983;internal:ResearchDaemon._recover_validated_feedback_tail",
+    "selected_source_sha": "e05a03988237e9328ae2d84efb5db29de27e0b8ef5d8e83af756b5f6a121a086",
+    "license": "repository-native-code-only",
+    "tests": ["invalid-completion-reopen", "feedback-absent", "execution-not-repeated", "chain-valid", "later-valid-work-allowed"],
+    "security_review": "Only the already-scoped independent-validation exception is classified as a feedback-free orphan. Ledger corruption, source-pin mismatch, ownership and startup failures remain fatal.",
+    "dependency_review": "No dependency, package, contract, schema, migration, lockfile, SBOM or notice change.",
+    "rollback": "Revert with R05B implementation."
+  },
+  "integrity": {"payload_sha256": "633c001b06e86cb242f298a0402dc44296caba4810e8c76cb9a8d67165545b1a", "parent_refs": ["git:f7f29212ec11afe736068caf7c7ff29f8d115983", "reuse:reuse-r05b-r2-independent-validation-assurance-20260719"]}
+}
