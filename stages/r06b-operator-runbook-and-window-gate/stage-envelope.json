@@ -1,0 +1,64 @@
+{
+  "stage_id": "r06b-operator-runbook-and-window-gate",
+  "agent_id": "agent-0",
+  "objective": "Freeze operator procedures and validate typed observation start/checkpoint/closeout documents with exact chronology, fingerprint, counters, distribution, incidents, resets, proof expiry and public-boundary rules.",
+  "executable_blocker": "R06A records durable monitoring inputs, but future windows still lack pre-start thresholds, sequential chronology, non-vacuity, reset/incident and privacy validation; starting a timer now would be under-specified.",
+  "base_sha": "8e4540d08e8eb3623a1e59e03c38d7f3e3266a25",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "a1_contract_sha256": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+  "branch": "codex/bridge-a0-r06b-operator-runbook-and-window-gate",
+  "worktree": "/private/tmp/dcr-r06b-operator-runbook-and-window-gate",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "ownership/registry.json",
+    "docs/PRODUCT_COMPLETION.md",
+    "ops/organism/runtime-monitor-policy.json",
+    "ops/release/monitoring-recovery-policy.json",
+    "ops/organism/runtime_monitor.py",
+    "tools/capability_proof.py",
+    "tools/release_backup_restore.py"
+  ],
+  "write_set": [
+    "tools/observation_window_gate.py",
+    "docs/OBSERVATION_WINDOW_POLICY.json",
+    "docs/OPERATOR_OBSERVATION_RUNBOOK.md"
+  ],
+  "forbidden_scope": [
+    "src-ops-contract-schema-root-config-CI-migration-lockfile-or-test-edit",
+    "runtime-monitor-ledger-CAS-provider-deployment-or-VPS-mutation",
+    "observation-start-checkpoint-closeout-fabrication-or-timer-start",
+    "private-raw-evidence-secret-account-host-path-runtime-database-or-provider-response-in-Git"
+  ],
+  "dependency_hashes": {
+    "r06a_integration_head": "8e4540d08e8eb3623a1e59e03c38d7f3e3266a25",
+    "runtime_monitor_sha256": "7d594e850d2e5044dddc5f8711095920f1d8fda29b9f21ec8dc7b2e1cfb7a805",
+    "runtime_monitor_policy_sha256": "44159ebee95cfd1800f5ab93fb057c29a480c30bd8e68568e21185087d8c0fa9",
+    "monitoring_recovery_policy_sha256": "43aa8b33203af26b589ac045d89cf23c78bef2d5930ae85c8428b0e33e946634",
+    "product_completion_sha256": "4bcbd79a38e7e05bfbc6739386949a6c7c45f9829ec92ec4cf7bce27ba40641c",
+    "ownership_registry_sha256": "e7a6a5158e43cb76c1df0fa28caec36ec9585a0dd05a732eabb94a92e427c9da",
+    "reuse_receipt": "docs/receipts/reuse/r06b-operator-runbook-and-window-gate.json"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 tools/observation_window_gate.py validate-policy --policy docs/OBSERVATION_WINDOW_POLICY.json",
+    "python3 -m unittest discover -s tests",
+    "python3 -m unittest discover -s tests/stage0b -p test_*.py",
+    "git diff --check",
+    "exact-head remote CI"
+  ],
+  "risk_class": "high-vacuous-retrospective-or-mixed-release-operational-proof",
+  "stop_conditions": [
+    "dependency-hash-mismatch",
+    "write-outside-three-file-Agent-0-set",
+    "zero-work-stale-mixed-or-under-duration-closeout-passes",
+    "thresholds-can-change-after-start",
+    "counter-reset-or-incident-chain-can-be-hidden",
+    "validator-emits-or-accepts-private-raw-material"
+  ],
+  "expected_receipt": "docs/receipts/integration/r06b-operator-runbook-and-window-gate.json",
+  "rollback": "Remove the three additive gate files; retain R06A and keep every observation state NOT_STARTED.",
+  "commit_authority": "agent-0-scoped-stage",
+  "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent0_audit", "blocked_validation_failed"]
+}

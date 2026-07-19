@@ -1,0 +1,15 @@
+{
+  "lease_id": "lease-r06b-operator-runbook-and-window-gate-agent-0",
+  "stage_id": "r06b-operator-runbook-and-window-gate",
+  "agent_id": "agent-0",
+  "branch": "codex/bridge-a0-r06b-operator-runbook-and-window-gate",
+  "issued_at": "2026-07-19T16:29:57Z",
+  "expires_at": "2026-07-21T16:29:57Z",
+  "write_set": [
+    "tools/observation_window_gate.py",
+    "docs/OBSERVATION_WINDOW_POLICY.json",
+    "docs/OPERATOR_OBSERVATION_RUNBOOK.md"
+  ],
+  "exclusive": true,
+  "revoked": false
+}

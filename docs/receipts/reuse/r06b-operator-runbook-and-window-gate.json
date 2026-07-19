@@ -1,0 +1,25 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-r06b-operator-runbook-and-window-gate-20260719",
+  "issued_at": "2026-07-19T16:29:57Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "decision": "REUSE_INTERNAL_MONITOR_AND_RECEIPT_PATTERNS",
+  "objective": "Freeze typed, non-vacuous and privacy-safe start/checkpoint/closeout rules for post-Product-Done observation windows without starting them.",
+  "evaluation_order": [
+    "internal-adapter",
+    "owned-versioned-package",
+    "pinned-permissive-dependency",
+    "small-audited-vendor-import",
+    "minimal-missing-glue"
+  ],
+  "selected": [
+    "ops/organism/runtime_monitor.py:hash-chained cumulative counters and incident refs",
+    "tools/capability_proof.py:bounded proof validity pattern",
+    "tools/release_backup_restore.py:strict sanitized receipt pattern",
+    "docs/PRODUCT_COMPLETION.md:Product Done precedes operational windows"
+  ],
+  "new_dependency": false,
+  "external_code": false,
+  "rationale": "All required primitives already exist internally; one pure validator and two canonical policy/runbook documents are the minimal missing gate."
+}
