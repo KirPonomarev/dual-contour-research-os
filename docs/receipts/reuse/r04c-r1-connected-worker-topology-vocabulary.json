@@ -1,0 +1,34 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-r04c-r1-connected-worker-topology-vocabulary-20260719",
+  "issued_at": "2026-07-19T12:11:21Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-review-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "r04c-r1-connected-worker-topology-vocabulary",
+    "capability": "additive-connected-worker-topology-vocabulary",
+    "candidates": [
+      {"candidate": "reuse-offline-l0-topology-values", "disposition": "rejected-inaccurate-network-and-lifecycle-declaration"},
+      {"candidate": "encode-worker-boundaries-in-free-text", "disposition": "rejected-not-machine-validated"},
+      {"candidate": "new-topology-schema-version", "disposition": "rejected-additive-enum-support-is-sufficient"},
+      {"candidate": "extend-existing-strict-validator-vocabulary", "disposition": "selected-minimal-internal-adapter"}
+    ],
+    "selected_candidate": "three-additive-enum-members-in-existing-organism-validator",
+    "source_ref": "git:7192ae51f281b614938407d039ac792b7fd0dc45;internal:organism-validator",
+    "selected_source_sha": "e3d3dbfe8d6d9dc8fdbeb8d6d8e05ad4411c4241e0bc3bb5f3edb5fa8e9d4b41",
+    "license": "repository-native-code-only",
+    "tests": ["existing-organism-manifest-suite", "existing-state-pulse-suite", "full-core-suite", "temporary-exact-value-validation"],
+    "security_review": "declarative-validation-only-no-process-start-network-credential-state-write-or-authority-grant",
+    "dependency_review": "no-new-package-code-license-SBOM-or-notice-change",
+    "rollback": "Remove the three additive enum members before the connected-worker topology documents are integrated."
+  },
+  "integrity": {
+    "payload_sha256": "734b26ab87453b233d30c8f1e96e2f215864b5fd086215837ae664a8ac5df4f3",
+    "parent_refs": [
+      "git:7192ae51f281b614938407d039ac792b7fd0dc45",
+      "source:sha256:e3d3dbfe8d6d9dc8fdbeb8d6e05ad4411c4241e0bc3bb5f3edb5fa8e9d4b41"
+    ]
+  }
+}

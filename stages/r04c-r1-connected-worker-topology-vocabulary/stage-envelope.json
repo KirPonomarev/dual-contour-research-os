@@ -1,0 +1,52 @@
+{
+  "stage_id": "r04c-r1-connected-worker-topology-vocabulary",
+  "agent_id": "agent-5",
+  "objective": "Add the minimal strict-validator vocabulary needed to declare the connected worker as a separate process with a bounded provider-egress role.",
+  "executable_blocker": "The current organism validator cannot represent the R04C connected-worker authority ceiling, network mode, or lifecycle without reusing inaccurate offline-L0 values.",
+  "base_sha": "7192ae51f281b614938407d039ac792b7fd0dc45",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "a1_contract_sha256": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+  "branch": "codex/bridge-a5-r04c-r1-connected-worker-topology-vocabulary",
+  "worktree": "/private/tmp/dcr-r04c-r1-connected-worker-topology-vocabulary",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "ownership/registry.json",
+    "src/research_bridge/organism.py",
+    "tests/test_s11_manifest_topology.py",
+    "tests/test_s12_state_pulse.py"
+  ],
+  "write_set": ["src/research_bridge/organism.py"],
+  "forbidden_scope": [
+    "contracts-canonical-docs-root-config-CI-lockfiles-migrations-or-other-runtime-source",
+    "organism-source-or-deployment-projection-documents",
+    "process-start-network-credential-private-response-or-ledger-mutation",
+    "authority-grant-or-enforcement-proof"
+  ],
+  "dependency_hashes": {
+    "r04b_integration_head": "7192ae51f281b614938407d039ac792b7fd0dc45",
+    "organism_source_sha256": "e3d3dbfe8d6d9dc8fdbeb8d6d8e05ad4411c4241e0bc3bb5f3edb5fa8e9d4b41",
+    "ownership_registry_sha256": "e7a6a5158e43cb76c1df0fa28caec36ec9585a0dd05a732eabb94a92e427c9da",
+    "reuse_receipt": "docs/receipts/reuse/r04c-r1-connected-worker-topology-vocabulary.json"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest tests.test_s11_manifest_topology tests.test_s12_state_pulse",
+    "python3 -m unittest discover -s tests",
+    "temporary exact-value validation for the three additive enum members",
+    "git diff --check",
+    "exact-head remote CI"
+  ],
+  "risk_class": "medium-declarative-topology-vocabulary-drift",
+  "stop_conditions": [
+    "base-contract-or-owner-mismatch",
+    "write-outside-organism-validator",
+    "existing-topology-value-removal-or-semantic-change",
+    "runtime-side-effect-or-authority-expansion"
+  ],
+  "expected_receipt": "docs/receipts/integration/r04c-r1-connected-worker-topology-vocabulary.json",
+  "rollback": "Revert the additive validator vocabulary before integrating R04C topology documents.",
+  "commit_authority": "one-scoped-agent-5-branch-stage",
+  "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent0_audit", "blocked_validation_failed"]
+}

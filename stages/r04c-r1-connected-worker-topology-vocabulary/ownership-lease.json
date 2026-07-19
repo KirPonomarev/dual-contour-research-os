@@ -1,0 +1,11 @@
+{
+  "lease_id": "lease-r04c-r1-connected-worker-topology-vocabulary-agent-5",
+  "stage_id": "r04c-r1-connected-worker-topology-vocabulary",
+  "agent_id": "agent-5",
+  "branch": "codex/bridge-a5-r04c-r1-connected-worker-topology-vocabulary",
+  "issued_at": "2026-07-19T12:11:21Z",
+  "expires_at": "2026-07-21T12:11:21Z",
+  "write_set": ["src/research_bridge/organism.py"],
+  "exclusive": true,
+  "revoked": false
+}
