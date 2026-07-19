@@ -26,6 +26,7 @@
     "audit_results": {
       "contract_gate": "green",
       "privacy_secret_scan": "green",
+      "source_mutation": false,
       "write_set_exact": true,
       "model_broker_sha256": "0ec53e1a5e677d198987057b2c07d2ea58748a6d5e9507b0cfae0c886e655ebe",
       "control_sha256": "fb38865d8862e01755e52c3540304c43b9975ede8e301650aac4c6a66939c506",
@@ -51,7 +52,7 @@
     "known_next_gate": "Run the disjoint Agent-5 R04B AF_UNIX and durable-state assurance lane before accepting the sprint."
   },
   "integrity": {
-    "payload_sha256": "5129dd14982241d650e8e0d57b8301698588a01f0ecf5fe582ced773b8199255",
+    "payload_sha256": "bc846aaf4262033856939aba92f854065ed36ee6c7a53a9978ac01e62adb740e",
     "parent_refs": [
       "git:76b07ea1032e4754183a8c625d064564d5fad350",
       "git:cfe080c27fe9c58e11e886bde347e5e5fbbb7e56",
