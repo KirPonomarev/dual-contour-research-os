@@ -1,0 +1,99 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-r06b-operator-runbook-and-window-gate-20260719",
+  "issued_at": "2026-07-19T16:49:05Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "r06b-operator-runbook-and-window-gate",
+    "agent_id": "agent-0",
+    "ownership_lease_ref": "stages/r06b-operator-runbook-and-window-gate/ownership-lease.json",
+    "assurance_ownership_lease_ref": "stages/r06b-r1-window-gate-assurance/ownership-lease.json",
+    "base_sha": "8e4540d08e8eb3623a1e59e03c38d7f3e3266a25",
+    "stage_authorization_sha": "cf027819094af781beec28dec00949755c76560e",
+    "stage_authorization_repair_sha": "ededa6f40d0c1f717d030d9d44954cc53c8434d9",
+    "worker_head_sha": "1b0113bbd99043b31a7305b4f70d8256c54c98c7",
+    "primary_merge_sha": "0bcc1224f37b8fb093d52a01b7155e5ae6d07098",
+    "assurance_authorization_sha": "6e81b3af334f5e71bfd13f51169516960dff8dc1",
+    "assurance_worker_head_sha": "f5367ed25314057fa01a2ce161f27d011e7e4084",
+    "head_sha": "435efbe00b8bcbca886a7f8352dd85fc0eb2a2fc",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "a1_contract_sha256": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+    "write_set": [
+      "tools/observation_window_gate.py",
+      "provenance/observation-window-policy-v1.json",
+      "docs/OPERATOR_OBSERVATION_RUNBOOK.md",
+      "tests/test_r06b_operator_window_gate.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "privacy_secret_scan": "green",
+      "write_set_exact": true,
+      "policy_frozen_before_start": true,
+      "window_sequence_enforced": true,
+      "product_done_required_before_start": true,
+      "zero_work_closeout_rejected": true,
+      "short_interval_rejected": true,
+      "stale_or_mixed_fingerprint_rejected": true,
+      "counter_underflow_rejected": true,
+      "reset_counter_ref_mismatch_rejected": true,
+      "unresolved_incident_rejected": true,
+      "expired_proof_rejected": true,
+      "non_distributed_workload_rejected": true,
+      "zero_tolerance_nonzero_rejected": true,
+      "public_raw_evidence_ref_rejected": true,
+      "provider_independent_window_calls": 0,
+      "observation_windows_started": false,
+      "production_mutations": 0,
+      "grants_authority": false,
+      "focused_tests": 7,
+      "full_core_tests": 877,
+      "stage0b_tests": 25
+    },
+    "file_sha256": {
+      "tools/observation_window_gate.py": "d59edc6cecb3bfab099f5aba1a48a500ca65248ac3e2c72e4d30c0207a562fee",
+      "provenance/observation-window-policy-v1.json": "686371331c881b7c43f51e48c93f69e26ad511e4d085b089d6dc2761f24b7332",
+      "docs/OPERATOR_OBSERVATION_RUNBOOK.md": "03b6866d5e13553de50a4762c49f1f7335bb6f8b0dfb66b3aefcab4fcbdd55e1",
+      "tests/test_r06b_operator_window_gate.py": "4acbba8998ce05b0835ca4b046ee691acd69183f7f916b21426a315947a3b94d"
+    },
+    "pull_request_refs": [
+      "https://github.com/KirPonomarev/dual-contour-research-os/pull/74",
+      "https://github.com/KirPonomarev/dual-contour-research-os/pull/75"
+    ],
+    "remote_ci_refs": [
+      "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29695005545",
+      "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29695309973",
+      "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29695419375",
+      "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29695424549",
+      "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29695441835",
+      "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29695478874",
+      "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29695567817",
+      "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29695569374",
+      "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29695589592"
+    ],
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29695589592",
+    "integration_commit_sha": "435efbe00b8bcbca886a7f8352dd85fc0eb2a2fc",
+    "known_next_gate": "Advance to R07A proof-currentness and final-freeze validator on this exact accepted head; no observation timer starts."
+  },
+  "integrity": {
+    "payload_sha256": "877cee9025b09b043c0f84fdebd9dc52b6d1f1d6d8948fbd7cdbc82bc5d95817",
+    "parent_refs": [
+      "git:8e4540d08e8eb3623a1e59e03c38d7f3e3266a25",
+      "git:cf027819094af781beec28dec00949755c76560e",
+      "git:ededa6f40d0c1f717d030d9d44954cc53c8434d9",
+      "git:1b0113bbd99043b31a7305b4f70d8256c54c98c7",
+      "git:0bcc1224f37b8fb093d52a01b7155e5ae6d07098",
+      "git:6e81b3af334f5e71bfd13f51169516960dff8dc1",
+      "git:f5367ed25314057fa01a2ce161f27d011e7e4084",
+      "git:435efbe00b8bcbca886a7f8352dd85fc0eb2a2fc",
+      "ci:29695589592",
+      "pr:74",
+      "pr:75",
+      "reuse:reuse-r06b-operator-runbook-and-window-gate-20260719",
+      "reuse:reuse-r06b-r1-window-gate-assurance-20260719",
+      "integration:integration-r06a-observability-and-recovery-controls-20260719"
+    ]
+  }
+}
