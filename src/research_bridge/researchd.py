@@ -613,6 +613,29 @@ class ResearchDaemon:
             job_spec_ref = _text(
                 "job_spec.object_id", job_spec.get("object_id"), maximum=256
             )
+            if self._a1_enabled:
+                a1_backend = self._a1_backend
+                if a1_backend is None:
+                    raise ResearchdError("A1 submit requires the durable admission backend")
+                try:
+                    issued_bundle = a1_backend.resolve_issued_authority_bundle(
+                        job_spec_ref=job_spec_ref
+                    )
+                except Exception as exc:
+                    raise ResearchdError(
+                        "A1 submit requires one exact durable issued authority bundle"
+                    ) from exc
+                submitted_bundle = {
+                    "job_spec": job_spec,
+                    "permit": permit,
+                    "lease": lease,
+                }
+                if _canonical_json_bytes(issued_bundle) != _canonical_json_bytes(
+                    submitted_bundle
+                ):
+                    raise ResearchdError(
+                        "A1 submit differs from the durable issued authority bundle"
+                    )
             lease_payload = _mapping_member(lease, "payload", "lease")
             attempt_id = _text(
                 "lease.payload.attempt_id",

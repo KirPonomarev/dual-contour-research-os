@@ -1526,6 +1526,50 @@ class DurableDiscoveryService:
             self._commit(states, key, now, "ack")
             return _deep_freeze(response)
 
+    def resolve_issued_authority_bundle(
+        self, *, job_spec_ref: str
+    ) -> Mapping[str, object]:
+        """Return the one replay-validated durable bundle for ``job_spec_ref``."""
+
+        reference = _text("job_spec_ref", job_spec_ref, maximum=256)
+        with self._lock:
+            states = self._states()
+            self._validate_admission_runtime_state(states)
+            entries = states["admissions"].get("entries")
+            if not isinstance(entries, Mapping):
+                raise DiscoveryError("durable admission projection is invalid")
+            matches: list[dict[str, object]] = []
+            for raw_entry in entries.values():
+                entry = _exact_mapping(
+                    raw_entry, _ADMISSION_ENTRY_KEYS, "admission entry"
+                )
+                response = entry["response"]
+                if not isinstance(response, Mapping):
+                    raise DiscoveryError("durable admission response is invalid")
+                if response.get("authority_status") != "ISSUED":
+                    continue
+                bundle = response.get("authority_bundle")
+                if not isinstance(bundle, Mapping) or set(bundle) != {
+                    "job_spec",
+                    "permit",
+                    "lease",
+                }:
+                    raise DiscoveryError("durable issued authority bundle is invalid")
+                job_spec = bundle.get("job_spec")
+                if not isinstance(job_spec, Mapping):
+                    raise DiscoveryError("durable issued JobSpec is invalid")
+                if job_spec.get("object_id") != reference:
+                    continue
+                copied = _json_copy(bundle)
+                if not isinstance(copied, dict):  # pragma: no cover - Mapping copied above.
+                    raise DiscoveryError("durable issued authority bundle is invalid")
+                matches.append(copied)
+            if len(matches) != 1:
+                raise DiscoveryError(
+                    "exactly one durable issued authority bundle is required"
+                )
+            return _deep_freeze(matches[0])
+
     def _admit_candidate(
         self,
         states: Mapping[str, Mapping[str, object]],
