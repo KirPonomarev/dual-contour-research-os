@@ -1,0 +1,59 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-s39-r1-predecessor-probe-fix-20260719",
+  "issued_at": "2026-07-19T02:42:31Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "s39-r1-predecessor-probe-fix",
+    "agent_id": "agent-0",
+    "ownership_lease_ref": "stages/s39-r1-predecessor-probe-fix/ownership-lease.json",
+    "base_sha": "9c2f8c0c2d83366db77d2733b5d3e909d7ba118a",
+    "head_sha": "b484e7e1309b4b086355195f81e486bf8381ff74",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "tools/pre_soak_deploy.py",
+      "tests/test_s38_r1_final_deployment_rebind.py",
+      "docs/receipts/reuse/s39-r1-predecessor-probe-fix.json",
+      "stages/s39-r1-predecessor-probe-fix/"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "privacy_secret_scan": "green",
+      "candidate_release_sha": "b2c2e6a8c4e0a364ef82e8e51540433aa91430d4",
+      "candidate_image_id": "sha256:c654b09504dec237966623088e4dbbbe104d6364cd5760a4cfb145eb388a3844",
+      "candidate_source_changed": false,
+      "deployment_controller_changed": true,
+      "malformed_shell_quote_repaired": true,
+      "generated_probe_bash_syntax": "green",
+      "real_read_only_predecessor_probe": "green",
+      "active_enabled_or_running_predecessor_denial": "green",
+      "failed_attempt_approval_consumed": false,
+      "failed_attempt_ledger_created": false,
+      "repair_authority_consumptions": 0,
+      "repair_remote_mutations": 0,
+      "automatic_deployment_retry": false,
+      "reboot_restore_live_or_canonical_actions": 0,
+      "focused_tests": 65,
+      "full_core_tests": 800,
+      "stage0b_tests": 25
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29670592225",
+    "integration_commit_sha": "207d2af730487b4981a6cc166d5e591c35911e36"
+  },
+  "integrity": {
+    "payload_sha256": "0ba4b6999fccacbef201c37eb5a7472c5ffc95f6760b6475460a47d1efec11c3",
+    "parent_refs": [
+      "git:9c2f8c0c2d83366db77d2733b5d3e909d7ba118a",
+      "git:b484e7e1309b4b086355195f81e486bf8381ff74",
+      "git:207d2af730487b4981a6cc166d5e591c35911e36",
+      "ci:29670592225",
+      "runtime-failure:sha256:cc75d82911eccb696c1bce4cddebe8e629e286c7a156759dca44ff4df15692c9"
+    ]
+  }
+}
