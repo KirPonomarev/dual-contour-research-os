@@ -39,6 +39,33 @@ _COMMAND_PAYLOAD_KEYS = {
     "claim_proposal": frozenset({"material_event_ref"}),
     "submit_proposal": frozenset({"proposal_envelope"}),
     "ack_proposal": frozenset({"material_event_ref", "claim_token"}),
+    "reserve_model_call": frozenset(
+        {
+            "role",
+            "role_assignment_ref",
+            "classification",
+            "request_body",
+            "max_tokens",
+            "max_cost_units",
+            "expires_at",
+        }
+    ),
+    "begin_model_call": frozenset(
+        {"call_id", "dispatch_token", "request_body"}
+    ),
+    "complete_model_call": frozenset(
+        {
+            "call_id",
+            "dispatch_token",
+            "outcome",
+            "response_ref",
+            "actual_tokens",
+            "actual_cost_units",
+            "provider_receipt_ref",
+            "failure_code",
+        }
+    ),
+    "lookup_model_call": frozenset({"call_id"}),
 }
 _OPERATOR_COMMANDS = frozenset(
     {"status", "pause_global", "resume_global", "submit", "lookup"}
@@ -50,17 +77,24 @@ _SCOUT_COMMANDS = frozenset(
         "claim_proposal",
         "submit_proposal",
         "ack_proposal",
+        "reserve_model_call",
+        "lookup_model_call",
     }
+)
+_CONNECTED_WORKER_COMMANDS = frozenset(
+    {"begin_model_call", "complete_model_call", "lookup_model_call"}
 )
 _ROLE_COMMANDS = {
     "operator": _OPERATOR_COMMANDS,
     "collector": _COLLECTOR_COMMANDS,
     "scout": _SCOUT_COMMANDS,
+    "connected_worker": _CONNECTED_WORKER_COMMANDS,
 }
 _ROLE_VERSIONS = {
     "operator": frozenset({"1.1", "1.2"}),
     "collector": frozenset({"1.2"}),
     "scout": frozenset({"1.2"}),
+    "connected_worker": frozenset({"1.2"}),
 }
 
 
@@ -150,6 +184,61 @@ class _A1ControlBackend(Protocol):
     ) -> Mapping[str, object]: ...
 
 
+class _ModelControlBackend(Protocol):
+    def reserve_model_call(
+        self,
+        *,
+        role: str,
+        role_assignment_ref: str,
+        classification: str,
+        request_body: str,
+        max_tokens: int,
+        max_cost_units: int,
+        expires_at: str,
+        actor: str,
+        idempotency_key: str,
+        now: str,
+    ) -> Mapping[str, object]: ...
+
+    def begin_model_call(
+        self,
+        *,
+        call_id: str,
+        dispatch_token: str,
+        request_body: str,
+        actor: str,
+        idempotency_key: str,
+        now: str,
+    ) -> Mapping[str, object]: ...
+
+    def complete_model_call(
+        self,
+        *,
+        call_id: str,
+        dispatch_token: str,
+        outcome: str,
+        response_ref: str | None,
+        actual_tokens: int | None,
+        actual_cost_units: int | None,
+        provider_receipt_ref: str | None,
+        failure_code: str | None,
+        actor: str,
+        idempotency_key: str,
+        now: str,
+    ) -> Mapping[str, object]: ...
+
+    def lookup_model_call(
+        self,
+        *,
+        call_id: str,
+        actor: str,
+    ) -> Mapping[str, object]: ...
+
+    def validate_proposal_envelope(
+        self, proposal_envelope: Mapping[str, object]
+    ) -> None: ...
+
+
 @dataclass(frozen=True, slots=True)
 class ControlRequest:
     """One strictly shaped versioned control request."""
@@ -221,6 +310,42 @@ class ControlRequest:
             _normalized_text(
                 "claim_token", copied_payload["claim_token"], maximum=512
             )
+        elif self.command == "reserve_model_call":
+            _normalized_text("role", copied_payload["role"], maximum=128)
+            _normalized_text(
+                "role_assignment_ref",
+                copied_payload["role_assignment_ref"],
+                maximum=512,
+            )
+            if copied_payload["classification"] not in {"D0", "D1"}:
+                raise ControlError("model call classification must be D0 or D1")
+            _model_request_body(copied_payload["request_body"])
+            _positive_integer("max_tokens", copied_payload["max_tokens"])
+            _positive_integer("max_cost_units", copied_payload["max_cost_units"])
+            _normalized_text(
+                "expires_at", copied_payload["expires_at"], maximum=64
+            )
+        elif self.command == "begin_model_call":
+            _normalized_text("call_id", copied_payload["call_id"], maximum=128)
+            _sha256_text("dispatch_token", copied_payload["dispatch_token"])
+            _model_request_body(copied_payload["request_body"])
+        elif self.command == "complete_model_call":
+            _normalized_text("call_id", copied_payload["call_id"], maximum=128)
+            _sha256_text("dispatch_token", copied_payload["dispatch_token"])
+            if copied_payload["outcome"] not in {
+                "SUCCEEDED",
+                "FAILED_KNOWN",
+                "UNKNOWN",
+            }:
+                raise ControlError("model call outcome is unsupported")
+            for name in ("response_ref", "provider_receipt_ref", "failure_code"):
+                value = copied_payload[name]
+                if value is not None:
+                    _normalized_text(name, value, maximum=512)
+            for name in ("actual_tokens", "actual_cost_units"):
+                _optional_nonnegative_integer(name, copied_payload[name])
+        elif self.command == "lookup_model_call":
+            _normalized_text("call_id", copied_payload["call_id"], maximum=128)
         object.__setattr__(self, "payload", MappingProxyType(copied_payload))
 
     @classmethod
@@ -302,6 +427,7 @@ class ControlRouter:
         backend: _ControlBackend,
         *,
         a1_backend: _A1ControlBackend | None = None,
+        model_backend: _ModelControlBackend | None = None,
         authority: PinnedOfflineAuthority | None = None,
         clock: Callable[[], datetime] | None = None,
     ) -> None:
@@ -315,6 +441,7 @@ class ControlRouter:
             raise ControlError("pinned authority verifier is required") from exc
         self._backend = backend
         self._a1_backend = a1_backend
+        self._model_backend = model_backend
         self._clock = clock if clock is not None else lambda: datetime.now(timezone.utc)
 
     def dispatch(
@@ -403,11 +530,57 @@ class ControlRouter:
                     now=self._event_at(),
                 )
             elif request.command == "submit_proposal":
+                model_backend = self._model_backend
+                if model_backend is not None:
+                    model_backend.validate_proposal_envelope(
+                        request.payload["proposal_envelope"]  # type: ignore[arg-type]
+                    )
                 result = self._require_a1_backend().submit_proposal(
                     proposal_envelope=request.payload["proposal_envelope"],  # type: ignore[arg-type]
                     actor=actor,
                     idempotency_key=request.idempotency_key,
                     now=self._event_at(),
+                )
+            elif request.command == "reserve_model_call":
+                result = self._require_model_backend().reserve_model_call(
+                    role=request.payload["role"],  # type: ignore[arg-type]
+                    role_assignment_ref=request.payload["role_assignment_ref"],  # type: ignore[arg-type]
+                    classification=request.payload["classification"],  # type: ignore[arg-type]
+                    request_body=request.payload["request_body"],  # type: ignore[arg-type]
+                    max_tokens=request.payload["max_tokens"],  # type: ignore[arg-type]
+                    max_cost_units=request.payload["max_cost_units"],  # type: ignore[arg-type]
+                    expires_at=request.payload["expires_at"],  # type: ignore[arg-type]
+                    actor=actor,
+                    idempotency_key=request.idempotency_key,
+                    now=self._event_at(),
+                )
+            elif request.command == "begin_model_call":
+                result = self._require_model_backend().begin_model_call(
+                    call_id=request.payload["call_id"],  # type: ignore[arg-type]
+                    dispatch_token=request.payload["dispatch_token"],  # type: ignore[arg-type]
+                    request_body=request.payload["request_body"],  # type: ignore[arg-type]
+                    actor=actor,
+                    idempotency_key=request.idempotency_key,
+                    now=self._event_at(),
+                )
+            elif request.command == "complete_model_call":
+                result = self._require_model_backend().complete_model_call(
+                    call_id=request.payload["call_id"],  # type: ignore[arg-type]
+                    dispatch_token=request.payload["dispatch_token"],  # type: ignore[arg-type]
+                    outcome=request.payload["outcome"],  # type: ignore[arg-type]
+                    response_ref=request.payload["response_ref"],  # type: ignore[arg-type]
+                    actual_tokens=request.payload["actual_tokens"],  # type: ignore[arg-type]
+                    actual_cost_units=request.payload["actual_cost_units"],  # type: ignore[arg-type]
+                    provider_receipt_ref=request.payload["provider_receipt_ref"],  # type: ignore[arg-type]
+                    failure_code=request.payload["failure_code"],  # type: ignore[arg-type]
+                    actor=actor,
+                    idempotency_key=request.idempotency_key,
+                    now=self._event_at(),
+                )
+            elif request.command == "lookup_model_call":
+                result = self._require_model_backend().lookup_model_call(
+                    call_id=request.payload["call_id"],  # type: ignore[arg-type]
+                    actor=actor,
                 )
             elif request.command == "ack_proposal":
                 result = self._require_a1_backend().ack_proposal(
@@ -436,6 +609,11 @@ class ControlRouter:
             raise ControlError("A1 control backend is unavailable")
         return self._a1_backend
 
+    def _require_model_backend(self) -> _ModelControlBackend:
+        if self._model_backend is None:
+            raise ControlError("model control backend is unavailable")
+        return self._model_backend
+
     def _event_at(self) -> str:
         try:
             current = self._clock()
@@ -461,6 +639,41 @@ def _normalized_text(name: str, value: object, *, maximum: int) -> str:
     ):
         raise ControlError(f"{name} must be normalized non-empty text")
     return value
+
+
+def _model_request_body(value: object) -> str:
+    if not isinstance(value, str) or not value or "\x00" in value:
+        raise ControlError("request_body must be non-empty UTF-8 text")
+    try:
+        encoded = value.encode("utf-8", errors="strict")
+    except UnicodeError as exc:
+        raise ControlError("request_body must be non-empty UTF-8 text") from exc
+    if len(encoded) > 1_048_576:
+        raise ControlError("request_body exceeds the local byte limit")
+    return value
+
+
+def _positive_integer(name: str, value: object) -> int:
+    if type(value) is not int or value <= 0:
+        raise ControlError(f"{name} must be a positive integer")
+    return value
+
+
+def _optional_nonnegative_integer(name: str, value: object) -> int | None:
+    if value is None:
+        return None
+    if type(value) is not int or value < 0:
+        raise ControlError(f"{name} must be a non-negative integer or null")
+    return value
+
+
+def _sha256_text(name: str, value: object) -> str:
+    normalized = _normalized_text(name, value, maximum=64)
+    if len(normalized) != 64 or any(
+        character not in "0123456789abcdef" for character in normalized
+    ):
+        raise ControlError(f"{name} must be a lowercase sha256 digest")
+    return normalized
 
 
 def _json_copy(value: object) -> object:

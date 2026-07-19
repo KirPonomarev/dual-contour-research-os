@@ -1572,6 +1572,144 @@ class ModelCallBroker:
         except (LedgerError, ModelBrokerError, OSError, RuntimeError):
             return self._mark_unknown(sent_record.snapshot, event_at=timestamp)
 
+    def begin_external(
+        self,
+        call_id: str,
+        *,
+        request_bytes: bytes,
+        event_at: str,
+    ) -> ModelCallHandle:
+        """Durably mark one reserved IPC dispatch SENT before worker egress.
+
+        A repeated begin is rejected instead of authorizing a second external
+        attempt.  Restart recovery converts a stranded SENT state to UNKNOWN.
+        """
+
+        timestamp = _timestamp("event_at", event_at)
+        current = self._state(call_id)
+        if current["state"] != "RESERVED":
+            raise ModelBrokerError("only a fresh RESERVED model call may begin")
+        if (
+            not isinstance(request_bytes, bytes)
+            or hashlib.sha256(request_bytes).hexdigest()
+            != current["request_sha256"]
+        ):
+            raise ModelBrokerError("model request bytes differ from the reservation")
+        if current["registry_sha256"] != self._registry.registry_sha256:
+            raise ModelBrokerError("model registry drifted after reservation")
+        route = self._registry.route(current["role"], current["classification"])
+        if (
+            route.model_binding != current["model_binding"]
+            or route.binding_revision != current["binding_revision"]
+        ):
+            raise ModelBrokerError("model route drifted after reservation")
+        sent = self._transition(current, state="SENT", event_at=timestamp)
+        return _handle(
+            self._append(
+                sent,
+                idempotency_key=f"{call_id}:external-sent",
+                event_at=timestamp,
+            )
+        )
+
+    def complete_external(
+        self,
+        call_id: str,
+        *,
+        outcome: str,
+        response_ref: str | None,
+        actual_tokens: int | None,
+        actual_cost_units: int | None,
+        provider_receipt_ref: str | None,
+        failure_code: str | None,
+        event_at: str,
+    ) -> ModelCallHandle:
+        """Record untrusted worker completion metadata in the one ledger.
+
+        Raw response bytes never cross this boundary.  The response reference
+        remains non-authoritative evidence until later physical-worker proof.
+        """
+
+        timestamp = _timestamp("event_at", event_at)
+        state = _text("outcome", outcome, maximum=64)
+        if state not in {"SUCCEEDED", "FAILED_KNOWN", "UNKNOWN"}:
+            raise ModelBrokerError("external model-call outcome is unsupported")
+        response = (
+            None
+            if response_ref is None
+            else _portable_ref("response_ref", response_ref)
+        )
+        tokens = _optional_nonnegative("actual_tokens", actual_tokens)
+        cost = _optional_nonnegative("actual_cost_units", actual_cost_units)
+        receipt = _optional_ref("provider_receipt_ref", provider_receipt_ref)
+        failure = (
+            None
+            if failure_code is None
+            else _text("failure_code", failure_code, maximum=512)
+        )
+        if state == "SUCCEEDED":
+            if response is None or failure is not None:
+                raise ModelBrokerError("successful external completion shape is invalid")
+        elif state == "FAILED_KNOWN":
+            if response is not None or failure is None:
+                raise ModelBrokerError("known external failure shape is invalid")
+        elif any(value is not None for value in (tokens, cost, receipt, failure)):
+            raise ModelBrokerError("UNKNOWN external completion cannot assert accounting")
+
+        current = self._state(call_id)
+        durable_origin = (
+            current["previous_state"]
+            if current["state"] == "RECONCILED"
+            else current["state"]
+        )
+        if durable_origin in {"SUCCEEDED", "FAILED_KNOWN", "UNKNOWN"}:
+            expected_failure = (
+                "AMBIGUOUS_PROVIDER_OUTCOME" if state == "UNKNOWN" else failure
+            )
+            if (
+                durable_origin != state
+                or current["response_ref"] != response
+                or current["actual_tokens"] != tokens
+                or current["actual_cost_units"] != cost
+                or current["provider_receipt_ref"] != receipt
+                or current["failure_code"] != expected_failure
+            ):
+                raise ModelBrokerError(
+                    "external completion replay differs from durable state"
+                )
+            return ModelCallHandle(
+                call_id=current["call_id"],  # type: ignore[arg-type]
+                state=current["state"],  # type: ignore[arg-type]
+                event_sequence=self._ledger.model_call_state(call_id).event.sequence,
+                registry_sha256=current["registry_sha256"],  # type: ignore[arg-type]
+                model_binding=current["model_binding"],  # type: ignore[arg-type]
+            )
+        if current["state"] != "SENT":
+            raise ModelBrokerError("only SENT may accept external completion")
+        if state == "UNKNOWN":
+            return self._mark_unknown(
+                current,
+                event_at=timestamp,
+                response_ref=response,
+            )
+        terminal = self._terminal(
+            current,
+            state=state,
+            event_at=timestamp,
+            response_ref=response,
+            actual_tokens=tokens,
+            actual_cost_units=cost,
+            provider_receipt_ref=receipt,
+            failure_code=failure,
+        )
+        return _handle(
+            self._append(
+                terminal,
+                idempotency_key=f"{call_id}:external-{state.lower()}",
+                event_at=timestamp,
+            )
+        )
+
     def execute_raw(
         self,
         call_id: str,
@@ -1757,6 +1895,11 @@ class ModelCallBroker:
 
     def state(self, call_id: str) -> ModelCallHandle:
         return _handle(self._ledger.model_call_state(call_id))
+
+    def snapshot(self, call_id: str) -> Mapping[str, object]:
+        """Return an immutable copy of one replay-validated durable state."""
+
+        return MappingProxyType(dict(self._state(call_id)))
 
     def _initial_snapshot(
         self,
