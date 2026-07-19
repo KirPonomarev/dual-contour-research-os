@@ -1,0 +1,31 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-r05b-independent-validation-closure-20260719",
+  "issued_at": "2026-07-19T15:35:17Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-review-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "r05b-independent-validation-closure",
+    "capability": "non-vacuous-independent-byte-validation-and-exact-production-handoff",
+    "candidates": [
+      {"candidate": "accept-zero-byte-fixture-as-mechanical-success", "disposition": "rejected-vacuous-production-proof"},
+      {"candidate": "add-model-evaluator-or-hidden-holdout", "disposition": "rejected-correlated-and-out-of-scope-authority"},
+      {"candidate": "change-frozen-ValidationReceipt-schema", "disposition": "rejected-existing-metrics-checks-tolerances-and-reasons-fields-are-sufficient"},
+      {"candidate": "reuse-DeterministicL0Validator-and-ValidatedOfflineExecutionCoordinator", "disposition": "selected-minimal-repository-native-tightening"}
+    ],
+    "selected_candidate": "require-positive-input-bytes-chunks-and-artifact-metrics-in-validator-and-exact-zero-tolerance-no-holdout-mechanical-profile-in-handoff",
+    "source_ref": "git:72ef989ff0908aca27743be243f32f6f150d2fff;internal:DeterministicL0Validator+ValidatedOfflineExecutionCoordinator",
+    "selected_source_sha": "6377a7d60c0246d38d2fefe5a3a685409a3434342e41d0d88262ece8d326fa51",
+    "license": "repository-native-code-only",
+    "tests": ["zero-byte-input-denial", "zero-chunk-denial", "known-invalid-artifact-denial", "forged-nonzero-tolerance-denial", "holdout-none-exact", "mechanical-only-outcome"],
+    "security_review": "The change only narrows the existing offline byte validator and receipt-last handoff. It adds no data source, model evaluator, holdout query, network path, writer, domain outcome or authority.",
+    "dependency_review": "No dependency, package, vendor code, contract, schema, migration, lockfile, SBOM or notice change.",
+    "rollback": "Revert the two-file tightening and keep R05B incomplete."
+  },
+  "integrity": {
+    "payload_sha256": "f277e4745a653c8623def39f19a33c7a93d08aeb941fee64cb6b5a06af23bcbf",
+    "parent_refs": ["git:72ef989ff0908aca27743be243f32f6f150d2fff", "source:sha256:6377a7d60c0246d38d2fefe5a3a685409a3434342e41d0d88262ece8d326fa51", "integration:integration-r05a-feedback-memory-next-event-20260719"]
+  }
+}

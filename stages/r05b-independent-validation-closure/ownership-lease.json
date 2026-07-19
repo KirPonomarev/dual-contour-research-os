@@ -1,0 +1,11 @@
+{
+  "lease_id": "lease-r05b-independent-validation-closure-agent-2",
+  "stage_id": "r05b-independent-validation-closure",
+  "agent_id": "agent-2",
+  "branch": "codex/bridge-a2-r05b-independent-validation-closure",
+  "issued_at": "2026-07-19T15:35:17Z",
+  "expires_at": "2026-07-21T15:35:17Z",
+  "write_set": ["src/research_bridge/validation.py", "src/research_bridge/execution.py"],
+  "exclusive": true,
+  "revoked": false
+}

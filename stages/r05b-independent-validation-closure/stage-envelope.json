@@ -1,0 +1,65 @@
+{
+  "stage_id": "r05b-independent-validation-closure",
+  "agent_id": "agent-2",
+  "objective": "Reject vacuous L0 evidence before ValidationReceipt issuance and require the exact non-vacuous mechanical-validation profile at the execution handoff before feedback can be durable.",
+  "executable_blocker": "A production AF_UNIX probe accepted one registered zero-byte input, produced input_bytes=0 and chunk_count=0, issued VALIDATED_MECHANICAL, and persisted feedback.",
+  "base_sha": "72ef989ff0908aca27743be243f32f6f150d2fff",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "a1_contract_sha256": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+  "branch": "codex/bridge-a2-r05b-independent-validation-closure",
+  "worktree": "/private/tmp/dcr-r05b-independent-validation-closure",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "ownership/registry.json",
+    "contracts/v1/ValidationReceipt.schema.json",
+    "src/research_bridge/validation.py",
+    "src/research_bridge/execution.py",
+    "src/research_bridge/l0.py",
+    "tests/test_s07_l0_independent_validation.py",
+    "tests/test_s14_provider_independent_hostile_core.py",
+    "tests/test_stage1_validation.py",
+    "tests/test_stage1_validation_assurance.py",
+    "tests/test_stage1_execution_assurance.py",
+    "tests/test_r03c_corridor_hostile_assurance.py",
+    "docs/receipts/integration/r05a-feedback-memory-next-event.json"
+  ],
+  "write_set": [
+    "src/research_bridge/validation.py",
+    "src/research_bridge/execution.py"
+  ],
+  "forbidden_scope": [
+    "contract-schema-runtime-rebind-test-ops-root-config-CI-lockfile-or-migration-edit",
+    "domain-application-scientific-truth-REFUTED-from-infrastructure-or-provider-failure",
+    "model-output-as-evidence-hidden-holdout-access-or-evaluator-mutation",
+    "execution-repeat-network-path-provider-call-canonical-write-or-authority-expansion"
+  ],
+  "dependency_hashes": {
+    "accepted_base_head": "72ef989ff0908aca27743be243f32f6f150d2fff",
+    "validation_sha256": "6377a7d60c0246d38d2fefe5a3a685409a3434342e41d0d88262ece8d326fa51",
+    "execution_sha256": "3cbb9cf48e49fec952b14e03629ff0546c0ef888f6a78e24f243c95f99cdbb7c",
+    "ownership_registry_sha256": "e7a6a5158e43cb76c1df0fa28caec36ec9585a0dd05a732eabb94a92e427c9da",
+    "reuse_receipt": "docs/receipts/reuse/r05b-independent-validation-closure.json"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest tests.test_s07_l0_independent_validation tests.test_s14_provider_independent_hostile_core tests.test_stage1_validation tests.test_stage1_validation_assurance tests.test_stage1_execution_assurance tests.test_r03c_corridor_hostile_assurance",
+    "temporary production empty-input and forged-handoff negative probes",
+    "python3 -m unittest discover -s tests",
+    "git diff --check",
+    "exact-head remote CI"
+  ],
+  "risk_class": "critical-validator-vacuity-identity-and-epistemic-integrity",
+  "stop_conditions": [
+    "base-contract-owner-or-dependency-hash-mismatch",
+    "write-outside-two-file-lease",
+    "zero-input-zero-chunk-or-zero-byte-metric-can-issue-or-pass-VALIDATED_MECHANICAL",
+    "holdout-model-output-or-nonzero-tolerance-can-pass-production-handoff",
+    "mechanical-validation-can-claim-scientific-outcome-or-mutate-evaluator"
+  ],
+  "expected_receipt": "docs/receipts/integration/r05b-independent-validation-closure.json",
+  "rollback": "Revert the two-file non-vacuity and handoff tightening; retain R05A and keep R05B incomplete.",
+  "commit_authority": "one-scoped-agent-2-branch-stage",
+  "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent0_audit", "blocked_validation_failed"]
+}
