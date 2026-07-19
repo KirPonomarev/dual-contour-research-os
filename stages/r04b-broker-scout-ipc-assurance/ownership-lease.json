@@ -1,0 +1,11 @@
+{
+  "lease_id": "lease-r04b-broker-scout-ipc-assurance-agent-5",
+  "stage_id": "r04b-broker-scout-ipc-assurance",
+  "agent_id": "agent-5",
+  "branch": "codex/bridge-a5-r04b-broker-scout-ipc-assurance",
+  "issued_at": "2026-07-19T11:49:37Z",
+  "expires_at": "2026-07-21T11:49:37Z",
+  "write_set": ["tests/test_r04b_broker_scout_ipc.py"],
+  "exclusive": true,
+  "revoked": false
+}

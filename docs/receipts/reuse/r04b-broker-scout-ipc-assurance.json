@@ -1,0 +1,40 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-r04b-broker-scout-ipc-assurance-20260719",
+  "issued_at": "2026-07-19T11:49:37Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-freeze-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "BROKER_SCOUT_IPC_DURABLE_HANDSHAKE_ASSURANCE",
+    "candidates": [
+      {"candidate": "one-additive-unittest-module-over-production-config-ResearchDaemon-real-AF_UNIX-and-existing-ledger", "disposition": "selected-owner-independent-assurance"},
+      {"candidate": "direct-backend-only-or-mocked-transport-check", "disposition": "rejected-does-not-prove-OS-role-routing"},
+      {"candidate": "new-service-queue-database-or-dependency", "disposition": "rejected-existing-runtime-boundaries-are-sufficient"}
+    ],
+    "selected_mode": "production-shaped-multi-role-AF_UNIX-assurance-covering-reservation-SENT-completion-replay-restart-UNKNOWN-budget-unavailable-route-exact-output-binding-and-Scout-only-proposal-intake",
+    "source_ref": "git:6b84295f4a3cdb7fb755d4748b9f90be052c41cb;internal:existing-r02c-r03a-assurance-patterns+r04b-runtime",
+    "license_spdx": "NOASSERTION",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "strict model runtime config and role mapping",
+      "unavailable route and budget boundary",
+      "request and dispatch exact binding",
+      "durable SENT before acknowledgement",
+      "idempotent completion and zero-write lookup",
+      "restart recovery without automatic retry",
+      "successful distinct role-correct output references before proposal",
+      "worker cannot submit proposal or mutate ledger directly"
+    ],
+    "canonical_owner": "agent-5-with-agent-0-integration",
+    "rollback": "Remove the additive R04B assurance module; accepted runtime composition remains unchanged and pending another independent gate."
+  },
+  "integrity": {
+    "payload_sha256": "2f6c22433086a7926e339925a61d66ee3d775536d6fa930eaf1ecbf7926178f8",
+    "parent_refs": [
+      "git:6b84295f4a3cdb7fb755d4748b9f90be052c41cb",
+      "integration:integration-r04b-broker-scout-ipc-runtime-20260719"
+    ]
+  }
+}

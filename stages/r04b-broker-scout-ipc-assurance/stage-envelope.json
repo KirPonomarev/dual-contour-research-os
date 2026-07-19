@@ -1,0 +1,62 @@
+{
+  "stage_id": "r04b-broker-scout-ipc-assurance",
+  "agent_id": "agent-5",
+  "objective": "Independently prove the production-shaped Scout-to-connected-worker handshake over real AF_UNIX roles, the single durable model-call ledger, restart recovery, exact result binding and Scout-only proposal intake.",
+  "executable_blocker": "The Agent-1 runtime and temporary owner probe are green, but no permanent Agent-5 module proves the complete authenticated handshake and its negative cases on the integrated remote head.",
+  "base_sha": "6b84295f4a3cdb7fb755d4748b9f90be052c41cb",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "a1_contract_sha256": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+  "branch": "codex/bridge-a5-r04b-broker-scout-ipc-assurance",
+  "worktree": "/private/tmp/dcr-r04b-broker-scout-ipc-assurance",
+  "read_set": [
+    "ops/release/researchd.config.template.json",
+    "provenance/model-provider-routing-v1.json",
+    "provenance/model-worker-ipc-extension-v1.json",
+    "src/research_bridge/control.py",
+    "src/research_bridge/ipc.py",
+    "src/research_bridge/ledger.py",
+    "src/research_bridge/model_broker.py",
+    "src/research_bridge/researchd.py",
+    "tests/test_r02c_a1_backend_durability_assurance.py",
+    "tests/test_r03a_admission_runtime_ops.py"
+  ],
+  "write_set": ["tests/test_r04b_broker_scout_ipc.py"],
+  "forbidden_scope": [
+    "production-source-contract-profile-provenance-doc-ops-tool-root-config-CI-lockfile-migration-or-other-test-edit",
+    "provider-network-credential-cost-private-raw-response-D2-D3-holdout-or-domain-payload",
+    "new-database-ledger-queue-scheduler-service-thread-dependency-or-schema",
+    "worker-ledger-Core-proposal-authority-automatic-retry-binding-selection-or-deployment-claim"
+  ],
+  "dependency_hashes": {
+    "runtime_integration_head": "6b84295f4a3cdb7fb755d4748b9f90be052c41cb",
+    "model_broker_sha256": "0ec53e1a5e677d198987057b2c07d2ea58748a6d5e9507b0cfae0c886e655ebe",
+    "control_sha256": "fb38865d8862e01755e52c3540304c43b9975ede8e301650aac4c6a66939c506",
+    "ipc_sha256": "a70eceda056c332c4747d6f8899f72b2707e7c42935675f215361e6bda822aee",
+    "ledger_sha256": "8ef7bc1e7c94da0afdb1b92a90e5699df213aa6b0a13a6010d6f302716c11356",
+    "researchd_sha256": "761085906cdb11fb620fef78e8d93a62c1a27c249b8ef3c5cd955a3b09a552d7",
+    "reuse_receipt": "docs/receipts/reuse/r04b-broker-scout-ipc-assurance.json",
+    "proof_backend": "production-config-parser+ResearchDaemon+real-AF_UNIX+durable-ledger",
+    "external_dependencies": "none-stdlib-unittest-and-existing-runtime-only"
+  },
+  "acceptance_commands": [
+    "python3 -m unittest -v tests.test_r04b_broker_scout_ipc",
+    "python3 -m unittest -v tests.test_s15_model_registry_broker tests.test_s16_provider_routing tests.test_s17_cost_reconciliation tests.test_s18_provider_hostile tests.test_stage1_control tests.test_stage1_researchd tests.test_r03a_admission_runtime_ops",
+    "make contracts",
+    "make test",
+    "git diff --check",
+    "exact-head remote CI"
+  ],
+  "risk_class": "critical-second-writer-duplicate-call-unbound-result-or-ambiguous-retry",
+  "stop_conditions": [
+    "reservation-or-SENT-order-is-not-durable",
+    "worker-can-open-ledger-submit-proposal-or-select-binding",
+    "duplicate-restart-stale-request-or-identity-mismatch-can-repeat-egress",
+    "proposal-accepts-missing-nonsuccessful-mixed-role-or-unbound-output-references",
+    "write-outside-single-Agent-5-test-file-or-public-safety-boundary-breach"
+  ],
+  "expected_receipt": "docs/receipts/integration/r04b-broker-scout-ipc-handshake.json",
+  "rollback": "Remove the one additive Agent-5 assurance module; accepted runtime code remains unchanged.",
+  "commit_authority": "one-scoped-agent-5-assurance-stage",
+  "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent0_audit", "blocked_validation_failed"]
+}

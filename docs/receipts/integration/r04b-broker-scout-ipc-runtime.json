@@ -1,0 +1,66 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-r04b-broker-scout-ipc-runtime-20260719",
+  "issued_at": "2026-07-19T11:49:37Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "r04b-broker-scout-ipc-handshake",
+    "agent_id": "agent-1",
+    "ownership_lease_ref": "stages/r04b-broker-scout-ipc-handshake/ownership-lease.json",
+    "base_sha": "76b07ea1032e4754183a8c625d064564d5fad350",
+    "authorization_sha": "cfe080c27fe9c58e11e886bde347e5e5fbbb7e56",
+    "extension_dependency_sha": "9e4b43c057cad811db189e1f971b26b887508ff2",
+    "head_sha": "0df8ae20f26e6c8f8f10de93fad90ca153ea50ec",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "a1_contract_sha256": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+    "write_set": [
+      "src/research_bridge/model_broker.py",
+      "src/research_bridge/control.py",
+      "src/research_bridge/ipc.py",
+      "src/research_bridge/ledger.py",
+      "src/research_bridge/researchd.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "privacy_secret_scan": "green",
+      "write_set_exact": true,
+      "model_broker_sha256": "0ec53e1a5e677d198987057b2c07d2ea58748a6d5e9507b0cfae0c886e655ebe",
+      "control_sha256": "fb38865d8862e01755e52c3540304c43b9975ede8e301650aac4c6a66939c506",
+      "ipc_sha256": "a70eceda056c332c4747d6f8899f72b2707e7c42935675f215361e6bda822aee",
+      "ledger_sha256": "8ef7bc1e7c94da0afdb1b92a90e5699df213aa6b0a13a6010d6f302716c11356",
+      "researchd_sha256": "761085906cdb11fb620fef78e8d93a62c1a27c249b8ef3c5cd955a3b09a552d7",
+      "worker_ipc_extension_sha256": "03d91f027bb6975c55d84acaef188546bcd24af9944a72f4ff9314296399d07a",
+      "temporary_af_unix_e2e": "PASS",
+      "focused_tests": 57,
+      "full_core_tests": 834,
+      "stage0b_tests": 25,
+      "reservation_before_sent": true,
+      "restart_sent_to_unknown": true,
+      "automatic_retry": false,
+      "worker_ledger_or_proposal_authority": false,
+      "provider_network_or_credentials": 0,
+      "deployment_mutations": 0,
+      "grants_authority": false
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29685794072",
+    "pull_request_ref": "https://github.com/KirPonomarev/dual-contour-research-os/pull/60",
+    "integration_commit_sha": "6b84295f4a3cdb7fb755d4748b9f90be052c41cb",
+    "known_next_gate": "Run the disjoint Agent-5 R04B AF_UNIX and durable-state assurance lane before accepting the sprint."
+  },
+  "integrity": {
+    "payload_sha256": "5129dd14982241d650e8e0d57b8301698588a01f0ecf5fe582ced773b8199255",
+    "parent_refs": [
+      "git:76b07ea1032e4754183a8c625d064564d5fad350",
+      "git:cfe080c27fe9c58e11e886bde347e5e5fbbb7e56",
+      "git:9e4b43c057cad811db189e1f971b26b887508ff2",
+      "git:0df8ae20f26e6c8f8f10de93fad90ca153ea50ec",
+      "git:6b84295f4a3cdb7fb755d4748b9f90be052c41cb",
+      "ci:29685794072",
+      "pr:60",
+      "reuse:reuse-r04b-broker-scout-ipc-handshake-20260719"
+    ]
+  }
+}
