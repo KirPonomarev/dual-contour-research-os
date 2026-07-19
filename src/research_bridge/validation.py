@@ -327,6 +327,10 @@ class DeterministicL0Validator:
             "input_bytes": sum(len(value) for value in input_bytes),
             "input_count": len(input_refs),
         }
+        if any(metrics[name] <= 0 for name in metrics):
+            raise ValidationBoundaryError(
+                "L0 validation evidence is vacuous"
+            )
         payload = {
             "protocol_ref": self._protocol_ref,
             "execution_ref": execution_ref,
@@ -340,6 +344,7 @@ class DeterministicL0Validator:
                 "canonical-l0-result",
                 "ordered-input-cas-bytes",
                 "chunk-byte-recomputation",
+                "non-vacuous-input-and-chunk-evidence",
                 "zero-holdout-exposure",
             ],
             "metrics": metrics,
