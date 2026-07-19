@@ -1,0 +1,53 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-r03c-corridor-hostile-assurance-20260719",
+  "issued_at": "2026-07-19T10:55:41Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "r03c-corridor-hostile-assurance",
+    "agent_id": "agent-5",
+    "ownership_lease_ref": "stages/r03c-corridor-hostile-assurance/ownership-lease.json",
+    "base_sha": "22c2f042197c3897aa93a3d5e4e64944da0cb549",
+    "implementation_dependency_sha": "5e071ab09ea90dc04a9ce18cd407d3dbaa5745a1",
+    "head_sha": "7e6750d897b4b96f8f56b5b465a96ca291e46893",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "a1_contract_sha256": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+    "write_set": ["tests/test_r03c_corridor_hostile_assurance.py"],
+    "audit_results": {
+      "contract_gate": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "test_source_sha256": "2c1175e793f11c125b5eb5ff56d485d93d1ea2ad904e55d6fda5e89bc8670e02",
+      "production_composition": "CONFIG_PARSER_RESEARCH_DAEMON_REAL_AF_UNIX_DURABLE_CAS_LEDGER",
+      "exact_issued_binding_dependency": "INTEGRATED_AND_GREEN",
+      "focused_tests": 8,
+      "related_acceptance_tests": 35,
+      "full_core_tests": 828,
+      "stage0b_tests": 25,
+      "restart_lookup": "BYTE_EXACT_ZERO_WRITE",
+      "second_writer": "REJECTED",
+      "provider_network_canonical_or_live_actions": 0,
+      "deployment_or_VPS_mutations": 0,
+      "grants_authority": false
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29684191355",
+    "pull_request_ref": "https://github.com/KirPonomarev/dual-contour-research-os/pull/58",
+    "integration_commit_sha": "aaff02a52cfac7fdb21573f5df4418935a0bf147",
+    "known_next_gate": "Advance to R04A model role evaluation and registry closure on the exact accepted R03C head."
+  },
+  "integrity": {
+    "payload_sha256": "9e658043d130f287d45277e059a04dd823533199dda57c632324797187e2cd7b",
+    "parent_refs": [
+      "git:22c2f042197c3897aa93a3d5e4e64944da0cb549",
+      "git:5e071ab09ea90dc04a9ce18cd407d3dbaa5745a1",
+      "git:7e6750d897b4b96f8f56b5b465a96ca291e46893",
+      "git:aaff02a52cfac7fdb21573f5df4418935a0bf147",
+      "ci:29684191355",
+      "pr:58",
+      "reuse:reuse-r03c-corridor-hostile-assurance-20260719"
+    ]
+  }
+}
