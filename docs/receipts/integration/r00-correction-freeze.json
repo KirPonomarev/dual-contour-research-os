@@ -28,6 +28,7 @@
     "audit_results": {
       "contract_gate": "green",
       "privacy_secret_scan": "green",
+      "source_mutation": false,
       "previous_candidate_status": "SUPERSEDED_REPAIR_REQUIRED",
       "replacement_release_required": true,
       "public_prepare_denied": true,
@@ -46,7 +47,7 @@
     "integration_commit_sha": "2bb917a611d755d1934900f3b456e7ae860a7764"
   },
   "integrity": {
-    "payload_sha256": "0dbda2daabe4b6d6ba1ad73cf849630d592a915844e5f54dd35af2dd65269c80",
+    "payload_sha256": "9389e5c8ccd5f17e4d37faa3acac96dfdabc3ef7cb4c333e46c32bae4b30fd11",
     "parent_refs": [
       "git:37f671269adc5a15c6f6571c0cf1731eccb3fc38",
       "git:cfb2c5ec43ccbd82df865b6a2d9472e977887d14",

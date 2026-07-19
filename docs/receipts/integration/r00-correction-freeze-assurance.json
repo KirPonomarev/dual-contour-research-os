@@ -24,6 +24,7 @@
     "audit_results": {
       "contract_gate": "green",
       "privacy_secret_scan": "green",
+      "source_mutation": false,
       "focused_tests": 12,
       "full_core_tests": 804,
       "stage0b_tests": 25,
@@ -45,7 +46,7 @@
     "integration_commit_sha": "2bb917a611d755d1934900f3b456e7ae860a7764"
   },
   "integrity": {
-    "payload_sha256": "a824dd9d39082168603bf6432a89f96a8da642413673158d3c9a4531b565eb8c",
+    "payload_sha256": "9d8196f34974a22800af911e782ee1fc9e14a7231691da3310ffd6a765948dff",
     "parent_refs": [
       "git:cfb2c5ec43ccbd82df865b6a2d9472e977887d14",
       "git:ae56e350aa5d1129aadea0e945f4e0c6a32f2cd5",
