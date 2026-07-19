@@ -1,0 +1,62 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-r03b-r1-researchd-validation-composition-20260719",
+  "issued_at": "2026-07-19T09:49:56Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "r03b-r1-researchd-validation-composition",
+    "agent_id": "agent-1",
+    "ownership_lease_ref": "stages/r03b-r1-researchd-validation-composition/ownership-lease.json",
+    "base_sha": "6fc8841c8de47a500c327c6f0216b9f5383201e0",
+    "implementation_dependency_sha": "d01ce76ea5349474103358737b8a39cf41709022",
+    "head_sha": "0ead3e889ed11941ae0dfc15ffad4440f001e376",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "a1_contract_sha256": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+    "write_set": ["src/research_bridge/researchd.py"],
+    "audit_results": {
+      "contract_gate": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "worker_source_change_integrated": true,
+      "researchd_source_sha256": "3c6629cb9e5a2015fcfb5600cab752bfe1a11c3fc15813b104598deba7b4b6c1",
+      "execution_source_sha256": "3cbb9cf48e49fec952b14e03629ff0546c0ef888f6a78e24f243c95f99cdbb7c",
+      "validation_source_sha256": "6377a7d60c0246d38d2fefe5a3a685409a3434342e41d0d88262ece8d326fa51",
+      "validator_id": "independent-byte-level-l0",
+      "non_null_profile_submit": "EXECUTION_AND_VALIDATION_RECEIPTS",
+      "lookup_restart": "BYTE_IDENTICAL_ZERO_WRITE",
+      "mixed_protocol": "DENIED_BEFORE_STAGING_AND_CLAIM",
+      "validator_artifact_ceiling_bytes": 8388608,
+      "validator_input_ceiling_bytes": 67108864,
+      "one_tib_runtime_quota_widens_validator": false,
+      "stale_validator_source": "FAILS_BEFORE_SOCKET",
+      "null_profile_and_AI_OFF": "LEGACY_UNCOMPOSED_FAIL_CLOSED",
+      "manual_probe_sha256": "5a871f76f933bd657df13d49b9f6219d89dec7f132619d56bc1f38540619dbd8",
+      "manual_probe_result": "R03B_R1_MANUAL_PROBE_OK",
+      "focused_tests": 27,
+      "full_core_tests": 820,
+      "stage0b_tests": 25,
+      "provider_network_canonical_or_live_actions": 0,
+      "deployment_or_VPS_mutations": 0,
+      "grants_authority": false
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29682248610",
+    "pull_request_ref": "https://github.com/KirPonomarev/dual-contour-research-os/pull/56",
+    "integration_commit_sha": "da08b2755fcb3ba1f2d6294da8e0b50aba5750a6",
+    "known_next_gate": "R03C must independently exercise the complete admission-authority-execution-validation corridor and deny forged, stale, mixed, duplicate, expired, private, live, canonical and second-writer cases before this path is accepted for a future exact image."
+  },
+  "integrity": {
+    "payload_sha256": "56a89cd4d05749b67b0ab4e9112063ffb97b6ad3415b47170f50bd39304d6dd9",
+    "parent_refs": [
+      "git:6fc8841c8de47a500c327c6f0216b9f5383201e0",
+      "git:d01ce76ea5349474103358737b8a39cf41709022",
+      "git:0ead3e889ed11941ae0dfc15ffad4440f001e376",
+      "git:da08b2755fcb3ba1f2d6294da8e0b50aba5750a6",
+      "ci:29682248610",
+      "pr:56",
+      "reuse:reuse-r03b-r1-researchd-validation-composition-20260719"
+    ]
+  }
+}
