@@ -1,0 +1,53 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-r04c-r2-shared-worker-ipc-parent-mode-20260719",
+  "issued_at": "2026-07-19T12:33:31Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "r04c-r2-shared-worker-ipc-parent-mode",
+    "agent_id": "agent-1",
+    "ownership_lease_ref": "stages/r04c-r2-shared-worker-ipc-parent-mode/ownership-lease.json",
+    "base_sha": "b2e0c62c1baecc759b71585ad180b31bd4b57490",
+    "authority_sha": "573fb59eca0d95ff9c031241a2820a9a32dee079",
+    "worker_head_sha": "9c974afe1226c7120b1f7ad6ed7c7dae8847b1aa",
+    "head_sha": "8ed63a30a49534a162ff06f6e19f423fb92e9f1b",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "a1_contract_sha256": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+    "write_set": ["src/research_bridge/researchd.py"],
+    "audit_results": {
+      "contract_gate": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "bridge_runtime_source_mutation": true,
+      "write_set_exact": true,
+      "accepted_runtime_root_modes": ["0700", "0710"],
+      "denied_runtime_root_modes": ["0750", "0711", "0770"],
+      "private_child_mode_0710_denied": true,
+      "ledger_CAS_lock_and_socket_modes_changed": false,
+      "researchd_sha256": "6aa0a071770cf2a73a69a337202427095a1da9574513be0d51e34d450d3d653b",
+      "focused_tests": 16,
+      "full_core_tests": 841,
+      "provider_calls_or_cost": 0,
+      "deployment_or_VPS_mutations": 0,
+      "grants_authority": false
+    },
+    "pull_request_ref": "https://github.com/KirPonomarev/dual-contour-research-os/pull/63",
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29687189829",
+    "integration_commit_sha": "8ed63a30a49534a162ff06f6e19f423fb92e9f1b",
+    "known_next_gate": "Rebind R04C to this exact accepted head and implement the distinct worker unit with a 0710 runtime parent and unchanged private child modes."
+  },
+  "integrity": {
+    "payload_sha256": "30cab92c7fed473069d03f99bcec04b6f4706f854d2bf10eaccc518f4b1c63bf",
+    "parent_refs": [
+      "git:b2e0c62c1baecc759b71585ad180b31bd4b57490",
+      "git:573fb59eca0d95ff9c031241a2820a9a32dee079",
+      "git:9c974afe1226c7120b1f7ad6ed7c7dae8847b1aa",
+      "git:8ed63a30a49534a162ff06f6e19f423fb92e9f1b",
+      "ci:29687189829",
+      "reuse:reuse-r04c-r2-shared-worker-ipc-parent-mode-20260719"
+    ]
+  }
+}
