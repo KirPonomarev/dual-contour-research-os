@@ -5,6 +5,7 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 import hashlib
+import hmac
 import json
 from pathlib import Path, PurePosixPath
 import re
@@ -130,7 +131,13 @@ def _is_ancestor(root: Path, ancestor: str, descendant: str) -> bool:
     ).returncode == 0
 
 
-def _bundle_sha256(root: Path, commit: str, value: object, label: str) -> dict[str, object]:
+def _bundle_sha256(
+    root: Path,
+    release_commit: str,
+    evidence_commit: str,
+    value: object,
+    label: str,
+) -> dict[str, object]:
     bundle = _exact(value, _BUNDLE_KEYS, label)
     paths = bundle["paths"]
     if (
@@ -141,10 +148,17 @@ def _bundle_sha256(root: Path, commit: str, value: object, label: str) -> dict[s
     ):
         raise ReleaseCurrentnessError(f"{label}.paths must be a sorted unique non-empty array")
     normalized = [_path(item, f"{label}.paths") for item in paths]
-    material = {
-        relative: hashlib.sha256(_git_bytes(root, commit, relative)).hexdigest()
-        for relative in normalized
-    }
+    material: dict[str, str] = {}
+    for relative in normalized:
+        release_bytes = _git_bytes(root, release_commit, relative)
+        if not hmac.compare_digest(
+            hashlib.sha256(release_bytes).digest(),
+            hashlib.sha256(_git_bytes(root, evidence_commit, relative)).digest(),
+        ):
+            raise ReleaseCurrentnessError(
+                f"{label} changed after the frozen release subject"
+            )
+        material[relative] = hashlib.sha256(release_bytes).hexdigest()
     if _sha(bundle["sha256"], f"{label}.sha256") != canonical_json_sha256(material):
         raise ReleaseCurrentnessError(f"{label} differs from the exact release subject")
     return bundle
@@ -189,7 +203,13 @@ def validate_release_currentness_context(
     if not isinstance(bundles, Mapping) or set(bundles) != _BUNDLE_NAMES:
         raise ReleaseCurrentnessError("release bundle coverage is incomplete")
     context["release_bundles"] = {
-        name: _bundle_sha256(root, release_sha, bundles[name], f"release_bundles.{name}")
+        name: _bundle_sha256(
+            root,
+            release_sha,
+            evidence_head,
+            bundles[name],
+            f"release_bundles.{name}",
+        )
         for name in sorted(_BUNDLE_NAMES)
     }
 
