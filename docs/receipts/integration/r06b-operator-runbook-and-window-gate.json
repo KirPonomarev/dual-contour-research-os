@@ -30,6 +30,7 @@
     "audit_results": {
       "contract_gate": "green",
       "privacy_secret_scan": "green",
+      "source_mutation": false,
       "write_set_exact": true,
       "policy_frozen_before_start": true,
       "window_sequence_enforced": true,
@@ -78,7 +79,7 @@
     "known_next_gate": "Advance to R07A proof-currentness and final-freeze validator on this exact accepted head; no observation timer starts."
   },
   "integrity": {
-    "payload_sha256": "877cee9025b09b043c0f84fdebd9dc52b6d1f1d6d8948fbd7cdbc82bc5d95817",
+    "payload_sha256": "3addd6216482ae974291726084501a2796efea278048d994c31f3725e693b600",
     "parent_refs": [
       "git:8e4540d08e8eb3623a1e59e03c38d7f3e3266a25",
       "git:cf027819094af781beec28dec00949755c76560e",
