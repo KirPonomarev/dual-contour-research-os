@@ -93,6 +93,22 @@ _RECEIPT_FIELDS = frozenset(
         "integrity",
     }
 )
+_VALIDATION_PAYLOAD_FIELDS = frozenset(
+    {
+        "protocol_ref",
+        "execution_ref",
+        "artifact_refs",
+        "validator_id",
+        "validator_sha256",
+        "holdout_access_ref",
+        "checks_performed",
+        "metrics",
+        "tolerances",
+        "proposed_outcome",
+        "reasons",
+        "reproducibility_class",
+    }
+)
 _EVENT_FIELDS = frozenset(
     {
         "sequence",
@@ -155,6 +171,14 @@ class ExecutionRecord:
     checkpoint_manifest: Mapping[str, Any]
     artifact_records: tuple[_ArtifactRecordSnapshot, ...]
     execution_receipt: Mapping[str, Any]
+
+
+@dataclass(frozen=True, slots=True)
+class ValidatedExecutionRecord:
+    """Deeply immutable durable execution and independent validation pair."""
+
+    execution_receipt: Mapping[str, Any]
+    validation_receipt: Mapping[str, Any]
 
 
 @dataclass(frozen=True, slots=True)
@@ -241,6 +265,12 @@ class _Ingestor(Protocol):
         staging_envelope: Mapping[str, Any],
         staging_root: os.PathLike[str] | str,
     ) -> tuple[object, ...]: ...
+
+
+class _Validator(Protocol):
+    def validate(
+        self, execution_receipt: Mapping[str, Any]
+    ) -> Mapping[str, Any]: ...
 
 
 def canonical_json_sha256(value: Any) -> str:
@@ -532,6 +562,115 @@ class OfflineExecutionCoordinator:
             raise
         except Exception as exc:
             raise ExecutionError("terminal execution receipt is unavailable") from exc
+
+
+class ValidatedOfflineExecutionCoordinator:
+    """Receipt-last composition over execution and an injected validator.
+
+    Independent validation sees only the execution receipt reopened from the
+    durable completion/CAS projection.  It never receives runner state,
+    checkpoints, staging paths, or mutable artifact records.  Recovery after
+    an ambiguous response uses :meth:`validate_completed`, which cannot claim
+    or execute another attempt.
+    """
+
+    def __init__(
+        self,
+        execution_coordinator: OfflineExecutionCoordinator,
+        validator: _Validator,
+        *,
+        expected_validator_id: str,
+        expected_validator_sha256: str,
+        expected_protocol_ref: str,
+    ) -> None:
+        if type(execution_coordinator) is not OfflineExecutionCoordinator:
+            raise ExecutionError(
+                "execution_coordinator must be the exact offline coordinator"
+            )
+        _callable_method(validator, "validate", "validator")
+        self._execution_coordinator = execution_coordinator
+        self._validator = validator
+        self._expected_validator_id = _identifier(
+            "expected_validator_id", expected_validator_id
+        )
+        self._expected_validator_sha256 = _sha256(
+            "expected_validator_sha256", expected_validator_sha256
+        )
+        self._expected_protocol_ref = _normalized_text(
+            "expected_protocol_ref", expected_protocol_ref
+        )
+
+    def execute_and_validate(
+        self,
+        job_spec: Mapping[str, Any],
+        permit: Mapping[str, Any],
+        lease: Mapping[str, Any],
+        staging_root: os.PathLike[str] | str,
+        *,
+        now: Any,
+    ) -> ValidatedExecutionRecord:
+        """Execute once, reopen its terminal receipt, then validate it."""
+
+        job = _mapping(job_spec, "job_spec")
+        job_spec_ref = _identifier("job_spec.object_id", job.get("object_id"))
+        record = self._execution_coordinator.execute(
+            job_spec,
+            permit,
+            lease,
+            staging_root,
+            now=now,
+        )
+        durable_receipt = self._lookup_durable(job_spec_ref)
+        if not hmac.compare_digest(
+            _canonical_json_bytes(record.execution_receipt),
+            _canonical_json_bytes(durable_receipt),
+        ):
+            raise ExecutionError(
+                "execution result differs from durable terminal lookup"
+            )
+        return self._validate_durable(durable_receipt)
+
+    def validate_completed(
+        self, job_spec_ref: str
+    ) -> ValidatedExecutionRecord:
+        """Revalidate one completed attempt without execution or writes."""
+
+        return self._validate_durable(
+            self._lookup_durable(_identifier("job_spec_ref", job_spec_ref))
+        )
+
+    def _lookup_durable(self, job_spec_ref: str) -> Mapping[str, Any]:
+        try:
+            receipt = self._execution_coordinator.lookup_execution_receipt(
+                job_spec_ref
+            )
+        except Exception as exc:
+            raise ExecutionError(
+                "durable terminal execution receipt is unavailable"
+            ) from exc
+        return _mapping(receipt, "durable execution receipt")
+
+    def _validate_durable(
+        self, execution_receipt: Mapping[str, Any]
+    ) -> ValidatedExecutionRecord:
+        try:
+            validation_receipt = self._validator.validate(execution_receipt)
+        except Exception as exc:
+            raise ExecutionError(
+                "independent validation failed after durable completion; "
+                "retry through validate_completed"
+            ) from exc
+        validation = _validate_validation_handoff(
+            execution_receipt,
+            validation_receipt,
+            expected_validator_id=self._expected_validator_id,
+            expected_validator_sha256=self._expected_validator_sha256,
+            expected_protocol_ref=self._expected_protocol_ref,
+        )
+        return ValidatedExecutionRecord(
+            execution_receipt=_deep_freeze(execution_receipt),
+            validation_receipt=validation,
+        )
 
 
 def _authority_bindings(
@@ -1301,6 +1440,128 @@ def _construct_execution_receipt(
         },
     }
     return _deep_freeze(receipt)
+
+
+def _validate_validation_handoff(
+    execution_receipt: Mapping[str, Any],
+    validation_receipt: Mapping[str, Any],
+    *,
+    expected_validator_id: str,
+    expected_validator_sha256: str,
+    expected_protocol_ref: str,
+) -> Mapping[str, Any]:
+    execution = _exact_mapping(
+        execution_receipt,
+        _RECEIPT_FIELDS,
+        "execution_receipt",
+    )
+    if (
+        execution["schema_id"] != "ExecutionReceipt"
+        or execution["schema_version"] != "1.0.0"
+    ):
+        raise ExecutionError("durable execution receipt schema is invalid")
+    execution_payload = _mapping(
+        execution.get("payload"), "execution_receipt.payload"
+    )
+    execution_object_id = _identifier(
+        "execution_receipt.object_id", execution.get("object_id")
+    )
+    expected_execution_object_id = (
+        f"execution-receipt-{canonical_json_sha256(execution_payload)}"
+    )
+    if execution_object_id != expected_execution_object_id:
+        raise ExecutionError("durable execution receipt object identity mismatch")
+    execution_artifacts = execution_payload.get("artifact_refs")
+    if not isinstance(execution_artifacts, (list, tuple)):
+        raise ExecutionError("durable execution artifact_refs must be an array")
+    artifact_refs = tuple(
+        _cas_ref(f"execution artifact_refs[{index}]", value)
+        for index, value in enumerate(execution_artifacts)
+    )
+    execution_ref = f"execution:{execution_object_id}"
+    execution_issued_at = _timestamp(
+        "execution_receipt.issued_at", execution.get("issued_at")
+    )
+
+    validation = _exact_mapping(
+        validation_receipt,
+        _RECEIPT_FIELDS,
+        "validation_receipt",
+    )
+    if (
+        validation["schema_id"] != "ValidationReceipt"
+        or validation["schema_version"] != "1.0.0"
+    ):
+        raise ExecutionError("validation receipt schema is invalid")
+    if validation.get("contour") != execution.get("contour"):
+        raise ExecutionError("validation contour does not bind execution")
+    if validation.get("classification") != execution.get("classification"):
+        raise ExecutionError("validation classification does not bind execution")
+    if _timestamp("validation_receipt.issued_at", validation.get("issued_at")) != (
+        execution_issued_at
+    ):
+        raise ExecutionError(
+            "validation timestamp does not bind execution completion"
+        )
+    issuer = _exact_mapping(
+        validation.get("issuer"),
+        frozenset({"id", "authority_class"}),
+        "validation_receipt.issuer",
+    )
+    validator_id = _identifier("validation issuer.id", issuer.get("id"))
+    if issuer.get("authority_class") != "pinned-validator":
+        raise ExecutionError("validation issuer is not a pinned validator")
+    if validator_id != expected_validator_id:
+        raise ExecutionError("validation issuer is not the expected validator")
+    payload = _exact_mapping(
+        validation.get("payload"),
+        _VALIDATION_PAYLOAD_FIELDS,
+        "validation_receipt.payload",
+    )
+    _ensure_json_value(payload, "validation_receipt.payload")
+    if payload["execution_ref"] != execution_ref:
+        raise ExecutionError("validation execution reference mismatch")
+    if payload["validator_id"] != validator_id:
+        raise ExecutionError("validation issuer identity mismatch")
+    validator_sha256 = _sha256(
+        "validation validator_sha256", payload["validator_sha256"]
+    )
+    if not hmac.compare_digest(
+        validator_sha256,
+        expected_validator_sha256,
+    ):
+        raise ExecutionError("validation validator digest mismatch")
+    if payload["protocol_ref"] != expected_protocol_ref:
+        raise ExecutionError("validation protocol reference mismatch")
+    validation_artifacts = payload["artifact_refs"]
+    if not isinstance(validation_artifacts, (list, tuple)):
+        raise ExecutionError("validation artifact_refs must be an array")
+    if tuple(validation_artifacts) != artifact_refs:
+        raise ExecutionError("validation artifact binding mismatch")
+    for index, value in enumerate(validation_artifacts):
+        _cas_ref(f"validation artifact_refs[{index}]", value)
+    integrity = _exact_mapping(
+        validation.get("integrity"),
+        frozenset({"payload_sha256", "parent_refs"}),
+        "validation_receipt.integrity",
+    )
+    payload_sha256 = _sha256(
+        "validation_receipt.integrity.payload_sha256",
+        integrity.get("payload_sha256"),
+    )
+    if not hmac.compare_digest(payload_sha256, canonical_json_sha256(payload)):
+        raise ExecutionError("validation receipt payload integrity mismatch")
+    object_id = _identifier(
+        "validation_receipt.object_id", validation.get("object_id")
+    )
+    if object_id != f"validation-receipt-{payload_sha256}":
+        raise ExecutionError("validation receipt object identity mismatch")
+    parents = integrity.get("parent_refs")
+    if not isinstance(parents, (list, tuple)):
+        raise ExecutionError("validation receipt parent_refs must be an array")
+    if tuple(parents) != (execution_ref, *artifact_refs):
+        raise ExecutionError("validation receipt parent chain mismatch")
+    return _deep_freeze(validation)
 
 
 def _validate_event_columns(
