@@ -1,5 +1,6 @@
 import json
 import shutil
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -25,6 +26,13 @@ class ReleaseIdentityTests(unittest.TestCase):
         root = Path(temporary.name)
         for relative in ("docs/receipts/release", "docs/receipts/integration", "ops/release", "contracts"):
             shutil.copytree(ROOT / relative, root / relative)
+        historical = subprocess.run(
+            ["git", "show", "5c2bd7c090fada6e5b65dc955e80b256d88252de:ops/release/researchd.config.template.json"],
+            cwd=ROOT,
+            check=True,
+            capture_output=True,
+        ).stdout
+        (root / "ops/release/researchd.config.template.json").write_bytes(historical)
         return temporary, root
 
     def test_manifest_payload_tamper_is_rejected(self) -> None:

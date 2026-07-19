@@ -124,6 +124,14 @@ class FinalDeploymentRebindTests(unittest.TestCase):
         self.assertEqual(result["candidate_release_sha"], final.CANDIDATE_SHA)
         self.assertEqual(result["candidate_tree_sha"], final.CANDIDATE_TREE)
         self.assertTrue(result["replacement_release_required"])
+        self.assertEqual(
+            result["historical_static_subjects"],
+            [final.CANDIDATE_SHA, final.S38_REBIND_SHA],
+        )
+        self.assertNotEqual(
+            final._digest_file(final.CONFIG),
+            "0b186888a3a1bb8fb028315681bf4073ec4186a0acbdf2f226b5a53d69a9d542",
+        )
         self.assertFalse(result["deployment_allowed"])
         self.assertEqual(result["remote_actions"], 0)
         packet = json.loads(

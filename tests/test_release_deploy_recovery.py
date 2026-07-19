@@ -8,6 +8,7 @@ import tempfile
 import unittest
 import io
 import os
+import subprocess
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -250,10 +251,18 @@ class ReleaseDeployRecoveryTests(unittest.TestCase):
         self.archive = self.temp / "release.tar"
         self.archive.write_bytes(b"synthetic exact image archive")
         self.archive_sha = hashlib.sha256(self.archive.read_bytes()).hexdigest()
+        self.historical_config = self.temp / "historical-researchd.config.json"
+        historical_config = subprocess.run(
+            ["git", "show", f"{deploy.RELEASE_SHA}:ops/release/researchd.config.template.json"],
+            cwd=ROOT,
+            check=True,
+            capture_output=True,
+        ).stdout
+        self.historical_config.write_bytes(historical_config)
         self.bundle = deploy._load_bundle(
             manifest_path=ROOT / "docs/receipts/release/s4-release-manifest.json",
             policy_path=ROOT / "ops/release/runtime-policy.json",
-            config_path=ROOT / "ops/release/researchd.config.template.json",
+            config_path=self.historical_config,
             unit_path=ROOT / "ops/deploy/research-os-bridge.service",
             archive_path=self.archive,
             archive_sha256=self.archive_sha,
@@ -625,7 +634,7 @@ class ReleaseDeployRecoveryTests(unittest.TestCase):
             deploy._load_bundle(
                 manifest_path=ROOT / "docs/receipts/release/s4-release-manifest.json",
                 policy_path=ROOT / "ops/release/runtime-policy.json",
-                config_path=ROOT / "ops/release/researchd.config.template.json",
+                config_path=self.historical_config,
                 unit_path=ROOT / "ops/deploy/research-os-bridge.service",
                 archive_path=self.archive,
                 archive_sha256="0" * 64,
@@ -701,6 +710,8 @@ class ReleaseDeployRecoveryTests(unittest.TestCase):
                 str(self.known_hosts),
                 "--receipt",
                 str(receipt_path),
+                "--config",
+                str(self.historical_config),
                 "deploy",
                 "--archive",
                 str(self.archive),

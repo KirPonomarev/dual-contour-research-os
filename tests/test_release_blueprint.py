@@ -18,6 +18,7 @@ class ReleaseBlueprintTests(unittest.TestCase):
         self.assertEqual(result["status"], "PASS")
         self.assertFalse(result["network_at_runtime"])
         self.assertFalse(result["external_action_authority"])
+        self.assertEqual(result["config_mode"], "a1-enabled")
         self.assertEqual(len(result["hashes"]), 6)
 
     def copied(self) -> tuple[tempfile.TemporaryDirectory[str], Path]:

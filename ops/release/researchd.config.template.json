@@ -1,9 +1,9 @@
 {
   "schema_id": "ResearchdServiceConfig",
-  "schema_version": "1.0.0",
+  "schema_version": "1.1.0",
   "runtime_root": "/var/lib/research-os",
   "runner_identity": "pre-soak-offline-l0",
-  "allowed_uids": [10001],
+  "allowed_uids": [10001, 10002, 10003],
   "input_quota_bytes": 16777216,
   "checkpoint_quota_bytes": 16777216,
   "artifact_quota_bytes": 16777216,
@@ -16,6 +16,86 @@
     "PolicySnapshot": {"issuer_id": "governance-policy-authority", "authority_class": "policy-authority"},
     "ApprovalReceipt": {"issuer_id": "operator-approval-authority", "authority_class": "operator-authority"}
   },
-  "policy_snapshots": {},
-  "approval_receipts": {}
+  "policy_snapshots": {
+    "89cb6acaae9a96cb1ba84a7d5683dab8a0588afb7fb42c18ecf5caf4b4d7ff16": {
+      "schema_id": "PolicySnapshot",
+      "schema_version": "1.0.0",
+      "object_id": "policy-snapshot:a1-sandbox-policy-v1:20260719",
+      "issued_at": "2026-07-19T05:55:00Z",
+      "issuer": {
+        "id": "governance-policy-authority",
+        "authority_class": "policy-authority"
+      },
+      "contour": "governance",
+      "classification": "D1_INTERNAL_SANITIZED",
+      "payload": {
+        "source_repo": "https://github.com/KirPonomarev/dual-contour-research-os",
+        "commit_sha": "f6ee4643a07af6e2f92a61a0aa4720bb1b7b1271",
+        "aggregate_sha256": "50a3f629d8931262b7cd7109575ddb99f5fc8cacffec1985e1d5793e012dc3b4",
+        "covered_action_classes": [
+          "offline_execution",
+          "bounded_a1_sandbox_admission",
+          "source_trigger_materialization",
+          "scout_proposal"
+        ],
+        "allow_rules": [
+          {"network_class": "offline"},
+          {"data_classes": ["D0_PUBLIC", "D1_INTERNAL_SANITIZED"]},
+          {"data_origin": ["public", "already_registered"]}
+        ],
+        "deny_rules": [
+          {"network_class": "connected"},
+          {"data_classification": ["D2_DOMAIN_CONFIDENTIAL", "D3_RESTRICTED"]},
+          {"action_class": ["canonical_mutation", "live_execution", "private_api", "unseen_holdout"]}
+        ],
+        "valid_from": "2026-07-19T00:00:00Z",
+        "valid_until": "2026-08-09T00:00:00Z"
+      },
+      "integrity": {
+        "payload_sha256": "42526e0b770cccb2927195f36d5f459744cd14cee6bd1bb11dd2626fcf7a38c4",
+        "parent_refs": [
+          "contracts/a1/v1/profiles/a1_sandbox_policy_v1.json#sha256:50a3f629d8931262b7cd7109575ddb99f5fc8cacffec1985e1d5793e012dc3b4"
+        ]
+      }
+    }
+  },
+  "approval_receipts": {},
+  "a1_enabled": true,
+  "principal_roles": {
+    "10001": "operator",
+    "10002": "collector",
+    "10003": "scout"
+  },
+  "frozen_bindings": {
+    "core_catalog_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "a1_catalog_sha256": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+    "release_manifest_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "policy_sha256": "89cb6acaae9a96cb1ba84a7d5683dab8a0588afb7fb42c18ecf5caf4b4d7ff16",
+    "ipc_compatibility_profile_sha256": "c9cdd8c51616ac843a6729166b6f21c9a44de24fac7559b86f842c7e1930ba04",
+    "executor_capability_refs": [
+      "docs/receipts/capability/e1b-durable-feedback-offline.json"
+    ],
+    "evaluator_capability_refs": [
+      "docs/receipts/capability/e2-autonomous-research-shadow.json"
+    ]
+  },
+  "a1_limits": {
+    "cycle_limits": {
+      "max_admitted_experiments": 4,
+      "max_model_calls": 12,
+      "max_wall_seconds": 7200,
+      "max_cpu_seconds": 14400,
+      "max_memory_mib": 8192,
+      "max_output_bytes": 1073741824,
+      "max_tokens": 200000,
+      "max_cost_units": 100
+    },
+    "daily_limits": {
+      "max_admitted_experiments": 16,
+      "max_model_calls": 64,
+      "max_wall_seconds": 28800,
+      "max_tokens": 800000,
+      "max_cost_units": 400
+    }
+  }
 }

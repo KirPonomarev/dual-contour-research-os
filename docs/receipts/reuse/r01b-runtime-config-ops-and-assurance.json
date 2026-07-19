@@ -1,0 +1,58 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-r01b-runtime-config-ops-and-assurance-20260719",
+  "issued_at": "2026-07-19T05:58:00Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "reuse-freeze-authority"
+  },
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "PRODUCTION_A1_CONFIG_ROLE_TOPOLOGY_AND_HOSTILE_ASSURANCE",
+    "candidates": [
+      {
+        "candidate": "upgrade-existing-researchd-template-final-runtime-policy-and-rootless-unit",
+        "disposition": "selected-internal-adapter"
+      },
+      {
+        "candidate": "reuse-frozen-A1-sandbox-policy-IPC-profile-and-R01A-strict-loader",
+        "disposition": "selected"
+      },
+      {
+        "candidate": "embed-reusable-human-approval-in-static-config",
+        "disposition": "rejected-stale-authority-and-replay-risk"
+      },
+      {
+        "candidate": "new-auth-service-container-or-role-token",
+        "disposition": "rejected-unnecessary-service-and-authority-surface"
+      }
+    ],
+    "selected_mode": "exact-A1-1.1-template-with-one-current-D1-policy-numeric-UID-role-map-frozen-limits-empty-static-approval-resolver-and-single-supervisor-rootless-unit",
+    "source_ref": "git:f73f2ce83a3146b96f0f18d8b0b32aae5fefc6f2;internal:R01A-service-loader+release-blueprint+final-rootless-unit;contract:a1-sandbox-policy-v1+ipc-compatibility-v1",
+    "code_sha256": "0b186888a3a1bb8fb028315681bf4073ec4186a0acbdf2f226b5a53d69a9d542",
+    "license_spdx": "NOASSERTION",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "canonical-A1-config-parse-and-start",
+      "empty-mixed-policy-catalog-IPC-release-capability-limit-denials",
+      "OS-verified-operator-peer",
+      "collector-scout-role-matrix-and-cross-role-denials",
+      "AI_OFF-Core-bootstrap",
+      "socket-mode-group-topology",
+      "historical-S38-subject-stability",
+      "false-A1-green-denial-before-backend"
+    ],
+    "canonical_owner": "agent-5-ops-and-assurance-with-agent-0-integration",
+    "rollback": "Restore the prior inert template and keep R00 deployment prohibition active; do not advance to R02 until a replacement ops binding passes."
+  },
+  "integrity": {
+    "payload_sha256": "48fd86a8bbdac91577b21a118fb0c7a420518f2c5c0219deefa0108d926b9043",
+    "parent_refs": [
+      "git:f73f2ce83a3146b96f0f18d8b0b32aae5fefc6f2",
+      "reuse:reuse-r01a-runtime-config-and-ipc-code-20260719",
+      "reuse:reuse-r01b0-config-validator-decoupling-20260719"
+    ]
+  }
+}

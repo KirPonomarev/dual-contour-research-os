@@ -37,6 +37,24 @@ def _payload_sha(value: object) -> str:
     return hashlib.sha256(json.dumps(value, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
 
 
+def _git_blob(root: Path, relative: str) -> bytes:
+    result = subprocess.run(
+        ["git", "show", f"{RELEASE_SHA}:{relative}"],
+        cwd=root,
+        check=False,
+        capture_output=True,
+    )
+    if result.returncode != 0:
+        raise ValueError(f"historical release input is unavailable: {relative}")
+    return result.stdout
+
+
+def _binding_sha(root: Path, relative: str, *, historical: bool) -> str:
+    if historical:
+        return hashlib.sha256(_git_blob(root, relative)).hexdigest()
+    return _sha(root / relative)
+
+
 def inspect(root: Path = ROOT, *, check_git: bool = True) -> dict[str, Any]:
     failures: list[str] = []
     manifest_path = root / "docs/receipts/release/s4-release-manifest.json"
@@ -56,10 +74,10 @@ def inspect(root: Path = ROOT, *, check_git: bool = True) -> dict[str, Any]:
     expected = {
         "release_sha": RELEASE_SHA,
         "image_digests": [IMAGE_DIGEST],
-        "policy_sha256": _sha(root / "ops/release/runtime-policy.json"),
-        "config_sha256": _sha(root / "ops/release/researchd.config.template.json"),
-        "schema_sha256": _sha(root / "contracts/catalog.json"),
-        "dependency_lock_sha256": _sha(root / "ops/release/dependency-lock.json"),
+        "policy_sha256": _binding_sha(root, "ops/release/runtime-policy.json", historical=check_git),
+        "config_sha256": _binding_sha(root, "ops/release/researchd.config.template.json", historical=check_git),
+        "schema_sha256": _binding_sha(root, "contracts/catalog.json", historical=check_git),
+        "dependency_lock_sha256": _binding_sha(root, "ops/release/dependency-lock.json", historical=check_git),
         "sbom_ref": f"artifact:sha256:{sbom_sha}",
         "previous_release_ref": "release:none-service-stopped",
     }
