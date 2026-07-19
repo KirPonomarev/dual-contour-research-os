@@ -1,3 +1,17 @@
 **
 !src/
 !src/**
+!tools/
+!tools/model_provider_shadow.py
+!provenance/
+!provenance/model-provider-connected-shadow-v2.json
+!provenance/model-provider-routing-v1.json
+!provenance/model-worker-ipc-extension-v1.json
+!contracts/
+!contracts/a1/
+!contracts/a1/v1/
+!contracts/a1/v1/profiles/
+!contracts/a1/v1/profiles/model_role_registry_v1.json
+!ops/
+!ops/connected-worker/
+!ops/connected-worker/**

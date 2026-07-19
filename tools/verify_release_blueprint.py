@@ -50,6 +50,25 @@ _A1_CONFIG_KEYS = _LEGACY_CONFIG_KEYS | {
     "frozen_bindings",
     "a1_limits",
 }
+_EXPECTED_BUILD_CONTEXT = (
+    "**",
+    "!src/",
+    "!src/**",
+    "!tools/",
+    "!tools/model_provider_shadow.py",
+    "!provenance/",
+    "!provenance/model-provider-connected-shadow-v2.json",
+    "!provenance/model-provider-routing-v1.json",
+    "!provenance/model-worker-ipc-extension-v1.json",
+    "!contracts/",
+    "!contracts/a1/",
+    "!contracts/a1/v1/",
+    "!contracts/a1/v1/profiles/",
+    "!contracts/a1/v1/profiles/model_role_registry_v1.json",
+    "!ops/",
+    "!ops/connected-worker/",
+    "!ops/connected-worker/**",
+)
 
 
 class BlueprintError(RuntimeError):
@@ -175,7 +194,7 @@ def inspect(root: Path = ROOT) -> dict[str, Any]:
             failures.append("runtime_policy.boundary")
         if BASE_DIGEST not in notice or "/usr/local/lib/python3.11/LICENSE.txt" not in notice or "/usr/share/doc/*/copyright" not in notice:
             failures.append("third_party_notice.incomplete")
-        if dockerignore.splitlines() != ["**", "!src/", "!src/**"]:
+        if tuple(dockerignore.splitlines()) != _EXPECTED_BUILD_CONTEXT:
             failures.append("build_context.not_minimal")
         return {
             "status": "PASS" if not failures else "FAIL",
