@@ -1,0 +1,61 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-s33-generated-isolation-20260719",
+  "issued_at": "2026-07-19T00:02:00Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "reuse-freeze-authority"
+  },
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "FEATURE_OFF_L1_L2_ROOTLESS_ISOLATION_GATE_AND_RESULT_VALIDATION",
+    "candidates": [
+      {
+        "candidate": "reuse-existing-JobSpec-Permit-AttemptLease-CAS-and-fencing-identities",
+        "disposition": "selected"
+      },
+      {
+        "candidate": "reuse-existing-offline-execution-artifact-and-receipt-last-patterns",
+        "disposition": "selected"
+      },
+      {
+        "candidate": "add-stdlib-only-generated-artifact-backend-registry-launch-plan-result-validator-and-rollback-proposal",
+        "disposition": "selected-minimal-missing-glue"
+      },
+      {
+        "candidate": "embed-subprocess-Docker-daemon-or-unrestricted-interpreter-in-Bridge",
+        "disposition": "rejected-authority-and-portability-risk"
+      },
+      {
+        "candidate": "L3-live-private-network-host-mount-or-autonomous-deploy",
+        "disposition": "rejected-out-of-scope"
+      }
+    ],
+    "selected_mode": "pure-gate-and-result-validator-for-externally-attested-rootless-OCI-executor-feature-off-by-default-D0-only-L1-L2-only",
+    "source_ref": "git:98415d56044bc406ec7303df00a4ee19bbc1359f;internal:authority+execution+CAS+L0;profile:sha256:a02fb9bb7e328f355cae083193f4ae63bfb299bf2e4c633ae496ccf31ca0ef89",
+    "code_sha256": "a02fb9bb7e328f355cae083193f4ae63bfb299bf2e4c633ae496ccf31ca0ef89",
+    "license_spdx": "NOASSERTION",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "feature-off-default",
+      "parent-authority-inheritance",
+      "L3-unreachable",
+      "network-path-resource-denial",
+      "backend-attestation",
+      "artifact-CAS-provenance",
+      "fence-and-result-integrity",
+      "rollback-proposal-only"
+    ],
+    "canonical_owner": "agent-0-policy-agent-2-generated-execution-module-agent-5-assurance",
+    "rollback": "Disable feature and remove S33 additive profile/module/assurance; L0 remains the only executable in-process runner."
+  },
+  "integrity": {
+    "payload_sha256": "da83d71012d6fe83db76840e632da746ffc27429bbb385bb253e2e4dddca68b1",
+    "parent_refs": [
+      "git:98415d56044bc406ec7303df00a4ee19bbc1359f",
+      "profile:sha256:a02fb9bb7e328f355cae083193f4ae63bfb299bf2e4c633ae496ccf31ca0ef89"
+    ]
+  }
+}

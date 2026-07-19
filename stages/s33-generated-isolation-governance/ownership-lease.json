@@ -1,0 +1,16 @@
+{
+  "lease_id": "lease-s33-generated-isolation-governance-agent-0",
+  "stage_id": "s33-generated-isolation-governance",
+  "agent_id": "agent-0",
+  "branch": "codex/bridge-a0-s33-generated-isolation-governance",
+  "issued_at": "2026-07-19T00:02:00Z",
+  "expires_at": "2026-07-21T00:02:00Z",
+  "write_set": [
+    "provenance/generated-code-isolation-ladder-v1.json",
+    "docs/receipts/reuse/s33-generated-isolation.json",
+    "stages/s33-generated-isolation-governance/stage-envelope.json",
+    "stages/s33-generated-isolation-governance/ownership-lease.json"
+  ],
+  "exclusive": true,
+  "revoked": false
+}
