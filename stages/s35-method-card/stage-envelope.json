@@ -1,0 +1,15 @@
+{
+  "stage_id": "s35-method-card", "agent_id": "agent-0",
+  "objective": "Freeze and enforce a domain-owned metadata-only MethodCard declassification boundary without cross-contour scientific truth transfer.",
+  "executable_blocker": "No typed additive E5 contract currently prevents raw/tainted domain material from being represented as transferable method metadata.",
+  "base_sha": "9d4e00a74cf8d9e1fcfd0cfdff6040d91ce941bd", "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a0-s35-method-card", "worktree": "/private/tmp/dcr-s35-method-card",
+  "read_set": ["src/research_bridge/evolution.py", "provenance/evidence-replication-matrix-v1.json", "docs/ARCHITECTURE.md"],
+  "write_set": ["contracts/e5/", "provenance/method-card-declassification-v1.json", "tools/method_card.py", "tools/validate_e5_contracts.py", "tools/validate_contracts.py", "docs/ADR/0009-e5-method-card-boundary.md", "docs/receipts/reuse/s35-method-card.json", "tests/test_s35_method_card.py", "stages/s35-method-card/"],
+  "forbidden_scope": ["Core-catalog-or-frozen-contract-rewrite", "raw-evidence-target-strategy-holdout-secret-prompt-domain-conclusion-or-D2-D3", "runtime-store-service-network-model-call-recipient-write-promotion-or-authority"],
+  "dependency_hashes": {"subject_main": "9d4e00a74cf8d9e1fcfd0cfdff6040d91ce941bd", "core_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50"},
+  "acceptance_commands": ["python3 tools/validate_e5_contracts.py", "python3 -m unittest -v tests.test_s35_method_card", "make contracts", "make test", "git diff --check"],
+  "risk_class": "critical-cross-contour-leak-and-shadow-laundering", "stop_conditions": ["D2-D3-or-forbidden-metadata-accepted", "SHADOW_UNAPPLIED-issued-as-MethodCard", "Bridge-mints-domain-receipt", "recipient-canonical-write-or-authority"],
+  "expected_receipt": "docs/receipts/integration/s35-method-card.json", "rollback": "Remove additive E5 artifacts without changing Core or domain registries.", "commit_authority": "one-scoped-agent-0-stage", "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent0_integration", "blocked_validation_failed"]
+}

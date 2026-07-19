@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/KirPonomarev/dual-contour-research-os/contracts/e5/v1/MethodCard.schema.json",
+  "title": "MethodCard",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_id", "schema_version", "object_id", "issued_at", "issuer", "contour", "classification", "payload", "integrity"],
+  "properties": {
+    "schema_id": {"const": "MethodCard"}, "schema_version": {"const": "1.0.0"},
+    "object_id": {"type": "string", "pattern": "^method-card:sha256:[a-f0-9]{64}$"}, "issued_at": {"type": "string", "format": "date-time"},
+    "issuer": {"type": "object", "additionalProperties": false, "required": ["id", "authority_class"], "properties": {"id": {"type": "string", "minLength": 1}, "authority_class": {"const": "domain-declassification-authority"}}},
+    "contour": {"const": "governance"}, "classification": {"enum": ["D0_PUBLIC", "D1_INTERNAL_SANITIZED"]},
+    "payload": {
+      "type": "object", "additionalProperties": false,
+      "required": ["method_id", "method_family", "objective_class", "input_contract_refs", "output_contract_refs", "precondition_codes", "invariant_codes", "failure_mode_codes", "evaluation_protocol_ref", "provenance_refs", "declassification_receipt_ref", "eligible_recipient_classes", "source_shadow_taint", "transfer_status", "no_raw_payload", "grants_authority"],
+      "properties": {
+        "method_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{2,63}$"},
+        "method_family": {"enum": ["EXPERIMENT_DESIGN", "EVIDENCE_TRIAGE", "FALSIFICATION", "REPLICATION", "ROBUSTNESS", "CALIBRATION"]},
+        "objective_class": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]{2,63}$"},
+        "input_contract_refs": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "output_contract_refs": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "precondition_codes": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]{2,63}$"}},
+        "invariant_codes": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]{2,63}$"}},
+        "failure_mode_codes": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]{2,63}$"}},
+        "evaluation_protocol_ref": {"type": "string", "minLength": 1}, "provenance_refs": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "declassification_receipt_ref": {"type": "string", "pattern": "^declassification-receipt:sha256:[a-f0-9]{64}$"},
+        "eligible_recipient_classes": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["MARKET_RESEARCH", "SECURITY_RESEARCH", "GENERIC_RESEARCH"]}},
+        "source_shadow_taint": {"const": "NONE"}, "transfer_status": {"const": "DECLASSIFIED_METHOD_ONLY"}, "no_raw_payload": {"const": true}, "grants_authority": {"const": false}
+      }
+    },
+    "integrity": {"type": "object", "additionalProperties": false, "required": ["payload_sha256", "parent_refs"], "properties": {"payload_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}, "parent_refs": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}}}
+  },
+  "x-owner": "domain", "x-writer": "domain-declassification-authority", "x-authority": "declassified-method-reference-only"
+}

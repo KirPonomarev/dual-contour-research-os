@@ -1,0 +1,21 @@
+{
+  "schema_id": "ReuseDecisionReceipt", "schema_version": "1.0.0", "object_id": "reuse-s35-method-card-20260719", "issued_at": "2026-07-19T00:46:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-freeze-authority"}, "contour": "governance", "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "DECLASSIFIED_METHOD_CARD_VALIDATION_AND_RECIPIENT_ELIGIBILITY",
+    "candidates": [
+      {"candidate": "reuse-existing-envelope-integrity-shadow-taint-and-replication-declassification-patterns", "disposition": "selected"},
+      {"candidate": "additive-E5-catalog-plus-stdlib-pure-validator", "disposition": "selected-minimal-missing-glue"},
+      {"candidate": "mutate-frozen-Core-catalog", "disposition": "rejected-unnecessary-freeze-rewrite"},
+      {"candidate": "cross-contour-database-vector-store-or-new-service", "disposition": "rejected-no-storage-needed"},
+      {"candidate": "raw-evidence-target-strategy-holdout-prompt-or-domain-truth-transfer", "disposition": "rejected-boundary-violation"}
+    ],
+    "selected_mode": "separate-additive-E5-contract-catalog-domain-owned-declassification-receipt-and-controlled-code-only-MethodCard",
+    "source_ref": "git:9d4e00a74cf8d9e1fcfd0cfdff6040d91ce941bd;internal:S23+S26+S34",
+    "code_sha256": "ecbf5578f85d50b9cdf53f5bead12f00a27c9500474faf50860d952408188628", "license_spdx": "NOASSERTION", "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": ["D2-D3-denial", "shadow-laundering-denial", "field-metadata-scan", "domain-receipt-binding", "recipient-eligibility", "zero-write-zero-authority"],
+    "canonical_owner": "agent-0-E5-contract-and-validator-agent-5-assurance",
+    "rollback": "Remove the additive E5 catalog/profile/tool; frozen Core contracts and all domain truth remain unchanged."
+  },
+  "integrity": {"payload_sha256": "2fb6104495044888b37dc350e8d3b9aac56e24bdf499365fef033a7be9721ea7", "parent_refs": ["git:9d4e00a74cf8d9e1fcfd0cfdff6040d91ce941bd"]}
+}

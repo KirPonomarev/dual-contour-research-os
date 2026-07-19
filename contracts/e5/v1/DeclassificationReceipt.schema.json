@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/KirPonomarev/dual-contour-research-os/contracts/e5/v1/DeclassificationReceipt.schema.json",
+  "title": "DeclassificationReceipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_id", "schema_version", "object_id", "issued_at", "issuer", "contour", "classification", "payload", "integrity"],
+  "properties": {
+    "schema_id": {"const": "DeclassificationReceipt"},
+    "schema_version": {"const": "1.0.0"},
+    "object_id": {"type": "string", "pattern": "^declassification-receipt:sha256:[a-f0-9]{64}$"},
+    "issued_at": {"type": "string", "format": "date-time"},
+    "issuer": {"type": "object", "additionalProperties": false, "required": ["id", "authority_class"], "properties": {"id": {"type": "string", "minLength": 1}, "authority_class": {"const": "domain-declassification-authority"}}},
+    "contour": {"enum": ["market", "security"]},
+    "classification": {"enum": ["D0_PUBLIC", "D1_INTERNAL_SANITIZED"]},
+    "payload": {
+      "type": "object", "additionalProperties": false,
+      "required": ["draft_sha256", "source_domain", "source_classification", "source_shadow_taint", "scan_profile_sha256", "reviewed_field_paths", "forbidden_match_count", "method_family", "eligible_recipient_classes", "expires_at", "raw_evidence_included", "targets_included", "strategies_included", "holdout_included", "secret_prompts_included", "grants_authority"],
+      "properties": {
+        "draft_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "source_domain": {"enum": ["market", "security"]},
+        "source_classification": {"enum": ["D0_PUBLIC", "D1_INTERNAL_SANITIZED"]},
+        "source_shadow_taint": {"const": "NONE"},
+        "scan_profile_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "reviewed_field_paths": {"type": "array", "minItems": 12, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "forbidden_match_count": {"const": 0},
+        "method_family": {"enum": ["EXPERIMENT_DESIGN", "EVIDENCE_TRIAGE", "FALSIFICATION", "REPLICATION", "ROBUSTNESS", "CALIBRATION"]},
+        "eligible_recipient_classes": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["MARKET_RESEARCH", "SECURITY_RESEARCH", "GENERIC_RESEARCH"]}},
+        "expires_at": {"type": "string", "format": "date-time"},
+        "raw_evidence_included": {"const": false}, "targets_included": {"const": false}, "strategies_included": {"const": false}, "holdout_included": {"const": false}, "secret_prompts_included": {"const": false}, "grants_authority": {"const": false}
+      }
+    },
+    "integrity": {"type": "object", "additionalProperties": false, "required": ["payload_sha256", "parent_refs"], "properties": {"payload_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}, "parent_refs": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}}}
+  },
+  "x-owner": "domain", "x-writer": "domain-declassification-authority", "x-authority": "method-transfer-eligibility-only"
+}
