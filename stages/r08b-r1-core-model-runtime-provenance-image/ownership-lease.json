@@ -1,0 +1,19 @@
+{
+  "lease_id": "lease-r08b-r1-core-model-runtime-provenance-image-agent-5",
+  "stage_id": "r08b-r1-core-model-runtime-provenance-image",
+  "agent_id": "agent-5",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-19T20:05:52Z",
+  "expires_at": "2026-07-21T20:05:52Z",
+  "base_sha": "b0287d7dab9fbe72f4e42a43982d92e2672f0586",
+  "branch": "codex/bridge-a5-r08b-r1-core-model-runtime-provenance-image",
+  "worktree": "/private/tmp/dcr-r08b-r1-core-model-runtime-provenance-image",
+  "write_set": [
+    "ops/release/Containerfile",
+    "tests/test_r08a_production_image_e2e_harness.py"
+  ],
+  "exclusive": true,
+  "delegation_allowed": false,
+  "revoked": false,
+  "state": "active"
+}
