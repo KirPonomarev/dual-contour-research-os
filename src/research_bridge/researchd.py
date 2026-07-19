@@ -941,6 +941,47 @@ class ResearchDaemon:
         except ModelBrokerError as exc:
             raise ResearchdError("model lookup failed closed") from exc
 
+    def reconcile_model_call(
+        self,
+        *,
+        call_id: str,
+        actual_tokens: int,
+        actual_cost_units: int,
+        provider_receipt_ref: str,
+        actor: str,
+        idempotency_key: str,
+        now: str,
+    ) -> Mapping[str, object]:
+        """Apply exact operator billing evidence through the single writer."""
+
+        if not isinstance(actor, str) or not actor.startswith("uid:"):
+            raise ResearchdError("model reconciliation requires the operator principal")
+        broker, _ = self._require_model_runtime()
+        try:
+            before = broker.snapshot(call_id)
+            if before["state"] == "RECONCILED":
+                expected = {
+                    "actual_tokens": actual_tokens,
+                    "actual_cost_units": actual_cost_units,
+                    "provider_receipt_ref": provider_receipt_ref,
+                }
+                if any(before[name] != value for name, value in expected.items()):
+                    raise ModelBrokerError(
+                        "reconciliation replay differs from durable state"
+                    )
+                return self._sanitized_model_state(before)
+            handle = broker.reconcile(
+                call_id,
+                actual_tokens=actual_tokens,
+                actual_cost_units=actual_cost_units,
+                provider_receipt_ref=provider_receipt_ref,
+                event_at=now,
+                idempotency_key=idempotency_key,
+            )
+            return self._sanitized_model_state(broker.snapshot(handle.call_id))
+        except ModelBrokerError as exc:
+            raise ResearchdError("model reconciliation failed closed") from exc
+
     def validate_proposal_envelope(
         self, proposal_envelope: Mapping[str, object]
     ) -> None:
