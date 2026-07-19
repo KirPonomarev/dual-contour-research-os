@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "catalog_id": "dual-contour-e5-method-transfer-catalog",
+  "schema_version": "1.0.0",
+  "status": "frozen-additive",
+  "core_catalog_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "contracts": {
+    "DeclassificationReceipt": {
+      "owner": "domain",
+      "writer": "domain-declassification-authority",
+      "authority": "method-transfer-eligibility-only",
+      "schema_ref": "contracts/e5/v1/DeclassificationReceipt.schema.json"
+    },
+    "MethodCard": {
+      "owner": "domain",
+      "writer": "domain-declassification-authority",
+      "authority": "declassified-method-reference-only",
+      "schema_ref": "contracts/e5/v1/MethodCard.schema.json"
+    }
+  }
+}
