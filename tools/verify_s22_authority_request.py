@@ -13,7 +13,7 @@ from typing import Mapping
 
 ROOT = Path(__file__).resolve().parents[1]
 REQUEST = ROOT / "docs/receipts/requests/s22-final-deployment-authority-request.json"
-BASE_SHA = "d28bef12cbf6acd1747ddf0e3ec51671c4ca2dcb"
+BASE_SHA = "9c2f8c0c2d83366db77d2733b5d3e909d7ba118a"
 RELEASE_SHA = "b2c2e6a8c4e0a364ef82e8e51540433aa91430d4"
 RELEASE_TREE = "7d6bd1e13d651950cced23dfe75a24946a3218fc"
 
@@ -70,6 +70,8 @@ def validate(root: Path = ROOT, request: Mapping[str, object] | None = None) -> 
         ("final_freeze_receipt_ref", "final_freeze_receipt_sha256"),
         ("readiness_packet_ref", "readiness_packet_sha256"),
         ("isolation_packet_ref", "isolation_packet_sha256"),
+        ("operational_rebind_packet_ref", "operational_rebind_packet_sha256"),
+        ("operational_rebind_integration_ref", "operational_rebind_integration_sha256"),
         ("runbook_ref", "runbook_sha256"),
     ):
         if digest(root / str(evidence[ref_key])) != evidence.get(hash_key):
@@ -78,9 +80,12 @@ def validate(root: Path = ROOT, request: Mapping[str, object] | None = None) -> 
         release.get("final_release_rebind_required") is not False
         or release.get("release_sha") != RELEASE_SHA
         or release.get("release_tree_sha") != RELEASE_TREE
-        or release.get("image_build_state") != "WAIT_AUTHORIZED_DEPLOYMENT_PREFLIGHT"
+        or release.get("image_build_state") != "PASS_LOCAL_EXACT_CANDIDATE"
+        or release.get("image_id") != "sha256:c654b09504dec237966623088e4dbbbe104d6364cd5760a4cfb145eb388a3844"
+        or release.get("image_archive_sha256") != "374b8ca553ddf47d40400576589619a6ee5822f6f977ced36e404c0c8b693bea"
+        or release.get("operational_release_manifest_sha256") != "47a3dcac2782fb8e0a03f599f58f778ecbbf7005fd01e7ff140f905648a756ce"
         or evidence.get("exact_head_ci_sha") != BASE_SHA
-        or evidence.get("exact_head_ci_run") != 29668388814
+        or evidence.get("exact_head_ci_run") != 29669535372
     ):
         raise AuthorityRequestError("request could authorize a stale final release")
     if blast != {"service": "research-os-a1-bridge.service", "container": "research-os-a1-bridge", "network": "none", "published_ports": 0, "live_capability": False, "canonical_mutation": False, "concurrent_predecessor_writer": False}:

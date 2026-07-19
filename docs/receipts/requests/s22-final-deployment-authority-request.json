@@ -5,13 +5,16 @@
   "valid_until": "2026-07-20T01:40:00Z",
   "status": "WAIT_HUMAN_REVIEW",
   "grants_authority": false,
-  "request_base_sha": "d28bef12cbf6acd1747ddf0e3ec51671c4ca2dcb",
+  "request_base_sha": "9c2f8c0c2d83366db77d2733b5d3e909d7ba118a",
   "release_proposal": {
     "manifest_ref": "docs/receipts/release/s38-final-release-manifest.json",
     "manifest_sha256": "0439dee8e058914fe8e11416112e4a985e4bfec11502bb2cd0fd5b883295c369",
     "release_sha": "b2c2e6a8c4e0a364ef82e8e51540433aa91430d4",
     "release_tree_sha": "7d6bd1e13d651950cced23dfe75a24946a3218fc",
-    "image_build_state": "WAIT_AUTHORIZED_DEPLOYMENT_PREFLIGHT",
+    "image_build_state": "PASS_LOCAL_EXACT_CANDIDATE",
+    "image_id": "sha256:c654b09504dec237966623088e4dbbbe104d6364cd5760a4cfb145eb388a3844",
+    "image_archive_sha256": "374b8ca553ddf47d40400576589619a6ee5822f6f977ced36e404c0c8b693bea",
+    "operational_release_manifest_sha256": "47a3dcac2782fb8e0a03f599f58f778ecbbf7005fd01e7ff140f905648a756ce",
     "final_release_rebind_required": false
   },
   "evidence": {
@@ -23,10 +26,14 @@
     "readiness_packet_sha256": "0085672bd78590fe96aa91b4a70bd2f09fa0ea81cb4405bde6596588ecdb0c48",
     "isolation_packet_ref": "ops/deploy/stage4-a1-isolation-release-packet.json",
     "isolation_packet_sha256": "2038a4fe49e018d58832df5dd1028c5cd2e49e5075f98f805e393abbe14557f0",
-    "runbook_ref": "docs/STAGE4_A1_ISOLATION_RELEASE_RUNBOOK.md",
-    "runbook_sha256": "cfe77859cf86f64e9272ced2a7799cce0744e74143a02096867e1ad821cd99da",
-    "exact_head_ci_run": 29668388814,
-    "exact_head_ci_sha": "d28bef12cbf6acd1747ddf0e3ec51671c4ca2dcb"
+    "operational_rebind_packet_ref": "ops/deploy/s38-r1-final-deployment-rebind.json",
+    "operational_rebind_packet_sha256": "e57b0f59b420f1f969c6bb8017ed2fee49d8042e4f5b546eab4fdbca0dfa86bf",
+    "operational_rebind_integration_ref": "docs/receipts/integration/s38-r1-final-deployment-rebind.json",
+    "operational_rebind_integration_sha256": "825f6947957f2617fb4f1476bdda72ab20b3ddba0266ea8f25b32d67102dc665",
+    "runbook_ref": "docs/S38_FINAL_DEPLOYMENT_RUNBOOK.md",
+    "runbook_sha256": "1c2c15239aa033e0963c6ad3380c3a13fd7d199d300523db8d5347ca0fcafa1a",
+    "exact_head_ci_run": 29669535372,
+    "exact_head_ci_sha": "9c2f8c0c2d83366db77d2733b5d3e909d7ba118a"
   },
   "requested_future_scopes": [
     "DEPLOY_EXACT_FINAL_OFFLINE_SHADOW_RELEASE",
@@ -39,5 +46,5 @@
   "expected_receipts": ["DeploymentApprovalReceipt", "BackupReceipt", "RestoreReceipt", "DeploymentReceipt", "RollbackReceipt"],
   "hard_denies": ["AUTO_APPROVAL", "AUTO_EXECUTE", "SUDO_BYPASS", "UNAPPROVED_REBOOT_OR_RESTORE", "LIVE_TRADING", "AUTONOMOUS_LIVE_SECURITY", "PUBLICATION", "CANONICAL_OR_POLICY_MUTATION"],
   "review_decision": "PENDING",
-  "integrity": {"profile": "core-json-sha256-v1", "payload_sha256": "40c2a5812b14349c01a118eee43c10cd0f71ddf3bb91de3355ddb66d2dfcbf11"}
+  "integrity": {"profile": "core-json-sha256-v1", "payload_sha256": "3942d435f86030fd6503bc76f7d6186636be79ead28398426a6e5438f17492f8"}
 }

@@ -6,17 +6,17 @@
   "payload": {
     "capability": "BOUNDED_HUMAN_AUTHORITY_REQUEST_NO_EXECUTION",
     "candidates": [
-      {"candidate": "reuse-S20-isolation-S21-readiness-release-manifest-and-existing-approval-contract", "disposition": "selected"},
+      {"candidate": "reuse-S20-S21-S38-R1-isolation-readiness-operational-release-and-existing-approval-contract", "disposition": "selected"},
       {"candidate": "minimal-machine-readable-request-and-fail-closed-validator", "disposition": "selected-minimal-missing-glue"},
       {"candidate": "issue-or-consume-DeploymentApprovalReceipt-now", "disposition": "rejected-human-authority-and-runtime-evidence-missing"},
       {"candidate": "automatic-deploy-reboot-restore-or-rollback", "disposition": "rejected-night-contour-and-plan-boundary"}
     ],
-    "selected_mode": "PR_HUMAN-WAIT_HUMAN_REVIEW-bound-to-exact-S38-final-candidate",
-    "source_ref": "git:d28bef12cbf6acd1747ddf0e3ec51671c4ca2dcb;candidate:b2c2e6a8c4e0a364ef82e8e51540433aa91430d4;manifest:sha256:0439dee8e058914fe8e11416112e4a985e4bfec11502bb2cd0fd5b883295c369",
-    "code_sha256": "05871e14caf800b9b5578a187e8ee91e3dc1663c4e2145748069d9685e20b9b7", "license_spdx": "NOASSERTION", "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "selected_mode": "PR_HUMAN-WAIT_HUMAN_REVIEW-bound-to-exact-S38-candidate-and-S38-R1-operational-rebind",
+    "source_ref": "git:9c2f8c0c2d83366db77d2733b5d3e909d7ba118a;candidate:b2c2e6a8c4e0a364ef82e8e51540433aa91430d4;operational-manifest:sha256:47a3dcac2782fb8e0a03f599f58f778ecbbf7005fd01e7ff140f905648a756ce",
+    "code_sha256": "ed98eb35ffd249dbaa6a91de91f7a3facf75b998618faef84de65943e8b5fb03", "license_spdx": "NOASSERTION", "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "tests": ["request-integrity", "exact-release-evidence", "authority-impersonation", "blast-radius", "hard-denies", "public-safety"],
     "canonical_owner": "agent-0-release-governance",
     "rollback": "Close the unmerged request PR and delete only its plan-owned branch/worktree; no authority or external state was created."
   },
-  "integrity": {"payload_sha256": "cac6a0738638630c27b57a0eea0c8fab12d5fcba78704c7f64a619c5b16d5cb3", "parent_refs": ["git:d28bef12cbf6acd1747ddf0e3ec51671c4ca2dcb", "integration:integration-s38-final-release-freeze-20260719"]}
+  "integrity": {"payload_sha256": "754184afc4a8bc8d1900f90ad1f8f26a19f6a52f500eff4738cf13173091faaa", "parent_refs": ["git:9c2f8c0c2d83366db77d2733b5d3e909d7ba118a", "integration:integration-s38-r1-final-deployment-rebind-20260719"]}
 }
