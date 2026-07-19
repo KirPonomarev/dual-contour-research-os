@@ -1,0 +1,15 @@
+{
+  "lease_id": "lease-r04d-r4-connected-worker-budget-output-agent-5",
+  "stage_id": "r04d-r4-connected-worker-budget-output",
+  "agent_id": "agent-5",
+  "branch": "codex/bridge-a5-r04d-r4-worker-budget-output",
+  "issued_at": "2026-07-19T14:42:00Z",
+  "expires_at": "2026-07-21T14:42:00Z",
+  "write_set": [
+    "ops/connected-worker/model_worker.py",
+    "ops/connected-worker/runtime-policy.json",
+    "tests/test_r04c_connected_worker_runtime.py"
+  ],
+  "exclusive": true,
+  "revoked": false
+}

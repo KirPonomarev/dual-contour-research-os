@@ -1,0 +1,41 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-r04d-r4-connected-worker-budget-output-20260719",
+  "issued_at": "2026-07-19T14:42:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-review-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "r04d-r4-connected-worker-budget-output",
+    "capability": "pre-egress-total-token-budget-and-non-vacuous-result-enforcement",
+    "candidates": [
+      {"candidate": "treat-provider-generation-limit-as-total-reservation", "disposition": "rejected-observed-total-usage-overrun"},
+      {"candidate": "accept-overrun-and-reconcile-later", "disposition": "rejected-reconciliation-does-not-authorize-budget-overrun"},
+      {"candidate": "add-provider-specific-tokenizer-dependencies", "disposition": "rejected-unnecessary-and-not-universally-exact"},
+      {"candidate": "reuse-canonical-request-bytes-with-conservative-input-margin-and-bounded-output-cap", "disposition": "selected-minimal-repository-native-repair"}
+    ],
+    "selected_candidate": "derive-provider-output-allowance-from-total-reservation-before-SENT-and-verify-exact-reported-total-after-response",
+    "source_ref": "git:c7d1284bf81ea9f362def182a902941ac89ef681;internal:model_worker+build_request_bytes+ProviderAccounting",
+    "selected_source_sha": "3b59242e5eff234ab925fd6e672a296979d88735880064446bf7e92b2f0241e1",
+    "license": "repository-native-code-only",
+    "tests": [
+      "output-allowance-derived-before-egress",
+      "insufficient-total-budget-denied-before-SENT",
+      "reported-total-over-reservation-is-known-failure",
+      "vacuous-output-is-known-failure",
+      "normal-private-commit-and-replay-remain-exact"
+    ],
+    "security_review": "No tokenizer, endpoint, credential, network or state owner is added. The conservative input margin and output cap can only reduce egress allowance; exact provider total usage is checked before success; unusable output remains private and grants no authority.",
+    "dependency_review": "No new dependency, contract, schema, service, queue, database, package, license, SBOM or notice change.",
+    "rollback": "Revert the three-file worker repair and keep R04D provider proof incomplete."
+  },
+  "integrity": {
+    "payload_sha256": "c46da56ff3c229f4947d3c8aacf9c9a3c3e3772bebaa06c3114842c2d773d03c",
+    "parent_refs": [
+      "git:c7d1284bf81ea9f362def182a902941ac89ef681",
+      "source:sha256:3b59242e5eff234ab925fd6e672a296979d88735880064446bf7e92b2f0241e1",
+      "receipt:sha256:fc8b85bf37442cfa93a1a29e94f9d560f50c08f89fb5750adf6b92ae3472008c"
+    ]
+  }
+}

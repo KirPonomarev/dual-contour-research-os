@@ -1,0 +1,66 @@
+{
+  "stage_id": "r04d-r4-connected-worker-budget-output",
+  "agent_id": "agent-5",
+  "objective": "Enforce the broker reservation as a total provider-token ceiling, derive a smaller provider output allowance before egress, and classify vacuous output as a known unusable result.",
+  "executable_blocker": "The first R04D call used the total reservation as the provider generation limit, so provider total usage exceeded the reserved amount; the worker also accepted a two-byte semantic result as success.",
+  "base_sha": "c7d1284bf81ea9f362def182a902941ac89ef681",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "a1_contract_sha256": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+  "branch": "codex/bridge-a5-r04d-r4-worker-budget-output",
+  "worktree": "/private/tmp/dcr-r04d-r4-worker-budget-output",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "ownership/registry.json",
+    "src/research_bridge/model_broker.py",
+    "tools/model_provider_shadow.py",
+    "ops/connected-worker/Containerfile",
+    "ops/connected-worker/model_worker.py",
+    "ops/connected-worker/runtime-policy.json",
+    "tests/test_r04c_connected_worker_runtime.py",
+    "docs/receipts/integration/r04d-r3-connected-worker-build-context.json"
+  ],
+  "write_set": [
+    "ops/connected-worker/model_worker.py",
+    "ops/connected-worker/runtime-policy.json",
+    "tests/test_r04c_connected_worker_runtime.py"
+  ],
+  "forbidden_scope": [
+    "contract-canonical-doc-root-config-CI-migration-provenance-or-core-source-edit",
+    "provider-call-credential-access-route-selection-automatic-repeat-or-new-payment",
+    "second-ledger-writer-raw-response-publication-or-private-reference-egress",
+    "reservation-widening-after-send-or-vacuous-output-reported-success",
+    "deployment-VPS-mutation-or-authority-expansion"
+  ],
+  "dependency_hashes": {
+    "r04d_r3_receipt_head": "c7d1284bf81ea9f362def182a902941ac89ef681",
+    "model_worker_sha256": "3b59242e5eff234ab925fd6e672a296979d88735880064446bf7e92b2f0241e1",
+    "runtime_policy_sha256": "e00548ad9b506291a3f899678ec11b2aa2e85f91c356fe58791e87e7ae1f81b3",
+    "runtime_test_sha256": "e5057a50962ca6022dc85d84535bdc025a6675ce5016df2afef1d5ec587a282f",
+    "containerfile_sha256": "5e748ab7e8fd5418bfbbe5f2ee19053ee74cba38330fe8058f90f63299e8b8ef",
+    "r04d_r3_integration_receipt_sha256": "fc8b85bf37442cfa93a1a29e94f9d560f50c08f89fb5750adf6b92ae3472008c",
+    "ownership_registry_sha256": "e7a6a5158e43cb76c1df0fa28caec36ec9585a0dd05a732eabb94a92e427c9da",
+    "reuse_receipt": "docs/receipts/reuse/r04d-r4-connected-worker-budget-output.json"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest tests.test_r04c_connected_worker_runtime",
+    "direct exact-context connected-worker image build",
+    "python3 -m unittest discover -s tests",
+    "git diff --check",
+    "exact-head remote CI"
+  ],
+  "risk_class": "critical-provider-budget-privacy-and-result-integrity",
+  "stop_conditions": [
+    "base-contract-owner-or-dependency-hash-mismatch",
+    "write-outside-three-file-lease",
+    "provider-output-limit-not-derived-before-durable-SENT",
+    "actual-total-over-reservation-or-vacuous-output-reported-success",
+    "raw-secret-private-evidence-or-provider-call-during-tests"
+  ],
+  "expected_receipt": "docs/receipts/integration/r04d-r4-connected-worker-budget-output.json",
+  "rollback": "Revert the worker and policy repair, keep R04D incomplete, and do not issue another provider call until a replacement bound is reviewed.",
+  "commit_authority": "one-scoped-agent-5-branch-stage",
+  "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent0_audit", "blocked_validation_failed"]
+}
