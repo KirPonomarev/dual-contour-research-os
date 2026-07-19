@@ -1,0 +1,67 @@
+{
+  "profile_id": "generated-code-isolation-ladder-v1",
+  "schema_version": "1.0.0",
+  "status": "frozen-feature-off-isolation-policy",
+  "feature_enabled_by_default": false,
+  "allowed_classifications": [
+    "D0_PUBLIC"
+  ],
+  "levels": {
+    "L1": {
+      "timeout_seconds": 5,
+      "cpu_millis": 500,
+      "memory_bytes": 134217728,
+      "pids": 32,
+      "workspace_bytes": 8388608,
+      "output_bytes": 1048576
+    },
+    "L2": {
+      "timeout_seconds": 15,
+      "cpu_millis": 1000,
+      "memory_bytes": 268435456,
+      "pids": 64,
+      "workspace_bytes": 16777216,
+      "output_bytes": 2097152
+    }
+  },
+  "artifact_limits": {
+    "max_code_bytes": 262144,
+    "max_input_refs": 16,
+    "max_output_artifacts": 16
+  },
+  "required_backend": {
+    "isolation_kind": "ROOTLESS_OCI_CONTAINER",
+    "network_mode": "NONE",
+    "root_filesystem": "READ_ONLY",
+    "workspace": "EPHEMERAL_TMPFS",
+    "host_mounts": "NONE",
+    "devices": "NONE",
+    "linux_capabilities": "DROP_ALL",
+    "no_new_privileges": true,
+    "seccomp": "REQUIRED",
+    "environment_allowlist": []
+  },
+  "statuses": [
+    "FEATURE_DISABLED",
+    "READY_FOR_ISOLATED_EXECUTOR",
+    "MECHANICAL_EXECUTION_PASS",
+    "REJECTED_BOUNDARY",
+    "ROLLBACK_PROPOSAL_ONLY",
+    "WAIT_AUTHORITY"
+  ],
+  "invariants": {
+    "L3_registered": false,
+    "child_must_match_parent_code_input_image_and_fence": true,
+    "child_cost_must_not_exceed_parent_permit": true,
+    "network_calls_allowed": 0,
+    "private_or_live_data_allowed": false,
+    "absolute_or_host_paths_allowed": false,
+    "unrestricted_code_execution": false,
+    "artifact_provenance_required": true,
+    "output_must_be_CAS_addressed": true,
+    "rollback_is_descriptive_and_requires_authority": true,
+    "automatic_deploy": false,
+    "canonical_writes": 0,
+    "grants_authority": false
+  }
+}

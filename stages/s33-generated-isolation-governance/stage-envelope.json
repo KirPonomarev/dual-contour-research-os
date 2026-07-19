@@ -1,0 +1,58 @@
+{
+  "stage_id": "s33-generated-isolation-governance",
+  "agent_id": "agent-0",
+  "objective": "Freeze feature-off D0-only L1/L2 rootless OCI isolation, authority inheritance, provenance and rollback boundaries while L3 remains absent.",
+  "executable_blocker": "E3 can propose mutations but generated execution has no bounded L1/L2 gate or result validator.",
+  "base_sha": "98415d56044bc406ec7303df00a4ee19bbc1359f",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a0-s33-generated-isolation-governance",
+  "worktree": "/private/tmp/dcr-s33-generated-isolation-governance",
+  "read_set": [
+    "src/research_bridge/authority.py",
+    "src/research_bridge/execution.py",
+    "src/research_bridge/l0.py"
+  ],
+  "write_set": [
+    "ownership/registry.json",
+    "docs/ADR/0008-generated-execution-path-activation.md",
+    "docs/receipts/OWNERSHIP_REGISTRY_AMENDMENT_7.json",
+    "src/research_bridge/generated_execution.py",
+    "provenance/generated-code-isolation-ladder-v1.json",
+    "docs/receipts/reuse/s33-generated-isolation.json",
+    "stages/s33-generated-isolation-governance/stage-envelope.json",
+    "stages/s33-generated-isolation-governance/ownership-lease.json"
+  ],
+  "forbidden_scope": [
+    "runtime-behavior-tests-contract-CI-lockfile-migration-edit",
+    "L3-live-private-network-host-mount-device-or-daemon",
+    "embedded-subprocess-executor-deploy-canonical-write-or-authority"
+  ],
+  "dependency_hashes": {
+    "base_main": "98415d56044bc406ec7303df00a4ee19bbc1359f",
+    "profile": "a02fb9bb7e328f355cae083193f4ae63bfb299bf2e4c633ae496ccf31ca0ef89",
+    "previous_ownership_registry": "c2b67f6c9de257ddfe3686c86311d11d2d69b15632d0278706a98f14d6f3a2d8"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "profile and reuse integrity",
+    "Agent-2 implementation",
+    "Agent-5 hostile assurance",
+    "make test",
+    "git diff --check"
+  ],
+  "risk_class": "critical-sandbox-escape-and-code-execution-authority",
+  "stop_conditions": [
+    "child-wider-than-parent",
+    "L3-network-private-live-or-host-path-reachable",
+    "backend-unattested-or-resource-unbounded",
+    "automatic-deploy-rollback-apply-or-authority"
+  ],
+  "expected_receipt": "docs/receipts/integration/s33-generated-isolation-governance.json",
+  "rollback": "Restore ownership registry 1.1.0/ADR 0007, remove amendment 7, the inert reserved module and S33 governance files, and keep generated execution feature disabled.",
+  "commit_authority": "one-scoped-agent-0-commit",
+  "push_authority": true,
+  "expected_handoff_status": [
+    "ready_for_agent2_s33-generated-isolation",
+    "blocked_validation_failed"
+  ]
+}
