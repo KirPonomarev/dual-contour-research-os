@@ -1540,6 +1540,38 @@ def _validate_validation_handoff(
         raise ExecutionError("validation artifact binding mismatch")
     for index, value in enumerate(validation_artifacts):
         _cas_ref(f"validation artifact_refs[{index}]", value)
+    expected_checks = (
+        "execution-receipt-chain",
+        "artifact-cas-bytes",
+        "canonical-l0-result",
+        "ordered-input-cas-bytes",
+        "chunk-byte-recomputation",
+        "non-vacuous-input-and-chunk-evidence",
+        "zero-holdout-exposure",
+    )
+    if tuple(payload["checks_performed"]) != expected_checks:
+        raise ExecutionError("validation check profile is not the frozen L0 profile")
+    metrics = _exact_mapping(
+        payload["metrics"],
+        frozenset({"artifact_bytes", "chunk_count", "input_bytes", "input_count"}),
+        "validation metrics",
+    )
+    for name, value in metrics.items():
+        _positive_safe_integer(f"validation metrics.{name}", value)
+    tolerances = _exact_mapping(
+        payload["tolerances"],
+        frozenset({"byte_mismatches", "digest_mismatches"}),
+        "validation tolerances",
+    )
+    if tolerances != {"byte_mismatches": 0, "digest_mismatches": 0}:
+        raise ExecutionError("validation tolerances must be exact zero")
+    if (
+        payload["holdout_access_ref"] != "holdout:none"
+        or payload["proposed_outcome"] != "VALIDATED_MECHANICAL"
+        or tuple(payload["reasons"]) != ("L0_BYTES_RECOMPUTED",)
+        or payload["reproducibility_class"] != "deterministic-offline"
+    ):
+        raise ExecutionError("validation epistemic profile is not frozen mechanical-only")
     integrity = _exact_mapping(
         validation.get("integrity"),
         frozenset({"payload_sha256", "parent_refs"}),
