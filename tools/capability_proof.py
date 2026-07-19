@@ -113,6 +113,28 @@ _EVOLUTION_E3_REQUIRED_SCOPE = {
     "live_trading": False,
     "live_security_execution": False,
 }
+_REAL_PROVIDER_ROUTE_REQUIRED_SCOPE = {
+    "proof_state": "REAL_PROVIDER_ROUTE_PASS_FOR_EXACT_R04D_SCOPE",
+    "data_scope": "D0_PUBLIC_SYNTHETIC_ONLY",
+    "route_binding": "gpt-5.6-sol-xhigh",
+    "durable_route_provider_slot": "OPENAI_API",
+    "physical_gateway_provider_slot": "OPENROUTER_API",
+    "gateway_model_family_relation": "DISTINCT_TRANSPORT_AND_REQUESTED_MODEL_FAMILY",
+    "upstream_provider_attested": False,
+    "fixture_claims_separate": True,
+    "real_provider_calls": 1,
+    "maximum_total_tokens": 1024,
+    "actual_total_tokens": 155,
+    "output_non_vacuous": True,
+    "accounting_state": "RECONCILED",
+    "restart_no_repeat": True,
+    "raw_response_public": False,
+    "credential_public": False,
+    "scientific_evidence": False,
+    "domain_application": "SHADOW_UNAPPLIED",
+    "grants_route_authority": False,
+    "canonical_mutation": "DENIED",
+}
 _CAPABILITY_SCOPES = {
     "A1_DISCOVERY_ADMISSION_FIXTURE": _E1A_REQUIRED_SCOPE,
     "A1_DURABLE_FEEDBACK": _DURABLE_FEEDBACK_REQUIRED_SCOPE,
@@ -120,6 +142,10 @@ _CAPABILITY_SCOPES = {
     "EVOLUTION_KERNEL_V1": _EVOLUTION_KERNEL_V1_REQUIRED_SCOPE,
     "AUTONOMOUS_RESEARCH_E2_SHADOW": _AUTONOMOUS_RESEARCH_E2_REQUIRED_SCOPE,
     "EVOLUTION_E3_SHADOW": _EVOLUTION_E3_REQUIRED_SCOPE,
+    "REAL_PROVIDER_ROUTE_R04D": _REAL_PROVIDER_ROUTE_REQUIRED_SCOPE,
+}
+_CAPABILITY_ENVIRONMENTS = {
+    "REAL_PROVIDER_ROUTE_R04D": ["linux-container-colima", "macos-development"],
 }
 _REQUIRED_NEGATIVE_PROBES = frozenset(
     {
@@ -266,6 +292,23 @@ def issue_e3_evolution_proof(
     )
 
 
+def issue_real_provider_route_proof(
+    payload: Mapping[str, object],
+    *,
+    issued_at: str,
+    classification: str = "D1",
+) -> Mapping[str, object]:
+    """Issue only the exact sanitized R04D provider-route capability proof."""
+
+    if payload.get("capability_id") != "REAL_PROVIDER_ROUTE_R04D":
+        raise CapabilityProofError("provider-route issuer received a different capability")
+    return issue_capability_proof(
+        payload,
+        issued_at=issued_at,
+        classification=classification,
+    )
+
+
 def issue_capability_proof(
     payload: Mapping[str, object],
     *,
@@ -390,7 +433,11 @@ def _validate_payload(payload: object) -> dict[str, object]:
         raise CapabilityProofError("capability scope overclaims frozen evidence")
     if set(scope) != set(required_scope) | {"environments"}:
         raise CapabilityProofError("capability scope shape is not frozen")
-    if _strings("scope.environments", scope["environments"], allow_empty=False) != ["linux-ci", "macos-development"]:
+    expected_environments = _CAPABILITY_ENVIRONMENTS.get(
+        capability_id,
+        ["linux-ci", "macos-development"],
+    )
+    if _strings("scope.environments", scope["environments"], allow_empty=False) != expected_environments:
         raise CapabilityProofError("capability environments are not the tested fixture pair")
     proof_basis = value["proof_basis"]
     if not isinstance(proof_basis, list) or not proof_basis or any(not isinstance(item, Mapping) or not item for item in proof_basis):
@@ -522,5 +569,6 @@ __all__ = [
     "issue_e1a_fixture_proof", "issue_durable_feedback_proof", "issue_operational_self_model_proof",
     "issue_evolution_kernel_v1_proof",
     "issue_e2_autonomous_research_proof", "issue_e3_evolution_proof",
+    "issue_real_provider_route_proof",
     "validate_capability_proof", "assess_capability_proof", "canonical_json_sha256",
 ]

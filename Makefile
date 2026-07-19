@@ -5,6 +5,7 @@ contracts:
 	python3 tools/verify_freeze_receipt.py
 	python3 tools/validate_a1_contracts.py
 	python3 tools/verify_a1_freeze_receipt.py
+	python3 tools/verify_r04e_provider_proof.py
 
 test: contracts
 	python3 -m unittest discover -s tests -p 'test_*.py'

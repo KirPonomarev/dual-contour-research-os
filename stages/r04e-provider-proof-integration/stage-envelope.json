@@ -1,0 +1,72 @@
+{
+  "stage_id": "r04e-provider-proof-integration",
+  "agent_id": "agent-0",
+  "objective": "Integrate only sanitized, exact-subject, expiring evidence from the accepted R04D provider route, with explicit gateway/model-family separation and zero authority.",
+  "executable_blocker": "R04D private evidence is valid but cannot enter the public repository directly; no current typed public proof binds the repaired worker image, exact route layers, total-token accounting, non-vacuous output, privacy and expiry.",
+  "base_sha": "e5f613e1604bd1f6ff4537a7747c037a49816307",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "a1_contract_sha256": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+  "branch": "codex/bridge-a0-r04e-provider-proof-integration",
+  "worktree": "/private/tmp/dcr-r04e-provider-proof-integration",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "contracts/a1/v1/CapabilityProofReceipt.schema.json",
+    "provenance/model-role-evaluation-v2.json",
+    "provenance/model-provider-routing-v1.json",
+    "provenance/model-provider-connected-shadow-v2.json",
+    "provenance/model-worker-ipc-extension-v1.json",
+    "ops/connected-worker/model_worker.py",
+    "ops/connected-worker/runtime-policy.json",
+    "docs/receipts/integration/r04d-r3-connected-worker-build-context.json",
+    "docs/receipts/integration/r04d-r4-connected-worker-budget-output.json",
+    "tools/capability_proof.py",
+    "Makefile"
+  ],
+  "write_set": [
+    "Makefile",
+    "provenance/model-provider-functional-proof-v1.json",
+    "tools/capability_proof.py",
+    "tools/verify_r04e_provider_proof.py",
+    "docs/receipts/capability/r04e-provider-functional-proof.json"
+  ],
+  "forbidden_scope": [
+    "contract-frozen-profile-CI-migration-runtime-worker-test-or-domain-code-edit",
+    "credential-raw-response-runtime-database-private-URL-or-private-volume-reference-in-Git",
+    "fixture-claim-as-real-upstream-gateway-as-independence-or-requested-model-as-attested-upstream",
+    "provider-call-payment-top-up-deployment-or-external-mutation",
+    "route-authority-canonical-authority-publication-or-domain-application"
+  ],
+  "dependency_hashes": {
+    "r04d_receipt_head": "e5f613e1604bd1f6ff4537a7747c037a49816307",
+    "capability_proof_tool_sha256": "690be42244441b062e94534225781faa260fe3df0df5961c132c0581d1a0dd35",
+    "capability_schema_sha256": "c5b21d5b2036c9001375e9251d91186c324c8d09bb3497d3233169c89cf09122",
+    "model_role_evaluation_sha256": "111a7ac1dc954466b19d5e408debeeefcf65c76b5b025a743a2433be910c1e75",
+    "provider_routing_sha256": "37db8596a8245a6b1ea2bc5bce1495a4e7dadb314876e51397ad11dd194b3dc6",
+    "connected_shadow_sha256": "63ae65247d61b918aced080e6419609459ebcbf4a3384ea29f2617e65597258c",
+    "model_worker_sha256": "31864bf94b4d827f18e556ee97ebee91cfe86ccc5ee81a3e33cfa034413c4a00",
+    "runtime_policy_sha256": "8de5bbd3b7a680e5af5db99b9735e6337df0cf3055aecdca5017327ef361ca70",
+    "reuse_receipt": "docs/receipts/reuse/r04e-provider-proof-integration.json"
+  },
+  "acceptance_commands": [
+    "python3 tools/verify_r04e_provider_proof.py",
+    "make contracts",
+    "python3 -m unittest tests.test_a1_capability_proof tests.test_integration_receipts",
+    "python3 -m unittest discover -s tests",
+    "git diff --check",
+    "exact-head remote CI"
+  ],
+  "risk_class": "high-provider-currentness-privacy-and-overclaim",
+  "stop_conditions": [
+    "base-contract-owner-or-dependency-hash-mismatch",
+    "write-outside-five-file-lease",
+    "private-byte-secret-account-runtime-state-or-private-URL-detected",
+    "proof-subject-image-route-accounting-or-expiry-not-exact",
+    "gateway-model-family-upstream-or-fixture-claim-overstated"
+  ],
+  "expected_receipt": "docs/receipts/integration/r04e-provider-proof-integration.json",
+  "rollback": "Remove the additive sanitized proof, validator and capability registration; retain R04D private evidence outside Git and keep downstream provider capability unproven.",
+  "commit_authority": "one-scoped-agent-0-branch-stage",
+  "push_authority": true,
+  "expected_handoff_status": ["ready_for_agent0_audit", "blocked_validation_failed"]
+}

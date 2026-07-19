@@ -1,0 +1,130 @@
+{
+  "schema_id": "CapabilityProofReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "capability-proof:d93b58c53be6f74b8c05b9d7e75bbcf1c8d71e9f229c98d441f4eea9e3fbdef0",
+  "issued_at": "2026-07-19T15:02:00Z",
+  "issuer": "independent-assurance-issuer",
+  "contour": "governance",
+  "classification": "D1",
+  "payload": {
+    "receipt_id": "capability-proof:r04e-real-provider-route:e5f613e",
+    "capability_id": "REAL_PROVIDER_ROUTE_R04D",
+    "subject_ref": "git:e5f613e1604bd1f6ff4537a7747c037a49816307",
+    "scope": {
+      "proof_state": "REAL_PROVIDER_ROUTE_PASS_FOR_EXACT_R04D_SCOPE",
+      "data_scope": "D0_PUBLIC_SYNTHETIC_ONLY",
+      "route_binding": "gpt-5.6-sol-xhigh",
+      "durable_route_provider_slot": "OPENAI_API",
+      "physical_gateway_provider_slot": "OPENROUTER_API",
+      "gateway_model_family_relation": "DISTINCT_TRANSPORT_AND_REQUESTED_MODEL_FAMILY",
+      "upstream_provider_attested": false,
+      "fixture_claims_separate": true,
+      "real_provider_calls": 1,
+      "maximum_total_tokens": 1024,
+      "actual_total_tokens": 155,
+      "output_non_vacuous": true,
+      "accounting_state": "RECONCILED",
+      "restart_no_repeat": true,
+      "raw_response_public": false,
+      "credential_public": false,
+      "scientific_evidence": false,
+      "domain_application": "SHADOW_UNAPPLIED",
+      "grants_route_authority": false,
+      "canonical_mutation": "DENIED",
+      "environments": ["linux-container-colima", "macos-development"]
+    },
+    "status": "PASS_FOR_FROZEN_SCOPE",
+    "proof_basis": [
+      {"manifest_ref": "provenance/model-provider-functional-proof-v1.json", "claim_scope": "SANITIZED_EXACT_SUBJECT_ONLY"},
+      {"integration_ref": "integration-r04d-r3-connected-worker-build-context-20260719", "claim_scope": "SHIPPED_IMAGE_CONTEXT_BUILDABLE"},
+      {"integration_ref": "integration-r04d-r4-connected-worker-budget-output-20260719", "claim_scope": "TOTAL_TOKEN_AND_NON_VACUOUS_ENFORCEMENT"},
+      {"local_proof_ref": "private-manifest:sha256:826156b3c41c35b3c1d3498b2b62bc4d5d69b97aec51d96a64f266fb9db64cda", "claim_scope": "HASH_ONLY_PRIVATE_EVIDENCE"}
+    ],
+    "code_sha256": "31864bf94b4d827f18e556ee97ebee91cfe86ccc5ee81a3e33cfa034413c4a00",
+    "config_sha256": "8de5bbd3b7a680e5af5db99b9735e6337df0cf3055aecdca5017327ef361ca70",
+    "policy_sha256": "63ae65247d61b918aced080e6419609459ebcbf4a3384ea29f2617e65597258c",
+    "schema_sha256": "c5b21d5b2036c9001375e9251d91186c324c8d09bb3497d3233169c89cf09122",
+    "executor_ref": "image:sha256:ea4cb31db6eec84c6f8e77c972b6374027fdb6a8e4c34f73747ce7857287bc32",
+    "evaluator_ref": "assurance:deterministic-r04e-provider-proof-validator",
+    "test_refs": [
+      "test:tests.test_r04c_connected_worker_runtime",
+      "test:tests.test_r04d_model_reconciliation_ipc",
+      "validator:tools.verify_r04e_provider_proof"
+    ],
+    "environment_ref": "environment:macos-colima-linux-container-arm64:2026-07-19",
+    "data_refs": [
+      "manifest:sha256:209fd9a6ee34f5f1ff60c71fc862733adc1a39b685ac0e06665d29d2ead3559d",
+      "output:sha256:4e1a0a371fbdaaefa1c4d781cf6acad95b87bebe00d3421293947c73e03db1d0",
+      "private-manifest:sha256:826156b3c41c35b3c1d3498b2b62bc4d5d69b97aec51d96a64f266fb9db64cda",
+      "spend-receipt:sha256:4a578f47457c49c4126eb9bf92d51d9bf8d3868ba6900be1c972cd5c3af2f4ce"
+    ],
+    "issuer_independence": {
+      "issuer_ref": "assurance-role:agent-5-deterministic-validator",
+      "independent_of_subject": true,
+      "independent_of_executor": true
+    },
+    "critical_dependencies": [
+      "catalog:core:13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+      "catalog:a1:eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+      "connected-profile:sha256:63ae65247d61b918aced080e6419609459ebcbf4a3384ea29f2617e65597258c",
+      "role-evaluation:sha256:111a7ac1dc954466b19d5e408debeeefcf65c76b5b025a743a2433be910c1e75",
+      "routing-profile:sha256:37db8596a8245a6b1ea2bc5bce1495a4e7dadb314876e51397ad11dd194b3dc6"
+    ],
+    "compatibility_dependencies": ["docker:linux-arm64", "python:3.11", "AF_UNIX:peer-credentials"],
+    "environment_compatibility_ref": "environment:macos-colima-linux-container-arm64:2026-07-19",
+    "negative_probe_refs": [
+      "probe:canonical-live-authority-absent",
+      "probe:expired-proof-stale",
+      "probe:fixture-real-claim-separation",
+      "probe:gateway-upstream-overclaim-denied",
+      "probe:ipc-role-spoof-denied",
+      "probe:mixed-head-stale",
+      "probe:model-drift-stale",
+      "probe:parser-hostile-pack",
+      "probe:private-raw-absent",
+      "probe:shadow-admission-parked",
+      "probe:terminal-restart-no-repeat",
+      "probe:total-token-overrun-failed-known",
+      "probe:vacuous-output-failed-known",
+      "probe:writer-spoof-denied"
+    ],
+    "valid_from": "2026-07-19T15:02:00Z",
+    "valid_until": "2026-07-26T15:02:00Z",
+    "invalidation_conditions": [
+      "code-hash-drift",
+      "config-hash-drift",
+      "environment-compatibility-drift",
+      "negative-probe-regression",
+      "policy-hash-drift",
+      "proof-expiry",
+      "schema-hash-drift",
+      "subject-head-drift"
+    ],
+    "grants_authority": false
+  },
+  "integrity": {
+    "profile_id": "core-json-sha256-v1",
+    "payload_sha256": "d93b58c53be6f74b8c05b9d7e75bbcf1c8d71e9f229c98d441f4eea9e3fbdef0",
+    "parent_refs": [
+      "environment:macos-colima-linux-container-arm64:2026-07-19",
+      "git:e5f613e1604bd1f6ff4537a7747c037a49816307",
+      "probe:canonical-live-authority-absent",
+      "probe:expired-proof-stale",
+      "probe:fixture-real-claim-separation",
+      "probe:gateway-upstream-overclaim-denied",
+      "probe:ipc-role-spoof-denied",
+      "probe:mixed-head-stale",
+      "probe:model-drift-stale",
+      "probe:parser-hostile-pack",
+      "probe:private-raw-absent",
+      "probe:shadow-admission-parked",
+      "probe:terminal-restart-no-repeat",
+      "probe:total-token-overrun-failed-known",
+      "probe:vacuous-output-failed-known",
+      "probe:writer-spoof-denied",
+      "test:tests.test_r04c_connected_worker_runtime",
+      "test:tests.test_r04d_model_reconciliation_ipc",
+      "validator:tools.verify_r04e_provider_proof"
+    ]
+  }
+}

@@ -1,0 +1,84 @@
+{
+  "profile_id": "model-provider-functional-proof-v1",
+  "schema_version": "1.0.0",
+  "status": "PASS_FOR_EXACT_R04D_SCOPE",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "issued_at": "2026-07-19T15:02:00Z",
+  "valid_until": "2026-07-26T15:02:00Z",
+  "subject": {
+    "repository": "KirPonomarev/dual-contour-research-os",
+    "release_sha": "e5f613e1604bd1f6ff4537a7747c037a49816307",
+    "release_tree_sha": "cc79ea72288d9530e0eb3fbce012f6b1651988ad",
+    "exact_head_ci_run": 29691530310,
+    "exact_head_ci_conclusion": "success",
+    "worker_image_id": "sha256:ea4cb31db6eec84c6f8e77c972b6374027fdb6a8e4c34f73747ce7857287bc32"
+  },
+  "route": {
+    "role": "CRITIC_DEEP",
+    "binding": "gpt-5.6-sol-xhigh",
+    "durable_route_provider_slot": "OPENAI_API",
+    "physical_gateway_provider_slot": "OPENROUTER_API",
+    "gateway_provider": "openrouter",
+    "requested_api_model": "openai/gpt-5.6-sol",
+    "slot_relation": "GATEWAY_TRANSPORT_DISTINCT_FROM_REQUESTED_MODEL_FAMILY",
+    "upstream_provider_attested": false,
+    "model_independence_established": false
+  },
+  "functional_proof": {
+    "input_class": "D0",
+    "provider_calls": 1,
+    "maximum_calls": 1,
+    "maximum_total_tokens": 1024,
+    "actual_total_tokens": 155,
+    "maximum_cost_units": 1,
+    "actual_cost_units": 1,
+    "accounting_state": "RECONCILED",
+    "budget_released": true,
+    "automatic_retry": false,
+    "output_bytes": 337,
+    "output_non_vacuous": true,
+    "restart_no_repeat": true,
+    "ledger_unchanged_on_terminal_replay": true
+  },
+  "claim_boundary": {
+    "real_provider_route": "PASS_FOR_EXACT_BINDING_AND_GATEWAY_SCOPE",
+    "fixture_claims_separate": true,
+    "requested_model_slug_is_upstream_attestation": false,
+    "gateway_is_model_independence_evidence": false,
+    "scientific_evidence": false,
+    "domain_application": "SHADOW_UNAPPLIED",
+    "grants_authority": false
+  },
+  "privacy": {
+    "credential_bytes_present": false,
+    "raw_response_bytes_present": false,
+    "account_material_present": false,
+    "runtime_database_present": false,
+    "private_location_present": false,
+    "output_bytes_present": false
+  },
+  "evidence": {
+    "private_manifest_sha256": "826156b3c41c35b3c1d3498b2b62bc4d5d69b97aec51d96a64f266fb9db64cda",
+    "private_spend_receipt_sha256": "4a578f47457c49c4126eb9bf92d51d9bf8d3868ba6900be1c972cd5c3af2f4ce",
+    "private_output_sha256": "4e1a0a371fbdaaefa1c4d781cf6acad95b87bebe00d3421293947c73e03db1d0",
+    "model_worker_sha256": "31864bf94b4d827f18e556ee97ebee91cfe86ccc5ee81a3e33cfa034413c4a00",
+    "runtime_policy_sha256": "8de5bbd3b7a680e5af5db99b9735e6337df0cf3055aecdca5017327ef361ca70",
+    "role_evaluation_sha256": "111a7ac1dc954466b19d5e408debeeefcf65c76b5b025a743a2433be910c1e75",
+    "routing_profile_sha256": "37db8596a8245a6b1ea2bc5bce1495a4e7dadb314876e51397ad11dd194b3dc6",
+    "connected_shadow_profile_sha256": "63ae65247d61b918aced080e6419609459ebcbf4a3384ea29f2617e65597258c",
+    "worker_ipc_extension_sha256": "03d91f027bb6975c55d84acaef188546bcd24af9944a72f4ff9314296399d07a"
+  },
+  "invalidation_conditions": [
+    "release-subject-drift",
+    "worker-image-drift",
+    "worker-code-drift",
+    "runtime-policy-drift",
+    "role-evaluation-drift",
+    "routing-profile-drift",
+    "connected-shadow-profile-drift",
+    "proof-expiry",
+    "privacy-boundary-regression",
+    "accounting-regression",
+    "route-layer-overclaim"
+  ]
+}
