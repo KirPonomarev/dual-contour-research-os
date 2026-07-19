@@ -1,0 +1,14 @@
+{
+  "lease_id": "lease-r00-correction-freeze-assurance-agent-5",
+  "stage_id": "r00-correction-freeze-assurance",
+  "agent_id": "agent-5",
+  "branch": "codex/bridge-a5-r00-correction-freeze-assurance",
+  "issued_at": "2026-07-19T05:02:43Z",
+  "expires_at": "2026-07-21T05:02:43Z",
+  "write_set": [
+    "tests/test_s38_r2_product_completion.py",
+    "tests/test_s38_r1_final_deployment_rebind.py"
+  ],
+  "exclusive": true,
+  "revoked": false
+}

@@ -1,0 +1,52 @@
+{
+  "schema_id": "ReleaseSupersessionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "release-supersession:b2c2e6a8c4e0a364ef82e8e51540433aa91430d4",
+  "issued_at": "2026-07-19T04:54:26Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "release-supersession-authority"
+  },
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "candidate_release_sha": "b2c2e6a8c4e0a364ef82e8e51540433aa91430d4",
+    "candidate_tree_sha": "7d6bd1e13d651950cced23dfe75a24946a3218fc",
+    "candidate_manifest_ref": "docs/receipts/release/s38-final-release-manifest.json",
+    "candidate_manifest_sha256": "0439dee8e058914fe8e11416112e4a985e4bfec11502bb2cd0fd5b883295c369",
+    "supersession_state": "SUPERSEDED_REPAIR_REQUIRED",
+    "reason_codes": [
+      "EMPTY_POLICY_RESOLVER",
+      "A1_BACKEND_NOT_WIRED",
+      "COLLECTOR_SCOUT_ROLES_NOT_WIRED",
+      "STATUS_ONLY_DEPLOY_SMOKE",
+      "STALE_E2_PROOF",
+      "FINAL_FREEZE_NOT_CURRENTNESS_AWARE",
+      "PROVIDER_SOURCE_EDGES_NOT_PHYSICALLY_CLOSED"
+    ],
+    "historical_integrity_preserved": true,
+    "replacement_release_required": true,
+    "deployment_allowed": false,
+    "VPS_mutation_allowed": false,
+    "restore_allowed": false,
+    "reboot_allowed": false,
+    "canonical_mutation_allowed": false,
+    "live_action_allowed": false,
+    "grants_authority": false,
+    "superseded_authority_request": {
+      "pr": 25,
+      "head_sha": "31b17488ed56bee7375ffcf20af83a846b07ce1e",
+      "usable_for_deployment": false
+    }
+  },
+  "integrity": {
+    "profile_id": "core-json-sha256-v1",
+    "payload_sha256": "b0bbf401d082518dc95f3db3d787a49f204e4ab5b9bf9e1da3a6c7ae089cc894",
+    "parent_refs": [
+      "git:37f671269adc5a15c6f6571c0cf1731eccb3fc38",
+      "git:b2c2e6a8c4e0a364ef82e8e51540433aa91430d4",
+      "artifact:sha256:0439dee8e058914fe8e11416112e4a985e4bfec11502bb2cd0fd5b883295c369",
+      "capability:sha256:4295c2ce6bb0d92246eff87bd144c16fde5a73d8e91d5e57a83ae1c15add63aa"
+    ]
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "lease_id": "lease-r00-correction-freeze-agent-0",
+  "stage_id": "r00-correction-freeze",
+  "agent_id": "agent-0",
+  "branch": "codex/bridge-a0-r00-correction-freeze",
+  "issued_at": "2026-07-19T04:54:26Z",
+  "expires_at": "2026-07-21T04:54:26Z",
+  "write_set": [
+    "README.md",
+    "docs/PRODUCT_COMPLETION.md",
+    "docs/receipts/release/r00-superseded-release.json",
+    "docs/receipts/reuse/r00-correction-freeze.json",
+    "tools/final_deployment_rebind.py",
+    "stages/r00-correction-freeze/"
+  ],
+  "exclusive": true,
+  "revoked": false
+}

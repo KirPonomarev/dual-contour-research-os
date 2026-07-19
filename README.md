@@ -6,11 +6,11 @@ The public repository contains only domain-neutral contracts, control-plane code
 
 ## Current status
 
-`PRODUCT_IMPLEMENTATION_COMPLETE_CANDIDATE + OPERATIONAL_PROOF_PENDING`
+`SUPERSEDED_REPAIR_REQUIRED + PRODUCT_REPAIR_IN_PROGRESS`
 
-The Core and additive A1 public contracts are frozen and verified by `make contracts`. The bounded product implementation through E1–E5 is integrated: trusted discovery and admission, durable offline execution, operational self-model, model-role routing, research portfolio and replication, shadow evolution, generated-execution isolation metadata, attestation, and governed MethodCard transfer. Every model or evolutionary output remains untrusted and non-authoritative.
+The Core and additive A1 public contracts remain frozen and verified by `make contracts`. Historical E0–E5 component work remains immutable provenance, but independent exact-runtime probes found that the S38 deployment target cannot execute the production A1 route: its policy resolver is empty, the daemon does not wire the durable A1 backend or Collector/Scout roles, its deployment smoke proves only `status`, and its E2 proof is stale.
 
-Product completion is distinct from operational proof. The frozen application candidate and its deployment corridor are prepared, but final A1 deployment, recovery drills, observation windows, the 14-day burn-in, and the final `DONE` transition remain pending their explicit human and operational gates. See [Product completion boundary](docs/PRODUCT_COMPLETION.md).
+The old candidate `b2c2e6a8…` is preserved as a historical object but is machine-denied as a deployment target by an additive supersession receipt. Product completion now requires a replacement exact image, full AF_UNIX A1 E2E, current capability proofs, physical deployment and recovery proof before any observation window begins. See [Product completion boundary](docs/PRODUCT_COMPLETION.md).
 
 ## Product boundary
 

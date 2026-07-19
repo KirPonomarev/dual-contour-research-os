@@ -41,6 +41,8 @@ CANDIDATE_SHA = "b2c2e6a8c4e0a364ef82e8e51540433aa91430d4"
 CANDIDATE_TREE = "7d6bd1e13d651950cced23dfe75a24946a3218fc"
 FINAL_MANIFEST = ROOT / "docs/receipts/release/s38-final-release-manifest.json"
 FINAL_MANIFEST_SHA256 = "0439dee8e058914fe8e11416112e4a985e4bfec11502bb2cd0fd5b883295c369"
+SUPERSESSION = ROOT / "docs/receipts/release/r00-superseded-release.json"
+SUPERSESSION_SHA256 = "5dcda4584a475e564e05a9a715b8e27d8e52950fc9eb781c8ee0376f8611a9e6"
 POLICY = ROOT / "ops/release/final-a1-runtime-policy.json"
 CONFIG = ROOT / "ops/release/researchd.config.template.json"
 DEPENDENCY_LOCK = ROOT / "ops/release/dependency-lock.json"
@@ -257,8 +259,73 @@ def _verify_final_manifest() -> dict[str, Any]:
     return manifest
 
 
+def _verify_supersession() -> dict[str, Any]:
+    if _digest_file(SUPERSESSION) != SUPERSESSION_SHA256:
+        raise FinalDeploymentRebindError("release supersession receipt drifted")
+    receipt = _load_json(SUPERSESSION, "release supersession receipt")
+    payload = receipt.get("payload")
+    integrity = receipt.get("integrity")
+    if (
+        receipt.get("schema_id") != "ReleaseSupersessionReceipt"
+        or receipt.get("schema_version") != "1.0.0"
+        or receipt.get("object_id") != f"release-supersession:{CANDIDATE_SHA}"
+        or not isinstance(payload, dict)
+        or not isinstance(integrity, dict)
+        or integrity.get("profile_id") != "core-json-sha256-v1"
+        or integrity.get("payload_sha256") != _digest_bytes(_canonical(payload))
+        or payload.get("candidate_release_sha") != CANDIDATE_SHA
+        or payload.get("candidate_tree_sha") != CANDIDATE_TREE
+        or payload.get("candidate_manifest_ref")
+        != str(FINAL_MANIFEST.relative_to(ROOT))
+        or payload.get("candidate_manifest_sha256") != FINAL_MANIFEST_SHA256
+        or payload.get("supersession_state") != "SUPERSEDED_REPAIR_REQUIRED"
+        or payload.get("historical_integrity_preserved") is not True
+        or payload.get("replacement_release_required") is not True
+    ):
+        raise FinalDeploymentRebindError("release supersession receipt is invalid")
+    denied = (
+        "deployment_allowed",
+        "VPS_mutation_allowed",
+        "restore_allowed",
+        "reboot_allowed",
+        "canonical_mutation_allowed",
+        "live_action_allowed",
+        "grants_authority",
+    )
+    request = payload.get("superseded_authority_request")
+    reasons = payload.get("reason_codes")
+    if (
+        any(payload.get(field) is not False for field in denied)
+        or not isinstance(reasons, list)
+        or set(reasons)
+        != {
+            "EMPTY_POLICY_RESOLVER",
+            "A1_BACKEND_NOT_WIRED",
+            "COLLECTOR_SCOUT_ROLES_NOT_WIRED",
+            "STATUS_ONLY_DEPLOY_SMOKE",
+            "STALE_E2_PROOF",
+            "FINAL_FREEZE_NOT_CURRENTNESS_AWARE",
+            "PROVIDER_SOURCE_EDGES_NOT_PHYSICALLY_CLOSED",
+        }
+        or not isinstance(request, dict)
+        or request.get("pr") != 25
+        or request.get("usable_for_deployment") is not False
+    ):
+        raise FinalDeploymentRebindError("release supersession deny boundary is invalid")
+    return receipt
+
+
+def _require_deployable_candidate() -> None:
+    receipt = _verify_supersession()
+    payload = receipt["payload"]
+    raise FinalDeploymentRebindError(
+        f"candidate is {payload['supersession_state']}; replacement release required"
+    )
+
+
 def _verify_static() -> dict[str, object]:
     manifest = _verify_final_manifest()
+    supersession = _verify_supersession()
     expected = {
         str(POLICY.relative_to(ROOT)): "b3fc58125b3308c723c25461828b914a2f244dfa260dda7d5eea49467a7fc647",
         str(CONFIG.relative_to(ROOT)): "0b186888a3a1bb8fb028315681bf4073ec4186a0acbdf2f226b5a53d69a9d542",
@@ -282,10 +349,13 @@ def _verify_static() -> dict[str, object]:
     if any(token not in unit for token in required) or any(token in unit for token in forbidden):
         raise FinalDeploymentRebindError("A1 unit does not enforce the frozen isolation profile")
     return {
-        "status": "PASS_FOR_FROZEN_SCOPE",
+        "status": "SUPERSEDED_REPAIR_REQUIRED",
         "candidate_release_sha": CANDIDATE_SHA,
         "candidate_tree_sha": CANDIDATE_TREE,
         "final_manifest_ref": str(manifest["object_id"]),
+        "supersession_ref": str(supersession["object_id"]),
+        "historical_freeze_valid": True,
+        "replacement_release_required": True,
         "A1_namespace": True,
         "single_supervisor": True,
         "deployment_allowed": False,
@@ -808,12 +878,14 @@ def run(
         arguments = _parser().parse_args(argv)
         if arguments.command == "verify-static":
             result = _verify_static()
-        elif arguments.command == "prepare":
-            result = _prepare(arguments.output_dir, arguments.image_tag)
-        elif arguments.command == "verify-prepared":
-            result = _verify_prepared(arguments.output_dir)
         else:
-            result = _deploy(arguments)
+            _require_deployable_candidate()
+            if arguments.command == "prepare":
+                result = _prepare(arguments.output_dir, arguments.image_tag)
+            elif arguments.command == "verify-prepared":
+                result = _verify_prepared(arguments.output_dir)
+            else:
+                result = _deploy(arguments)
         print(json.dumps(result, sort_keys=True), file=output)
         return 0
     except (

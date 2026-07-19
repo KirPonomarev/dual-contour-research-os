@@ -120,8 +120,10 @@ class FinalDeploymentRebindTests(unittest.TestCase):
 
     def test_static_rebind_preserves_candidate_and_wait_authority(self) -> None:
         result = final._verify_static()
+        self.assertEqual(result["status"], "SUPERSEDED_REPAIR_REQUIRED")
         self.assertEqual(result["candidate_release_sha"], final.CANDIDATE_SHA)
         self.assertEqual(result["candidate_tree_sha"], final.CANDIDATE_TREE)
+        self.assertTrue(result["replacement_release_required"])
         self.assertFalse(result["deployment_allowed"])
         self.assertEqual(result["remote_actions"], 0)
         packet = json.loads(
@@ -137,6 +139,79 @@ class FinalDeploymentRebindTests(unittest.TestCase):
             packet["causal_order"].index("FIRST_REMOTE_MUTATION"),
         )
         self.assertTrue(all(value is False for value in packet["authority"].values()))
+
+    def test_public_cli_denies_all_superseded_candidate_actions_before_side_effects(
+        self,
+    ) -> None:
+        output_dir = self.temp / "prepared"
+        output_dir.mkdir(mode=0o700)
+        deploy_receipt = self.temp / "deployment-receipt.json"
+        approval_ledger = self.temp / "approval.sqlite3"
+        command_lines = (
+            ["prepare", "--output-dir", str(output_dir)],
+            ["verify-prepared", "--output-dir", str(output_dir)],
+            [
+                "deploy",
+                "--ssh-alias",
+                "synthetic_lab",
+                "--known-hosts",
+                str(self.known_hosts),
+                "--release-manifest",
+                str(self.manifest_path),
+                "--archive",
+                str(self.archive),
+                "--archive-sha256",
+                self.archive_sha,
+                "--backup-receipt",
+                str(self.temp / "backup.json"),
+                "--restore-receipt",
+                str(self.temp / "restore.json"),
+                "--approval-receipt",
+                str(self.temp / "approval.json"),
+                "--approval-ledger",
+                str(approval_ledger),
+                "--trusted-issuer-id",
+                TRUSTED_ISSUER_ID,
+                "--trusted-key-id",
+                TRUSTED_KEY_ID,
+                "--key-hex-fd",
+                "-1",
+                "--remote-ci-ref",
+                CI_REF,
+                "--receipt",
+                str(deploy_receipt),
+            ],
+        )
+
+        with (
+            mock.patch.object(
+                final,
+                "_require_deployable_candidate",
+                wraps=final._require_deployable_candidate,
+            ) as deny,
+            mock.patch.object(final, "_prepare") as prepare,
+            mock.patch.object(final, "_verify_prepared") as verify_prepared,
+            mock.patch.object(final, "_deploy") as deploy_command,
+        ):
+            for arguments in command_lines:
+                with self.subTest(command=arguments[0]):
+                    stdout = io.StringIO()
+                    stderr = io.StringIO()
+                    self.assertEqual(final.run(arguments, stdout=stdout, stderr=stderr), 2)
+                    self.assertEqual(stdout.getvalue(), "")
+                    failure = json.loads(stderr.getvalue())
+                    self.assertEqual(failure["status"], "STOP")
+                    self.assertEqual(
+                        failure["reason_code"], "FinalDeploymentRebindError"
+                    )
+
+        self.assertEqual(deny.call_count, len(command_lines))
+        prepare.assert_not_called()
+        verify_prepared.assert_not_called()
+        deploy_command.assert_not_called()
+        self.assertEqual(list(output_dir.iterdir()), [])
+        self.assertFalse(approval_ledger.exists())
+        self.assertFalse(deploy_receipt.exists())
 
     def test_final_bundle_uses_A1_namespace_and_single_supervisor(self) -> None:
         rendered = self.bundle.unit_bytes.decode()
