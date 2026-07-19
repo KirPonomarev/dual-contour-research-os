@@ -1,0 +1,17 @@
+{
+  "lease_amendment_id": "lease-r08a-production-image-e2e-harness-agent-5-amendment-2",
+  "lease_id": "lease-r08a-production-image-e2e-harness-agent-5",
+  "stage_id": "r08a-production-image-e2e-harness",
+  "agent_id": "agent-5",
+  "issued_at": "2026-07-19T18:07:30Z",
+  "reason": "Physical UID-10002 AF_UNIX access proved an empty named volume is repopulated with the image-layer 0700 mode after initialization; the final unit must persist a private marker so its declared 0710 traversal boundary survives container creation.",
+  "add_write_set": ["ops/deploy/research-os-a1-final.service"],
+  "resulting_write_set": [
+    "ops/release/Containerfile",
+    "ops/release/image_e2e_harness.py",
+    "ops/deploy/research-os-a1-final.service",
+    "tests/test_r08a_production_image_e2e_harness.py"
+  ],
+  "exclusive": true,
+  "revoked": false
+}
