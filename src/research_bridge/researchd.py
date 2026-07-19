@@ -1257,6 +1257,9 @@ def _discovery_config_from_authority(
     cycle = a1_limits.get("cycle_limits")
     if not isinstance(cycle, Mapping):
         raise ResearchdError("A1 discovery cycle limits are invalid")
+    source_rate_limit = cycle.get("max_model_calls")
+    if type(source_rate_limit) is not int or source_rate_limit < 0:
+        raise ResearchdError("A1 discovery source rate limit is invalid")
     energy = {
         "wall_seconds": cycle.get("max_wall_seconds"),
         "cpu_seconds": cycle.get("max_cpu_seconds"),
@@ -1296,6 +1299,8 @@ def _discovery_config_from_authority(
             release_manifest_sha256=str(
                 frozen_bindings.get("release_manifest_sha256")
             ),
+            maximum_source_triggers_per_window=min(1_024, max(1, source_rate_limit)),
+            source_rate_window_seconds=60,
         )
     except Exception as exc:
         raise ResearchdError("A1 discovery runtime binding is invalid") from exc
