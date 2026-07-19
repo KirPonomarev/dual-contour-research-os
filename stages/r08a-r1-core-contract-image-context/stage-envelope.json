@@ -1,0 +1,55 @@
+{
+  "stage_id": "r08a-r1-core-contract-image-context",
+  "agent_id": "agent-0",
+  "objective": "Admit only the frozen Core and A1 contract runtime files into the deny-first build context and make the release blueprint validator require their exact image copies.",
+  "executable_blocker": "The R08A physical startup exits before AF_UNIX bind because /opt/research-os/contracts/a1/v1/catalog.json is absent from the image.",
+  "base_sha": "e641ea6bcae9808eaaa9f2d5e0b0d948f73c5f86",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "a1_contract_sha256": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+  "branch": "codex/bridge-a0-r08a-r1-core-contract-image-context",
+  "worktree": "/private/tmp/dcr-r08a-r1-core-contract-image-context",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "ownership/registry.json",
+    "contracts/catalog.json",
+    "contracts/a1/v1/**",
+    "ops/release/Containerfile",
+    ".dockerignore",
+    "tools/verify_release_blueprint.py",
+    "tests/test_release_blueprint.py"
+  ],
+  "write_set": [".dockerignore", "tools/verify_release_blueprint.py"],
+  "forbidden_scope": [
+    "edit-frozen-contract-content-source-policy-unit-lockfile-CI-migration-or-existing-test",
+    "admit-non-runtime-doc-test-secret-private-data-or-unbounded-repository-context",
+    "cut-candidate-issue-image-claim-deploy-or-start-observation-window"
+  ],
+  "dependency_hashes": {
+    "r08a_authorization_head": "e641ea6bcae9808eaaa9f2d5e0b0d948f73c5f86",
+    "core_catalog_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "a1_catalog_sha256": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+    "release_blueprint_validator_sha256": "8810a0c539a619d2eea46d3acffe7db1478884aef77ad085eca4ed83eaab433b",
+    "reuse_receipt": "docs/receipts/reuse/r08a-r1-core-contract-image-context.json"
+  },
+  "acceptance_commands": [
+    "python3 -m unittest tests.test_r08a_production_image_e2e_harness tests.test_release_blueprint",
+    "python3 tools/verify_release_blueprint.py",
+    "make contracts",
+    "make test",
+    "git diff --check",
+    "exact-head remote CI"
+  ],
+  "risk_class": "critical-inert-production-image",
+  "stop_conditions": [
+    "frozen-contract-hash-mismatch",
+    "build-context-admits-files-outside-src-and-exact-runtime-contracts-and-connected-worker-inputs",
+    "image-copy-includes-non-runtime-or-private-data",
+    "write-outside-two-agent-0-files"
+  ],
+  "expected_receipt": "docs/receipts/integration/r08a-production-image-e2e-harness.json",
+  "rollback": "Revert the two deny-first context/validator changes together with the Agent-5 Containerfile copy; no release or runtime state is changed.",
+  "commit_authority": "one-scoped-agent-0-repair-stage",
+  "push_authority": true,
+  "expected_handoff_status": ["ready_for_combined_r08a_audit", "blocked_validation_failed"]
+}

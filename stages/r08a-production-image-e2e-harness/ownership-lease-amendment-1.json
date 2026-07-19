@@ -1,0 +1,16 @@
+{
+  "lease_amendment_id": "lease-r08a-production-image-e2e-harness-agent-5-amendment-1",
+  "lease_id": "lease-r08a-production-image-e2e-harness-agent-5",
+  "stage_id": "r08a-production-image-e2e-harness",
+  "agent_id": "agent-5",
+  "issued_at": "2026-07-19T18:01:27Z",
+  "reason": "Physical image startup proved the frozen A1 contract catalogs are absent from the production image; the Agent-5 operations owner must add only those runtime inputs to Containerfile.",
+  "add_write_set": ["ops/release/Containerfile"],
+  "resulting_write_set": [
+    "ops/release/Containerfile",
+    "ops/release/image_e2e_harness.py",
+    "tests/test_r08a_production_image_e2e_harness.py"
+  ],
+  "exclusive": true,
+  "revoked": false
+}

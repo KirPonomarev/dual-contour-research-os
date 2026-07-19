@@ -1,0 +1,18 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-r08a-r1-core-contract-image-context-20260719",
+  "issued_at": "2026-07-19T18:01:27Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "decision": "REUSE_FROZEN_INTERNAL_CONTRACT_BUNDLE",
+  "objective": "Make the existing production A1 runtime executable without introducing any new dependency or mutable contract copy.",
+  "evaluation_order": ["internal-adapter", "owned-versioned-package", "pinned-permissive-dependency", "small-audited-vendor-import", "minimal-missing-glue"],
+  "selected": [
+    "contracts/catalog.json:frozen-Core-catalog",
+    "contracts/a1/v1/:frozen-A1-catalog-schemas-and-profiles",
+    "tools/verify_release_blueprint.py:existing-deny-first-image-validator"
+  ],
+  "new_dependency": false,
+  "external_code": false,
+  "rationale": "The runtime already verifies the exact frozen catalog digests; packaging those owned 88 KiB inputs is the minimal missing glue and preserves fail-closed startup."
+}

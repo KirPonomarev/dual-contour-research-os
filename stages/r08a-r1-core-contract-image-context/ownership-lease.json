@@ -1,0 +1,11 @@
+{
+  "lease_id": "lease-r08a-r1-core-contract-image-context-agent-0",
+  "stage_id": "r08a-r1-core-contract-image-context",
+  "agent_id": "agent-0",
+  "branch": "codex/bridge-a0-r08a-r1-core-contract-image-context",
+  "issued_at": "2026-07-19T18:01:27Z",
+  "expires_at": "2026-07-21T18:01:27Z",
+  "write_set": [".dockerignore", "tools/verify_release_blueprint.py"],
+  "exclusive": true,
+  "revoked": false
+}
