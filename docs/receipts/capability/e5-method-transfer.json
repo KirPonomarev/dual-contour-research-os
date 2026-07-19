@@ -1,0 +1,32 @@
+{
+  "integrity": {
+    "parent_refs": [
+      "receipt:integration-s35-method-card-20260719",
+      "receipt:integration-s36-recipient-shadow-20260719",
+      "profile:sha256:5d895f221d6a2971dd9341c1dbf9bd74dcd21c0f5d2b129df9dce974ccd194e9"
+    ],
+    "payload_sha256": "885164cf5f5e7420a3e3ec8f1032b497806ff6069d2a15a31fccc349c7e111b5"
+  },
+  "object_id": "method-transfer-proof:sha256:885164cf5f5e7420a3e3ec8f1032b497806ff6069d2a15a31fccc349c7e111b5",
+  "payload": {
+    "authority_state": "WAIT_HUMAN_DOMAIN_AUTHORITY",
+    "capability": "METHOD_TRANSFER",
+    "evidence_refs": [
+      "receipt:integration-s35-method-card-20260719",
+      "receipt:integration-s36-recipient-shadow-20260719",
+      "profile:sha256:5d895f221d6a2971dd9341c1dbf9bd74dcd21c0f5d2b129df9dce974ccd194e9"
+    ],
+    "expires_at": "2026-08-02T01:20:00Z",
+    "grants_authority": false,
+    "issued_at": "2026-07-19T01:20:00Z",
+    "promotion_applied": false,
+    "promotion_receipt_issued": false,
+    "recipient_registry_writes": 0,
+    "request_id": "transfer-proof-request-0001",
+    "scientific_truth_transfer": false,
+    "status": "METHOD_TRANSFER_PASS_FOR_FROZEN_SCOPE",
+    "subject_sha": "64a911e4bd6bc03a4ab0e29be373fa3a3352c705"
+  },
+  "schema_id": "MethodTransferCapabilityProof",
+  "schema_version": "1.0.0"
+}
