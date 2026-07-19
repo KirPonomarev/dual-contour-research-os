@@ -1,0 +1,37 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-r02a-durable-production-a1-backend-20260719",
+  "issued_at": "2026-07-19T06:28:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-freeze-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "DURABLE_PRODUCTION_A1_CONTROL_BACKEND",
+    "candidates": [
+      {"candidate": "thin-adapter-over-A1AdmissionKernel-JobLedger-ControlRouter", "disposition": "selected-internal-adapter"},
+      {"candidate": "reuse-DiscoveryFixtureService-in-production", "disposition": "rejected-in-memory-fixture-boundary"},
+      {"candidate": "new-database-ledger-queue-scheduler-or-service", "disposition": "rejected-duplicates-global-order-and-writer"},
+      {"candidate": "new-external-dependency", "disposition": "rejected-existing-stdlib-components-sufficient"}
+    ],
+    "selected_mode": "one-researchd-owned-JobLedger-v2-plus-additive-projection-transition-method-and-durable-adapter",
+    "schema_capacity_decision": {
+      "status": "PASS_WITH_ADDITIVE_METHOD_NO_MIGRATION",
+      "schema_version": 2,
+      "schema_fingerprint_sha256": "3dfa76e651502a14726fe130609a928217a8d611db97a0e20d90b2a451635ebd",
+      "existing_capacity": ["single global append order", "immutable A1 objects", "complete A1 projections", "idempotency-key replay detection", "append-only triggers", "single-writer runtime lock"],
+      "missing_glue": "permit projection-only durable claim/ack state transitions without requiring a new immutable object",
+      "migration_required": false
+    },
+    "source_ref": "git:5ff7c35ce6338f5e15ab4bf6ffae1928271523a5;internal:admission.py+discovery.py+ledger.py+control.py+researchd.py",
+    "license_spdx": "NOASSERTION",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": ["exact replay", "conflicting replay", "restart claim recovery", "stale claim fencing", "ack recovery", "single-writer and chain coverage"],
+    "canonical_owner": "agent-1-with-agent-0-integration",
+    "rollback": "Remove the adapter and additive method; retain fail-closed A1 startup/deployment state."
+  },
+  "integrity": {
+    "payload_sha256": "9c40d04969ed434a2d2201254ea0694196474576c1bf7f31d8ba065a8ad0fbc3",
+    "parent_refs": ["git:5ff7c35ce6338f5e15ab4bf6ffae1928271523a5", "reuse:reuse-r01a-runtime-config-and-ipc-code-20260719"]
+  }
+}
