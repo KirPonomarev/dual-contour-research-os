@@ -10,9 +10,9 @@
   "maximum_input_bytes": 4194304,
   "deadline_seconds": 5,
   "trusted_issuers": {
-    "JobSpec": {"issuer_id": "domain-job-authority", "authority_class": "job-authority"},
+    "JobSpec": {"issuer_id": "domain-job-authority", "authority_class": "admission-controller"},
     "Permit": {"issuer_id": "bridge-permit-authority", "authority_class": "permit-authority"},
-    "AttemptLease": {"issuer_id": "bridge-lease-authority", "authority_class": "lease-authority"},
+    "AttemptLease": {"issuer_id": "bridge-lease-authority", "authority_class": "researchd"},
     "PolicySnapshot": {"issuer_id": "governance-policy-authority", "authority_class": "policy-authority"},
     "ApprovalReceipt": {"issuer_id": "operator-approval-authority", "authority_class": "operator-authority"}
   },
@@ -77,7 +77,11 @@
     ],
     "evaluator_capability_refs": [
       "docs/receipts/capability/e2-autonomous-research-shadow.json"
-    ]
+    ],
+    "admission_runtime": {
+      "model_route_proof_ref": "provenance/model-provider-routing-v1.json#sha256:37db8596a8245a6b1ea2bc5bce1495a4e7dadb314876e51397ad11dd194b3dc6",
+      "corridor_executor_profile": null
+    }
   },
   "a1_limits": {
     "cycle_limits": {
