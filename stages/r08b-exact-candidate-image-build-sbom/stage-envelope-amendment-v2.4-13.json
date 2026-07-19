@@ -1,0 +1,69 @@
+{
+  "stage_id": "r08b-exact-candidate-image-build-sbom",
+  "repair_stage_id": "r08b-r4-critic-visible-output-profile-repair-agent-0",
+  "amendment_id": "R08B_R4_CRITIC_VISIBLE_OUTPUT_PROFILE_REPAIR_AGENT_0_20260719",
+  "plan_id": "DCR_OS_AUTONOMOUS_V2_3_NO_BRAKES_20260719",
+  "plan_version": "2.4.0-fast-working-release",
+  "issued_by": "agent-0",
+  "issued_at": "2026-07-19T23:17:06Z",
+  "authority_head": "6ed733ba5c48d33e105019bb074a4a50c1dae15b",
+  "authority_tree": "09f91ecd222b63c84e52e3ace600b36b63e8cc0f",
+  "candidate_sha": null,
+  "candidate_tree_sha": null,
+  "candidate_exact_head_ci_run": "NOT_CUT",
+  "failed_private_receipt": {
+    "sha256": "61a077a72be8e2f2f774253e6b296b0d9412f67617179e57fb685c3b285daa3c",
+    "state": "FAILED_IMMUTABLE_SUPERSESSION_REQUIRED",
+    "critic_state": "UNKNOWN",
+    "provider_calls": 1,
+    "automatic_retry": false,
+    "candidate_cut_credit": false
+  },
+  "observed_blocker": "The bounded OpenRouter Critic call returned HTTP 200 but consumed all 144 completion tokens under xhigh reasoning, emitted encrypted reasoning only, and produced null visible content. The connected worker correctly persisted UNKNOWN without retry, so no valid two-role proposal envelope exists.",
+  "agent_0_write_set": [
+    "stages/r08b-exact-candidate-image-build-sbom/stage-envelope-amendment-v2.4-13.json",
+    "stages/r08b-exact-candidate-image-build-sbom/ownership-lease-amendment-v2.4-13.json",
+    "provenance/model-provider-connected-shadow-v3.json",
+    "tools/model_provider_shadow_v3.py"
+  ],
+  "required_change": {
+    "binding": "gpt-5.6-sol-xhigh",
+    "transport": "openrouter",
+    "reasoning_effort_before": "xhigh",
+    "reasoning_effort_after": "low",
+    "reason": "Official OpenRouter semantics allocate approximately 95 percent of the bounded output allowance to xhigh reasoning and approximately 20 percent to low reasoning; the Critic task is a compact structured review and requires visible output within the unchanged 1024 total-token reservation.",
+    "request_total_token_budget_unchanged": 1024,
+    "maximum_cost_units_per_call_unchanged": 1,
+    "automatic_retry_unchanged": false,
+    "endpoint_api_model_credential_privacy_authority_unchanged": true,
+    "historical_v1_v2_bytes_unchanged": true,
+    "candidate_remains_null": true
+  },
+  "sequential_owner_followup": {
+    "required": true,
+    "owner": "agent-5",
+    "paths": [
+      "ops/connected-worker/runtime-policy-v3.json",
+      "tests/test_s17_provider_shadow_tool.py"
+    ],
+    "cross_owner_write_set": false,
+    "starts_only_after_agent_0_remote_head": true
+  },
+  "acceptance_commands": [
+    "python3 tools/model_provider_shadow_v3.py --profile provenance/model-provider-connected-shadow-v3.json --render-only",
+    "git diff proves only Agent-0-owned profile tool and declared authority paths changed",
+    "non-force push and exact remote equality",
+    "sequential Agent-5 policy-hash and test expectation repair",
+    "literal no-cache worker image rebuild from the final exact head",
+    "fresh private full pre-cut collector plus Worker and Critic proof with no automatic retry",
+    "current parent exact-head CI green before any candidate cut"
+  ],
+  "stop_conditions": [
+    "Agent 0 mutates ops or tests",
+    "Agent 5 receives provenance tools or stages authority",
+    "failed UNKNOWN call is replayed",
+    "new payment or top-up is required",
+    "candidate becomes non-null before the full pre-cut gate passes",
+    "force push rebase history rewrite or live action"
+  ]
+}
