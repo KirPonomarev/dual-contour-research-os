@@ -1,0 +1,96 @@
+{
+  "schema_id": "PrivateStageEnvelope",
+  "schema_version": "1.0.0",
+  "stage_id": "R08B-R9_EXACT_IMAGE_TRANSPORT_ARCHIVE_RESEAL",
+  "issued_at": "2026-07-20T08:52:00Z",
+  "agent_id": "agent-0",
+  "base_sha": "aa1178ac063bf2ea71b5a8f2953500efd4ce7a20",
+  "base_tree_sha": "1aee1a7e33b16db369a2edfe726053c9d7e975d5",
+  "branch": "codex/bridge-a0-r08b-r9-archive-transport-reseal",
+  "worktree": "/private/tmp/dcr-r08b-r9-aa1178a",
+  "plan_identity": {
+    "plan_id": "DCR_OS_AUTONOMOUS_V2_3_NO_BRAKES_20260719",
+    "plan_version": "2.4.0-fast-working-release",
+    "project_fingerprint": "b371429cb7c01fd6c5dbd430510a264684dab906188d706b7479446c1bd8f154",
+    "master_plan_sha256": "dd4ae7060213c334991380f7ed09251a44924f441a88515b65420f1a5ed36eaa",
+    "tracker_fencing_token": "e319fe7b-0312-4856-8c22-273875940692"
+  },
+  "objective": "Additively reseal a deterministic transport archive for the unchanged exact R08B image and refresh the F09 qualification binding before retrying F10.",
+  "release_identity": {
+    "release_sha": "974a5dd932e53b82407a4b71f8af5e5641803564",
+    "tree_sha": "fe0066c975c8de7022dc6047158cbf35cad8ccce",
+    "image_id": "sha256:be49e1ce3606fa0f3d1c96002fb2a9cc35072449af1a3e5f5b2a1c2cc3b1d159",
+    "original_unavailable_archive_sha256": "f0e4cfb2de4df6ccf0f6809e362eed45806a4dbf54c61216a14853a04940829a",
+    "replacement_transport_archive_sha256": "b1c1396de6fa76bc4845cd7d310cb50faf2cc6c64f3485a3cd7cc8f03a2b7596",
+    "config_blob_sha256": "c50051025d18f4306ae8af217d3b120d24d9a9526710f7412c8ad9b4aa596778"
+  },
+  "dependency_hashes": {
+    "f09_freeze_sha256": "464d210d5cb76f992dc56f8904e7eb103ddef401b41db22e1eaab54c75382bb1",
+    "f09_integration_receipt_sha256": "aef624e71e173569d3ad8b7ef63ab96619e1e012f8c489aba0b68d9a633f3e4f",
+    "f10_failed_action_receipt_sha256": "f8402b6a93d9e7938cedf71c65c81cc40b10e74b9ea3a937c8852966fc6bc111",
+    "f10_failed_sanitized_manifest_sha256": "79aeebd54ddeaa101772aa95ae9153e6c8dae624403bf33430b79376cc11a44e",
+    "release_relevant_paths_sha256": "67479ff1d799d384f5eb98cfd955e39c403bfb32d509e2c4b82598d57d79b7a1",
+    "evidence_only_allowlist_sha256": "7a3ece39a5e2ccaeadc244ed980bc26dce6d5cbf9b84d89743459a0f871f640c"
+  },
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "contracts/**",
+    "docs/receipts/release/**",
+    "docs/receipts/capability/f09-*.json",
+    "docs/receipts/assurance/f09-r08c-exact-image-functional.json",
+    "tools/release_currentness.py",
+    "private:f10-failed-action-receipt:sha256:f8402b6a93d9e7938cedf71c65c81cc40b10e74b9ea3a937c8852966fc6bc111",
+    "private:deterministic-transport-archive:sha256:b1c1396de6fa76bc4845cd7d310cb50faf2cc6c64f3485a3cd7cc8f03a2b7596"
+  ],
+  "write_set": [
+    "stages/r08b-r9-exact-image-transport-archive-reseal/stage-envelope.json",
+    "stages/r08b-r9-exact-image-transport-archive-reseal/ownership-lease.json",
+    "docs/receipts/reuse/r08b-r9-exact-image-transport-archive-reseal.json",
+    "docs/receipts/assurance/f10-archive-availability-preflight.json",
+    "docs/receipts/release/r08b-r9-exact-image-transport-archive-reseal.json",
+    "docs/receipts/release/f09-release-qualification-freeze-v2.json",
+    "docs/receipts/integration/r08b-r9-exact-image-transport-archive-reseal.json"
+  ],
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest tests.test_r07a_proof_currentness tests.test_r07b_currentness_path_assurance tests.test_s19_e1_aggregate_gate tests.test_s28_e2_aggregate_gate tests.test_s32_e3_aggregate_gate tests.test_integration_receipts",
+    "python3 -m unittest discover -s tests",
+    "python3 -m unittest discover -s tests/stage0b -p test_*.py",
+    "git diff --check",
+    "public secret/private-data scan",
+    "exact PR-head CI",
+    "exact merge-head CI",
+    "exact IntegrationReceipt-head CI"
+  ],
+  "acceptance": {
+    "two_transport_exports_byte_identical": true,
+    "exact_internal_image_manifest_config_layers": true,
+    "safe_archive_members": true,
+    "release_relevant_drift": 0,
+    "f09_currentness_refresh": true,
+    "provider_calls": 0,
+    "target_actions": 0,
+    "live_or_canonical_actions": 0,
+    "grants_authority": false
+  },
+  "forbidden_scope": [
+    "any source, config, policy, provider, contract, tool, test, status-doc, CI, lockfile, migration or non-allowlisted byte",
+    "rebuild, retag as a different image, release SHA/tree/image change or acceptance of the unavailable archive as present",
+    "raw provider response, credential, runtime database, private locator or D2/D3 byte in Git",
+    "provider call, model identity, payment, target creation, deploy, restore, reboot, live/VPS or canonical action",
+    "RELEASE_READY, PRODUCT_DONE or DONE claim"
+  ],
+  "stop_conditions": [
+    "either deterministic transport export differs or its internal manifest/config/layer set differs from the accepted image",
+    "any non-allowlisted repository drift or stale/mixed/expired F09 proof passes",
+    "any critical/high or public secret/private finding",
+    "write outside the exact seven-path set"
+  ],
+  "provider_calls_allowed": 0,
+  "live_or_canonical_actions_allowed": false,
+  "integrity": {
+    "profile": "core-json-sha256-v1",
+    "payload_sha256": "42383c05702cea5edeb400aeff539aec10c1abedfaa9dde7ec0ab8cb4b544997"
+  }
+}

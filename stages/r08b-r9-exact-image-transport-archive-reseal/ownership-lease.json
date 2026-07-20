@@ -1,0 +1,22 @@
+{
+  "schema_id": "PrivateOwnershipLease",
+  "schema_version": "1.0.0",
+  "lease_id": "r08b-r9-agent0-archive-transport-aa1178a",
+  "stage_id": "R08B-R9_EXACT_IMAGE_TRANSPORT_ARCHIVE_RESEAL",
+  "issued_at": "2026-07-20T08:52:00Z",
+  "expires_at": "2026-07-21T08:52:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "canonical-owner"},
+  "holder": {"id": "agent-0", "role": "archive-transport-reseal-writer"},
+  "branch": "codex/bridge-a0-r08b-r9-archive-transport-reseal",
+  "worktree": "/private/tmp/dcr-r08b-r9-aa1178a",
+  "base_sha": "aa1178ac063bf2ea71b5a8f2953500efd4ce7a20",
+  "stage_envelope_file_sha256": "5814b5c1e1205cb4a33851c36224ce82e10a482f835d876c10300cbc8525cc7d",
+  "second_writer_allowed": false,
+  "sublease_allowed": false,
+  "revoked": false,
+  "cleanup_rule": "after terminal IntegrationReceipt exact-head CI, remove the exact stage branch and worktree only after remote/tree/WIP equality proof",
+  "integrity": {
+    "profile": "core-json-sha256-v1",
+    "payload_sha256": "d9e1223b008468976f28657ba31fbbf949679234bee8d192890563602165862c"
+  }
+}
