@@ -1,0 +1,129 @@
+{
+  "schema_id": "PrivateStageEnvelope",
+  "schema_version": "1.0.0",
+  "stage_id": "F12_FINAL_EVIDENCE_AND_INDEPENDENT_AUDIT",
+  "issued_at": "2026-07-20T18:27:40Z",
+  "agent_id": "agent-0",
+  "base_sha": "61a2b35bab91e038cd8148cfe9a364fab294518b",
+  "base_tree_sha": "5a72ce5dbb9884ce7c33265ed2241f86f90ffc7a",
+  "branch": "codex/bridge-a0-f12-final-evidence-independent-audit",
+  "worktree": "/private/tmp/dcr-f12-61a2b35",
+  "plan_identity": {
+    "plan_id": "DCR_OS_AUTONOMOUS_V2_3_NO_BRAKES_20260719",
+    "plan_version": "2.4.0-fast-working-release",
+    "mission_id": "DCR_OS_V2_4_FAST_WORKING_RELEASE",
+    "project_fingerprint": "b371429cb7c01fd6c5dbd430510a264684dab906188d706b7479446c1bd8f154",
+    "master_plan_sha256": "7cfccd38f2483c70f814e4318254be79d717e22f78aba24425846046095c44dc",
+    "tracker_fencing_token": "516d57e2-b0d2-47c3-bebf-e419da679f61",
+    "thread_id": "019f7deb-c709-7101-8695-0474e171c10d"
+  },
+  "objective": "Integrate only sanitized F10/F11 typed receipt digests, prove the complete immutable evidence DAG, seal F12-A as PENDING_FINAL_AUDIT, deliver one exact terminal IntegrationReceipt head, clean plan-owned delivery artifacts, then hand that immutable head to a separate Agent-5 read-only F12-B audit outside Git.",
+  "release_identity": {
+    "release_sha": "0394d6c9e327eceb62f738eca90be3ece015ba79",
+    "tree_sha": "636fda24cbb2da567fb23a4d44fa865ae74ac4bc",
+    "portable_image_id": "sha256:e6db8ab087e18b13ac357a751a2e7318c3abb81a4f2af459c930a630ddc65577",
+    "local_exact_image_id": "sha256:d1f56e933a8e498ae9e3a1f70ba0e764785a0de44d6f702f7e1945c3621b671f",
+    "rendered_config_sha256": "c610ed8aebea67833d1771e3fba0a47ddf6d133b90ae411ee8ba9f669f8b7d99",
+    "rendered_policy_sha256": "665bfb70a82d3aa5988d45fa299fb14d2b28926e6267a15ae440e3c03fbb0cd9",
+    "release_config_bundle_sha256": "31233c747a7fc057ab48df47abe9845dc7edece5498a16c68b82e6fc96d3461d",
+    "release_policy_bundle_sha256": "00a24ffe76a6f48aa5a5bc523ed271f8f0c2da536c64e1aa4e482a235f619f8d",
+    "provider_bundle_sha256": "6644db32e06b2f0681c7252af959300d4ae0c659eee36e11bd8249d7952beb0a",
+    "sbom_sha256": "57e0f924f43e2466ade26c334632f93071cda27435ce9cc2a7dc02ec6c90ec22",
+    "inventory_sha256": "c0a444152fc2ecb2dbe517edfacefed7d3258bb6e3a26ad58ed342d94b3d5e97",
+    "release_relevant_paths_manifest_sha256": "201df1ef44255ffd284e32a60cf616e6c3741accfaccef89b3b12de85e8cb93b",
+    "evidence_only_path_allowlist_sha256": "a691630d87b549fec3fffc44913531cd86bfb96858b3bd7d1afd8846eceb7ae1"
+  },
+  "dependency_hashes": {
+    "f09_freeze_v3_sha256": "eaa6026ef0ac71662ea3bf0a7b438298b4a757ebedcbc2bf22a361a33eaa6d77",
+    "f09_integration_receipt_sha256": "1134a039551e6f1394405f106f07c86fbbb5e7a12a36e7d4a4e7dfa3546b5a5d",
+    "f10_functional_stage_receipt_sha256": "6f9f56d14ba8247abf73794a3c1fd70f00d29873f42d9f94eceed352cc2ab765",
+    "f10_backup_repair_stage_receipt_sha256": "0b1eb21f7577daf351b76268897c2f963cdc6fcc2891846686bcf4809a8c463f",
+    "f10_backup_receipt_sha256": "76db3a4e423d876f5780295dcfcb0e5cc81be779b421748f5fe7b27f444603b2",
+    "f11_stage_receipt_sha256": "fd3eb7f51c9378c5203732d049817d4228f5731222d05196b9a8ab85a6afa12f",
+    "f11_sanitized_manifest_sha256": "90a24af2ce191a3ceff72a81db4d14f9ac3e1819cc9323ee8348428d493f0fd2",
+    "status_readme_sha256": "51e18b87973b409030233fc21da16f64a751faa5dc63b5174c2c004f7b251a31",
+    "status_architecture_sha256": "3256c4f10c2a8787ce2561d3abb356207eaa731429ac4a1fff051fd8167c3075",
+    "status_product_completion_sha256": "2c86c57292ea13594c6fe5656b6ef1565cf59cb8bf2dbf7cc1cb9c41b7346ac7",
+    "final_validator_sha256": "06cd182be4cc416b31696d075fbda47d002147851e931e2083fd3a6b9124f647"
+  },
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "README.md",
+    "docs/ARCHITECTURE.md",
+    "docs/PRODUCT_COMPLETION.md",
+    "docs/R08B_RELEASE_OPERATOR_RUNBOOK.md",
+    "contracts/**",
+    "tools/verify_final_release_freeze.py",
+    "tools/release_currentness.py",
+    "docs/receipts/**",
+    "stages/f09-release-evidence-currentness-and-freeze/**",
+    "private:f10-functional-stage-receipt:sha256:6f9f56d14ba8247abf73794a3c1fd70f00d29873f42d9f94eceed352cc2ab765",
+    "private:f10-backup-repair-stage-receipt:sha256:0b1eb21f7577daf351b76268897c2f963cdc6fcc2891846686bcf4809a8c463f",
+    "private:f11-stage-receipt:sha256:fd3eb7f51c9378c5203732d049817d4228f5731222d05196b9a8ab85a6afa12f",
+    "private:f11-sanitized-manifest:sha256:90a24af2ce191a3ceff72a81db4d14f9ac3e1819cc9323ee8348428d493f0fd2"
+  ],
+  "write_set": [
+    "stages/f12-final-evidence-and-independent-audit/stage-envelope.json",
+    "stages/f12-final-evidence-and-independent-audit/ownership-lease.json",
+    "docs/receipts/release/f10-disposable-linux-release-e2e-sanitized.json",
+    "docs/receipts/release/f11-isolated-recovery-campaign-sanitized.json",
+    "docs/receipts/assurance/f12-final-evidence-dag.json",
+    "docs/receipts/integration/f12-final-evidence-and-independent-audit.json"
+  ],
+  "acceptance_commands": [
+    "make contracts",
+    "make test",
+    "python3 tools/verify_final_release_freeze.py --self-test-v24-status",
+    "python3 -m unittest tests.test_r07a_proof_currentness tests.test_r07b_currentness_path_assurance tests.test_integration_receipts",
+    "git diff --check",
+    "public secret/private-data scan",
+    "exact PR-head CI",
+    "exact merge-head CI",
+    "exact IntegrationReceipt-head CI",
+    "read-only cleanup and exact-head equality proof",
+    "independent Agent-5 F12-B audit outside Git"
+  ],
+  "acceptance": {
+    "f10_f11_typed_sanitized_receipts_integrated": true,
+    "full_evidence_dag": true,
+    "release_subject_unchanged": true,
+    "repository_status_during_f12a": "IN_PROGRESS",
+    "f12a_status": "PENDING_FINAL_AUDIT",
+    "f12b_owner": "agent-5",
+    "f12b_writes_git": false,
+    "critical_findings": 0,
+    "high_findings": 0,
+    "provider_calls": 0,
+    "live_or_canonical_actions": 0,
+    "grants_authority": false
+  },
+  "cleanup_scope": {
+    "active_f12_branch_and_worktree": "delete only after accepted terminal receipt-head CI and no unique WIP",
+    "legacy_plan_artifacts": "delete only after read-only ownership and accepted-or-merged proof; preserve ambiguous or user-owned artifacts",
+    "private_f10_f11_evidence": "preserve",
+    "source_backup": "preserve"
+  },
+  "forbidden_scope": [
+    "any source, config, policy, provider, contract, test, status-doc, validator, CI, lockfile, migration or non-allowlisted byte",
+    "release SHA/tree/image/config/policy/provider/SBOM/inventory change",
+    "raw provider response, secret, credential, runtime database, checkpoint, private locator or D2/D3 byte in Git",
+    "provider call, new model identity, deploy, restore, reboot, live/VPS, canonical, publication or timed-window action",
+    "self-audit substitution for F12-B",
+    "DONE, PRODUCT_DONE, RELEASE_DONE or RELEASE_READY in Git or external state before exact F12-B PASS",
+    "delete any branch/worktree without exact plan ownership and accepted-or-merged proof"
+  ],
+  "stop_conditions": [
+    "any changed path falls outside the frozen evidence-only allowlist or exact six-path write set",
+    "release-relevant identity differs from the F09/R17 frozen subject",
+    "any critical/high, stale/expired/mixed proof, privacy leak, red required CI or unresolved incident",
+    "terminal receipt head differs from the independent audit subject",
+    "cleanup target ownership or unique WIP is ambiguous"
+  ],
+  "provider_calls_allowed": 0,
+  "live_or_canonical_actions_allowed": false,
+  "integrity": {
+    "profile": "core-json-sha256-v1",
+    "payload_sha256": "714bffba18c9da9a2f6e7536d09731689c0f1258de057a4941208bb043bd04ce"
+  }
+}

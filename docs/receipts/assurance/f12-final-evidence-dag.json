@@ -1,0 +1,332 @@
+{
+  "schema_id": "F12FinalEvidenceDAG",
+  "schema_version": "1.0.0",
+  "object_id": "f12-final-evidence-dag-61a2b35",
+  "issued_at": "2026-07-20T19:29:23Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "final-evidence-integration-authority"
+  },
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "plan_id": "DCR_OS_AUTONOMOUS_V2_3_NO_BRAKES_20260719",
+    "plan_version": "2.4.0-fast-working-release",
+    "amendment_id": "FAST_RELEASE_NO_TIMED_WINDOWS_NO_HUMAN_WAIT_20260719",
+    "project_fingerprint": "b371429cb7c01fd6c5dbd430510a264684dab906188d706b7479446c1bd8f154",
+    "stage_id": "F12_FINAL_EVIDENCE_AND_INDEPENDENT_AUDIT",
+    "f12a_status": "PENDING_FINAL_AUDIT",
+    "repository_status": "IN_PROGRESS",
+    "release_identity": {
+      "release_sha": "0394d6c9e327eceb62f738eca90be3ece015ba79",
+      "tree_sha": "636fda24cbb2da567fb23a4d44fa865ae74ac4bc",
+      "portable_image_id": "sha256:e6db8ab087e18b13ac357a751a2e7318c3abb81a4f2af459c930a630ddc65577",
+      "local_exact_image_id": "sha256:d1f56e933a8e498ae9e3a1f70ba0e764785a0de44d6f702f7e1945c3621b671f",
+      "rendered_config_sha256": "c610ed8aebea67833d1771e3fba0a47ddf6d133b90ae411ee8ba9f669f8b7d99",
+      "rendered_policy_sha256": "665bfb70a82d3aa5988d45fa299fb14d2b28926e6267a15ae440e3c03fbb0cd9",
+      "release_config_bundle_sha256": "31233c747a7fc057ab48df47abe9845dc7edece5498a16c68b82e6fc96d3461d",
+      "release_policy_bundle_sha256": "00a24ffe76a6f48aa5a5bc523ed271f8f0c2da536c64e1aa4e482a235f619f8d",
+      "provider_bundle_sha256": "6644db32e06b2f0681c7252af959300d4ae0c659eee36e11bd8249d7952beb0a",
+      "sbom_sha256": "57e0f924f43e2466ade26c334632f93071cda27435ce9cc2a7dc02ec6c90ec22",
+      "inventory_sha256": "c0a444152fc2ecb2dbe517edfacefed7d3258bb6e3a26ad58ed342d94b3d5e97"
+    },
+    "repository_subjects": {
+      "release_subject_sha": "0394d6c9e327eceb62f738eca90be3ece015ba79",
+      "release_subject_tree_sha": "636fda24cbb2da567fb23a4d44fa865ae74ac4bc",
+      "f12_base_evidence_head_sha": "61a2b35bab91e038cd8148cfe9a364fab294518b",
+      "f12_base_evidence_tree_sha": "5a72ce5dbb9884ce7c33265ed2241f86f90ffc7a",
+      "f12_authority_head_sha": "8247045fc0c63d3c571f9294a10337a196299fc6",
+      "terminal_receipt_head_sha": null,
+      "terminal_receipt_head_binding": "PENDING_TERMINAL_INTEGRATION_RECEIPT",
+      "release_and_evidence_subjects_distinct": true
+    },
+    "frozen_invariance": {
+      "release_relevant_paths_ref": "docs/receipts/release/r17-release-relevant-paths.json",
+      "release_relevant_paths_sha256": "201df1ef44255ffd284e32a60cf616e6c3741accfaccef89b3b12de85e8cb93b",
+      "evidence_only_path_allowlist_ref": "docs/receipts/release/r17-evidence-only-path-allowlist.json",
+      "evidence_only_path_allowlist_sha256": "a691630d87b549fec3fffc44913531cd86bfb96858b3bd7d1afd8846eceb7ae1",
+      "non_allowlisted_blob_drift": 0,
+      "release_subject_advanced": false,
+      "status": "PASS"
+    },
+    "evidence_nodes": [
+      {
+        "id": "R17_EXACT_CANDIDATE",
+        "type": "release",
+        "ref": "docs/receipts/release/r17-candidate-cut.json",
+        "sha256": "88fc89b497e8be4e1b577b593f7020583553d950f7ab32a8daf15d1d9e1e21b9",
+        "status": "ACCEPTED"
+      },
+      {
+        "id": "F09_QUALIFICATION_FREEZE_V3",
+        "type": "release-freeze",
+        "ref": "docs/receipts/release/f09-release-qualification-freeze-v3.json",
+        "sha256": "eaa6026ef0ac71662ea3bf0a7b438298b4a757ebedcbc2bf22a361a33eaa6d77",
+        "status": "CURRENT",
+        "valid_until": "2026-08-19T12:55:00Z"
+      },
+      {
+        "id": "F09_INTEGRATION",
+        "type": "integration",
+        "ref": "docs/receipts/integration/f09-r4-exact-subject-qualification-refresh.json",
+        "sha256": "1134a039551e6f1394405f106f07c86fbbb5e7a12a36e7d4a4e7dfa3546b5a5d",
+        "status": "ACCEPTED_EXACT_HEAD_CI_GREEN"
+      },
+      {
+        "id": "F10_DISPOSABLE_RELEASE_E2E",
+        "type": "sanitized-physical-release",
+        "ref": "docs/receipts/release/f10-disposable-linux-release-e2e-sanitized.json",
+        "sha256": "7747b5b5b2c5a8db97bb843ae5129f1a8021b886a8401bc43eaac4183a457b49",
+        "status": "ACCEPTED"
+      },
+      {
+        "id": "F11_ISOLATED_RECOVERY",
+        "type": "sanitized-recovery",
+        "ref": "docs/receipts/release/f11-isolated-recovery-campaign-sanitized.json",
+        "sha256": "7ff36b031c7c298997eaab499c7828a2162259a3778777b4a93335db2bb5c0a3",
+        "status": "ACCEPTED_WITH_CLOSED_LOW_RECONCILIATION"
+      },
+      {
+        "id": "V24_STATUS_README",
+        "type": "read-only-status",
+        "ref": "README.md",
+        "sha256": "51e18b87973b409030233fc21da16f64a751faa5dc63b5174c2c004f7b251a31",
+        "status": "IN_PROGRESS"
+      },
+      {
+        "id": "V24_STATUS_ARCHITECTURE",
+        "type": "read-only-status",
+        "ref": "docs/ARCHITECTURE.md",
+        "sha256": "3256c4f10c2a8787ce2561d3abb356207eaa731429ac4a1fff051fd8167c3075",
+        "status": "IN_PROGRESS"
+      },
+      {
+        "id": "V24_STATUS_PRODUCT_COMPLETION",
+        "type": "read-only-status",
+        "ref": "docs/PRODUCT_COMPLETION.md",
+        "sha256": "2c86c57292ea13594c6fe5656b6ef1565cf59cb8bf2dbf7cc1cb9c41b7346ac7",
+        "status": "IN_PROGRESS"
+      },
+      {
+        "id": "V24_FINAL_VALIDATOR",
+        "type": "read-only-validator",
+        "ref": "tools/verify_final_release_freeze.py",
+        "sha256": "06cd182be4cc416b31696d075fbda47d002147851e931e2083fd3a6b9124f647",
+        "status": "GREEN"
+      }
+    ],
+    "evidence_edges": [
+      {"from": "R17_EXACT_CANDIDATE", "to": "F09_QUALIFICATION_FREEZE_V3", "relation": "QUALIFIED_EXACT_SUBJECT"},
+      {"from": "F09_QUALIFICATION_FREEZE_V3", "to": "F09_INTEGRATION", "relation": "SEALED_BY_EXACT_HEAD_CI"},
+      {"from": "F09_QUALIFICATION_FREEZE_V3", "to": "F10_DISPOSABLE_RELEASE_E2E", "relation": "EXECUTED_EXACT_RELEASE"},
+      {"from": "F10_DISPOSABLE_RELEASE_E2E", "to": "F11_ISOLATED_RECOVERY", "relation": "PROVIDED_VERIFIED_ENCRYPTED_BACKUP"},
+      {"from": "F09_QUALIFICATION_FREEZE_V3", "to": "F11_ISOLATED_RECOVERY", "relation": "RESTORED_AND_ROLLED_BACK_EXACT_RELEASE"},
+      {"from": "V24_STATUS_README", "to": "V24_FINAL_VALIDATOR", "relation": "REJECTS_PREMATURE_DONE"},
+      {"from": "V24_STATUS_ARCHITECTURE", "to": "V24_FINAL_VALIDATOR", "relation": "REJECTS_FALSE_LIVE_CLAIM"},
+      {"from": "V24_STATUS_PRODUCT_COMPLETION", "to": "V24_FINAL_VALIDATOR", "relation": "REQUIRES_F12_B_PASS"}
+    ],
+    "definition_of_done": {
+      "section_19_1_repository_and_delivery": {
+        "release_subject_and_evidence_head_distinct": "PASS",
+        "f10_f11_bind_exact_f09_release": "PASS",
+        "frozen_catalogs_ownership_currentness_validate": "PASS",
+        "release_relevant_invariance": "PASS",
+        "accepted_sprint_receipt_chain": "PASS_THROUGH_F11",
+        "public_private_data_boundary": "PENDING_FINAL_PUBLIC_SCAN",
+        "exact_terminal_receipt_head_ci": "PENDING_F12_A_TERMINAL_RECEIPT",
+        "no_unfinished_plan_delivery_artifact": "PENDING_POST_RECEIPT_CLEANUP",
+        "final_local_origin_live_remote_equality": "PENDING_POST_CLEANUP"
+      },
+      "section_19_2_product_functionality_and_physical_release": {
+        "PRODUCT_CODE_COMPLETE": true,
+        "FINAL_RUNTIME_FUNCTIONAL": true,
+        "AUTONOMOUS_A1_LOOP_FUNCTIONAL": true,
+        "REAL_SOURCE_ROUTE_FUNCTIONAL": true,
+        "REAL_PROVIDER_ROUTE_FUNCTIONAL": true,
+        "PRE_CUT_READINESS": "PASS",
+        "EXACT_IMAGE_E2E": true,
+        "DISPOSABLE_LINUX_RELEASE_E2E": true,
+        "PHYSICALLY_DEPLOYED": false,
+        "LIVE_REMOTE_E2E": "OUT_OF_SCOPE",
+        "AUTONOMOUS_RESTART_PROVEN": true,
+        "DEPLOYMENT_PACKET_READY": true,
+        "BACKUP_TOOLING_READY": true,
+        "RESTORE_PROVEN_TWICE": true,
+        "ISOLATED_ROLLBACK_PROVEN": true,
+        "MONITORING_VERIFIED": true,
+        "RECOVERY_READY": true,
+        "CRITICAL_HIGH_FINDINGS": 0
+      },
+      "section_19_3_operational_self_model": {
+        "operational_self_model": "PASS_FOR_FROZEN_SCOPE",
+        "topology_awareness": "PASS_FOR_FROZEN_SCOPE",
+        "causal_lineage": "PASS_FOR_FROZEN_SCOPE",
+        "authority_awareness": "PASS_FOR_FROZEN_SCOPE",
+        "recovery_awareness": "PASS_FOR_FROZEN_SCOPE"
+      },
+      "section_19_4_autonomous_research": {
+        "autonomous_material_event_detection": "PASS_FOR_FROZEN_SCOPE",
+        "autonomous_hypothesis_generation": "PASS_FOR_FROZEN_SCOPE",
+        "autonomous_falsification": "PASS_FOR_FROZEN_SCOPE",
+        "autonomous_a1_admission": "PASS_FOR_FROZEN_SCOPE",
+        "autonomous_bounded_testing": "PASS_FOR_FROZEN_SCOPE",
+        "autonomous_replication": "PASS_FOR_FROZEN_SCOPE",
+        "autonomous_next_event_generation": "PASS_FOR_FROZEN_SCOPE"
+      },
+      "section_19_5_models": {
+        "worker_route": "VERSIONED_CURRENT_EVAL_SELECTED_REAL_ROUTE",
+        "primary_critic": "VERSIONED_CURRENT_REAL_DIFFERENT_DECLARED_MODEL_FAMILY_AND_PROVENANCE_GROUP",
+        "two_role_proposal_envelope": "PHYSICALLY_PROVEN",
+        "deep_reviewer": "EVAL_SELECTED_OR_EXPLICITLY_UNAVAILABLE_FAIL_CLOSED",
+        "chief_scientist": "EVAL_SELECTED_OR_EXPLICITLY_UNAVAILABLE_FAIL_CLOSED",
+        "reserve_arbiter": "EVAL_SELECTED_OR_EXPLICITLY_DISABLED_FAIL_CLOSED",
+        "independence_status": "EMPIRICALLY_SCOPED_OR_NOT_ESTABLISHED",
+        "consensus_as_evidence": false,
+        "self_assignment": false,
+        "hidden_fallback": false
+      },
+      "section_19_6_learning_evolution_attestation_transfer": {
+        "operational_experience": "ENABLED",
+        "failure_memory": "ENABLED",
+        "conflict_candidate_memory": "ENABLED",
+        "outcome_to_next_event": "ENABLED",
+        "shadow_taint_inheritance": "ENABLED",
+        "scientific_learning": "DOMAIN_OWNED",
+        "memory_uplift": "MEASURED_SCOPED_OR_NOT_ESTABLISHED",
+        "calibration": "NOT_CLAIMED_WITHOUT_MATURITY_EVIDENCE",
+        "opportunity_detection": "AUTOMATIC",
+        "mutation_generation": "AUTOMATIC",
+        "frozen_evaluation": "AUTOMATIC",
+        "adversarial_evaluation": "AUTOMATIC",
+        "shadow_evaluation": "AUTOMATIC",
+        "regression_detection": "AUTOMATIC",
+        "promotion": "HUMAN_ONLY",
+        "selected_attestation": "PASS_FOR_FROZEN_SCOPE",
+        "method_transfer": "DECLASSIFIED_RECIPIENT_SHADOW_WAIT_AUTHORITY"
+      },
+      "section_19_7_fast_release_boundary": {
+        "current": {
+          "STATUS": "IN_PROGRESS",
+          "PRODUCT_DONE": false,
+          "RELEASE_DONE": false,
+          "MASTER_PLAN_DONE": false,
+          "F12_A_STATUS": "PENDING_FINAL_AUDIT",
+          "F12_B_STATUS": "PENDING",
+          "PHYSICALLY_DEPLOYED": false,
+          "AUTONOMOUS_RUNTIME_ACTIVE": false,
+          "OPERATIONALLY_PROVEN": false
+        },
+        "terminal_transition_allowed_only_after": "EXACT_TERMINAL_RECEIPT_HEAD_GREEN_CLEANUP_ZERO_AND_INDEPENDENT_F12_B_PASS"
+      },
+      "section_20_fast_release": {
+        "r08b_exact_reproducible_candidate_image_sbom": "PASS",
+        "r08c_exact_image_real_source_worker_critic_a1_and_hostile": "PASS",
+        "f09_qualification_and_operator_packet": "PASS",
+        "f10_clean_disposable_linux_packaged_release_e2e": "PASS",
+        "f11_two_clean_restores_restart_hostile_and_rollback": "PASS",
+        "f12_sanitized_evidence_graph": "PASS_PENDING_TERMINAL_SEAL",
+        "all_relevant_capability_proofs_current": "PASS",
+        "all_incidents_and_findings_closed": "PASS",
+        "exact_terminal_remote_checks": "PENDING_TERMINAL_RECEIPT_HEAD",
+        "delivery_cleanup_debt_zero": "PENDING_POST_RECEIPT_CLEANUP",
+        "independent_f12_b_critical_high_zero": "PENDING_INDEPENDENT_AGENT_5",
+        "required_user_review_live_action_or_elapsed_wait": 0
+      }
+    },
+    "status_and_validator_assurance": {
+      "status_documents": "V2.4_STATUS_DOCS_GREEN_IN_PROGRESS",
+      "done_requires": "F12_B_INDEPENDENT_AUDIT_PASS",
+      "hostile_status_mutations_rejected": 8,
+      "frozen_envelope_command": "python3 tools/verify_final_release_freeze.py --self-test-v24-status",
+      "executable_current_command": "python3 tools/verify_final_release_freeze.py self-test-v2.4-status",
+      "command_shape_reconciliation": "CLOSED_CLI_SUBCOMMAND_RENAME_NO_CODE_OR_STATUS_MUTATION",
+      "premature_done_rejected": true,
+      "false_live_claim_rejected": true
+    },
+    "closed_reconciliations": [
+      {
+        "id": "F10_TERMINAL_AUTHORITY_STATE",
+        "severity": "PLAN_RECONCILIATION",
+        "status": "CLOSED",
+        "outcome": "CANDIDATE_REJECTED_AUTHORITY_NOT_ISSUED_IS_SAFETY_EQUIVALENT_TO_WAIT_AUTHORITY"
+      },
+      {
+        "id": "F11_BACKUP_RECEIPT_SUMMARY_TRANSCRIPTION",
+        "severity": "LOW",
+        "status": "CLOSED",
+        "outcome": "PRIMARY_BACKUP_AND_RESTORE_BINDINGS_PROVE_76DB3A4E_FILE_DIGEST"
+      },
+      {
+        "id": "F12_VALIDATOR_COMMAND_SHAPE",
+        "severity": "LOW",
+        "status": "CLOSED",
+        "outcome": "CURRENT_READ_ONLY_SUBCOMMAND_EXECUTED_GREEN"
+      }
+    ],
+    "environment_cleanup_observation": {
+      "observed_at": "2026-07-20T19:38:14Z",
+      "observer_command": "colima list --json",
+      "agent_created_disposable_profiles_remaining": 0,
+      "f10_disposable_profile_remaining": false,
+      "f11_target_a_profile_remaining": false,
+      "f11_target_b_profile_remaining": false,
+      "default_profile_present": true,
+      "default_profile_touched_by_f11": false,
+      "source_backup_preserved": true,
+      "status": "GREEN"
+    },
+    "zero_tolerance": {
+      "budget_breach": 0,
+      "unauthorized_external_action": 0,
+      "cross_contour_leak": 0,
+      "unreceipted_canonical_mutation": 0,
+      "unverified_scientific_claim": 0,
+      "authority_escalation": 0,
+      "vacuous_validator_promotion": 0,
+      "live_trading": 0,
+      "autonomous_live_security_execution": 0,
+      "unresolved_critical_findings": 0,
+      "unresolved_high_findings": 0
+    },
+    "authority_boundary": {
+      "canonical_mutation": "HUMAN_OR_DOMAIN_AUTHORITY",
+      "policy_application": "HUMAN_ONLY",
+      "live_deployment": "OUT_OF_SCOPE_REQUIRES_FUTURE_EXACT_AUTHORITY",
+      "publication": "HUMAN_ONLY",
+      "live_trading": "DENIED",
+      "autonomous_live_security": "DENIED",
+      "authority_mutation": "DENIED",
+      "provider_calls_during_f12": 0,
+      "live_or_canonical_actions_during_f12": 0,
+      "grants_authority": false
+    },
+    "f12_finalization": {
+      "pr_head_ci": "PENDING",
+      "merge_head_ci": "PENDING",
+      "terminal_integration_receipt": "PENDING",
+      "terminal_receipt_head_ci": "PENDING",
+      "active_f12_branch_and_worktree_cleanup": "PENDING",
+      "verified_legacy_cleanup_debt": "PENDING_READ_ONLY_OWNERSHIP_AUDIT",
+      "independent_audit_owner": "agent-5",
+      "independent_audit_git_writes_allowed": false,
+      "independent_f12b": "PENDING",
+      "product_done": false,
+      "release_done": false,
+      "master_plan_done": false,
+      "physically_deployed": false,
+      "operationally_proven": false
+    }
+  },
+  "integrity": {
+    "profile": "core-json-sha256-v1",
+    "payload_sha256": "70d900511b40a44b0819a3f6ca50bca347559c693f7ef6690e7a624a2a4ad18b",
+    "parent_refs": [
+      "git:61a2b35bab91e038cd8148cfe9a364fab294518b",
+      "git:8247045fc0c63d3c571f9294a10337a196299fc6",
+      "f09-freeze:sha256:eaa6026ef0ac71662ea3bf0a7b438298b4a757ebedcbc2bf22a361a33eaa6d77",
+      "f09-integration:sha256:1134a039551e6f1394405f106f07c86fbbb5e7a12a36e7d4a4e7dfa3546b5a5d",
+      "f10-sanitized:sha256:7747b5b5b2c5a8db97bb843ae5129f1a8021b886a8401bc43eaac4183a457b49",
+      "f11-sanitized:sha256:7ff36b031c7c298997eaab499c7828a2162259a3778777b4a93335db2bb5c0a3"
+    ]
+  }
+}
