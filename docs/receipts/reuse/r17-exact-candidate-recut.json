@@ -1,0 +1,15 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "receipt_id": "r17-reuse-accepted-r15-candidate-pipeline-after-r16",
+  "recorded_at": "2026-07-20T12:28:00Z",
+  "stage_id": "R17_EXACT_CANDIDATE_RECUT_AFTER_TEMPORAL_FIXTURE",
+  "decision": "REUSE_ACCEPTED_R15_BUILD_IDENTITY_SBOM_AND_PACKET_PIPELINE",
+  "selected": ["two no-cache deterministic BuildKit builds", "recursive portable archive config identity", "existing SPDX/inventory/path manifest generator", "classic-Docker archive-load proof", "additive receipts only"],
+  "external_code_added": false,
+  "new_dependency_added": false,
+  "runtime_source_or_test_change": false,
+  "provider_or_live_action": false,
+  "grants_authority": false,
+  "integrity": {"profile": "core-json-sha256-v1", "payload_sha256": "aeea16003244b60d396557b35347b334ade78b1f8b4298ead258465b70aed3c5"}
+}
