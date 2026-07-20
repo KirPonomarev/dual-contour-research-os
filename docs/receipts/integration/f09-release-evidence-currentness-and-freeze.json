@@ -1,0 +1,74 @@
+{
+  "classification": "D1_INTERNAL_SANITIZED",
+  "contour": "governance",
+  "integrity": {
+    "parent_refs": [
+      "git:abe8bb3c7c1996bf5e9dcd580da986363521b2fd",
+      "git:366275f3bd01b0b4aa75eb44a4d2dbb7fcd52057",
+      "ci:29727735844",
+      "freeze:sha256:464d210d5cb76f992dc56f8904e7eb103ddef401b41db22e1eaab54c75382bb1"
+    ],
+    "payload_sha256": "941f7016a82b13eab6b05fcfb398f2c659f32382c9f38c3ac6e12072c879f807"
+  },
+  "issued_at": "2026-07-20T08:27:00Z",
+  "issuer": {
+    "authority_class": "integration-authority",
+    "id": "agent-0"
+  },
+  "object_id": "integration-f09-release-evidence-currentness-and-freeze-20260720",
+  "payload": {
+    "agent_id": "agent-0",
+    "audit_results": {
+      "contract_gate": "green",
+      "current_capability_proofs": 7,
+      "evidence_head_sha": "366275f3bd01b0b4aa75eb44a4d2dbb7fcd52057",
+      "exact_merge_head_ci": "green",
+      "exact_merge_head_ci_run": 29727735844,
+      "focused_tests": 41,
+      "full_core_tests": 894,
+      "grants_authority": false,
+      "live_or_vps_actions": 0,
+      "product_done": false,
+      "provider_calls": 0,
+      "privacy_secret_scan": "green",
+      "qualification_freeze_ref": "docs/receipts/release/f09-release-qualification-freeze.json",
+      "qualification_freeze_sha256": "464d210d5cb76f992dc56f8904e7eb103ddef401b41db22e1eaab54c75382bb1",
+      "qualification_state": "FROZEN_CANDIDATE_READY_FOR_DISPOSABLE_QUALIFICATION",
+      "r08c_exact_image_functional": "green",
+      "release_ready": false,
+      "release_relevant_invariance": "green",
+      "release_sha": "974a5dd932e53b82407a4b71f8af5e5641803564",
+      "release_tree_sha": "fe0066c975c8de7022dc6047158cbf35cad8ccce",
+      "secret_private_findings": 0,
+      "stage0b_tests": 25,
+      "status": "PASS",
+      "source_mutation": false,
+      "unresolved_critical_debt": 0,
+      "unresolved_high_debt": 0
+    },
+    "base_sha": "abe8bb3c7c1996bf5e9dcd580da986363521b2fd",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "head_sha": "366275f3bd01b0b4aa75eb44a4d2dbb7fcd52057",
+    "integration_commit_sha": "366275f3bd01b0b4aa75eb44a4d2dbb7fcd52057",
+    "ownership_lease_ref": "stages/f09-release-evidence-currentness-and-freeze/ownership-lease.json",
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29727735844",
+    "stage_id": "F09_RELEASE_EVIDENCE_CURRENTNESS_AND_FREEZE",
+    "write_set": [
+      "stages/f09-release-evidence-currentness-and-freeze/stage-envelope.json",
+      "stages/f09-release-evidence-currentness-and-freeze/ownership-lease.json",
+      "docs/receipts/reuse/f09-release-evidence-currentness-and-freeze.json",
+      "docs/receipts/assurance/f09-r08c-exact-image-functional.json",
+      "docs/receipts/capability/f09-e1a-discovery-admission.json",
+      "docs/receipts/capability/f09-e1b-durable-feedback.json",
+      "docs/receipts/capability/f09-e1c-operational-self-model.json",
+      "docs/receipts/capability/f09-e1-evolution-kernel.json",
+      "docs/receipts/capability/f09-e2-autonomous-research.json",
+      "docs/receipts/capability/f09-e3-evolution-shadow.json",
+      "docs/receipts/capability/f09-provider-runtime.json",
+      "docs/receipts/release/f09-release-qualification-freeze.json",
+      "docs/receipts/integration/f09-release-evidence-currentness-and-freeze.json"
+    ]
+  },
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0"
+}
