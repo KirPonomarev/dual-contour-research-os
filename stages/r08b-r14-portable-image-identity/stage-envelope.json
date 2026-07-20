@@ -1,0 +1,42 @@
+{
+  "schema_id": "PrivateStageEnvelope",
+  "schema_version": "1.0.0",
+  "stage_id": "R08B-R14_PORTABLE_IMAGE_IDENTITY_FIX",
+  "issued_at": "2026-07-20T11:21:00Z",
+  "agent_id": "agent-0",
+  "base_sha": "099414721b37127a90dbb9946fd6150f306db9a2",
+  "base_tree_sha": "f945c159ae82424e70dcc91ea588b04cbb9b1a71",
+  "branch": "codex/bridge-a0-r08b-r14-portable-image-identity",
+  "worktree": "/private/tmp/dcr-r08b-r14-0994147",
+  "objective": "Make candidate image identity portable across containerd and classic Docker stores by binding the verified archive config digest while retaining and validating the local OCI manifest/index ID as diagnostic evidence.",
+  "executable_blocker": "R08B-R13 proved two reproducible builds and equal inventories, then stopped because Docker 29 containerd Image.Id is an OCI index digest while the transport archive's portable load identity is its config digest.",
+  "dependencies": {
+    "r08b_r13_failed_stage_receipt_sha256": "820561f2ccb7955a94d7dec216c7c4eedad8bf38ba4c6e88a22939fc71908c48",
+    "candidate_subject_sha": "099414721b37127a90dbb9946fd6150f306db9a2",
+    "candidate_subject_ci_run": 29737465772
+  },
+  "write_set": [
+    "stages/r08b-r14-portable-image-identity/stage-envelope.json",
+    "stages/r08b-r14-portable-image-identity/ownership-lease.json",
+    "tools/candidate_image_build.py",
+    "tests/test_r08b_reproducible_candidate_build.py",
+    "docs/receipts/reuse/r08b-r14-portable-image-identity.json",
+    "docs/receipts/assurance/r08b-r13-portable-image-identity-failure.json"
+  ],
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest tests.test_r08b_reproducible_candidate_build",
+    "python3 tools/candidate_image_build.py self-test",
+    "physical candidate prepare and verify on containerd store",
+    "classic Docker archive-load identity proof",
+    "full tests and exact PR/merge/IntegrationReceipt-head CI"
+  ],
+  "forbidden_scope": [
+    "runtime, Containerfile, contracts, dependencies, provider, policy, config, migration or CI mutation",
+    "accepting an archive without recursive digest/config binding",
+    "provider call, live/VPS/canonical action, candidate cut or DONE claim"
+  ],
+  "provider_calls_allowed": 0,
+  "live_or_canonical_actions_allowed": false,
+  "integrity": {"profile": "core-json-sha256-v1", "payload_sha256": "38377860a339c098a073f7ed329a06803c88ee9836c902581217f0b17f98d6eb"}
+}

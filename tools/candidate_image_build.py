@@ -399,7 +399,7 @@ def _release_path_manifests(candidate: str, tree: str) -> tuple[dict[str, object
     return relevant_manifest, allowlist
 
 
-def _archive_config_sha(path: Path) -> str:
+def _archive_identity(path: Path) -> tuple[str, tuple[str, ...]]:
     with tarfile.open(path, "r") as archive:
         members = archive.getmembers()
         names = [member.name for member in members]
@@ -416,7 +416,78 @@ def _archive_config_sha(path: Path) -> str:
         _require(config_member is not None, "archive config missing")
         config_bytes = config_member.read()
         _require(Path(config_name).stem == _sha_bytes(config_bytes), "archive config digest mismatch")
-        return _sha_bytes(config_bytes)
+        config_sha256 = _sha_bytes(config_bytes)
+        bound_oci_digests: set[str] = set()
+        if "index.json" in names:
+            index_member = archive.extractfile("index.json")
+            _require(index_member is not None, "archive OCI index missing")
+            try:
+                index = json.loads(index_member.read())
+            except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+                raise CandidateBuildError("archive OCI index is invalid") from exc
+
+            def visit(descriptor: object, ancestors: tuple[str, ...]) -> bool:
+                _require(isinstance(descriptor, dict), "archive OCI descriptor shape")
+                digest = descriptor.get("digest")
+                _require(
+                    isinstance(digest, str)
+                    and re.fullmatch(r"sha256:[0-9a-f]{64}", digest) is not None,
+                    "archive OCI descriptor digest",
+                )
+                digest_value = digest.removeprefix("sha256:")
+                _require(digest_value not in ancestors, "archive OCI descriptor cycle")
+                blob = archive.extractfile(f"blobs/sha256/{digest_value}")
+                _require(blob is not None, "archive OCI descriptor blob missing")
+                blob_bytes = blob.read()
+                _require(_sha_bytes(blob_bytes) == digest_value, "archive OCI descriptor blob digest")
+                try:
+                    value = json.loads(blob_bytes)
+                except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+                    raise CandidateBuildError("archive OCI descriptor blob is invalid") from exc
+                _require(isinstance(value, dict), "archive OCI descriptor object")
+                config = value.get("config")
+                if isinstance(config, dict):
+                    matched = config.get("digest") == f"sha256:{config_sha256}"
+                else:
+                    children = value.get("manifests")
+                    _require(isinstance(children, list) and children, "archive OCI manifest chain")
+                    matched = any(
+                        visit(child, (*ancestors, digest_value)) for child in children
+                    )
+                if matched:
+                    bound_oci_digests.add(digest_value)
+                return matched
+
+            descriptors = index.get("manifests") if isinstance(index, dict) else None
+            _require(isinstance(descriptors, list) and descriptors, "archive OCI index manifests")
+            _require(any(visit(item, ()) for item in descriptors), "archive OCI index does not bind config")
+        return config_sha256, tuple(sorted(bound_oci_digests))
+
+
+def _archive_config_sha(path: Path) -> str:
+    return _archive_identity(path)[0]
+
+
+def _portable_image_id(
+    local_store_image_id: str,
+    archive_config_sha256: str,
+    bound_oci_digests: tuple[str, ...],
+) -> str:
+    _require(
+        re.fullmatch(r"sha256:[0-9a-f]{64}", local_store_image_id) is not None,
+        "local image ID is invalid",
+    )
+    _require(
+        re.fullmatch(r"[0-9a-f]{64}", archive_config_sha256) is not None,
+        "archive config digest is invalid",
+    )
+    portable = f"sha256:{archive_config_sha256}"
+    if local_store_image_id != portable:
+        _require(
+            local_store_image_id.removeprefix("sha256:") in bound_oci_digests,
+            "local image store ID is not bound through the archive OCI index",
+        )
+    return portable
 
 
 def _secret_scan(values: Iterable[bytes]) -> list[str]:
@@ -463,9 +534,13 @@ def prepare(args: argparse.Namespace) -> None:
     _run(["docker", "image", "save", "--output", str(archive), tag_two], timeout=1800)
     os.chmod(archive, 0o600)
     archive_sha = _sha_file(archive)
-    archive_config = _archive_config_sha(archive)
-    image_id = str(normalized_two["id"])
-    _require(image_id == f"sha256:{archive_config}", "archive config does not equal image ID")
+    archive_config, bound_oci_digests = _archive_identity(archive)
+    local_store_image_id = str(normalized_two["id"])
+    image_id = _portable_image_id(
+        local_store_image_id,
+        archive_config,
+        bound_oci_digests,
+    )
 
     files_sha = _write_private(output / "container-file-inventory.txt", files_two)
     dpkg_sha = _write_private(output / "dpkg-inventory.tsv", dpkg_two)
@@ -498,6 +573,8 @@ def prepare(args: argparse.Namespace) -> None:
             "layer_timestamps_rewritten": True,
             "image_tag": tag_two,
             "image_id": image_id,
+            "local_store_image_id": local_store_image_id,
+            "portable_image_identity_source": "verified-archive-config-digest",
             "config_sha256": normalized_two["config_sha256"],
             "rootfs_sha256": normalized_two["rootfs_sha256"],
             "entrypoint": normalized_two["entrypoint"],

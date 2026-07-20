@@ -1,0 +1,23 @@
+{
+  "schema_id": "R08B13SanitizedImageIdentityFailureEvidence",
+  "schema_version": "1.0.0",
+  "issued_at": "2026-07-20T11:24:00Z",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "R08B-R14_PORTABLE_IMAGE_IDENTITY_FIX",
+    "status": "R08B_R13_FAILED_CLOSED_PORTABLE_IDENTITY_REPAIR_REQUIRED",
+    "private_failed_stage_receipt_sha256": "820561f2ccb7955a94d7dec216c7c4eedad8bf38ba4c6e88a22939fc71908c48",
+    "subject_sha": "099414721b37127a90dbb9946fd6150f306db9a2",
+    "two_reproducible_builds_equal": true,
+    "inventories_equal": true,
+    "containerd_local_id_is_oci_index_digest": true,
+    "portable_archive_id_is_config_digest": true,
+    "candidate_cut": false,
+    "provider_calls": 0,
+    "live_or_vps_actions": 0,
+    "repository_mutation_during_failed_stage": false,
+    "private_or_secret_bytes_public": false,
+    "grants_authority": false
+  },
+  "integrity": {"profile": "core-json-sha256-v1", "payload_sha256": "d16a76dc187a3f8ea0cd67ce07c929ffb360d662fe74588edb327d5759c4713f"}
+}

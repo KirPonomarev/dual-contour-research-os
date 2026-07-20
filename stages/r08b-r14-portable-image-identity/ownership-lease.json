@@ -1,0 +1,17 @@
+{
+  "schema_id": "PrivateOwnershipLease",
+  "schema_version": "1.0.0",
+  "lease_id": "r08b-r14-agent0-portable-image-identity-0994147",
+  "stage_id": "R08B-R14_PORTABLE_IMAGE_IDENTITY_FIX",
+  "issued_at": "2026-07-20T11:21:00Z",
+  "expires_at": "2026-07-21T11:21:00Z",
+  "holder": {"id": "agent-0", "role": "release-build-tool-repair-writer"},
+  "branch": "codex/bridge-a0-r08b-r14-portable-image-identity",
+  "worktree": "/private/tmp/dcr-r08b-r14-0994147",
+  "base_sha": "099414721b37127a90dbb9946fd6150f306db9a2",
+  "stage_envelope_sha256": "2f80068ae81544f7abd1f610188a29bb6545b2f55ac4d7fe76d6ef9e3f8e6f54",
+  "second_writer_allowed": false,
+  "sublease_allowed": false,
+  "revoked": false,
+  "integrity": {"profile": "core-json-sha256-v1", "payload_sha256": "c8f4b9d9c274a8b16a33c3bf87fdebeafb161be67cb7c9d29587c186b513dc38"}
+}
