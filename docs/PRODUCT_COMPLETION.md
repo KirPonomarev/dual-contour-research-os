@@ -1,4 +1,36 @@
-# Product completion boundary — superseded checkpoint
+# Product completion boundary — V2.4 fast working release
+
+Current status: `V2.4_FAST_WORKING_RELEASE_IN_PROGRESS`.
+
+V2.4 defines Product Done and Release Done together at F12. R08B freezes the
+exact release subject; R08C proves its full functional loop; F09 freezes
+current evidence; F10 proves a clean disposable Linux installation; F11 proves
+isolated recovery; F12-A seals the Git evidence and F12-B independently audits
+that immutable head outside Git. No earlier stage may claim `DONE`.
+
+Live/VPS deployment, live restore/rollback/reboot and the 24-hour, 48-hour,
+seven-day and 14-day observation windows are outside this plan. They remain
+valuable later operational evidence, but they do not delay V2.4 Product Done
+or Release Done. The terminal V2.4 state must preserve
+`PHYSICALLY_DEPLOYED=false` and `OPERATIONALLY_PROVEN=false`.
+
+```text
+PLAN_ID=DCR_OS_AUTONOMOUS_V2_3_NO_BRAKES_20260719
+PLAN_VERSION=2.4.0-fast-working-release
+STATUS=IN_PROGRESS
+PRODUCT_CODE_COMPLETE=true
+PRODUCT_DONE=false
+RELEASE_DONE=false
+REAL_BOUNDED_RESEARCH_OPERATION_READY=false
+MASTER_PLAN_DONE=false
+PHYSICALLY_DEPLOYED=false
+OPERATIONALLY_PROVEN=false
+TIMED_WINDOWS=OUT_OF_SCOPE
+LIVE_VPS_DEPLOYMENT=OUT_OF_SCOPE
+DONE_REQUIRES=F12_B_INDEPENDENT_AUDIT_PASS
+```
+
+## Historical checkpoint retained
 
 Status: `SUPERSEDED_REPAIR_REQUIRED`
 
@@ -57,7 +89,7 @@ These claims describe component or shadow evidence only. They are not current pr
 - release blueprint, release identity, isolation, readiness and final-freeze validators;
 - secret/privacy/public-repository scans over the exact product-completion diff.
 
-## Required before the replacement Product Done gate
+## Historical pre-V2.4 replacement requirements
 
 The following are known product and physical-completion requirements, not elapsed-time observation:
 
@@ -69,6 +101,16 @@ The following are known product and physical-completion requirements, not elapse
 - replacement release freeze and successful physical deployment;
 - full remote A1 E2E, monitoring, backup, two restores, restart, provider failure and rollback proof.
 
-Deployment, remote E2E and recovery are part of those product conditions. Only after they pass may the finished product start its separate operational windows: 24-hour substrate, 48-hour provider, seven-day integrated and 14-day/200-job final burn-in. The final global `DONE` transition remains after those windows.
+Under the historical plan, deployment, remote E2E and recovery were part of
+those product conditions. Only after they passed could the finished product
+start its separate operational windows: 24-hour substrate, 48-hour provider,
+seven-day integrated and 14-day/200-job final burn-in. V2.4 supersedes that
+gating sequence without deleting its evidence history: only disposable and
+isolated physical proof remains in release scope, while live and timed work is
+out of scope.
 
-Until the replacement Product Done receipt exists, the honest state is `SUPERSEDED_REPAIR_REQUIRED / DEPLOYMENT_DENIED`. No local test, CI result, saved receipt integrity, image build or GitHub review replaces functional exact-image, remote and recovery evidence.
+The historical checkpoint's honest state remains
+`SUPERSEDED_REPAIR_REQUIRED / DEPLOYMENT_DENIED`. The current V2.4 state is
+separately `IN_PROGRESS`; no local unit test, CI result, saved receipt
+integrity, image build or GitHub review substitutes for R08C/F10/F11 physical
+evidence or the independent F12 audit.

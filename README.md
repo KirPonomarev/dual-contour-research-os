@@ -6,11 +6,44 @@ The public repository contains only domain-neutral contracts, control-plane code
 
 ## Current status
 
-`SUPERSEDED_REPAIR_REQUIRED + PRODUCT_REPAIR_IN_PROGRESS`
+`V2.4_FAST_WORKING_RELEASE_IN_PROGRESS`
+
+The active V2.4 release plan is intentionally not `DONE`. Product code is
+complete, but the exact release still must pass R08B, R08C, F09, F10, F11 and
+the independent F12 closeout. Live/VPS deployment and the 24-hour, 48-hour,
+seven-day and 14-day observation windows are outside this release plan; they
+are neither performed nor used as release gates. `PHYSICALLY_DEPLOYED` and
+`OPERATIONALLY_PROVEN` therefore remain false even when F12 eventually marks
+the bounded working release done.
+
+```text
+PLAN_ID=DCR_OS_AUTONOMOUS_V2_3_NO_BRAKES_20260719
+PLAN_VERSION=2.4.0-fast-working-release
+STATUS=IN_PROGRESS
+PRODUCT_CODE_COMPLETE=true
+PRODUCT_DONE=false
+RELEASE_DONE=false
+REAL_BOUNDED_RESEARCH_OPERATION_READY=false
+MASTER_PLAN_DONE=false
+PHYSICALLY_DEPLOYED=false
+OPERATIONALLY_PROVEN=false
+TIMED_WINDOWS=OUT_OF_SCOPE
+LIVE_VPS_DEPLOYMENT=OUT_OF_SCOPE
+DONE_REQUIRES=F12_B_INDEPENDENT_AUDIT_PASS
+```
+
+Historical correction marker retained as immutable provenance:
+`SUPERSEDED_REPAIR_REQUIRED + PRODUCT_REPAIR_IN_PROGRESS`.
 
 The Core and additive A1 public contracts remain frozen and verified by `make contracts`. Historical E0–E5 component work remains immutable provenance, but independent exact-runtime probes found that the S38 deployment target cannot execute the production A1 route: its policy resolver is empty, the daemon does not wire the durable A1 backend or Collector/Scout roles, its deployment smoke proves only `status`, and its E2 proof is stale.
 
-The old candidate `b2c2e6a8…` is preserved as a historical object but is machine-denied as a deployment target by an additive supersession receipt. Product completion now requires a replacement exact image, full AF_UNIX A1 E2E, current capability proofs, physical deployment and recovery proof before any observation window begins. See [Product completion boundary](docs/PRODUCT_COMPLETION.md).
+The old candidate `b2c2e6a8…` is preserved as a historical object but is
+machine-denied as a deployment target by an additive supersession receipt.
+That historical correction required a replacement exact image and physical
+proof; the active V2.4 amendment narrows release completion to a real bounded
+working release on disposable/isolated targets and leaves every live/VPS and
+timed claim explicitly false or out of scope. See [Product completion
+boundary](docs/PRODUCT_COMPLETION.md).
 
 ## Product boundary
 

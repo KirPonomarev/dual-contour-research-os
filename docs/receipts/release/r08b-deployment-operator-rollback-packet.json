@@ -1,0 +1,131 @@
+{
+  "schema_id": "R08BDeploymentOperatorRollbackPacket",
+  "schema_version": "1.0.0",
+  "object_id": "r08b-deployment-operator-rollback-packet-v2.4-20260720",
+  "issued_at": "2026-07-20T01:05:41Z",
+  "payload": {
+    "plan_id": "DCR_OS_AUTONOMOUS_V2_3_NO_BRAKES_20260719",
+    "plan_version": "2.4.0-fast-working-release",
+    "stage_id": "R08B_EXACT_CANDIDATE_IMAGE_BUILD_AND_SBOM",
+    "status": "STATIC_INPUTS_FROZEN_CANDIDATE_NOT_CUT",
+    "candidate_resolution": {
+      "candidate_release_sha": null,
+      "candidate_tree_sha": null,
+      "candidate_exact_head_ci_run": "NOT_CUT",
+      "resolution_source": "post-squash exact-merge-head candidate-cut IntegrationReceipt",
+      "mutable_branch_or_tag_allowed": false,
+      "historical_s38_candidate_allowed": false
+    },
+    "static_inputs": [
+      {"path": "docs/R08B_RELEASE_OPERATOR_RUNBOOK.md", "sha256": "ed118966a7f57c9e01e1a9df9795ac8b82a44f4128464e8809f3fa51c93d4564"},
+      {"path": "README.md", "sha256": "51e18b87973b409030233fc21da16f64a751faa5dc63b5174c2c004f7b251a31"},
+      {"path": "docs/ARCHITECTURE.md", "sha256": "3256c4f10c2a8787ce2561d3abb356207eaa731429ac4a1fff051fd8167c3075"},
+      {"path": "docs/PRODUCT_COMPLETION.md", "sha256": "2c86c57292ea13594c6fe5656b6ef1565cf59cb8bf2dbf7cc1cb9c41b7346ac7"},
+      {"path": "tools/candidate_image_build.py", "sha256": "dfd3a576c29006c4c07969672bc4e873118a41b15aecdbd16e4fe2bdd7ca47d4"},
+      {"path": "tools/verify_final_release_freeze.py", "sha256": "06cd182be4cc416b31696d075fbda47d002147851e931e2083fd3a6b9124f647"},
+      {"path": "ops/release/Containerfile", "sha256": "19c81a091994fd8fb744780c344164574278cff404c306f7304b9ccedcfa7e47"},
+      {"path": "ops/release/researchd.config.template.json", "sha256": "c97a5b03942edf5746a1362a418b3d7ecad9d5e45620d80305475cefebf7591f"},
+      {"path": "ops/release/final-a1-runtime-policy.json", "sha256": "665bfb70a82d3aa5988d45fa299fb14d2b28926e6267a15ae440e3c03fbb0cd9"},
+      {"path": "ops/release/monitoring-recovery-policy.json", "sha256": "43aa8b33203af26b589ac045d89cf23c78bef2d5930ae85c8428b0e33e946634"},
+      {"path": "ops/release/dependency-lock.json", "sha256": "58cd81aa9e5554e5ae88a0d86822e341a6ac25eb8179cca9a9fb3e4512493be9"},
+      {"path": "ops/release/THIRD_PARTY_NOTICES.md", "sha256": "f3683a82df4e25de6a748270abd351342bc69796eddfa519ef1fe5f1f2fa9ebd"},
+      {"path": "ops/release/image_e2e_harness.py", "sha256": "bc4c12e9eb86e0c390916610d729a370cf835052488af54167abbf1ce3b35331"},
+      {"path": "tools/release_backup_restore.py", "sha256": "9e9c0d2d8a1be70e27c3d6d6c6dbf522a3fe0f331f4cc2d186968c1b60515a74"},
+      {"path": "ops/deploy/research-os-a1-final.service", "sha256": "eafdfccdc66ce160f9aaad0d724efa8c42414b9d69d8e78ca323bbe9b4a25349"},
+      {"path": "ops/deploy/research-os-connected-worker@.service", "sha256": "b3287005312adaf7acf70f981765b0c75ebeb0aabf6da268df47a0e376ded2c5"},
+      {"path": "ops/deploy/research-os-runtime-monitor.service", "sha256": "b5b4d7ab75452fbeb12a4eb77797e809bf19c6d4fb941212760346df433f20a2"},
+      {"path": "ops/deploy/research-os-runtime-monitor.timer", "sha256": "ba9d3c522cac720d719202a10339a35835ed924bf4a465903b22177fa5c50843"},
+      {"path": "ops/deploy/research-os-backup.service", "sha256": "b1d3452c56a8f5ce663144f503dc7aefc9f394b7b202711602b53cfe4749da17"},
+      {"path": "ops/deploy/research-os-backup.timer", "sha256": "67af9d8caabcc7bc0961627360e4f112a81420cb9ccf7aac0f3cd0a7d7580760"},
+      {"path": "ops/connected-worker/Containerfile", "sha256": "aede97dd972e46cb0d762bc2d52f28d2f9ff21895234160ab367b5a57c282261"},
+      {"path": "ops/connected-worker/runbook-inputs.json", "sha256": "1a3bcee50ec1191c384bee7e7d1a28e41181b3cb3a3106929160624d6a772aba"}
+    ],
+    "private_inputs": {
+      "candidate_image_archive": "OWNER_ONLY_RESOLVED_BY_CANDIDATE_CUT_RECEIPT",
+      "candidate_build_evidence": "OWNER_ONLY_RESOLVED_BY_CANDIDATE_CUT_RECEIPT",
+      "advisory_snapshot": "OWNER_ONLY_HASH_ONLY",
+      "provider_credentials": "EXISTING_OWNER_ONLY_LOCATOR_ONLY",
+      "provider_raw_responses": "OWNER_ONLY_NEVER_GIT",
+      "runtime_database": "OWNER_ONLY_NEVER_GIT",
+      "backup_repository": "OWNER_ONLY_NEVER_GIT"
+    },
+    "phase_boundaries": {
+      "R08C": "LOCAL_ONLY",
+      "F09": "SANITIZED_EVIDENCE_ONLY_PR_AUTO",
+      "F10": "AGENT_CREATED_DISPOSABLE_LINUX_ONLY",
+      "F11": "AGENT_CREATED_ISOLATED_TARGETS_ONLY",
+      "F12_A": "SANITIZED_EVIDENCE_SEAL_IN_GIT",
+      "F12_B": "INDEPENDENT_READ_ONLY_OUTSIDE_GIT"
+    },
+    "installation": {
+      "clean_target_required": true,
+      "repository_or_worktree_mount_allowed": false,
+      "prior_runtime_volume_allowed": false,
+      "pre_rendered_state_allowed": false,
+      "immutable_image_id_required": true,
+      "non_root_uids_required": true,
+      "single_supervisor_required": true,
+      "single_durable_writer_required": true,
+      "core_provider_network_allowed": false,
+      "connected_edge_bounded_egress_only": true,
+      "shipped_units_only": true
+    },
+    "backup_restore": {
+      "controller": "tools/release_backup_restore.py",
+      "encrypted_verified_backup_required": true,
+      "post_jobspec_state_required": true,
+      "two_distinct_clean_restore_targets_required": true,
+      "distinct_action_receipts_required": true,
+      "manifest_equality_required": true,
+      "private_locator_in_git": false,
+      "live_restore_allowed": false
+    },
+    "rollback": {
+      "target": "EXACT_F09_FROZEN_RELEASE",
+      "requires_distinct_fault_injection_fingerprint": true,
+      "same_version_reinstall_counts": false,
+      "historical_superseded_candidate_allowed": false,
+      "post_rollback_jobspec_required": true,
+      "live_target_allowed": false
+    },
+    "completion": {
+      "status_before_f12_b": "IN_PROGRESS",
+      "done_requires": "F12_B_INDEPENDENT_AUDIT_PASS",
+      "product_done_before_f12_b": false,
+      "release_done_before_f12_b": false,
+      "physically_deployed_at_done": false,
+      "operationally_proven_at_done": false,
+      "timed_windows": "OUT_OF_SCOPE"
+    },
+    "authority": {
+      "local_disposable_verification": true,
+      "agent_created_isolated_verification": true,
+      "live_deployment": false,
+      "vps_mutation": false,
+      "live_restore": false,
+      "live_rollback": false,
+      "host_reboot": false,
+      "canonical_mutation": false,
+      "publication": false,
+      "live_trading": false,
+      "autonomous_live_security": false,
+      "grants_authority": false,
+      "physically_deployed": false,
+      "operationally_proven": false,
+      "timed_windows": "OUT_OF_SCOPE"
+    },
+    "public_safety": {
+      "secrets": 0,
+      "raw_provider_bytes": 0,
+      "runtime_database_bytes": 0,
+      "d2_d3_payloads": 0,
+      "target_specific_material": 0,
+      "private_locators": 0,
+      "external_actions": 0
+    }
+  },
+  "integrity": {
+    "profile": "core-json-sha256-v1",
+    "payload_sha256": "5e67385b67b7ec08b8673e30f1464e6c256da233047314817c66d90583c5a4d8"
+  }
+}

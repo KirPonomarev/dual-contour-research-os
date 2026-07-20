@@ -3,6 +3,8 @@
 
 from __future__ import annotations
 
+import argparse
+from copy import deepcopy
 import hashlib
 import json
 from pathlib import Path
@@ -26,9 +28,202 @@ MANIFEST = "docs/receipts/release/s38-final-release-manifest.json"
 INVENTORY = "docs/receipts/release/s38-dependency-notice-inventory.json"
 PACKET = "ops/deploy/s38-final-deployment-packet.json"
 
+V24_PLAN_ID = "DCR_OS_AUTONOMOUS_V2_3_NO_BRAKES_20260719"
+V24_PLAN_VERSION = "2.4.0-fast-working-release"
+V24_STATUS_DOCS = (
+    "README.md",
+    "docs/ARCHITECTURE.md",
+    "docs/PRODUCT_COMPLETION.md",
+)
+V24_STATUS_KEYS = (
+    "PLAN_ID",
+    "PLAN_VERSION",
+    "STATUS",
+    "PRODUCT_CODE_COMPLETE",
+    "PRODUCT_DONE",
+    "RELEASE_DONE",
+    "REAL_BOUNDED_RESEARCH_OPERATION_READY",
+    "MASTER_PLAN_DONE",
+    "PHYSICALLY_DEPLOYED",
+    "OPERATIONALLY_PROVEN",
+    "TIMED_WINDOWS",
+    "LIVE_VPS_DEPLOYMENT",
+    "DONE_REQUIRES",
+)
+V24_IN_PROGRESS_STATUS = {
+    "PLAN_ID": V24_PLAN_ID,
+    "PLAN_VERSION": V24_PLAN_VERSION,
+    "STATUS": "IN_PROGRESS",
+    "PRODUCT_CODE_COMPLETE": "true",
+    "PRODUCT_DONE": "false",
+    "RELEASE_DONE": "false",
+    "REAL_BOUNDED_RESEARCH_OPERATION_READY": "false",
+    "MASTER_PLAN_DONE": "false",
+    "PHYSICALLY_DEPLOYED": "false",
+    "OPERATIONALLY_PROVEN": "false",
+    "TIMED_WINDOWS": "OUT_OF_SCOPE",
+    "LIVE_VPS_DEPLOYMENT": "OUT_OF_SCOPE",
+    "DONE_REQUIRES": "F12_B_INDEPENDENT_AUDIT_PASS",
+}
+
 
 class FinalReleaseFreezeError(RuntimeError):
     pass
+
+
+def _status_values(value: Mapping[str, object]) -> dict[str, str]:
+    result: dict[str, str] = {}
+    for key in V24_STATUS_KEYS:
+        item = value.get(key)
+        if isinstance(item, bool):
+            result[key] = str(item).lower()
+        elif isinstance(item, str):
+            result[key] = item
+        else:
+            raise FinalReleaseFreezeError(f"V2.4 status field missing or invalid:{key}")
+    extras = set(value) - set(V24_STATUS_KEYS) - {"F12_A_STATUS", "F12_B_STATUS"}
+    if extras:
+        raise FinalReleaseFreezeError(f"V2.4 status has unexpected fields:{sorted(extras)}")
+    return result
+
+
+def validate_v24_status(
+    value: Mapping[str, object],
+    *,
+    require_in_progress: bool = False,
+) -> dict[str, str]:
+    """Validate exact V2.4 identity and the only permitted terminal transition."""
+
+    values = _status_values(value)
+    if values["PLAN_ID"] != V24_PLAN_ID:
+        raise FinalReleaseFreezeError("V2.4 PLAN_ID mismatch")
+    if values["PLAN_VERSION"] != V24_PLAN_VERSION:
+        raise FinalReleaseFreezeError("V2.4 PLAN_VERSION mismatch")
+    invariant = {
+        "PRODUCT_CODE_COMPLETE": "true",
+        "PHYSICALLY_DEPLOYED": "false",
+        "OPERATIONALLY_PROVEN": "false",
+        "TIMED_WINDOWS": "OUT_OF_SCOPE",
+        "LIVE_VPS_DEPLOYMENT": "OUT_OF_SCOPE",
+        "DONE_REQUIRES": "F12_B_INDEPENDENT_AUDIT_PASS",
+    }
+    for key, expected in invariant.items():
+        if values[key] != expected:
+            raise FinalReleaseFreezeError(f"V2.4 invariant mismatch:{key}")
+    completion_keys = (
+        "PRODUCT_DONE",
+        "RELEASE_DONE",
+        "REAL_BOUNDED_RESEARCH_OPERATION_READY",
+        "MASTER_PLAN_DONE",
+    )
+    status = values["STATUS"]
+    if require_in_progress and status != "IN_PROGRESS":
+        raise FinalReleaseFreezeError("frozen status document is not IN_PROGRESS")
+    if status == "IN_PROGRESS":
+        if any(values[key] != "false" for key in completion_keys):
+            raise FinalReleaseFreezeError("premature V2.4 completion claim")
+    elif status == "DONE":
+        if any(values[key] != "true" for key in completion_keys):
+            raise FinalReleaseFreezeError("V2.4 DONE is not atomic")
+        if value.get("F12_A_STATUS") != "SEALED" or value.get("F12_B_STATUS") != "PASS":
+            raise FinalReleaseFreezeError("V2.4 DONE lacks sealed F12-A/F12-B PASS")
+    else:
+        raise FinalReleaseFreezeError("invalid V2.4 STATUS")
+    return values
+
+
+def _extract_v24_status(path: Path) -> dict[str, str]:
+    text = path.read_text(encoding="utf-8")
+    blocks = re.findall(r"```text\n(.*?)\n```", text, flags=re.DOTALL)
+    matches = [block for block in blocks if f"PLAN_ID={V24_PLAN_ID}" in block]
+    if len(matches) != 1:
+        raise FinalReleaseFreezeError(f"expected one V2.4 status block:{path}")
+    values: dict[str, str] = {}
+    for line in matches[0].splitlines():
+        if "=" not in line:
+            raise FinalReleaseFreezeError(f"malformed V2.4 status line:{path}")
+        key, item = line.split("=", 1)
+        if key in values:
+            raise FinalReleaseFreezeError(f"duplicate V2.4 status key:{path}:{key}")
+        values[key] = item
+    if tuple(values) != V24_STATUS_KEYS:
+        raise FinalReleaseFreezeError(f"V2.4 status field order/set mismatch:{path}")
+    return values
+
+
+def verify_v24_status_docs(root: Path = ROOT) -> dict[str, object]:
+    digests: dict[str, str] = {}
+    for ref in V24_STATUS_DOCS:
+        path = root / ref
+        values = _extract_v24_status(path)
+        validate_v24_status(values, require_in_progress=True)
+        if values != V24_IN_PROGRESS_STATUS:
+            raise FinalReleaseFreezeError(f"V2.4 status value mismatch:{ref}")
+        digests[ref] = _sha(path)
+    return {
+        "status": "V2.4_STATUS_DOCS_GREEN",
+        "plan_id": V24_PLAN_ID,
+        "plan_version": V24_PLAN_VERSION,
+        "documents": digests,
+        "done_requires": "F12_B_INDEPENDENT_AUDIT_PASS",
+        "physically_deployed": False,
+        "operationally_proven": False,
+    }
+
+
+def self_test_v24_status() -> dict[str, object]:
+    validate_v24_status(V24_IN_PROGRESS_STATUS, require_in_progress=True)
+    terminal = dict(V24_IN_PROGRESS_STATUS)
+    terminal.update(
+        {
+            "STATUS": "DONE",
+            "PRODUCT_DONE": "true",
+            "RELEASE_DONE": "true",
+            "REAL_BOUNDED_RESEARCH_OPERATION_READY": "true",
+            "MASTER_PLAN_DONE": "true",
+            "F12_A_STATUS": "SEALED",
+            "F12_B_STATUS": "PASS",
+        }
+    )
+    validate_v24_status(terminal)
+    mutations: dict[str, tuple[str, object | None]] = {
+        "missing-field": ("RELEASE_DONE", None),
+        "plan-id-mismatch": ("PLAN_ID", "wrong"),
+        "plan-version-mismatch": ("PLAN_VERSION", "2.4"),
+        "premature-done": ("PRODUCT_DONE", "true"),
+        "physical-live-overclaim": ("PHYSICALLY_DEPLOYED", "true"),
+        "timed-window-overclaim": ("TIMED_WINDOWS", "IN_SCOPE"),
+    }
+    rejected: list[str] = []
+    for name, (field, replacement) in mutations.items():
+        candidate = deepcopy(V24_IN_PROGRESS_STATUS)
+        if replacement is None:
+            candidate.pop(field)
+        else:
+            candidate[field] = replacement
+        try:
+            validate_v24_status(candidate)
+        except FinalReleaseFreezeError:
+            rejected.append(name)
+        else:
+            raise FinalReleaseFreezeError(f"accepted hostile V2.4 status:{name}")
+    for name, field, replacement in (
+        ("done-without-f12b", "F12_B_STATUS", "PENDING"),
+        ("done-non-atomic", "MASTER_PLAN_DONE", "false"),
+    ):
+        candidate = deepcopy(terminal)
+        candidate[field] = replacement
+        try:
+            validate_v24_status(candidate)
+        except FinalReleaseFreezeError:
+            rejected.append(name)
+        else:
+            raise FinalReleaseFreezeError(f"accepted hostile terminal status:{name}")
+    return {
+        "status": "V2.4_STATUS_SELF_TEST_GREEN",
+        "hostile_mutations_rejected": rejected,
+        "hostile_mutation_count": len(rejected),
+    }
 
 
 def _load(path: Path) -> dict[str, object]:
@@ -224,7 +419,22 @@ def inspect(root: Path = ROOT) -> dict[str, object]:
 
 
 def main() -> int:
-    try: result = inspect()
+    parser = argparse.ArgumentParser(description=__doc__)
+    subparsers = parser.add_subparsers(dest="command")
+    status_parser = subparsers.add_parser("verify-v2.4-status")
+    status_parser.add_argument("--state-file")
+    subparsers.add_parser("self-test-v2.4-status")
+    args = parser.parse_args()
+    try:
+        if args.command == "verify-v2.4-status":
+            result = verify_v24_status_docs()
+            if args.state_file:
+                state = _load(Path(args.state_file))
+                result["external_state"] = validate_v24_status(state)
+        elif args.command == "self-test-v2.4-status":
+            result = self_test_v24_status()
+        else:
+            result = inspect()
     except FinalReleaseFreezeError as exc:
         print(json.dumps({"status": "FAIL", "reason": str(exc)}, sort_keys=True)); return 1
     print(json.dumps(result, sort_keys=True)); return 0

@@ -82,9 +82,41 @@ Higher-order E2–E5 evaluators are bounded library/tool capabilities referenced
 
 ## Product and operational evidence
 
+### V2.4 release-scoped completion
+
+V2.4 separates a proven bounded working release from later live deployment and
+elapsed-time operational evidence. The exact runtime subject is frozen at
+R08B; subsequent evidence commits may advance only through the frozen
+evidence-only path allowlist. R08C, F10 and F11 execute only disposable or
+agent-created isolated targets. F12 is the sole transition to Product Done,
+Release Done and Master Plan Done, and F12-B must be performed by an
+independent read-only assurance owner against the sealed F12-A receipt head.
+
+```text
+PLAN_ID=DCR_OS_AUTONOMOUS_V2_3_NO_BRAKES_20260719
+PLAN_VERSION=2.4.0-fast-working-release
+STATUS=IN_PROGRESS
+PRODUCT_CODE_COMPLETE=true
+PRODUCT_DONE=false
+RELEASE_DONE=false
+REAL_BOUNDED_RESEARCH_OPERATION_READY=false
+MASTER_PLAN_DONE=false
+PHYSICALLY_DEPLOYED=false
+OPERATIONALLY_PROVEN=false
+TIMED_WINDOWS=OUT_OF_SCOPE
+LIVE_VPS_DEPLOYMENT=OUT_OF_SCOPE
+DONE_REQUIRES=F12_B_INDEPENDENT_AUDIT_PASS
+```
+
+The block records the current pre-F12 state. At the terminal external state
+transition, the four completion booleans become true atomically only after a
+sealed F12-A receipt and a separate F12-B audit; the physical, operational,
+live and timed values do not change.
+
 `PRODUCT_IMPLEMENTATION_COMPLETE` means the public code, contracts, documentation, deterministic tests, hostile probes, phase receipts, frozen application candidate, and fail-closed deployment corridor are integrated on one exact remote head. It does not mean the release is deployed or operationally proven.
 
-Operational proof is a later authority-bound sequence:
+The following is the retained historical operational sequence, not a V2.4
+release gate:
 
 ```text
 fresh Human DeploymentApprovalReceipt

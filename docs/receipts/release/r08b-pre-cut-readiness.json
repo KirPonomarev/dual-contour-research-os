@@ -1,0 +1,148 @@
+{
+  "schema_id": "R08BPreCutReadinessReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "r08b-parent-precut-readiness-v2.4-20260720",
+  "issued_at": "2026-07-20T01:09:10Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "plan_id": "DCR_OS_AUTONOMOUS_V2_3_NO_BRAKES_20260719",
+    "plan_version": "2.4.0-fast-working-release",
+    "amendment_id": "FAST_RELEASE_NO_TIMED_WINDOWS_NO_HUMAN_WAIT_20260719",
+    "stage_id": "R08B_EXACT_CANDIDATE_IMAGE_BUILD_AND_SBOM",
+    "repair_stage_id": "r08b-r7-static-precut-release-inputs",
+    "status": "PASS_PARENT_PRE_CUT_READINESS",
+    "accepted_predecessor": {
+      "head_sha": "671af7e7908830c45aff64f3bb0984ffa8661564",
+      "tree_sha": "13d6ff8ed7acf7a098cf62320db205c043f53aeb",
+      "receipt_ref": "docs/receipts/integration/r08b-r6-private-two-role-precut.json",
+      "receipt_sha256": "cb0b39d553ee5f9b89903df28a44fb6a82e2cc27bcdfa870cd48e8d582e48188",
+      "receipt_head_ci_run": 29709929666
+    },
+    "authority": {
+      "head_sha": "e80f134ff36555822e4d89d5946465fc3dd43ed5",
+      "tree_sha": "93b8dd0bd079ba63c7f232b1ddbc581a5c9a3a43",
+      "exact_head_ci_run": 29710065714,
+      "stage_envelope_ref": "stages/r08b-exact-candidate-image-build-sbom/stage-envelope-amendment-v2.4-17.json",
+      "ownership_lease_ref": "stages/r08b-exact-candidate-image-build-sbom/ownership-lease-amendment-v2.4-17.json",
+      "cross_owner_write_set": false,
+      "provider_call_budget": 0,
+      "external_source_read_budget": 0,
+      "live_or_vps_action_budget": 0
+    },
+    "private_two_role_component": {
+      "status": "PASS_PRIVATE_TWO_ROLE_PROPOSAL_EVIDENCE",
+      "stage_receipt_sha256": "07ce02c895a0be88399418b1134ea943c407da513c08a24084a34763173ad14c",
+      "proposal_envelope_sha256": "01db7297a081d8543862fb0aff866dbfc225c6d0c05787b4b232514bd3e86a67",
+      "critic_sanitized_manifest_sha256": "4f719e4c80add6a96f7a44a3e5561557dd70d1874f01e1b122acae334b272d2d",
+      "sanitized_parent_manifest_sha256": "c2b1b6771edcf8fdd9656236f7c361bc08366ec2cad98af33f16d92f008c4e26",
+      "total_provider_calls": 2,
+      "fresh_provider_calls_for_r7": 0,
+      "distinct_declared_model_families": true,
+      "distinct_declared_provenance_groups": true,
+      "upstream_provider_independence": "NOT_ESTABLISHED",
+      "all_provider_accounting_reconciled": true,
+      "automatic_retry": false,
+      "real_non_fixture_source": true,
+      "raw_or_credential_bytes_public": false
+    },
+    "static_release_inputs": {
+      "deployment_operator_rollback_packet_ref": "docs/receipts/release/r08b-deployment-operator-rollback-packet.json",
+      "deployment_operator_rollback_packet_sha256": "97ce159831d9635a10e47a05d540dddbe353153b36a948c32422b04f1cfdfc2e",
+      "operator_runbook_ref": "docs/R08B_RELEASE_OPERATOR_RUNBOOK.md",
+      "operator_runbook_sha256": "ed118966a7f57c9e01e1a9df9795ac8b82a44f4128464e8809f3fa51c93d4564",
+      "parent_validator_ref": "tools/r08b_pre_cut_readiness.py",
+      "parent_validator_sha256": "a59f58b144744d0fde8cae5cf5294e77763d568e06c1eaec19e051cb877b8f8d",
+      "candidate_build_tool_ref": "tools/candidate_image_build.py",
+      "candidate_build_tool_sha256": "dfd3a576c29006c4c07969672bc4e873118a41b15aecdbd16e4fe2bdd7ca47d4",
+      "final_status_validator_ref": "tools/verify_final_release_freeze.py",
+      "final_status_validator_sha256": "06cd182be4cc416b31696d075fbda47d002147851e931e2083fd3a6b9124f647",
+      "packet_static_input_count": 22,
+      "candidate_build_tool_new_dependency": false
+    },
+    "v2_4_status": {
+      "status": "IN_PROGRESS",
+      "product_code_complete": true,
+      "product_done": false,
+      "release_done": false,
+      "real_bounded_research_operation_ready": false,
+      "master_plan_done": false,
+      "physically_deployed": false,
+      "operationally_proven": false,
+      "timed_windows": "OUT_OF_SCOPE",
+      "live_vps_deployment": "OUT_OF_SCOPE",
+      "done_requires": "F12_B_INDEPENDENT_AUDIT_PASS",
+      "hostile_status_mutations_rejected": 8
+    },
+    "focused_validation": {
+      "release_blueprint": "green",
+      "trailer_identity_correction": "green",
+      "frozen_image_inputs": "green",
+      "candidate_build_self_test": "green",
+      "candidate_build_hostile_mutations_rejected": 7,
+      "parent_pre_cut_self_test": "green",
+      "parent_pre_cut_hostile_mutations_rejected": 10,
+      "parent_pre_cut_private_manifest": "green",
+      "status_docs_and_validator": "green",
+      "deployment_packet_integrity": "green",
+      "contracts": "green",
+      "full_suite": "green",
+      "full_suite_tests": 919,
+      "sandbox_baseline": "AF_UNIX_BIND_DENIED_BY_SANDBOX",
+      "sandbox_failures": 2,
+      "sandbox_errors": 59,
+      "outside_sandbox_regressions": 0,
+      "privacy_secret_scan": "green-synthetic-hostile-probes-only"
+    },
+    "delivery_state": {
+      "parent_pre_cut_requirements_complete": true,
+      "parent_delivery_gate": "PENDING_PR_HEAD_AND_POST_SQUASH_MERGE_HEAD_CI",
+      "candidate_sha": null,
+      "candidate_tree_sha": null,
+      "candidate_exact_head_ci_run": "NOT_CUT",
+      "candidate_cut_permitted": false,
+      "r08b_accepted": false,
+      "release_claim_issued": false,
+      "product_done": false,
+      "release_done": false,
+      "live_or_vps_actions": 0,
+      "timed_observations": "OUT_OF_SCOPE",
+      "grants_authority": false
+    },
+    "known_next_gates": [
+      "commit and non-force push the exact R08B-R7 write-set",
+      "green exact implementation-head CI",
+      "green exact parent PR-head CI",
+      "squash merge with canonical trailers",
+      "green exact post-squash merge-head CI",
+      "select only that merge SHA/tree as candidate",
+      "two literal no-cache linux/amd64 builds and archive/SBOM/inventory reconciliation",
+      "candidate-cut IntegrationReceipt and exact receipt-head CI"
+    ],
+    "public_safety": {
+      "owner_only_files_copied_to_git": 0,
+      "raw_provider_bytes": 0,
+      "credentials": 0,
+      "runtime_databases": 0,
+      "d2_d3_payloads": 0,
+      "private_locators": 0,
+      "live_actions": 0,
+      "grants_authority": false
+    }
+  },
+  "integrity": {
+    "profile": "core-json-sha256-v1",
+    "payload_sha256": "b066392f8ad28e37517dd8196200eb9fa97e7c95bc53a7bff065fc590f0bbd8d",
+    "parent_refs": [
+      "git:671af7e7908830c45aff64f3bb0984ffa8661564",
+      "git:e80f134ff36555822e4d89d5946465fc3dd43ed5",
+      "public-r6-receipt:sha256:cb0b39d553ee5f9b89903df28a44fb6a82e2cc27bcdfa870cd48e8d582e48188",
+      "private-stage-receipt:sha256:07ce02c895a0be88399418b1134ea943c407da513c08a24084a34763173ad14c",
+      "private-proposal-envelope:sha256:01db7297a081d8543862fb0aff866dbfc225c6d0c05787b4b232514bd3e86a67",
+      "sanitized-parent-manifest:sha256:c2b1b6771edcf8fdd9656236f7c361bc08366ec2cad98af33f16d92f008c4e26"
+    ]
+  }
+}
