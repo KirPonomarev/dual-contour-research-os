@@ -47,6 +47,7 @@ PROJECT_FINGERPRINTS = frozenset({
     "5cc00261c78745d05abfb0aebce5e1f86fbefc2960a9c4284662b1284b0fc08f",
 })
 SERVICE_NAME = "research-os-a1-bridge.service"
+INGRESS_SERVICE_NAME = "research-os-a1-ingress.service"
 CONTAINER_NAME = "research-os-a1-bridge"
 RUNTIME_VOLUME = "research-os-a1-runtime"
 CONFIG_VOLUME = "research-os-a1-config"
@@ -62,6 +63,13 @@ _PROJECTS = {
     "security": "security-researcher",
 }
 _DATA_CLASSES = {"D0_PUBLIC", "D1_INTERNAL_SANITIZED", "PUBLIC_SANITIZED"}
+_ACTION_TRANSITIONS = {
+    "deploy": ("release:none-service-stopped", RUNTIME_RELEASE_SHA),
+    "ingress": (RUNTIME_RELEASE_SHA, RUNTIME_RELEASE_SHA),
+    "restart": (RUNTIME_RELEASE_SHA, RUNTIME_RELEASE_SHA),
+    "reboot": (RUNTIME_RELEASE_SHA, RUNTIME_RELEASE_SHA),
+    "rollback_readiness": (RUNTIME_RELEASE_SHA, RUNTIME_RELEASE_SHA),
+}
 
 
 class PhysicalReleaseError(RuntimeError):
@@ -639,10 +647,27 @@ def validate_action_envelope(
     if envelope["mission_id"] != MISSION_ID:
         raise PhysicalReleaseError("action envelope mission binding is invalid")
     _text(envelope["sprint_id"], "action envelope sprint id", maximum=128)
-    if envelope["to_release_identity"] != RUNTIME_RELEASE_SHA or envelope["from_release_identity"] != "release:none-service-stopped":
+    transition = _ACTION_TRANSITIONS.get(action)
+    if transition is None:
+        raise PhysicalReleaseError("action envelope action is unsupported")
+    if (envelope["from_release_identity"], envelope["to_release_identity"]) != transition:
         raise PhysicalReleaseError("action envelope release transition is invalid")
-    if envelope["exact_service_units"] != [SERVICE_NAME]:
-        raise PhysicalReleaseError("action envelope service set is not exact")
+    units = envelope["exact_service_units"]
+    if (
+        not isinstance(units, list)
+        or not units
+        or len(units) != len(set(units))
+        or any(not isinstance(item, str) or not item.endswith(".service") for item in units)
+    ):
+        raise PhysicalReleaseError("action envelope service set is invalid")
+    if action == "deploy" and units != [SERVICE_NAME]:
+        raise PhysicalReleaseError("deploy action service set is not exact")
+    if action == "ingress" and units != [INGRESS_SERVICE_NAME]:
+        raise PhysicalReleaseError("ingress action service set is not exact")
+    if action in {"restart", "rollback_readiness"} and SERVICE_NAME not in units:
+        raise PhysicalReleaseError("Bridge service is missing from the action service set")
+    if action == "reboot" and not {SERVICE_NAME, INGRESS_SERVICE_NAME}.issubset(units):
+        raise PhysicalReleaseError("reboot action lacks the persistent Bridge service set")
     if type(envelope["provider_calls_maximum"]) is not int or envelope["provider_calls_maximum"] != 0:
         raise PhysicalReleaseError("deployment envelope must not authorize provider calls")
     fingerprints = envelope["project_fingerprints"]
@@ -990,6 +1015,26 @@ def self_test() -> dict[str, object]:
             {"exact_host_fingerprint": host_fingerprint},
             action="deploy",
         )
+        ingress_payload = json.loads(json.dumps(envelope_payload))
+        ingress_payload.update({
+            "sprint_id": "P04_DUAL_DOMAIN_BOUNDED_REMOTE_E2E",
+            "action": "ingress",
+            "exact_service_units": [INGRESS_SERVICE_NAME],
+            "from_release_identity": RUNTIME_RELEASE_SHA,
+            "authorized_steps": ["ingress"],
+        })
+        ingress_envelope = _document(
+            "OperationalActionEnvelope",
+            "action-envelope:self-test-ingress",
+            action_issued,
+            ingress_payload,
+        )
+        validate_action_envelope(
+            ingress_envelope,
+            None,
+            action="ingress",
+            expected_host_fingerprint=host_fingerprint,
+        )
         wrong_host = json.loads(json.dumps(envelope))
         wrong_host["payload"]["exact_host_fingerprint"] = hashlib.sha256(b"wrong-host").hexdigest()
         wrong_host["integrity"]["payload_sha256"] = payload_sha(wrong_host["payload"])
@@ -1063,6 +1108,10 @@ def _parser() -> argparse.ArgumentParser:
     ingress.add_argument("--envelope", type=Path, required=True)
     ingress.add_argument("--expected-host-fingerprint", required=True)
     ingress.add_argument("--receipt", type=Path, required=True)
+    envelope = commands.add_parser("validate-envelope")
+    envelope.add_argument("--envelope", type=Path, required=True)
+    envelope.add_argument("--expected-host-fingerprint", required=True)
+    envelope.add_argument("--action", choices=tuple(_ACTION_TRANSITIONS), required=True)
     preflight = commands.add_parser("deploy-preflight")
     preflight.add_argument("--profile", type=Path, required=True)
     preflight.add_argument("--envelope", type=Path)
@@ -1092,6 +1141,19 @@ def run(argv: Sequence[str] | None = None) -> int:
             )
         elif arguments.command == "ingress-once":
             result = run_ingress(arguments)
+        elif arguments.command == "validate-envelope":
+            document = read_json(arguments.envelope, "action envelope")
+            validated = validate_action_envelope(
+                document,
+                None,
+                action=arguments.action,
+                expected_host_fingerprint=arguments.expected_host_fingerprint,
+            )
+            result = {
+                "status": "PASS",
+                "action": arguments.action,
+                "payload_sha256": payload_sha(validated),
+            }
         elif arguments.command == "deploy-preflight":
             profile = read_json(arguments.profile, "deploy profile")
             envelope = read_json(arguments.envelope, "action envelope") if arguments.envelope else None

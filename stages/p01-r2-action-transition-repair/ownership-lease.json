@@ -1,0 +1,23 @@
+{
+  "lease_id": "lease-p01-r2-action-transition-repair-agent-0-20260720",
+  "fencing_token": "61a42c51-0010-4663-a8d6-2dc737786d73",
+  "stage_id": "p01-r2-action-transition-repair",
+  "agent_id": "agent-0",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-20T23:13:00Z",
+  "expires_at": "2026-07-21T10:30:29Z",
+  "base_sha": "65af2e0c4a3587f22db84653e7f04c90bf702035",
+  "branch": "codex/bridge-a0-p01-r2-action-transitions",
+  "worktree": "/private/tmp/dcr-p01-r2-65af2e0",
+  "write_set": [
+    "Makefile",
+    "tools/physical_release_control.py",
+    "inventory/p01-r2-action-transition-control-artifact.json",
+    "docs/receipts/reuse/p01-r2-action-transition-repair.json",
+    "docs/receipts/integration/p01-r2-action-transition-repair.json",
+    "stages/p01-r2-action-transition-repair/stage-envelope.json",
+    "stages/p01-r2-action-transition-repair/ownership-lease.json"
+  ],
+  "delegation_allowed": false,
+  "state": "active"
+}
