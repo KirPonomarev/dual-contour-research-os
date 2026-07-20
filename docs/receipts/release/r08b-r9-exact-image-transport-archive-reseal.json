@@ -1,0 +1,81 @@
+{
+  "schema_id": "R08BR9ExactImageTransportArchiveReseal",
+  "schema_version": "1.0.0",
+  "object_id": "r08b-r9-exact-image-transport-archive-reseal-20260720",
+  "issued_at": "2026-07-20T08:58:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "R08B-R9_EXACT_IMAGE_TRANSPORT_ARCHIVE_RESEAL",
+    "status": "PASS_DETERMINISTIC_EXACT_IMAGE_TRANSPORT_RESEAL_AWAITING_INTEGRATION",
+    "plan_id": "DCR_OS_AUTONOMOUS_V2_3_NO_BRAKES_20260719",
+    "project_fingerprint": "b371429cb7c01fd6c5dbd430510a264684dab906188d706b7479446c1bd8f154",
+    "release_identity": {
+      "release_sha": "974a5dd932e53b82407a4b71f8af5e5641803564",
+      "tree_sha": "fe0066c975c8de7022dc6047158cbf35cad8ccce",
+      "image_manifest_digest": "sha256:be49e1ce3606fa0f3d1c96002fb2a9cc35072449af1a3e5f5b2a1c2cc3b1d159",
+      "image_manifest_size": 2657,
+      "config_blob_sha256": "c50051025d18f4306ae8af217d3b120d24d9a9526710f7412c8ad9b4aa596778",
+      "architecture": "amd64",
+      "os": "linux",
+      "container_user": "10001:10001",
+      "release_revision_label": "974a5dd932e53b82407a4b71f8af5e5641803564",
+      "layer_count": 12,
+      "all_layer_digests_verified": true
+    },
+    "transport": {
+      "format": "docker-save-oci-layout-tar",
+      "exporter": "docker-engine-29.5.2-linux-arm64",
+      "repo_tag": "dcr-os-candidate:974a5dd932e53b82407a4b71f8af5e5641803564",
+      "archive_sha256": "b1c1396de6fa76bc4845cd7d310cb50faf2cc6c64f3485a3cd7cc8f03a2b7596",
+      "second_archive_sha256": "b1c1396de6fa76bc4845cd7d310cb50faf2cc6c64f3485a3cd7cc8f03a2b7596",
+      "exports_byte_identical": true,
+      "archive_size_bytes": 47946240,
+      "member_count": 19,
+      "duplicate_members": 0,
+      "unsafe_members": 0,
+      "special_or_symlink_members": 0,
+      "normalized_uid_gid_mtime": true,
+      "owner_only_mode": "0600"
+    },
+    "supersession": {
+      "original_archive_sha256": "f0e4cfb2de4df6ccf0f6809e362eed45806a4dbf54c61216a14853a04940829a",
+      "original_archive_available": false,
+      "original_archive_claimed_present": false,
+      "runtime_image_rebuilt": false,
+      "release_subject_changed": false,
+      "release_relevant_bytes_changed": false,
+      "replacement_role": "TRANSPORT_CARRIER_FOR_THE_SAME_EXACT_IMAGE",
+      "original_receipts_rewritten": false
+    },
+    "evidence": {
+      "f09_freeze_sha256": "464d210d5cb76f992dc56f8904e7eb103ddef401b41db22e1eaab54c75382bb1",
+      "f09_integration_receipt_sha256": "aef624e71e173569d3ad8b7ef63ab96619e1e012f8c489aba0b68d9a633f3e4f",
+      "f10_archive_preflight_ref": "docs/receipts/assurance/f10-archive-availability-preflight.json",
+      "private_transport_reseal_report_sha256": "b30e020a2682d43b73dc0e8bec63965831acda4364ea0dc6c850d788c974cc4e"
+    },
+    "safety": {
+      "secret_or_private_findings": 0,
+      "provider_calls": 0,
+      "new_model_call_identities": 0,
+      "credential_accesses": 0,
+      "target_actions": 0,
+      "live_or_canonical_actions": 0,
+      "unresolved_critical": 0,
+      "unresolved_high": 0,
+      "grants_authority": false
+    },
+    "next_gate": "refresh F09 currentness against the integrated evidence head and bind this transport carrier before F10 retry"
+  },
+  "integrity": {
+    "profile": "core-json-sha256-v1",
+    "payload_sha256": "50cf914eb2225887009160ba2bb51b0d57fa4645cc3da9903e3cb60779c6599a",
+    "parent_refs": [
+      "git:974a5dd932e53b82407a4b71f8af5e5641803564",
+      "git:aa1178ac063bf2ea71b5a8f2953500efd4ce7a20",
+      "image:sha256:be49e1ce3606fa0f3d1c96002fb2a9cc35072449af1a3e5f5b2a1c2cc3b1d159",
+      "private-report:sha256:b30e020a2682d43b73dc0e8bec63965831acda4364ea0dc6c850d788c974cc4e"
+    ]
+  }
+}

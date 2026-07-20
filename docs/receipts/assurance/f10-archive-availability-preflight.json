@@ -1,0 +1,34 @@
+{
+  "schema_id": "F10ArchiveAvailabilityPreflightEvidence",
+  "schema_version": "1.0.0",
+  "issued_at": "2026-07-20T08:58:00Z",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "R08B-R9_EXACT_IMAGE_TRANSPORT_ARCHIVE_RESEAL",
+    "status": "FAIL_CLOSED_THEN_RECOVERED_BY_EXACT_IMAGE_TRANSPORT_RESEAL",
+    "f10_failed_action_receipt_sha256": "f8402b6a93d9e7938cedf71c65c81cc40b10e74b9ea3a937c8852966fc6bc111",
+    "f10_failed_sanitized_manifest_sha256": "79aeebd54ddeaa101772aa95ae9153e6c8dae624403bf33430b79376cc11a44e",
+    "private_transport_reseal_report_sha256": "b30e020a2682d43b73dc0e8bec63965831acda4364ea0dc6c850d788c974cc4e",
+    "release_sha": "974a5dd932e53b82407a4b71f8af5e5641803564",
+    "release_tree_sha": "fe0066c975c8de7022dc6047158cbf35cad8ccce",
+    "image_id": "sha256:be49e1ce3606fa0f3d1c96002fb2a9cc35072449af1a3e5f5b2a1c2cc3b1d159",
+    "original_archive_sha256": "f0e4cfb2de4df6ccf0f6809e362eed45806a4dbf54c61216a14853a04940829a",
+    "original_archive_available": false,
+    "replacement_transport_archive_sha256": "b1c1396de6fa76bc4845cd7d310cb50faf2cc6c64f3485a3cd7cc8f03a2b7596",
+    "replacement_exports_byte_identical": true,
+    "internal_image_identity_exact": true,
+    "target_created_before_stop": false,
+    "installation_started_before_stop": false,
+    "provider_calls": 0,
+    "new_model_call_identities": 0,
+    "credential_accesses": 0,
+    "repository_runtime_mutation": false,
+    "live_or_canonical_actions": 0,
+    "private_or_secret_bytes_public": false,
+    "grants_authority": false
+  },
+  "integrity": {
+    "profile": "core-json-sha256-v1",
+    "payload_sha256": "077f3a16caa22a87fa50e3215adc646c3691fa8e9029de5c28c73fc59297f600"
+  }
+}
