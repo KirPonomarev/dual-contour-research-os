@@ -1,0 +1,38 @@
+{
+  "base_sha": "abe8bb3c7c1996bf5e9dcd580da986363521b2fd",
+  "branch": "codex/bridge-a0-f09-release-evidence-currentness-and-freeze",
+  "cleanup_rule": "After terminal IntegrationReceipt exact-head CI, remove the F09 stage branch and linked worktree only after remote equality and no unique WIP are proven.",
+  "concurrency": {
+    "mutating_lanes": 1,
+    "second_writer_allowed": false,
+    "sublease_allowed": false
+  },
+  "expires_at": "2026-07-21T08:05:29Z",
+  "forbidden_scope": [
+    "all release-relevant and non-allowlisted repository bytes",
+    "all raw/private/provider/credential/runtime database bytes",
+    "all live, VPS, deployment, restore, reboot, canonical scientific and publication targets",
+    "all provider calls, model-call identities, payment and quantitative authority"
+  ],
+  "holder": {
+    "id": "agent-0",
+    "role": "release-evidence-currentness-freeze-writer"
+  },
+  "integrity": {
+    "payload_sha256": "37d4a040d7f8ba8c8a166a3b8aa7f7a03debe4391375579431f2443c713cb751",
+    "profile": "core-json-sha256-v1"
+  },
+  "issued_at": "2026-07-20T08:11:01Z",
+  "issuer": {
+    "authority_class": "canonical-owner",
+    "id": "agent-0"
+  },
+  "lease_id": "f09-agent0-release-evidence-currentness-freeze-abe8bb3",
+  "revoked": false,
+  "schema_id": "PrivateOwnershipLease",
+  "schema_version": "1.0.0",
+  "stage_envelope_file_sha256": "e3e65623db7a64295559fd2917c3ca4d5952e9cca8d3eeebc6d54c046cb5fcb9",
+  "stage_id": "F09_RELEASE_EVIDENCE_CURRENTNESS_AND_FREEZE",
+  "worktree": "/private/tmp/dcr-f09-abe8bb3",
+  "write_set_ref": "private-stage-envelope:f09-release-evidence-currentness-and-freeze-abe8bb3"
+}

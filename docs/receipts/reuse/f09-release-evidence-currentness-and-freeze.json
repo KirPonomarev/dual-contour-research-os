@@ -1,0 +1,36 @@
+{
+  "decision": "REUSE_INTERNAL_CURRENTNESS_CAPABILITY_AND_FINAL_FREEZE_FRAMEWORK",
+  "external_code_added": false,
+  "grants_authority": false,
+  "integrity": {
+    "payload_sha256": "79a5723f3e14f639cbdc0cac8831a9d171af95e7ab0c26bd6bad82689205a097",
+    "profile": "core-json-sha256-v1"
+  },
+  "new_dependency_added": false,
+  "new_provider_action_required": false,
+  "ordered_evaluation": [
+    "existing repository-native capability issuers and currentness validators",
+    "existing R08B immutable release manifests, packet and runbook",
+    "existing accepted sanitized R08C hashes",
+    "owned versioned package extraction",
+    "pinned permissive dependency",
+    "small audited vendor import",
+    "minimal missing glue"
+  ],
+  "receipt_id": "f09-reuse-currentness-and-freeze-framework",
+  "recorded_at": "2026-07-20T08:11:01Z",
+  "repository_implementation_changes_required": false,
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "selected": [
+    "tools/capability_proof.py",
+    "tools/release_currentness.py",
+    "tools/e1_aggregate_gate.py",
+    "tools/e2_aggregate_gate.py",
+    "tools/e3_aggregate_gate.py",
+    "tools/verify_final_release_freeze.py",
+    "R08B evidence-only allowlist and deployment/operator/rollback packet",
+    "R08C terminal sanitized digest set"
+  ],
+  "stage_id": "F09_RELEASE_EVIDENCE_CURRENTNESS_AND_FREEZE"
+}
