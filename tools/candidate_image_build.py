@@ -13,6 +13,7 @@ import re
 import stat
 import subprocess
 import tarfile
+import tempfile
 from typing import Any, Iterable, Mapping
 
 
@@ -116,6 +117,60 @@ def _git(*args: str) -> str:
     result = _run(["git", *args])
     assert isinstance(result.stdout, str)
     return result.stdout.strip()
+
+
+def _source_date_epoch(candidate: str) -> str:
+    value = _git("show", "-s", "--format=%ct", candidate)
+    _require(re.fullmatch(r"[1-9][0-9]*", value) is not None, "candidate commit epoch is invalid")
+    return value
+
+
+def _reproducible_build_command(
+    candidate: str,
+    tag: str,
+    source_date_epoch: str,
+    output_path: Path,
+) -> list[str]:
+    _require(re.fullmatch(r"[0-9a-f]{40}", candidate) is not None, "candidate SHA format")
+    _require(re.fullmatch(r"[1-9][0-9]*", source_date_epoch) is not None, "candidate commit epoch is invalid")
+    return [
+        "docker",
+        "buildx",
+        "build",
+        "--no-cache",
+        "--pull=false",
+        "--provenance=false",
+        "--platform",
+        PLATFORM,
+        "--build-arg",
+        f"RELEASE_SHA={candidate}",
+        "--build-arg",
+        f"SOURCE_DATE_EPOCH={source_date_epoch}",
+        "--build-arg",
+        "BUILDKIT_MULTI_PLATFORM=1",
+        f"--output=type=oci,dest={output_path},rewrite-timestamp=true",
+        "-f",
+        CONTAINERFILE,
+        "-t",
+        tag,
+        ".",
+    ]
+
+
+def _build_reproducible_image(candidate: str, tag: str, source_date_epoch: str) -> None:
+    with tempfile.TemporaryDirectory(prefix="r08b-reproducible-build-") as directory:
+        output_path = Path(directory) / "image.oci.tar"
+        _run(
+            _reproducible_build_command(
+                candidate,
+                tag,
+                source_date_epoch,
+                output_path,
+            ),
+            timeout=3600,
+        )
+        _require(output_path.is_file() and not output_path.is_symlink(), "reproducible OCI output missing")
+        _run(["docker", "load", "--input", str(output_path)], timeout=1800)
 
 
 def _write_private(path: Path, value: bytes) -> str:
@@ -389,14 +444,11 @@ def prepare(args: argparse.Namespace) -> None:
 
     tag_one = f"dcr-os-r08b-build-one:{candidate[:12]}"
     tag_two = f"dcr-os-candidate:{candidate}"
-    common = [
-        "docker", "build", "--no-cache", "--pull=false", "--platform", PLATFORM,
-        "--build-arg", f"RELEASE_SHA={candidate}", "-f", CONTAINERFILE,
-    ]
-    _run([*common, "-t", tag_one, "."], timeout=3600)
+    source_date_epoch = _source_date_epoch(candidate)
+    _build_reproducible_image(candidate, tag_one, source_date_epoch)
     inspect_one = _image_inspect(tag_one)
     files_one, dpkg_one, python_one = _inventory(tag_one)
-    _run([*common, "-t", tag_two, "."], timeout=3600)
+    _build_reproducible_image(candidate, tag_two, source_date_epoch)
     inspect_two = _image_inspect(tag_two)
     files_two, dpkg_two, python_two = _inventory(tag_two)
     normalized_one = _normalize_image(inspect_one)
@@ -440,6 +492,10 @@ def prepare(args: argparse.Namespace) -> None:
         "build": {
             "literal_no_cache_builds": 2,
             "pull": False,
+            "builder": "docker-buildx",
+            "source_date_epoch": source_date_epoch,
+            "deterministic_multi_platform_output": True,
+            "layer_timestamps_rewritten": True,
             "image_tag": tag_two,
             "image_id": image_id,
             "config_sha256": normalized_two["config_sha256"],

@@ -1,0 +1,65 @@
+{
+  "schema_id": "PrivateStageEnvelope",
+  "schema_version": "1.0.0",
+  "stage_id": "R08B-R12_REPRODUCIBLE_CANDIDATE_BUILD_FIX",
+  "issued_at": "2026-07-20T10:55:00Z",
+  "agent_id": "agent-0",
+  "base_sha": "925f0cfa3b660b4dbb4b9f3536aef9deaf9732f1",
+  "base_tree_sha": "cc556c2ce574682e01e1ea505ddf316f41a36f6a",
+  "branch": "codex/bridge-a0-r08b-r12-reproducible-build",
+  "worktree": "/private/tmp/dcr-r08b-r12-925f0cf",
+  "objective": "Repair the exact candidate build tool so two no-cache BuildKit builds bind the immutable Git commit epoch and deterministic output mode, then prove the fix physically before restarting candidate recut.",
+  "executable_blocker": "R08B-R11 exhausted both arm64 BuildKit and clean x86_64 classic-builder approaches; each produced distinct post-base RUN/COPY layers for the same exact subject because the build command binds no reproducible epoch.",
+  "dependencies": {
+    "r08b_r11_failed_stage_receipt_sha256": "629e8d4ad8f4faffe5febb57e11e0036e5dd0cc35e52df35622d696c7d5e10a7",
+    "candidate_subject_sha": "925f0cfa3b660b4dbb4b9f3536aef9deaf9732f1",
+    "candidate_subject_ci_run": 29735521384,
+    "docker_buildx_version": "0.35.0",
+    "docker_buildx_license": "Apache-2.0"
+  },
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "tools/candidate_image_build.py",
+    "ops/release/Containerfile",
+    "installed Docker Buildx 0.35.0 documentation for deterministic built-in build arguments",
+    "private:R08B-R11 failed stage evidence"
+  ],
+  "write_set": [
+    "stages/r08b-r12-reproducible-candidate-build/stage-envelope.json",
+    "stages/r08b-r12-reproducible-candidate-build/ownership-lease.json",
+    "tools/candidate_image_build.py",
+    "tests/test_r08b_reproducible_candidate_build.py",
+    "docs/receipts/reuse/r08b-r12-reproducible-candidate-build.json",
+    "docs/receipts/assurance/r08b-r11-candidate-build-reproducibility-failure.json"
+  ],
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest tests.test_r08b_reproducible_candidate_build",
+    "python3 tools/candidate_image_build.py self-test",
+    "physical two no-cache linux/amd64 build equality proof",
+    "python3 -m unittest discover -s tests",
+    "python3 -m unittest discover -s tests/stage0b -p test_*.py",
+    "git diff --check",
+    "public secret/private-data scan",
+    "exact PR/merge/IntegrationReceipt-head CI"
+  ],
+  "forbidden_scope": [
+    "runtime source, Containerfile, contracts, dependency lock, provider, policy, model registry, config, migration or CI mutation",
+    "weakening no-cache, exact-subject, two-build, inventory, SBOM, secret scan or advisory acceptance",
+    "provider call, live/VPS/canonical action, force push or history rewrite",
+    "candidate cut or DONE claim in this repair stage"
+  ],
+  "stop_conditions": [
+    "SOURCE_DATE_EPOCH is not derived from the exact candidate commit",
+    "BuildKit deterministic arguments do not make two physical no-cache builds identical",
+    "focused/full/CI regression",
+    "secret/private-data or critical/high finding"
+  ],
+  "provider_calls_allowed": 0,
+  "live_or_canonical_actions_allowed": false,
+  "integrity": {
+    "profile": "core-json-sha256-v1",
+    "payload_sha256": "4016a75fcc976dc2dcfe6577d8348d1f250ac40f53c7a942b38dbf3fc93a77a8"
+  }
+}
