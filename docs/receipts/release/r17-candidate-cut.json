@@ -1,0 +1,114 @@
+{
+  "classification": "D1_INTERNAL_SANITIZED",
+  "integrity": {
+    "parent_refs": [
+      "git:0394d6c9e327eceb62f738eca90be3ece015ba79",
+      "ci:29741846120",
+      "private-build-evidence:sha256:aafaf14bbf36c1360b45a92d12d47a21dfc74dc4d9b824b7acaba8bbcd71f771",
+      "archive:sha256:e4e79a75d718c5681d824d777c91f56a4061d9f2ffe1e1de7d32dd1e9e38b2cf"
+    ],
+    "payload_sha256": "ed4c2d7f6537a9d2511c600c12aa74eb8ec2775a6f18d7a628b01846c905467c",
+    "profile": "core-json-sha256-v1"
+  },
+  "issued_at": "2026-07-20T12:29:00Z",
+  "issuer": {
+    "authority_class": "integration-authority",
+    "id": "agent-0"
+  },
+  "object_id": "r17-candidate-cut-0394d6c-20260720",
+  "payload": {
+    "amendment_id": "FAST_RELEASE_NO_TIMED_WINDOWS_NO_HUMAN_WAIT_20260719",
+    "candidate": {
+      "exact_head_ci_conclusion": "success",
+      "exact_head_ci_run": 29741846120,
+      "immutable_through_f12": true,
+      "release_sha": "0394d6c9e327eceb62f738eca90be3ece015ba79",
+      "tree_sha": "636fda24cbb2da567fb23a4d44fa865ae74ac4bc"
+    },
+    "delivery_state": {
+      "candidate_cut_evidence_ci": "PENDING_EXACT_HEAD_CI",
+      "candidate_cut_evidence_commit": "PENDING_THIS_COMMIT",
+      "next_sprint_dependency_ready": false,
+      "r08b_accepted": false,
+      "terminal_integration_receipt": "PENDING_AFTER_GREEN_CANDIDATE_EVIDENCE_HEAD"
+    },
+    "grants_authority": false,
+    "image": {
+      "builder": "docker-buildx-v0.35.0/buildkit-v0.30.0",
+      "classic_disposable_target_deleted": true,
+      "classic_docker_29_5_2_load_identity_equal": true,
+      "config_semantics_sha256": "f22f7a0886e822e31f4c515e3ca9894937f40d3b5dad5fb5c8d7202db49622e1",
+      "image_id": "sha256:e6db8ab087e18b13ac357a751a2e7318c3abb81a4f2af459c930a630ddc65577",
+      "literal_no_cache_builds": 2,
+      "local_containerd_store_image_id": "sha256:d1f56e933a8e498ae9e3a1f70ba0e764785a0de44d6f702f7e1945c3621b671f",
+      "owner_only_archive_mode": "0600",
+      "owner_only_archive_sha256": "e4e79a75d718c5681d824d777c91f56a4061d9f2ffe1e1de7d32dd1e9e38b2cf",
+      "platform": "linux/amd64",
+      "portable_image_identity_source": "verified-archive-config-digest",
+      "rewrite_timestamp": true,
+      "rootfs_semantics_sha256": "6fe7fe0106543ef0f77c83c4c496fa999f3a27fa7d792e372db67c99a5f99d94",
+      "source_date_epoch": 1784550032,
+      "two_build_semantics_and_inventories_equal": true
+    },
+    "invalidation": {
+      "allowlist_mutation_rewinds_to_r08b": true,
+      "any_non_allowlisted_diff_rewinds_to_r08b": true,
+      "later_diff_must_be_evidence_only": true,
+      "path_allowlist_sha256": "a691630d87b549fec3fffc44913531cd86bfb96858b3bd7d1afd8846eceb7ae1",
+      "release_subject_sha": "0394d6c9e327eceb62f738eca90be3ece015ba79",
+      "release_subject_tree_sha": "636fda24cbb2da567fb23a4d44fa865ae74ac4bc"
+    },
+    "live_or_vps_actions": 0,
+    "next_gate": {
+      "fresh_f10_packaged_release_e2e_required": true,
+      "product_done": false,
+      "release_ready": false,
+      "required": "F09_EXACT_SUBJECT_CURRENTNESS_REFRESH_BEFORE_F10"
+    },
+    "plan_id": "DCR_OS_AUTONOMOUS_V2_3_NO_BRAKES_20260719",
+    "plan_version": "2.4.0-fast-working-release",
+    "private_evidence": {
+      "advisory_snapshot_sha256": "f1dc53be409de1576e96633bbfc571ff822874af46b8ff76a70198b2790005a7",
+      "broader_or_live_reuse_requires_new_scan": true,
+      "candidate_build_evidence_sha256": "aafaf14bbf36c1360b45a92d12d47a21dfc74dc4d9b824b7acaba8bbcd71f771",
+      "owner_only_files_copied_to_git": 0,
+      "private_locator_public": false,
+      "raw_vulnerability_records": 93,
+      "unresolved_release_critical_findings": 0,
+      "unresolved_release_high_findings": 0
+    },
+    "provider_calls": 0,
+    "public_artifacts": {
+      "deployment_operator_rollback_packet_ref": "docs/receipts/release/r17-deployment-operator-rollback-packet.json",
+      "deployment_operator_rollback_packet_sha256": "52ab1772d0c9e3a1b8951d768f039f87b90e3a483d742db7ca0d32f743085b2d",
+      "evidence_only_path_allowlist_private_build_sha256": "0b21c588530f09287f3e6057db7ad6a4a601d518cf47330e6af310c0877a8e9a",
+      "evidence_only_path_allowlist_ref": "docs/receipts/release/r17-evidence-only-path-allowlist.json",
+      "evidence_only_path_allowlist_sha256": "a691630d87b549fec3fffc44913531cd86bfb96858b3bd7d1afd8846eceb7ae1",
+      "inventory_payload_sha256": "46a8bf979222e1ce05ad792e7385e7ecb3efddb9b06decfb59dc1cc3a6e3f5dd",
+      "inventory_ref": "docs/receipts/release/r17-candidate-inventory.json",
+      "inventory_sha256": "c0a444152fc2ecb2dbe517edfacefed7d3258bb6e3a26ad58ed342d94b3d5e97",
+      "release_relevant_paths_private_build_sha256": "051012f7db06e8406ff886ea5eef8af92d5b207865e444566484bbe003fb4090",
+      "release_relevant_paths_ref": "docs/receipts/release/r17-release-relevant-paths.json",
+      "release_relevant_paths_sha256": "201df1ef44255ffd284e32a60cf616e6c3741accfaccef89b3b12de85e8cb93b",
+      "sbom_ref": "docs/receipts/release/r17-candidate-sbom.spdx.json",
+      "sbom_sha256": "57e0f924f43e2466ade26c334632f93071cda27435ce9cc2a7dc02ec6c90ec22"
+    },
+    "raw_or_credential_bytes_public": false,
+    "repair_lineage": {
+      "all_repair_exact_head_ci_green": true,
+      "f09_r3_failed_receipt_sha256": "0854af9ffb55a60021461efba656bdb3a4ae88de79c40e5173ce333ca07253fd",
+      "f10_r2_failed_receipt_sha256": "f2762bc2b622ac62e7bdec59f179e350c33bd1bdefa3614a1ba60bf8dfcd8a6a",
+      "final_runtime_tmpdir_repair_subject": "925f0cfa3b660b4dbb4b9f3536aef9deaf9732f1",
+      "invalidated_release_sha": "211e681958c7198f97f1230f30a5ef7f3023f9e0",
+      "portable_identity_repair_subject": "211e681958c7198f97f1230f30a5ef7f3023f9e0",
+      "reproducible_build_repair_subject": "099414721b37127a90dbb9946fd6150f306db9a2",
+      "temporal_fixture_repair_subject": "0394d6c9e327eceb62f738eca90be3ece015ba79"
+    },
+    "secret_scan_findings": 0,
+    "stage_id": "R17_EXACT_CANDIDATE_RECUT_AFTER_TEMPORAL_FIXTURE",
+    "status": "FROZEN_EXACT_CANDIDATE_AWAITING_EVIDENCE_INTEGRATION",
+    "timed_observations": "OUT_OF_SCOPE"
+  },
+  "schema_id": "R08BCandidateCutReceipt",
+  "schema_version": "1.0.0"
+}
