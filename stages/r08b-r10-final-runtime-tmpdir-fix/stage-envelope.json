@@ -1,0 +1,81 @@
+{
+  "schema_id": "PrivateStageEnvelope",
+  "schema_version": "1.0.0",
+  "stage_id": "R08B-R10_FINAL_RUNTIME_TMPDIR_FIX",
+  "issued_at": "2026-07-20T10:06:00Z",
+  "agent_id": "agent-0",
+  "base_sha": "8966b165fd4f1113565dd6a2797f8010468cc0aa",
+  "base_tree_sha": "06814513f101f0a0ce7250426b8c28cb3848338b",
+  "branch": "codex/bridge-a0-r08b-r10-final-tmpdir-fix",
+  "worktree": "/private/tmp/dcr-r08b-r10-8966b16",
+  "plan_identity": {
+    "plan_id": "DCR_OS_AUTONOMOUS_V2_3_NO_BRAKES_20260719",
+    "plan_version": "2.4.0-fast-working-release",
+    "project_fingerprint": "b371429cb7c01fd6c5dbd430510a264684dab906188d706b7479446c1bd8f154",
+    "master_plan_sha256": "582fab525c8c0441873ca28dddf27f3bc31e64c347f63ee3c229077fe37a95c4",
+    "tracker_fencing_token": "408ec527-0b85-443b-a9b4-c2c286ec7c4a"
+  },
+  "objective": "Repair the shipped final A1 rootless read-only unit so terminal material uses the runtime-owned private TMPDIR, and add a regression that proves the final unit retains this invariant before the mandatory candidate recut.",
+  "executable_blocker": "F10 exact-release execution durably reached claim, checkpoint and artifact CAS, then failed before terminal CAS because research-os-a1-final.service omitted the writable runtime TMPDIR binding present in the predecessor production unit.",
+  "dependency_hashes": {
+    "f09_v2_freeze_sha256": "522a843065b8b2fa7a449977a5bbf55eafcefc217f7ff7496e55d20e4597f5c3",
+    "r08b_r9_transport_receipt_sha256": "755ce4558ce92e4321f5bde88f4b26b68f6fa38c182d3672bcf699773598eabb",
+    "f10_action_envelope_sha256": "8d2a4d83ea870a2e28b6acce4b7f3ed85e7abaa4209dbfb25d679e6bd51d4245",
+    "f10_ownership_lease_sha256": "b5ed3014858f040d001be61bce389870cb80d1eaf401cb4b24087289432ec355"
+  },
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "ops/deploy/research-os-a1-final.service",
+    "ops/deploy/research-os-a1-bridge.service",
+    "src/research_bridge/execution.py",
+    "tests/test_release_deploy_recovery.py",
+    "tests/test_s38_r1_final_deployment_rebind.py",
+    "private:F10-R2-runtime-ledger-and-CAS-primary-evidence"
+  ],
+  "write_set": [
+    "stages/r08b-r10-final-runtime-tmpdir-fix/stage-envelope.json",
+    "stages/r08b-r10-final-runtime-tmpdir-fix/ownership-lease.json",
+    "ops/deploy/research-os-a1-final.service",
+    "tests/test_release_deploy_recovery.py",
+    "docs/receipts/reuse/r08b-r10-final-runtime-tmpdir-fix.json",
+    "docs/receipts/assurance/f10-r2-final-runtime-tmpdir-failure.json"
+  ],
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest tests.test_release_deploy_recovery tests.test_s38_r1_final_deployment_rebind tests.test_r08a_production_image_e2e_harness",
+    "python3 -m unittest discover -s tests",
+    "python3 -m unittest discover -s tests/stage0b -p test_*.py",
+    "git diff --check",
+    "public secret/private-data scan",
+    "exact PR-head CI",
+    "exact merge-head CI"
+  ],
+  "acceptance": {
+    "runtime_owned_tmpdir_mode": "0700",
+    "root_filesystem_read_only": true,
+    "network_none": true,
+    "release_recut_required_after_merge": true,
+    "provider_calls": 0,
+    "live_or_canonical_actions": 0
+  },
+  "forbidden_scope": [
+    "runtime Python, contracts, provider profile, model registry, policy, dependency, lockfile, migration or CI mutation",
+    "raw provider response, credential, runtime database, private locator or D2/D3 byte in Git",
+    "reuse of the invalidated image as the repaired candidate",
+    "provider call, live/VPS/canonical action, force push or history rewrite",
+    "RELEASE_READY, PRODUCT_DONE or DONE claim"
+  ],
+  "stop_conditions": [
+    "dirty path or ownership collision outside the exact write_set",
+    "rootless/read-only/no-network invariant weakens",
+    "focused or full test failure remains after two bounded repair approaches",
+    "any critical/high or public secret/private-data finding"
+  ],
+  "provider_calls_allowed": 0,
+  "live_or_canonical_actions_allowed": false,
+  "integrity": {
+    "profile": "core-json-sha256-v1",
+    "payload_sha256": "d7a7b12d14184102305d38816f00fcecbca0c25b3d999ca3d71f945a2ad3dbaf"
+  }
+}

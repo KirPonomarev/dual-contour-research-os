@@ -1,0 +1,25 @@
+{
+  "schema_id": "PrivateOwnershipLeaseAmendment",
+  "schema_version": "1.0.0",
+  "stage_id": "R08B-R10_FINAL_RUNTIME_TMPDIR_FIX",
+  "amendment_id": "R08B-R10-A1-TMPDIR-INDEPENDENT-OF-CAPSULE",
+  "issued_at": "2026-07-20T10:12:00Z",
+  "expires_at": "2026-07-21T10:06:00Z",
+  "holder": {"id": "agent-0", "role": "release-repair-writer"},
+  "branch": "codex/bridge-a0-r08b-r10-final-tmpdir-fix",
+  "worktree": "/private/tmp/dcr-r08b-r10-8966b16",
+  "parent_ownership_lease_sha256": "ed05af6bd7fafddd025c9ceab07cb6a048b642ad03be407d2c6854818ff86148",
+  "stage_envelope_amendment_sha256": "42636632933da4cf03593cba17a0fa23fb661dc0ee6eda5372e480d27b2ae081",
+  "additional_write_set": [
+    "stages/r08b-r10-final-runtime-tmpdir-fix/stage-envelope-amendment-1.json",
+    "stages/r08b-r10-final-runtime-tmpdir-fix/ownership-lease-amendment-1.json",
+    "tools/pre_soak_deploy.py"
+  ],
+  "second_writer_allowed": false,
+  "sublease_allowed": false,
+  "revoked": false,
+  "integrity": {
+    "profile": "core-json-sha256-v1",
+    "payload_sha256": "ec169b173f00175f5924b19f0908398400dbecaefbeefedd2548e85b955df104"
+  }
+}

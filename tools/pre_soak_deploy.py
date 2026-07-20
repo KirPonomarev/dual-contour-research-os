@@ -807,8 +807,6 @@ def _load_bundle(
     has_tmpdir = "--env=TMPDIR=/var/lib/research-os/tmp" in template
     if capsule is not None and not has_tmpdir:
         raise DeploymentError("capsule service unit does not bind the writable TMPDIR")
-    if capsule is None and has_tmpdir:
-        raise DeploymentError("legacy service unit unexpectedly selects the capsule profile")
 
     actual_archive_sha: str | None = None
     if archive_path is not None:
@@ -1335,12 +1333,13 @@ class PreSoakDeployController:
         cap_drop = host.get("CapDrop")
         restart = host.get("RestartPolicy")
         running = state.get("Running")
+        tmpdir_required = b"--env=TMPDIR=/var/lib/research-os/tmp" in bundle.unit_bytes
         expected_environment = [
             "RESEARCH_OS_ENVIRONMENT=pre-soak",
             "RESEARCH_OS_EXTERNAL_ACTION_AUTHORITY=false",
             *(
                 ["TMPDIR=/var/lib/research-os/tmp"]
-                if bundle.capsule is not None
+                if tmpdir_required
                 else []
             ),
             *_FROZEN_IMAGE_ENV,
@@ -1352,7 +1351,7 @@ class PreSoakDeployController:
         )
         capsule_tmpdir_valid = (
             tmpdir_entries == ["TMPDIR=/var/lib/research-os/tmp"]
-            if bundle.capsule is not None
+            if tmpdir_required
             else tmpdir_entries == []
         )
         capsule_label_valid = (
