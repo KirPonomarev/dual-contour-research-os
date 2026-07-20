@@ -1,0 +1,37 @@
+{
+  "schema_id": "PrivateStageEnvelopeAmendment",
+  "schema_version": "1.0.0",
+  "stage_id": "R08B-R12_REPRODUCIBLE_CANDIDATE_BUILD_FIX",
+  "amendment_id": "R08B-R12-MERGE-HEAD-INTEGRATION-RECEIPT",
+  "issued_at": "2026-07-20T11:06:00Z",
+  "issued_by": "agent-0",
+  "base_sha": "653853c8ac34fa0692f919f0d0dbd3acfe30f2ea",
+  "base_tree_sha": "5ff7a58c42a20a6de02fa6b971f20e5533c0e07f",
+  "branch": "codex/bridge-a0-r08b-r12-reproducible-build-receipt",
+  "worktree": "/private/tmp/dcr-r08b-r12-receipt-653853c",
+  "parent_stage_envelope_sha256": "b3c9313721019d1fb6d87798a0eeb5432820c243d4767d072b8d1711ef4c97bf",
+  "merged_pr": 90,
+  "pr_head_sha": "53dc63030fe51d31dc480e42803a090d2e5dffcf",
+  "pr_head_ci_run": 29737153438,
+  "merge_head_sha": "653853c8ac34fa0692f919f0d0dbd3acfe30f2ea",
+  "merge_head_ci_run": 29737198288,
+  "objective": "Seal the accepted reproducible-build repair IntegrationReceipt without cutting a candidate or changing another release byte.",
+  "write_set": [
+    "stages/r08b-r12-reproducible-candidate-build/stage-envelope-amendment-1.json",
+    "stages/r08b-r12-reproducible-candidate-build/ownership-lease-amendment-1.json",
+    "docs/receipts/integration/r08b-r12-reproducible-candidate-build.json"
+  ],
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest tests.test_integration_receipts",
+    "git diff --check",
+    "public secret/private-data scan",
+    "exact PR/merge/IntegrationReceipt-head CI"
+  ],
+  "provider_calls_allowed": 0,
+  "live_or_canonical_actions_allowed": false,
+  "integrity": {
+    "profile": "core-json-sha256-v1",
+    "payload_sha256": "6a15e05ebf505b6ede509b94769ab09f6313859548f54fb743d6d87ffacfe38a"
+  }
+}
