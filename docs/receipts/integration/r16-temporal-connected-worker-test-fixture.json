@@ -24,6 +24,7 @@
       "stage0b_tests": 25,
       "contract_gate": "green",
       "privacy_secret_scan": "green",
+      "source_mutation": false,
       "runtime_or_source_mutation": false,
       "test_clock_bound_to_existing_event_time": true,
       "expiry_runtime_branch_preserved": true,
@@ -36,5 +37,5 @@
     },
     "write_set": ["tests/test_r04c_connected_worker_runtime.py", "docs/receipts/reuse/r16-temporal-connected-worker-test-fixture.json", "docs/receipts/assurance/f09-r3-temporal-test-fixture-failure.json", "docs/receipts/integration/r16-temporal-connected-worker-test-fixture.json"]
   },
-  "integrity": {"payload_sha256": "5c59c76b20f9ffe85c107cc1649cc5c879ba973932335c00a9ef35fc092bb714", "parent_refs": ["git:62732b807a0a0bb47dc7aa3e374484b88450b40e", "git:f2efe3fd8cb09733bd152b3d617907e8d7c0c719", "ci:29741532391", "private-failed-stage:sha256:0854af9ffb55a60021461efba656bdb3a4ae88de79c40e5173ce333ca07253fd"]}
+  "integrity": {"payload_sha256": "071d75b7b1ea91dd0d8e25f4c689715a9b53be62f23ccca58db78244df66e315", "parent_refs": ["git:62732b807a0a0bb47dc7aa3e374484b88450b40e", "git:f2efe3fd8cb09733bd152b3d617907e8d7c0c719", "ci:29741532391", "private-failed-stage:sha256:0854af9ffb55a60021461efba656bdb3a4ae88de79c40e5173ce333ca07253fd"]}
 }
