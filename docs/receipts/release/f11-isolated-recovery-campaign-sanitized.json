@@ -1,0 +1,124 @@
+{
+  "schema_id": "F11IsolatedRecoveryCampaignSanitizedReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "f11-isolated-recovery-campaign-sanitized-61a2b35",
+  "issued_at": "2026-07-20T19:29:23Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "final-evidence-integration-authority"
+  },
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "plan_id": "DCR_OS_AUTONOMOUS_V2_3_NO_BRAKES_20260719",
+    "plan_version": "2.4.0-fast-working-release",
+    "project_fingerprint": "b371429cb7c01fd6c5dbd430510a264684dab906188d706b7479446c1bd8f154",
+    "stage_id": "F11_ISOLATED_RECOVERY_CAMPAIGN",
+    "status": "ACCEPTED_WITH_CLOSED_SOURCE_SUMMARY_RECONCILIATION",
+    "repository_evidence": {
+      "head_sha": "61a2b35bab91e038cd8148cfe9a364fab294518b",
+      "tree_sha": "5a72ce5dbb9884ce7c33265ed2241f86f90ffc7a",
+      "repository_read_only": true,
+      "git_mutations": 0
+    },
+    "release_identity": {
+      "release_sha": "0394d6c9e327eceb62f738eca90be3ece015ba79",
+      "tree_sha": "636fda24cbb2da567fb23a4d44fa865ae74ac4bc",
+      "portable_image_id": "sha256:e6db8ab087e18b13ac357a751a2e7318c3abb81a4f2af459c930a630ddc65577",
+      "local_exact_image_id": "sha256:d1f56e933a8e498ae9e3a1f70ba0e764785a0de44d6f702f7e1945c3621b671f",
+      "config_sha256": "c610ed8aebea67833d1771e3fba0a47ddf6d133b90ae411ee8ba9f669f8b7d99",
+      "policy_sha256": "665bfb70a82d3aa5988d45fa299fb14d2b28926e6267a15ae440e3c03fbb0cd9",
+      "post_rollback_exact_f09": true,
+      "equal_to_f09_subject": true
+    },
+    "private_receipt_digests": {
+      "stage_receipt_sha256": "fd3eb7f51c9378c5203732d049817d4228f5731222d05196b9a8ab85a6afa12f",
+      "sanitized_manifest_sha256": "90a24af2ce191a3ceff72a81db4d14f9ac3e1819cc9323ee8348428d493f0fd2",
+      "target_a_restore_sha256": "428621022c310a1a641273629cac31c4bf8968335d1b3911fcac2bd43bd05299",
+      "target_a_action_sha256": "4311b763cdbc81afa46dc36ab826c0b6a9cb90c7ec93e4e1b2ff1da10821d604",
+      "target_a_cleanup_sha256": "3d756f8f7747e6c7a77b376e14140d2fe7516b0f2be103cc7b9a363d8c2f7ef2",
+      "target_b_restore_sha256": "35dbb29f4244b00ebbd8da4ade15e8ca2b4fcf20b8046ee4f57a31f6107420a5",
+      "target_b_rollback_restore_sha256": "66547548ebd89bb363dfef5dac108dba9bc528d2648e3f51eb178da0e0e9fb5b",
+      "target_b_action_sha256": "206da593a66fd621f0c23b18d00e5f68c522ff61f48b49ace0357c9fad16ba7c",
+      "target_b_cleanup_sha256": "ed4c47fb5e702aaf738e712214175494a5e721f2ddd6ab3c6bb32f98ff86c629"
+    },
+    "source_backup": {
+      "backup_receipt_sha256": "76db3a4e423d876f5780295dcfcb0e5cc81be779b421748f5fe7b27f444603b2",
+      "backup_payload_sha256": "83cfe0f229b2f018e996d1ccd06a422777ffec3dd0e744f35953c24d3f99f832",
+      "snapshot_id": "30f8fe18984616b8d5f1408e44407786ce4e316a99a45210dccf32d76b71efb0",
+      "restored_manifest_sha256": "32f08a3ed48eea4f3b493bf8492304942726a166da337e0dc4a03a74790bc848",
+      "frozen_ledger_sha256": "aaf1a8cb14ec3b3fcdb2832bf6f0dff6d5d64d014d54adfc0c8977098acfb065",
+      "encrypted": true,
+      "source_backup_preserved": true
+    },
+    "source_summary_reconciliation": {
+      "status": "CLOSED_NON_GATING_TRANSCRIPTION_ONLY",
+      "severity": "LOW",
+      "immutable_summary_field_digest": "76db3a4c4d1204d6c9a0566af3ff8a81d44b354423281a0b5a19705c9384f868",
+      "authoritative_backup_receipt_file_sha256": "76db3a4e423d876f5780295dcfcb0e5cc81be779b421748f5fe7b27f444603b2",
+      "authoritative_backup_payload_sha256": "83cfe0f229b2f018e996d1ccd06a422777ffec3dd0e744f35953c24d3f99f832",
+      "authoritative_snapshot_id": "30f8fe18984616b8d5f1408e44407786ce4e316a99a45210dccf32d76b71efb0",
+      "primary_bindings": [
+        "f10-r5-stage-receipt:sha256:0b1eb21f7577daf351b76268897c2f963cdc6fcc2891846686bcf4809a8c463f",
+        "f11-backup-binding-v2:sha256:a653b5eb35032fe3939246fcc314cb2e228d6f2be8dba75cc819733380b6a6f1",
+        "target-a-action:sha256:4311b763cdbc81afa46dc36ab826c0b6a9cb90c7ec93e4e1b2ff1da10821d604",
+        "target-a-restore:sha256:428621022c310a1a641273629cac31c4bf8968335d1b3911fcac2bd43bd05299",
+        "target-b-restore:sha256:35dbb29f4244b00ebbd8da4ade15e8ca2b4fcf20b8046ee4f57a31f6107420a5",
+        "target-b-rollback:sha256:66547548ebd89bb363dfef5dac108dba9bc528d2648e3f51eb178da0e0e9fb5b"
+      ],
+      "original_summary_objects_rewritten": false,
+      "backup_or_restore_bytes_affected": false,
+      "release_identity_affected": false,
+      "acceptance_affected": false,
+      "unresolved_finding": false
+    },
+    "recovery_campaign": {
+      "wip_max": 1,
+      "campaign_sequence": "A_ACCEPT_SEAL_DELETE_THEN_B_ACCEPT_SEAL_DELETE",
+      "clean_distinct_restore_targets": 2,
+      "exact_encrypted_backup_restored_twice": true,
+      "one_writer_identity_restored_twice": true,
+      "target_a_shipped_tests_passed": 39,
+      "target_b_post_rollback_tests_passed": 8,
+      "post_restore_functional_checks": "PASS",
+      "fault_successor_distinct_and_nonreleasable": true,
+      "isolated_rollback": "PASS_EXACT_F09",
+      "post_rollback_jobspec": "PASS_FULL_AF_UNIX_LIFECYCLE_BYTE_EXACT",
+      "rollback_same_version_reinstall_only": false,
+      "sqlite_integrity": "ok",
+      "cas_objects": 5,
+      "cas_non_0444": 0,
+      "duplicate_event_hash_groups": 0,
+      "duplicate_object_id_groups": 0,
+      "terminal_result_sha256": "a13b8e8d25a665db0a8512dcf42b914c58d542922447f552826deb2642287e71",
+      "targets_cleaned_after_evidence_sealing": true
+    },
+    "safety": {
+      "new_provider_calls": 0,
+      "new_model_identities": 0,
+      "automatic_unknown_retries": 0,
+      "canonical_writes": 0,
+      "live_or_vps_actions": 0,
+      "critical_incidents_open": 0,
+      "high_incidents_open": 0,
+      "private_evidence_in_public_git": false,
+      "private_locators_public": false,
+      "default_runtime_profile_touched": false,
+      "grants_authority": false,
+      "product_done": false,
+      "release_done": false
+    }
+  },
+  "integrity": {
+    "profile": "core-json-sha256-v1",
+    "payload_sha256": "e60228faa0bad1e0f58669f741be7c6ad50208f70b60e011a78da0bd938d6471",
+    "parent_refs": [
+      "git:61a2b35bab91e038cd8148cfe9a364fab294518b",
+      "release:0394d6c9e327eceb62f738eca90be3ece015ba79",
+      "f09-freeze:sha256:eaa6026ef0ac71662ea3bf0a7b438298b4a757ebedcbc2bf22a361a33eaa6d77",
+      "private-f11-stage:sha256:fd3eb7f51c9378c5203732d049817d4228f5731222d05196b9a8ab85a6afa12f",
+      "private-f11-manifest:sha256:90a24af2ce191a3ceff72a81db4d14f9ac3e1819cc9323ee8348428d493f0fd2",
+      "backup-receipt:sha256:76db3a4e423d876f5780295dcfcb0e5cc81be779b421748f5fe7b27f444603b2"
+    ]
+  }
+}

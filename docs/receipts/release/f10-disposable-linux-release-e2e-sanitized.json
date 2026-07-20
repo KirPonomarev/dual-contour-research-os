@@ -1,0 +1,132 @@
+{
+  "schema_id": "F10DisposableLinuxReleaseE2ESanitizedReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "f10-disposable-linux-release-e2e-sanitized-61a2b35",
+  "issued_at": "2026-07-20T19:29:23Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "final-evidence-integration-authority"
+  },
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "plan_id": "DCR_OS_AUTONOMOUS_V2_3_NO_BRAKES_20260719",
+    "plan_version": "2.4.0-fast-working-release",
+    "project_fingerprint": "b371429cb7c01fd6c5dbd430510a264684dab906188d706b7479446c1bd8f154",
+    "stage_id": "F10_DISPOSABLE_LINUX_RELEASE_E2E",
+    "status": "ACCEPTED_WITH_EXPLICIT_TERMINAL_AUTHORITY_RECONCILIATION",
+    "repository_evidence": {
+      "head_sha": "61a2b35bab91e038cd8148cfe9a364fab294518b",
+      "tree_sha": "5a72ce5dbb9884ce7c33265ed2241f86f90ffc7a",
+      "repository_mutations": 0
+    },
+    "release_identity": {
+      "release_sha": "0394d6c9e327eceb62f738eca90be3ece015ba79",
+      "tree_sha": "636fda24cbb2da567fb23a4d44fa865ae74ac4bc",
+      "portable_image_id": "sha256:e6db8ab087e18b13ac357a751a2e7318c3abb81a4f2af459c930a630ddc65577",
+      "local_exact_image_id": "sha256:d1f56e933a8e498ae9e3a1f70ba0e764785a0de44d6f702f7e1945c3621b671f",
+      "config_sha256": "c610ed8aebea67833d1771e3fba0a47ddf6d133b90ae411ee8ba9f669f8b7d99",
+      "policy_sha256": "665bfb70a82d3aa5988d45fa299fb14d2b28926e6267a15ae440e3c03fbb0cd9",
+      "equal_to_f09_subject": true
+    },
+    "private_receipt_digests": {
+      "functional_stage_receipt_sha256": "6f9f56d14ba8247abf73794a3c1fd70f00d29873f42d9f94eceed352cc2ab765",
+      "backup_repair_stage_receipt_sha256": "0b1eb21f7577daf351b76268897c2f963cdc6fcc2891846686bcf4809a8c463f",
+      "backup_receipt_sha256": "76db3a4e423d876f5780295dcfcb0e5cc81be779b421748f5fe7b27f444603b2",
+      "backup_payload_sha256": "83cfe0f229b2f018e996d1ccd06a422777ffec3dd0e744f35953c24d3f99f832",
+      "verification_restore_receipt_sha256": "ea2aef0df1e3e97755efac7d3c7de175b70d44a79d0071c47307faae2455a4b8"
+    },
+    "clean_disposable_execution": {
+      "target_clean_before_install": true,
+      "repository_or_worktree_mounted": false,
+      "runtime_uid": 10001,
+      "runtime_network": "none",
+      "single_durable_writer": true,
+      "provider_calls": 2,
+      "actual_tokens": 957,
+      "actual_cost_units": 2,
+      "provider_state": "ALL_RECONCILED_SENT_0_UNKNOWN_0",
+      "automatic_retries": 0,
+      "new_calls_after_reboot": 0
+    },
+    "functional_cycle": {
+      "claim_sequence": 24,
+      "checkpoint_sequence": 25,
+      "complete_sequence": 26,
+      "feedback_sequence": 27,
+      "execution_receipt_sha256": "97622d0421fc8505ab4ec3f17ab6f09d60556516af6cd708be2deb699bd018c4",
+      "validation_receipt_sha256": "0f716d4337d758542494116c7de27c8a6b6db196c02ce04db9b5e26cf7004c96",
+      "feedback_event_sha256": "c2a202c655dd3f39e384b470c8a40ecf603343b3b3145fa75a458ca46a5d3aa8",
+      "mechanical_axis": "MECHANICAL_SUCCESS",
+      "epistemic_axis": "UNRESOLVED",
+      "memory_class": "INCONCLUSIVE",
+      "next_material_event_present": true,
+      "claims_scientific_truth": false
+    },
+    "terminal_authority_reconciliation": {
+      "observed_decision": "REJECT",
+      "observed_reason": "FORBIDDEN_DATA_CLASS",
+      "observed_authority_status": "NOT_ISSUED",
+      "authority_bundle_issued": false,
+      "budget_action": "NONE",
+      "new_model_call_identities": 0,
+      "provider_network_calls": 0,
+      "safety_equivalent_terminal": "CANDIDATE_REJECTED_AUTHORITY_NOT_ISSUED",
+      "literal_wait_authority_hostile_test": "PASS",
+      "disposition": "CLOSED_ACCEPTED_PLAN_RECONCILIATION"
+    },
+    "restart_monitoring_and_assurance": {
+      "same_container_restart": "PASS",
+      "terminal_lookup_byte_exact": true,
+      "monitor_record_sha256": "76d9e048df9c3d7817a1a96f80d93e93cb040cd3c32ab6e57b30af02acb31baf",
+      "monitor_research_state_writes": 0,
+      "packaged_source_tests_passed": 55,
+      "packaged_source_test_failures": 0,
+      "packaged_source_test_errors": 0
+    },
+    "superseding_backup": {
+      "original_backup_superseded": true,
+      "original_backup_receipt_sha256": "ff69743a4c15d2dc45cc6957a8bdcd81bd8231f3b712c38e15f74472d3174d1f",
+      "objects_mode_repaired": 5,
+      "mode_transition": "0400_TO_0444",
+      "content_byte_mutations": 0,
+      "ledger_mutations": 0,
+      "source_manifest_sha256": "32f08a3ed48eea4f3b493bf8492304942726a166da337e0dc4a03a74790bc848",
+      "ledger_sha256": "aaf1a8cb14ec3b3fcdb2832bf6f0dff6d5d64d014d54adfc0c8977098acfb065",
+      "snapshot_id": "30f8fe18984616b8d5f1408e44407786ce4e316a99a45210dccf32d76b71efb0",
+      "encrypted": true,
+      "verification": "VERIFIED",
+      "verification_restore_cas_0444_count": 5,
+      "verification_restore_bad_mode_count": 0,
+      "terminal_lookup": "PASS",
+      "same_release_restart": "PASS_BYTE_IDENTICAL_LOOKUP",
+      "sqlite_integrity": "ok",
+      "duplicate_event_hashes": 0,
+      "duplicate_object_ids": 0,
+      "source_backup_preserved": true
+    },
+    "safety": {
+      "unresolved_critical_incidents": 0,
+      "unresolved_high_incidents": 0,
+      "canonical_actions": 0,
+      "live_or_vps_actions": 0,
+      "private_or_secret_bytes_public": false,
+      "private_locators_public": false,
+      "grants_authority": false,
+      "product_done": false,
+      "release_done": false
+    }
+  },
+  "integrity": {
+    "profile": "core-json-sha256-v1",
+    "payload_sha256": "e8bc98fca901020f849f372ac531e6bf5a92d2cec178f3ce856692f0857c3b54",
+    "parent_refs": [
+      "git:61a2b35bab91e038cd8148cfe9a364fab294518b",
+      "release:0394d6c9e327eceb62f738eca90be3ece015ba79",
+      "f09-freeze:sha256:eaa6026ef0ac71662ea3bf0a7b438298b4a757ebedcbc2bf22a361a33eaa6d77",
+      "private-f10-functional:sha256:6f9f56d14ba8247abf73794a3c1fd70f00d29873f42d9f94eceed352cc2ab765",
+      "private-f10-backup-repair:sha256:0b1eb21f7577daf351b76268897c2f963cdc6fcc2891846686bcf4809a8c463f",
+      "backup-receipt:sha256:76db3a4e423d876f5780295dcfcb0e5cc81be779b421748f5fe7b27f444603b2"
+    ]
+  }
+}
