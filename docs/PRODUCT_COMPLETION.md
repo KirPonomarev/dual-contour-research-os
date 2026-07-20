@@ -1,22 +1,25 @@
-# Product completion boundary — V2.4 fast working release
+# Product completion boundary — V2.5.2 physical release
 
-Current status: `V2.4_FAST_WORKING_RELEASE_IN_PROGRESS`.
+Current status: `R17_PROVEN_CANDIDATE_DEPLOYMENT_PENDING`.
 
-V2.4 defines Product Done and Release Done together at F12. R08B freezes the
-exact release subject; R08C proves its full functional loop; F09 freezes
-current evidence; F10 proves a clean disposable Linux installation; F11 proves
-isolated recovery; F12-A seals the Git evidence and F12-B independently audits
-that immutable head outside Git. No earlier stage may claim `DONE`.
+The completed V2.4/F12 work proves the immutable R17 runtime candidate, its
+portable image, clean installation, isolated recovery, and independent Git
+audit. It does **not** by itself prove Product Done or Release Done. V2.5.2
+restores the intended boundary: the exact R17 image must be installed in its
+permanent, collision-free VPS namespace; both domain-owned immutable exports
+must traverse the single local ingress and the AF_UNIX runtime boundary; and
+restart, controlled reboot, encrypted backup, clean restore, rollback
+readiness, monitoring, exact-head CI, and independent physical audit must all
+pass on bound identities.
 
-Live/VPS deployment, live restore/rollback/reboot and the 24-hour, 48-hour,
-seven-day and 14-day observation windows are outside this plan. They remain
-valuable later operational evidence, but they do not delay V2.4 Product Done
-or Release Done. The terminal V2.4 state must preserve
-`PHYSICALLY_DEPLOYED=false` and `OPERATIONALLY_PROVEN=false`.
+Only elapsed-time observation windows are post-release. The 24-hour, 48-hour,
+seven-day, and 14-day windows may run alongside real bounded work after
+release and do not block the physical release verdict. They cannot substitute
+for any immediate physical gate.
 
 ```text
 PLAN_ID=DCR_OS_AUTONOMOUS_V2_3_NO_BRAKES_20260719
-PLAN_VERSION=2.4.0-fast-working-release
+PLAN_VERSION=2.5.2-physical-release-final
 STATUS=IN_PROGRESS
 PRODUCT_CODE_COMPLETE=true
 PRODUCT_DONE=false
@@ -25,10 +28,36 @@ REAL_BOUNDED_RESEARCH_OPERATION_READY=false
 MASTER_PLAN_DONE=false
 PHYSICALLY_DEPLOYED=false
 OPERATIONALLY_PROVEN=false
-TIMED_WINDOWS=OUT_OF_SCOPE
-LIVE_VPS_DEPLOYMENT=OUT_OF_SCOPE
-DONE_REQUIRES=F12_B_INDEPENDENT_AUDIT_PASS
+TIMED_WINDOWS=POST_RELEASE_NONBLOCKING
+LIVE_VPS_DEPLOYMENT=REQUIRED
+DONE_REQUIRES=P06B2_AGENT0_PHYSICAL_CLOSEOUT
 ```
+
+## Current release identity separation
+
+- Immutable runtime subject: `0394d6c9e327eceb62f738eca90be3ece015ba79`, tree `636fda24cbb2da567fb23a4d44fa865ae74ac4bc`.
+- Portable image: `sha256:e6db8ab087e18b13ac357a751a2e7318c3abb81a4f2af459c930a630ddc65577`.
+- Maintenance control head: created by the protected P01 delivery and never represented as runtime bytes.
+- Final evidence head: created only after physical evidence is sanitized and delivered.
+
+If a runtime input changes, a new runtime subject and image are required. A
+control-only or evidence-only commit never relabels or silently rebuilds R17.
+
+## Physical Product Done gates
+
+Product Done and Release Done require all of the following on the exact bound
+host and namespace:
+
+1. one transport-only ingress principal and zero public Bridge listeners;
+2. independently provenance-bound, immutable, current Market and Security exports;
+3. exact R17 carrier load and persistent rootless service activation;
+4. physical Market and Security shadow E2E with no domain canonical writes;
+5. same-release restart, controlled reboot, encrypted backup, isolated clean restore, and rollback readiness;
+6. green monitoring, exact-head protected delivery, and sanitized receipts;
+7. an independent physical audit followed by Agent 0 closeout.
+
+No test fixture, local image, CI result, deploy exit code, timer state, or old
+receipt alone satisfies these gates.
 
 ## Historical checkpoint retained
 
@@ -101,16 +130,18 @@ The following are known product and physical-completion requirements, not elapse
 - replacement release freeze and successful physical deployment;
 - full remote A1 E2E, monitoring, backup, two restores, restart, provider failure and rollback proof.
 
-Under the historical plan, deployment, remote E2E and recovery were part of
-those product conditions. Only after they passed could the finished product
-start its separate operational windows: 24-hour substrate, 48-hour provider,
-seven-day integrated and 14-day/200-job final burn-in. V2.4 supersedes that
-gating sequence without deleting its evidence history: only disposable and
-isolated physical proof remains in release scope, while live and timed work is
-out of scope.
+Under the older plan, deployment, remote E2E and recovery were part of those
+product conditions. Only after they passed could the finished product start
+its separate operational windows: 24-hour substrate, 48-hour provider,
+seven-day integrated and 14-day/200-job final burn-in. V2.4 temporarily moved
+the live deployment boundary out of scope; V2.5.2 additively corrects that
+decision without deleting any evidence history. Permanent deployment and the
+short physical proof chain are release gates again, while only the elapsed
+observation windows remain post-release.
 
 The historical checkpoint's honest state remains
-`SUPERSEDED_REPAIR_REQUIRED / DEPLOYMENT_DENIED`. The current V2.4 state is
-separately `IN_PROGRESS`; no local unit test, CI result, saved receipt
-integrity, image build or GitHub review substitutes for R08C/F10/F11 physical
-evidence or the independent F12 audit.
+`SUPERSEDED_REPAIR_REQUIRED / DEPLOYMENT_DENIED`. The current V2.5.2 state is
+`R17_PROVEN_CANDIDATE_DEPLOYMENT_PENDING`; no local unit test, CI result,
+saved receipt integrity, image build or GitHub review substitutes for the
+remaining permanent deployment, domain E2E, recovery and independent physical
+audit gates.
