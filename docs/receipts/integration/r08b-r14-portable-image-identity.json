@@ -1,0 +1,64 @@
+{
+  "classification": "D1_INTERNAL_SANITIZED",
+  "contour": "governance",
+  "integrity": {
+    "parent_refs": [
+      "git:099414721b37127a90dbb9946fd6150f306db9a2",
+      "git:978b64e8efd5e356536b787632ec8e4659d0c321",
+      "ci:29738558374",
+      "git:d555ebd07d10bd664444c6bf080903fc7d89989c",
+      "ci:29738608250",
+      "private-failed-stage:sha256:820561f2ccb7955a94d7dec216c7c4eedad8bf38ba4c6e88a22939fc71908c48"
+    ],
+    "payload_sha256": "55d7bfb8426ba306ee2747b16b02ac826ba67dcd27248c88b68dec3492d61642"
+  },
+  "issued_at": "2026-07-20T11:28:30Z",
+  "issuer": {"authority_class": "integration-authority", "id": "agent-0"},
+  "object_id": "integration-r08b-r14-portable-image-identity-20260720",
+  "payload": {
+    "agent_id": "agent-0",
+    "audit_results": {
+      "status": "PASS_REPAIR_ACCEPTED_RECUT_REQUIRED",
+      "contract_gate": "green",
+      "focused_tests": 4,
+      "full_core_tests": 899,
+      "stage0b_tests": 25,
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "runtime_or_containerfile_mutation": false,
+      "recursive_oci_descriptor_binding": "green",
+      "containerd_local_store_identity_bound": true,
+      "classic_docker_archive_load_identity_equal": true,
+      "classic_docker_server_version": "29.5.2",
+      "portable_image_identity_source": "verified-archive-config-digest",
+      "disposable_classic_target_deleted": true,
+      "provider_calls": 0,
+      "live_or_vps_actions": 0,
+      "candidate_cut": false,
+      "candidate_recut_required": true,
+      "unresolved_critical_debt": 0,
+      "unresolved_high_debt": 0,
+      "release_ready": false,
+      "product_done": false,
+      "grants_authority": false
+    },
+    "base_sha": "099414721b37127a90dbb9946fd6150f306db9a2",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "head_sha": "d555ebd07d10bd664444c6bf080903fc7d89989c",
+    "integration_commit_sha": "d555ebd07d10bd664444c6bf080903fc7d89989c",
+    "ownership_lease_ref": "stages/r08b-r14-portable-image-identity/ownership-lease.json",
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29738608250",
+    "remote_pr_head_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29738558374",
+    "stage_id": "R08B-R14_PORTABLE_IMAGE_IDENTITY_FIX",
+    "write_set": [
+      "stages/r08b-r14-portable-image-identity/**",
+      "tools/candidate_image_build.py",
+      "tests/test_r08b_reproducible_candidate_build.py",
+      "docs/receipts/reuse/r08b-r14-portable-image-identity.json",
+      "docs/receipts/assurance/r08b-r13-portable-image-identity-failure.json",
+      "docs/receipts/integration/r08b-r14-portable-image-identity.json"
+    ]
+  },
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0"
+}
