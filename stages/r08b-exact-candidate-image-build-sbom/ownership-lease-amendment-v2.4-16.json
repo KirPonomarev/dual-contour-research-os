@@ -1,0 +1,36 @@
+{
+  "stage_id": "r08b-r6-private-two-role-precut-integration",
+  "amendment_id": "R08B_R6_PRIVATE_TWO_ROLE_PRECUT_INTEGRATION_20260720",
+  "issued_by": "agent-0",
+  "issued_at": "2026-07-20T00:32:07Z",
+  "authority_head": "051fe747f3971142e04ba06c96977084d0f62b24",
+  "authority_tree": "b4bc5744c2415914005690167edd068964db6433",
+  "stage_envelope_amendment_sha256": "8d05f53727c61e36bea202519488601046bddc7bf52d5bd7056c4962c55ddf90",
+  "candidate_sha": null,
+  "candidate_tree_sha": null,
+  "leases": [
+    {
+      "owner": "agent-0",
+      "branch": "codex/bridge-a0-r08b-exact-candidate-image-build-sbom",
+      "write_set": [
+        "stages/r08b-exact-candidate-image-build-sbom/stage-envelope-amendment-v2.4-16.json",
+        "stages/r08b-exact-candidate-image-build-sbom/ownership-lease-amendment-v2.4-16.json",
+        "tools/r08b_pre_cut_readiness.py",
+        "docs/receipts/integration/r08b-r6-private-two-role-precut.json"
+      ]
+    }
+  ],
+  "private_read_set": [
+    "owner-only R08B-R6 private StageReceipt by SHA-256",
+    "owner-only R08B-R6 private proposal envelope by SHA-256",
+    "owner-only sanitized Critic manifest by SHA-256"
+  ],
+  "provider_call_budget": 0,
+  "external_source_read_budget": 0,
+  "cross_owner_write_set": false,
+  "one_mutating_lane_at_a_time": true,
+  "history_rewrite_authority": false,
+  "candidate_cut_permitted": false,
+  "expires_at": "2026-07-20T06:32:07Z",
+  "state": "active"
+}
