@@ -1,0 +1,42 @@
+{
+  "integrity": {
+    "payload_sha256": "b22c9a10863e033f4a39eef54acc3ab9a5c9e48c4ec020b3494c16ee7a9a3881",
+    "profile": "core-json-sha256-v1"
+  },
+  "payload": {
+    "accepted_runtime_pulse_report_sha256": "fdd47085235750d6ff45aa790ee55074de72963d15161584739f96955169af9a",
+    "accepted_runtime_state": "GENERATING_RUNNABLE_1_RED_STALE_NO_FALSE_GREEN",
+    "claims_scientific_truth": false,
+    "corrected_config_sha256": "d358b47a4c83448f9f43a3bab6d6a45c9b8021c0a547ea055125c1a406d2e10f",
+    "credential_mounts": 0,
+    "exact_image_af_unix_report_sha256": "48d43349d18b9adf6900c113fdf90fecc47f18f130605b0e6d7f2351603d8df1",
+    "exact_image_hostile_report_sha256": "877ee9ed66c43893dc3a4e0bdabd15ead088b5d26effd1bc4070a2c616b64a4e",
+    "grants_authority": false,
+    "hostile_tests": {
+      "errors": 0,
+      "failures": 0,
+      "run": 22
+    },
+    "image_id": "sha256:be49e1ce3606fa0f3d1c96002fb2a9cc35072449af1a3e5f5b2a1c2cc3b1d159",
+    "live_or_canonical_actions": 0,
+    "new_model_call_identities": 0,
+    "physical_af_unix": "PASS",
+    "positive_negative_inconclusive": "PASS",
+    "provider_calls": 0,
+    "provider_routing_sha256": "37db8596a8245a6b1ea2bc5bce1495a4e7dadb314876e51397ad11dd194b3dc6",
+    "r08c_sanitized_manifest_sha256": "ced6ad7d18008cbe640100ee4ea32122c646062f06c396672d93e4dd32a9d16a",
+    "r08c_stage_receipt_sha256": "5457a7492d57fc4997c8769b1fa512bd3a8613b4da6bff2e2dc54729a90563cb",
+    "release_subject_sha": "974a5dd932e53b82407a4b71f8af5e5641803564",
+    "release_subject_tree_sha": "fe0066c975c8de7022dc6047158cbf35cad8ccce",
+    "repository_mutation": false,
+    "restart_zero_write": true,
+    "runtime_policy_sha256": "89cb6acaae9a96cb1ba84a7d5683dab8a0588afb7fb42c18ecf5caf4b4d7ff16",
+    "source_content_sha256": "b97f38535f32c29ae4eb2e7ec3d4d41eeb84c7f9813b0998fc73a15a3b7bcdbc",
+    "stage_id": "F09_RELEASE_EVIDENCE_CURRENTNESS_AND_FREEZE",
+    "status": "PASS_RECONCILED",
+    "terminal_hashes_equal": true,
+    "wait_authority_disposable_exact_image": "PASS"
+  },
+  "schema_id": "F09R08CSanitizedFunctionalEvidence",
+  "schema_version": "1.0.0"
+}
