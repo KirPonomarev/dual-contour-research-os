@@ -1,0 +1,84 @@
+{
+  "stage_id": "r08b-exact-candidate-image-build-sbom",
+  "repair_stage_id": "r08b-r7-static-precut-release-inputs",
+  "amendment_id": "R08B_R7_STATIC_PRECUT_RELEASE_INPUTS_20260720",
+  "plan_id": "DCR_OS_AUTONOMOUS_V2_3_NO_BRAKES_20260719",
+  "plan_version": "2.4.0-fast-working-release",
+  "issued_by": "agent-0",
+  "issued_at": "2026-07-20T00:48:50Z",
+  "authority_head": "671af7e7908830c45aff64f3bb0984ffa8661564",
+  "authority_tree": "13d6ff8ed7acf7a098cf62320db205c043f53aeb",
+  "candidate_sha": null,
+  "candidate_tree_sha": null,
+  "candidate_exact_head_ci_run": "NOT_CUT",
+  "accepted_predecessor": {
+    "r08b_r6_receipt_sha256": "cb0b39d553ee5f9b89903df28a44fb6a82e2cc27bcdfa870cd48e8d582e48188",
+    "r08b_r6_receipt_head": "671af7e7908830c45aff64f3bb0984ffa8661564",
+    "r08b_r6_receipt_ci_run": 29709929666,
+    "private_two_role_component": "PASS",
+    "parent_pre_cut_complete": false
+  },
+  "objective": "Finalize every remaining Agent-0-owned shipped release input before candidate cut, encode V2.4 release-scoped status semantics, and make the complete parent pre-cut gate deterministic while the candidate remains null.",
+  "agent_0_write_set": [
+    "stages/r08b-exact-candidate-image-build-sbom/stage-envelope-amendment-v2.4-17.json",
+    "stages/r08b-exact-candidate-image-build-sbom/ownership-lease-amendment-v2.4-17.json",
+    "tools/candidate_image_build.py",
+    "tools/r08b_pre_cut_readiness.py",
+    "tools/verify_final_release_freeze.py",
+    "README.md",
+    "docs/ARCHITECTURE.md",
+    "docs/PRODUCT_COMPLETION.md",
+    "docs/R08B_RELEASE_OPERATOR_RUNBOOK.md",
+    "docs/receipts/release/r08b-deployment-operator-rollback-packet.json",
+    "docs/receipts/release/r08b-pre-cut-readiness.json"
+  ],
+  "required_change": {
+    "v2_4_status_semantics": {
+      "done_requires_f12": true,
+      "product_done_before_f12": false,
+      "release_done_before_f12": false,
+      "physically_deployed": false,
+      "operationally_proven": false,
+      "timed_windows": "OUT_OF_SCOPE"
+    },
+    "final_status_validator_rejects_premature_done_or_live_claims": true,
+    "deployment_operator_rollback_packet_is_complete_before_cut": true,
+    "runbook_covers_disposable_f10_and_isolated_f11_without_live_authority": true,
+    "candidate_build_tool_accepts_only_post_squash_green_merge_head": true,
+    "parent_pre_cut_validator_binds_static_inputs_and_accepted_private_component": true,
+    "candidate_remains_null_until_post_squash_merge_head_ci": true
+  },
+  "reuse_decision": {
+    "receipt_ref": "docs/receipts/reuse/r08b-exact-candidate-image-build-sbom.json",
+    "internal_patterns": [
+      "tools/final_deployment_rebind.py:owner-only artifact and image inspection patterns",
+      "tools/verify_final_release_freeze.py:strict JSON and release currentness patterns",
+      "existing deploy units packets and recovery controllers by immutable hash",
+      "python standard library only"
+    ],
+    "new_dependency": false,
+    "external_code": false
+  },
+  "acceptance_commands": [
+    "python3 tools/verify_final_release_freeze.py verify-v2.4-status",
+    "python3 tools/verify_final_release_freeze.py self-test-v2.4-status",
+    "python3 tools/candidate_image_build.py self-test",
+    "python3 tools/r08b_pre_cut_readiness.py verify-parent --private-evidence-dir <owner-only-r08b-r6-dir> --expected-head 671af7e7908830c45aff64f3bb0984ffa8661564 --expected-tree 13d6ff8ed7acf7a098cf62320db205c043f53aeb --output <owner-only-output>",
+    "python3 tools/verify_release_blueprint.py",
+    "python3 tools/verify_r08b_trailer_identity.py",
+    "make contracts",
+    "make test",
+    "git diff --check",
+    "privacy secret and private-evidence scan is green",
+    "non-force push and exact remote equality",
+    "current PR-head exact-head CI green before squash merge"
+  ],
+  "stop_conditions": [
+    "any ops tests src contracts CI ownership lockfile or undeclared path mutation",
+    "any private receipt raw provider output credential runtime database D2 D3 target strategy holdout or owner-only locator enters Git",
+    "status docs or validator claim DONE RELEASE_READY physical deployment operational proof or timed-window completion before F12",
+    "packet or runbook grants live VPS deployment restore rollback reboot publication trading security execution or canonical authority",
+    "candidate becomes non-null before exact post-squash merge-head CI",
+    "force push rebase amend cherry-pick rewrite or historical deletion"
+  ]
+}
