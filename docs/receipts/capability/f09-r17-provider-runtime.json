@@ -1,0 +1,166 @@
+{
+  "classification": "D1",
+  "contour": "governance",
+  "integrity": {
+    "parent_refs": [
+      "environment:macos-colima-classic-docker-linux-amd64-emulated:2026-07-20",
+      "git:0394d6c9e327eceb62f738eca90be3ece015ba79",
+      "probe:canonical-live-authority-absent",
+      "probe:expired-proof-stale",
+      "probe:fixture-real-claim-separation",
+      "probe:gateway-upstream-overclaim-denied",
+      "probe:ipc-role-spoof-denied",
+      "probe:mixed-head-stale",
+      "probe:model-drift-stale",
+      "probe:parser-hostile-pack",
+      "probe:private-raw-absent",
+      "probe:shadow-admission-parked",
+      "probe:terminal-restart-no-repeat",
+      "probe:total-token-overrun-failed-known",
+      "probe:vacuous-output-failed-known",
+      "probe:writer-spoof-denied",
+      "test:tests.test_r04c_connected_worker_runtime",
+      "test:tests.test_r04d_model_reconciliation_ipc",
+      "validator:tools.verify_r04e_provider_proof"
+    ],
+    "payload_sha256": "9f1c20f544afb52cfbb3f2476e6df641920b1ab6896f5c7c2f4ed70695f60f54",
+    "profile_id": "core-json-sha256-v1"
+  },
+  "issued_at": "2026-07-20T12:55:00Z",
+  "issuer": "independent-assurance-issuer",
+  "object_id": "capability-proof:9f1c20f544afb52cfbb3f2476e6df641920b1ab6896f5c7c2f4ed70695f60f54",
+  "payload": {
+    "capability_id": "REAL_PROVIDER_ROUTE_R04D",
+    "code_sha256": "89fda8c02b0e22c7a9d2a7588bad298ad204b24ddfed1780af9e827f64d998c4",
+    "compatibility_dependencies": [
+      "docker:linux-arm64",
+      "python:3.11",
+      "AF_UNIX:peer-credentials"
+    ],
+    "config_sha256": "31233c747a7fc057ab48df47abe9845dc7edece5498a16c68b82e6fc96d3461d",
+    "critical_dependencies": [
+      "catalog:core:13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+      "catalog:a1:eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+      "connected-profile:sha256:63ae65247d61b918aced080e6419609459ebcbf4a3384ea29f2617e65597258c",
+      "role-evaluation:sha256:111a7ac1dc954466b19d5e408debeeefcf65c76b5b025a743a2433be910c1e75",
+      "routing-profile:sha256:37db8596a8245a6b1ea2bc5bce1495a4e7dadb314876e51397ad11dd194b3dc6"
+    ],
+    "data_refs": [
+      "manifest:sha256:209fd9a6ee34f5f1ff60c71fc862733adc1a39b685ac0e06665d29d2ead3559d",
+      "output:sha256:4e1a0a371fbdaaefa1c4d781cf6acad95b87bebe00d3421293947c73e03db1d0",
+      "private-manifest:sha256:826156b3c41c35b3c1d3498b2b62bc4d5d69b97aec51d96a64f266fb9db64cda",
+      "spend-receipt:sha256:4a578f47457c49c4126eb9bf92d51d9bf8d3868ba6900be1c972cd5c3af2f4ce"
+    ],
+    "environment_compatibility_ref": "environment:macos-colima-classic-docker-linux-amd64-emulated:2026-07-20",
+    "environment_ref": "environment:macos-colima-classic-docker-linux-amd64-emulated:2026-07-20",
+    "evaluator_ref": "assurance:deterministic-r04e-provider-proof-validator",
+    "executor_ref": "image:sha256:ea4cb31db6eec84c6f8e77c972b6374027fdb6a8e4c34f73747ce7857287bc32",
+    "grants_authority": false,
+    "invalidation_conditions": [
+      "code-hash-drift",
+      "config-hash-drift",
+      "environment-compatibility-drift",
+      "negative-probe-regression",
+      "policy-hash-drift",
+      "proof-expiry",
+      "schema-hash-drift",
+      "subject-head-drift"
+    ],
+    "issuer_independence": {
+      "independent_of_executor": true,
+      "independent_of_subject": true,
+      "issuer_ref": "assurance-role:agent-5-deterministic-validator"
+    },
+    "negative_probe_refs": [
+      "probe:canonical-live-authority-absent",
+      "probe:expired-proof-stale",
+      "probe:fixture-real-claim-separation",
+      "probe:gateway-upstream-overclaim-denied",
+      "probe:ipc-role-spoof-denied",
+      "probe:mixed-head-stale",
+      "probe:model-drift-stale",
+      "probe:parser-hostile-pack",
+      "probe:private-raw-absent",
+      "probe:shadow-admission-parked",
+      "probe:terminal-restart-no-repeat",
+      "probe:total-token-overrun-failed-known",
+      "probe:vacuous-output-failed-known",
+      "probe:writer-spoof-denied"
+    ],
+    "policy_sha256": "6644db32e06b2f0681c7252af959300d4ae0c659eee36e11bd8249d7952beb0a",
+    "proof_basis": [
+      {
+        "claim_scope": "SANITIZED_EXACT_SUBJECT_ONLY",
+        "manifest_ref": "provenance/model-provider-functional-proof-v1.json"
+      },
+      {
+        "claim_scope": "SHIPPED_IMAGE_CONTEXT_BUILDABLE",
+        "integration_ref": "integration-r04d-r3-connected-worker-build-context-20260719"
+      },
+      {
+        "claim_scope": "TOTAL_TOKEN_AND_NON_VACUOUS_ENFORCEMENT",
+        "integration_ref": "integration-r04d-r4-connected-worker-budget-output-20260719"
+      },
+      {
+        "claim_scope": "HASH_ONLY_PRIVATE_EVIDENCE",
+        "local_proof_ref": "private-manifest:sha256:826156b3c41c35b3c1d3498b2b62bc4d5d69b97aec51d96a64f266fb9db64cda"
+      },
+      {
+        "accepted_actual_tokens": 2898,
+        "accepted_cost_units": 6,
+        "accepted_provider_calls": 6,
+        "claim_scope": "R08B_R8_TWO_ROLE_ACCOUNTING_REUSED_NO_NEW_PROVIDER_ACTION",
+        "r08c_provider_delta": 0,
+        "sent_or_unknown": 0,
+        "upstream_provider_independence": "NOT_ESTABLISHED"
+      },
+      {
+        "assurance_ref": "docs/receipts/assurance/f09-r17-exact-image-functional.json",
+        "assurance_sha256": "499595353e34017887d20e36f399fd0e5eef640662766f0fcdcdb929962ac410",
+        "claim_scope": "EXACT_R17_RELEASE_IMAGE_HOSTILE_REVALIDATION",
+        "image_id": "sha256:e6db8ab087e18b13ac357a751a2e7318c3abb81a4f2af459c930a630ddc65577",
+        "private_proof_sha256": "4cdd57b2d802e707304c467156767a5c745b34fe99c52ac27e33ed989243f65e",
+        "provider_calls": 0
+      }
+    ],
+    "receipt_id": "capability-proof:f09-provider-runtime:0394d6c",
+    "schema_sha256": "d262099ef5993d9064717ac03ca58eb5d1c393cf69161746b96017a67470e379",
+    "scope": {
+      "accounting_state": "RECONCILED",
+      "actual_total_tokens": 155,
+      "canonical_mutation": "DENIED",
+      "credential_public": false,
+      "data_scope": "D0_PUBLIC_SYNTHETIC_ONLY",
+      "domain_application": "SHADOW_UNAPPLIED",
+      "durable_route_provider_slot": "OPENAI_API",
+      "environments": [
+        "linux-container-colima",
+        "macos-development"
+      ],
+      "fixture_claims_separate": true,
+      "gateway_model_family_relation": "DISTINCT_TRANSPORT_AND_REQUESTED_MODEL_FAMILY",
+      "grants_route_authority": false,
+      "maximum_total_tokens": 1024,
+      "output_non_vacuous": true,
+      "physical_gateway_provider_slot": "OPENROUTER_API",
+      "proof_state": "REAL_PROVIDER_ROUTE_PASS_FOR_EXACT_R04D_SCOPE",
+      "raw_response_public": false,
+      "real_provider_calls": 1,
+      "restart_no_repeat": true,
+      "route_binding": "gpt-5.6-sol-xhigh",
+      "scientific_evidence": false,
+      "upstream_provider_attested": false
+    },
+    "status": "PASS_FOR_FROZEN_SCOPE",
+    "subject_ref": "git:0394d6c9e327eceb62f738eca90be3ece015ba79",
+    "test_refs": [
+      "test:tests.test_r04c_connected_worker_runtime",
+      "test:tests.test_r04d_model_reconciliation_ipc",
+      "validator:tools.verify_r04e_provider_proof"
+    ],
+    "valid_from": "2026-07-20T12:55:00Z",
+    "valid_until": "2026-08-19T12:55:00Z"
+  },
+  "schema_id": "CapabilityProofReceipt",
+  "schema_version": "1.0.0"
+}

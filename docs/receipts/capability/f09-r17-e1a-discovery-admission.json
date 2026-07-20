@@ -1,0 +1,132 @@
+{
+  "classification": "D1",
+  "contour": "governance",
+  "integrity": {
+    "parent_refs": [
+      "environment:macos-colima-classic-docker-linux-amd64-emulated:2026-07-20",
+      "git:0394d6c9e327eceb62f738eca90be3ece015ba79",
+      "probe:canonical-live-authority-absent",
+      "probe:expired-proof-stale",
+      "probe:ipc-role-spoof-denied",
+      "probe:mixed-head-stale",
+      "probe:parser-hostile-pack",
+      "probe:shadow-admission-parked",
+      "probe:writer-spoof-denied",
+      "test:tests.test_a1_admission_fixture",
+      "test:tests.test_a1_scout_ipc_fixture",
+      "test:tests.test_a1_synthetic_domain_freeze"
+    ],
+    "payload_sha256": "f06b713404e884c26c6e950d8c1d97189bb88e1b56fecda1d6769f9f954647c7",
+    "profile_id": "core-json-sha256-v1"
+  },
+  "issued_at": "2026-07-20T12:55:00Z",
+  "issuer": "independent-assurance-issuer",
+  "object_id": "capability-proof:f06b713404e884c26c6e950d8c1d97189bb88e1b56fecda1d6769f9f954647c7",
+  "payload": {
+    "capability_id": "A1_DISCOVERY_ADMISSION_FIXTURE",
+    "code_sha256": "89fda8c02b0e22c7a9d2a7588bad298ad204b24ddfed1780af9e827f64d998c4",
+    "compatibility_dependencies": [
+      "python:>=3.11",
+      "git:required",
+      "make:required"
+    ],
+    "config_sha256": "31233c747a7fc057ab48df47abe9845dc7edece5498a16c68b82e6fc96d3461d",
+    "critical_dependencies": [
+      "catalog:core:13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+      "catalog:a1:eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1"
+    ],
+    "data_refs": [
+      "fixture:public-synthetic-research-item-001"
+    ],
+    "environment_compatibility_ref": "environment:macos-colima-classic-docker-linux-amd64-emulated:2026-07-20",
+    "environment_ref": "environment:macos-colima-classic-docker-linux-amd64-emulated:2026-07-20",
+    "evaluator_ref": "assurance:agent5-s01-s02-s03-negative-probe-pack",
+    "executor_ref": "fixture:registered-offline-l0-not-invoked",
+    "grants_authority": false,
+    "invalidation_conditions": [
+      "code-hash-drift",
+      "config-hash-drift",
+      "environment-compatibility-drift",
+      "negative-probe-regression",
+      "policy-hash-drift",
+      "proof-expiry",
+      "schema-hash-drift",
+      "subject-head-drift"
+    ],
+    "issuer_independence": {
+      "independent_of_executor": true,
+      "independent_of_subject": true,
+      "issuer_ref": "assurance-role:agent-5"
+    },
+    "negative_probe_refs": [
+      "probe:canonical-live-authority-absent",
+      "probe:expired-proof-stale",
+      "probe:ipc-role-spoof-denied",
+      "probe:mixed-head-stale",
+      "probe:parser-hostile-pack",
+      "probe:shadow-admission-parked",
+      "probe:writer-spoof-denied"
+    ],
+    "policy_sha256": "00a24ffe76a6f48aa5a5bc523ed271f8f0c2da536c64e1aa4e482a235f619f8d",
+    "proof_basis": [
+      {
+        "ci_run": 29645921989,
+        "integration_ref": "integration:integration-s01-e1a-admission-complete-20260718"
+      },
+      {
+        "ci_run": 29646646408,
+        "integration_ref": "integration:integration-s02-scout-ipc-assurance-20260718"
+      },
+      {
+        "ci_run": 29647203808,
+        "integration_ref": "integration:integration-s03-synthetic-domain-assurance-20260718"
+      },
+      {
+        "full_suite": {
+          "core": 500,
+          "stage0b": 25
+        },
+        "result": "green"
+      },
+      {
+        "claim_scope": "EXACT_R08B_RELEASE_R08C_HOSTILE_REVALIDATION",
+        "r08c_sanitized_manifest_sha256": "ced6ad7d18008cbe640100ee4ea32122c646062f06c396672d93e4dd32a9d16a"
+      },
+      {
+        "assurance_ref": "docs/receipts/assurance/f09-r17-exact-image-functional.json",
+        "assurance_sha256": "499595353e34017887d20e36f399fd0e5eef640662766f0fcdcdb929962ac410",
+        "claim_scope": "EXACT_R17_RELEASE_IMAGE_HOSTILE_REVALIDATION",
+        "image_id": "sha256:e6db8ab087e18b13ac357a751a2e7318c3abb81a4f2af459c930a630ddc65577",
+        "private_proof_sha256": "4cdd57b2d802e707304c467156767a5c745b34fe99c52ac27e33ed989243f65e",
+        "provider_calls": 0
+      }
+    ],
+    "receipt_id": "capability-proof:f09-e1a-discovery-admission:0394d6c",
+    "schema_sha256": "d262099ef5993d9064717ac03ca58eb5d1c393cf69161746b96017a67470e379",
+    "scope": {
+      "canonical_mutation": "DENIED",
+      "data_scope": "D0_PUBLIC_SYNTHETIC_ONLY",
+      "domain_application": "SHADOW_UNAPPLIED",
+      "environments": [
+        "linux-ci",
+        "macos-development"
+      ],
+      "live_security_execution": "DENIED",
+      "live_trading": "DENIED",
+      "model_route": "LOCAL_FIXTURE_ONLY",
+      "proof_state": "SHADOW_PASS_WITH_FIXTURE_MODEL",
+      "real_provider": "UNPROVEN"
+    },
+    "status": "PASS_FOR_FROZEN_SCOPE",
+    "subject_ref": "git:0394d6c9e327eceb62f738eca90be3ece015ba79",
+    "test_refs": [
+      "test:tests.test_a1_admission_fixture",
+      "test:tests.test_a1_scout_ipc_fixture",
+      "test:tests.test_a1_synthetic_domain_freeze"
+    ],
+    "valid_from": "2026-07-20T12:55:00Z",
+    "valid_until": "2026-08-19T12:55:00Z"
+  },
+  "schema_id": "CapabilityProofReceipt",
+  "schema_version": "1.0.0"
+}
