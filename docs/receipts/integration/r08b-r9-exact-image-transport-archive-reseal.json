@@ -1,0 +1,69 @@
+{
+  "classification": "D1_INTERNAL_SANITIZED",
+  "contour": "governance",
+  "integrity": {
+    "parent_refs": [
+      "git:aa1178ac063bf2ea71b5a8f2953500efd4ce7a20",
+      "git:bcdd5ddfc223dc68e46accb91a35a5d4d08da50b",
+      "ci:29729953695",
+      "freeze:sha256:522a843065b8b2fa7a449977a5bbf55eafcefc217f7ff7496e55d20e4597f5c3"
+    ],
+    "payload_sha256": "69a79395caddf04db9c3ee571c53984aa1f5a44c1316c61ca9e22e95da7f5e8b"
+  },
+  "issued_at": "2026-07-20T09:05:00Z",
+  "issuer": {
+    "authority_class": "integration-authority",
+    "id": "agent-0"
+  },
+  "object_id": "integration-r08b-r9-exact-image-transport-archive-reseal-20260720",
+  "payload": {
+    "agent_id": "agent-0",
+    "audit_results": {
+      "contract_gate": "green",
+      "current_capability_proofs": 7,
+      "focused_tests": 36,
+      "full_core_tests": 894,
+      "grants_authority": false,
+      "image_id": "sha256:be49e1ce3606fa0f3d1c96002fb2a9cc35072449af1a3e5f5b2a1c2cc3b1d159",
+      "internal_image_identity_exact": true,
+      "live_or_vps_actions": 0,
+      "original_archive_available": false,
+      "privacy_secret_scan": "green",
+      "product_done": false,
+      "provider_calls": 0,
+      "qualification_freeze_ref": "docs/receipts/release/f09-release-qualification-freeze-v2.json",
+      "qualification_freeze_sha256": "522a843065b8b2fa7a449977a5bbf55eafcefc217f7ff7496e55d20e4597f5c3",
+      "qualification_state": "FROZEN_CANDIDATE_READY_FOR_DISPOSABLE_QUALIFICATION",
+      "release_ready": false,
+      "release_relevant_invariance": "green",
+      "release_sha": "974a5dd932e53b82407a4b71f8af5e5641803564",
+      "release_tree_sha": "fe0066c975c8de7022dc6047158cbf35cad8ccce",
+      "source_mutation": false,
+      "stage0b_tests": 25,
+      "status": "PASS",
+      "target_actions": 0,
+      "transport_archive_sha256": "b1c1396de6fa76bc4845cd7d310cb50faf2cc6c64f3485a3cd7cc8f03a2b7596",
+      "transport_exports_byte_identical": true,
+      "unresolved_critical_debt": 0,
+      "unresolved_high_debt": 0
+    },
+    "base_sha": "aa1178ac063bf2ea71b5a8f2953500efd4ce7a20",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "head_sha": "bcdd5ddfc223dc68e46accb91a35a5d4d08da50b",
+    "integration_commit_sha": "bcdd5ddfc223dc68e46accb91a35a5d4d08da50b",
+    "ownership_lease_ref": "stages/r08b-r9-exact-image-transport-archive-reseal/ownership-lease.json",
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29729953695",
+    "stage_id": "R08B-R9_EXACT_IMAGE_TRANSPORT_ARCHIVE_RESEAL",
+    "write_set": [
+      "stages/r08b-r9-exact-image-transport-archive-reseal/stage-envelope.json",
+      "stages/r08b-r9-exact-image-transport-archive-reseal/ownership-lease.json",
+      "docs/receipts/reuse/r08b-r9-exact-image-transport-archive-reseal.json",
+      "docs/receipts/assurance/f10-archive-availability-preflight.json",
+      "docs/receipts/release/r08b-r9-exact-image-transport-archive-reseal.json",
+      "docs/receipts/release/f09-release-qualification-freeze-v2.json",
+      "docs/receipts/integration/r08b-r9-exact-image-transport-archive-reseal.json"
+    ]
+  },
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0"
+}
