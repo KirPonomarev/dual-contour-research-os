@@ -1,0 +1,38 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-p01-r2-action-transition-repair-20260720",
+  "issued_at": "2026-07-20T23:14:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-freeze-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "truthful-action-specific-operational-envelope-release-transition-validation",
+    "candidates": [
+      {"candidate": "existing-P01-OperationalActionEnvelope-validator", "disposition": "selected-for-minimal-owned-repair"},
+      {"candidate": "lie-about-from-release-as-none-after-deploy", "disposition": "rejected-false-provenance"},
+      {"candidate": "second-envelope-library-or-public-contract", "disposition": "rejected-unnecessary"}
+    ],
+    "selected_mode": "closed-action-transition-table-with-action-specific-service-set-and-generic-private-envelope-validation-command",
+    "source_ref": "git:65af2e0c4a3587f22db84653e7f04c90bf702035;runtime:0394d6c9e327eceb62f738eca90be3ece015ba79",
+    "code_sha256": "1b2a6ec27f32f33bea44472291be5d2ec3eb8dea4374a29f812d9d6673fc9aee",
+    "license_spdx": "Proprietary-Internal-Owned",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "deploy requires none-service-stopped to R17 and exact Bridge unit",
+      "ingress restart reboot and rollback-readiness require R17 to R17",
+      "ingress and reboot require their persistent service identities",
+      "wrong host action transition service set budget or authority fails closed",
+      "runtime image carrier and public contracts remain unchanged"
+    ],
+    "canonical_owner": "Agent0-physical-release-control",
+    "rollback": "Revert only P01-R2 state-machine control files; no physical action occurred."
+  },
+  "integrity": {
+    "payload_sha256": "70ba78a22076779510d8303e0fa659d336355c4fbe6d39e67ef428dc26101f95",
+    "parent_refs": [
+      "git:65af2e0c4a3587f22db84653e7f04c90bf702035",
+      "runtime:0394d6c9e327eceb62f738eca90be3ece015ba79"
+    ]
+  }
+}

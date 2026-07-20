@@ -1,0 +1,55 @@
+{
+  "stage_id": "p01-r2-action-transition-repair",
+  "agent_id": "agent-0",
+  "objective": "Correct the private OperationalActionEnvelope state machine so post-deploy ingress, restart, reboot and rollback-readiness actions bind R17-to-R17 instead of falsely claiming none-to-R17.",
+  "executable_blocker": "P02 found that the P01 validator hard-coded the deployment transition for every action, making truthful post-deploy ingress and reboot envelopes impossible.",
+  "base_sha": "65af2e0c4a3587f22db84653e7f04c90bf702035",
+  "base_tree": "d4b3fbf7c6c12c48de12c9301374e2465cb5e653",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a0-p01-r2-action-transitions",
+  "worktree": "/private/tmp/dcr-p01-r2-65af2e0",
+  "read_set": [
+    "tools/physical_release_control.py",
+    "inventory/p01-physical-release-control-artifact.json",
+    "docs/receipts/integration/p01-minimal-maintenance-and-ingress-patch.json"
+  ],
+  "write_set": [
+    "Makefile",
+    "tools/physical_release_control.py",
+    "inventory/p01-r2-action-transition-control-artifact.json",
+    "docs/receipts/reuse/p01-r2-action-transition-repair.json",
+    "docs/receipts/integration/p01-r2-action-transition-repair.json",
+    "stages/p01-r2-action-transition-repair/stage-envelope.json",
+    "stages/p01-r2-action-transition-repair/ownership-lease.json"
+  ],
+  "boundary_contract": {
+    "deploy_transition": "release:none-service-stopped->0394d6c9e327eceb62f738eca90be3ece015ba79",
+    "post_deploy_transitions": "0394d6c9e327eceb62f738eca90be3ece015ba79->0394d6c9e327eceb62f738eca90be3ece015ba79",
+    "runtime_inputs_changed": false,
+    "image_rebuild": false,
+    "physical_mutation": false
+  },
+  "forbidden_scope": [
+    "runtime-image-carrier-ops-tests-contract-workflow-domain-or-VPS-mutation",
+    "history-rewrite-force-push-direct-main-push-or-CI-weakening",
+    "new-authority-public-listener-domain-write-live-action-or-secret-in-Git"
+  ],
+  "acceptance_commands": [
+    "make physical-release-control",
+    "make test",
+    "truthful deploy ingress restart reboot and rollback-readiness transition tests",
+    "false transition and wrong service-set rejection",
+    "git diff --check",
+    "exact-head PR merge and receipt CI"
+  ],
+  "risk_class": "low-control-state-machine-repair",
+  "stop_conditions": [
+    "runtime input or physical target mutation required",
+    "frozen public contract break required",
+    "action-specific transition cannot be proven fail-closed"
+  ],
+  "expected_receipt": "docs/receipts/integration/p01-r2-action-transition-repair.json",
+  "rollback": "Revert only P01-R2 control artifacts; no physical action has occurred.",
+  "commit_authority": "agent-0-only",
+  "push_authority": "agent-0-only"
+}
