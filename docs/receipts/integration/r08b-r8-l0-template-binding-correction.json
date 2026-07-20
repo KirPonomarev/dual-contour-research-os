@@ -1,0 +1,140 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-r08b-r8-l0-template-binding-correction-20260720",
+  "issued_at": "2026-07-20T07:16:02Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "R08B-R8_L0_TEMPLATE_BINDING_CORRECTION_AND_RECUT",
+    "plan_id": "DCR_OS_AUTONOMOUS_V2_3_NO_BRAKES_20260719",
+    "plan_version": "2.4.0-fast-working-release",
+    "amendment_id": "FAST_RELEASE_NO_TIMED_WINDOWS_NO_HUMAN_WAIT_20260719",
+    "integration_agent_id": "agent-0",
+    "base_sha": "043a7101743b238cdeff9047938ad8ffd4091ed8",
+    "integration_commit_sha": "dbf7ce68b3d8df5630fdd6f7718436a93eab25e7",
+    "head_sha": "dbf7ce68b3d8df5630fdd6f7718436a93eab25e7",
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29724022838",
+    "delivery_mode": "PR_AUTO_PLUS_TERMINAL_RECEIPT_HEAD",
+    "authority": {
+      "stage_envelope_ref": "docs/receipts/release/r08b-r8-l0-template-binding-stage-envelope.json",
+      "ownership_lease_ref": "docs/receipts/release/r08b-r8-l0-template-binding-ownership-lease.json",
+      "stage_envelope_amendment_1_ref": "docs/receipts/release/r08b-r8-l0-template-binding-stage-envelope-amendment-1.json",
+      "ownership_lease_amendment_1_ref": "docs/receipts/release/r08b-r8-l0-template-binding-ownership-lease-amendment-1.json",
+      "private_provider_rebind_envelope_sha256": "6b551ddaed693840c98314bee58386fff404f24550800e1e33931ba0c0d1076e",
+      "private_provider_rebind_lease_sha256": "71f11e6f82ec7b4547720751d844dd1eb38c563a0520f5da432237067f614737",
+      "cross_owner_write_set": false,
+      "grants_external_action_authority": false
+    },
+    "delivery": {
+      "branch": "codex/bridge-a0-r08b-r8-l0-template-binding-correction",
+      "branch_head_sha": "076e6fa887dd52f3604cec5e29d16cd7ab07453c",
+      "branch_push_ci_run": 29723922312,
+      "pull_request": 84,
+      "pull_request_url": "https://github.com/KirPonomarev/dual-contour-research-os/pull/84",
+      "pull_request_head_ci_run": 29723960992,
+      "squash_merge_sha": "dbf7ce68b3d8df5630fdd6f7718436a93eab25e7",
+      "merge_head_ci_run": 29724022838,
+      "branch_head_exact_ci_green": true,
+      "pull_request_head_exact_ci_green": true,
+      "merge_head_exact_ci_green": true,
+      "non_force_push": true,
+      "canonical_trailers_green": true,
+      "release_subject_tree_unchanged": true
+    },
+    "ci_ancestry_repair": {
+      "temporary_stage_scoped_anchor_branch": "codex/bridge-a0-r08b-r8-ci-ancestry-anchor",
+      "anchor_commit_sha": "5cfcb90533fd18e658df53aa8ea69097e4468cdd",
+      "anchor_tree_sha": "a3207cbee2935139c0e89e2fac1bce23b0574690",
+      "authority_head_tree_sha": "a3207cbee2935139c0e89e2fac1bce23b0574690",
+      "tree_bytes_changed": false,
+      "historical_receipt_parent_chains_restored": 4,
+      "history_rewritten": false,
+      "cleanup_required_after_terminal_receipt_ci": true
+    },
+    "release_receipt": {
+      "ref": "docs/receipts/release/r08b-r8-l0-template-binding-correction.json",
+      "sha256": "ef1c6f1f8ac5e319302b252baa07b08872dad1743d4fac3357410d306a45854b",
+      "payload_sha256": "060747c24852a89d177db98c5086bf50f98743b0130c95730718033cf2e73752"
+    },
+    "private_evidence": {
+      "stage_receipt_sha256": "9d9f235a9ba23ca8aa0aae29d77224e7db07bc94cf29f5ac18821febc339ca62",
+      "sanitized_manifest_sha256": "27e27a3e1e06bed21be58e6fa872aa91c05ffb55f6d71792d9b0cf08e363f026",
+      "reuse_decision_sha256": "e696b97d6617447de8ecd0c0f6e9a90893c6cafcec9f176c3cb7f63f4e38332c",
+      "two_role_proposal_envelope_sha256": "81c105ec2a2bfece91aa1d63e3d270a12ef679c7dce99328639d5fdc0b85ea42",
+      "fresh_runtime_ledger_sha256": "2ae6f6d5f2c275c9deadf91c9a6c972a85686524dfd0c89ec58a6a9d9bbc9e87",
+      "raw_or_credential_bytes_public": false
+    },
+    "provider_accounting": {
+      "durable_model_call_identities": 7,
+      "provider_network_calls": 6,
+      "actual_tokens": 2898,
+      "actual_cost_units": 6,
+      "all_calls_reconciled": true,
+      "sent_or_unknown": 0,
+      "automatic_retry": false,
+      "within_exact_authority": true,
+      "payment_or_top_up": false
+    },
+    "physical_acceptance": {
+      "release_image_id": "sha256:be49e1ce3606fa0f3d1c96002fb2a9cc35072449af1a3e5f5b2a1c2cc3b1d159",
+      "corrected_config_sha256": "d358b47a4c83448f9f43a3bab6d6a45c9b8021c0a547ea055125c1a406d2e10f",
+      "worker_output_sha256": "0017c1a800a2df44ebc31a2147245954ee339d786d7db840360a982622bf3fb0",
+      "critic_output_sha256": "c055d17dd42d0e71df52193153ecc0e98bd7734d2aabba81a3342182e0a75ad4",
+      "execution_receipt_sha256": "2e2755194630a5f618a52def392c89818bf2c7f60b824a1e9e26d89b70aa93fa",
+      "validation_receipt_sha256": "4d29aaa1854556f2270b56207c4f83e318938d98a25405751b07662d5187bf05",
+      "feedback_event_sha256": "903bfc4948bc3ad1484eff52cfea5a463bc11a30a774112b6bb5930180661c61",
+      "terminal_lookup_equal": true,
+      "durable_claim_checkpoint_complete": true,
+      "mechanical_axis": "MECHANICAL_SUCCESS",
+      "claims_scientific_truth": false,
+      "grants_authority": false,
+      "target_stopped_exit_zero": true
+    },
+    "audit_results": {
+      "contract_gate": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "write_set_exact": true,
+      "focused_integration_receipt_tests": 1,
+      "full_core_tests": 894,
+      "stage0b_tests": 25,
+      "unresolved_stage_critical_findings": 0,
+      "unresolved_stage_high_findings": 0
+    },
+    "acceptance": {
+      "status": "ACCEPTED_R08B_R8",
+      "private_physical_gate_green": true,
+      "sanitized_delivery_green": true,
+      "corrected_template_binding_proven": true,
+      "release_subject_unchanged": true,
+      "next_sprint_dependency_ready": true,
+      "product_done": false,
+      "release_done": false,
+      "physically_deployed": false,
+      "operationally_proven": false,
+      "timed_observations": "OUT_OF_SCOPE",
+      "live_or_vps_actions": 0
+    },
+    "known_next_gate": "Resume R08C exact-image functional E2E on this exact evidence head, then F09 through F12."
+  },
+  "integrity": {
+    "payload_sha256": "19ae0f85f27245ff086b704c686bee15b7da79e785eadc846929134cc3913b4b",
+    "parent_refs": [
+      "git:043a7101743b238cdeff9047938ad8ffd4091ed8",
+      "git:076e6fa887dd52f3604cec5e29d16cd7ab07453c",
+      "ci:29723922312",
+      "pr:84",
+      "ci:29723960992",
+      "git:dbf7ce68b3d8df5630fdd6f7718436a93eab25e7",
+      "ci:29724022838",
+      "git:5cfcb90533fd18e658df53aa8ea69097e4468cdd",
+      "release:r08b-r8-l0-template-binding-correction-043a710-20260720",
+      "private-stage-receipt:sha256:9d9f235a9ba23ca8aa0aae29d77224e7db07bc94cf29f5ac18821febc339ca62"
+    ]
+  }
+}
