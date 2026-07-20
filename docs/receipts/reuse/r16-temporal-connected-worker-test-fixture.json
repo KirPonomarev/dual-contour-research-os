@@ -1,0 +1,15 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "receipt_id": "r16-reuse-unittest-mock-existing-event-time",
+  "recorded_at": "2026-07-20T12:11:00Z",
+  "stage_id": "R16_TEMPORAL_CONNECTED_WORKER_TEST_FIXTURE",
+  "decision": "REUSE_EXISTING_UNITTEST_MOCK_AND_FIXTURE_EVENT_TIME",
+  "selected": ["existing unittest.mock import", "existing deterministic EVENT_AT constant", "freeze only the CLI call clock while preserving the real expiry branch"],
+  "external_code_added": false,
+  "new_dependency_added": false,
+  "runtime_mutation": false,
+  "provider_or_live_action": false,
+  "grants_authority": false,
+  "integrity": {"profile": "core-json-sha256-v1", "payload_sha256": "c7eb25c05d8bb128e26a6a078ad56eddbde043f5499438405b1b64195fd47c3a"}
+}

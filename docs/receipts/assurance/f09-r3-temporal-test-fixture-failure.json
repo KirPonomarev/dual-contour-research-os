@@ -1,0 +1,24 @@
+{
+  "schema_id": "F09R3SanitizedTemporalFixtureFailureEvidence",
+  "schema_version": "1.0.0",
+  "issued_at": "2026-07-20T12:11:00Z",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "status": "F09_R3_FAILED_CLOSED_TEMPORAL_TEST_FIXTURE_REPAIR_REQUIRED",
+    "private_failed_stage_receipt_sha256": "0854af9ffb55a60021461efba656bdb3a4ae88de79c40e5173ce333ca07253fd",
+    "exact_image_functional_pass": true,
+    "focused_tests_passed": 65,
+    "full_suite_tests_run": 899,
+    "full_suite_failures": 1,
+    "failure_class": "HARD_CODED_FIXTURE_EXPIRY_ELAPSED",
+    "expected_code": 30,
+    "actual_correct_expired_code": 20,
+    "runtime_regression": false,
+    "public_commit_or_pr_during_failed_stage": false,
+    "provider_calls": 0,
+    "live_or_vps_actions": 0,
+    "candidate_or_f09_accepted": false,
+    "grants_authority": false
+  },
+  "integrity": {"profile": "core-json-sha256-v1", "payload_sha256": "74f1e6ecceb3f5d3952238ea2904ff566243ee7afff348f4ecd9d902a195a0b2"}
+}
