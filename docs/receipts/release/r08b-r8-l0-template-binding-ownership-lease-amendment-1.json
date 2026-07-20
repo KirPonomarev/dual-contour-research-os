@@ -1,0 +1,71 @@
+{
+  "schema_id": "OwnershipLeaseAmendment",
+  "schema_version": "1.0.0",
+  "lease_id": "r08b-r8-agent0-fresh-runtime-same-identity-replay-043a710",
+  "stage_id": "R08B-R8_L0_TEMPLATE_BINDING_CORRECTION_AND_RECUT",
+  "amendment_id": "R08B_R8_FRESH_RUNTIME_SAME_IDENTITY_COMPLETION_REPLAY_20260720",
+  "plan_id": "DCR_OS_AUTONOMOUS_V2_3_NO_BRAKES_20260719",
+  "plan_version": "2.4.0-fast-working-release",
+  "plan_amendment_id": "FAST_RELEASE_NO_TIMED_WINDOWS_NO_HUMAN_WAIT_20260719",
+  "issued_by": "agent-0",
+  "issued_at": "2026-07-20T04:45:27Z",
+  "expires_at": "2026-07-21T04:45:27Z",
+  "authority_head": "804627d3fc8c700bc649fc3b4dc709e3df6b03b1",
+  "supersedes_lease_sha256": "3ce5f247090403dace789968cf99df515def5ce0c31db0dbc330cfbb9fdd0186",
+  "stage_envelope_amendment_sha256": "ed463c80ae8446ed273608766d30b646f9cf5f213ebc1c52667fe23d7fcb8fde",
+  "holder": {
+    "id": "agent-0",
+    "role": "integration-and-private-recut-executor",
+    "branch": "codex/bridge-a0-r08b-r8-l0-template-binding-correction",
+    "worktree": "/private/tmp/dcr-r08b-r8-043a710"
+  },
+  "repository_write_set": [
+    "docs/receipts/release/r08b-r8-l0-template-binding-stage-envelope.json",
+    "docs/receipts/release/r08b-r8-l0-template-binding-ownership-lease.json",
+    "docs/receipts/release/r08b-r8-l0-template-binding-reuse-decision.json",
+    "docs/receipts/release/r08b-r8-l0-template-binding-stage-envelope-amendment-1.json",
+    "docs/receipts/release/r08b-r8-l0-template-binding-ownership-lease-amendment-1.json",
+    "docs/receipts/release/r08b-r8-l0-template-binding-correction.json",
+    "docs/receipts/integration/r08b-r8-l0-template-binding-correction.json"
+  ],
+  "private_write_set": [
+    "/private/tmp/dcr-r08c-043a710/r08c-harness.py",
+    "/private/tmp/dcr-r08b-r8-043a710-private",
+    "docker-volume:dcr-r08c-config-043a710",
+    "docker-volume:dcr-r08c-dispatch-043a710",
+    "docker-volume:dcr-r08c-runtime-043a710",
+    "docker-volume:dcr-r08c-private-043a710",
+    "docker-volume:dcr-r08c-source-043a710",
+    "docker-volume:dcr-r08b-r8-runtime-043a710",
+    "docker-container:dcr-r08c-core-043a710",
+    "docker-container:dcr-r08b-r8-core-043a710",
+    "docker-container-prefix:dcr-r08c-client-043a710"
+  ],
+  "replay_budget": {
+    "exact_existing_call_identities": 2,
+    "new_global_call_identities": 0,
+    "provider_network_calls": 0,
+    "provider_adapter_invocations": 0,
+    "provider_retries": 0,
+    "credential_mounts": 0,
+    "actual_tokens_reaccounted_from_immutable_records": 1157,
+    "actual_cost_units_reaccounted_from_immutable_records": 2,
+    "new_cost_units": 0,
+    "payment_or_top_up_allowed": false
+  },
+  "concurrency": {
+    "mutating_lanes": 1,
+    "second_writer_allowed": false,
+    "sublease_allowed": false,
+    "cross_owner_write_set": false
+  },
+  "git_policy": {
+    "force_push": false,
+    "rebase": false,
+    "amend": false,
+    "history_rewrite": false,
+    "protection_bypass": false
+  },
+  "cleanup_rule": "Preserve the old failed R08C runtime and receipts until the corrected fresh-runtime receipt is sealed; after the terminal receipt head, remove only plan-owned disposable targets with proven no unique WIP.",
+  "state": "active"
+}
