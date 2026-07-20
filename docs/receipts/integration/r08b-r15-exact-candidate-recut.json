@@ -1,0 +1,73 @@
+{
+  "classification": "D1_INTERNAL_SANITIZED",
+  "contour": "governance",
+  "integrity": {
+    "parent_refs": [
+      "git:211e681958c7198f97f1230f30a5ef7f3023f9e0",
+      "ci:29738829181",
+      "git:a81e7a4c6c86a94b89569e2b29cce837d288d96c",
+      "ci:29739887174",
+      "git:e097cb6e33b64fb522767e0efc0d8862a50c8367",
+      "ci:29739958610",
+      "private-build-evidence:sha256:7e870c46577d2b72d1c890a7a225fa60009c6b08f93e113893c2cb1586934dd1",
+      "archive:sha256:9521be1b4697455ef98804edbd922d545bd7fe553af38f71e7f3db9669807211"
+    ],
+    "payload_sha256": "a635ca8cfd61534c2009ce93808c96a89a0ab83878c76ac47c697635299b8713"
+  },
+  "issued_at": "2026-07-20T11:52:00Z",
+  "issuer": {"authority_class": "integration-authority", "id": "agent-0"},
+  "object_id": "integration-r08b-r15-exact-candidate-recut-20260720",
+  "payload": {
+    "agent_id": "agent-0",
+    "audit_results": {
+      "status": "PASS_EXACT_CANDIDATE_ACCEPTED_F09_REFRESH_REQUIRED",
+      "contract_gate": "green",
+      "full_core_tests": 899,
+      "stage0b_tests": 25,
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "runtime_or_containerfile_mutation": false,
+      "candidate_subject_sha": "211e681958c7198f97f1230f30a5ef7f3023f9e0",
+      "candidate_subject_tree_sha": "5aacfd823f13f2b642f80b5e91a7fb6a62c6aac8",
+      "candidate_subject_exact_ci": 29738829181,
+      "candidate_image_id": "sha256:d3ecdfc7033f298c27fa519145405cbce17a9af93df498f251e04431ee9aae32",
+      "literal_no_cache_builds": 2,
+      "two_build_image_and_inventory_equality": "green",
+      "portable_archive_identity": "green",
+      "classic_docker_29_5_2_load_identity": "green",
+      "disposable_classic_target_deleted": true,
+      "spdx_package_count": 108,
+      "raw_advisory_records_retained_private": 93,
+      "unresolved_release_critical_findings": 0,
+      "unresolved_release_high_findings": 0,
+      "candidate_to_evidence_head_diff_evidence_only": true,
+      "provider_calls": 0,
+      "live_or_vps_actions": 0,
+      "f09_refresh_required": true,
+      "f10_required": true,
+      "release_ready": false,
+      "product_done": false,
+      "grants_authority": false
+    },
+    "base_sha": "211e681958c7198f97f1230f30a5ef7f3023f9e0",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "head_sha": "e097cb6e33b64fb522767e0efc0d8862a50c8367",
+    "integration_commit_sha": "e097cb6e33b64fb522767e0efc0d8862a50c8367",
+    "ownership_lease_ref": "private-owner-retained:sha256:8de6a932407adeb683d1f46789294c087d1a53e48df6cef698eb3f82f7c28451",
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29739958610",
+    "remote_pr_head_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29739887174",
+    "stage_id": "R08B-R15_EXACT_CANDIDATE_RECUT",
+    "write_set": [
+      "docs/receipts/reuse/r08b-r15-exact-candidate-recut.json",
+      "docs/receipts/release/r08b-r15-candidate-sbom.spdx.json",
+      "docs/receipts/release/r08b-r15-candidate-inventory.json",
+      "docs/receipts/release/r08b-r15-release-relevant-paths.json",
+      "docs/receipts/release/r08b-r15-evidence-only-path-allowlist.json",
+      "docs/receipts/release/r08b-r15-deployment-operator-rollback-packet.json",
+      "docs/receipts/release/r08b-r15-candidate-cut.json",
+      "docs/receipts/integration/r08b-r15-exact-candidate-recut.json"
+    ]
+  },
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0"
+}
