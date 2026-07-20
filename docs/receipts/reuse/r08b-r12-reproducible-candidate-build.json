@@ -1,0 +1,32 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "receipt_id": "r08b-r12-reuse-buildkit-reproducible-output-controls",
+  "recorded_at": "2026-07-20T10:58:00Z",
+  "stage_id": "R08B-R12_REPRODUCIBLE_CANDIDATE_BUILD_FIX",
+  "decision": "REUSE_DOCKER_BUILDKIT_STANDARD_REPRODUCIBILITY_CONTROLS",
+  "ordered_evaluation": [
+    "existing candidate build tool and exact Git commit timestamp",
+    "Docker BuildKit built-in SOURCE_DATE_EPOCH and BUILDKIT_MULTI_PLATFORM controls",
+    "OCI exporter rewrite-timestamp control",
+    "new package extraction",
+    "small audited vendor import",
+    "minimal missing glue"
+  ],
+  "selected": [
+    "existing tools/candidate_image_build.py two-build comparison",
+    "docker-buildx 0.35.0 Apache-2.0 installed operator tool",
+    "SOURCE_DATE_EPOCH derived from git show --format=%ct on the exact candidate",
+    "BUILDKIT_MULTI_PLATFORM=1 with OCI rewrite-timestamp=true",
+    "load only the completed private OCI output into the local image store"
+  ],
+  "external_code_vendored": false,
+  "runtime_or_containerfile_change": false,
+  "new_shipped_dependency": false,
+  "provider_or_live_action": false,
+  "grants_authority": false,
+  "integrity": {
+    "profile": "core-json-sha256-v1",
+    "payload_sha256": "30e75eec326295f63ebf9996f02c9cc62b7b20458731a501c213f06950e3056b"
+  }
+}
