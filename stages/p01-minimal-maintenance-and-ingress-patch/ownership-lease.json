@@ -1,0 +1,25 @@
+{
+  "lease_id": "lease-p01-minimal-maintenance-and-ingress-patch-agent-0-20260720",
+  "fencing_token": "61a42c51-0010-4663-a8d6-2dc737786d73",
+  "stage_id": "p01-minimal-maintenance-and-ingress-patch",
+  "agent_id": "agent-0",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-20T22:39:25Z",
+  "expires_at": "2026-07-21T10:30:29Z",
+  "base_sha": "4aef4788bb26be71ab1ba3cffa6ae39484c4eef0",
+  "branch": "codex/bridge-a0-p01-physical-release",
+  "worktree": "/private/tmp/dcr-p01-4aef478",
+  "write_set": [
+    "Makefile",
+    "tools/physical_release_control.py",
+    "docs/PHYSICAL_RELEASE_RUNBOOK.md",
+    "docs/PRODUCT_COMPLETION.md",
+    "inventory/p01-physical-release-control-artifact.json",
+    "docs/receipts/reuse/p01-minimal-maintenance-and-ingress-patch.json",
+    "docs/receipts/integration/p01-minimal-maintenance-and-ingress-patch.json",
+    "stages/p01-minimal-maintenance-and-ingress-patch/stage-envelope.json",
+    "stages/p01-minimal-maintenance-and-ingress-patch/ownership-lease.json"
+  ],
+  "delegation_allowed": false,
+  "state": "active"
+}

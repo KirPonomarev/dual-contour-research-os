@@ -1,0 +1,61 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-p01-minimal-maintenance-and-ingress-patch-20260720",
+  "issued_at": "2026-07-20T22:55:00Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "reuse-freeze-authority"
+  },
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "single-principal-transport-only-domain-export-ingress-and-current-R17-physical-deploy-binding",
+    "candidates": [
+      {
+        "candidate": "existing-AF_UNIX-ControlRequest-and-SourceTrigger-corridor",
+        "disposition": "selected-existing-runtime-boundary"
+      },
+      {
+        "candidate": "existing-bounded-rootless-PreSoakDeployController-low-level-primitives",
+        "disposition": "selected-owned-deployment-primitives-with-new-exact-R17-wrapper"
+      },
+      {
+        "candidate": "legacy-pre_soak_deploy-run-entrypoint-bound-to-release-5c2bd7c",
+        "disposition": "rejected-stale-release-binding"
+      },
+      {
+        "candidate": "legacy-final_deployment_rebind-S38-entrypoint",
+        "disposition": "rejected-superseded-and-intentionally-stopping"
+      },
+      {
+        "candidate": "new-public-listener-second-ingress-or-domain-projection-service",
+        "disposition": "rejected-forbidden-and-unnecessary"
+      }
+    ],
+    "selected_mode": "strict-domain-owned-export-binding-validation-ref-only-deterministic-SourceTrigger-over-local-AF_UNIX-plus-exact-R17-bundle-construction-around-owned-final-A1-rootless-controller",
+    "source_ref": "git:4aef4788bb26be71ab1ba3cffa6ae39484c4eef0;runtime:0394d6c9e327eceb62f738eca90be3ece015ba79;image:sha256:e6db8ab087e18b13ac357a751a2e7318c3abb81a4f2af459c930a630ddc65577;carrier:sha256:46e12e35ef89463a9f13028732e35c30ce3aaa7b121834f68a9aeccbf727d9f7",
+    "code_sha256": "57368f21642c8aea09feb2624d6d42233d01d22113042746de26516f37740756",
+    "license_spdx": "Proprietary-Internal-Owned",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "exact producer registry and export binding accepted",
+      "swapped stale mutable missing and content-tampered exports rejected",
+      "one collector principal and AF_UNIX-only ref-only SourceTrigger",
+      "exact R17 release tree image carrier config policy unit and namespace binding",
+      "legacy deploy entrypoints are never invoked",
+      "no runtime rebuild domain write live authority public listener or secret-bearing public artifact"
+    ],
+    "canonical_owner": "Agent0-physical-release-control",
+    "rollback": "Revert only the P01 control-layer files; the immutable R17 image, carrier, VPS, domain services, exports and stores remain unchanged."
+  },
+  "integrity": {
+    "payload_sha256": "ebef4b05679b056b886298ac3351c5d429bb2a6e4fb38d4b44bfdcae2a42f620",
+    "parent_refs": [
+      "git:4aef4788bb26be71ab1ba3cffa6ae39484c4eef0",
+      "runtime:0394d6c9e327eceb62f738eca90be3ece015ba79",
+      "image:sha256:e6db8ab087e18b13ac357a751a2e7318c3abb81a4f2af459c930a630ddc65577",
+      "carrier:sha256:46e12e35ef89463a9f13028732e35c30ce3aaa7b121834f68a9aeccbf727d9f7"
+    ]
+  }
+}

@@ -1,0 +1,89 @@
+{
+  "stage_id": "p01-minimal-maintenance-and-ingress-patch",
+  "agent_id": "agent-0",
+  "objective": "Add the smallest fail-closed physical-release control layer: two independently provenance-bound read-only domain export consumers, one local AF_UNIX SourceTrigger ingress process, and an exact-R17 deploy preflight wrapper without changing the immutable runtime image.",
+  "executable_blocker": "The R17 image and carrier exist, but the repository has no current-release deploy binding, no strict domain-export binding validator, and no single-principal transport-only ingress path suitable for physical release.",
+  "base_sha": "4aef4788bb26be71ab1ba3cffa6ae39484c4eef0",
+  "base_tree": "d4d1dba0ad4079421c484297054f1c12ae81ac8e",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a0-p01-physical-release",
+  "worktree": "/private/tmp/dcr-p01-4aef478",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "src/research_bridge/control.py",
+    "src/research_bridge/ipc.py",
+    "src/research_bridge/researchd.py",
+    "tools/pre_soak_deploy.py",
+    "ops/deploy/research-os-a1-final.service",
+    "ops/release/final-a1-runtime-policy.json",
+    "ops/release/researchd.config.template.json",
+    "docs/receipts/release/r17-candidate-cut.json",
+    "docs/receipts/release/r17-deployment-operator-rollback-packet.json"
+  ],
+  "write_set": [
+    "Makefile",
+    "tools/physical_release_control.py",
+    "docs/PHYSICAL_RELEASE_RUNBOOK.md",
+    "docs/PRODUCT_COMPLETION.md",
+    "inventory/p01-physical-release-control-artifact.json",
+    "docs/receipts/reuse/p01-minimal-maintenance-and-ingress-patch.json",
+    "docs/receipts/integration/p01-minimal-maintenance-and-ingress-patch.json",
+    "stages/p01-minimal-maintenance-and-ingress-patch/stage-envelope.json",
+    "stages/p01-minimal-maintenance-and-ingress-patch/ownership-lease.json"
+  ],
+  "boundary_contract": {
+    "runtime_release_sha": "0394d6c9e327eceb62f738eca90be3ece015ba79",
+    "runtime_tree_sha": "636fda24cbb2da567fb23a4d44fa865ae74ac4bc",
+    "portable_image_id": "sha256:e6db8ab087e18b13ac357a751a2e7318c3abb81a4f2af459c930a630ddc65577",
+    "carrier_sha256": "46e12e35ef89463a9f13028732e35c30ce3aaa7b121834f68a9aeccbf727d9f7",
+    "carrier_bytes": 47947776,
+    "ingress_processes": 1,
+    "ingress_principal": "collector:uid:10002",
+    "control_transport": "AF_UNIX",
+    "published_ports": 0,
+    "domain_consumers": ["market", "security"],
+    "domain_writes": false,
+    "live_authority": false,
+    "runtime_rebuild": false
+  },
+  "forbidden_scope": [
+    "ops-tests-src-contracts-workflow-lockfile-migration-or-domain-repository-edit",
+    "second-ingress-writer-orchestrator-ledger-or-public-listener",
+    "domain-projection-canonical-write-trading-live-security-execution-publication-or-authority-escalation",
+    "legacy-pre-soak-deploy-or-final-deployment-rebind-direct-execution",
+    "runtime-image-rebuild-relabel-or-release-subject-change",
+    "secret-private-locator-D2-D3-payload-runtime-database-or-checkpoint-in-git"
+  ],
+  "dependency_hashes": {
+    "contract_catalog": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "development_agent_contract": "b4ca3f735cbbc0359ca20e47681f38d47527969f4b4f3fa2eb49bf694fc856aa",
+    "unit_template": "97cfd4702d5e9be1e7768bb5a9a624ec2420145d0380f7eda412b1f108e16cb6",
+    "runtime_policy": "665bfb70a82d3aa5988d45fa299fb14d2b28926e6267a15ae440e3c03fbb0cd9",
+    "config_template": "c97a5b03942edf5746a1362a418b3d7ecad9d5e45620d80305475cefebf7591f",
+    "r17_candidate_cut": "88fc89b497e8be4e1b577b593f7020583553d950f7ab32a8daf15d1d9e1e21b9",
+    "r17_deployment_packet": "52ab1772d0c9e3a1b8951d768f039f87b90e3a483d742db7ca0d32f743085b2d",
+    "carrier_binding": "5ec076442c86d31d1bbec0c0dba029b16588bdd52bfede4e2805ccca8b71e596"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 tools/physical_release_control.py self-test",
+    "python3 tools/physical_release_control.py validate-artifact --artifact inventory/p01-physical-release-control-artifact.json",
+    "make test",
+    "git diff --check",
+    "exact write-set, privacy, secret, listener, authority, provenance, stale-input and release-subject scans",
+    "exact-head public CI before integration receipt"
+  ],
+  "risk_class": "medium-operational-release-control",
+  "stop_conditions": [
+    "base-contract-release-image-carrier-or-write-set-mismatch",
+    "domain-export-cannot-be-proven-immutable-current-public-sanitized-and-owner-produced",
+    "more-than-one-ingress-principal-or-any-public-listener-is-required",
+    "runtime-rebuild-domain-write-live-authority-or-legacy-controller-direct-execution-is-required",
+    "before-equals-after-or-executable-blocker-remains"
+  ],
+  "expected_receipt": "docs/receipts/integration/p01-minimal-maintenance-and-ingress-patch.json",
+  "rollback": "Revert only the control-layer commit; the immutable R17 image, carrier, domain repositories, VPS services and domain exports remain untouched.",
+  "commit_authority": "agent-0-only",
+  "push_authority": "agent-0-only"
+}
