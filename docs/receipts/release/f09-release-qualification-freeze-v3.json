@@ -1,0 +1,254 @@
+{
+  "classification": "D1_INTERNAL_SANITIZED",
+  "contour": "governance",
+  "integrity": {
+    "parent_refs": [
+      "git:0394d6c9e327eceb62f738eca90be3ece015ba79",
+      "git:ce584b4612c7d203c710c2d705f755b2720e0039",
+      "ci:29744304133",
+      "functional:sha256:499595353e34017887d20e36f399fd0e5eef640662766f0fcdcdb929962ac410",
+      "archive:sha256:e4e79a75d718c5681d824d777c91f56a4061d9f2ffe1e1de7d32dd1e9e38b2cf"
+    ],
+    "payload_sha256": "d4597eab68c4a24188e82542799ba48d4e14e4a0b75213b113db92c167f0363b",
+    "profile": "core-json-sha256-v1"
+  },
+  "issued_at": "2026-07-20T13:00:00Z",
+  "issuer": {
+    "authority_class": "integration-authority",
+    "id": "agent-0"
+  },
+  "object_id": "f09-release-qualification-freeze-v3-ce584b4-20260720",
+  "payload": {
+    "authority": {
+      "canonical_scientific_actions_allowed": false,
+      "deployment_allowed": false,
+      "grants_authority": false,
+      "live_or_vps_actions_allowed": false,
+      "master_plan_done": false,
+      "product_done": false,
+      "release_ready": false
+    },
+    "capability_proofs": [
+      {
+        "capability_id": "EVOLUTION_KERNEL_V1",
+        "ref": "docs/receipts/capability/f09-r17-e1-evolution-kernel.json",
+        "sha256": "cf6a6d64a2f5ae4ff0ba433a3ae8b9213a010d5d6372414ec9a08e5ebd583567",
+        "status": "PASS_FOR_FROZEN_SCOPE",
+        "valid_until": "2026-08-19T12:55:00Z"
+      },
+      {
+        "capability_id": "A1_DISCOVERY_ADMISSION_FIXTURE",
+        "ref": "docs/receipts/capability/f09-r17-e1a-discovery-admission.json",
+        "sha256": "6048de449d0d20b8088969b72a07dece55b50f74b624b84a8393cf07ff80ab59",
+        "status": "PASS_FOR_FROZEN_SCOPE",
+        "valid_until": "2026-08-19T12:55:00Z"
+      },
+      {
+        "capability_id": "A1_DURABLE_FEEDBACK",
+        "ref": "docs/receipts/capability/f09-r17-e1b-durable-feedback.json",
+        "sha256": "f953c8610b9e045e071a6933910aae6f839619864c1c0998dbad1c734f364952",
+        "status": "PASS_FOR_FROZEN_SCOPE",
+        "valid_until": "2026-08-19T12:55:00Z"
+      },
+      {
+        "capability_id": "OPERATIONAL_SELF_MODEL",
+        "ref": "docs/receipts/capability/f09-r17-e1c-operational-self-model.json",
+        "sha256": "79ddd6f43802f42e8289479370ccbfa813531da340f8d29cd9cccc34819e6518",
+        "status": "PASS_FOR_FROZEN_SCOPE",
+        "valid_until": "2026-08-19T12:55:00Z"
+      },
+      {
+        "capability_id": "AUTONOMOUS_RESEARCH_E2_SHADOW",
+        "ref": "docs/receipts/capability/f09-r17-e2-autonomous-research.json",
+        "sha256": "a4eaf28437ff443e3a0084fb00a0d00ccd80350008cfb9d9304c233ebbf4264c",
+        "status": "PASS_FOR_FROZEN_SCOPE",
+        "valid_until": "2026-08-19T12:55:00Z"
+      },
+      {
+        "capability_id": "EVOLUTION_E3_SHADOW",
+        "ref": "docs/receipts/capability/f09-r17-e3-evolution-shadow.json",
+        "sha256": "04a385433bee0b5d31318696defcc79631e258734d4c17d20cb977a64f113eca",
+        "status": "PASS_FOR_FROZEN_SCOPE",
+        "valid_until": "2026-08-19T12:55:00Z"
+      },
+      {
+        "capability_id": "REAL_PROVIDER_ROUTE_R04D",
+        "ref": "docs/receipts/capability/f09-r17-provider-runtime.json",
+        "sha256": "92a415421d4a21cac9ff267b21486327c2d67ba5cbea8df6c35cdaf9e31d3d0b",
+        "status": "PASS_FOR_FROZEN_SCOPE",
+        "valid_until": "2026-08-19T12:55:00Z"
+      }
+    ],
+    "debt": {
+      "secret_or_private_findings": 0,
+      "unresolved_critical": 0,
+      "unresolved_high": 0
+    },
+    "functional_e2e": {
+      "ref": "docs/receipts/assurance/f09-r17-exact-image-functional.json",
+      "sha256": "499595353e34017887d20e36f399fd0e5eef640662766f0fcdcdb929962ac410",
+      "private_proof_sha256": "4cdd57b2d802e707304c467156767a5c745b34fe99c52ac27e33ed989243f65e",
+      "status": "PASS_EXACT_IMAGE_NO_PROVIDER_FUNCTIONAL_AND_HOSTILE"
+    },
+    "operator_inputs": {
+      "candidate_cut_ref": "docs/receipts/release/r17-candidate-cut.json",
+      "candidate_cut_sha256": "88fc89b497e8be4e1b577b593f7020583553d950f7ab32a8daf15d1d9e1e21b9",
+      "deployment_rollback_packet_ref": "docs/receipts/release/r17-deployment-operator-rollback-packet.json",
+      "deployment_rollback_packet_sha256": "52ab1772d0c9e3a1b8951d768f039f87b90e3a483d742db7ca0d32f743085b2d",
+      "runbook_ref": "docs/R08B_RELEASE_OPERATOR_RUNBOOK.md",
+      "runbook_sha256": "ed118966a7f57c9e01e1a9df9795ac8b82a44f4128464e8809f3fa51c93d4564"
+    },
+    "plan_id": "DCR_OS_AUTONOMOUS_V2_3_NO_BRAKES_20260719",
+    "plan_version": "2.4.0-fast-working-release",
+    "project_fingerprint": "b371429cb7c01fd6c5dbd430510a264684dab906188d706b7479446c1bd8f154",
+    "qualification_subject": {
+      "evidence_head_sha": "ce584b4612c7d203c710c2d705f755b2720e0039",
+      "evidence_head_tree_sha": "44ba8afef7721d7c1bddf4ac701bb476ecf100d2",
+      "exact_head_ci_conclusion": "success",
+      "exact_head_ci_run": 29744304133
+    },
+    "release_currentness_context": {
+      "catalog_sha256": {
+        "a1": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+        "core": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+        "e5": "254e6cd624f91e37b0d186937f4b71acb7177c216e44e782540d76ba8c33696b"
+      },
+      "ci": {
+        "head_sha": "ce584b4612c7d203c710c2d705f755b2720e0039",
+        "workflow": "exact-head-ci",
+        "run_id": 29744304133,
+        "conclusion": "success",
+        "ref": "ci:github-actions/29744304133",
+        "grants_authority": false
+      },
+      "dependency_inventory": {
+        "path": "docs/receipts/release/r17-candidate-inventory.json",
+        "sha256": "c0a444152fc2ecb2dbe517edfacefed7d3258bb6e3a26ad58ed342d94b3d5e97"
+      },
+      "e2e": {
+        "proof_ref": "proof:f09-r17/sha256:499595353e34017887d20e36f399fd0e5eef640662766f0fcdcdb929962ac410",
+        "release_sha": "0394d6c9e327eceb62f738eca90be3ece015ba79",
+        "tree_sha": "636fda24cbb2da567fb23a4d44fa865ae74ac4bc",
+        "image_digests": [
+          "sha256:e6db8ab087e18b13ac357a751a2e7318c3abb81a4f2af459c930a630ddc65577"
+        ],
+        "config_sha256": "31233c747a7fc057ab48df47abe9845dc7edece5498a16c68b82e6fc96d3461d",
+        "policy_sha256": "00a24ffe76a6f48aa5a5bc523ed271f8f0c2da536c64e1aa4e482a235f619f8d",
+        "provider_sha256": "6644db32e06b2f0681c7252af959300d4ae0c659eee36e11bd8249d7952beb0a",
+        "environment_compatibility_ref": "environment:macos-colima-classic-docker-linux-amd64-emulated:2026-07-20",
+        "status": "PASS",
+        "valid_until": "2026-08-19T12:55:00Z",
+        "grants_authority": false
+      },
+      "environment_compatibility_ref": "environment:macos-colima-classic-docker-linux-amd64-emulated:2026-07-20",
+      "grants_authority": false,
+      "image_digests": [
+        "sha256:e6db8ab087e18b13ac357a751a2e7318c3abb81a4f2af459c930a630ddc65577"
+      ],
+      "invalidation_refs": [],
+      "observed_at": "2026-07-20T13:00:00Z",
+      "release_bundles": {
+        "code": {
+          "paths": [
+            "src/research_bridge/__init__.py",
+            "src/research_bridge/admission.py",
+            "src/research_bridge/authority.py",
+            "src/research_bridge/cas.py",
+            "src/research_bridge/control.py",
+            "src/research_bridge/deployment.py",
+            "src/research_bridge/discovery.py",
+            "src/research_bridge/evolution.py",
+            "src/research_bridge/execution.py",
+            "src/research_bridge/generated_execution.py",
+            "src/research_bridge/ingestion.py",
+            "src/research_bridge/ipc.py",
+            "src/research_bridge/kernel.py",
+            "src/research_bridge/l0.py",
+            "src/research_bridge/ledger.py",
+            "src/research_bridge/model_broker.py",
+            "src/research_bridge/organism.py",
+            "src/research_bridge/researchctl.py",
+            "src/research_bridge/researchd.py",
+            "src/research_bridge/validation.py"
+          ],
+          "sha256": "89fda8c02b0e22c7a9d2a7588bad298ad204b24ddfed1780af9e827f64d998c4"
+        },
+        "config": {
+          "paths": [
+            "ops/connected-worker/runbook-inputs.json",
+            "ops/release/researchd.config.template.json"
+          ],
+          "sha256": "31233c747a7fc057ab48df47abe9845dc7edece5498a16c68b82e6fc96d3461d"
+        },
+        "policy": {
+          "paths": [
+            "contracts/a1/v1/profiles/a1_sandbox_policy_v1.json",
+            "contracts/a1/v1/profiles/authority_corridor_v1.json",
+            "ops/release/final-a1-runtime-policy.json"
+          ],
+          "sha256": "00a24ffe76a6f48aa5a5bc523ed271f8f0c2da536c64e1aa4e482a235f619f8d"
+        },
+        "provider": {
+          "paths": [
+            "provenance/model-provider-connected-shadow-v2.json",
+            "provenance/model-provider-routing-v1.json",
+            "provenance/model-role-evaluation-v2.json"
+          ],
+          "sha256": "6644db32e06b2f0681c7252af959300d4ae0c659eee36e11bd8249d7952beb0a"
+        }
+      },
+      "release_sha": "0394d6c9e327eceb62f738eca90be3ece015ba79",
+      "repository_evidence_head_sha": "ce584b4612c7d203c710c2d705f755b2720e0039",
+      "sbom": {
+        "path": "docs/receipts/release/r17-candidate-sbom.spdx.json",
+        "sha256": "57e0f924f43e2466ade26c334632f93071cda27435ce9cc2a7dc02ec6c90ec22"
+      },
+      "schema_id": "ReleaseCurrentnessContext",
+      "schema_version": "1.0.0",
+      "tree_sha": "636fda24cbb2da567fb23a4d44fa865ae74ac4bc"
+    },
+    "release_identity": {
+      "release_sha": "0394d6c9e327eceb62f738eca90be3ece015ba79",
+      "tree_sha": "636fda24cbb2da567fb23a4d44fa865ae74ac4bc",
+      "image_id": "sha256:e6db8ab087e18b13ac357a751a2e7318c3abb81a4f2af459c930a630ddc65577",
+      "owner_only_archive_sha256": "e4e79a75d718c5681d824d777c91f56a4061d9f2ffe1e1de7d32dd1e9e38b2cf",
+      "portable_image_identity_source": "verified-archive-config-digest",
+      "immutable_through_f12": true
+    },
+    "release_relevant_invariance": {
+      "evidence_only_allowlist_ref": "docs/receipts/release/r17-evidence-only-path-allowlist.json",
+      "evidence_only_allowlist_sha256": "a691630d87b549fec3fffc44913531cd86bfb96858b3bd7d1afd8846eceb7ae1",
+      "release_relevant_paths_ref": "docs/receipts/release/r17-release-relevant-paths.json",
+      "release_relevant_paths_sha256": "201df1ef44255ffd284e32a60cf616e6c3741accfaccef89b3b12de85e8cb93b",
+      "release_subject_advanced": false,
+      "non_allowlisted_blob_drift": 0,
+      "status": "PASS"
+    },
+    "stage_id": "F09-R4_EXACT_SUBJECT_QUALIFICATION_REFRESH",
+    "status": "FROZEN_CANDIDATE_READY_FOR_DISPOSABLE_QUALIFICATION",
+    "validators": {
+      "release_currentness_sha256": "418728f6a2b5310028f979fef50cce6ff1f135a402a7dc9041339d9e6af1ce93",
+      "e1_aggregate_gate_sha256": "85ac953b46accacdd4cda711064b479eaa590674c4eb3f413f724560a7d244fd",
+      "e2_aggregate_gate_sha256": "d52ad8f44357805e994d2b8a417212e5dee5604a2a89b8db0b706a6cc652ec67",
+      "e3_aggregate_gate_sha256": "d5145d59723630997865e694575c213b0702acfdab2d0bc55a2af7d30e92ef3b",
+      "final_release_freeze_verifier_sha256": "06cd182be4cc416b31696d075fbda47d002147851e931e2083fd3a6b9124f647",
+      "focused_tests": 65,
+      "full_core_tests": 899,
+      "stage0b_tests": 25
+    },
+    "candidate_recut": {
+      "stage_id": "R17_EXACT_CANDIDATE_RECUT_AFTER_TEMPORAL_FIXTURE",
+      "candidate_cut_ref": "docs/receipts/release/r17-candidate-cut.json",
+      "candidate_image_id": "sha256:e6db8ab087e18b13ac357a751a2e7318c3abb81a4f2af459c930a630ddc65577",
+      "owner_only_archive_sha256": "e4e79a75d718c5681d824d777c91f56a4061d9f2ffe1e1de7d32dd1e9e38b2cf",
+      "private_build_evidence_sha256": "aafaf14bbf36c1360b45a92d12d47a21dfc74dc4d9b824b7acaba8bbcd71f771",
+      "literal_no_cache_builds": 2,
+      "classic_docker_load_identity_equal": true,
+      "unresolved_release_critical_findings": 0,
+      "unresolved_release_high_findings": 0,
+      "status": "PASS"
+    }
+  },
+  "schema_id": "F09ReleaseQualificationFreeze",
+  "schema_version": "1.0.0"
+}
