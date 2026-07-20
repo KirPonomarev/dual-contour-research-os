@@ -1,0 +1,88 @@
+{
+  "schema_id": "R08BCandidateInventory",
+  "schema_version": "1.0.0",
+  "object_id": "r08b-candidate-inventory-974a5dd-20260720",
+  "issued_at": "2026-07-20T01:35:16Z",
+  "payload": {
+    "candidate_release_sha": "974a5dd932e53b82407a4b71f8af5e5641803564",
+    "candidate_tree_sha": "fe0066c975c8de7022dc6047158cbf35cad8ccce",
+    "candidate_exact_head_ci_run": 29710733971,
+    "platform": "linux/amd64",
+    "image_manifest_id": "sha256:be49e1ce3606fa0f3d1c96002fb2a9cc35072449af1a3e5f5b2a1c2cc3b1d159",
+    "image_config_blob_sha256": "c50051025d18f4306ae8af217d3b120d24d9a9526710f7412c8ad9b4aa596778",
+    "image_config_semantics_sha256": "307242bb258ea914314478f740a2e381efa839e955970349aad02eb129530a71",
+    "image_rootfs_semantics_sha256": "a8e957d3b462d79b5ceb5619959239946a1e286c9230db26fbe249f6f53436ab",
+    "owner_only_archive_sha256": "f0e4cfb2de4df6ccf0f6809e362eed45806a4dbf54c61216a14853a04940829a",
+    "owner_only_archive_mode": "0600",
+    "owner_only_archive_copies_built": 2,
+    "owner_only_archives_byte_identical": true,
+    "container_file_inventory": {
+      "entry_count": 47,
+      "sha256": "18b3af13ad0e83948ecac5de7d199314c01887f83aa71ecff6a71339d6c7ec02"
+    },
+    "dpkg_inventory": {
+      "package_count": 105,
+      "sha256": "2563b1069f87341a2e9995be704a69dcf9fa1639c11e89ad162e7bb1a6bd16c4"
+    },
+    "python_inventory": {
+      "sha256": "9753de62760338ce66468fc1eb60c862f4e92078141a9f84b8a5bd679a9ae7e7"
+    },
+    "spdx": {
+      "ref": "docs/receipts/release/r08b-candidate-sbom.spdx.json",
+      "sha256": "8df578c6ff66bd3161481f8b1f7d30741bdc86ce3c5fb49c456064a88c88a921",
+      "package_count": 108,
+      "format": "SPDX-2.3"
+    },
+    "dependency_lock": {
+      "ref": "ops/release/dependency-lock.json",
+      "sha256": "58cd81aa9e5554e5ae88a0d86822e341a6ac25eb8179cca9a9fb3e4512493be9"
+    },
+    "third_party_notices": {
+      "ref": "ops/release/THIRD_PARTY_NOTICES.md",
+      "sha256": "f3683a82df4e25de6a748270abd351342bc69796eddfa519ef1fe5f1f2fa9ebd"
+    },
+    "advisory_snapshot": {
+      "owner_only_sha256": "d4a35f0c21040ab2ec69e54a982661647b203f0695e09ad8df62f0857730be08",
+      "scanner": "osv-scanner-2.3.8",
+      "database_revision": "max-osv-modified:2026-07-14T10:56:37.948360943Z",
+      "packages_scanned": 108,
+      "raw_vulnerability_records": 93,
+      "unresolved_release_critical_findings": 0,
+      "unresolved_release_high_findings": 0,
+      "scope": "V2.4_LOCAL_DISPOSABLE_AND_ISOLATED_FAST_RELEASE_ONLY",
+      "broader_or_live_reuse_requires_new_scan": true
+    },
+    "build_reproducibility": {
+      "builder": "docker-buildx-v0.35.0/buildkit-v0.30.0",
+      "builder_binary_sha256": "fedbcbd488dcdb46414c6119920d8186d406531a1157ceede4e857e25af77ff1",
+      "source_date_epoch": 1784510306,
+      "rewrite_timestamp": true,
+      "provenance_export": false,
+      "sbom_export": false,
+      "literal_no_cache_builds": 2,
+      "selected_fallback": "BYTE_IDENTICAL_DETERMINISTIC_DOCKER_ARCHIVES",
+      "legacy_platform_export_attempt_accepted": false,
+      "ordinary_nondeterministic_layer_attempt_accepted": false
+    },
+    "runtime_acceptance": {
+      "af_unix_status": true,
+      "source_materialized": true,
+      "material_event_sha256": "3211553c12f2f26cf88b5c6bf04a869a15323ed226c7c0c3d31357c35e36e513",
+      "role_mismatch_rejected": true,
+      "second_writer_rejected": true,
+      "same_container_restart": true,
+      "network": "none",
+      "rootless_user": "10001:10001",
+      "external_action_authority": false
+    },
+    "secret_scan_findings": 0,
+    "private_or_raw_bytes_public": false,
+    "live_or_vps_actions": 0,
+    "timed_observations": "OUT_OF_SCOPE",
+    "grants_authority": false
+  },
+  "integrity": {
+    "profile": "core-json-sha256-v1",
+    "payload_sha256": "e053df2e3b1aaa65d26513dbf8fb9f98645fb5a3820e00bacb0453edcbe42b45"
+  }
+}
