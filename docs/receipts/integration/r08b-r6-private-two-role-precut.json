@@ -1,0 +1,172 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-r08b-r6-private-two-role-precut-20260720",
+  "issued_at": "2026-07-20T00:38:04Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "r08b-r6-private-two-role-precut-integration",
+    "parent_stage_id": "r08b-exact-candidate-image-build-sbom",
+    "integration_agent_id": "agent-0",
+    "base_sha": "051fe747f3971142e04ba06c96977084d0f62b24",
+    "head_sha": "8c8076976917e4eb69851290390f6b45b9dd6769",
+    "integration_commit_sha": "8c8076976917e4eb69851290390f6b45b9dd6769",
+    "stage_authority_sha": "8c8076976917e4eb69851290390f6b45b9dd6769",
+    "stage_authority_tree_sha": "e923eb168a1dee7fb56aa3b15112ebc0dabc56e7",
+    "stage_envelope_ref": "stages/r08b-exact-candidate-image-build-sbom/stage-envelope-amendment-v2.4-16.json",
+    "stage_envelope_sha256": "8d05f53727c61e36bea202519488601046bddc7bf52d5bd7056c4962c55ddf90",
+    "ownership_lease_ref": "stages/r08b-exact-candidate-image-build-sbom/ownership-lease-amendment-v2.4-16.json",
+    "ownership_lease_sha256": "331d4d3a9418f5b0d49806b69e7810eff14698cbad02be4fb6f53bd3124bd433",
+    "private_evidence": {
+      "stage_receipt_sha256": "07ce02c895a0be88399418b1134ea943c407da513c08a24084a34763173ad14c",
+      "proposal_envelope_sha256": "01db7297a081d8543862fb0aff866dbfc225c6d0c05787b4b232514bd3e86a67",
+      "critic_sanitized_manifest_sha256": "4f719e4c80add6a96f7a44a3e5561557dd70d1874f01e1b122acae334b272d2d",
+      "sanitized_pre_cut_manifest_sha256": "b26e2a2296d82cbc59f22d83535830835c7b1b48cc433d6b0f9547f5a1ba54fd",
+      "owner_only_files_copied_to_git": 0,
+      "raw_or_credential_bytes_public": false
+    },
+    "repository_evidence": {
+      "head_sha": "051fe747f3971142e04ba06c96977084d0f62b24",
+      "tree_sha": "b4bc5744c2415914005690167edd068964db6433",
+      "remote_equal": true,
+      "exact_head_ci_run": 29708605741
+    },
+    "runtime_subject": {
+      "core_image_id": "sha256:ebc07e9c488fb0e5f5767cd7cc38b78172d3c94d35bfc0eaf3e924dd6cd3584b",
+      "current_worker_image_id": "sha256:f424945d7ba821d56c20e8f7728c15984ca49df3c478c54fdcaaace945fff139",
+      "current_worker_image_platform": "linux/arm64",
+      "current_worker_image_revision": "051fe747f3971142e04ba06c96977084d0f62b24",
+      "provider_profile_v3_sha256": "707b5b2da2e6ae2d735dc51def3cde79683e5467ec3f72e029612dea02564779",
+      "provider_tool_v3_sha256": "a02f33670f6aa13046e6a32bc64defd4b8920c34beb1bad345f1d17344a11692",
+      "model_worker_v3_sha256": "9c63773179769a7912a9b3fc098c163bf4e656d75d575524ea799779de82edca",
+      "runtime_policy_v3_sha256": "e96e1951676987da6a6568bb8cbed13b6e54267e0f3cb3a89fa9a74c11292dba",
+      "rendered_config_sha256": "9e5a74083edace33df41062a28f3c343702f2120e847dbc53088ba2811f66278"
+    },
+    "source": {
+      "source_class": "D0_PUBLIC",
+      "content_sha256": "b97f38535f32c29ae4eb2e7ec3d4d41eeb84c7f9813b0998fc73a15a3b7bcdbc",
+      "source_commit_sha": "7e6c4cb56da3aad70ccc403cac04f47e8da9f492",
+      "fixture_generator": false,
+      "fresh_external_source_reads": 0
+    },
+    "roles": {
+      "worker": {
+        "role": "RESEARCH_WORKER",
+        "binding": "deepseek-v4-pro",
+        "declared_family": "deepseek-v4",
+        "declared_provenance_group": "deepseek:deepseek-v4",
+        "output_sha256": "28c7e00651c8b99ae2b7a24e2149ce6241346e32eb0f8e59af070008de30f911",
+        "actual_tokens": 237,
+        "provider_calls": 1,
+        "budget_reconciled": true,
+        "budget_released": true,
+        "automatic_retry": false
+      },
+      "critic": {
+        "role": "CRITIC_DEEP",
+        "binding": "gpt-5.6-sol-xhigh",
+        "declared_family": "gpt-5.6-sol",
+        "declared_provenance_group": "openai:gpt-5.6-sol",
+        "transport_reasoning_effort": "low",
+        "output_sha256": "5317725003fde79a8fa37870d73852cd8cbf8bf316137365a2935ceb66084db1",
+        "actual_tokens": 236,
+        "decision": "PASS",
+        "output_bytes": 17,
+        "output_exact_contract_token": true,
+        "provider_calls": 1,
+        "budget_reconciled": true,
+        "budget_released": true,
+        "automatic_retry": false
+      }
+    },
+    "proposal": {
+      "status": "PASS_PRE_CUT_TWO_ROLE_PROPOSAL_ENVELOPE",
+      "schema": "R08B_BOUNDED_TWO_ROLE_MINIMAL_DECISION_V1",
+      "distinct_declared_model_families": true,
+      "distinct_declared_provenance_groups": true,
+      "upstream_provider_independence": "NOT_ESTABLISHED",
+      "total_provider_calls": 2,
+      "all_provider_accounting_reconciled": true,
+      "automatic_retry": false,
+      "grants_authority": false
+    },
+    "recovery": {
+      "current_head_worker_invalid_receipt_sha256": "9ea20dbb45b2efa2ea0e767084296b5ad2dac30f29544cea98b94fef34f4bd05",
+      "unsent_oversize_critic_receipt_sha256": "773db8c107310117b26bc27352b477c8df73a39dbb184c786d8411f12a1a2b37",
+      "unsent_reserved_call_provider_calls": 0,
+      "failed_or_unsent_calls_replayed": false,
+      "successful_split_provider_calls": 1
+    },
+    "focused_validation": {
+      "validator_ref": "tools/r08b_pre_cut_readiness.py",
+      "validator_sha256": "c882359723ac84ddc78791f609d6f1aabf5d825fa1ced61e6254d6531f1ef210",
+      "requires_owner_only_input_modes": true,
+      "requires_exact_private_receipt_hashes": true,
+      "requires_exact_repository_head_and_tree": true,
+      "rejects_fixture_source": true,
+      "rejects_same_family_or_provenance_group": true,
+      "rejects_unreconciled_calls_or_retry": true,
+      "rejects_non_pass_critic": true,
+      "rejects_non_null_candidate": true,
+      "rejects_upstream_independence_overclaim": true,
+      "rejects_parent_pre_cut_overclaim": true,
+      "hostile_mutations_rejected": 10
+    },
+    "delivery_state": {
+      "outer_branch": "codex/bridge-a0-r08b-exact-candidate-image-build-sbom",
+      "predecessor_head_sha": "051fe747f3971142e04ba06c96977084d0f62b24",
+      "authority_head_sha": "8c8076976917e4eb69851290390f6b45b9dd6769",
+      "authority_remote_equal": true,
+      "authority_exact_head_ci_run": 29709688954,
+      "candidate_sha": null,
+      "candidate_tree_sha": null,
+      "candidate_exact_head_ci_run": "NOT_CUT",
+      "parent_r08b_pre_cut_complete": false,
+      "candidate_cut_permitted": false,
+      "product_done": false,
+      "release_done": false,
+      "grants_authority": false
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29709688954",
+    "audit_results": {
+      "contract_gate": "green",
+      "source_mutation": false,
+      "full_suite_status": "green",
+      "full_suite_tests": 919,
+      "private_two_role_component": "green",
+      "real_non_fixture_source": "green",
+      "non_null_executor_profile": "green",
+      "model_family_and_declared_provenance_diversity": "green",
+      "provider_accounting": "green",
+      "privacy_secret_scan": "green",
+      "parent_r08b_pre_cut_complete": false,
+      "candidate_sha": null,
+      "candidate_tree_sha": null,
+      "candidate_exact_head_ci_run": "NOT_CUT",
+      "release_claim_issued": false,
+      "grants_authority": false
+    },
+    "known_not_done": [
+      "complete V2.4 status documents final-status validator deployment operator rollback packet and R08B runbook",
+      "run the complete parent pre-cut gate after all remaining release inputs are finalized",
+      "create and merge the parent R08B PR",
+      "select only the exact green post-squash merge SHA as candidate",
+      "perform the two exact candidate builds SBOM inventory archive and terminal candidate-cut receipt"
+    ]
+  },
+  "integrity": {
+    "payload_sha256": "ce2ac700984ceac663f6e6532083a461c2218c7e44726646263f35dfaab2a4f0",
+    "parent_refs": [
+      "git:051fe747f3971142e04ba06c96977084d0f62b24",
+      "git:8c8076976917e4eb69851290390f6b45b9dd6769",
+      "private-stage-receipt:sha256:07ce02c895a0be88399418b1134ea943c407da513c08a24084a34763173ad14c",
+      "private-proposal-envelope:sha256:01db7297a081d8543862fb0aff866dbfc225c6d0c05787b4b232514bd3e86a67",
+      "sanitized-manifest:sha256:b26e2a2296d82cbc59f22d83535830835c7b1b48cc433d6b0f9547f5a1ba54fd"
+    ]
+  }
+}
