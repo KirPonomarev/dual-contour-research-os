@@ -1,0 +1,72 @@
+{
+  "stage_id": "r08b-exact-candidate-image-build-sbom",
+  "repair_stage_id": "r08b-r6-private-two-role-precut-integration",
+  "amendment_id": "R08B_R6_PRIVATE_TWO_ROLE_PRECUT_INTEGRATION_20260720",
+  "plan_id": "DCR_OS_AUTONOMOUS_V2_3_NO_BRAKES_20260719",
+  "plan_version": "2.4.0-fast-working-release",
+  "issued_by": "agent-0",
+  "issued_at": "2026-07-20T00:32:07Z",
+  "authority_head": "051fe747f3971142e04ba06c96977084d0f62b24",
+  "authority_tree": "b4bc5744c2415914005690167edd068964db6433",
+  "candidate_sha": null,
+  "candidate_tree_sha": null,
+  "candidate_exact_head_ci_run": "NOT_CUT",
+  "private_predecessor": {
+    "stage_receipt_sha256": "07ce02c895a0be88399418b1134ea943c407da513c08a24084a34763173ad14c",
+    "proposal_envelope_sha256": "01db7297a081d8543862fb0aff866dbfc225c6d0c05787b4b232514bd3e86a67",
+    "worker_output_sha256": "28c7e00651c8b99ae2b7a24e2149ce6241346e32eb0f8e59af070008de30f911",
+    "critic_output_sha256": "5317725003fde79a8fa37870d73852cd8cbf8bf316137365a2935ceb66084db1",
+    "worker_actual_tokens": 237,
+    "critic_actual_tokens": 236,
+    "total_provider_calls": 2,
+    "all_calls_reconciled": true,
+    "automatic_retry": false,
+    "raw_or_credential_bytes_public": false,
+    "status": "PASS_PRIVATE_TWO_ROLE_PROPOSAL_EVIDENCE"
+  },
+  "agent_0_write_set": [
+    "stages/r08b-exact-candidate-image-build-sbom/stage-envelope-amendment-v2.4-16.json",
+    "stages/r08b-exact-candidate-image-build-sbom/ownership-lease-amendment-v2.4-16.json",
+    "tools/r08b_pre_cut_readiness.py",
+    "docs/receipts/integration/r08b-r6-private-two-role-precut.json"
+  ],
+  "required_change": {
+    "validator_consumes_owner_only_receipts_without_copying_private_bytes_into_git": true,
+    "validator_requires_exact_repository_head_tree_and_private_stage_receipt_hash": true,
+    "validator_requires_real_non_fixture_source_and_non_null_executor_profile": true,
+    "validator_requires_distinct_declared_model_families_and_provenance_groups": true,
+    "validator_requires_exact_two_role_call_count_and_reconciled_budgets": true,
+    "validator_requires_critic_pass_and_exact_minimal_output_contract": true,
+    "validator_preserves_upstream_provider_independence_as_not_established": true,
+    "public_receipt_is_sanitized_and_contains_no_private_locator_raw_hash_or_credential_value": true,
+    "parent_pre_cut_complete": false,
+    "candidate_remains_null": true
+  },
+  "reuse_decision": {
+    "receipt_ref": "docs/receipts/reuse/r08b-exact-candidate-image-build-sbom.json",
+    "internal_patterns": [
+      "tools/final_deployment_rebind.py:owner-only artifact validation and sanitized manifest output",
+      "python standard library only"
+    ],
+    "new_dependency": false,
+    "external_code": false
+  },
+  "acceptance_commands": [
+    "python3 tools/r08b_pre_cut_readiness.py verify --private-evidence-dir <owner-only-r08b-r6-dir> --expected-head 051fe747f3971142e04ba06c96977084d0f62b24 --expected-tree b4bc5744c2415914005690167edd068964db6433 --output <owner-only-output>",
+    "python3 tools/r08b_pre_cut_readiness.py self-test",
+    "python3 tools/verify_r08b_trailer_identity.py",
+    "make contracts",
+    "make test",
+    "git diff --check",
+    "privacy scan reports zero raw credential private-store runtime-db or owner-only locator bytes",
+    "non-force push and exact remote equality",
+    "exact receipt-head CI green"
+  ],
+  "stop_conditions": [
+    "any private receipt raw response credential runtime database or private locator enters Git",
+    "validator accepts a fixture source same-family roles unreconciled call non-PASS Critic non-null candidate or overstated parent pre-cut status",
+    "any path outside the exact Agent-0 write set changes",
+    "any provider call source read candidate cut release claim live VPS timed destructive or irreversible action",
+    "force push rebase amend cherry-pick rewrite or historical deletion"
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "stage_id": "r08b-exact-candidate-image-build-sbom",
+  "repair_stage_id": "r08b-r3-build-context-verifier-v3",
+  "amendment_id": "R08B_R3_BUILD_CONTEXT_VERIFIER_V3_20260719",
+  "plan_id": "DCR_OS_AUTONOMOUS_V2_3_NO_BRAKES_20260719",
+  "plan_version": "2.4.0-fast-working-release",
+  "issued_by": "agent-0",
+  "issued_at": "2026-07-19T22:28:50Z",
+  "authority_head": "102b0afdbb2a719b81fba323c4cc9971102125f9",
+  "authority_tree": "8ad50357895b26bc882662ef7da8a79b43500763",
+  "failed_exact_head_ci_run": 29706177028,
+  "candidate_sha": null,
+  "candidate_tree_sha": null,
+  "candidate_exact_head_ci_run": "NOT_CUT",
+  "observed_blocker": "The exact build-context allowlist repair is correct but its immutable Agent-0 blueprint verifier still expects the pre-v3 tuple, causing exact-head CI to fail only with build_context.not_minimal.",
+  "agent_0_write_set": [
+    "stages/r08b-exact-candidate-image-build-sbom/stage-envelope-amendment-v2.4-11.json",
+    "stages/r08b-exact-candidate-image-build-sbom/ownership-lease-amendment-v2.4-11.json",
+    "tools/verify_release_blueprint.py"
+  ],
+  "required_change": {
+    "expected_build_context_additions": [
+      "!tools/model_provider_shadow_v3.py",
+      "!provenance/model-provider-connected-shadow-v3.json"
+    ],
+    "preserve_exact_tuple_validation": true,
+    "preserve_deny_first_default": true,
+    "no_test_or_foreign_owner_mutation": true
+  },
+  "acceptance_commands": [
+    "python3 tools/verify_release_blueprint.py",
+    "python3 -m unittest -v tests.test_release_blueprint",
+    "make contracts and make test",
+    "exact-head CI green",
+    "literal no-cache linux/arm64 build succeeds"
+  ],
+  "stop_conditions": [
+    "verifier accepts any context other than the exact deny-first tuple",
+    "foreign owner path changes",
+    "candidate becomes non-null before full parent pre-cut PASS",
+    "force push rebase history rewrite or live action"
+  ]
+}

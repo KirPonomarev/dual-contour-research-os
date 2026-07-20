@@ -1,0 +1,109 @@
+{
+  "stage_id": "r08b-exact-candidate-image-build-sbom",
+  "correction_stage_id": "r08b-r2-owner-correct-exact-source-build",
+  "amendment_id": "R08B_R2_OWNER_CORRECT_EXACT_SOURCE_BUILD_20260719",
+  "plan_id": "DCR_OS_AUTONOMOUS_V2_3_NO_BRAKES_20260719",
+  "plan_version": "2.4.0-fast-working-release",
+  "issued_by": "agent-0",
+  "issued_at": "2026-07-19T21:01:16Z",
+  "base_stage_envelope_ref": "stages/r08b-exact-candidate-image-build-sbom/stage-envelope.json",
+  "prior_amendment_ref": "stages/r08b-exact-candidate-image-build-sbom/stage-envelope-amendment-v2.4-2.json",
+  "prior_amendment_sha256": "7fc6695390de49746d5c81a7fbe73bc083f1ddfa82590620f2da697feca3053e",
+  "prior_receipt_ref": "docs/receipts/integration/r08b-r1-core-model-runtime-provenance-image.json",
+  "prior_receipt_sha256": "9a4f0f852ee5155f5ef6df68e403fd5d348284bce00235b714605a842fc9bc53",
+  "authority_head": "9cfcd1f7281d6a1d89b245266dd63ec992c1d94e",
+  "authority_tree": "ce52a3c785575106b1a176a3c0ef474337066d83",
+  "base_sha": "7e6c4cb56da3aad70ccc403cac04f47e8da9f492",
+  "candidate_sha": null,
+  "candidate_tree_sha": null,
+  "candidate_exact_head_ci_run": "NOT_CUT",
+  "objective": "Additively supersede the unproven R08B-R1 acceptance by re-delivering the control-path verifier byte under its canonical Agent-0 owner, preserving the valid Agent-5 ops/tests bytes, and proving the literal versioned current-head Containerfile with a no-cache linux/amd64 BuildKit build.",
+  "audit_debt": {
+    "cross_owner_commit": "8639e0d1540c572e6e43b5e3348e467203d52fd8",
+    "cross_owner_path": "tools/verify_release_blueprint.py",
+    "canonical_owner": "agent-0",
+    "historical_worker_owner": "agent-5",
+    "ownership_registry_sha256": "e7a6a5158e43cb76c1df0fa28caec36ec9585a0dd05a732eabb94a92e427c9da",
+    "literal_exact_build_missing": true,
+    "historical_functional_fallback_image": "sha256:7e6b17b4b780f4f64302aa2e598844932adeb0e5a42e0d3cd8267a3bd02fe920",
+    "historical_trailer_parse_incomplete": [
+      "9ad08a51dabda38f21e6fd6ced171128ed80d5a4",
+      "8639e0d1540c572e6e43b5e3348e467203d52fd8",
+      "9cfcd1f7281d6a1d89b245266dd63ec992c1d94e"
+    ]
+  },
+  "immutable_history_policy": {
+    "rewrite": false,
+    "force_push": false,
+    "rebase": false,
+    "prior_bytes_or_receipts_deleted": false,
+    "prior_receipt_acceptance_status": "SUPERSEDED_PENDING_CORRECTION"
+  },
+  "agent_0_write_set": [
+    "stages/r08b-exact-candidate-image-build-sbom/stage-envelope-amendment-v2.4-3.json",
+    "stages/r08b-exact-candidate-image-build-sbom/ownership-lease-amendment-v2.4-3.json",
+    "tools/verify_release_blueprint.py",
+    "docs/receipts/integration/r08b-r2-owner-correct-exact-source-build.json"
+  ],
+  "agent_5_read_only_assurance": {
+    "canonical_paths": [
+      "ops/release/Containerfile",
+      "tests/test_r08a_production_image_e2e_harness.py"
+    ],
+    "write_set": [],
+    "tools_paths": [],
+    "actions": [
+      "verify the historical Agent-5 diff is confined to the original ops/tests write-set after excluding the invalid tool path",
+      "witness the literal current-head no-cache linux/amd64 versioned Containerfile build inventory and startup evidence"
+    ]
+  },
+  "tool_redelivery": {
+    "owner": "agent-0",
+    "path": "tools/verify_release_blueprint.py",
+    "method": "two additive non-rewriting commits revert then reapply the exact one-line allowlist expectation under Agent-0 authority",
+    "final_bytes_must_equal_sha256": "fa9c73bee62bdba5d1277bc44aa5e186fe296d63d494febebbc0ecc5f7b503cd"
+  },
+  "exact_source_build": {
+    "required": true,
+    "fallback_is_not_acceptance": true,
+    "command": "docker buildx build --no-cache --platform linux/amd64 --load --build-arg RELEASE_SHA=<exact-current-head> -f ops/release/Containerfile -t dcr-r08b-r2-core:<exact-current-head> .",
+    "bind": [
+      "exact source head and tree",
+      "BuildKit and builder identity",
+      "image ID and digest",
+      "complete intended inventory and exact three provenance files",
+      "network-none rootless runtime startup with non-null executor profile and two bindings"
+    ]
+  },
+  "trailer_gate": {
+    "required_keys_in_order": [
+      "PLAN-ID",
+      "PLAN-VERSION",
+      "AMENDMENT-ID",
+      "SPRINT-ID"
+    ],
+    "command": "git show -s --format=%B <commit> | git interpret-trailers --parse",
+    "require_all_four": true,
+    "blank_lines_between_trailers": false
+  },
+  "acceptance_commands": [
+    "git diff --name-only <authority-head>..<tool-reapply-head> is limited to the two amendment files and tools/verify_release_blueprint.py",
+    "git show <tool-revert-commit> and <tool-reapply-commit> prove Agent-0 additive redelivery with final bytes equal to the required sha256",
+    "python3 -m unittest -v tests.test_release_blueprint tests.test_r08a_production_image_e2e_harness",
+    "make contracts",
+    "literal exact-source no-cache linux/amd64 BuildKit command from current head succeeds",
+    "exact image inventory and network-none digest-bound AF_UNIX startup succeed",
+    "every new commit parses one contiguous four-key trailer block",
+    "correction receipt-head exact-head CI is green"
+  ],
+  "stop_conditions": [
+    "Agent-5 receives any lease or write authority for tools/**",
+    "ops/** or tests/** is mutated by Agent-0",
+    "the derived historical fallback is represented as the literal source build",
+    "candidate fields become non-null before the correction receipt-head CI is green",
+    "any prior commit receipt or evidence object is rewritten or deleted",
+    "any new commit fails the four-key interpret-trailers gate"
+  ],
+  "expected_receipt": "docs/receipts/integration/r08b-r2-owner-correct-exact-source-build.json",
+  "next_gate": "Only after accepted correction may the remaining parent R08B private pre-cut collector/provider work resume."
+}

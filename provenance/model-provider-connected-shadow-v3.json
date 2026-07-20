@@ -1,0 +1,79 @@
+{
+  "profile_id": "model-provider-connected-shadow-v3",
+  "schema_version": "3.0.0",
+  "status": "OFFICIAL_API_SHAPE_VERIFIED_CONNECTED_VISIBLE_OUTPUT_BOUNDED_LOW_REASONING",
+  "allowed_input_classes": ["D0", "D1"],
+  "forbidden_input_classes": ["D2", "D3", "sealed-holdout"],
+  "max_request_bytes": 65536,
+  "max_response_bytes": 1048576,
+  "timeout_seconds": 45,
+  "bindings": {
+    "deepseek-v4-flash": {
+      "provider": "deepseek",
+      "provider_slot": "DEEPSEEK_API",
+      "credential_env": "DEEPSEEK_API_KEY",
+      "endpoint": "https://api.deepseek.com/chat/completions",
+      "protocol": "OPENAI_CHAT_COMPLETIONS",
+      "api_model": "deepseek-v4-flash",
+      "context_window": null,
+      "request_options": {"thinking": {"type": "disabled"}, "reasoning_effort": "high"},
+      "source": "https://api-docs.deepseek.com/api/create-chat-completion"
+    },
+    "deepseek-v4-pro": {
+      "provider": "deepseek",
+      "provider_slot": "DEEPSEEK_API",
+      "credential_env": "DEEPSEEK_API_KEY",
+      "endpoint": "https://api.deepseek.com/chat/completions",
+      "protocol": "OPENAI_CHAT_COMPLETIONS",
+      "api_model": "deepseek-v4-pro",
+      "context_window": null,
+      "request_options": {"thinking": {"type": "disabled"}, "reasoning_effort": "high"},
+      "source": "https://api-docs.deepseek.com/api/create-chat-completion"
+    },
+    "glm-5.2-max": {
+      "provider": "zhipu",
+      "provider_slot": "GLM_API",
+      "credential_env": "ZHIPU_API_KEY",
+      "endpoint": "https://open.bigmodel.cn/api/paas/v4/chat/completions",
+      "protocol": "OPENAI_CHAT_COMPLETIONS",
+      "api_model": "glm-5.2",
+      "context_window": null,
+      "request_options": {"thinking": {"type": "enabled"}, "reasoning_effort": "max"},
+      "source": "https://docs.bigmodel.cn/cn/guide/models/text/glm-5.2"
+    },
+    "gpt-5.6-sol-xhigh": {
+      "provider": "openrouter",
+      "provider_slot": "OPENROUTER_API",
+      "credential_env": "OPENROUTER_API_KEY",
+      "endpoint": "https://openrouter.ai/api/v1/chat/completions",
+      "protocol": "OPENAI_CHAT_COMPLETIONS",
+      "api_model": "openai/gpt-5.6-sol",
+      "context_window": 1000000,
+      "request_options": {"reasoning": {"effort": "low"}},
+      "source": "https://openrouter.ai/openai/gpt-5.6-sol/"
+    },
+    "gpt-5.6-sol-max": {
+      "provider": "openai",
+      "provider_slot": "OPENAI_API",
+      "credential_env": "OPENAI_API_KEY",
+      "endpoint": "https://api.openai.com/v1/responses",
+      "protocol": "OPENAI_RESPONSES",
+      "api_model": "gpt-5.6-sol",
+      "context_window": null,
+      "request_options": {"reasoning": {"effort": "max"}, "store": false},
+      "source": "https://developers.openai.com/api/docs/models/gpt-5.6-sol"
+    }
+  },
+  "invariants": {
+    "caller_cannot_select_binding": true,
+    "credential_value_never_enters_request_ledger_or_output": true,
+    "raw_response_is_private_CAS_only": true,
+    "automatic_retry": false,
+    "actual_cost_requires_reconciliation": true,
+    "real_call_requires_existing_pre_authorized_provider_balance": true,
+    "openrouter_credential_precedence": "environment_then_macos_keychain",
+    "openrouter_gateway_is_not_model_independence_evidence": true,
+    "actual_upstream_provider_is_not_attested_by_requested_model_slug": true,
+    "connected_capability_status": "UNPROVEN_UNTIL_R08B_PRE_CUT"
+  }
+}

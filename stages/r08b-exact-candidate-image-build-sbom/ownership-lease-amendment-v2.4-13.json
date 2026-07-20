@@ -1,0 +1,28 @@
+{
+  "stage_id": "r08b-r4-critic-visible-output-profile-repair-agent-0",
+  "amendment_id": "R08B_R4_CRITIC_VISIBLE_OUTPUT_PROFILE_REPAIR_AGENT_0_20260719",
+  "issued_by": "agent-0",
+  "issued_at": "2026-07-19T23:17:06Z",
+  "authority_head": "6ed733ba5c48d33e105019bb074a4a50c1dae15b",
+  "candidate_sha": null,
+  "candidate_tree_sha": null,
+  "leases": [
+    {
+      "owner": "agent-0",
+      "branch": "codex/bridge-a0-r08b-exact-candidate-image-build-sbom",
+      "write_set": [
+        "stages/r08b-exact-candidate-image-build-sbom/stage-envelope-amendment-v2.4-13.json",
+        "stages/r08b-exact-candidate-image-build-sbom/ownership-lease-amendment-v2.4-13.json",
+        "provenance/model-provider-connected-shadow-v3.json",
+        "tools/model_provider_shadow_v3.py"
+      ]
+    }
+  ],
+  "root_only_mutation_by_agent_0": false,
+  "cross_owner_write_set": false,
+  "one_mutating_lane_at_a_time": true,
+  "sequential_agent_5_followup_requires_new_lease": true,
+  "failed_private_receipt_sha256": "61a077a72be8e2f2f774253e6b296b0d9412f67617179e57fb685c3b285daa3c",
+  "expires_at": "2026-07-20T05:17:06Z",
+  "candidate_cut_permitted": false
+}

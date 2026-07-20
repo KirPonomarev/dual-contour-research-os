@@ -124,6 +124,24 @@ class ProductionImageE2EHarnessTests(unittest.TestCase):
         container = (ROOT / "ops/release/Containerfile").read_text()
         self.assertNotIn("image_e2e_harness", container)
         self.assertNotIn("COPY .", container)
+        required_provenance = {
+            "model-role-evaluation-v2.json",
+            "model-worker-ipc-extension-v1.json",
+            "model-provider-routing-v1.json",
+        }
+        for name in required_provenance:
+            self.assertIn(
+                "COPY --chown=10001:10001 "
+                f"provenance/{name} /opt/research-os/provenance/{name}",
+                container,
+            )
+        self.assertEqual(
+            container.count("COPY --chown=10001:10001 provenance/"), 3
+        )
+        dockerignore = (ROOT / ".dockerignore").read_text()
+        for name in required_provenance:
+            self.assertIn(f"!provenance/{name}", dockerignore)
+        self.assertNotIn("!provenance/**", dockerignore)
         policy = json.loads(
             (ROOT / "ops/release/final-a1-runtime-policy.json").read_text()
         )

@@ -1,0 +1,75 @@
+{
+  "stage_id": "r08b-exact-candidate-image-build-sbom",
+  "repair_stage_id": "r08b-r3-deepseek-visible-output-profile",
+  "amendment_id": "R08B_R3_DEEPSEEK_VISIBLE_OUTPUT_PROFILE_20260719",
+  "plan_id": "DCR_OS_AUTONOMOUS_V2_3_NO_BRAKES_20260719",
+  "plan_version": "2.4.0-fast-working-release",
+  "issued_by": "agent-0",
+  "issued_at": "2026-07-19T21:49:00Z",
+  "authority_head": "c74d9f611081880629816517b7d3c507bc8ae284",
+  "authority_tree": "77c0722e8be84ce9083725b7825b83766b9cac0e",
+  "base_sha": "7e6c4cb56da3aad70ccc403cac04f47e8da9f492",
+  "candidate_sha": null,
+  "candidate_tree_sha": null,
+  "candidate_exact_head_ci_run": "NOT_CUT",
+  "objective": "Repair the pre-cut RESEARCH_WORKER route so the frozen DeepSeek Pro binding returns visible bounded JSON instead of spending the entire output allowance on hidden reasoning, then rebuild the exact connected-worker image and rerun only the invalidated two-role proof under a new provider-profile identity.",
+  "observed_failure": {
+    "private_envelope_sha256": "9bfa19b2005684827a805fe4b82451b058719276fadff0e4514264463257a2bf",
+    "binding": "deepseek-v4-pro",
+    "http_status": 200,
+    "total_tokens": 368,
+    "reasoning_tokens": 300,
+    "visible_output_bytes": 0,
+    "durable_state": "UNKNOWN",
+    "automatic_retry": false,
+    "raw_response_public": false,
+    "candidate_cut_permitted": false
+  },
+  "sequential_owner_lanes": [
+    {
+      "owner": "agent-0",
+      "write_set": [
+        "stages/r08b-exact-candidate-image-build-sbom/stage-envelope-amendment-v2.4-4.json",
+        "stages/r08b-exact-candidate-image-build-sbom/ownership-lease-amendment-v2.4-4.json",
+        "provenance/model-provider-connected-shadow-v2.json",
+        "tools/model_provider_shadow.py"
+      ],
+      "mutation": "Set only deepseek-v4-pro request_options.thinking.type from enabled to disabled in the immutable-shape profile and its exact implementation mirror; keep model, endpoint, role, family, provenance, privacy, budget, retry and authority semantics unchanged."
+    },
+    {
+      "owner": "agent-5",
+      "write_set": [
+        "ops/connected-worker/runtime-policy.json",
+        "tests/test_s17_provider_shadow_tool.py"
+      ],
+      "mutation": "Rebind the connected-worker runtime policy to the new exact provider-profile and shadow-tool hashes and update only the directly invalidated request-codec assertion. Agent 5 receives no tools or provenance authority."
+    }
+  ],
+  "provider_evidence_invalidation": {
+    "old_profile_sha256": "63ae65247d61b918aced080e6419609459ebcbf4a3384ea29f2617e65597258c",
+    "old_worker_image_id": "sha256:ea4cb31db6eec84c6f8e77c972b6374027fdb6a8e4c34f73747ce7857287bc32",
+    "old_unknown_receipt_preserved": true,
+    "new_provider_call_budget_after_exact_rebuild": 2,
+    "automatic_retry_of_old_call": false
+  },
+  "acceptance_commands": [
+    "git diff proves each commit remains within its canonical owner write set",
+    "python3 -m unittest -v tests.test_s17_provider_shadow_tool tests.test_r04c_connected_worker_runtime",
+    "make contracts",
+    "no-cache linux/arm64 connected-worker image build from exact repair head",
+    "exact worker image dependency hashes match runtime-policy.json",
+    "fresh private envelope binds the new provider profile worker image rendered config and two-call budget",
+    "one RESEARCH_WORKER and one cross-family CRITIC_DEEP call succeed and form the bounded proposal envelope",
+    "every new commit parses PLAN-ID PLAN-VERSION AMENDMENT-ID SPRINT-ID as one contiguous trailer block",
+    "repair merge-head and receipt-head exact-head CI are green"
+  ],
+  "stop_conditions": [
+    "Agent 0 mutates ops or tests",
+    "Agent 5 mutates tools or provenance",
+    "model endpoint role family provenance privacy budget retry or authority semantics change",
+    "old UNKNOWN call is replayed or raw bytes enter Git",
+    "candidate becomes non-null before the repaired pre-cut gate passes",
+    "force push rebase history rewrite or live action"
+  ],
+  "rollback": "Before candidate cut, additively revert only the R08B-R3 profile/policy/test bytes; preserve both private UNKNOWN attempts and all remote history."
+}

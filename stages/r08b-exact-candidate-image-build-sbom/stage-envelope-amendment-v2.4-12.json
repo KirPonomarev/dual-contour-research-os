@@ -1,0 +1,52 @@
+{
+  "stage_id": "r08b-exact-candidate-image-build-sbom",
+  "repair_stage_id": "r08b-r3-build-context-bytecode-exclusion",
+  "amendment_id": "R08B_R3_BUILD_CONTEXT_BYTECODE_EXCLUSION_20260719",
+  "plan_id": "DCR_OS_AUTONOMOUS_V2_3_NO_BRAKES_20260719",
+  "plan_version": "2.4.0-fast-working-release",
+  "issued_by": "agent-0",
+  "issued_at": "2026-07-19T22:33:04Z",
+  "authority_head": "b7e538bcd1762b22693a29f90763c5182a5669f5",
+  "authority_tree": "16cb657d4ae43bf9a084629db5ea6c45bea80366",
+  "candidate_sha": null,
+  "candidate_tree_sha": null,
+  "candidate_exact_head_ci_run": "NOT_CUT",
+  "invalidated_physical_build": {
+    "source_head": "b7e538bcd1762b22693a29f90763c5182a5669f5",
+    "image_digest": "sha256:2b5b336713d535c03cde79a2e261cdd5f431bdaa63935351f24e56bd8ef1d13b",
+    "functional_v3_binding": "PASS",
+    "inventory_acceptance": "FAIL_LOCAL_BYTECODE_PRESENT",
+    "file_count": 55,
+    "acceptance_credit": "SCOPED_FUNCTIONAL_ONLY"
+  },
+  "observed_blocker": "The exact no-cache image admitted unversioned local __pycache__ and .pyc files, including CPython 3.14 bytecode, through broad allowed source directories. Release inventory must exclude all cache directories and compiled Python bytes independently of worktree state.",
+  "agent_0_write_set": [
+    "stages/r08b-exact-candidate-image-build-sbom/stage-envelope-amendment-v2.4-12.json",
+    "stages/r08b-exact-candidate-image-build-sbom/ownership-lease-amendment-v2.4-12.json",
+    ".dockerignore",
+    "tools/verify_release_blueprint.py"
+  ],
+  "required_change": {
+    "exact_final_deny_patterns": [
+      "**/__pycache__/**",
+      "**/*.pyc"
+    ],
+    "verifier_requires_exact_tuple": true,
+    "no_release_input_allowlist_expansion": true,
+    "candidate_remains_null": true
+  },
+  "acceptance_commands": [
+    "python3 tools/verify_release_blueprint.py",
+    "python3 -m unittest -v tests.test_release_blueprint",
+    "make contracts and make test",
+    "exact-head CI green",
+    "repeat literal no-cache linux/arm64 build from new exact head",
+    "image inventory contains zero __pycache__ .pyc or unversioned bytes"
+  ],
+  "stop_conditions": [
+    "any allowlist expansion accompanies the exclusion",
+    "foreign owner path changes",
+    "candidate becomes non-null before full parent pre-cut PASS",
+    "force push rebase history rewrite or live action"
+  ]
+}

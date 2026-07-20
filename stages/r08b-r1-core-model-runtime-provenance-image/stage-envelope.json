@@ -1,0 +1,76 @@
+{
+  "stage_id": "r08b-r1-core-model-runtime-provenance-image",
+  "agent_id": "agent-5",
+  "objective": "Make the production Core image capable of starting its already-implemented model runtime by copying exactly the three public non-secret provenance files that researchd verifies, and prove the exact image inventory and AF_UNIX startup path.",
+  "executable_blocker": "The exact R08A Core image exits before AF_UNIX readiness when model_runtime is configured because /opt/research-os/provenance/model-role-evaluation-v2.json and its two sibling bound inputs are absent from the image.",
+  "base_sha": "b0287d7dab9fbe72f4e42a43982d92e2672f0586",
+  "base_tree_sha": "855777809325763133ca9027e392f0cce48ef097",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "a1_contract_sha256": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+  "branch": "codex/bridge-a5-r08b-r1-core-model-runtime-provenance-image",
+  "worktree": "/private/tmp/dcr-r08b-r1-core-model-runtime-provenance-image",
+  "delivery_target_branch": "codex/bridge-a0-r08b-exact-candidate-image-build-sbom",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "ownership/registry.json",
+    ".dockerignore",
+    "ops/release/Containerfile",
+    "ops/release/image_e2e_harness.py",
+    "ops/release/researchd.config.template.json",
+    "ops/connected-worker/runbook-inputs.json",
+    "provenance/model-role-evaluation-v2.json",
+    "provenance/model-worker-ipc-extension-v1.json",
+    "provenance/model-provider-routing-v1.json",
+    "src/research_bridge/researchd.py",
+    "tests/test_r08a_production_image_e2e_harness.py",
+    "stages/r08b-exact-candidate-image-build-sbom/stage-envelope-amendment-v2.4-1.json"
+  ],
+  "write_set": [
+    "ops/release/Containerfile",
+    "tests/test_r08a_production_image_e2e_harness.py"
+  ],
+  "forbidden_scope": [
+    "edit-source-contract-policy-provider-route-config-root-CI-lockfile-migration-or-any-path-outside-write-set",
+    "copy-any-file-beyond-src-contracts-and-the-three-exact-public-provenance-inputs-into-Core-image",
+    "embed-secret-private-evidence-runtime-database-checkpoint-raw-provider-response-test-fixture-or-repository-metadata-in-image",
+    "provider-call-deployment-live-VPS-timed-observation-canonical-mutation-or-authority-expansion"
+  ],
+  "dependency_hashes": {
+    "parent_r08b_authority_head": "b0287d7dab9fbe72f4e42a43982d92e2672f0586",
+    "ownership_registry_sha256": "e7a6a5158e43cb76c1df0fa28caec36ec9585a0dd05a732eabb94a92e427c9da",
+    "core_containerfile_before_sha256": "75a863b34004693d5f8f88bc202643a63a80274052438a0c025f9430052ca406",
+    "r08a_test_before_sha256": "26f72da13949a230a483235335ad5b5056aafcf30199c536bd5420e304b15f64",
+    "model_role_evaluation_sha256": "111a7ac1dc954466b19d5e408debeeefcf65c76b5b025a743a2433be910c1e75",
+    "worker_ipc_extension_sha256": "03d91f027bb6975c55d84acaef188546bcd24af9944a72f4ff9314296399d07a",
+    "provider_routing_sha256": "37db8596a8245a6b1ea2bc5bce1495a4e7dadb314876e51397ad11dd194b3dc6",
+    "reuse_receipt": "docs/receipts/reuse/r08b-r1-core-model-runtime-provenance-image.json"
+  },
+  "acceptance_commands": [
+    "python3 -m unittest -v tests.test_r08a_production_image_e2e_harness",
+    "make contracts",
+    "make test",
+    "git diff --check",
+    "docker build --no-cache --platform linux/amd64 --build-arg RELEASE_SHA=<worker-head> -f ops/release/Containerfile -t dcr-r08b-r1-core:<worker-head> .",
+    "exact image file inventory contains src contracts and exactly model-role-evaluation-v2.json model-worker-ipc-extension-v1.json model-provider-routing-v1.json under provenance",
+    "non-null corridor_executor_profile plus RESEARCH_WORKER and CRITIC_DEEP available bindings reaches a 0660 AF_UNIX socket with network=none",
+    "current nested PR-head exact-head CI"
+  ],
+  "risk_class": "critical-inert-production-image-under-connected-model-runtime",
+  "stop_conditions": [
+    "any dependency hash base branch ownership or catalog mismatch",
+    "any changed path outside the two-file write-set",
+    "Core image still cannot reach AF_UNIX readiness with model_runtime enabled",
+    "image inventory contains an extra provenance file or any forbidden/private path",
+    "test weakens an existing deny assertion or uses a fixture shortcut instead of the built image",
+    "runtime behavior requires source contract policy provider route or config mutation"
+  ],
+  "expected_receipt": "docs/receipts/integration/r08b-r1-core-model-runtime-provenance-image.json",
+  "rollback": "Revert the two additive Containerfile/test changes on the nested branch; the parent R08B candidate remains null and no external or runtime state is authoritative.",
+  "commit_authority": "one-scoped-agent-5-worker-commit",
+  "push_authority": true,
+  "expected_handoff_status": [
+    "ready_for_agent0_audit",
+    "blocked_validation_failed"
+  ]
+}
