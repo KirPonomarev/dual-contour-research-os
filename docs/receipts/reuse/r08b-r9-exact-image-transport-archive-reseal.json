@@ -1,0 +1,31 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "receipt_id": "r08b-r9-reuse-exact-image-export-and-currentness",
+  "recorded_at": "2026-07-20T08:52:00Z",
+  "stage_id": "R08B-R9_EXACT_IMAGE_TRANSPORT_ARCHIVE_RESEAL",
+  "decision": "REUSE_EXISTING_EXACT_IMAGE_EXPORT_AND_CURRENTNESS_VALIDATORS",
+  "ordered_evaluation": [
+    "already-loaded immutable exact image and Docker save transport",
+    "existing archive safety and currentness validators",
+    "owned versioned package extraction",
+    "pinned permissive dependency",
+    "small audited vendor import",
+    "minimal missing glue"
+  ],
+  "selected": [
+    "Docker 29.5.2 server deterministic tagged image export",
+    "tools/release_currentness.py",
+    "existing F09 capability proof set",
+    "minimal private tar inspection glue"
+  ],
+  "external_code_added": false,
+  "new_dependency_added": false,
+  "new_provider_action_required": false,
+  "repository_implementation_changes_required": false,
+  "grants_authority": false,
+  "integrity": {
+    "profile": "core-json-sha256-v1",
+    "payload_sha256": "86baafe724a7603d41bc61ba80f249db2442ef88b465ce6783549c4a01c648d2"
+  }
+}
