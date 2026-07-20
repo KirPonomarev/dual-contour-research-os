@@ -1,0 +1,123 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-p01-r3-engine-image-mapping-20260720",
+  "issued_at": "2026-07-20T23:58:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "plan_id": "DCR_OS_AUTONOMOUS_V2_3_NO_BRAKES_20260719",
+    "plan_version": "2.5.2-physical-release-final",
+    "mission_id": "DCR_OS_PHYSICAL_RELEASE_20260721",
+    "project_fingerprint": "b371429cb7c01fd6c5dbd430510a264684dab906188d706b7479446c1bd8f154",
+    "stage_id": "P01_R3_ENGINE_IMAGE_MAPPING",
+    "agent_id": "agent-0",
+    "base_sha": "fd0c6e6cb6a8e89a77ff44e1f26e673115d0052e",
+    "head_sha": "1cdd5811a58c406c985b30d5df14d51118f9b57f",
+    "pr_head_sha": "bb2ca3e1c7e48b209c21d16c8417cbc064f10f0c",
+    "integration_commit_sha": "1cdd5811a58c406c985b30d5df14d51118f9b57f",
+    "integration_tree_sha": "47faec758272233e7db41b9af96eeeb67e16b1f9",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29788813683",
+    "ownership_lease_ref": "stages/p01-r3-engine-image-mapping/ownership-lease.json",
+    "delivery": {
+      "branch": "codex/bridge-a0-p01-r3-engine-id-mapping",
+      "pr_number": 108,
+      "pr_head_ci_run": 29788766382,
+      "pr_head_ci_conclusion": "success",
+      "push_head_ci_run": 29788753448,
+      "push_head_ci_conclusion": "success",
+      "merge_head_sha": "1cdd5811a58c406c985b30d5df14d51118f9b57f",
+      "merge_tree_sha": "47faec758272233e7db41b9af96eeeb67e16b1f9",
+      "merge_head_ci_run": 29788813683,
+      "merge_head_ci_conclusion": "success",
+      "squash_merge_trailers_valid": true,
+      "terminal_receipt_head_ci": "PENDING_THIS_RECEIPT_DELIVERY"
+    },
+    "repair": {
+      "cause": "The first P03 attempt verified and loaded the exact carrier but P01 treated the portable OCI identity as the Docker engine-local runtime reference.",
+      "failure_mode": "FAIL_CLOSED_BEFORE_SERVICE_INSTALL_OR_START",
+      "portable_image_id": "sha256:e6db8ab087e18b13ac357a751a2e7318c3abb81a4f2af459c930a630ddc65577",
+      "engine_image_id": "sha256:d1f56e933a8e498ae9e3a1f70ba0e764785a0de44d6f702f7e1945c3621b671f",
+      "engine_identity_source": "F10 qualified local exact image identity and exact carrier load observation",
+      "carrier_identity_preserved": true,
+      "rendered_unit_uses_engine_id": true,
+      "mutable_tag_used": false,
+      "image_rebuilt": false,
+      "image_relabelled": false,
+      "domain_services_mutated": false
+    },
+    "release_identity": {
+      "runtime_release_sha": "0394d6c9e327eceb62f738eca90be3ece015ba79",
+      "runtime_tree_sha": "636fda24cbb2da567fb23a4d44fa865ae74ac4bc",
+      "portable_image_id": "sha256:e6db8ab087e18b13ac357a751a2e7318c3abb81a4f2af459c930a630ddc65577",
+      "engine_image_id": "sha256:d1f56e933a8e498ae9e3a1f70ba0e764785a0de44d6f702f7e1945c3621b671f",
+      "carrier_sha256": "46e12e35ef89463a9f13028732e35c30ce3aaa7b121834f68a9aeccbf727d9f7",
+      "maintenance_control_head": "1cdd5811a58c406c985b30d5df14d51118f9b57f",
+      "runtime_inputs_changed": false,
+      "runtime_subject_advanced": false,
+      "image_rebuilt": false,
+      "service_installed_by_failed_attempt": false,
+      "service_started_by_failed_attempt": false
+    },
+    "artifacts": {
+      "control_executable_sha256": "c8fad287986ff563c762f48a6fa5088fe0a6edfcdf544eb41168dc6a82ae483c",
+      "artifact_manifest_ref": "inventory/p01-r3-engine-image-mapping-control-artifact.json",
+      "artifact_manifest_sha256": "fe0a73a0d83c7406d9dc80f55ade1890061b39d8984b5f5ab79bf71e502417a9",
+      "artifact_payload_sha256": "e9da61d7a1636501e0855018114e31fd3cd064cb6afeec94e78382f03597749b",
+      "reuse_receipt_ref": "docs/receipts/reuse/p01-r3-engine-image-mapping.json",
+      "reuse_receipt_sha256": "f6bfaedcf2a8b1a2a759192728599627f248bb110c75a31b58ab0b5c7a98f100",
+      "stage_envelope_sha256": "3ee0ba97cc5329f22e225b2e7120f56cce9ca1bf2e8151f1af1de78ee737a270",
+      "ownership_lease_sha256": "7f83815cef55c3c8b72468fe399f99efd90debf4798d2587f9b9e50a9500b3f2",
+      "focused_test_sha256": "53897826adfb7f89dbd5085e30ea7b04aff9eb0ff662c1465607abd0c692017e"
+    },
+    "audit_results": {
+      "contract_gate": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "runtime_or_release_relevant_mutation": false,
+      "full_core_tests": 901,
+      "stage0b_tests": 25,
+      "focused_engine_mapping_tests": 2,
+      "focused_engine_mapping_status": "green",
+      "sandbox_only_af_unix_failures_replayed_outside_socket_restriction": true,
+      "physical_deployment_complete": false,
+      "product_done": false,
+      "release_done": false
+    },
+    "post_receipt_requirements": {
+      "exact_terminal_receipt_head_ci": "REQUIRED_PENDING",
+      "receipt_pr_squash_merge": "REQUIRED_PENDING",
+      "exact_receipt_merge_head_ci": "REQUIRED_PENDING",
+      "regenerate_p03_profile_and_envelope_with_engine_identity": "REQUIRED_PENDING",
+      "resume_same_exact_r17_deploy": "REQUIRED_PENDING",
+      "stage_branch_and_worktree_cleanup": "REQUIRED_PENDING"
+    },
+    "write_set": [
+      "Makefile",
+      "docs/PHYSICAL_RELEASE_RUNBOOK.md",
+      "tools/physical_release_control.py",
+      "tests/test_p01_r3_engine_image_mapping.py",
+      "inventory/p01-r3-engine-image-mapping-control-artifact.json",
+      "docs/receipts/reuse/p01-r3-engine-image-mapping.json",
+      "docs/receipts/integration/p01-r3-engine-image-mapping.json",
+      "stages/p01-r3-engine-image-mapping/stage-envelope.json",
+      "stages/p01-r3-engine-image-mapping/ownership-lease.json"
+    ]
+  },
+  "integrity": {
+    "profile": "core-json-sha256-v1",
+    "payload_sha256": "f4b2baae9f00e3562bda522eacc0b9edb33227c09667da39520a013a7d82c43a",
+    "parent_refs": [
+      "git:fd0c6e6cb6a8e89a77ff44e1f26e673115d0052e",
+      "git:bb2ca3e1c7e48b209c21d16c8417cbc064f10f0c",
+      "ci:29788766382",
+      "git:1cdd5811a58c406c985b30d5df14d51118f9b57f",
+      "ci:29788813683",
+      "runtime:0394d6c9e327eceb62f738eca90be3ece015ba79",
+      "image-portable:sha256:e6db8ab087e18b13ac357a751a2e7318c3abb81a4f2af459c930a630ddc65577",
+      "image-engine:sha256:d1f56e933a8e498ae9e3a1f70ba0e764785a0de44d6f702f7e1945c3621b671f"
+    ]
+  }
+}
