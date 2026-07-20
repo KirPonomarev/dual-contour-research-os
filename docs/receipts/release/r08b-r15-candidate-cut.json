@@ -1,0 +1,109 @@
+{
+  "schema_id": "R08BCandidateCutReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "r08b-r15-candidate-cut-211e681-20260720",
+  "issued_at": "2026-07-20T11:43:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "plan_id": "DCR_OS_AUTONOMOUS_V2_3_NO_BRAKES_20260719",
+    "plan_version": "2.4.0-fast-working-release",
+    "amendment_id": "FAST_RELEASE_NO_TIMED_WINDOWS_NO_HUMAN_WAIT_20260719",
+    "stage_id": "R08B-R15_EXACT_CANDIDATE_RECUT",
+    "status": "FROZEN_EXACT_CANDIDATE_AWAITING_EVIDENCE_INTEGRATION",
+    "candidate": {
+      "release_sha": "211e681958c7198f97f1230f30a5ef7f3023f9e0",
+      "tree_sha": "5aacfd823f13f2b642f80b5e91a7fb6a62c6aac8",
+      "exact_head_ci_run": 29738829181,
+      "exact_head_ci_conclusion": "success",
+      "immutable_through_f12": true
+    },
+    "repair_lineage": {
+      "invalidated_release_sha": "974a5dd932e53b82407a4b71f8af5e5641803564",
+      "f10_r2_failed_receipt_sha256": "f2762bc2b622ac62e7bdec59f179e350c33bd1bdefa3614a1ba60bf8dfcd8a6a",
+      "final_runtime_tmpdir_repair_subject": "925f0cfa3b660b4dbb4b9f3536aef9deaf9732f1",
+      "reproducible_build_repair_subject": "099414721b37127a90dbb9946fd6150f306db9a2",
+      "portable_identity_repair_subject": "211e681958c7198f97f1230f30a5ef7f3023f9e0",
+      "all_repair_exact_head_ci_green": true
+    },
+    "image": {
+      "platform": "linux/amd64",
+      "image_id": "sha256:d3ecdfc7033f298c27fa519145405cbce17a9af93df498f251e04431ee9aae32",
+      "local_containerd_store_image_id": "sha256:dd78543cd315773de69f7acee6bf32cc777266d9294867985ce7a66478f1a81b",
+      "portable_image_identity_source": "verified-archive-config-digest",
+      "config_semantics_sha256": "e93d0e1862946e9e0d07fad8e847712c13fdae6ef3af2ce0116eddbfc60b13cb",
+      "rootfs_semantics_sha256": "09dd640f999cfc4ea6eaa4aad7e017991bf0468535b916c7efc5f0957d8e056f",
+      "owner_only_archive_sha256": "9521be1b4697455ef98804edbd922d545bd7fe553af38f71e7f3db9669807211",
+      "owner_only_archive_mode": "0600",
+      "literal_no_cache_builds": 2,
+      "two_build_semantics_and_inventories_equal": true,
+      "builder": "docker-buildx-v0.35.0/buildkit-v0.30.0",
+      "source_date_epoch": 1784547064,
+      "rewrite_timestamp": true,
+      "classic_docker_29_5_2_load_identity_equal": true,
+      "classic_disposable_target_deleted": true
+    },
+    "public_artifacts": {
+      "inventory_ref": "docs/receipts/release/r08b-r15-candidate-inventory.json",
+      "inventory_sha256": "0aaa4964e0f2b4816b5491873ebfc2dec8706bf76d878019507b97f38bbd87e4",
+      "inventory_payload_sha256": "64ff650746c9b00fa218987e7b7d672a5bf037400c963002e4f22cdc7853b26d",
+      "sbom_ref": "docs/receipts/release/r08b-r15-candidate-sbom.spdx.json",
+      "sbom_sha256": "0090ba9d86ca4569e08f5eb83944641dce61cbe1ddb8bb6765f94568496d3b7f",
+      "release_relevant_paths_ref": "docs/receipts/release/r08b-r15-release-relevant-paths.json",
+      "release_relevant_paths_sha256": "076f026527a4d16eded5515ea3d5fed0f6a4339319d0fc9c5063f5cd9dd2e191",
+      "release_relevant_paths_private_build_sha256": "e2782e6bff79c8b5c2d60a288f47f520a4be4011e3e4ffe0dd3c4032102e770f",
+      "evidence_only_path_allowlist_ref": "docs/receipts/release/r08b-r15-evidence-only-path-allowlist.json",
+      "evidence_only_path_allowlist_sha256": "dd33caddecfba9af8e9c20c7301082912cc8411d42e4f2daefaf879f00892411",
+      "evidence_only_path_allowlist_private_build_sha256": "8eec03a08cf5e6c18ef47ad40de7ec8f6be18c9e11cc05041e325ade4608066c",
+      "deployment_operator_rollback_packet_ref": "docs/receipts/release/r08b-r15-deployment-operator-rollback-packet.json",
+      "deployment_operator_rollback_packet_sha256": "8c33776a278f3555d4368ff492330ad1bb886219d1575e3d897394f8633ca928"
+    },
+    "private_evidence": {
+      "candidate_build_evidence_sha256": "7e870c46577d2b72d1c890a7a225fa60009c6b08f93e113893c2cb1586934dd1",
+      "advisory_snapshot_sha256": "f1dc53be409de1576e96633bbfc571ff822874af46b8ff76a70198b2790005a7",
+      "raw_vulnerability_records": 93,
+      "unresolved_release_critical_findings": 0,
+      "unresolved_release_high_findings": 0,
+      "broader_or_live_reuse_requires_new_scan": true,
+      "owner_only_files_copied_to_git": 0,
+      "private_locator_public": false
+    },
+    "next_gate": {
+      "required": "F09_EXACT_SUBJECT_CURRENTNESS_REFRESH_BEFORE_F10",
+      "fresh_f10_packaged_release_e2e_required": true,
+      "release_ready": false,
+      "product_done": false
+    },
+    "invalidation": {
+      "release_subject_sha": "211e681958c7198f97f1230f30a5ef7f3023f9e0",
+      "release_subject_tree_sha": "5aacfd823f13f2b642f80b5e91a7fb6a62c6aac8",
+      "later_diff_must_be_evidence_only": true,
+      "path_allowlist_sha256": "dd33caddecfba9af8e9c20c7301082912cc8411d42e4f2daefaf879f00892411",
+      "any_non_allowlisted_diff_rewinds_to_r08b": true,
+      "allowlist_mutation_rewinds_to_r08b": true
+    },
+    "delivery_state": {
+      "candidate_cut_evidence_commit": "PENDING_THIS_COMMIT",
+      "candidate_cut_evidence_ci": "PENDING_EXACT_HEAD_CI",
+      "terminal_integration_receipt": "PENDING_AFTER_GREEN_CANDIDATE_EVIDENCE_HEAD",
+      "r08b_accepted": false,
+      "next_sprint_dependency_ready": false
+    },
+    "secret_scan_findings": 0,
+    "raw_or_credential_bytes_public": false,
+    "provider_calls": 0,
+    "live_or_vps_actions": 0,
+    "timed_observations": "OUT_OF_SCOPE",
+    "grants_authority": false
+  },
+  "integrity": {
+    "profile": "core-json-sha256-v1",
+    "payload_sha256": "5591635272efea402ded85f8b205afcd3068e8543678f9b9f42d6bb3e02234bd",
+    "parent_refs": [
+      "git:211e681958c7198f97f1230f30a5ef7f3023f9e0",
+      "ci:29738829181",
+      "private-build-evidence:sha256:7e870c46577d2b72d1c890a7a225fa60009c6b08f93e113893c2cb1586934dd1",
+      "archive:sha256:9521be1b4697455ef98804edbd922d545bd7fe553af38f71e7f3db9669807211"
+    ]
+  }
+}

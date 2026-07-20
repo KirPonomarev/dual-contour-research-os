@@ -1,0 +1,69 @@
+{
+  "schema_id": "R08BCandidateInventory",
+  "schema_version": "1.0.0",
+  "object_id": "r08b-r15-candidate-inventory-211e681-20260720",
+  "issued_at": "2026-07-20T11:41:00Z",
+  "payload": {
+    "candidate_release_sha": "211e681958c7198f97f1230f30a5ef7f3023f9e0",
+    "candidate_tree_sha": "5aacfd823f13f2b642f80b5e91a7fb6a62c6aac8",
+    "candidate_exact_head_ci_run": 29738829181,
+    "platform": "linux/amd64",
+    "image_id": "sha256:d3ecdfc7033f298c27fa519145405cbce17a9af93df498f251e04431ee9aae32",
+    "local_containerd_store_image_id": "sha256:dd78543cd315773de69f7acee6bf32cc777266d9294867985ce7a66478f1a81b",
+    "portable_image_identity_source": "verified-archive-config-digest",
+    "image_config_semantics_sha256": "e93d0e1862946e9e0d07fad8e847712c13fdae6ef3af2ce0116eddbfc60b13cb",
+    "image_rootfs_semantics_sha256": "09dd640f999cfc4ea6eaa4aad7e017991bf0468535b916c7efc5f0957d8e056f",
+    "owner_only_archive_sha256": "9521be1b4697455ef98804edbd922d545bd7fe553af38f71e7f3db9669807211",
+    "owner_only_archive_mode": "0600",
+    "container_file_inventory": {"entry_count": 47, "sha256": "18b3af13ad0e83948ecac5de7d199314c01887f83aa71ecff6a71339d6c7ec02"},
+    "dpkg_inventory": {"package_count": 105, "sha256": "2563b1069f87341a2e9995be704a69dcf9fa1639c11e89ad162e7bb1a6bd16c4"},
+    "python_inventory": {"sha256": "9753de62760338ce66468fc1eb60c862f4e92078141a9f84b8a5bd679a9ae7e7"},
+    "spdx": {
+      "ref": "docs/receipts/release/r08b-r15-candidate-sbom.spdx.json",
+      "sha256": "0090ba9d86ca4569e08f5eb83944641dce61cbe1ddb8bb6765f94568496d3b7f",
+      "owner_only_build_artifact_sha256": "320d35e79297316a9471412d147b4ca5013a875df343cf5e60782c9168405100",
+      "package_count": 108,
+      "format": "SPDX-2.3"
+    },
+    "dependency_lock": {"ref": "ops/release/dependency-lock.json", "sha256": "58cd81aa9e5554e5ae88a0d86822e341a6ac25eb8179cca9a9fb3e4512493be9"},
+    "third_party_notices": {"ref": "ops/release/THIRD_PARTY_NOTICES.md", "sha256": "f3683a82df4e25de6a748270abd351342bc69796eddfa519ef1fe5f1f2fa9ebd"},
+    "advisory_snapshot": {
+      "owner_only_sha256": "f1dc53be409de1576e96633bbfc571ff822874af46b8ff76a70198b2790005a7",
+      "scanner": "osv-scanner-2.3.8",
+      "database_revision": "max-osv-modified:2026-07-14T10:56:37.948360943Z",
+      "packages_scanned": 108,
+      "raw_vulnerability_records": 93,
+      "unresolved_release_critical_findings": 0,
+      "unresolved_release_high_findings": 0,
+      "scope": "V2.4_LOCAL_DISPOSABLE_AND_ISOLATED_FAST_RELEASE_ONLY",
+      "broader_or_live_reuse_requires_new_scan": true
+    },
+    "build_reproducibility": {
+      "builder": "docker-buildx-v0.35.0/buildkit-v0.30.0",
+      "builder_binary_sha256": "8d50dd2ab46d37b57f6cb41f31ee64ebdfd20ea402e3ffbe26b7c1ff42d3ca7e",
+      "source_date_epoch": 1784547064,
+      "rewrite_timestamp": true,
+      "provenance_export": false,
+      "literal_no_cache_builds": 2,
+      "two_build_image_semantics_equal": true,
+      "two_build_inventories_equal": true
+    },
+    "classic_transport_proof": {
+      "docker_server_version": "29.5.2",
+      "classic_graphdriver": true,
+      "archive_load_image_id": "sha256:d3ecdfc7033f298c27fa519145405cbce17a9af93df498f251e04431ee9aae32",
+      "platform": "linux/amd64",
+      "rootless_user": "10001:10001",
+      "revision_label_exact": true,
+      "disposable_target_deleted": true
+    },
+    "candidate_build_evidence_sha256": "7e870c46577d2b72d1c890a7a225fa60009c6b08f93e113893c2cb1586934dd1",
+    "secret_scan_findings": 0,
+    "private_or_raw_bytes_public": false,
+    "provider_calls": 0,
+    "live_or_vps_actions": 0,
+    "timed_observations": "OUT_OF_SCOPE",
+    "grants_authority": false
+  },
+  "integrity": {"profile": "core-json-sha256-v1", "payload_sha256": "64ff650746c9b00fa218987e7b7d672a5bf037400c963002e4f22cdc7853b26d"}
+}
