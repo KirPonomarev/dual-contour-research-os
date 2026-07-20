@@ -484,7 +484,11 @@ class ConnectedWorkerRuntimeTests(unittest.TestCase):
         )
         stderr = io.StringIO()
         stdout = io.StringIO()
-        with contextlib.redirect_stderr(stderr), contextlib.redirect_stdout(stdout):
+        with (
+            mock.patch.object(worker, "_now", return_value=EVENT_AT),
+            contextlib.redirect_stderr(stderr),
+            contextlib.redirect_stdout(stdout),
+        ):
             code = worker.main(
                 [
                     "run",
