@@ -1,0 +1,60 @@
+{
+  "classification": "D1_INTERNAL_SANITIZED",
+  "contour": "governance",
+  "integrity": {
+    "parent_refs": [
+      "git:925f0cfa3b660b4dbb4b9f3536aef9deaf9732f1",
+      "git:53dc63030fe51d31dc480e42803a090d2e5dffcf",
+      "ci:29737153438",
+      "git:653853c8ac34fa0692f919f0d0dbd3acfe30f2ea",
+      "ci:29737198288",
+      "private-failed-stage:sha256:629e8d4ad8f4faffe5febb57e11e0036e5dd0cc35e52df35622d696c7d5e10a7"
+    ],
+    "payload_sha256": "bc2137017b7c64bd7eaa99fec673e0424df1282ff1d93f41a4cc550c86f15ee5"
+  },
+  "issued_at": "2026-07-20T11:06:00Z",
+  "issuer": {"authority_class": "integration-authority", "id": "agent-0"},
+  "object_id": "integration-r08b-r12-reproducible-candidate-build-20260720",
+  "payload": {
+    "agent_id": "agent-0",
+    "audit_results": {
+      "status": "PASS_REPAIR_ACCEPTED_RECUT_REQUIRED",
+      "contract_gate": "green",
+      "focused_tests": 3,
+      "full_core_tests": 898,
+      "stage0b_tests": 25,
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "runtime_or_containerfile_mutation": false,
+      "physical_two_build_image_identity_equal": true,
+      "physical_two_build_rootfs_layers_equal": true,
+      "provider_calls": 0,
+      "live_or_vps_actions": 0,
+      "candidate_cut": false,
+      "candidate_recut_required": true,
+      "unresolved_critical_debt": 0,
+      "unresolved_high_debt": 0,
+      "release_ready": false,
+      "product_done": false,
+      "grants_authority": false
+    },
+    "base_sha": "925f0cfa3b660b4dbb4b9f3536aef9deaf9732f1",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "head_sha": "653853c8ac34fa0692f919f0d0dbd3acfe30f2ea",
+    "integration_commit_sha": "653853c8ac34fa0692f919f0d0dbd3acfe30f2ea",
+    "ownership_lease_ref": "stages/r08b-r12-reproducible-candidate-build/ownership-lease.json",
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29737198288",
+    "remote_pr_head_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29737153438",
+    "stage_id": "R08B-R12_REPRODUCIBLE_CANDIDATE_BUILD_FIX",
+    "write_set": [
+      "stages/r08b-r12-reproducible-candidate-build/**",
+      "tools/candidate_image_build.py",
+      "tests/test_r08b_reproducible_candidate_build.py",
+      "docs/receipts/reuse/r08b-r12-reproducible-candidate-build.json",
+      "docs/receipts/assurance/r08b-r11-candidate-build-reproducibility-failure.json",
+      "docs/receipts/integration/r08b-r12-reproducible-candidate-build.json"
+    ]
+  },
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0"
+}
