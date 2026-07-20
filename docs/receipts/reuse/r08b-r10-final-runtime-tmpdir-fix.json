@@ -1,0 +1,30 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "receipt_id": "r08b-r10-reuse-runtime-owned-private-tmpdir-pattern",
+  "recorded_at": "2026-07-20T10:08:00Z",
+  "stage_id": "R08B-R10_FINAL_RUNTIME_TMPDIR_FIX",
+  "decision": "REUSE_EXISTING_SHIPPED_RUNTIME_TMPDIR_PATTERN",
+  "ordered_evaluation": [
+    "ops/deploy/research-os-a1-bridge.service runtime-owned TMPDIR pattern",
+    "ops/deploy/research-os-bridge.functional.service runtime-owned TMPDIR pattern",
+    "new package extraction",
+    "pinned permissive dependency",
+    "small audited vendor import",
+    "minimal missing glue"
+  ],
+  "selected": [
+    "existing install -d -m 0700 -o 10001 -g 10001 runtime directory pattern",
+    "existing TMPDIR=/var/lib/research-os/tmp container environment binding",
+    "one focused static regression over the shipped final unit"
+  ],
+  "external_code_added": false,
+  "new_dependency_added": false,
+  "runtime_python_change": false,
+  "provider_or_policy_change": false,
+  "grants_authority": false,
+  "integrity": {
+    "profile": "core-json-sha256-v1",
+    "payload_sha256": "04ff19496c4a245cb720337bca2572178fe706d0dfc9cf2aacafe6a2519c6d54"
+  }
+}

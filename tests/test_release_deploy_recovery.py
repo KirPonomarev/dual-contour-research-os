@@ -199,7 +199,8 @@ class FakeRunner:
                     "RESEARCH_OS_EXTERNAL_ACTION_AUTHORITY=false",
                 ] + (
                     ["TMPDIR=/var/lib/research-os/tmp"]
-                    if self.bundle.capsule is not None or self.inject_tmpdir
+                    if b"--env=TMPDIR=/var/lib/research-os/tmp" in self.bundle.unit_bytes
+                    or self.inject_tmpdir
                     else []
                 ) + deploy._FROZEN_IMAGE_ENV + self.extra_environment,
             },
@@ -268,6 +269,27 @@ class ReleaseDeployRecoveryTests(unittest.TestCase):
             archive_sha256=self.archive_sha,
         )
         self.clock = lambda: datetime(2026, 7, 18, 1, 0, tzinfo=timezone.utc)
+
+    def test_final_a1_unit_has_private_runtime_tmpdir_on_read_only_root(self) -> None:
+        unit = (ROOT / "ops/deploy/research-os-a1-final.service").read_text()
+        create_line = next(
+            line
+            for line in unit.splitlines()
+            if "docker container create --name=research-os-a1-bridge" in line
+        )
+        initialize_line = next(
+            line
+            for line in unit.splitlines()
+            if "research-os-a1-runtime,target=/var/lib/research-os" in line
+            and "install -d" in line
+        )
+        self.assertIn("--read-only", create_line)
+        self.assertIn("--network=none", create_line)
+        self.assertIn("--env=TMPDIR=/var/lib/research-os/tmp", create_line)
+        self.assertIn(
+            "install -d -m 0700 -o 10001 -g 10001 /var/lib/research-os/tmp",
+            initialize_line,
+        )
 
     def controller(self, runner: FakeRunner) -> deploy.PreSoakDeployController:
         return deploy.PreSoakDeployController(

@@ -1,0 +1,31 @@
+{
+  "schema_id": "F10SanitizedFailureEvidence",
+  "schema_version": "1.0.0",
+  "issued_at": "2026-07-20T10:08:00Z",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "R08B-R10_FINAL_RUNTIME_TMPDIR_FIX",
+    "status": "FAIL_CLOSED_RELEASE_DEFECT_REWIND_REQUIRED",
+    "private_failed_action_receipt_sha256": "f2762bc2b622ac62e7bdec59f179e350c33bd1bdefa3614a1ba60bf8dfcd8a6a",
+    "release_sha": "974a5dd932e53b82407a4b71f8af5e5641803564",
+    "image_id": "sha256:be49e1ce3606fa0f3d1c96002fb2a9cc35072449af1a3e5f5b2a1c2cc3b1d159",
+    "root_filesystem_read_only": true,
+    "runtime_tmpdir_binding_present": false,
+    "claim_checkpoint_and_artifact_cas_present": true,
+    "terminal_cas_and_completion_absent": true,
+    "failure_boundary": "after-artifact-cas-before-terminal-cas",
+    "provider_calls": 2,
+    "actual_tokens": 1021,
+    "actual_cost_units": 2,
+    "open_sent_or_unknown_identities": 0,
+    "backup_created": false,
+    "f10_accepted": false,
+    "private_or_secret_bytes_public": false,
+    "live_or_canonical_actions": 0,
+    "grants_authority": false
+  },
+  "integrity": {
+    "profile": "core-json-sha256-v1",
+    "payload_sha256": "0c764c58d3bd0b729ed5768e78c35c6074471535f9d52db004cf680bf1c54acb"
+  }
+}

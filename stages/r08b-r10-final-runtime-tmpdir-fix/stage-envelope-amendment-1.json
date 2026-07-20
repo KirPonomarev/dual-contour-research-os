@@ -1,0 +1,33 @@
+{
+  "schema_id": "PrivateStageEnvelopeAmendment",
+  "schema_version": "1.0.0",
+  "stage_id": "R08B-R10_FINAL_RUNTIME_TMPDIR_FIX",
+  "amendment_id": "R08B-R10-A1-TMPDIR-INDEPENDENT-OF-CAPSULE",
+  "issued_at": "2026-07-20T10:12:00Z",
+  "issued_by": "agent-0",
+  "base_sha": "8966b165fd4f1113565dd6a2797f8010468cc0aa",
+  "parent_stage_envelope_sha256": "49efec361f6aedb0b6b9cb884da298dcf5306d3ba42435f3dfcf1abb9502e133",
+  "reason": "Focused tests proved the deployment verifier incorrectly treated any writable TMPDIR as capsule-only. The final A1 runtime is intentionally non-capsule but requires TMPDIR because its root filesystem remains read-only.",
+  "additional_write_set": [
+    "stages/r08b-r10-final-runtime-tmpdir-fix/stage-envelope-amendment-1.json",
+    "stages/r08b-r10-final-runtime-tmpdir-fix/ownership-lease-amendment-1.json",
+    "tools/pre_soak_deploy.py"
+  ],
+  "required_change": {
+    "derive_tmpdir_requirement_from_exact_rendered_unit": true,
+    "retain_capsule_tmpdir_requirement": true,
+    "allow_non_capsule_final_a1_tmpdir": true,
+    "weaken_read_only_or_network_isolation": false
+  },
+  "acceptance_commands": [
+    "python3 -m unittest tests.test_release_deploy_recovery tests.test_s38_r1_final_deployment_rebind tests.test_r08a_production_image_e2e_harness",
+    "make contracts",
+    "python3 -m unittest discover -s tests"
+  ],
+  "provider_calls_allowed": 0,
+  "live_or_canonical_actions_allowed": false,
+  "integrity": {
+    "profile": "core-json-sha256-v1",
+    "payload_sha256": "5169b1b48dcce855278cba578f88d1f858676eb2bca5c40648525045cfebb50f"
+  }
+}
