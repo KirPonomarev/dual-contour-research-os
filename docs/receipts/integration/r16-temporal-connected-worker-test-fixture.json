@@ -1,0 +1,41 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-r16-temporal-connected-worker-test-fixture-20260720",
+  "issued_at": "2026-07-20T12:16:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "R16_TEMPORAL_CONNECTED_WORKER_TEST_FIXTURE",
+    "agent_id": "agent-0",
+    "base_sha": "62732b807a0a0bb47dc7aa3e374484b88450b40e",
+    "head_sha": "f2efe3fd8cb09733bd152b3d617907e8d7c0c719",
+    "integration_commit_sha": "f2efe3fd8cb09733bd152b3d617907e8d7c0c719",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "ownership_lease_ref": "private-owner-retained:sha256:28e963c7b2550cbb81f5a069d167a0be5b90642ca79acda6835da554a6bfb23b",
+    "remote_pr_head_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29741486605",
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29741532391",
+    "audit_results": {
+      "status": "PASS_TEST_FIXTURE_REPAIRED_CANDIDATE_RECUT_REQUIRED",
+      "focused_test": "green",
+      "connected_worker_tests": 12,
+      "full_core_tests": 899,
+      "stage0b_tests": 25,
+      "contract_gate": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "runtime_or_source_mutation": false,
+      "test_clock_bound_to_existing_event_time": true,
+      "expiry_runtime_branch_preserved": true,
+      "provider_calls": 0,
+      "live_or_vps_actions": 0,
+      "candidate_recut_required": true,
+      "release_ready": false,
+      "product_done": false,
+      "grants_authority": false
+    },
+    "write_set": ["tests/test_r04c_connected_worker_runtime.py", "docs/receipts/reuse/r16-temporal-connected-worker-test-fixture.json", "docs/receipts/assurance/f09-r3-temporal-test-fixture-failure.json", "docs/receipts/integration/r16-temporal-connected-worker-test-fixture.json"]
+  },
+  "integrity": {"payload_sha256": "071d75b7b1ea91dd0d8e25f4c689715a9b53be62f23ccca58db78244df66e315", "parent_refs": ["git:62732b807a0a0bb47dc7aa3e374484b88450b40e", "git:f2efe3fd8cb09733bd152b3d617907e8d7c0c719", "ci:29741532391", "private-failed-stage:sha256:0854af9ffb55a60021461efba656bdb3a4ae88de79c40e5173ce333ca07253fd"]}
+}
