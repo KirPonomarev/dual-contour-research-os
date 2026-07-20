@@ -1,0 +1,127 @@
+{
+  "schema_id": "R08BCandidateCutReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "r08b-candidate-cut-974a5dd-20260720",
+  "issued_at": "2026-07-20T01:36:16Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "plan_id": "DCR_OS_AUTONOMOUS_V2_3_NO_BRAKES_20260719",
+    "plan_version": "2.4.0-fast-working-release",
+    "amendment_id": "FAST_RELEASE_NO_TIMED_WINDOWS_NO_HUMAN_WAIT_20260719",
+    "stage_id": "R08B_EXACT_CANDIDATE_IMAGE_BUILD_AND_SBOM",
+    "status": "FROZEN_EXACT_CANDIDATE_IMAGE_AWAITING_TERMINAL_INTEGRATION_RECEIPT",
+    "candidate": {
+      "release_sha": "974a5dd932e53b82407a4b71f8af5e5641803564",
+      "tree_sha": "fe0066c975c8de7022dc6047158cbf35cad8ccce",
+      "exact_head_ci_run": 29710733971,
+      "exact_head_ci_conclusion": "success",
+      "parent_pr": 82,
+      "parent_pr_head_sha": "b8990f0dde8361d693f78c5fb92f66a2f9e68542",
+      "parent_pr_head_ci_run": 29710699948,
+      "parent_pr_head_ci_conclusion": "success",
+      "squash_tree_equals_pr_head_tree": true,
+      "canonical_trailer_count": 4,
+      "canonical_trailer_values_match": true,
+      "immutable_through_f12": true
+    },
+    "pre_cut": {
+      "receipt_ref": "docs/receipts/release/r08b-pre-cut-readiness.json",
+      "receipt_sha256": "13979c0f47bda31bc07dc956894dad5acbec4060de4cbe5ce2e84224d865867a",
+      "receipt_payload_sha256": "b066392f8ad28e37517dd8196200eb9fa97e7c95bc53a7bff065fc590f0bbd8d",
+      "parent_manifest_sha256": "c2b1b6771edcf8fdd9656236f7c361bc08366ec2cad98af33f16d92f008c4e26",
+      "parent_pre_cut_requirements_complete": true,
+      "private_two_role_provider_calls": 2,
+      "fresh_provider_calls_after_pre_cut": 0,
+      "all_provider_accounting_reconciled": true,
+      "upstream_provider_independence": "NOT_ESTABLISHED"
+    },
+    "image": {
+      "platform": "linux/amd64",
+      "manifest_id": "sha256:be49e1ce3606fa0f3d1c96002fb2a9cc35072449af1a3e5f5b2a1c2cc3b1d159",
+      "config_blob_sha256": "c50051025d18f4306ae8af217d3b120d24d9a9526710f7412c8ad9b4aa596778",
+      "config_semantics_sha256": "307242bb258ea914314478f740a2e381efa839e955970349aad02eb129530a71",
+      "rootfs_semantics_sha256": "a8e957d3b462d79b5ceb5619959239946a1e286c9230db26fbe249f6f53436ab",
+      "owner_only_archive_sha256": "f0e4cfb2de4df6ccf0f6809e362eed45806a4dbf54c61216a14853a04940829a",
+      "owner_only_archive_mode": "0600",
+      "literal_no_cache_builds": 2,
+      "deterministic_archive_copies": 2,
+      "archives_byte_identical": true,
+      "builder": "docker-buildx-v0.35.0/buildkit-v0.30.0",
+      "builder_binary_sha256": "fedbcbd488dcdb46414c6119920d8186d406531a1157ceede4e857e25af77ff1",
+      "source_date_epoch": 1784510306,
+      "rewrite_timestamp": true,
+      "minimal_fallback_reason": "ordinary no-cache layer tar timestamps were nondeterministic despite identical config and inventories",
+      "unaccepted_attempts_claim_candidate_credit": false
+    },
+    "public_artifacts": {
+      "inventory_ref": "docs/receipts/release/r08b-candidate-inventory.json",
+      "inventory_sha256": "dd67ac7ff840b859a6f8c0a3b0c38cf2b1cc0eea55f86a9ff7ab8f8cb7bf3208",
+      "inventory_payload_sha256": "e053df2e3b1aaa65d26513dbf8fb9f98645fb5a3820e00bacb0453edcbe42b45",
+      "sbom_ref": "docs/receipts/release/r08b-candidate-sbom.spdx.json",
+      "sbom_sha256": "8df578c6ff66bd3161481f8b1f7d30741bdc86ce3c5fb49c456064a88c88a921",
+      "release_relevant_paths_ref": "docs/receipts/release/r08b-release-relevant-paths.json",
+      "release_relevant_paths_manifest_sha256": "67479ff1d799d384f5eb98cfd955e39c403bfb32d509e2c4b82598d57d79b7a1",
+      "evidence_only_path_allowlist_ref": "docs/receipts/release/r08b-evidence-only-path-allowlist.json",
+      "evidence_only_path_allowlist_sha256": "7a3ece39a5e2ccaeadc244ed980bc26dce6d5cbf9b84d89743459a0f871f640c",
+      "deployment_operator_rollback_packet_ref": "docs/receipts/release/r08b-deployment-operator-rollback-packet.json",
+      "deployment_operator_rollback_packet_sha256": "97ce159831d9635a10e47a05d540dddbe353153b36a948c32422b04f1cfdfc2e"
+    },
+    "private_evidence": {
+      "candidate_build_evidence_sha256": "5ec6aed6c10a6a61e2f36f0a442930db720d7b7be23b8a2fd549528261ae8ae4",
+      "advisory_snapshot_sha256": "d4a35f0c21040ab2ec69e54a982661647b203f0695e09ad8df62f0857730be08",
+      "raw_vulnerability_records": 93,
+      "unresolved_release_critical_findings": 0,
+      "unresolved_release_high_findings": 0,
+      "broader_or_live_reuse_requires_new_scan": true,
+      "owner_only_files_copied_to_git": 0,
+      "private_locator_public": false
+    },
+    "runtime_acceptance": {
+      "af_unix_status": true,
+      "source_materialized": true,
+      "material_event_sha256": "3211553c12f2f26cf88b5c6bf04a869a15323ed226c7c0c3d31357c35e36e513",
+      "role_mismatch_rejected": true,
+      "second_writer_rejected": true,
+      "same_container_restart": true,
+      "network": "none",
+      "rootless_user": "10001:10001",
+      "external_action_authority": false
+    },
+    "invalidation": {
+      "release_subject_sha": "974a5dd932e53b82407a4b71f8af5e5641803564",
+      "release_subject_tree_sha": "fe0066c975c8de7022dc6047158cbf35cad8ccce",
+      "later_diff_must_be_evidence_only": true,
+      "path_allowlist_sha256": "7a3ece39a5e2ccaeadc244ed980bc26dce6d5cbf9b84d89743459a0f871f640c",
+      "any_non_allowlisted_diff_rewinds_to_r08b": true,
+      "allowlist_mutation_rewinds_to_r08b": true
+    },
+    "delivery_state": {
+      "candidate_cut_evidence_commit": "PENDING_THIS_COMMIT",
+      "candidate_cut_evidence_ci": "PENDING_EXACT_HEAD_CI",
+      "terminal_integration_receipt": "PENDING_AFTER_GREEN_CANDIDATE_EVIDENCE_HEAD",
+      "r08b_accepted": false,
+      "next_sprint_dependency_ready": false,
+      "product_done": false,
+      "release_done": false
+    },
+    "secret_scan_findings": 0,
+    "raw_or_credential_bytes_public": false,
+    "live_or_vps_actions": 0,
+    "timed_observations": "OUT_OF_SCOPE",
+    "grants_authority": false
+  },
+  "integrity": {
+    "profile": "core-json-sha256-v1",
+    "payload_sha256": "84c627f3605a9ebbbf2dbba411e9a16c397429d0d4072c2e31058b00126b9713",
+    "parent_refs": [
+      "git:974a5dd932e53b82407a4b71f8af5e5641803564",
+      "ci:29710733971",
+      "private-build-evidence:sha256:5ec6aed6c10a6a61e2f36f0a442930db720d7b7be23b8a2fd549528261ae8ae4",
+      "archive:sha256:f0e4cfb2de4df6ccf0f6809e362eed45806a4dbf54c61216a14853a04940829a"
+    ]
+  }
+}
