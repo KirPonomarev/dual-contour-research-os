@@ -1,0 +1,25 @@
+{
+  "schema_id": "PrivateOwnershipLeaseAmendment",
+  "schema_version": "1.0.0",
+  "stage_id": "R08B-R10_FINAL_RUNTIME_TMPDIR_FIX",
+  "amendment_id": "R08B-R10-MERGE-HEAD-INTEGRATION-RECEIPT",
+  "issued_at": "2026-07-20T10:29:00Z",
+  "expires_at": "2026-07-21T10:06:00Z",
+  "holder": {"id": "agent-0", "role": "integration-receipt-writer"},
+  "branch": "codex/bridge-a0-r08b-r10-final-tmpdir-receipt",
+  "worktree": "/private/tmp/dcr-r08b-r10-receipt-9689dff",
+  "parent_ownership_lease_sha256": "ed05af6bd7fafddd025c9ceab07cb6a048b642ad03be407d2c6854818ff86148",
+  "stage_envelope_amendment_sha256": "2eb736ee441feabb8e48d2e7ddfca4d292420cfee4df2dfc3daf0fb1a813a70a",
+  "write_set": [
+    "stages/r08b-r10-final-runtime-tmpdir-fix/stage-envelope-amendment-2.json",
+    "stages/r08b-r10-final-runtime-tmpdir-fix/ownership-lease-amendment-2.json",
+    "docs/receipts/integration/r08b-r10-final-runtime-tmpdir-fix.json"
+  ],
+  "second_writer_allowed": false,
+  "sublease_allowed": false,
+  "revoked": false,
+  "integrity": {
+    "profile": "core-json-sha256-v1",
+    "payload_sha256": "f084d46a9e6ef78f615cb6639ca05d06da9ba97f04dd7e167cd979c56f1bd183"
+  }
+}
