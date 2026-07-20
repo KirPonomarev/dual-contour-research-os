@@ -1,0 +1,112 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-p01-r2-action-transition-repair-20260720",
+  "issued_at": "2026-07-20T23:17:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "plan_id": "DCR_OS_AUTONOMOUS_V2_3_NO_BRAKES_20260719",
+    "plan_version": "2.5.2-physical-release-final",
+    "mission_id": "DCR_OS_PHYSICAL_RELEASE_20260721",
+    "project_fingerprint": "b371429cb7c01fd6c5dbd430510a264684dab906188d706b7479446c1bd8f154",
+    "stage_id": "P01_R2_ACTION_TRANSITION_REPAIR",
+    "agent_id": "agent-0",
+    "base_sha": "65af2e0c4a3587f22db84653e7f04c90bf702035",
+    "head_sha": "973e5e23b5f69794b91aa14a297c7208f2dce818",
+    "pr_head_sha": "c52df77bb7f7085d970562733d9e2f9f2620d7ca",
+    "integration_commit_sha": "973e5e23b5f69794b91aa14a297c7208f2dce818",
+    "integration_tree_sha": "813d5bd20785cea44cd435fe6ff3568bfda0a5cd",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29786679295",
+    "ownership_lease_ref": "stages/p01-r2-action-transition-repair/ownership-lease.json",
+    "delivery": {
+      "branch": "codex/bridge-a0-p01-r2-action-transitions",
+      "pr_number": 106,
+      "pr_head_ci_run": 29786641532,
+      "pr_head_ci_conclusion": "success",
+      "push_head_ci_run": 29786616001,
+      "push_head_ci_conclusion": "success",
+      "merge_head_sha": "973e5e23b5f69794b91aa14a297c7208f2dce818",
+      "merge_tree_sha": "813d5bd20785cea44cd435fe6ff3568bfda0a5cd",
+      "merge_head_ci_run": 29786679295,
+      "merge_head_ci_conclusion": "success",
+      "squash_merge_trailers_valid": true,
+      "terminal_receipt_head_ci": "PENDING_THIS_RECEIPT_DELIVERY"
+    },
+    "repair": {
+      "cause": "P01 validator applied the deploy none-to-R17 transition to all post-deploy actions.",
+      "deploy_transition": ["release:none-service-stopped", "0394d6c9e327eceb62f738eca90be3ece015ba79"],
+      "ingress_transition": ["0394d6c9e327eceb62f738eca90be3ece015ba79", "0394d6c9e327eceb62f738eca90be3ece015ba79"],
+      "restart_transition": ["0394d6c9e327eceb62f738eca90be3ece015ba79", "0394d6c9e327eceb62f738eca90be3ece015ba79"],
+      "reboot_transition": ["0394d6c9e327eceb62f738eca90be3ece015ba79", "0394d6c9e327eceb62f738eca90be3ece015ba79"],
+      "rollback_readiness_transition": ["0394d6c9e327eceb62f738eca90be3ece015ba79", "0394d6c9e327eceb62f738eca90be3ece015ba79"],
+      "generic_private_envelope_validator_added": true,
+      "action_specific_service_sets": true,
+      "false_transition_rejected": true
+    },
+    "release_identity": {
+      "runtime_release_sha": "0394d6c9e327eceb62f738eca90be3ece015ba79",
+      "runtime_tree_sha": "636fda24cbb2da567fb23a4d44fa865ae74ac4bc",
+      "portable_image_id": "sha256:e6db8ab087e18b13ac357a751a2e7318c3abb81a4f2af459c930a630ddc65577",
+      "carrier_sha256": "46e12e35ef89463a9f13028732e35c30ce3aaa7b121834f68a9aeccbf727d9f7",
+      "maintenance_control_head": "973e5e23b5f69794b91aa14a297c7208f2dce818",
+      "runtime_inputs_changed": false,
+      "runtime_subject_advanced": false,
+      "image_rebuilt": false,
+      "physical_mutation": false
+    },
+    "artifacts": {
+      "control_executable_sha256": "1b2a6ec27f32f33bea44472291be5d2ec3eb8dea4374a29f812d9d6673fc9aee",
+      "artifact_manifest_ref": "inventory/p01-r2-action-transition-control-artifact.json",
+      "artifact_manifest_sha256": "9e61a28790074e4046cffaaf358fce9c9dc1cd90ba4ad3461393df385a872131",
+      "artifact_payload_sha256": "3f8992d5edd3ce7aed2fa06e9eaa2cecb2737951a083838125d58421e380bbd7",
+      "reuse_receipt_ref": "docs/receipts/reuse/p01-r2-action-transition-repair.json",
+      "reuse_receipt_sha256": "23fb1283ed2824f7acae80c24bea1412561e1a6b59b32aa7b6803adfc852e864",
+      "stage_envelope_sha256": "9f23e67791fee879fada7ff7229e5392c738d2ec7494134b4e6c03279e75fce8",
+      "ownership_lease_sha256": "6ab3e1414e2c96249c07c06a41d6380392f493926f25de0cf3376a3cd82c703b"
+    },
+    "audit_results": {
+      "contract_gate": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "runtime_or_release_relevant_mutation": false,
+      "full_core_tests": 899,
+      "stage0b_tests": 25,
+      "focused_action_transition_tests": "green",
+      "physical_deployment_performed": false,
+      "product_done": false,
+      "release_done": false
+    },
+    "post_receipt_requirements": {
+      "exact_terminal_receipt_head_ci": "REQUIRED_PENDING",
+      "receipt_pr_squash_merge": "REQUIRED_PENDING",
+      "exact_receipt_merge_head_ci": "REQUIRED_PENDING",
+      "resume_p02_owner_only_freeze": "REQUIRED_PENDING",
+      "stage_branch_and_worktree_cleanup": "REQUIRED_PENDING"
+    },
+    "write_set": [
+      "Makefile",
+      "tools/physical_release_control.py",
+      "inventory/p01-r2-action-transition-control-artifact.json",
+      "docs/receipts/reuse/p01-r2-action-transition-repair.json",
+      "docs/receipts/integration/p01-r2-action-transition-repair.json",
+      "stages/p01-r2-action-transition-repair/stage-envelope.json",
+      "stages/p01-r2-action-transition-repair/ownership-lease.json"
+    ]
+  },
+  "integrity": {
+    "profile": "core-json-sha256-v1",
+    "payload_sha256": "af39204948e88075a3f23e3e42c583007dcc35b944290df79fc0bd6572b31799",
+    "parent_refs": [
+      "git:65af2e0c4a3587f22db84653e7f04c90bf702035",
+      "git:c52df77bb7f7085d970562733d9e2f9f2620d7ca",
+      "ci:29786641532",
+      "git:973e5e23b5f69794b91aa14a297c7208f2dce818",
+      "ci:29786679295",
+      "runtime:0394d6c9e327eceb62f738eca90be3ece015ba79",
+      "image:sha256:e6db8ab087e18b13ac357a751a2e7318c3abb81a4f2af459c930a630ddc65577"
+    ]
+  }
+}
