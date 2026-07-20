@@ -1,0 +1,62 @@
+{
+  "stage_id": "p01-r3-engine-image-mapping",
+  "agent_id": "agent-0",
+  "objective": "Bind the R17 portable OCI identity to the already-qualified Docker engine-local image identity so the VPS deploy renders an executable exact image reference without rebuilding or relabeling the runtime.",
+  "executable_blocker": "The first P03 attempt verified and loaded carrier 46e12e35 but failed closed before service installation because P01 rendered portable identity e6db8ab as a Docker engine ID instead of qualified loaded identity d1f56e9.",
+  "base_sha": "fd0c6e6cb6a8e89a77ff44e1f26e673115d0052e",
+  "base_tree": "cc938ad2e5a61a5d3e2353b90baf0393d9c32ae4",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a0-p01-r3-engine-id-mapping",
+  "worktree": "/private/tmp/dcr-p01-r3-fd0c6e6",
+  "read_set": [
+    "docs/receipts/release/f10-disposable-linux-release-e2e-sanitized.json",
+    "docs/receipts/release/r17-candidate-inventory.json",
+    "docs/receipts/integration/p01-r2-action-transition-repair.json",
+    "tools/pre_soak_deploy.py",
+    "ops/deploy/research-os-a1-final.service"
+  ],
+  "write_set": [
+    "Makefile",
+    "docs/PHYSICAL_RELEASE_RUNBOOK.md",
+    "tools/physical_release_control.py",
+    "tests/test_p01_r3_engine_image_mapping.py",
+    "inventory/p01-r3-engine-image-mapping-control-artifact.json",
+    "docs/receipts/reuse/p01-r3-engine-image-mapping.json",
+    "docs/receipts/integration/p01-r3-engine-image-mapping.json",
+    "stages/p01-r3-engine-image-mapping/stage-envelope.json",
+    "stages/p01-r3-engine-image-mapping/ownership-lease.json"
+  ],
+  "boundary_contract": {
+    "portable_image_id": "sha256:e6db8ab087e18b13ac357a751a2e7318c3abb81a4f2af459c930a630ddc65577",
+    "engine_image_id": "sha256:d1f56e933a8e498ae9e3a1f70ba0e764785a0de44d6f702f7e1945c3621b671f",
+    "identity_source": "F10 exact release evidence plus exact carrier load on bound VPS",
+    "runtime_inputs_changed": false,
+    "image_rebuild": false,
+    "image_relabel": false,
+    "additional_vps_mutation": false
+  },
+  "forbidden_scope": [
+    "runtime-image-carrier-config-policy-contract-domain-or-provider mutation",
+    "history-rewrite-force-push-direct-main-push-or-CI-weakening",
+    "mutable-tag-public-listener-domain-write-live-action-or-secret-in-Git"
+  ],
+  "acceptance_commands": [
+    "make physical-release-control",
+    "python3 -m unittest tests.test_p01_r3_engine_image_mapping",
+    "make test",
+    "rendered unit contains d1f56e9 and not e6db8ab",
+    "profile binds both identities and rejects omission or substitution",
+    "git diff --check",
+    "exact-head PR merge and receipt CI"
+  ],
+  "risk_class": "low-control-identity-mapping-repair",
+  "stop_conditions": [
+    "qualified engine identity cannot be reconciled to the exact carrier",
+    "runtime rebuild or relabel becomes necessary",
+    "frozen public contract break becomes necessary"
+  ],
+  "expected_receipt": "docs/receipts/integration/p01-r3-engine-image-mapping.json",
+  "rollback": "Revert only P01-R3 control artifacts; preserve the exact staged image and immutable failed operational receipts.",
+  "commit_authority": "agent-0-only",
+  "push_authority": "agent-0-only"
+}
