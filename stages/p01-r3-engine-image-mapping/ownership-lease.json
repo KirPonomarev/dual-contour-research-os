@@ -1,0 +1,25 @@
+{
+  "lease_id": "lease-p01-r3-engine-image-mapping-agent-0-20260720",
+  "fencing_token": "61a42c51-0010-4663-a8d6-2dc737786d73-p01r3",
+  "stage_id": "p01-r3-engine-image-mapping",
+  "agent_id": "agent-0",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-20T23:45:00Z",
+  "expires_at": "2026-07-21T10:30:29Z",
+  "base_sha": "fd0c6e6cb6a8e89a77ff44e1f26e673115d0052e",
+  "branch": "codex/bridge-a0-p01-r3-engine-id-mapping",
+  "worktree": "/private/tmp/dcr-p01-r3-fd0c6e6",
+  "write_set": [
+    "Makefile",
+    "docs/PHYSICAL_RELEASE_RUNBOOK.md",
+    "tools/physical_release_control.py",
+    "tests/test_p01_r3_engine_image_mapping.py",
+    "inventory/p01-r3-engine-image-mapping-control-artifact.json",
+    "docs/receipts/reuse/p01-r3-engine-image-mapping.json",
+    "docs/receipts/integration/p01-r3-engine-image-mapping.json",
+    "stages/p01-r3-engine-image-mapping/stage-envelope.json",
+    "stages/p01-r3-engine-image-mapping/ownership-lease.json"
+  ],
+  "delegation_allowed": false,
+  "state": "active"
+}

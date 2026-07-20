@@ -4,6 +4,11 @@ This runbook governs the control layer only. The immutable runtime remains R17
 at Git SHA `0394d6c9e327eceb62f738eca90be3ece015ba79`, tree
 `636fda24cbb2da567fb23a4d44fa865ae74ac4bc`, and portable image
 `sha256:e6db8ab087e18b13ac357a751a2e7318c3abb81a4f2af459c930a630ddc65577`.
+Loading that carrier into the qualified Docker engine produces the exact
+engine-local ID
+`sha256:d1f56e933a8e498ae9e3a1f70ba0e764785a0de44d6f702f7e1945c3621b671f`.
+Receipts retain the portable identity; rendered Docker commands use the bound
+engine-local identity. Neither may be replaced by a tag.
 The maintenance head is a separate control identity and must never be used to
 relabel or rebuild that image.
 
@@ -48,7 +53,7 @@ python3 tools/physical_release_control.py deploy-preflight \
 ```
 
 The private `PhysicalReleaseControlProfile/v1` binds the exact R17 release,
-tree, image, 47,947,776-byte carrier with SHA-256 `46e12e35...`, carrier
+tree, portable image, engine-local image, 47,947,776-byte carrier with SHA-256 `46e12e35...`, carrier
 amendment, config, policy, unit template, strict known-hosts file, host
 fingerprint, one service/container/volume namespace, and zero public
 listeners. The `OperationalActionEnvelope/v1` additionally constrains the
@@ -74,6 +79,10 @@ the content-addressed image, rejects a conflicting writer, and writes
 owner-only non-overwriting receipts. It does not discover credentials, use
 sudo, reboot the host, rebuild an image, alter domain services, or claim that a
 successful deploy alone is Release Done.
+
+The deploy path verifies carrier identity `46e12e35...`, portable identity
+`e6db8ab...`, and loaded Docker identity `d1f56e...`, then renders the service
+with `d1f56e...`. This mapping is frozen evidence, not an image rebuild.
 
 Run one ingress cycle only after the service and both current immutable export
 bindings are proven:

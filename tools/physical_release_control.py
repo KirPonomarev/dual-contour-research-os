@@ -31,6 +31,7 @@ sys.path.insert(0, str(ROOT / "tools"))
 RUNTIME_RELEASE_SHA = "0394d6c9e327eceb62f738eca90be3ece015ba79"
 RUNTIME_TREE_SHA = "636fda24cbb2da567fb23a4d44fa865ae74ac4bc"
 IMAGE_ID = "sha256:e6db8ab087e18b13ac357a751a2e7318c3abb81a4f2af459c930a630ddc65577"
+ENGINE_IMAGE_ID = "sha256:d1f56e933a8e498ae9e3a1f70ba0e764785a0de44d6f702f7e1945c3621b671f"
 CARRIER_SHA256 = "46e12e35ef89463a9f13028732e35c30ce3aaa7b121834f68a9aeccbf727d9f7"
 CARRIER_BYTES = 47_947_776
 CARRIER_BINDING_SHA256 = "5ec076442c86d31d1bbec0c0dba029b16588bdd52bfede4e2805ccca8b71e596"
@@ -564,7 +565,7 @@ def validate_deploy_profile(document: Mapping[str, object]) -> dict[str, Any]:
     _timestamp(document["issued_at"], "deploy profile issued_at")
     payload = _integrity(document, "deploy profile")
     keys = {
-        "runtime_release_sha", "runtime_tree_sha", "image_id", "carrier_sha256",
+        "runtime_release_sha", "runtime_tree_sha", "image_id", "engine_image_id", "carrier_sha256",
         "carrier_bytes", "carrier_binding_sha256", "unit_sha256", "policy_sha256",
         "config_sha256", "r17_deployment_packet_sha256", "exact_host_fingerprint",
         "ssh_alias", "known_hosts_path", "carrier_path", "service_name",
@@ -576,6 +577,7 @@ def validate_deploy_profile(document: Mapping[str, object]) -> dict[str, Any]:
         "runtime_release_sha": RUNTIME_RELEASE_SHA,
         "runtime_tree_sha": RUNTIME_TREE_SHA,
         "image_id": IMAGE_ID,
+        "engine_image_id": ENGINE_IMAGE_ID,
         "carrier_sha256": CARRIER_SHA256,
         "carrier_bytes": CARRIER_BYTES,
         "carrier_binding_sha256": CARRIER_BINDING_SHA256,
@@ -733,7 +735,7 @@ def _render_bundle(profile: Mapping[str, object]) -> object:
             raise PhysicalReleaseError(f"{label} drifted")
     unit = unit_path.read_text(encoding="utf-8")
     rendered = (
-        unit.replace("@@IMAGE_ID@@", IMAGE_ID)
+        unit.replace("@@IMAGE_ID@@", ENGINE_IMAGE_ID)
         .replace("@@RELEASE_SHA@@", RUNTIME_RELEASE_SHA)
         .replace("@@POLICY_SHA256@@", POLICY_SHA256)
         .replace("@@CONFIG_SHA256@@", CONFIG_SHA256)
@@ -742,7 +744,7 @@ def _render_bundle(profile: Mapping[str, object]) -> object:
         raise PhysicalReleaseError("rendered unit retains an unresolved token")
     return deploy.ReleaseBundle(
         release_sha=RUNTIME_RELEASE_SHA,
-        image_id=IMAGE_ID,
+        image_id=ENGINE_IMAGE_ID,
         previous_release_ref="release:none-service-stopped",
         policy_sha256=POLICY_SHA256,
         config_sha256=CONFIG_SHA256,
@@ -765,6 +767,7 @@ def deploy_preflight(profile_document: Mapping[str, object], envelope_document: 
         "runtime_release_sha": RUNTIME_RELEASE_SHA,
         "runtime_tree_sha": RUNTIME_TREE_SHA,
         "image_id": IMAGE_ID,
+        "engine_image_id": ENGINE_IMAGE_ID,
         "carrier_sha256": CARRIER_SHA256,
         "carrier_bytes": CARRIER_BYTES,
         "rendered_unit_sha256": bundle.unit_sha256,
@@ -805,6 +808,7 @@ def execute_deploy(arguments: argparse.Namespace) -> dict[str, object]:
             "runtime_release_sha": RUNTIME_RELEASE_SHA,
             "runtime_tree_sha": RUNTIME_TREE_SHA,
             "image_id": IMAGE_ID,
+            "engine_image_id": ENGINE_IMAGE_ID,
             "carrier_sha256": CARRIER_SHA256,
             "service_name": SERVICE_NAME,
             "runtime_rebuild": False,
@@ -826,6 +830,7 @@ def execute_deploy(arguments: argparse.Namespace) -> dict[str, object]:
             "action_envelope_sha256": digest_bytes(canonical_bytes(envelope_document)),
             "runtime_release_sha": RUNTIME_RELEASE_SHA,
             "image_id": IMAGE_ID,
+            "engine_image_id": ENGINE_IMAGE_ID,
             "service_name": SERVICE_NAME,
             "automatic_sudo_executed": False,
             "automatic_reboot_executed": False,
@@ -854,7 +859,7 @@ def validate_artifact(document: Mapping[str, object], *, root: Path = ROOT) -> d
     _timestamp(document["issued_at"], "control artifact issued_at")
     payload = _integrity(document, "control artifact")
     required = {
-        "runtime_release_sha", "runtime_tree_sha", "image_id", "carrier_sha256",
+        "runtime_release_sha", "runtime_tree_sha", "image_id", "engine_image_id", "carrier_sha256",
         "carrier_bytes", "ingress_executable", "ingress_executable_sha256",
         "domain_consumers", "ingress_principal", "ingress_principal_count",
         "transport", "public_listener_count", "domain_writes", "live_authority",
@@ -865,6 +870,7 @@ def validate_artifact(document: Mapping[str, object], *, root: Path = ROOT) -> d
         "runtime_release_sha": RUNTIME_RELEASE_SHA,
         "runtime_tree_sha": RUNTIME_TREE_SHA,
         "image_id": IMAGE_ID,
+        "engine_image_id": ENGINE_IMAGE_ID,
         "carrier_sha256": CARRIER_SHA256,
         "carrier_bytes": CARRIER_BYTES,
         "ingress_executable": "tools/physical_release_control.py",
@@ -1068,6 +1074,15 @@ def self_test() -> dict[str, object]:
     )
     if any(token in source for token in forbidden):
         raise PhysicalReleaseError("ingress source contains a forbidden public/network listener primitive")
+    unit_template = (ROOT / "ops/deploy/research-os-a1-final.service").read_text(encoding="utf-8")
+    rendered_unit = unit_template.replace("@@IMAGE_ID@@", ENGINE_IMAGE_ID)
+    if (
+        IMAGE_ID == ENGINE_IMAGE_ID
+        or "@@IMAGE_ID@@" not in unit_template
+        or ENGINE_IMAGE_ID not in rendered_unit
+        or IMAGE_ID in rendered_unit
+    ):
+        raise PhysicalReleaseError("portable-to-engine image identity mapping self-test failed")
     return {
         "status": "PASS",
         "valid_domains": 2,
@@ -1077,6 +1092,8 @@ def self_test() -> dict[str, object]:
         "runtime_rebuild": False,
         "runtime_release_sha": RUNTIME_RELEASE_SHA,
         "image_id": IMAGE_ID,
+        "engine_image_id": ENGINE_IMAGE_ID,
+        "portable_to_engine_mapping": True,
     }
 
 

@@ -1,0 +1,41 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-p01-r3-engine-image-mapping-20260720",
+  "issued_at": "2026-07-20T23:45:00Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-freeze-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "exact-portable-to-docker-engine-image-identity-binding",
+    "candidates": [
+      {"candidate": "reuse-qualified-F10-local-exact-image-identity", "disposition": "selected"},
+      {"candidate": "rebuild-or-relabel-R17", "disposition": "rejected-release-invalidation"},
+      {"candidate": "mutable-image-tag", "disposition": "rejected-non-exact"},
+      {"candidate": "new-deployment-controller", "disposition": "rejected-unnecessary"}
+    ],
+    "selected_mode": "retain portable carrier identity and render the separately bound qualified Docker engine-local ID",
+    "source_ref": "git:fd0c6e6cb6a8e89a77ff44e1f26e673115d0052e;runtime:0394d6c9e327eceb62f738eca90be3ece015ba79;f10-receipt:e8bc98fca901020f849f372ac531e6bf5a92d2cec178f3ce856692f0857c3b54",
+    "portable_image_id": "sha256:e6db8ab087e18b13ac357a751a2e7318c3abb81a4f2af459c930a630ddc65577",
+    "engine_image_id": "sha256:d1f56e933a8e498ae9e3a1f70ba0e764785a0de44d6f702f7e1945c3621b671f",
+    "code_sha256": "c8fad287986ff563c762f48a6fa5088fe0a6edfcdf544eb41168dc6a82ae483c",
+    "license_spdx": "Proprietary-Internal-Owned",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "F10 receipt identity equality",
+      "rendered bundle uses engine ID and excludes portable ID",
+      "carrier and release identity remain unchanged",
+      "control self-test reports explicit portable-to-engine mapping"
+    ],
+    "canonical_owner": "Agent0-physical-release-control",
+    "rollback": "Revert only P01-R3 mapping files; do not rewrite receipts or mutate R17."
+  },
+  "integrity": {
+    "payload_sha256": "cb058154fa75f7e426b88eaf7ac9c10eb2c06bb9eebb5dc9ca7b119a53042199",
+    "parent_refs": [
+      "git:fd0c6e6cb6a8e89a77ff44e1f26e673115d0052e",
+      "runtime:0394d6c9e327eceb62f738eca90be3ece015ba79",
+      "carrier:sha256:46e12e35ef89463a9f13028732e35c30ce3aaa7b121834f68a9aeccbf727d9f7"
+    ]
+  }
+}

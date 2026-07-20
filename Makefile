@@ -10,7 +10,7 @@ contracts:
 
 physical-release-control:
 	python3 tools/physical_release_control.py self-test
-	python3 tools/physical_release_control.py validate-artifact --artifact inventory/p01-r2-action-transition-control-artifact.json
+	python3 tools/physical_release_control.py validate-artifact --artifact inventory/p01-r3-engine-image-mapping-control-artifact.json
 
 test: contracts
 	python3 -m unittest discover -s tests -p 'test_*.py'
