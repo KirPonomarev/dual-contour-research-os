@@ -1,0 +1,42 @@
+{
+  "schema_id": "PrivateOwnershipLease",
+  "schema_version": "1.0.0",
+  "lease_id": "f12-agent0-final-evidence-990685da-dc6d-40d7-907a-a889dfffbac7",
+  "stage_id": "F12_FINAL_EVIDENCE_AND_INDEPENDENT_AUDIT",
+  "issued_at": "2026-07-20T18:27:40Z",
+  "expires_at": "2026-07-21T18:27:40Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "canonical-owner"
+  },
+  "holder": {
+    "id": "agent-0",
+    "role": "final-evidence-integration-writer"
+  },
+  "branch": "codex/bridge-a0-f12-final-evidence-independent-audit",
+  "worktree": "/private/tmp/dcr-f12-61a2b35",
+  "base_sha": "61a2b35bab91e038cd8148cfe9a364fab294518b",
+  "stage_envelope_file_sha256": "8ae1a22f7796ab475656629d22eeb68d4d3ebc96ecc7f032187fb8790b71d137",
+  "write_set": [
+    "stages/f12-final-evidence-and-independent-audit/stage-envelope.json",
+    "stages/f12-final-evidence-and-independent-audit/ownership-lease.json",
+    "docs/receipts/release/f10-disposable-linux-release-e2e-sanitized.json",
+    "docs/receipts/release/f11-isolated-recovery-campaign-sanitized.json",
+    "docs/receipts/assurance/f12-final-evidence-dag.json",
+    "docs/receipts/integration/f12-final-evidence-and-independent-audit.json"
+  ],
+  "second_writer_allowed": false,
+  "sublease_allowed": false,
+  "revoked": false,
+  "independent_audit": {
+    "owner": "agent-5",
+    "starts_only_after_terminal_receipt_head": true,
+    "separate_read_only_authority_required": true,
+    "git_writes_allowed": false
+  },
+  "cleanup_rule": "After green terminal IntegrationReceipt-head CI, remove the exact F12 branch/worktree only after remote/tree/WIP equality proof; clean legacy artifacts only with exact plan ownership and accepted-or-merged proof.",
+  "integrity": {
+    "profile": "core-json-sha256-v1",
+    "payload_sha256": "5b3074dbdba991e554d7c22ddc2666f6ad69029ac6ebaab96bffa9ff221bd3f5"
+  }
+}
