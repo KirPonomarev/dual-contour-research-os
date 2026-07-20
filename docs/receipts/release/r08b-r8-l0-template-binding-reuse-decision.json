@@ -1,0 +1,52 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-r08b-r8-l0-template-binding-correction-20260720",
+  "issued_at": "2026-07-20T04:36:18Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "decision": "REUSE_EXISTING_RECONCILED_STRICT_OUTPUTS_AND_FROZEN_INTERNAL_L0_BINDINGS",
+  "objective": "Correct the invalid private R08B corridor code binding and recut the same immutable repository/image subject without another provider call or a runtime implementation change.",
+  "evaluation_order": [
+    "internal-adapter",
+    "owned-versioned-package",
+    "pinned-permissive-dependency",
+    "small-audited-vendor-import",
+    "minimal-missing-glue"
+  ],
+  "selected": [
+    "src/research_bridge/l0.py:frozen-template-material-sha256",
+    "tests/test_r03c_corridor_hostile_assurance.py:exact-corridor-code-binding-pattern",
+    "R08C-R2:model-call:992deeb4482a0c766692cef404e2a9751a23312e613d482c5a8b8da88f680bfc:strict-reconciled-worker-output",
+    "R08C-R2:model-call:c63ba6638a719971d569550e3c2daeb8e8d0b30ea8eee496ba494a4c48afd4ce:strict-reconciled-bound-critic-output",
+    "exact-candidate-image:sha256:be49e1ce3606fa0f3d1c96002fb2a9cc35072449af1a3e5f5b2a1c2cc3b1d159",
+    "python-standard-library-only-private-orchestration"
+  ],
+  "bindings": {
+    "repository_evidence_head_sha": "043a7101743b238cdeff9047938ad8ffd4091ed8",
+    "release_subject_sha": "974a5dd932e53b82407a4b71f8af5e5641803564",
+    "release_subject_tree_sha": "fe0066c975c8de7022dc6047158cbf35cad8ccce",
+    "source_content_sha256": "b97f38535f32c29ae4eb2e7ec3d4d41eeb84c7f9813b0998fc73a15a3b7bcdbc",
+    "worker_output_sha256": "0017c1a800a2df44ebc31a2147245954ee339d786d7db840360a982622bf3fb0",
+    "critic_output_sha256": "56744c489099ce3ad2110b6c0309462e439122ec650d1a940c7c20c7f30afe96",
+    "old_invalid_rendered_config_sha256": "9e5a74083edace33df41062a28f3c343702f2120e847dbc53088ba2811f66278",
+    "old_invalid_code_sha256": "310354c52eb4091652b370adde5ee82dacfe283b14215dfedfb49cc208b55502",
+    "required_frozen_template_sha256": "53e75c79888c60b304c0e7e5392a53c0ef508146dfd51c5dcb195a648a54f0c6"
+  },
+  "reuse_constraints": {
+    "provider_network_calls": 0,
+    "provider_call_retries": 0,
+    "new_durable_model_call_identities": 0,
+    "reuse_requires_exact_private_response_hashes": true,
+    "reuse_requires_all_five_prior_calls_reconciled": true,
+    "reuse_requires_new_material_event_and_new_proposal_idempotency": true,
+    "reuse_cannot_claim_old_failed_job_or_bundle_as_accepted": true,
+    "raw_outputs_remain_owner_only": true
+  },
+  "new_dependency": false,
+  "external_code": false,
+  "external_data": false,
+  "rationale": "The accepted image already contains the correct frozen L0 implementation and the R2 provider outputs are strict, role-correct, bound, immutable and reconciled. Only the private rendered corridor profile selected the wrong existing digest; a local exact binding correction and fresh admission/execution are sufficient."
+}

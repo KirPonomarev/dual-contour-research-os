@@ -1,0 +1,93 @@
+{
+  "schema_id": "StageEnvelopeAmendment",
+  "schema_version": "1.0.0",
+  "stage_id": "R08B-R8_L0_TEMPLATE_BINDING_CORRECTION_AND_RECUT",
+  "amendment_id": "R08B_R8_FRESH_RUNTIME_SAME_IDENTITY_COMPLETION_REPLAY_20260720",
+  "plan_id": "DCR_OS_AUTONOMOUS_V2_3_NO_BRAKES_20260719",
+  "plan_version": "2.4.0-fast-working-release",
+  "plan_amendment_id": "FAST_RELEASE_NO_TIMED_WINDOWS_NO_HUMAN_WAIT_20260719",
+  "issued_by": "agent-0",
+  "issued_at": "2026-07-20T04:45:27Z",
+  "authority_head": "804627d3fc8c700bc649fc3b4dc709e3df6b03b1",
+  "parent_stage_envelope_sha256": "63b14cbded09d750a0c06acaf76651b25d97b9e963ecef789f5c8ca397d23fd5",
+  "parent_ownership_lease_sha256": "3ce5f247090403dace789968cf99df515def5ce0c31db0dbc330cfbb9fdd0186",
+  "observed_failure": {
+    "corrected_config_sha256": "d358b47a4c83448f9f43a3bab6d6a45c9b8021c0a547ea055125c1a406d2e10f",
+    "corrected_config_semantic_diff_exact": true,
+    "direct_l0_preflight": "PASS",
+    "old_runtime_restart_with_corrected_context": "FAILED_CLOSED",
+    "reason": "the preserved durable discovery ledger correctly rejects a changed frozen runtime context",
+    "old_runtime_or_database_mutated": false,
+    "old_runtime_preserved": true
+  },
+  "added_private_target": {
+    "runtime_volume": "docker-volume:dcr-r08b-r8-runtime-043a710",
+    "core_container": "docker-container:dcr-r08b-r8-core-043a710",
+    "core_image": "sha256:be49e1ce3606fa0f3d1c96002fb2a9cc35072449af1a3e5f5b2a1c2cc3b1d159",
+    "core_network": "none",
+    "core_user": "10001:10001",
+    "reused_config_volume": "docker-volume:dcr-r08c-config-043a710",
+    "reused_dispatch_volume": "docker-volume:dcr-r08c-dispatch-043a710",
+    "reused_private_response_volume": "docker-volume:dcr-r08c-private-043a710",
+    "reused_source_volume": "docker-volume:dcr-r08c-source-043a710",
+    "live_or_vps": false,
+    "agent_created_disposable": true
+  },
+  "same_identity_completion_replay": {
+    "worker_call_id": "model-call:992deeb4482a0c766692cef404e2a9751a23312e613d482c5a8b8da88f680bfc",
+    "critic_call_id": "model-call:c63ba6638a719971d569550e3c2daeb8e8d0b30ea8eee496ba494a4c48afd4ce",
+    "worker_output_sha256": "0017c1a800a2df44ebc31a2147245954ee339d786d7db840360a982622bf3fb0",
+    "critic_output_sha256": "56744c489099ce3ad2110b6c0309462e439122ec650d1a940c7c20c7f30afe96",
+    "allowed_lifecycle": [
+      "reserve the exact same deterministic call identity using the original role/action/request/expiry bindings",
+      "prove the reconstructed call_id equals the immutable original call_id",
+      "durably begin the exact identity with network none and no provider adapter invocation",
+      "use the shipped replay_completion_only path to commit the pre-existing owner-only record",
+      "reconcile the exact original actual token and cost accounting once on the fresh ledger"
+    ],
+    "new_global_model_call_identities": 0,
+    "provider_network_calls": 0,
+    "provider_adapter_invocations": 0,
+    "provider_retries": 0,
+    "credential_volume_mounts": 0,
+    "payment_or_top_up": false,
+    "network_none_mandatory": true
+  },
+  "expanded_repository_write_set": [
+    "docs/receipts/release/r08b-r8-l0-template-binding-stage-envelope.json",
+    "docs/receipts/release/r08b-r8-l0-template-binding-ownership-lease.json",
+    "docs/receipts/release/r08b-r8-l0-template-binding-reuse-decision.json",
+    "docs/receipts/release/r08b-r8-l0-template-binding-stage-envelope-amendment-1.json",
+    "docs/receipts/release/r08b-r8-l0-template-binding-ownership-lease-amendment-1.json",
+    "docs/receipts/release/r08b-r8-l0-template-binding-correction.json",
+    "docs/receipts/integration/r08b-r8-l0-template-binding-correction.json"
+  ],
+  "expanded_private_write_set": [
+    "/private/tmp/dcr-r08c-043a710/r08c-harness.py",
+    "/private/tmp/dcr-r08b-r8-043a710-private",
+    "docker-volume:dcr-r08c-config-043a710",
+    "docker-volume:dcr-r08c-dispatch-043a710",
+    "docker-volume:dcr-r08c-runtime-043a710",
+    "docker-volume:dcr-r08c-private-043a710",
+    "docker-volume:dcr-r08c-source-043a710",
+    "docker-volume:dcr-r08b-r8-runtime-043a710",
+    "docker-container:dcr-r08c-core-043a710",
+    "docker-container:dcr-r08b-r8-core-043a710",
+    "docker-container-prefix:dcr-r08c-client-043a710"
+  ],
+  "acceptance_additions": [
+    "fresh runtime starts only with corrected config d358b47a...",
+    "new runtime has no imported or edited database bytes",
+    "reconstructed Worker and Critic call IDs exactly equal the two original immutable R2 call IDs",
+    "each completion reports network_calls=0 through replay_completion_only",
+    "all fresh-ledger call states are RECONCILED before proposal submission",
+    "old failed runtime and its claim sequence 35 remain immutable"
+  ],
+  "stop_conditions": [
+    "any reconstructed call ID differs",
+    "any provider adapter or network egress would occur",
+    "any credential volume or value is required",
+    "any old runtime database or failed receipt would be edited",
+    "any target outside the expanded exact disposable write set would be mutated"
+  ]
+}

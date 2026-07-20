@@ -1,0 +1,107 @@
+{
+  "schema_id": "StageEnvelope",
+  "schema_version": "1.0.0",
+  "stage_id": "R08B-R8_L0_TEMPLATE_BINDING_CORRECTION_AND_RECUT",
+  "plan_id": "DCR_OS_AUTONOMOUS_V2_3_NO_BRAKES_20260719",
+  "plan_version": "2.4.0-fast-working-release",
+  "amendment_id": "FAST_RELEASE_NO_TIMED_WINDOWS_NO_HUMAN_WAIT_20260719",
+  "issued_by": "agent-0",
+  "issued_at": "2026-07-20T04:36:18Z",
+  "authority_head": "043a7101743b238cdeff9047938ad8ffd4091ed8",
+  "authority_tree": "5da700b7a31fae9cb4d55c8f5c4826f88da8c5a3",
+  "branch": "codex/bridge-a0-r08b-r8-l0-template-binding-correction",
+  "worktree": "/private/tmp/dcr-r08b-r8-043a710",
+  "delivery_mode": "PR_AUTO_EVIDENCE_ONLY_RECUT_PLUS_TERMINAL_RECEIPT",
+  "objective": "Supersede only the invalid R08B private rendered corridor code binding, prove a fresh exact L0 admission/execution cycle with zero provider egress, and recut the same immutable repository/image subject before R08C resumes.",
+  "executable_blocker": {
+    "r08c_r2_failed_stage_receipt_sha256": "06a123447ffb78788725d7327f1e3971f9287e6d41a167189dff6235f654043b",
+    "r08c_r2_sanitized_manifest_sha256": "3d472f7edbde05844705bdcc34b2618e929633a0a37d4d93414ce08e1ba5c824",
+    "durable_claim_sequence": 35,
+    "checkpoint_events": 0,
+    "complete_events": 0,
+    "failure": "issued JobSpec code_ref used the L0 source-file SHA instead of the frozen template-material SHA",
+    "invalid_code_sha256": "310354c52eb4091652b370adde5ee82dacfe283b14215dfedfb49cc208b55502",
+    "required_code_sha256": "53e75c79888c60b304c0e7e5392a53c0ef508146dfd51c5dcb195a648a54f0c6"
+  },
+  "immutable_subject": {
+    "release_subject_sha": "974a5dd932e53b82407a4b71f8af5e5641803564",
+    "release_subject_tree_sha": "fe0066c975c8de7022dc6047158cbf35cad8ccce",
+    "release_image_id": "sha256:be49e1ce3606fa0f3d1c96002fb2a9cc35072449af1a3e5f5b2a1c2cc3b1d159",
+    "archive_sha256": "f0e4cfb2de4df6ccf0f6809e362eed45806a4dbf54c61216a14853a04940829a",
+    "sbom_sha256": "8df578c6ff66bd3161481f8b1f7d30741bdc86ce3c5fb49c456064a88c88a921",
+    "inventory_sha256": "dd67ac7ff840b859a6f8c0a3b0c38cf2b1cc0eea55f86a9ff7ab8f8cb7bf3208",
+    "release_relevant_paths_manifest_sha256": "67479ff1d799d384f5eb98cfd955e39c403bfb32d509e2c4b82598d57d79b7a1",
+    "evidence_only_path_allowlist_sha256": "7a3ece39a5e2ccaeadc244ed980bc26dce6d5cbf9b84d89743459a0f871f640c",
+    "repository_or_image_bytes_may_change": false
+  },
+  "correction_scope": {
+    "old_rendered_config_sha256": "9e5a74083edace33df41062a28f3c343702f2120e847dbc53088ba2811f66278",
+    "only_semantic_change": "frozen_bindings.admission_runtime.corridor_executor_profile.code_sha256",
+    "new_code_sha256": "53e75c79888c60b304c0e7e5392a53c0ef508146dfd51c5dcb195a648a54f0c6",
+    "unchanged_protocol_ref": "research-bridge:l0:chunk-sha256:v1",
+    "unchanged_source_content_sha256": "b97f38535f32c29ae4eb2e7ec3d4d41eeb84c7f9813b0998fc73a15a3b7bcdbc",
+    "unchanged_runtime_policy_binding_sha256": "89cb6acaae9a96cb1ba84a7d5683dab8a0588afb7fb42c18ecf5caf4b4d7ff16",
+    "unchanged_provider_routing_sha256": "37db8596a8245a6b1ea2bc5bce1495a4e7dadb314876e51397ad11dd194b3dc6",
+    "provider_network_calls": 0,
+    "new_model_call_identities": 0,
+    "live_or_vps_actions": 0,
+    "timed_actions": 0
+  },
+  "agent_0_repository_write_set": [
+    "docs/receipts/release/r08b-r8-l0-template-binding-stage-envelope.json",
+    "docs/receipts/release/r08b-r8-l0-template-binding-ownership-lease.json",
+    "docs/receipts/release/r08b-r8-l0-template-binding-reuse-decision.json",
+    "docs/receipts/release/r08b-r8-l0-template-binding-correction.json",
+    "docs/receipts/integration/r08b-r8-l0-template-binding-correction.json"
+  ],
+  "private_write_set": [
+    "/private/tmp/dcr-r08c-043a710/r08c-harness.py",
+    "/private/tmp/dcr-r08b-r8-043a710-private",
+    "docker-volume:dcr-r08c-config-043a710",
+    "docker-volume:dcr-r08c-dispatch-043a710",
+    "docker-volume:dcr-r08c-runtime-043a710",
+    "docker-volume:dcr-r08c-private-043a710",
+    "docker-volume:dcr-r08c-source-043a710",
+    "docker-container:dcr-r08c-core-043a710",
+    "docker-container-prefix:dcr-r08c-client-043a710"
+  ],
+  "read_set": [
+    "git:043a7101743b238cdeff9047938ad8ffd4091ed8",
+    "git:974a5dd932e53b82407a4b71f8af5e5641803564",
+    "/private/tmp/dcr-r08c-043a710/stage-receipt-r2.json#sha256:06a123447ffb78788725d7327f1e3971f9287e6d41a167189dff6235f654043b",
+    "/private/tmp/dcr-r08c-043a710/sanitized-manifest-r2.json#sha256:3d472f7edbde05844705bdcc34b2618e929633a0a37d4d93414ce08e1ba5c824",
+    "docker-image:sha256:be49e1ce3606fa0f3d1c96002fb2a9cc35072449af1a3e5f5b2a1c2cc3b1d159",
+    "docker-image:sha256:f424945d7ba821d56c20e8f7728c15984ca49df3c478c54fdcaaace945fff139"
+  ],
+  "reuse_decision": {
+    "receipt_ref": "docs/receipts/release/r08b-r8-l0-template-binding-reuse-decision.json",
+    "receipt_sha256": "c207338a0adb5759a79b2c71f384c1443946059034135bdd7e84b9807fa594f2",
+    "new_dependency": false,
+    "external_code": false,
+    "provider_egress": false
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "verify only the corridor code_sha256 changed between old and corrected canonical rendered config",
+    "direct frozen L0 runner preflight passes for the corrected profile",
+    "restart the same exact candidate image with network none and the corrected config",
+    "fresh registered material event plus reused strict Worker/Critic outputs produces a new exact issued authority bundle",
+    "non-zero L0 execution, independent validation, feedback, next event and WAIT_AUTHORITY are durably present",
+    "same-container restart lookup returns identical terminal hashes and adds zero ledger events",
+    "provider-network calls remain exactly four total and all five durable model calls remain RECONCILED",
+    "git diff contains only evidence-only allowlisted paths and public safety scan is zero",
+    "git diff --check",
+    "non-force push and exact remote equality",
+    "current PR-head exact-head CI green before squash merge",
+    "exact merge-head CI green",
+    "terminal IntegrationReceipt exact-head CI green"
+  ],
+  "stop_conditions": [
+    "any repository path outside the declared Agent-0 write set changes",
+    "any runtime image source policy provider route source content or release subject byte changes",
+    "any new provider call identity network call cost token payment top-up credential access or retry is attempted",
+    "any old failed JobSpec bundle database row or historical receipt is rewritten",
+    "any raw provider output credential runtime database D2 D3 private locator or owner-only path enters Git",
+    "any live VPS timed destructive irreversible rebase force push amend or history rewrite action is required"
+  ]
+}

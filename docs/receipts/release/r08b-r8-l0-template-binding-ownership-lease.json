@@ -1,0 +1,72 @@
+{
+  "schema_id": "OwnershipLease",
+  "schema_version": "1.0.0",
+  "lease_id": "r08b-r8-agent0-l0-template-binding-correction-043a710",
+  "stage_id": "R08B-R8_L0_TEMPLATE_BINDING_CORRECTION_AND_RECUT",
+  "plan_id": "DCR_OS_AUTONOMOUS_V2_3_NO_BRAKES_20260719",
+  "plan_version": "2.4.0-fast-working-release",
+  "amendment_id": "FAST_RELEASE_NO_TIMED_WINDOWS_NO_HUMAN_WAIT_20260719",
+  "issued_by": "agent-0",
+  "issued_at": "2026-07-20T04:36:18Z",
+  "expires_at": "2026-07-21T04:36:18Z",
+  "authority_head": "043a7101743b238cdeff9047938ad8ffd4091ed8",
+  "authority_tree": "5da700b7a31fae9cb4d55c8f5c4826f88da8c5a3",
+  "stage_envelope_sha256": "63b14cbded09d750a0c06acaf76651b25d97b9e963ecef789f5c8ca397d23fd5",
+  "reuse_decision_sha256": "c207338a0adb5759a79b2c71f384c1443946059034135bdd7e84b9807fa594f2",
+  "holder": {
+    "id": "agent-0",
+    "role": "integration-and-private-recut-executor",
+    "branch": "codex/bridge-a0-r08b-r8-l0-template-binding-correction",
+    "worktree": "/private/tmp/dcr-r08b-r8-043a710"
+  },
+  "repository_write_set": [
+    "docs/receipts/release/r08b-r8-l0-template-binding-stage-envelope.json",
+    "docs/receipts/release/r08b-r8-l0-template-binding-ownership-lease.json",
+    "docs/receipts/release/r08b-r8-l0-template-binding-reuse-decision.json",
+    "docs/receipts/release/r08b-r8-l0-template-binding-correction.json",
+    "docs/receipts/integration/r08b-r8-l0-template-binding-correction.json"
+  ],
+  "private_write_set": [
+    "/private/tmp/dcr-r08c-043a710/r08c-harness.py",
+    "/private/tmp/dcr-r08b-r8-043a710-private",
+    "docker-volume:dcr-r08c-config-043a710",
+    "docker-volume:dcr-r08c-dispatch-043a710",
+    "docker-volume:dcr-r08c-runtime-043a710",
+    "docker-volume:dcr-r08c-private-043a710",
+    "docker-volume:dcr-r08c-source-043a710",
+    "docker-container:dcr-r08c-core-043a710",
+    "docker-container-prefix:dcr-r08c-client-043a710"
+  ],
+  "forbidden_write_set": [
+    "all repository paths not explicitly listed in repository_write_set",
+    "release subject or image bytes, contracts, ownership, CI, root config, source, policy or provider route",
+    "the immutable R08C base, R1 or R2 authority, receipts, manifests, provider records, responses or failed job bundle",
+    "provider credential volume or credential values",
+    "live, VPS, timed-window, domain canonical, publication, trading or security-execution targets"
+  ],
+  "provider_budget": {
+    "maximum_new_durable_model_call_identities": 0,
+    "maximum_provider_network_calls": 0,
+    "maximum_actual_tokens": 0,
+    "maximum_actual_cost_units": 0,
+    "automatic_retry": false,
+    "payment_or_top_up_allowed": false,
+    "existing_reconciled_output_reuse_only": true
+  },
+  "concurrency": {
+    "mutating_lanes": 1,
+    "second_writer_allowed": false,
+    "sublease_allowed": false,
+    "cross_owner_write_set": false
+  },
+  "git_policy": {
+    "force_push": false,
+    "rebase": false,
+    "amend": false,
+    "history_rewrite": false,
+    "protection_bypass": false,
+    "delivery": "PR_AUTO_THEN_TERMINAL_RECEIPT_HEAD"
+  },
+  "cleanup_rule": "After a green terminal receipt head, remove only this plan-owned branch/worktree and the named disposable target after proving no unique WIP; preserve all immutable failed and accepted private receipts through F12.",
+  "state": "active"
+}
