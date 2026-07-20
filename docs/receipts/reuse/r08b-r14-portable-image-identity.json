@@ -1,0 +1,28 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "receipt_id": "r08b-r14-reuse-verified-archive-config-identity",
+  "recorded_at": "2026-07-20T11:24:00Z",
+  "stage_id": "R08B-R14_PORTABLE_IMAGE_IDENTITY_FIX",
+  "decision": "REUSE_EXISTING_ARCHIVE_CONFIG_DIGEST_AS_PORTABLE_IMAGE_ID",
+  "ordered_evaluation": [
+    "existing safe Docker archive parser and config digest validation",
+    "existing OCI index/manifest content-addressed descriptors",
+    "new package extraction",
+    "pinned dependency",
+    "vendor import",
+    "minimal missing glue"
+  ],
+  "selected": [
+    "recursive digest-verified OCI index to config binding",
+    "classic Docker Image.Id equals config digest path",
+    "containerd local index/manifest ID retained only as diagnostic evidence",
+    "portable promoted image ID always equals verified archive config digest"
+  ],
+  "external_code_added": false,
+  "new_dependency_added": false,
+  "runtime_or_containerfile_change": false,
+  "provider_or_live_action": false,
+  "grants_authority": false,
+  "integrity": {"profile": "core-json-sha256-v1", "payload_sha256": "c17a296ef1043fdc43d0472de87845fee5524685acbcd0200aa5876176d524be"}
+}

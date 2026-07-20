@@ -57,6 +57,28 @@ class ReproducibleCandidateBuildTests(unittest.TestCase):
         self.assertEqual(calls[0][0][:3], ["docker", "buildx", "build"])
         self.assertEqual(calls[1][0][:3], ["docker", "load", "--input"])
 
+    def test_portable_image_id_accepts_classic_or_recursively_bound_oci_id(self) -> None:
+        config = "a" * 64
+        manifest = "b" * 64
+        self.assertEqual(
+            candidate._portable_image_id("sha256:" + config, config, ()),
+            "sha256:" + config,
+        )
+        self.assertEqual(
+            candidate._portable_image_id(
+                "sha256:" + manifest,
+                config,
+                (manifest,),
+            ),
+            "sha256:" + config,
+        )
+        with self.assertRaises(candidate.CandidateBuildError):
+            candidate._portable_image_id(
+                "sha256:" + manifest,
+                config,
+                (),
+            )
+
 
 if __name__ == "__main__":
     unittest.main()
