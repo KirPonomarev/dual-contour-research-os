@@ -1,0 +1,31 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "receipt_id": "f09-r4-reuse-currentness-capability-issuers-and-exact-image-harness",
+  "recorded_at": "2026-07-20T12:55:00Z",
+  "stage_id": "F09-R4_EXACT_SUBJECT_QUALIFICATION_REFRESH",
+  "decision": "REUSE_OWNED_CURRENTNESS_CAPABILITY_AND_IMAGE_ASSURANCE_PIPELINE",
+  "ordered_evaluation": [
+    "existing exact production-image AF_UNIX harness",
+    "existing pure capability proof issuers and currentness validator",
+    "existing E1/E2/E3 aggregate and final-freeze hostile suites",
+    "new package extraction",
+    "pinned dependency",
+    "vendor import",
+    "minimal missing glue"
+  ],
+  "selected": [
+    "classic-Docker exact portable image execution with network none",
+    "reissue each proof on the new subject only after physical PASS",
+    "additive v3 qualification freeze preserving invalidated historical receipts"
+  ],
+  "external_code_added": false,
+  "new_dependency_added": false,
+  "release_relevant_mutation": false,
+  "provider_or_live_action": false,
+  "grants_authority": false,
+  "integrity": {
+    "profile": "core-json-sha256-v1",
+    "payload_sha256": "c9cdc399fbae7cc0ccd3110b133bbc73a5a089896651c59c243f167ded9ed739"
+  }
+}

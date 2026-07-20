@@ -1,0 +1,157 @@
+{
+  "classification": "D1",
+  "contour": "governance",
+  "integrity": {
+    "parent_refs": [
+      "environment:macos-colima-classic-docker-linux-amd64-emulated:2026-07-20",
+      "git:0394d6c9e327eceb62f738eca90be3ece015ba79",
+      "probe:canonical-live-authority-absent",
+      "probe:expired-proof-stale",
+      "probe:fixture-real-provider-claim-laundering-denied",
+      "probe:gpt-wait-provider-preserved",
+      "probe:ipc-role-spoof-denied",
+      "probe:kimi-unpromoted-route-denied",
+      "probe:mixed-head-stale",
+      "probe:parser-hostile-pack",
+      "probe:provider-independence-not-established",
+      "probe:shadow-admission-parked",
+      "probe:writer-spoof-denied",
+      "test:tests.test_s14_provider_independent_hostile_core",
+      "test:tests.test_s18_provider_hostile",
+      "test:tests.test_s19_e1_aggregate_gate"
+    ],
+    "payload_sha256": "f0663b1c0febf011601d454074bc9366face98c86c5e02ce9b685a39072eb11f",
+    "profile_id": "core-json-sha256-v1"
+  },
+  "issued_at": "2026-07-20T12:55:00Z",
+  "issuer": "independent-assurance-issuer",
+  "object_id": "capability-proof:f0663b1c0febf011601d454074bc9366face98c86c5e02ce9b685a39072eb11f",
+  "payload": {
+    "capability_id": "EVOLUTION_KERNEL_V1",
+    "code_sha256": "10a800039355137fa9a12570baee89d9abd8ee217753c56e429d8b22875369a4",
+    "compatibility_dependencies": [
+      "python:>=3.11",
+      "git:required",
+      "make:required"
+    ],
+    "config_sha256": "9d72fddc74dd6a2740d819444cbec3dc0f78f2e373897442aced6453ecc118a5",
+    "critical_dependencies": [
+      "catalog:core:13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+      "catalog:a1:eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1"
+    ],
+    "data_refs": [
+      "fixture:D0-public-synthetic",
+      "proof:s17-sanitized-D1-local-digest-only"
+    ],
+    "environment_compatibility_ref": "environment:macos-colima-classic-docker-linux-amd64-emulated:2026-07-20",
+    "environment_ref": "environment:macos-colima-classic-docker-linux-amd64-emulated:2026-07-20",
+    "evaluator_ref": "assurance:agent0-fail-closed-cross-receipt-validator",
+    "executor_ref": "aggregate:deterministic-e1-evidence-gate",
+    "grants_authority": false,
+    "invalidation_conditions": [
+      "code-hash-drift",
+      "config-hash-drift",
+      "environment-compatibility-drift",
+      "negative-probe-regression",
+      "policy-hash-drift",
+      "proof-expiry",
+      "schema-hash-drift",
+      "subject-head-drift"
+    ],
+    "issuer_independence": {
+      "independent_of_executor": true,
+      "independent_of_subject": true,
+      "issuer_ref": "assurance-role:agent-0-deterministic-validator"
+    },
+    "negative_probe_refs": [
+      "probe:canonical-live-authority-absent",
+      "probe:expired-proof-stale",
+      "probe:fixture-real-provider-claim-laundering-denied",
+      "probe:gpt-wait-provider-preserved",
+      "probe:ipc-role-spoof-denied",
+      "probe:kimi-unpromoted-route-denied",
+      "probe:mixed-head-stale",
+      "probe:parser-hostile-pack",
+      "probe:provider-independence-not-established",
+      "probe:shadow-admission-parked",
+      "probe:writer-spoof-denied"
+    ],
+    "policy_sha256": "fad6c49b3a3692fbd9969736e9f79e6900dfdaf0c675d76ae18f38678ad61152",
+    "proof_basis": [
+      {
+        "capability_ref": "capability-proof:07dfd9437366b272aba8194f9395c96f484cccbb9de3f705fececc672c0962c1",
+        "claim_scope": "FIXTURE_ONLY"
+      },
+      {
+        "capability_ref": "capability-proof:a5fadfff749d1ca23e94d87c7095ef043d5683376be73f7503d1d233e5431916",
+        "claim_scope": "OFFLINE_L0_FIXTURE_ONLY"
+      },
+      {
+        "capability_ref": "capability-proof:35970fc539cd474fff829070b6847b164150280b967b9e8f41877775dd2fbc49",
+        "claim_scope": "OPERATIONAL_SELF_MODEL_OFFLINE"
+      },
+      {
+        "claim_scope": "PROVIDER_INDEPENDENT_FIXTURES",
+        "integration_ref": "integration-s14-provider-independent-hostile-20260718"
+      },
+      {
+        "claim_scope": "AVAILABLE_EVALUATED_REAL_BINDINGS",
+        "integration_ref": "integration-s18-provider-hostile-20260718",
+        "local_proof_sha256": "43fafb2b354813d991da84c1a4757f88b5aee335d4861fa44d2998dcf534a399"
+      },
+      {
+        "ai_off": "CORE_OPERATIONAL",
+        "authority_terminal": "WAIT_AUTHORITY",
+        "result": "green-for-frozen-shadow-scope"
+      },
+      {
+        "claim_scope": "F09_EXACT_RELEASE_CURRENTNESS_REISSUE",
+        "r08c_sanitized_manifest_sha256": "ced6ad7d18008cbe640100ee4ea32122c646062f06c396672d93e4dd32a9d16a"
+      },
+      {
+        "assurance_ref": "docs/receipts/assurance/f09-r17-exact-image-functional.json",
+        "assurance_sha256": "499595353e34017887d20e36f399fd0e5eef640662766f0fcdcdb929962ac410",
+        "claim_scope": "EXACT_R17_RELEASE_IMAGE_HOSTILE_REVALIDATION",
+        "image_id": "sha256:e6db8ab087e18b13ac357a751a2e7318c3abb81a4f2af459c930a630ddc65577",
+        "private_proof_sha256": "4cdd57b2d802e707304c467156767a5c745b34fe99c52ac27e33ed989243f65e",
+        "provider_calls": 0
+      }
+    ],
+    "receipt_id": "capability-proof:f09-e1-evolution-kernel:0394d6c",
+    "schema_sha256": "d262099ef5993d9064717ac03ca58eb5d1c393cf69161746b96017a67470e379",
+    "scope": {
+      "autonomous_a1_sandbox_admission": true,
+      "autonomous_bounded_testing": true,
+      "autonomous_canonical_mutation": false,
+      "autonomous_idea_generation": true,
+      "autonomous_learning_memory": true,
+      "data_scope": "D0_PUBLIC_SYNTHETIC_AND_SANITIZED_D1_SHADOW_ONLY",
+      "deployment": false,
+      "domain_application": "SHADOW_UNAPPLIED",
+      "environments": [
+        "linux-ci",
+        "macos-development"
+      ],
+      "human_required_for_promotion": true,
+      "independence": "NOT_ESTABLISHED",
+      "live_security_execution": false,
+      "live_trading": false,
+      "mandatory_gpt": "WAIT_PROVIDER",
+      "model_claims": "FIXTURE_AND_REAL_PROVIDER_EVIDENCE_SEPARATED",
+      "proof_state": "EVOLUTION_KERNEL_V1_SHADOW_PASS_FOR_FROZEN_SCOPE",
+      "real_provider": "SCOPED_AVAILABLE_EVALUATED_BINDINGS_ONLY",
+      "temporary_kimi": "UNPROMOTED_NOT_ROUTABLE"
+    },
+    "status": "PASS_FOR_FROZEN_SCOPE",
+    "subject_ref": "git:0394d6c9e327eceb62f738eca90be3ece015ba79",
+    "test_refs": [
+      "test:tests.test_s19_e1_aggregate_gate",
+      "test:tests.test_s14_provider_independent_hostile_core",
+      "test:tests.test_s18_provider_hostile"
+    ],
+    "valid_from": "2026-07-20T12:55:00Z",
+    "valid_until": "2026-08-19T12:55:00Z"
+  },
+  "schema_id": "CapabilityProofReceipt",
+  "schema_version": "1.0.0"
+}

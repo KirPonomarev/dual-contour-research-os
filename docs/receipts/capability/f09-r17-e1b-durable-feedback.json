@@ -1,0 +1,153 @@
+{
+  "classification": "D1",
+  "contour": "governance",
+  "integrity": {
+    "parent_refs": [
+      "environment:macos-colima-classic-docker-linux-amd64-emulated:2026-07-20",
+      "git:0394d6c9e327eceb62f738eca90be3ece015ba79",
+      "probe:canonical-live-authority-absent",
+      "probe:expired-proof-stale",
+      "probe:feedback-fault-rollback",
+      "probe:feedback-replay-zero-write",
+      "probe:ipc-role-spoof-denied",
+      "probe:mixed-head-stale",
+      "probe:parser-hostile-pack",
+      "probe:shadow-admission-parked",
+      "probe:validator-known-invalid-denied",
+      "probe:writer-spoof-denied",
+      "test:tests.test_a1_authority_corridor",
+      "test:tests.test_s07_l0_independent_validation",
+      "test:tests.test_s08_atomic_feedback",
+      "test:tests.test_s09_feedback_replay_capacity"
+    ],
+    "payload_sha256": "2ab58c882b4ffe9a87b92de32681452cae2cf61b5e810016b8b0728d3e3c4240",
+    "profile_id": "core-json-sha256-v1"
+  },
+  "issued_at": "2026-07-20T12:55:00Z",
+  "issuer": "independent-assurance-issuer",
+  "object_id": "capability-proof:2ab58c882b4ffe9a87b92de32681452cae2cf61b5e810016b8b0728d3e3c4240",
+  "payload": {
+    "capability_id": "A1_DURABLE_FEEDBACK",
+    "code_sha256": "89fda8c02b0e22c7a9d2a7588bad298ad204b24ddfed1780af9e827f64d998c4",
+    "compatibility_dependencies": [
+      "python:>=3.11",
+      "git:required",
+      "make:required",
+      "sqlite:WAL-single-writer"
+    ],
+    "config_sha256": "31233c747a7fc057ab48df47abe9845dc7edece5498a16c68b82e6fc96d3461d",
+    "critical_dependencies": [
+      "catalog:core:13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+      "catalog:a1:eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+      "integration:s05-s06-s07-s08-s09"
+    ],
+    "data_refs": [
+      "fixture:public-synthetic-L0-inputs",
+      "fixture:public-synthetic-domain-writer"
+    ],
+    "environment_compatibility_ref": "environment:macos-colima-classic-docker-linux-amd64-emulated:2026-07-20",
+    "environment_ref": "environment:macos-colima-classic-docker-linux-amd64-emulated:2026-07-20",
+    "evaluator_ref": "validator:independent-byte-level-l0:6377a7d60c0246d38d2fefe5a3a685409a3434342e41d0d88262ece8d326fa51",
+    "executor_ref": "executor:deterministic-offline-l0:53e75c79888c60b304c0e7e5392a53c0ef508146dfd51c5dcb195a648a54f0c6",
+    "grants_authority": false,
+    "invalidation_conditions": [
+      "code-hash-drift",
+      "config-hash-drift",
+      "environment-compatibility-drift",
+      "negative-probe-regression",
+      "policy-hash-drift",
+      "proof-expiry",
+      "schema-hash-drift",
+      "subject-head-drift"
+    ],
+    "issuer_independence": {
+      "independent_of_executor": true,
+      "independent_of_subject": true,
+      "issuer_ref": "assurance-role:agent-5"
+    },
+    "negative_probe_refs": [
+      "probe:canonical-live-authority-absent",
+      "probe:expired-proof-stale",
+      "probe:feedback-fault-rollback",
+      "probe:feedback-replay-zero-write",
+      "probe:ipc-role-spoof-denied",
+      "probe:mixed-head-stale",
+      "probe:parser-hostile-pack",
+      "probe:shadow-admission-parked",
+      "probe:validator-known-invalid-denied",
+      "probe:writer-spoof-denied"
+    ],
+    "policy_sha256": "00a24ffe76a6f48aa5a5bc523ed271f8f0c2da536c64e1aa4e482a235f619f8d",
+    "proof_basis": [
+      {
+        "ci_run": 29648199423,
+        "integration_ref": "integration:integration-s05-db-v2-global-order-20260718"
+      },
+      {
+        "ci_run": 29648881613,
+        "integration_ref": "integration:integration-s06-authority-corridor-20260718"
+      },
+      {
+        "ci_run": 29649326475,
+        "integration_ref": "integration:integration-s07-l0-validation-20260718"
+      },
+      {
+        "ci_run": 29649957229,
+        "integration_ref": "integration:integration-s08-atomic-feedback-20260718"
+      },
+      {
+        "ci_run": 29650400176,
+        "integration_ref": "integration:integration-s09-replay-capacity-20260718"
+      },
+      {
+        "full_suite": {
+          "core": 541,
+          "stage0b": 25
+        },
+        "result": "green"
+      },
+      {
+        "claim_scope": "R08B_R8_REAL_L0_VALIDATION_FEEDBACK_PLUS_R08C_RESTART",
+        "execution_receipt_sha256": "2e2755194630a5f618a52def392c89818bf2c7f60b824a1e9e26d89b70aa93fa",
+        "feedback_event_sha256": "903bfc4948bc3ad1484eff52cfea5a463bc11a30a774112b6bb5930180661c61",
+        "validation_receipt_sha256": "4d29aaa1854556f2270b56207c4f83e318938d98a25405751b07662d5187bf05"
+      },
+      {
+        "assurance_ref": "docs/receipts/assurance/f09-r17-exact-image-functional.json",
+        "assurance_sha256": "499595353e34017887d20e36f399fd0e5eef640662766f0fcdcdb929962ac410",
+        "claim_scope": "EXACT_R17_RELEASE_IMAGE_HOSTILE_REVALIDATION",
+        "image_id": "sha256:e6db8ab087e18b13ac357a751a2e7318c3abb81a4f2af459c930a630ddc65577",
+        "private_proof_sha256": "4cdd57b2d802e707304c467156767a5c745b34fe99c52ac27e33ed989243f65e",
+        "provider_calls": 0
+      }
+    ],
+    "receipt_id": "capability-proof:f09-e1b-durable-feedback:0394d6c",
+    "schema_sha256": "d262099ef5993d9064717ac03ca58eb5d1c393cf69161746b96017a67470e379",
+    "scope": {
+      "canonical_mutation": "DENIED",
+      "data_scope": "D0_PUBLIC_SYNTHETIC_ONLY",
+      "domain_application": "SHADOW_UNAPPLIED",
+      "environments": [
+        "linux-ci",
+        "macos-development"
+      ],
+      "live_security_execution": "DENIED",
+      "live_trading": "DENIED",
+      "model_route": "NO_REAL_PROVIDER_REQUIRED",
+      "proof_state": "DURABLE_FEEDBACK_PASS_WITH_OFFLINE_L0_FIXTURE",
+      "real_provider": "UNPROVEN"
+    },
+    "status": "PASS_FOR_FROZEN_SCOPE",
+    "subject_ref": "git:0394d6c9e327eceb62f738eca90be3ece015ba79",
+    "test_refs": [
+      "test:tests.test_a1_authority_corridor",
+      "test:tests.test_s07_l0_independent_validation",
+      "test:tests.test_s08_atomic_feedback",
+      "test:tests.test_s09_feedback_replay_capacity"
+    ],
+    "valid_from": "2026-07-20T12:55:00Z",
+    "valid_until": "2026-08-19T12:55:00Z"
+  },
+  "schema_id": "CapabilityProofReceipt",
+  "schema_version": "1.0.0"
+}
