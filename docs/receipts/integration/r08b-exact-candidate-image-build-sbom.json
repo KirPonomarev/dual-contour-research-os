@@ -1,8 +1,8 @@
 {
   "schema_id": "IntegrationReceipt",
   "schema_version": "1.0.0",
-  "object_id": "integration-r08b-exact-candidate-image-build-sbom-20260720",
-  "issued_at": "2026-07-20T01:42:56Z",
+  "object_id": "integration-r08b-exact-candidate-image-build-sbom-correction-1-20260720",
+  "issued_at": "2026-07-20T01:47:20Z",
   "issuer": {
     "id": "agent-0",
     "authority_class": "integration-authority"
@@ -15,7 +15,22 @@
     "plan_version": "2.4.0-fast-working-release",
     "amendment_id": "FAST_RELEASE_NO_TIMED_WINDOWS_NO_HUMAN_WAIT_20260719",
     "integration_agent_id": "agent-0",
+    "base_sha": "7e6c4cb56da3aad70ccc403cac04f47e8da9f492",
+    "integration_commit_sha": "ece079b6b64c96b064940616d2def4ce65dc37a4",
+    "head_sha": "ece079b6b64c96b064940616d2def4ce65dc37a4",
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29711292068",
     "delivery_mode": "PR_AUTO_PARENT_AND_EVIDENCE_PLUS_TERMINAL_RECEIPT_HEAD",
+    "failed_candidate_correction": {
+      "failed_receipt_commit_sha": "b148eb6bc0c14a1e4f631b4d54960083d3bbb4ac",
+      "failed_receipt_file_sha256": "83f7a195c5498e0c2166a64012c0c9938680744e055dfaf0e22dd3d953364c68",
+      "failed_receipt_payload_sha256": "aa37e242e7c2dcf44f6f66ff44b6c4183fbbc08a1de1ef0b9e23254aadd481a3",
+      "failed_exact_head_ci_run": 29711393666,
+      "failure_class": "INTEGRATION_RECEIPT_LEGACY_SCHEMA_FIELDS_MISSING",
+      "historical_commit_rewritten": false,
+      "runtime_evidence_replayed": false,
+      "provider_calls_replayed": false,
+      "superseded_for_acceptance": true
+    },
     "authority": {
       "stage_envelope_ref": "stages/r08b-exact-candidate-image-build-sbom/stage-envelope-amendment-v2.4.json",
       "ownership_lease_ref": "stages/r08b-exact-candidate-image-build-sbom/ownership-lease-amendment-v2.4.json",
@@ -107,6 +122,14 @@
       "unresolved_release_high_findings": 0,
       "broader_or_live_reuse_requires_new_scan": true
     },
+    "audit_results": {
+      "contract_gate": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "receipt_schema_correction_only": true,
+      "release_subject_mutation": false,
+      "candidate_evidence_reused_without_invalidation": true
+    },
     "acceptance": {
       "status": "ACCEPTED_R08B",
       "pre_cut_gate_green": true,
@@ -134,7 +157,7 @@
     "known_next_gate": "Run R08C exact-image functional E2E as LOCAL_ONLY against the immutable R08B release subject after this receipt head passes exact-head CI."
   },
   "integrity": {
-    "payload_sha256": "aa37e242e7c2dcf44f6f66ff44b6c4183fbbc08a1de1ef0b9e23254aadd481a3",
+    "payload_sha256": "d52f4f91d8cff1ec5681a0638c3b97ebc74a0b1d724d1cc79e53fb7dd7f509a7",
     "parent_refs": [
       "git:974a5dd932e53b82407a4b71f8af5e5641803564",
       "ci:29710733971",
@@ -144,6 +167,8 @@
       "ci:29711267814",
       "git:ece079b6b64c96b064940616d2def4ce65dc37a4",
       "ci:29711292068",
+      "git:b148eb6bc0c14a1e4f631b4d54960083d3bbb4ac",
+      "ci:29711393666",
       "release:r08b-candidate-cut-974a5dd-20260720",
       "private-build-evidence:sha256:5ec6aed6c10a6a61e2f36f0a442930db720d7b7be23b8a2fd549528261ae8ae4"
     ]
