@@ -1,7 +1,7 @@
 {
   "schema_id": "ConnectedWorkerRunbookInputs",
   "schema_version": "1.0.0",
-  "input_id": "r04c-connected-worker-v1",
+  "input_id": "r18-connected-advisor-activation-v1",
   "public_classification": "D1_INTERNAL_SANITIZED",
   "worker_identity": {"uid": 10004, "gid": 10001, "principal_role": "connected_worker"},
   "paths": {
@@ -27,17 +27,26 @@
     "add_frozen_binding": {
       "model_runtime": {
         "role_registry_sha256": "4faf6765f48a952e4d35540d92797330517938b34b8d2f12cde791e761a32eac",
-        "routing_profile_sha256": "37db8596a8245a6b1ea2bc5bce1495a4e7dadb314876e51397ad11dd194b3dc6",
+        "routing_profile_sha256": "0539b1c2b3fd2e5b5f6e21769afe99d36a197f9399db100e5f0c5885e5da3c67",
         "role_evaluation_sha256": "111a7ac1dc954466b19d5e408debeeefcf65c76b5b025a743a2433be910c1e75",
         "worker_ipc_extension_sha256": "03d91f027bb6975c55d84acaef188546bcd24af9944a72f4ff9314296399d07a",
-        "binding_revision": "r04c-connected-worker-v1",
+        "binding_revision": "r18-connected-advisor-v1",
         "budget_policy_ref": "budget-policy:sha256:b8f42db7270c698b1d9300a4a2fc419df4dfc46792c60b84621f11516f49a285",
         "budget_scope_ref": "budget-scope:sha256:fc5f2e35c1eb3ccb87aecd6afe28a02347bf9131f00b8e4642c394e3927b2770",
         "max_active_calls": 4,
         "max_reserved_tokens": 20000,
         "max_reserved_cost_units": 40,
-        "available_bindings": [],
-        "role_binding_overrides": {}
+        "available_bindings": [
+          "deepseek-v4-flash",
+          "deepseek-v4-pro",
+          "glm-5.2-max",
+          "claude-fable-5",
+          "gpt-5.6-sol-xhigh",
+          "gpt-5.6-sol-max"
+        ],
+        "role_binding_overrides": {
+          "CRITIC_PRIMARY": "claude-fable-5"
+        }
       }
     },
     "rendered_config_classification": "PRIVATE_RUNTIME_INPUT",
@@ -53,7 +62,7 @@
     "name": "research-os-provider-egress",
     "attached_processes": ["connected-worker"],
     "offline_l0_attached": false,
-    "application_endpoint_allowlist_bound_to": "provenance/model-provider-connected-shadow-v2.json"
+    "application_endpoint_allowlist_bound_to": "provenance/model-provider-connected-shadow-v4.json"
   },
   "storage": {
     "external_volume_encryption_required": true,

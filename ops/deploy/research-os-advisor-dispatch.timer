@@ -1,0 +1,13 @@
+[Unit]
+Description=Dual-Contour Research OS advisor dispatch timer
+Documentation=https://github.com/KirPonomarev/dual-contour-research-os
+ConditionPathExists=!%h/.config/research-os/AI_OFF
+
+[Timer]
+OnCalendar=*:0/5
+Persistent=false
+RandomizedDelaySec=30
+Unit=research-os-advisor-dispatch.service
+
+[Install]
+WantedBy=timers.target

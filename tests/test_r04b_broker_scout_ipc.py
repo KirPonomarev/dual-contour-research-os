@@ -136,6 +136,7 @@ class BrokerScoutIPCHandshakeTests(unittest.TestCase):
                 if available is None
                 else available
             ),
+            "role_binding_overrides": {},
         }
         return config
 
