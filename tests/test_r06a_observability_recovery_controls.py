@@ -35,9 +35,19 @@ assert SPEC is not None and SPEC.loader is not None
 runtime_monitor = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(runtime_monitor)
 
+CYCLE_SPEC = importlib.util.spec_from_file_location(
+    "runtime_monitor_cycle",
+    ROOT / "ops" / "organism" / "runtime_monitor_cycle.py",
+)
+assert CYCLE_SPEC is not None and CYCLE_SPEC.loader is not None
+runtime_monitor_cycle = importlib.util.module_from_spec(CYCLE_SPEC)
+CYCLE_SPEC.loader.exec_module(runtime_monitor_cycle)
+
 MonitorError = runtime_monitor.MonitorError
 MonitorJournal = runtime_monitor.MonitorJournal
 validate_policy = runtime_monitor.validate_policy
+run_cycle = runtime_monitor_cycle.run_cycle
+select_pulse_policy = runtime_monitor_cycle.select_pulse_policy
 
 
 def _load(path: Path) -> dict[str, object]:
@@ -241,6 +251,108 @@ class ObservabilityRecoveryControlTests(unittest.TestCase):
         self.assertNotIn("PROVIDER_UNAVAILABLE", codes)
         self.assertNotIn("AI_OFF_PROVIDER_STATE_MISMATCH", codes)
 
+    def test_terminal_age_policy_is_selected_only_for_non_runnable_terminal_state(self) -> None:
+        active = _load(ROOT / "ops" / "organism" / "pulse-policy.json")
+        terminal = _load(ROOT / "ops" / "organism" / "terminal-pulse-policy.json")
+        parked = _state(
+            "PARKED",
+            queue={
+                "runnable": 0,
+                "waiting_authority": 0,
+                "parked": 1,
+                "oldest_event_at": STATE_AT,
+            },
+        )
+        self.assertEqual(
+            select_pulse_policy(parked, active, terminal)["policy_id"],
+            "a1-safe-terminal-pulse-policy",
+        )
+
+        active_work = _state(
+            "GENERATING",
+            queue={
+                "runnable": 1,
+                "waiting_authority": 0,
+                "parked": 0,
+                "oldest_event_at": STATE_AT,
+            },
+        )
+        self.assertEqual(
+            select_pulse_policy(active_work, active, terminal)["policy_id"],
+            "a1-read-only-pulse-policy",
+        )
+
+        parked_with_runnable_work = _state(
+            "PARKED",
+            queue={
+                "runnable": 1,
+                "waiting_authority": 0,
+                "parked": 1,
+                "oldest_event_at": STATE_AT,
+            },
+        )
+        self.assertEqual(
+            select_pulse_policy(parked_with_runnable_work, active, terminal)["policy_id"],
+            "a1-read-only-pulse-policy",
+        )
+
+        later = "2026-01-02T07:04:06Z"
+        parked_pulse = sample_pulse(
+            parked,
+            _manifest(),
+            [_capability()],
+            select_pulse_policy(parked, active, terminal),
+            sampled_at=later,
+        )
+        active_pulse = sample_pulse(
+            active_work,
+            _manifest(),
+            [_capability()],
+            select_pulse_policy(active_work, active, terminal),
+            sampled_at=later,
+        )
+        self.assertEqual(parked_pulse["payload"]["traffic_light"], "YELLOW")
+        self.assertEqual(active_pulse["payload"]["traffic_light"], "RED")
+
+    def test_fresh_cycle_reads_a_consistent_backup_and_writes_only_monitor_journal(self) -> None:
+        from research_bridge.ledger import JobLedger
+
+        ledger_path = Path(self.temporary.name) / "runtime" / "bridge-job-ledger.sqlite3"
+        ledger_path.parent.mkdir(mode=0o700)
+        identity_path = Path(self.temporary.name) / "runtime-identity.json"
+        identity_path.write_text(json.dumps(_identity()), encoding="utf-8")
+        os.chmod(identity_path, 0o600)
+        observed = datetime.fromisoformat(SAMPLE_AT[:-1] + "+00:00")
+
+        with JobLedger(ledger_path) as live:
+            before = live.event_count()
+            record = run_cycle(
+                ledger_path=ledger_path,
+                repository_root=ROOT,
+                manifest_source_path=ROOT / "ops" / "organism" / "component-declarations.json",
+                deployment_projection_path=ROOT / "ops" / "organism" / "deployment-projection.json",
+                active_pulse_policy_path=ROOT / "ops" / "organism" / "pulse-policy.json",
+                terminal_pulse_policy_path=ROOT / "ops" / "organism" / "terminal-pulse-policy.json",
+                monitor_policy_path=ROOT / "ops" / "organism" / "runtime-monitor-policy.json",
+                expected_identity_path=identity_path,
+                journal_root=self.root,
+                now=observed,
+                ai_off=False,
+                provider_state="AVAILABLE",
+                wip_count=1,
+                active_core_writers=1,
+                second_writer_attempts=0,
+            )
+            self.assertEqual(live.event_count(), before)
+
+        codes = {item["code"] for item in record["payload"]["alerts"]}
+        self.assertNotIn("RESEARCH_STATE_CHANGED_DURING_SAMPLE", codes)
+        self.assertNotIn("CLOCK_DRIFT", codes)
+        self.assertNotIn("HEARTBEAT_STALE", codes)
+        self.assertEqual(record["payload"]["monitor_research_state_writes"], 0)
+        self.assertFalse(record["payload"]["grants_authority"])
+        self.assertEqual(len(MonitorJournal(self.root, _monitor_policy(), _identity()).records()), 1)
+
     def test_reused_sample_or_tampered_chain_fails_closed(self) -> None:
         journal = self._journal()
         observed = datetime.fromisoformat(SAMPLE_AT[:-1] + "+00:00")
@@ -284,7 +396,10 @@ class ObservabilityRecoveryControlTests(unittest.TestCase):
         self.assertIn("OnUnitActiveSec=60s", monitor_timer)
         self.assertIn("Persistent=true", monitor_timer)
         self.assertIn("WantedBy=timers.target", monitor_timer)
-        self.assertIn("monitor-journal", monitor_service)
+        self.assertIn("RESEARCH_OS_MONITOR_JOURNAL_VOLUME", monitor_service)
+        self.assertIn("runtime_monitor_cycle.py", monitor_service)
+        self.assertIn("target=/var/lib/research-os,readonly", monitor_service)
+        self.assertIn("--network=none", monitor_service)
         self.assertNotIn("researchd.sock", monitor_service)
         self.assertNotIn("bridge_job_ledger", monitor_service)
         self.assertIn("/release_backup_restore.py backup ", backup_service)
