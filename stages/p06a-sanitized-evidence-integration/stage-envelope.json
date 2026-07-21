@@ -1,0 +1,84 @@
+{
+  "stage_id": "p06a-sanitized-evidence-integration",
+  "agent_id": "agent-0",
+  "objective": "Deliver only sanitized, hash-bound physical-release evidence for accepted P03-P05 outcomes and bind the final evidence head without changing the R17 runtime or VPS state.",
+  "executable_blocker": "P03-P05 private operational receipts are accepted, but their sanitized ancestry graph and P06A IntegrationReceipt have not yet been delivered to protected main.",
+  "base_sha": "37d028c6a9c1e5493655c54bc668ff73c673241b",
+  "base_tree": "b3f9d509ced84977404da622d06cbe3c53d4d5a1",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a0-p06a-physical-evidence",
+  "worktree": "/private/tmp/dcr-p06a-37d028c",
+  "read_set": [
+    "AGENTS.md",
+    "docs/DEVELOPMENT_AGENT_CONTRACT.md",
+    "contracts/v1/IntegrationReceipt.schema.json",
+    "docs/receipts/release/r17-candidate-cut.json",
+    "docs/receipts/release/r17-deployment-operator-rollback-packet.json",
+    "private:p03-terminal-receipt",
+    "private:p04-terminal-receipt",
+    "private:p05-terminal-receipt",
+    "external:MASTER_PLAN_AUTONOMOUS.md"
+  ],
+  "write_set": [
+    "docs/receipts/release/p06a-physical-release-sanitized.json",
+    "docs/receipts/integration/p06a-sanitized-evidence-integration.json",
+    "stages/p06a-sanitized-evidence-integration/stage-envelope.json",
+    "stages/p06a-sanitized-evidence-integration/ownership-lease.json"
+  ],
+  "boundary_contract": {
+    "project_fingerprint": "b371429cb7c01fd6c5dbd430510a264684dab906188d706b7479446c1bd8f154",
+    "mission_id": "DCR_OS_PHYSICAL_RELEASE_20260721",
+    "runtime_release_sha": "0394d6c9e327eceb62f738eca90be3ece015ba79",
+    "engine_image_id": "sha256:d1f56e933a8e498ae9e3a1f70ba0e764785a0de44d6f702f7e1945c3621b671f",
+    "portable_image_id": "sha256:e6db8ab087e18b13ac357a751a2e7318c3abb81a4f2af459c930a630ddc65577",
+    "carrier_sha256": "46e12e35ef89463a9f13028732e35c30ce3aaa7b121834f68a9aeccbf727d9f7",
+    "maintenance_control_head": "37d028c6a9c1e5493655c54bc668ff73c673241b",
+    "public_listener_count": 0,
+    "runtime_mutation": false,
+    "physical_mutation": false,
+    "provider_calls": 0
+  },
+  "forbidden_scope": [
+    "source-runtime-contract-root-config-ci-lockfile-migration-or-domain-repository-edit",
+    "raw-host-locator-secret-credential-private-D2-D3-runtime-database-or-checkpoint-in-git",
+    "runtime-image-or-carrier-rebuild",
+    "VPS-service-volume-network-or-domain-state-mutation",
+    "provider-call-canonical-write-trading-order-autonomous-security-action-or-authority-escalation",
+    "force-push-ruleset-bypass-or-direct-main-push",
+    "PhysicalReleaseCloseout-or-DONE-transition"
+  ],
+  "dependency_hashes": {
+    "development_agent_contract": "b4ca3f735cbbc0359ca20e47681f38d47527969f4b4f3fa2eb49bf694fc856aa",
+    "agent_contract": "1779a4fc01c2c5e607c57330e435fa4cdd5454c3eb82e517a7ed519437adcf4f",
+    "r17_candidate_cut": "88fc89b497e8be4e1b577b593f7020583553d950f7ab32a8daf15d1d9e1e21b9",
+    "r17_deployment_packet": "52ab1772d0c9e3a1b8951d768f039f87b90e3a483d742db7ca0d32f743085b2d",
+    "p03_terminal_receipt": "b5cef3c7ee4b9f33230d8aa8caa48f78e252ec9b428a1fb363b78c709b604eca",
+    "p04_terminal_receipt": "4675b458c2a8815c2a850782ae251278aee03657a06fec89c6e4b25b88ad2e95",
+    "p05_terminal_receipt": "0abae15835959d707631bd4966a5081be6c0aca088f5ec0975a477285cbc676c",
+    "external_tracker": "71a85f62cbaf7175c391b0a3ba8666572745a115d951006746bb675d4ca9b8f3",
+    "ruleset_id": "19274076"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "python3 -m unittest tests.test_integration_receipts",
+    "git diff --check",
+    "validate every changed JSON document and payload hash",
+    "exact write-set and secret/private-data scan",
+    "exact PR-head contracts-and-tests CI",
+    "protected squash merge",
+    "exact merge-head contracts-and-tests CI",
+    "receipt-only protected PR and exact final target CI"
+  ],
+  "risk_class": "medium-sanitized-release-evidence",
+  "stop_conditions": [
+    "base-contract-runtime-image-carrier-or-private-receipt-hash-mismatch",
+    "public evidence requires a raw host locator secret private payload or domain scientific truth",
+    "source-runtime-or-physical mutation is required",
+    "ruleset-required CI is not exact-head PASS",
+    "write-set collision or dirty worktree"
+  ],
+  "expected_receipt": "docs/receipts/integration/p06a-sanitized-evidence-integration.json",
+  "rollback": "Revert only unfinished sanitized evidence delivery; preserve all accepted private physical receipts and deployed R17 state.",
+  "commit_authority": "agent-0-only",
+  "push_authority": "agent-0-only"
+}

@@ -1,0 +1,183 @@
+{
+  "schema_id": "P06APhysicalReleaseSanitizedReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "p06a-physical-release-sanitized-8c69d2259e7504ee9b32485c6d31942f",
+  "issued_at": "2026-07-21T07:40:53Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "final-evidence-integration-authority"
+  },
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "plan_id": "DCR_OS_AUTONOMOUS_V2_3_NO_BRAKES_20260719",
+    "plan_version": "2.5.2-physical-release-final",
+    "mission_id": "DCR_OS_PHYSICAL_RELEASE_20260721",
+    "stage_id": "P06A_SANITIZED_EVIDENCE_INTEGRATION",
+    "status": "P03_P04_P05_ACCEPTED_PENDING_PROTECTED_P06A_DELIVERY",
+    "project_fingerprints": {
+      "bridge": "b371429cb7c01fd6c5dbd430510a264684dab906188d706b7479446c1bd8f154",
+      "market": "c0163d56601ed440f972a81818c4ac93aab2241816f92b340f2ca53d5a25ef91",
+      "security": "5cc00261c78745d05abfb0aebce5e1f86fbefc2960a9c4284662b1284b0fc08f"
+    },
+    "identity_separation": {
+      "mixed_receipts_or_approvals": false,
+      "bridge_owns_transport_and_contracts_only": true,
+      "domain_scientific_truth_remains_domain_owned": true,
+      "raw_host_locator_public": false
+    },
+    "release_identity": {
+      "runtime_release_sha": "0394d6c9e327eceb62f738eca90be3ece015ba79",
+      "runtime_tree_sha": "636fda24cbb2da567fb23a4d44fa865ae74ac4bc",
+      "engine_image_id": "sha256:d1f56e933a8e498ae9e3a1f70ba0e764785a0de44d6f702f7e1945c3621b671f",
+      "portable_image_id": "sha256:e6db8ab087e18b13ac357a751a2e7318c3abb81a4f2af459c930a630ddc65577",
+      "carrier_sha256": "46e12e35ef89463a9f13028732e35c30ce3aaa7b121834f68a9aeccbf727d9f7",
+      "config_sha256": "8274e12a54adbb4edd1efc1632d3a41a76a75b82d524a1952f1c5086861865d0",
+      "runtime_policy_sha256": "665bfb70a82d3aa5988d45fa299fb14d2b28926e6267a15ae440e3c03fbb0cd9",
+      "maintenance_control_head": "37d028c6a9c1e5493655c54bc668ff73c673241b",
+      "maintenance_control_tree": "b3f9d509ced84977404da622d06cbe3c53d4d5a1",
+      "maintenance_control_ci_run": 29810904304,
+      "maintenance_control_ci_conclusion": "success",
+      "runtime_rebuilt": false,
+      "image_rebuilt": false,
+      "carrier_rebuilt": false
+    },
+    "private_receipt_digests": {
+      "p03_terminal_receipt_sha256": "b5cef3c7ee4b9f33230d8aa8caa48f78e252ec9b428a1fb363b78c709b604eca",
+      "p04_terminal_receipt_sha256": "4675b458c2a8815c2a850782ae251278aee03657a06fec89c6e4b25b88ad2e95",
+      "p05_terminal_receipt_sha256": "0abae15835959d707631bd4966a5081be6c0aca088f5ec0975a477285cbc676c",
+      "p05_terminal_payload_sha256": "a83f61a322a72469e02995bb40b7bd4456dfed575aef3b1cc8fd32a7996f1aea",
+      "p05_backup_receipt_sha256": "d7e6884735ce2b0874160a75831ad8fa01141a3a398d195740660d155f146cc8",
+      "p05_restart_receipt_sha256": "c871ee269507e1eefc62f9e988a7a3006ed3f36b14c585004d97ed5c4bc2d313",
+      "p05_reboot_receipt_sha256": "60daabab4bacfd4911fb5cbe0fd64107ad3b895af9b25c1bfda12209c9fb8641",
+      "p05_restore_receipt_sha256": "1ed1e96a32a6b968614c07f104a54c08e24b062e5879e363d11f0dca0f149da5",
+      "p05_rollback_receipt_sha256": "ea056b66b682c847f647050e97eb7f48ddc11f3ef16985d6d284e8a320c94c41"
+    },
+    "physical_deployment": {
+      "status": "PASS",
+      "permanent_namespaced_service": true,
+      "automatic_batchmode_ssh_preexisted_and_was_verified": true,
+      "runtime_uid": 10001,
+      "rootless_container_runtime": true,
+      "core_network": "none",
+      "core_read_only": true,
+      "capabilities_dropped": ["ALL"],
+      "no_new_privileges": true,
+      "published_ports": 0,
+      "single_durable_writer": true,
+      "monitor_identity_owner_only": true
+    },
+    "domain_e2e": {
+      "status": "PASS",
+      "wip_max": 1,
+      "transport": "AF_UNIX",
+      "ingress_principal": "collector:uid:10002",
+      "ingress_principal_count": 1,
+      "market_export_sha256": "1fe3b8a3a54faa56d7b6f821ec0fe20e5b16383dc3051bbd6211aa723b1fc327",
+      "security_export_sha256": "54fb21e7562fa4f8015fd950b44c012312fcee9688c66068cdec5174aa6a126f",
+      "market_terminal_state": "SHADOW_UNAPPLIED",
+      "security_terminal_state": "WAIT_AUTHORITY",
+      "provider_calls": 4,
+      "worker_calls": 2,
+      "critic_calls": 2,
+      "actual_tokens": 1744,
+      "cost_units": 4,
+      "automatic_retries": 0,
+      "model_calls_reconciled": 4,
+      "canonical_writes": 0,
+      "trading_orders": 0,
+      "autonomous_security_actions": 0,
+      "workers_remaining": 0,
+      "provider_network_attachments_remaining": 0
+    },
+    "persistent_recovery": {
+      "status": "PASS",
+      "fresh_encrypted_off_host_backup": true,
+      "backup_archive_sha256": "6f06fd4a5967b53036973ec6b842ee44b71597dda1a06e75b9711396df81fa20",
+      "backup_owner_only": true,
+      "same_release_restart": "PASS",
+      "controlled_reboot": "PASS",
+      "bridge_autostart": "PASS",
+      "isolated_clean_restore": "PASS_31_OF_31_FILES",
+      "restored_identity_ledger_chain_cas_and_config": "PASS",
+      "bridge_namespace_rollback_readiness": "PASS",
+      "live_restore_performed": false,
+      "domain_namespace_mutation": false,
+      "provider_calls": 0
+    },
+    "monitoring": {
+      "status": "PASS_NON_RED",
+      "timer_active_and_enabled": true,
+      "unit_sha256": "955aedb5939ffa5a1a836e0e3672814f5f2b13cd1466f7839db2611b1b40814a",
+      "cycle_sha256": "44c376e9650280cd9ed5f608b37e6a4a060ac49da1774b2d8104de21f63fff14",
+      "journal_records": 2,
+      "yellow_samples": 2,
+      "red_samples": 0,
+      "terminal_lifecycle": "PARKED",
+      "monitor_research_state_writes": 0,
+      "grants_authority": false
+    },
+    "post_reboot_domain_health": {
+      "market_durable_health": "completed_green",
+      "market_required_pulse_red": false,
+      "security_timer": "active",
+      "security_heartbeat": "success",
+      "market_mac_operator_only": true,
+      "market_t7_cold_only": true,
+      "t7_active_db_or_wal": false
+    },
+    "known_non_blocking_incidents": [
+      {
+        "id": "MARKET_POST_RELEASE_SOAK_CURRENTNESS_20260721T073436Z",
+        "scope": "SEPARATE_DOMAIN_LONG_WINDOW",
+        "release_invalidating": false,
+        "timer_active": true,
+        "failure_mode": "FAIL_CLOSED_STALE_CANONICAL_PROJECTION",
+        "canonical_mutation": false,
+        "failed_attempt_runtime_mutation": false,
+        "live_or_trading_authority": false,
+        "disposition": "POST_RELEASE_ASSURANCE_BY_DOMAIN_OWNER"
+      }
+    ],
+    "known_non_runtime_debt": [
+      {
+        "id": "D109-TRAILER-GOVERNANCE",
+        "severity": "MEDIUM_NON_RUNTIME",
+        "release_invalidating": false,
+        "history_rewrite": false,
+        "disposition": "SEPARATE_MAINTENANCE_RELEASE"
+      }
+    ],
+    "safety": {
+      "critical_findings_open": 0,
+      "high_findings_open": 0,
+      "new_release_invalidating_medium_findings": 0,
+      "raw_host_locator_public": false,
+      "secret_or_credential_bytes_public": false,
+      "private_D2_D3_evidence_public": false,
+      "runtime_or_physical_mutation_in_p06a": false,
+      "grants_authority": false,
+      "product_done": false,
+      "release_done": false
+    },
+    "limitations": [
+      "Final evidence head is bound only after protected P06A terminal receipt delivery and exact final CI.",
+      "Independent physical audit and Agent-0 closeout remain P06B1 and P06B2.",
+      "24h, 48h, 7d and 14d assurance windows begin after Release Done and do not block this release."
+    ]
+  },
+  "integrity": {
+    "profile": "core-json-sha256-v1",
+    "payload_sha256": "8c69d2259e7504ee9b32485c6d31942f0906687038df197d5225a65e77dd893f",
+    "parent_refs": [
+      "git:37d028c6a9c1e5493655c54bc668ff73c673241b",
+      "ci:29810904304",
+      "runtime:0394d6c9e327eceb62f738eca90be3ece015ba79",
+      "image:sha256:e6db8ab087e18b13ac357a751a2e7318c3abb81a4f2af459c930a630ddc65577",
+      "carrier:sha256:46e12e35ef89463a9f13028732e35c30ce3aaa7b121834f68a9aeccbf727d9f7",
+      "private-p03-terminal:sha256:b5cef3c7ee4b9f33230d8aa8caa48f78e252ec9b428a1fb363b78c709b604eca",
+      "private-p04-terminal:sha256:4675b458c2a8815c2a850782ae251278aee03657a06fec89c6e4b25b88ad2e95",
+      "private-p05-terminal:sha256:0abae15835959d707631bd4966a5081be6c0aca088f5ec0975a477285cbc676c"
+    ]
+  }
+}
