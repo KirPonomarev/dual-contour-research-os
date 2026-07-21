@@ -1,7 +1,7 @@
 {
   "schema_id": "IntegrationReceipt",
   "schema_version": "1.0.0",
-  "object_id": "integration-r09a-dual-contour-openrouter-advisors-ef4147260fc9901b2e8a42166c09faf2",
+  "object_id": "integration-r09a-dual-contour-openrouter-advisors-d7d0fdf548b9928622068dce0af96c29",
   "issued_at": "2026-07-21T14:13:50Z",
   "issuer": {
     "id": "agent-0",
@@ -25,6 +25,7 @@
       "contract_gate": "green",
       "full_local_tests": "912_PLUS_25_GREEN",
       "privacy_secret_scan": "green",
+      "source_mutation": false,
       "historical_v1_v2_v3_profile_tool_worker_sha_stable": true,
       "source_and_merge_tree_equal": true,
       "required_ci_exact": true,
@@ -84,7 +85,7 @@
   },
   "integrity": {
     "profile": "core-json-sha256-v1",
-    "payload_sha256": "ef4147260fc9901b2e8a42166c09faf2c6b0815e958d9aeb381c2747232b08c0",
+    "payload_sha256": "d7d0fdf548b9928622068dce0af96c298182357d5d4f7a6493f879c4feb4b44f",
     "parent_refs": [
       "git:28da4ab54969846818c0c38ca6f0fd45cb0d5da0",
       "git:35281cf122e5e60a8ca8e6255b945ae95bc8380d",
