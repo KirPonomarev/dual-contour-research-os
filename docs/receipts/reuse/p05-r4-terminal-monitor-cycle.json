@@ -1,0 +1,64 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-p05-r4-terminal-monitor-cycle-20260721",
+  "issued_at": "2026-07-21T07:29:05Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "reuse-freeze-authority"
+  },
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "non-red-fresh-monitoring-of-validated-safe-terminal-lifecycle",
+    "candidates": [
+      {
+        "candidate": "select-terminal-policy-from-validated-current-lifecycle",
+        "disposition": "selected"
+      },
+      {
+        "candidate": "select-from-append-only-historical-queue-counters",
+        "disposition": "rejected-misclassifies-current-parked-state"
+      },
+      {
+        "candidate": "relax-active-lifecycle-thresholds",
+        "disposition": "rejected-would-mask-active-failure"
+      },
+      {
+        "candidate": "rewrite-durable-queue-history",
+        "disposition": "rejected-research-state-mutation"
+      }
+    ],
+    "selected_mode": "PARKED and WAIT_AUTHORITY use the long-age terminal policy because lifecycle is the validated current state; all other lifecycle values retain the original short active policy. Disposable tmpfs is owned by the non-root monitor UID.",
+    "source_ref": "git:d8ed87d321c46711141641f3f61bafd802347fe5;stage-envelope:sha256:b414067db6393420fd83bea983b8c9fa7967926e2aa01ba933b090687d9604c9",
+    "bound_state": {
+      "lifecycle_state": "PARKED",
+      "state_reason_codes": ["BOUNDED_GAP_PARKED"],
+      "historical_queue": {"runnable": 1, "waiting_authority": 1, "parked": 1},
+      "probe_active_policy_result": "RED",
+      "expected_terminal_policy_result": "YELLOW"
+    },
+    "artifacts": {
+      "cycle_sha256": "44c376e9650280cd9ed5f608b37e6a4a060ac49da1774b2d8104de21f63fff14",
+      "unit_sha256": "955aedb5939ffa5a1a836e0e3672814f5f2b13cd1466f7839db2611b1b40814a"
+    },
+    "external_dependencies_added": 0,
+    "license_spdx": "Proprietary-Internal-Owned",
+    "tests": [
+      "PARKED with historical runnable entries selects terminal policy",
+      "GENERATING always selects the original short policy",
+      "four-hour PARKED sample is YELLOW while four-hour GENERATING sample is RED",
+      "tmpfs is mode 0700 and owned by 10001:10001",
+      "research-state writes and provider calls remain zero"
+    ],
+    "canonical_owner": "Agent0-physical-release-control",
+    "rollback": "Restore d8ed87d monitor control tree; never modify the durable queue, Core, or domain services."
+  },
+  "integrity": {
+    "payload_sha256": "4ec5c684a010df493d2c699f7a53262ce577cb0b6b65570f8a6c666213ffef79",
+    "parent_refs": [
+      "git:d8ed87d321c46711141641f3f61bafd802347fe5",
+      "stage-envelope:sha256:b414067db6393420fd83bea983b8c9fa7967926e2aa01ba933b090687d9604c9"
+    ]
+  }
+}

@@ -251,7 +251,7 @@ class ObservabilityRecoveryControlTests(unittest.TestCase):
         self.assertNotIn("PROVIDER_UNAVAILABLE", codes)
         self.assertNotIn("AI_OFF_PROVIDER_STATE_MISMATCH", codes)
 
-    def test_terminal_age_policy_is_selected_only_for_non_runnable_terminal_state(self) -> None:
+    def test_terminal_age_policy_is_selected_only_for_validated_terminal_lifecycle(self) -> None:
         active = _load(ROOT / "ops" / "organism" / "pulse-policy.json")
         terminal = _load(ROOT / "ops" / "organism" / "terminal-pulse-policy.json")
         parked = _state(
@@ -293,7 +293,7 @@ class ObservabilityRecoveryControlTests(unittest.TestCase):
         )
         self.assertEqual(
             select_pulse_policy(parked_with_runnable_work, active, terminal)["policy_id"],
-            "a1-read-only-pulse-policy",
+            "a1-safe-terminal-pulse-policy",
         )
 
         later = "2026-01-02T07:04:06Z"
@@ -401,6 +401,7 @@ class ObservabilityRecoveryControlTests(unittest.TestCase):
         self.assertIn("runtime_monitor_cycle.py", monitor_service)
         self.assertIn("target=/var/lib/research-os,readonly", monitor_service)
         self.assertIn("--network=none", monitor_service)
+        self.assertIn("mode=0700,uid=10001,gid=10001", monitor_service)
         self.assertNotIn("PrivateDevices=yes", monitor_service)
         self.assertNotIn("PrivateTmp=yes", monitor_service)
         self.assertNotIn("source=%h/.config/research-os/runtime-identity.json", monitor_service)

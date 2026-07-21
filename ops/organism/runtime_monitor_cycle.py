@@ -3,7 +3,7 @@
 
 The cycle reads a consistent SQLite backup through a read-only volume mount,
 projects organism state from that disposable backup, selects a terminal-aware
-Pulse policy only for non-runnable PARKED/WAIT_AUTHORITY state, and writes only
+Pulse policy only for validated PARKED/WAIT_AUTHORITY lifecycle, and writes only
 to the dedicated monitor journal.  It never opens the live ledger through
 ``JobLedger`` and never calls a provider.
 """
@@ -97,7 +97,13 @@ def select_pulse_policy(
     active_policy: Mapping[str, object],
     terminal_policy: Mapping[str, object],
 ) -> Mapping[str, object]:
-    """Use relaxed age only for a proven terminal state with zero runnable work."""
+    """Use relaxed age only for a validated terminal lifecycle.
+
+    Queue projections are append-only historical aggregates and may retain old
+    runnable or authority-wait entries after the state projector has safely
+    moved the current lifecycle to PARKED.  Active lifecycle values still use
+    the short policy regardless of queue shape.
+    """
 
     active = validate_pulse_policy(active_policy)
     terminal = validate_pulse_policy(terminal_policy)
@@ -108,8 +114,7 @@ def select_pulse_policy(
     if not isinstance(queue, Mapping):
         raise MonitorCycleError("organism state queue is invalid")
     lifecycle = payload.get("lifecycle_state")
-    runnable = queue.get("runnable")
-    if lifecycle in {"PARKED", "WAIT_AUTHORITY"} and runnable == 0:
+    if lifecycle in {"PARKED", "WAIT_AUTHORITY"}:
         return terminal
     return active
 
