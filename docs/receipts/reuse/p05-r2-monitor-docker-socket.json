@@ -1,0 +1,60 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-p05-r2-monitor-docker-socket-20260721",
+  "issued_at": "2026-07-21T07:12:00Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "reuse-freeze-authority"
+  },
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "rootless-docker-socket-access-from-monitor-user-service",
+    "candidates": [
+      {
+        "candidate": "reuse-p01-r5-filesystem-namespace-compatibility-pattern",
+        "disposition": "selected"
+      },
+      {
+        "candidate": "change-docker-socket-permissions",
+        "disposition": "rejected-host-security-mutation"
+      },
+      {
+        "candidate": "run-monitor-rootful",
+        "disposition": "rejected-authority-expansion"
+      },
+      {
+        "candidate": "weaken-container-sandbox",
+        "disposition": "rejected-boundary-violation"
+      }
+    ],
+    "selected_mode": "omit only PrivateTmp from the user-systemd wrapper; retain every remaining compatible systemd restriction and the exact Docker network-none, read-only, cap-drop-all, no-new-privileges sandbox",
+    "source_ref": "git:c9af7585a0bbceb3e0fa43965478f99bed817f38;reuse:sha256:4808e953070e211770493583edc178cb3215d812ffa1caf70d9c462c262c0d16;stage-envelope:sha256:b7a7bb99c701f424b39f945b1cdef2649f7d01949d0b9ffe694c1d4ae402fd72",
+    "bound_host_pair": {
+      "with_private_tmp_exit": 1,
+      "without_private_tmp_exit": 0,
+      "successful_invocation_id": "d241e258cd5f41b99a7441b6d012a49b",
+      "operation": "read-only Docker server version"
+    },
+    "unit_sha256": "f5e1c969214afce061cf641a1b034f05aa343bf87f79afe1abe327cf79bddf2d",
+    "external_dependencies_added": 0,
+    "license_spdx": "Proprietary-Internal-Owned",
+    "tests": [
+      "PrivateDevices and PrivateTmp are absent",
+      "all remaining compatible systemd restrictions are retained",
+      "network none, read-only root/runtime mount, cap-drop all, and no-new-privileges are retained",
+      "exact-host paired Docker socket probe distinguishes PrivateTmp"
+    ],
+    "canonical_owner": "Agent0-physical-release-control",
+    "rollback": "Restore only the preceding monitor unit/control tree; leave Core, runtime state, provider state, and domain services unchanged."
+  },
+  "integrity": {
+    "payload_sha256": "3de399279a362168eb7199f6773a0378e8347007b25d0751a4b2403185842392",
+    "parent_refs": [
+      "git:c9af7585a0bbceb3e0fa43965478f99bed817f38",
+      "reuse:sha256:4808e953070e211770493583edc178cb3215d812ffa1caf70d9c462c262c0d16",
+      "stage-envelope:sha256:b7a7bb99c701f424b39f945b1cdef2649f7d01949d0b9ffe694c1d4ae402fd72"
+    ]
+  }
+}
