@@ -2023,7 +2023,6 @@ class DurableDiscoveryService:
             vcs = frozen_snapshot.get("vcs_identity")
             if (
                 frozen_snapshot.get("policy_sha256") != self._config.policy_sha256
-                or frozen_snapshot.get("context_sha256") != self._config.context_sha256
                 or frozen_snapshot.get("executor_capability_refs")
                 != list(admission_config.executor_capability_refs)
                 or frozen_snapshot.get("evaluator_capability_refs")
