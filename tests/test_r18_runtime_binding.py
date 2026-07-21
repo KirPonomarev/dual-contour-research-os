@@ -279,6 +279,142 @@ class FallbackRoutingTests(unittest.TestCase):
         self.assertEqual(decision.binding, "deepseek-v4-pro")
         self.assertFalse(decision.used_fallback)
 
+    def test_researchd_broker_uses_exact_fable_override(self) -> None:
+        """The durable broker and availability router must select the same binding."""
+        runtime = _base_model_runtime(
+            available_bindings=["glm-5.2-max", "claude-fable-5"],
+            role_binding_overrides={"CRITIC_PRIMARY": "claude-fable-5"},
+        )
+        service = _service_config_from_mapping(_full_config(runtime))
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory) / "runtime"
+            root.mkdir(mode=0o700)
+            daemon = ResearchDaemon(
+                root,
+                authority=service.authority,
+                allowed_uids=service.allowed_uids,
+                principal_roles=service.principal_roles,
+                a1_enabled=service.a1_enabled,
+                frozen_bindings=service.frozen_bindings,
+                a1_limits=service.a1_limits,
+                runner_identity=service.runner_identity,
+                input_quota_bytes=service.input_quota_bytes,
+                checkpoint_quota_bytes=service.checkpoint_quota_bytes,
+                artifact_quota_bytes=service.artifact_quota_bytes,
+                maximum_input_bytes=service.maximum_input_bytes,
+                deadline_seconds=service.deadline_seconds,
+                clock=lambda: NOW,
+            )
+            daemon.start()
+            try:
+                payload = {
+                    "capability": "R18_EXACT_OVERRIDE_TEST",
+                    "fixture_only": True,
+                    "grants_authority": False,
+                }
+                assert daemon._ledger is not None
+                daemon._ledger.append_a1_bundle(
+                    objects=[
+                        {
+                            "schema_id": "CapabilityProofReceipt",
+                            "schema_version": "1.0.0",
+                            "object_id": "capability-proof:r18-exact-override-test",
+                            "issued_at": "2026-07-21T18:00:00Z",
+                            "issuer": {
+                                "id": "agent-0-r18-test",
+                                "authority_class": "fixture-only-non-authoritative",
+                            },
+                            "contour": "governance",
+                            "classification": "D0",
+                            "payload": payload,
+                            "integrity": {
+                                "profile_id": "core-json-sha256-v1",
+                                "payload_sha256": hashlib.sha256(
+                                    json.dumps(
+                                        payload,
+                                        sort_keys=True,
+                                        separators=(",", ":"),
+                                    ).encode()
+                                ).hexdigest(),
+                                "parent_refs": ["profile:r18-exact-override-test"],
+                            },
+                        }
+                    ],
+                    projections={
+                        name: {
+                            "count": 1 if name == "capabilities" else 0,
+                            "fixture_only": True,
+                            "grants_authority": False,
+                            "marker": "r18-exact-override-test",
+                            "shadow_only": True,
+                        }
+                        for name in (
+                            "admissions",
+                            "candidates",
+                            "capabilities",
+                            "material_events",
+                        )
+                    },
+                    idempotency_key="r18-exact-override-test-bootstrap",
+                    event_at="2026-07-21T18:00:00Z",
+                )
+                result = daemon.reserve_model_call(
+                    role="CRITIC_PRIMARY",
+                    role_assignment_ref="role-assignment:r18-test/critic-primary",
+                    classification="D0",
+                    request_body="Synthetic D0 fallback routing proof.",
+                    max_tokens=512,
+                    max_cost_units=5,
+                    expires_at="2026-07-21T19:00:00Z",
+                    actor="scout:uid:10003",
+                    idempotency_key="r18-test-fable-fallback",
+                    now="2026-07-21T18:00:00Z",
+                )
+            finally:
+                daemon.close()
+        self.assertEqual(result["state"], "RESERVED")
+        self.assertEqual(result["model_binding"], "claude-fable-5")
+        self.assertTrue(result["used_fallback"])
+
+    def test_runbook_available_bindings_fail_closed_and_render_by_name(self) -> None:
+        """The durable source advertises no binding before name-only capability render."""
+        runbook = json.loads(
+            (REPO_ROOT / "ops/connected-worker/runbook-inputs-v2.json").read_text()
+        )
+        composition = runbook["researchd_runtime_composition"]
+        runtime = composition["add_frozen_binding"]["model_runtime"]
+        self.assertEqual(runtime["available_bindings"], [])
+        render = composition["available_bindings_render"]
+        self.assertEqual(render["mode"], "NAME_ONLY_NONEMPTY_CREDENTIAL_INTERSECTION")
+        self.assertTrue(render["required_before_private_render"])
+        self.assertEqual(render["fail_closed_default"], [])
+        self.assertFalse(render["credential_values_recorded"])
+
+        profile = json.loads(
+            (REPO_ROOT / "provenance/model-provider-connected-shadow-v4.json").read_text()
+        )
+        required = {
+            name: binding["credential_env"]
+            for name, binding in profile["bindings"].items()
+        }
+
+        def available(capabilities: set[str]) -> list[str]:
+            return sorted(name for name, credential in required.items() if credential in capabilities)
+
+        self.assertEqual(
+            available({"OPENROUTER_API_KEY"}),
+            ["claude-fable-5", "gpt-5.6-sol-xhigh"],
+        )
+        self.assertEqual(
+            available({"DEEPSEEK_API_KEY", "OPENROUTER_API_KEY"}),
+            [
+                "claude-fable-5",
+                "deepseek-v4-flash",
+                "deepseek-v4-pro",
+                "gpt-5.6-sol-xhigh",
+            ],
+        )
+
     def test_council_cap_remains_four(self) -> None:
         """Council max_calls remains 4 in routing v2."""
         routing = self._routing()

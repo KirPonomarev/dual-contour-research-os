@@ -834,6 +834,7 @@ class ModelProviderRouting:
         if not isinstance(raw_roles, Mapping) or set(raw_roles) != _FROZEN_MODEL_ROLES:
             raise ModelBrokerError("provider routing roles differ from frozen roles")
         roles: dict[str, tuple[str | None, tuple[str, ...], str]] = {}
+        binding_overrides: dict[str, str] = {}
         routed_bindings: set[str] = set()
         for role in sorted(_FROZEN_MODEL_ROLES):
             definition = _exact(
@@ -879,10 +880,13 @@ class ModelProviderRouting:
             else:
                 if primary is None:
                     raise ModelBrokerError("active model role lacks a primary binding")
-                if role_registry.route(role, "D0").model_binding != primary:
+                registry_binding = role_registry.route(role, "D0").model_binding
+                if registry_binding not in candidates:
                     raise ModelBrokerError(
-                        "provider route primary differs from role registry binding"
+                        "role registry binding is outside provider route candidates"
                     )
+                if registry_binding != primary:
+                    binding_overrides[role] = registry_binding
             routed_bindings.update(candidates)
             roles[role] = (primary, fallbacks, action)
 
@@ -925,6 +929,7 @@ class ModelProviderRouting:
         self._profile_sha256 = actual
         self._bindings = MappingProxyType(bindings)
         self._roles = MappingProxyType(roles)
+        self._binding_overrides = MappingProxyType(binding_overrides)
         self._tiers = MappingProxyType(tiers)
         self._max_calls = max_calls
 
@@ -953,7 +958,12 @@ class ModelProviderRouting:
             raise ModelBrokerError("provider routing privacy matrix denies input")
         available = self._available(available_bindings)
         primary, fallbacks, unavailable_action = self._roles[name]
-        candidates = (() if primary is None else (primary,)) + fallbacks
+        override = self._binding_overrides.get(name)
+        candidates = (
+            (override,)
+            if override is not None
+            else (() if primary is None else (primary,)) + fallbacks
+        )
         for index, candidate in enumerate(candidates):
             if candidate not in available:
                 continue
@@ -967,7 +977,7 @@ class ModelProviderRouting:
                 provider_slot=binding.provider_slot,
                 family=binding.family,
                 provenance_group=binding.provenance_group,
-                used_fallback=index > 0,
+                used_fallback=candidate != primary,
                 profile_sha256=self._profile_sha256,
             )
         return ModelRouteDecision(

@@ -36,18 +36,19 @@
         "max_active_calls": 4,
         "max_reserved_tokens": 20000,
         "max_reserved_cost_units": 40,
-        "available_bindings": [
-          "deepseek-v4-flash",
-          "deepseek-v4-pro",
-          "glm-5.2-max",
-          "claude-fable-5",
-          "gpt-5.6-sol-xhigh",
-          "gpt-5.6-sol-max"
-        ],
+        "available_bindings": [],
         "role_binding_overrides": {
           "CRITIC_PRIMARY": "claude-fable-5"
         }
       }
+    },
+    "available_bindings_render": {
+      "mode": "NAME_ONLY_NONEMPTY_CREDENTIAL_INTERSECTION",
+      "profile_ref": "provenance/model-provider-connected-shadow-v4.json",
+      "implementation_ref": "tools/model_provider_shadow_v4.py#ConnectedShadowProfile.available_bindings",
+      "required_before_private_render": true,
+      "fail_closed_default": [],
+      "credential_values_recorded": false
     },
     "rendered_config_classification": "PRIVATE_RUNTIME_INPUT",
     "rendered_config_in_Git": false

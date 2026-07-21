@@ -1234,6 +1234,7 @@ class ResearchDaemon:
                 / "model_role_registry_v1.json",
                 expected_profile_sha256=runtime["role_registry_sha256"],  # type: ignore[arg-type]
                 binding_revision=runtime["binding_revision"],  # type: ignore[arg-type]
+                binding_overrides=overrides,  # type: ignore[arg-type]
             )
             routing_paths = {
                 _MODEL_ROUTING_PROFILE_SHA256: (
