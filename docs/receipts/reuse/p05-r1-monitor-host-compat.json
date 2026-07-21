@@ -1,0 +1,66 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-p05-r1-monitor-host-compat-20260721",
+  "issued_at": "2026-07-21T07:06:38Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "reuse-freeze-authority"
+  },
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "bound-vps-user-systemd-monitor-wrapper-compatibility",
+    "candidates": [
+      {
+        "candidate": "reuse-p01-r4-private-devices-host-compatibility-decision",
+        "disposition": "selected"
+      },
+      {
+        "candidate": "remove-all-systemd-hardening",
+        "disposition": "rejected-overbroad"
+      },
+      {
+        "candidate": "weaken-docker-monitor-sandbox",
+        "disposition": "rejected-boundary-violation"
+      },
+      {
+        "candidate": "run-monitor-as-root",
+        "disposition": "rejected-authority-expansion"
+      }
+    ],
+    "selected_mode": "omit only PrivateDevices=yes, already proven incompatible on the exact VPS user manager; retain PrivateTmp and every other compatible systemd restriction plus the complete Docker sandbox",
+    "source_ref": "git:22673eac5b994c4a9d689c13062691d0ff68cb06;reuse:sha256:da78145fffb893dd3d5e1b40be38983c4ff2c7c2292855115520967a0e6aa1e8;stage-envelope:sha256:7a71f927d447e4e65f87d822967330552876a0634b81b49cbd4b9df22cf35de8",
+    "failure": {
+      "phase": "systemd-before-execstartpre",
+      "status": "218/CAPABILITIES",
+      "core_mutated": false,
+      "docker_monitor_started": false,
+      "monitor_journal_records_written": 0
+    },
+    "bound_host_probe": {
+      "invocation_id": "18297cbe058644f8a18843529c3baed4",
+      "retained_hardening_result": "success",
+      "main_status": 0
+    },
+    "unit_sha256": "14024bf34753c7e5356030d98a38ed5169a56233f3a653d777175694afbc085d",
+    "external_dependencies_added": 0,
+    "license_spdx": "Proprietary-Internal-Owned",
+    "tests": [
+      "PrivateDevices is absent",
+      "PrivateTmp is retained",
+      "network none, read-only root, read-only runtime mount, cap-drop all, and no-new-privileges are retained",
+      "bound-host retained-hardening systemd-run probe exits zero"
+    ],
+    "canonical_owner": "Agent0-physical-release-control",
+    "rollback": "Restore only the preceding monitor unit; do not alter Core, runtime state, provider state, or domain services."
+  },
+  "integrity": {
+    "payload_sha256": "6297fabe51da2e1e28a15401f755d51f58fd06d1337667b352ca939dd251ef38",
+    "parent_refs": [
+      "git:22673eac5b994c4a9d689c13062691d0ff68cb06",
+      "reuse:sha256:da78145fffb893dd3d5e1b40be38983c4ff2c7c2292855115520967a0e6aa1e8",
+      "stage-envelope:sha256:7a71f927d447e4e65f87d822967330552876a0634b81b49cbd4b9df22cf35de8"
+    ]
+  }
+}
