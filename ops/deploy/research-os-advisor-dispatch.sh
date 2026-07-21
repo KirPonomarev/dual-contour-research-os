@@ -95,6 +95,7 @@ request = {
     "command": "list_reserved_model_calls",
     "payload": {"maximum": 1}
 }
+
 frame = json.dumps(request, separators=(",", ":")).encode() + b"\n"
 try:
     s.sendall(frame)
@@ -123,6 +124,39 @@ if not response.get("ok"):
 result = response.get("result", {})
 print(json.dumps(result, separators=(",", ":")))
 ' 2>/dev/null
+}
+
+query_exact_call_state() {
+    docker exec --user 10004:10001 "${CORE_CONTAINER}" python3 -c '
+import hashlib, json, socket, sys
+call_id = sys.argv[1]
+s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+s.settimeout(10)
+s.connect("/var/lib/research-os/researchd.sock")
+request = {
+    "version": "1.2",
+    "request_id": hashlib.sha256(("advisor-dispatch:lookup:" + call_id).encode()).hexdigest(),
+    "idempotency_key": "advisor-dispatch:lookup:" + hashlib.sha256(call_id.encode()).hexdigest(),
+    "command": "lookup_model_call",
+    "payload": {"call_id": call_id},
+}
+s.sendall(json.dumps(request, separators=(",", ":")).encode() + b"\n")
+s.shutdown(socket.SHUT_WR)
+chunks = []
+while True:
+    chunk = s.recv(65536)
+    if not chunk:
+        break
+    chunks.append(chunk)
+s.close()
+response = json.loads(b"".join(chunks))
+if response.get("ok") is not True or not isinstance(response.get("result"), dict):
+    raise SystemExit(1)
+state = response["result"].get("state")
+if not isinstance(state, str):
+    raise SystemExit(1)
+print(state)
+' "${1}" 2>/dev/null
 }
 
 QUERY_RESULT=$(query_reserved_calls) || {
@@ -177,6 +211,31 @@ dispatch_one() {
     INSTANCE_NAME=$(printf '%s' "${CALL_ID}" | sed 's/[^A-Za-z0-9._-]/-/g' | cut -c1-200)
 
     DISPATCH_FILE="${DISPATCH_DIR}/${INSTANCE_NAME}.json"
+    DIAGNOSTIC_FILE="${DISPATCH_FILE}.failure.json"
+    DISPATCH_IDENTITY_SHA=$(printf '%s:%s' "${CALL_ID}" "${DISPATCH_TOKEN}" | sha256sum | cut -d' ' -f1)
+
+    write_failure_diagnostic() {
+        FAILURE_CODE="$1"
+        ACTIVE_STATE="$2"
+        UNIT_RESULT="$3"
+        MAIN_STATUS="$4"
+        python3 -c '
+import json, sys
+print(json.dumps({
+    "schema_id": "AdvisorDispatchFailureReceipt",
+    "schema_version": "1.0.0",
+    "dispatch_identity_sha256": sys.argv[1],
+    "failure_code": sys.argv[2],
+    "active_state": sys.argv[3],
+    "unit_result": sys.argv[4],
+    "exec_main_status": sys.argv[5],
+    "request_body_included": False,
+    "secret_material_included": False,
+}, sort_keys=True, separators=(",", ":")))
+' "${DISPATCH_IDENTITY_SHA}" "${FAILURE_CODE}" "${ACTIVE_STATE}" "${UNIT_RESULT}" "${MAIN_STATUS}" > "${DIAGNOSTIC_FILE}.tmp"
+        chmod 0600 "${DIAGNOSTIC_FILE}.tmp"
+        mv "${DIAGNOSTIC_FILE}.tmp" "${DIAGNOSTIC_FILE}"
+    }
 
     # Build dispatch JSON for the worker
     python3 -c '
@@ -201,23 +260,24 @@ print(json.dumps(dispatch, indent=2))
     chmod 0600 "${DISPATCH_FILE}.tmp"
     mv "${DISPATCH_FILE}.tmp" "${DISPATCH_FILE}"
 
-    log "Dispatching ${CALL_ID} as instance ${INSTANCE_NAME}"
+    log "Dispatching identity ${DISPATCH_IDENTITY_SHA}"
 
     # Start the worker template unit (user-level only, no system fallback)
-    if systemctl --user start "${WORKER_UNIT_TEMPLATE%.service}@${INSTANCE_NAME}.service" 2>/dev/null; then
-        log "Worker started for ${INSTANCE_NAME}"
+    UNIT="${WORKER_UNIT_TEMPLATE%.service}@${INSTANCE_NAME}.service"
+    if systemctl --user start --no-block "${UNIT}" 2>/dev/null; then
+        log "Worker started for identity ${DISPATCH_IDENTITY_SHA}"
     else
-        log "WARNING: could not start worker for ${INSTANCE_NAME}"
-        rm -f "${DISPATCH_FILE}"
+        log "WARNING: could not start worker for identity ${DISPATCH_IDENTITY_SHA}"
+        write_failure_diagnostic "START_FAILED" "unknown" "unknown" "unknown"
         return 1
     fi
 
     # Wait for worker to complete (oneshot — systemd tracks completion)
     WAITED=0
     while [ "${WAITED}" -lt "${MAX_WAIT_SECONDS}" ]; do
-        STATE=$(systemctl --user is-active "research-os-connected-worker@${INSTANCE_NAME}.service" 2>/dev/null) || STATE="inactive"
+        STATE=$(systemctl --user show "${UNIT}" --property=ActiveState --value 2>/dev/null) || STATE="unknown"
         case "${STATE}" in
-            inactive|failed|deactivating)
+            inactive|failed)
                 break
                 ;;
         esac
@@ -226,14 +286,36 @@ print(json.dumps(dispatch, indent=2))
     done
 
     if [ "${WAITED}" -ge "${MAX_WAIT_SECONDS}" ]; then
-        log "WARNING: worker ${INSTANCE_NAME} timed out after ${MAX_WAIT_SECONDS}s"
-    else
-        log "Worker ${INSTANCE_NAME} completed (state: ${STATE})"
+        log "WARNING: worker identity ${DISPATCH_IDENTITY_SHA} timed out after ${MAX_WAIT_SECONDS}s"
+        write_failure_diagnostic "WORKER_TIMEOUT" "${STATE}" "unknown" "unknown"
+        return 1
     fi
 
-    # Clean up dispatch file
-    rm -f "${DISPATCH_FILE}"
-    return 0
+    RESULT=$(systemctl --user show "${UNIT}" --property=Result --value 2>/dev/null) || RESULT="unknown"
+    EXEC_STATUS=$(systemctl --user show "${UNIT}" --property=ExecMainStatus --value 2>/dev/null) || EXEC_STATUS="unknown"
+    if [ "${STATE}" != "inactive" ] || [ "${RESULT}" != "success" ] || [ "${EXEC_STATUS}" != "0" ]; then
+        log "Worker identity ${DISPATCH_IDENTITY_SHA} failed (active=${STATE} result=${RESULT} status=${EXEC_STATUS})"
+        write_failure_diagnostic "WORKER_UNIT_FAILED" "${STATE}" "${RESULT}" "${EXEC_STATUS}"
+        return 1
+    fi
+
+    CORE_STATE=$(query_exact_call_state "${CALL_ID}") || {
+        log "Cannot obtain terminal Core state for identity ${DISPATCH_IDENTITY_SHA}"
+        write_failure_diagnostic "CORE_LOOKUP_FAILED" "${STATE}" "${RESULT}" "${EXEC_STATUS}"
+        return 1
+    }
+    case "${CORE_STATE}" in
+        SUCCEEDED|FAILED_KNOWN|UNKNOWN|RECONCILED)
+            log "Worker identity ${DISPATCH_IDENTITY_SHA} terminal (systemd=${RESULT}/0 core=${CORE_STATE})"
+            rm -f "${DISPATCH_FILE}" "${DIAGNOSTIC_FILE}"
+            return 0
+            ;;
+        *)
+            log "Worker identity ${DISPATCH_IDENTITY_SHA} lacks terminal Core truth (core=${CORE_STATE})"
+            write_failure_diagnostic "CORE_NOT_TERMINAL" "${STATE}" "${RESULT}" "${EXEC_STATUS}"
+            return 1
+            ;;
+    esac
 }
 
 # Extract reserved calls and dispatch sequentially
@@ -245,6 +327,7 @@ if [ "${CALL_COUNT}" -eq 0 ]; then
 fi
 
 IDX=0
+FAILURES=0
 while [ "${IDX}" -lt "${CALL_COUNT}" ]; do
     # Re-check AI_OFF before each call
     if [ -e "${AI_OFF_MARKER}" ]; then
@@ -264,9 +347,15 @@ if ${IDX} < len(calls):
         continue
     }
 
-    dispatch_one "${CALL_JSON}" || log "Dispatch failed for call at index ${IDX} — continuing"
+    if ! dispatch_one "${CALL_JSON}"; then
+        log "Dispatch failed for call at index ${IDX}"
+        FAILURES=$((FAILURES + 1))
+    fi
     IDX=$((IDX + 1))
 done
 
+if [ "${FAILURES}" -ne 0 ]; then
+    die "Dispatch cycle failed (${FAILURES}/${IDX})"
+fi
 log "Dispatch cycle complete (${IDX} calls processed)"
 exit 0

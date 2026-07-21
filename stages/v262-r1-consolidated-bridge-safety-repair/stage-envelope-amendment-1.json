@@ -1,0 +1,25 @@
+{
+  "stage_id": "v262-r1-consolidated-bridge-safety-repair",
+  "amendment_id": "v262-r1-ci-validator-closure-1",
+  "issued_by": "agent-0",
+  "issued_at": "2026-07-21T20:04:00Z",
+  "base_stage_envelope_ref": "stages/v262-r1-consolidated-bridge-safety-repair/stage-envelope.json",
+  "base_stage_envelope_sha256": "34c29aeae8d329eb667d0b026d6e538c58a90ae7d85fea9195ab9b807518babe",
+  "base_sha": "697f9fe186521c267f427c8859b7c102c8e4860f",
+  "ci_run": 29864048709,
+  "reason": "Close the exact two mechanical full-suite findings: register the intentionally public read-only JobLedger method in the static allowlist and replace pre-commit receipt placeholders with an existing exact commit identity.",
+  "added_write_set": [
+    "tests/test_stage1_assurance.py",
+    "stages/v262-r1-consolidated-bridge-safety-repair/stage-envelope-amendment-1.json",
+    "stages/v262-r1-consolidated-bridge-safety-repair/ownership-lease-amendment-1.json"
+  ],
+  "runtime_logic_mutation": false,
+  "contracts_mutation": false,
+  "forbidden_scope_unchanged": true,
+  "acceptance_commands": [
+    "python3 -m unittest tests.test_stage1_assurance tests.test_integration_receipts",
+    "make test",
+    "git diff --check",
+    "exact-head PR CI"
+  ]
+}

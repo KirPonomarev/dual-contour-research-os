@@ -111,6 +111,27 @@ _ADMISSION_RUNTIME_KEYS = frozenset(
     {"model_route_proof_ref", "corridor_executor_profile"}
 )
 _MODEL_RUNTIME_KEY = "model_runtime"
+_CONTEXT_BINDING_KEY = "context_binding"
+_CONTEXT_BINDING_KEYS = frozenset(
+    {
+        "context_schema_version",
+        "admission_authority_sha256",
+        "operational_model_runtime_sha256",
+        "migration_receipt",
+    }
+)
+_CONTEXT_MIGRATION_KEYS = frozenset(
+    {
+        "schema_id",
+        "schema_version",
+        "from_context_sha256s",
+        "to_context_sha256",
+        "admission_authority_sha256",
+        "operational_model_runtime_sha256",
+        "ledger_rows_mutated",
+        "integrity_sha256",
+    }
+)
 _MODEL_RUNTIME_KEYS = frozenset(
     {
         "role_registry_sha256",
@@ -1029,11 +1050,11 @@ class ResearchDaemon:
             raise ResearchdError(
                 "list_reserved_model_calls requires connected_worker or scout principal"
             )
-        if type(maximum) is not int or not 1 <= maximum <= 8:
-            raise ResearchdError("maximum must be 1..8")
+        if maximum != 1:
+            raise ResearchdError("production reserved-call maximum must be 1")
         broker, _ = self._require_model_runtime()
         try:
-            all_states = self._ledger._model_call_states()
+            all_states = self._ledger.model_call_states()
             reserved = []
             now_iso = self._clock().astimezone(timezone.utc).isoformat().replace(
                 "+00:00", "Z"
@@ -1247,7 +1268,7 @@ class ResearchDaemon:
                     max_reserved_cost_units=runtime["max_reserved_cost_units"],  # type: ignore[arg-type]
                 ),
             )
-            for record in ledger._model_call_states():
+            for record in ledger.model_call_states():
                 if record.snapshot["state"] == "SENT":
                     broker.recover_sent(
                         record.snapshot["call_id"],  # type: ignore[arg-type]
@@ -1957,7 +1978,7 @@ def _frozen_bindings(
     if (
         not _FROZEN_BINDING_KEYS.issubset(binding_keys)
         or binding_keys - _FROZEN_BINDING_KEYS
-        - {_ADMISSION_RUNTIME_KEY, _MODEL_RUNTIME_KEY}
+        - {_ADMISSION_RUNTIME_KEY, _MODEL_RUNTIME_KEY, _CONTEXT_BINDING_KEY}
     ):
         raise _ServiceConfigError("frozen_bindings shape is invalid")
     for name in (
@@ -2063,7 +2084,86 @@ def _frozen_bindings(
     raw_model_runtime = value.get(_MODEL_RUNTIME_KEY)
     if raw_model_runtime is not None:
         frozen[_MODEL_RUNTIME_KEY] = _model_runtime_from_config(raw_model_runtime)
+    raw_context_binding = value.get(_CONTEXT_BINDING_KEY)
+    if raw_context_binding is not None:
+        frozen[_CONTEXT_BINDING_KEY] = _context_binding_from_config(
+            raw_context_binding
+        )
     return MappingProxyType(frozen)
+
+
+def _context_binding_from_config(value: object) -> Mapping[str, object]:
+    """Parse an explicit additive v1-to-v2 context migration receipt."""
+
+    if not isinstance(value, dict):
+        raise _ServiceConfigError("context binding must be an object")
+    _expect_config_keys(value, _CONTEXT_BINDING_KEYS, "context_binding")
+    if value.get("context_schema_version") != "a1-context-v2":
+        raise _ServiceConfigError("context schema version is invalid")
+    for name in (
+        "admission_authority_sha256",
+        "operational_model_runtime_sha256",
+    ):
+        if not _is_sha256(value.get(name)):
+            raise _ServiceConfigError(f"{name} is invalid")
+    raw_receipt = value.get("migration_receipt")
+    if raw_receipt is None:
+        return MappingProxyType(
+            {
+                "context_schema_version": "a1-context-v2",
+                "admission_authority_sha256": value["admission_authority_sha256"],
+                "operational_model_runtime_sha256": value[
+                    "operational_model_runtime_sha256"
+                ],
+                "migration_receipt": None,
+            }
+        )
+    if not isinstance(raw_receipt, dict):
+        raise _ServiceConfigError("context migration receipt is invalid")
+    _expect_config_keys(
+        raw_receipt, _CONTEXT_MIGRATION_KEYS, "context migration receipt"
+    )
+    if (
+        raw_receipt.get("schema_id") != "ContextBindingMigrationReceipt"
+        or raw_receipt.get("schema_version") != "1.0.0"
+        or raw_receipt.get("ledger_rows_mutated") != 0
+    ):
+        raise _ServiceConfigError("context migration receipt semantics drifted")
+    raw_from = raw_receipt.get("from_context_sha256s")
+    if not isinstance(raw_from, list) or not 1 <= len(raw_from) <= 8:
+        raise _ServiceConfigError("context migration sources are invalid")
+    migration_from = tuple(raw_from)
+    if (
+        len(migration_from) != len(set(migration_from))
+        or any(not _is_sha256(item) for item in migration_from)
+        or not _is_sha256(raw_receipt.get("to_context_sha256"))
+        or raw_receipt.get("admission_authority_sha256")
+        != value.get("admission_authority_sha256")
+        or raw_receipt.get("operational_model_runtime_sha256")
+        != value.get("operational_model_runtime_sha256")
+    ):
+        raise _ServiceConfigError("context migration receipt binding is invalid")
+    integrity_payload = {
+        key: raw_receipt[key]
+        for key in _CONTEXT_MIGRATION_KEYS
+        if key != "integrity_sha256"
+    }
+    if raw_receipt.get("integrity_sha256") != canonical_json_sha256(
+        integrity_payload
+    ):
+        raise _ServiceConfigError("context migration receipt integrity is invalid")
+    return MappingProxyType(
+        {
+            "context_schema_version": "a1-context-v2",
+            "admission_authority_sha256": value["admission_authority_sha256"],
+            "operational_model_runtime_sha256": value[
+                "operational_model_runtime_sha256"
+            ],
+            "migration_receipt": MappingProxyType(
+                {**raw_receipt, "from_context_sha256s": migration_from}
+            ),
+        }
+    )
 
 
 def _capability_refs(value: object, label: str) -> tuple[str, ...]:
@@ -2251,6 +2351,71 @@ def _a1_limits(
     return MappingProxyType({"cycle_limits": cycle, "daily_limits": daily})
 
 
+def _derive_context_identities(
+    frozen_bindings: Mapping[str, object],
+    a1_limits: Mapping[str, object],
+) -> Mapping[str, str]:
+    """Derive reproducible v1/v2 context identities from normalized bindings."""
+
+    policy_sha256 = frozen_bindings.get("policy_sha256")
+    if not _is_sha256(policy_sha256):
+        raise ResearchdError("A1 discovery policy binding is invalid")
+    runtime_context: object = None
+    runtime_binding = frozen_bindings.get(_ADMISSION_RUNTIME_KEY)
+    if isinstance(runtime_binding, Mapping):
+        profile = runtime_binding.get("corridor_executor_profile")
+        profile_context: object = None
+        if type(profile) is CorridorExecutorProfile:
+            profile_context = {
+                "capability_ref": profile.capability_ref,
+                "protocol_ref": profile.protocol_ref,
+                "code_sha256": profile.code_sha256,
+                "image_digest": profile.image_digest,
+                "runner_identity": profile.runner_identity,
+                "maximum_lifetime_seconds": profile.maximum_lifetime_seconds,
+                "runner_profile": profile.runner_profile,
+                "input_ref_prefixes": profile.input_ref_prefixes,
+            }
+        runtime_context = {
+            "model_route_proof_ref": runtime_binding.get("model_route_proof_ref"),
+            "corridor_executor_profile": profile_context,
+        }
+    admission_authority_payload: dict[str, object] = {
+        "a1_limits": a1_limits,
+        "core_catalog_sha256": frozen_bindings.get("core_catalog_sha256"),
+        "a1_catalog_sha256": frozen_bindings.get("a1_catalog_sha256"),
+        "release_manifest_sha256": frozen_bindings.get("release_manifest_sha256"),
+        "policy_sha256": policy_sha256,
+    }
+    if runtime_binding is not None:
+        admission_authority_payload["admission_runtime"] = runtime_context
+    model_runtime = frozen_bindings.get(_MODEL_RUNTIME_KEY)
+    if model_runtime is not None and not isinstance(model_runtime, Mapping):
+        raise ResearchdError("A1 model runtime binding is invalid")
+    legacy_payload = dict(admission_authority_payload)
+    if model_runtime is not None:
+        legacy_payload["model_runtime"] = _json_copy(model_runtime)
+    admission_authority_sha256 = canonical_json_sha256(admission_authority_payload)
+    operational_model_runtime_sha256 = canonical_json_sha256(
+        None if model_runtime is None else _json_copy(model_runtime)
+    )
+    context_v2_sha256 = canonical_json_sha256(
+        {
+            "context_schema_version": "a1-context-v2",
+            "admission_authority_sha256": admission_authority_sha256,
+            "operational_model_runtime_sha256": operational_model_runtime_sha256,
+        }
+    )
+    return MappingProxyType(
+        {
+            "legacy_context_sha256": canonical_json_sha256(legacy_payload),
+            "admission_authority_sha256": admission_authority_sha256,
+            "operational_model_runtime_sha256": operational_model_runtime_sha256,
+            "context_v2_sha256": context_v2_sha256,
+        }
+    )
+
+
 def _discovery_config_from_authority(
     authority: PinnedOfflineAuthority,
     *,
@@ -2327,41 +2492,41 @@ def _discovery_config_from_authority(
     }
     if len(collectors) != 1:
         raise ResearchdError("A1 discovery requires exactly one collector principal")
-    runtime_context: object = None
-    runtime_binding = frozen_bindings.get(_ADMISSION_RUNTIME_KEY)
-    if isinstance(runtime_binding, Mapping):
-        profile = runtime_binding.get("corridor_executor_profile")
-        profile_context: object = None
-        if type(profile) is CorridorExecutorProfile:
-            profile_context = {
-                "capability_ref": profile.capability_ref,
-                "protocol_ref": profile.protocol_ref,
-                "code_sha256": profile.code_sha256,
-                "image_digest": profile.image_digest,
-                "runner_identity": profile.runner_identity,
-                "maximum_lifetime_seconds": profile.maximum_lifetime_seconds,
-                "runner_profile": profile.runner_profile,
-                "input_ref_prefixes": profile.input_ref_prefixes,
-            }
-        runtime_context = {
-            "model_route_proof_ref": runtime_binding.get("model_route_proof_ref"),
-            "corridor_executor_profile": profile_context,
-        }
-    context_payload: dict[str, object] = {
-        "a1_limits": a1_limits,
-        "core_catalog_sha256": frozen_bindings.get("core_catalog_sha256"),
-        "a1_catalog_sha256": frozen_bindings.get("a1_catalog_sha256"),
-        "release_manifest_sha256": frozen_bindings.get("release_manifest_sha256"),
-        "policy_sha256": policy_sha256,
-    }
-    if runtime_binding is not None:
-        context_payload["admission_runtime"] = runtime_context
-    model_runtime = frozen_bindings.get(_MODEL_RUNTIME_KEY)
-    if model_runtime is not None:
-        if not isinstance(model_runtime, Mapping):
-            raise ResearchdError("A1 model runtime binding is invalid")
-        context_payload["model_runtime"] = _json_copy(model_runtime)
-    context_sha256 = canonical_json_sha256(context_payload)
+    identities = _derive_context_identities(frozen_bindings, a1_limits)
+    context_binding = frozen_bindings.get(_CONTEXT_BINDING_KEY)
+    context_schema_version = "a1-context-v1"
+    admission_authority_sha256: str | None = None
+    operational_model_runtime_sha256: str | None = None
+    migration_from_context_sha256s: tuple[str, ...] = ()
+    if context_binding is None:
+        context_sha256 = identities["legacy_context_sha256"]
+    else:
+        if not isinstance(context_binding, Mapping):
+            raise ResearchdError("A1 context binding is invalid")
+        context_schema_version = "a1-context-v2"
+        admission_authority_sha256 = identities["admission_authority_sha256"]
+        operational_model_runtime_sha256 = identities[
+            "operational_model_runtime_sha256"
+        ]
+        context_sha256 = identities["context_v2_sha256"]
+        migration = context_binding.get("migration_receipt")
+        if (
+            context_binding.get("admission_authority_sha256")
+            != admission_authority_sha256
+            or context_binding.get("operational_model_runtime_sha256")
+            != operational_model_runtime_sha256
+        ):
+            raise ResearchdError("A1 context migration binding drifted")
+        if migration is not None:
+            if (
+                not isinstance(migration, Mapping)
+                or migration.get("to_context_sha256") != context_sha256
+            ):
+                raise ResearchdError("A1 context migration binding drifted")
+            sources = migration.get("from_context_sha256s")
+            if not isinstance(sources, tuple):
+                raise ResearchdError("A1 context migration sources are invalid")
+            migration_from_context_sha256s = sources
     try:
         executor_refs = frozen_bindings.get("executor_capability_refs")
         evaluator_refs = frozen_bindings.get("evaluator_capability_refs")
@@ -2408,6 +2573,10 @@ def _discovery_config_from_authority(
             release_manifest_sha256=str(
                 frozen_bindings.get("release_manifest_sha256")
             ),
+            context_schema_version=context_schema_version,
+            admission_authority_sha256=admission_authority_sha256,
+            operational_model_runtime_sha256=operational_model_runtime_sha256,
+            migration_from_context_sha256s=migration_from_context_sha256s,
             maximum_source_triggers_per_window=min(1_024, max(1, source_rate_limit)),
             source_rate_window_seconds=60,
             admission=admission_config,

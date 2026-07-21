@@ -1,0 +1,55 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-v262-r1-bridge-safety-repair-20260721",
+  "issued_at": "2026-07-21T19:55:00Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "reuse-freeze-authority"
+  },
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "versioned-admission-migration-terminal-dispatch-and-safe-provider-retry",
+    "candidates": [
+      {
+        "candidate": "reuse-existing-ledger-admission-worker-and-systemd-adapters",
+        "disposition": "selected-minimal-glue"
+      },
+      {
+        "candidate": "rewrite-ledger-or-delete-admissions",
+        "disposition": "rejected-data-integrity-violation"
+      },
+      {
+        "candidate": "new-broker-or-provider-sdk",
+        "disposition": "rejected-unnecessary-scope"
+      },
+      {
+        "candidate": "blind-retry-or-systemd-active-only-truth",
+        "disposition": "rejected-unsafe"
+      }
+    ],
+    "selected_mode": "small audited glue over owned JobLedger, DurableDiscoveryService, HTTPRawAdapter, private completion CAS, and existing user-systemd worker template",
+    "source_ref": "git:d13bdaf98307540c17bc320f23e2f2c142f72e6b",
+    "external_dependencies_added": 0,
+    "license_spdx": "Proprietary-Internal-Owned",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "versioned migration receipt integrity",
+      "public zero-write model state query",
+      "terminal systemd plus Core dispatch truth",
+      "pre-send retry and ambiguous no-retry",
+      "stable attempt identity and actual network count"
+    ],
+    "canonical_owner": "Agent0-Dual-Contour-Bridge",
+    "rollback": "Revert only the exact R01 merge and restore the previous image/config pair without changing ledger rows."
+  },
+  "integrity": {
+    "payload_sha256": "55f74081343a9b13af7ff3f66058b2f09ace6e5e5ecc95058a81f3af36b843f6",
+    "parent_refs": [
+      "git:d13bdaf98307540c17bc320f23e2f2c142f72e6b",
+      "stage-envelope:sha256:34c29aeae8d329eb667d0b026d6e538c58a90ae7d85fea9195ab9b807518babe",
+      "owner-only:admission-preflight:sha256:39ae30320ff7935a83a1cecf82d6fed6496c010f6d8d186a8e56ef6d0e4ad226"
+    ]
+  }
+}

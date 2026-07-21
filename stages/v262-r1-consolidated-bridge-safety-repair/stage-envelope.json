@@ -1,0 +1,62 @@
+{
+  "stage_id": "v262-r1-consolidated-bridge-safety-repair",
+  "agent_id": "agent-0",
+  "objective": "Repair admission context versioning, reserved-call discovery, dispatch terminal truth, and provider retry accounting in one exact-head delivery.",
+  "base_sha": "d13bdaf98307540c17bc320f23e2f2c142f72e6b",
+  "base_tree": "22e1386e42122c0997d025c7265e8104810f18a1",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "project_fingerprint": "b371429cb7c01fd6c5dbd430510a264684dab906188d706b7479446c1bd8f154",
+  "branch": "codex/bridge-a0-v262-r1-safety-repair",
+  "worktree": "/private/tmp/dcr-v262-r1-safety",
+  "read_set": [
+    "owner-only:v262-r1-admission-preflight:sha256:39ae30320ff7935a83a1cecf82d6fed6496c010f6d8d186a8e56ef6d0e4ad226",
+    "owner-only:live-ledger:a1-admission-v1:2-entries:a980841382635e8acde469df6080ea1efab69b0284da5c1acaf81d8dc45e45bd"
+  ],
+  "write_set": [
+    "src/research_bridge/discovery.py",
+    "src/research_bridge/researchd.py",
+    "src/research_bridge/ledger.py",
+    "ops/deploy/research-os-advisor-dispatch.sh",
+    "ops/connected-worker/model_worker_v4.py",
+    "tests/test_v262_r1_bridge_safety_repair.py",
+    "docs/receipts/reuse/v262-r1-bridge-safety-repair.json",
+    "docs/receipts/integration/v262-r1-bridge-safety-repair.json",
+    "stages/v262-r1-consolidated-bridge-safety-repair/stage-envelope.json",
+    "stages/v262-r1-consolidated-bridge-safety-repair/ownership-lease.json"
+  ],
+  "boundary_contract": {
+    "legacy_ledger_rows_mutated": false,
+    "aggregate_context_validation_required": true,
+    "production_dispatch_wip": 1,
+    "maximum_provider_attempts": 2,
+    "ambiguous_post_send_retry": false,
+    "public_ports_added": false,
+    "domain_authority_changed": false
+  },
+  "forbidden_scope": [
+    "ledger rewrite or admission deletion",
+    "new provider or broker",
+    "domain authority mutation",
+    "live trading or security execution",
+    "public listener or secret in Git",
+    "history rewrite, force push, direct main push, or CI weakening"
+  ],
+  "acceptance_commands": [
+    "python3 -m unittest tests.test_v262_r1_bridge_safety_repair",
+    "python3 -m unittest tests.test_r18_runtime_binding tests.test_r04b_broker_scout_ipc tests.test_r04c_connected_worker_runtime",
+    "make contracts",
+    "git diff --check",
+    "exact-head PR CI and merge"
+  ],
+  "risk_class": "high-runtime-integrity-repair",
+  "stop_conditions": [
+    "legacy ledger rows must be edited or deleted",
+    "aggregate context validation must be removed",
+    "ambiguous provider call must be retried",
+    "dispatch success cannot be bound to both systemd and Core terminal truth"
+  ],
+  "expected_receipt": "docs/receipts/integration/v262-r1-bridge-safety-repair.json",
+  "rollback": "Revert the exact R01 merge, restore the prior image/config pair, and preserve all immutable ledger rows and diagnostics.",
+  "commit_authority": "agent-0-only",
+  "push_authority": "agent-0-only"
+}

@@ -12,6 +12,7 @@ import argparse
 import base64
 from dataclasses import dataclass
 from datetime import datetime, timezone
+import errno
 import hashlib
 import json
 import os
@@ -87,7 +88,7 @@ _DISPATCH_KEYS = frozenset(
         "worker_ipc_extension_sha256",
     }
 )
-_RECORD_KEYS = frozenset(
+_RECORD_KEYS_V1 = frozenset(
     {
         "schema_id",
         "schema_version",
@@ -101,6 +102,23 @@ _RECORD_KEYS = frozenset(
         "provider_receipt_ref",
         "failure_code",
         "created_at",
+    }
+)
+_RECORD_KEYS = _RECORD_KEYS_V1 | frozenset({"attempts", "network_calls"})
+_ATTEMPT_KEYS = frozenset(
+    {
+        "attempt_number",
+        "attempt_id",
+        "call_id",
+        "provider_binding",
+        "request_sha256",
+        "request_bytes_sent",
+        "provider_request_id_or_null",
+        "failure_phase",
+        "failure_code",
+        "network_call_performed",
+        "started_at",
+        "completed_at",
     }
 )
 _TERMINAL_STATES = frozenset(
@@ -132,12 +150,11 @@ _PROVIDER_MAX_OUTPUT_TOKENS = {
 # subsequent timer invocation discovering the existing record and re-dispatching.
 _RETRYABLE_FAILURE_CODES = frozenset({
     "HTTP_429",
-    "HTTP_500",
     "HTTP_502",
     "HTTP_503",
     "HTTP_504",
+    "DNS_FAILURE",
     "CONNECT_FAILURE",
-    "TIMEOUT_BEFORE_SEND",
 })
 _MAX_PROVIDER_ATTEMPTS = 2
 
@@ -162,37 +179,28 @@ def _provider_timeout_seconds(name: str, profile: ConnectedShadowProfile) -> int
     return _PROVIDER_TIMEOUT_SECONDS.get(name, profile.timeout_seconds)
 
 
-def _classify_transient_failure(exc: BaseException) -> str | None:
-    """Classify an exception as a transient failure code eligible for retry.
-
-    Returns a failure code string if the failure is transient and safe to
-    retry, or None if the failure is ambiguous (post-send) or unknown.
-    Only pre-send failures are retryable without reconciliation.
-    """
+def _classify_transport_failure(exc: BaseException) -> tuple[str | None, object, str]:
+    """Return code, bytes-sent truth, and phase without guessing post-send state."""
     import urllib.error
-    import http.client
 
-    exc_str = str(exc).lower()
-    # Connection refused / DNS / network unreachable — pre-send
-    if isinstance(exc, (ConnectionRefusedError, ConnectionResetError, OSError)):
-        if any(k in exc_str for k in ("refused", "unreachable", "name or service not known", "nodename nor servname")):
-            return "CONNECT_FAILURE"
-    # Timeout before any response — ambiguous but classified as pre-send
-    # only if no data was received (socket.timeout during connect/send)
-    if isinstance(exc, (TimeoutError,)):
-        return "TIMEOUT_BEFORE_SEND"
-    if "timed out" in exc_str or "timeout" in exc_str:
-        return "TIMEOUT_BEFORE_SEND"
-    # HTTP error responses
-    if isinstance(exc, urllib.error.HTTPError):
-        code = exc.code
-        if code == 429:
-            return "HTTP_429"
-        if code in (500, 502, 503, 504):
-            return f"HTTP_{code}"
-    if isinstance(exc, http.client.HTTPException):
-        return "CONNECT_FAILURE"
-    return None
+    reason: BaseException = exc
+    if isinstance(exc, urllib.error.URLError) and isinstance(exc.reason, BaseException):
+        reason = exc.reason
+    if isinstance(reason, socket.gaierror):
+        return "DNS_FAILURE", False, "connect"
+    if isinstance(reason, ConnectionRefusedError):
+        return "CONNECT_FAILURE", False, "connect"
+    if isinstance(reason, OSError) and reason.errno in {
+        errno.ECONNREFUSED,
+        errno.ENETUNREACH,
+        errno.EHOSTUNREACH,
+    }:
+        return "CONNECT_FAILURE", False, "connect"
+    if isinstance(reason, (TimeoutError, socket.timeout)):
+        return "AMBIGUOUS_TIMEOUT", "unknown", "unknown_post_send"
+    if isinstance(reason, ConnectionResetError):
+        return "CONNECTION_RESET", "unknown", "unknown_post_send"
+    return None, "unknown", "unknown_post_send"
 
 
 class ConnectedWorkerError(RuntimeError):
@@ -665,7 +673,10 @@ class PrivateResponseStore:
             _regular_owner_file(path, maximum=self.maximum_record_bytes),
             label="completion record",
         )
-        if set(value) != _RECORD_KEYS or value.get("call_id") != call_id:
+        if (
+            set(value) not in {_RECORD_KEYS, _RECORD_KEYS_V1}
+            or value.get("call_id") != call_id
+        ):
             raise ConnectedWorkerError("completion record identity drifted")
         return value
 
@@ -873,10 +884,12 @@ def _record(
     provider_receipt_ref: str | None,
     failure_code: str | None,
     created_at: str,
+    attempts: tuple[Mapping[str, object], ...] = (),
+    network_calls: int = 0,
 ) -> dict[str, object]:
     return {
         "schema_id": "ConnectedWorkerCompletion",
-        "schema_version": "1.0.0",
+        "schema_version": "1.1.0",
         "call_id": dispatch.call_id,
         "dispatch_token": dispatch.dispatch_token,
         "outcome": outcome,
@@ -887,7 +900,63 @@ def _record(
         "provider_receipt_ref": provider_receipt_ref,
         "failure_code": failure_code,
         "created_at": created_at,
+        "attempts": [dict(attempt) for attempt in attempts],
+        "network_calls": network_calls,
     }
+
+
+def _attempt_record(
+    dispatch: Dispatch,
+    *,
+    attempt_number: int,
+    request_sha256: str,
+    request_bytes_sent: object,
+    provider_request_id: str | None,
+    failure_phase: str | None,
+    failure_code: str | None,
+    network_call_performed: bool,
+    started_at: str,
+    completed_at: str,
+) -> dict[str, object]:
+    attempt_id = hashlib.sha256(
+        f"{dispatch.call_id}:{attempt_number}:{request_sha256}".encode("utf-8")
+    ).hexdigest()
+    record = {
+        "attempt_number": attempt_number,
+        "attempt_id": attempt_id,
+        "call_id": dispatch.call_id,
+        "provider_binding": dispatch.model_binding,
+        "request_sha256": request_sha256,
+        "request_bytes_sent": request_bytes_sent,
+        "provider_request_id_or_null": provider_request_id,
+        "failure_phase": failure_phase,
+        "failure_code": failure_code,
+        "network_call_performed": network_call_performed,
+        "started_at": started_at,
+        "completed_at": completed_at,
+    }
+    if set(record) != _ATTEMPT_KEYS:
+        raise ConnectedWorkerError("provider attempt record shape drifted")
+    return record
+
+
+def _provider_request_id(raw: bytes) -> str | None:
+    try:
+        envelope = _strict_object(raw, label="provider envelope")
+        headers = envelope.get("headers")
+        if not isinstance(headers, dict):
+            return None
+        for name in ("x-request-id", "request-id", "openai-request-id"):
+            value = headers.get(name)
+            if (
+                isinstance(value, str)
+                and 0 < len(value) <= 512
+                and "\x00" not in value
+            ):
+                return value
+    except ConnectedWorkerError:
+        return None
+    return None
 
 
 def _completion_payload(record: Mapping[str, object]) -> dict[str, object]:
@@ -1107,10 +1176,16 @@ def run_dispatch(
     if not callable(getattr(adapter, "invoke_raw", None)):
         raise ConnectedWorkerError("provider adapter is invalid")
     raw_ref: str | None = None
+    attempts: list[Mapping[str, object]] = []
+    network_calls = 0
+    request_sha256 = hashlib.sha256(provider_request).hexdigest()
     attempt = 0
     while True:
         attempt += 1
+        attempt_started = now_value if event_at is not None else _now()
+        raw: bytes | None = None
         try:
+            network_calls += 1
             raw = adapter.invoke_raw(  # type: ignore[attr-defined]
                 call_id=dispatch.call_id,
                 request_bytes=provider_request,
@@ -1123,6 +1198,7 @@ def run_dispatch(
             ):
                 raise ConnectedWorkerError("provider response exceeds the frozen bound")
             raw_ref = store.commit_raw(raw)
+            provider_request_id = _provider_request_id(raw)
             parser = HTTPResponseParser(dispatch.model_binding, str(binding["protocol"]))
             accounting = parser.parse_response(
                 raw_response=raw,
@@ -1150,6 +1226,20 @@ def run_dispatch(
             output_ref = store.commit_output(
                 output, maximum=policy.max_extracted_output_bytes
             )
+            attempts.append(
+                _attempt_record(
+                    dispatch,
+                    attempt_number=attempt,
+                    request_sha256=request_sha256,
+                    request_bytes_sent=True,
+                    provider_request_id=provider_request_id,
+                    failure_phase=None,
+                    failure_code=None,
+                    network_call_performed=True,
+                    started_at=attempt_started,
+                    completed_at=now_value if event_at is not None else _now(),
+                )
+            )
             completion = _record(
                 dispatch,
                 outcome="SUCCEEDED",
@@ -1160,9 +1250,27 @@ def run_dispatch(
                 provider_receipt_ref=accounting.provider_receipt_ref,
                 failure_code=None,
                 created_at=now_value,
+                attempts=tuple(attempts),
+                network_calls=network_calls,
             )
             break
         except KnownProviderFailure as exc:
+            attempts.append(
+                _attempt_record(
+                    dispatch,
+                    attempt_number=attempt,
+                    request_sha256=request_sha256,
+                    request_bytes_sent=True,
+                    provider_request_id=(
+                        _provider_request_id(raw) if isinstance(raw, bytes) else None
+                    ),
+                    failure_phase="provider_response",
+                    failure_code=exc.code,
+                    network_call_performed=True,
+                    started_at=attempt_started,
+                    completed_at=now_value if event_at is not None else _now(),
+                )
+            )
             if (
                 policy.automatic_retry
                 and attempt < _MAX_PROVIDER_ATTEMPTS
@@ -1180,17 +1288,40 @@ def run_dispatch(
                 provider_receipt_ref=exc.provider_receipt_ref,
                 failure_code=exc.code,
                 created_at=now_value,
+                attempts=tuple(attempts),
+                network_calls=network_calls,
             )
             break
-        except ConnectedWorkerError:
-            raise
         except Exception as exc:
-            # Determine if this is a transient pre-send failure eligible for retry
-            failure_code = _classify_transient_failure(exc)
+            failure_code, request_bytes_sent, failure_phase = (
+                _classify_transport_failure(exc)
+            )
+            if raw_ref is not None:
+                request_bytes_sent = True
+                failure_phase = "response_parse"
+                if failure_code is None:
+                    failure_code = "MALFORMED_RESPONSE"
+            attempts.append(
+                _attempt_record(
+                    dispatch,
+                    attempt_number=attempt,
+                    request_sha256=request_sha256,
+                    request_bytes_sent=request_bytes_sent,
+                    provider_request_id=(
+                        _provider_request_id(raw) if isinstance(raw, bytes) else None
+                    ),
+                    failure_phase=failure_phase,
+                    failure_code=failure_code,
+                    network_call_performed=True,
+                    started_at=attempt_started,
+                    completed_at=now_value if event_at is not None else _now(),
+                )
+            )
             if (
                 policy.automatic_retry
                 and attempt < _MAX_PROVIDER_ATTEMPTS
                 and failure_code in _RETRYABLE_FAILURE_CODES
+                and request_bytes_sent is False
             ):
                 raw_ref = None
                 continue
@@ -1204,6 +1335,8 @@ def run_dispatch(
                 provider_receipt_ref=None,
                 failure_code=failure_code,
                 created_at=now_value,
+                attempts=tuple(attempts),
+                network_calls=network_calls,
             )
             break
     store.write_record(completion)
@@ -1216,7 +1349,8 @@ def run_dispatch(
         "status": "COMPLETED",
         "call_id": dispatch.call_id,
         "state": completed.get("state"),
-        "network_calls": 1,
+        "network_calls": network_calls,
+        "attempt_ids": tuple(attempt["attempt_id"] for attempt in attempts),
     }
 
 
