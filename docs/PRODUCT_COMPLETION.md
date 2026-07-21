@@ -1,16 +1,16 @@
 # Product completion boundary — V2.5.2 physical release
 
-Current status: `R17_PROVEN_CANDIDATE_DEPLOYMENT_PENDING`.
+Current status: `RELEASE_DONE_PHYSICAL_FUNCTIONAL_CLOSEOUT_REPAIRED`.
 
 The completed V2.4/F12 work proves the immutable R17 runtime candidate, its
 portable image, clean installation, isolated recovery, and independent Git
-audit. It does **not** by itself prove Product Done or Release Done. V2.5.2
-restores the intended boundary: the exact R17 image must be installed in its
-permanent, collision-free VPS namespace; both domain-owned immutable exports
-must traverse the single local ingress and the AF_UNIX runtime boundary; and
-restart, controlled reboot, encrypted backup, clean restore, rollback
-readiness, monitoring, exact-head CI, and independent physical audit must all
-pass on bound identities.
+audit. V2.5.2 restored and satisfied the intended physical boundary: the exact
+R17 image is installed in its permanent, collision-free VPS namespace; both
+domain-owned immutable exports traversed the single local ingress and AF_UNIX
+runtime boundary; and restart, controlled reboot, encrypted backup, clean
+restore, rollback readiness, monitoring, exact-head CI and independent
+physical audit passed on bound identities. The terminal cleanup-integrity
+repair also passed a fresh independent delta audit and superseding closeout.
 
 Only elapsed-time observation windows are post-release. The 24-hour, 48-hour,
 seven-day, and 14-day windows may run alongside real bounded work after
@@ -20,25 +20,34 @@ for any immediate physical gate.
 ```text
 PLAN_ID=DCR_OS_AUTONOMOUS_V2_3_NO_BRAKES_20260719
 PLAN_VERSION=2.5.2-physical-release-final
-STATUS=IN_PROGRESS
+STATUS=RELEASE_DONE_PHYSICAL_FUNCTIONAL_CLOSEOUT_REPAIRED
 PRODUCT_CODE_COMPLETE=true
-PRODUCT_DONE=false
-RELEASE_DONE=false
-REAL_BOUNDED_RESEARCH_OPERATION_READY=false
-MASTER_PLAN_DONE=false
-PHYSICALLY_DEPLOYED=false
+PRODUCT_DONE=true
+RELEASE_DONE=true
+MASTER_PLAN_DONE=true
+PHYSICALLY_DEPLOYED=true
+BRIDGE_RUNTIME_HEALTHY=true
+RELEASE_EVIDENCE_VALID=true
+PRODUCT_FUNCTIONAL_RELEASE=PASS
 OPERATIONALLY_PROVEN=false
-TIMED_WINDOWS=POST_RELEASE_NONBLOCKING
-LIVE_VPS_DEPLOYMENT=REQUIRED
-DONE_REQUIRES=P06B2_AGENT0_PHYSICAL_CLOSEOUT
+POST_RELEASE_ASSURANCE=DEGRADED_MONITORING
+TIMED_WINDOWS=POST_RELEASE_NONBLOCKING_INCOMPLETE
+LIVE_VPS_DEPLOYMENT=COMPLETE
+DONE_REQUIRES=SATISFIED_P06B2_SUPERSEDING_CLOSEOUT
 ```
+
+This is a release statement, not a claim of completed burn-in. The 24-hour,
+48-hour, seven-day and 14-day windows remain incomplete and non-blocking, so
+`OPERATIONALLY_PROVEN` stays false. Point-in-time domain incidents belong to
+current owner-controlled health receipts and do not rewrite this immutable
+release verdict.
 
 ## Current release identity separation
 
 - Immutable runtime subject: `0394d6c9e327eceb62f738eca90be3ece015ba79`, tree `636fda24cbb2da567fb23a4d44fa865ae74ac4bc`.
 - Portable image: `sha256:e6db8ab087e18b13ac357a751a2e7318c3abb81a4f2af459c930a630ddc65577`.
 - Maintenance control head: created by the protected P01 delivery and never represented as runtime bytes.
-- Final evidence head: created only after physical evidence is sanitized and delivered.
+- Final evidence head: `4ecffe992e1654e10cac15473d45ba3103b074f2`, created only after physical evidence was sanitized and delivered.
 
 If a runtime input changes, a new runtime subject and image are required. A
 control-only or evidence-only commit never relabels or silently rebuilds R17.
@@ -56,8 +65,9 @@ host and namespace:
 6. green monitoring, exact-head protected delivery, and sanitized receipts;
 7. an independent physical audit followed by Agent 0 closeout.
 
-No test fixture, local image, CI result, deploy exit code, timer state, or old
-receipt alone satisfies these gates.
+These gates were satisfied as a hash-bound chain. No test fixture, local
+image, CI result, deploy exit code, timer state or old receipt would satisfy
+them alone.
 
 ## Historical checkpoint retained
 
@@ -140,8 +150,9 @@ short physical proof chain are release gates again, while only the elapsed
 observation windows remain post-release.
 
 The historical checkpoint's honest state remains
-`SUPERSEDED_REPAIR_REQUIRED / DEPLOYMENT_DENIED`. The current V2.5.2 state is
-`R17_PROVEN_CANDIDATE_DEPLOYMENT_PENDING`; no local unit test, CI result,
-saved receipt integrity, image build or GitHub review substitutes for the
-remaining permanent deployment, domain E2E, recovery and independent physical
-audit gates.
+`SUPERSEDED_REPAIR_REQUIRED / DEPLOYMENT_DENIED`. It was superseded rather
+than rewritten. The current V2.5.2 state is
+`RELEASE_DONE_PHYSICAL_FUNCTIONAL_CLOSEOUT_REPAIRED`: permanent deployment,
+domain E2E, recovery and independent physical audit are complete, while the
+long post-release assurance windows remain in progress. Commits after the
+final evidence head do not implicitly alter or redeploy the R17 runtime.
