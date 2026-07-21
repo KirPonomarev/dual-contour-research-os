@@ -1,0 +1,20 @@
+{
+  "lease_id": "lease-p06a-sanitized-evidence-integration-agent-0-20260721",
+  "fencing_token": "c56389d6-5c5c-4cf3-9043-9199bf144b11",
+  "stage_id": "p06a-sanitized-evidence-integration",
+  "agent_id": "agent-0",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-21T07:40:53Z",
+  "expires_at": "2026-07-21T12:40:53Z",
+  "base_sha": "37d028c6a9c1e5493655c54bc668ff73c673241b",
+  "branch": "codex/bridge-a0-p06a-physical-evidence",
+  "worktree": "/private/tmp/dcr-p06a-37d028c",
+  "write_set": [
+    "docs/receipts/release/p06a-physical-release-sanitized.json",
+    "docs/receipts/integration/p06a-sanitized-evidence-integration.json",
+    "stages/p06a-sanitized-evidence-integration/stage-envelope.json",
+    "stages/p06a-sanitized-evidence-integration/ownership-lease.json"
+  ],
+  "delegation_allowed": false,
+  "state": "active"
+}
