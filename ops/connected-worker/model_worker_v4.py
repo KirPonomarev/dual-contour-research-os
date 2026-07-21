@@ -117,6 +117,30 @@ _PROVIDER_TIMEOUT_SECONDS = {
     "claude-fable-5": 1200,
 }
 
+# Per-binding maximum output tokens (provider capability, not historical ceiling)
+_PROVIDER_MAX_OUTPUT_TOKENS = {
+    "deepseek-v4-flash": 4096,
+    "deepseek-v4-pro": 4096,
+    "glm-5.2-max": 4096,
+    "claude-fable-5": 4096,
+    "gpt-5.6-sol-xhigh": 4096,
+    "gpt-5.6-sol-max": 4096,
+}
+
+# Safe retry: at most one additional attempt for UNKNOWN/FAILED_KNOWN with
+# transient failure codes.  The worker is oneshot; retry is achieved by a
+# subsequent timer invocation discovering the existing record and re-dispatching.
+_RETRYABLE_FAILURE_CODES = frozenset({
+    "HTTP_429",
+    "HTTP_500",
+    "HTTP_502",
+    "HTTP_503",
+    "HTTP_504",
+    "CONNECT_FAILURE",
+    "TIMEOUT_BEFORE_SEND",
+})
+_MAX_PROVIDER_ATTEMPTS = 2
+
 
 def _provider_quality_binding(
     name: str,
@@ -136,6 +160,39 @@ def _provider_quality_binding(
 
 def _provider_timeout_seconds(name: str, profile: ConnectedShadowProfile) -> int:
     return _PROVIDER_TIMEOUT_SECONDS.get(name, profile.timeout_seconds)
+
+
+def _classify_transient_failure(exc: BaseException) -> str | None:
+    """Classify an exception as a transient failure code eligible for retry.
+
+    Returns a failure code string if the failure is transient and safe to
+    retry, or None if the failure is ambiguous (post-send) or unknown.
+    Only pre-send failures are retryable without reconciliation.
+    """
+    import urllib.error
+    import http.client
+
+    exc_str = str(exc).lower()
+    # Connection refused / DNS / network unreachable — pre-send
+    if isinstance(exc, (ConnectionRefusedError, ConnectionResetError, OSError)):
+        if any(k in exc_str for k in ("refused", "unreachable", "name or service not known", "nodename nor servname")):
+            return "CONNECT_FAILURE"
+    # Timeout before any response — ambiguous but classified as pre-send
+    # only if no data was received (socket.timeout during connect/send)
+    if isinstance(exc, (TimeoutError,)):
+        return "TIMEOUT_BEFORE_SEND"
+    if "timed out" in exc_str or "timeout" in exc_str:
+        return "TIMEOUT_BEFORE_SEND"
+    # HTTP error responses
+    if isinstance(exc, urllib.error.HTTPError):
+        code = exc.code
+        if code == 429:
+            return "HTTP_429"
+        if code in (500, 502, 503, 504):
+            return f"HTTP_{code}"
+    if isinstance(exc, http.client.HTTPException):
+        return "CONNECT_FAILURE"
+    return None
 
 
 class ConnectedWorkerError(RuntimeError):
@@ -247,6 +304,7 @@ class RuntimePolicy:
     shadow_profile_sha256: str
     shadow_tool_sha256: str
     allowed_classifications: frozenset[str]
+    automatic_retry: bool
 
     @classmethod
     def load(cls, path: Path) -> "RuntimePolicy":
@@ -271,7 +329,7 @@ class RuntimePolicy:
                 "OWNER_ONLY_ENV_FILE_VPS",
             ]
             or value["allowed_classifications"] != ["D0", "D1"]
-            or value["automatic_retry"] is not False
+            or value["automatic_retry"] is not True
             or value["replay_completion_only"] is not True
         ):
             raise ConnectedWorkerError("runtime policy semantics drifted")
@@ -355,6 +413,7 @@ class RuntimePolicy:
             shadow_profile_sha256=digests["shadow_profile_sha256"],
             shadow_tool_sha256=digests["shadow_tool_sha256"],
             allowed_classifications=frozenset(value["allowed_classifications"]),  # type: ignore[arg-type]
+            automatic_retry=bool(value["automatic_retry"]),
         )
 
 
@@ -852,7 +911,6 @@ def _validate_lookup(dispatch: Dispatch, state: Mapping[str, object]) -> None:
         "classification": dispatch.classification,
         "max_tokens": dispatch.max_tokens,
         "expires_at": dispatch.expires_at,
-        "auto_retry": False,
     }
     if any(state.get(name) != value for name, value in expected.items()):
         raise ConnectedWorkerError("durable model call differs from dispatch")
@@ -1049,81 +1107,105 @@ def run_dispatch(
     if not callable(getattr(adapter, "invoke_raw", None)):
         raise ConnectedWorkerError("provider adapter is invalid")
     raw_ref: str | None = None
-    try:
-        raw = adapter.invoke_raw(  # type: ignore[attr-defined]
-            call_id=dispatch.call_id,
-            request_bytes=provider_request,
-            max_tokens=provider_output_tokens,
-        )
-        if (
-            not isinstance(raw, bytes)
-            or not raw
-            or len(raw) > profile.max_response_bytes
-        ):
-            raise ConnectedWorkerError("provider response exceeds the frozen bound")
-        raw_ref = store.commit_raw(raw)
-        parser = HTTPResponseParser(dispatch.model_binding, str(binding["protocol"]))
-        accounting = parser.parse_response(
-            raw_response=raw,
-            response_ref=raw_ref,
-            max_tokens=dispatch.max_tokens,
-        )
-        if (
-            accounting.actual_tokens is None
-            or accounting.actual_tokens > dispatch.max_tokens
-        ):
-            raise KnownProviderFailure(
-                "TOTAL_TOKEN_LIMIT_EXCEEDED",
+    attempt = 0
+    while True:
+        attempt += 1
+        try:
+            raw = adapter.invoke_raw(  # type: ignore[attr-defined]
+                call_id=dispatch.call_id,
+                request_bytes=provider_request,
+                max_tokens=provider_output_tokens,
+            )
+            if (
+                not isinstance(raw, bytes)
+                or not raw
+                or len(raw) > profile.max_response_bytes
+            ):
+                raise ConnectedWorkerError("provider response exceeds the frozen bound")
+            raw_ref = store.commit_raw(raw)
+            parser = HTTPResponseParser(dispatch.model_binding, str(binding["protocol"]))
+            accounting = parser.parse_response(
+                raw_response=raw,
+                response_ref=raw_ref,
+                max_tokens=dispatch.max_tokens,
+            )
+            if (
+                accounting.actual_tokens is None
+                or accounting.actual_tokens > dispatch.max_tokens
+            ):
+                raise KnownProviderFailure(
+                    "TOTAL_TOKEN_LIMIT_EXCEEDED",
+                    actual_tokens=accounting.actual_tokens,
+                    actual_cost_units=accounting.actual_cost_units,
+                    provider_receipt_ref=accounting.provider_receipt_ref,
+                )
+            output = _extract_output(raw, protocol=str(binding["protocol"]))
+            if len(output.strip()) < policy.minimum_output_bytes:
+                raise KnownProviderFailure(
+                    "VACUOUS_OUTPUT",
+                    actual_tokens=accounting.actual_tokens,
+                    actual_cost_units=accounting.actual_cost_units,
+                    provider_receipt_ref=accounting.provider_receipt_ref,
+                )
+            output_ref = store.commit_output(
+                output, maximum=policy.max_extracted_output_bytes
+            )
+            completion = _record(
+                dispatch,
+                outcome="SUCCEEDED",
+                response_ref=output_ref,
+                raw_response_ref=raw_ref,
                 actual_tokens=accounting.actual_tokens,
                 actual_cost_units=accounting.actual_cost_units,
                 provider_receipt_ref=accounting.provider_receipt_ref,
+                failure_code=None,
+                created_at=now_value,
             )
-        output = _extract_output(raw, protocol=str(binding["protocol"]))
-        if len(output.strip()) < policy.minimum_output_bytes:
-            raise KnownProviderFailure(
-                "VACUOUS_OUTPUT",
-                actual_tokens=accounting.actual_tokens,
-                actual_cost_units=accounting.actual_cost_units,
-                provider_receipt_ref=accounting.provider_receipt_ref,
+            break
+        except KnownProviderFailure as exc:
+            if (
+                policy.automatic_retry
+                and attempt < _MAX_PROVIDER_ATTEMPTS
+                and exc.code in _RETRYABLE_FAILURE_CODES
+            ):
+                raw_ref = None
+                continue
+            completion = _record(
+                dispatch,
+                outcome="FAILED_KNOWN",
+                response_ref=None,
+                raw_response_ref=raw_ref,
+                actual_tokens=exc.actual_tokens,
+                actual_cost_units=exc.actual_cost_units,
+                provider_receipt_ref=exc.provider_receipt_ref,
+                failure_code=exc.code,
+                created_at=now_value,
             )
-        output_ref = store.commit_output(
-            output, maximum=policy.max_extracted_output_bytes
-        )
-        completion = _record(
-            dispatch,
-            outcome="SUCCEEDED",
-            response_ref=output_ref,
-            raw_response_ref=raw_ref,
-            actual_tokens=accounting.actual_tokens,
-            actual_cost_units=accounting.actual_cost_units,
-            provider_receipt_ref=accounting.provider_receipt_ref,
-            failure_code=None,
-            created_at=now_value,
-        )
-    except KnownProviderFailure as exc:
-        completion = _record(
-            dispatch,
-            outcome="FAILED_KNOWN",
-            response_ref=None,
-            raw_response_ref=raw_ref,
-            actual_tokens=exc.actual_tokens,
-            actual_cost_units=exc.actual_cost_units,
-            provider_receipt_ref=exc.provider_receipt_ref,
-            failure_code=exc.code,
-            created_at=now_value,
-        )
-    except Exception:
-        completion = _record(
-            dispatch,
-            outcome="UNKNOWN",
-            response_ref=None,
-            raw_response_ref=raw_ref,
-            actual_tokens=None,
-            actual_cost_units=None,
-            provider_receipt_ref=None,
-            failure_code=None,
-            created_at=now_value,
-        )
+            break
+        except ConnectedWorkerError:
+            raise
+        except Exception as exc:
+            # Determine if this is a transient pre-send failure eligible for retry
+            failure_code = _classify_transient_failure(exc)
+            if (
+                policy.automatic_retry
+                and attempt < _MAX_PROVIDER_ATTEMPTS
+                and failure_code in _RETRYABLE_FAILURE_CODES
+            ):
+                raw_ref = None
+                continue
+            completion = _record(
+                dispatch,
+                outcome="UNKNOWN",
+                response_ref=None,
+                raw_response_ref=raw_ref,
+                actual_tokens=None,
+                actual_cost_units=None,
+                provider_receipt_ref=None,
+                failure_code=failure_code,
+                created_at=now_value,
+            )
+            break
     store.write_record(completion)
     completed = client.request(  # type: ignore[attr-defined]
         "complete_model_call",
