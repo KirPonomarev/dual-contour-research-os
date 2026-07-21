@@ -22,8 +22,10 @@ class SystemdHostCompatibilityTests(unittest.TestCase):
         for directive in (
             "PrivateDevices=yes",
             "ProtectClock=yes",
+            "ProtectControlGroups=yes",
             "ProtectKernelLogs=yes",
             "ProtectKernelModules=yes",
+            "ProtectKernelTunables=yes",
         ):
             self.assertNotIn(directive, self.unit)
 
@@ -33,8 +35,6 @@ class SystemdHostCompatibilityTests(unittest.TestCase):
             "RestrictAddressFamilies=AF_UNIX",
             "LockPersonality=yes",
             "MemoryDenyWriteExecute=yes",
-            "ProtectControlGroups=yes",
-            "ProtectKernelTunables=yes",
             "RestrictRealtime=yes",
             "RestrictSUIDSGID=yes",
             "SystemCallArchitectures=native",

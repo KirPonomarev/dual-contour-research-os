@@ -95,6 +95,14 @@ runtime image or container sandbox: the exact Docker command still requires
 remain enabled. Any host migration must re-run a persistent-unit compatibility
 probe rather than silently adding or removing hardening.
 
+A second persistent-unit matrix exercised the actual read-only local Docker
+API path. It proved that `ProtectControlGroups` and `ProtectKernelTunables`
+also deny access to the rootless Docker socket on this user manager even
+though a `/bin/true` probe succeeds. They are therefore omitted as well. The
+complete remaining systemd set passed `docker version` over the bound local
+AF_UNIX socket; the container isolation listed above remains mandatory and
+unchanged.
+
 Run one ingress cycle only after the service and both current immutable export
 bindings are proven:
 
