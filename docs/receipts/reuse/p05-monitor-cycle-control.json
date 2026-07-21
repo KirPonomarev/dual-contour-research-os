@@ -1,0 +1,66 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-p05-monitor-cycle-control-20260721",
+  "issued_at": "2026-07-21T06:56:27Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "reuse-freeze-authority"
+  },
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "fresh-read-only-runtime-pulse-cycle-for-safe-terminal-release-state",
+    "candidates": [
+      {
+        "candidate": "reuse-job-ledger-organism-projector-and-runtime-monitor-journal",
+        "disposition": "selected-internal-adapter"
+      },
+      {
+        "candidate": "mutate-live-ledger-to-refresh-state-time",
+        "disposition": "rejected-research-state-write"
+      },
+      {
+        "candidate": "globally-relax-active-pulse-thresholds",
+        "disposition": "rejected-would-mask-stuck-active-work"
+      },
+      {
+        "candidate": "rebuild-r17-runtime-image",
+        "disposition": "rejected-release-identity-drift"
+      },
+      {
+        "candidate": "repeat-static-monitor-input",
+        "disposition": "rejected-deterministic-staleness"
+      }
+    ],
+    "selected_mode": "minimal owned control adapter: SQLite read-only consistent backups, existing deterministic organism and Pulse projectors, terminal-only age policy selection, and existing immutable monitor journal",
+    "source_ref": "git:1690cdfb8f2e0e85e4a673d4c3d13876d53ee0fb;runtime:0394d6c9e327eceb62f738eca90be3ece015ba79;stage-envelope:sha256:09c0379bc05e4026589909cc656b9be58dd698288d408791e48401a88eb7416b",
+    "internal_reuse": {
+      "runtime_monitor_sha256": "7d594e850d2e5044dddc5f8711095920f1d8fda29b9f21ec8dc7b2e1cfb7a805",
+      "cycle_sha256": "bc4a5a74d1c2e993e3755f528365d7e19c34a1c122672bcc84529ab8da162d52",
+      "active_policy_sha256": "8965074fe642582ac5513e96d1ad1cdc565d33bbc6da761c4413d68ab083e224",
+      "terminal_policy_sha256": "a25d9e928c8a5aaf1ac3bf8f77784cdf534df035828f43a39d15f9a2dc3de811",
+      "service_sha256": "f9097f4b19250217ed8215e19fd4d116c29f181cb5adb4460d440c3e2faa6154"
+    },
+    "external_dependencies_added": 0,
+    "license_spdx": "Proprietary-Internal-Owned",
+    "tests": [
+      "terminal policy selected only for PARKED or WAIT_AUTHORITY with runnable equal to zero",
+      "active stale work remains RED under the original short thresholds",
+      "consistent live-ledger backups compare equal across one monitor projection",
+      "live ledger event count remains unchanged",
+      "monitor journal records zero research-state writes and grants no authority",
+      "container has network none, read-only runtime mount, cap-drop all, and no-new-privileges"
+    ],
+    "canonical_owner": "Agent0-physical-release-control",
+    "rollback": "Restore only the preceding monitor unit and owner-only control tree; leave the exact R17 Core container, runtime ledger, provider state, and domain services unchanged."
+  },
+  "integrity": {
+    "payload_sha256": "cb8a76718275fce6edea06b227985797cfd27f55d238ed4b8a6e4abb04c178fa",
+    "parent_refs": [
+      "git:1690cdfb8f2e0e85e4a673d4c3d13876d53ee0fb",
+      "runtime:0394d6c9e327eceb62f738eca90be3ece015ba79",
+      "stage-envelope:sha256:09c0379bc05e4026589909cc656b9be58dd698288d408791e48401a88eb7416b"
+    ]
+  }
+}

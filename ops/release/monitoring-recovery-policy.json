@@ -5,9 +5,9 @@
   "monitor": {
     "unit": "research-os-runtime-monitor.timer",
     "interval_seconds": 60,
-    "research_state_access": "READ_ONLY_SANITIZED_INPUT",
+    "research_state_access": "READ_ONLY_CONSISTENT_SQLITE_BACKUP",
     "write_namespace": "OWNER_ONLY_MONITOR_JOURNAL",
-    "counter_model": "HASH_CHAIN_REPLAY",
+    "counter_model": "FRESH_SAMPLE_HASH_CHAIN_REPLAY",
     "maximum_records": 30000,
     "external_paging": false,
     "grants_authority": false
