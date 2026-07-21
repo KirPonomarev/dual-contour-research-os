@@ -87,6 +87,22 @@ class ProviderShadowToolTests(unittest.TestCase):
             {"type": "disabled"},
         )
         self.assertEqual(
+            worker_v3._provider_quality_binding(
+                "deepseek-v4-pro", profile.binding("deepseek-v4-pro")
+            )["request_options"]["reasoning_effort"],
+            "max",
+        )
+        self.assertEqual(
+            worker_v3._provider_quality_binding(
+                "deepseek-v4-pro", profile.binding("deepseek-v4-pro")
+            )["request_options"]["thinking"],
+            {"type": "enabled"},
+        )
+        self.assertEqual(worker_v3._provider_timeout_seconds("deepseek-v4-flash", profile), 300)
+        self.assertEqual(worker_v3._provider_timeout_seconds("deepseek-v4-pro", profile), 1800)
+        self.assertEqual(worker_v3._provider_timeout_seconds("glm-5.2-max", profile), 1200)
+        self.assertEqual(worker_v3._provider_timeout_seconds("gpt-5.6-sol-max", profile), 45)
+        self.assertEqual(
             profile.binding("gpt-5.6-sol-xhigh")["request_options"]["reasoning"],
             {"effort": "low"},
         )

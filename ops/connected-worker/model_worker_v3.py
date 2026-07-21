@@ -111,6 +111,37 @@ _HISTORICAL_SHADOW_TOOL_SHA256 = (
     "31254568045a82565e6ab8a77fe198c672d95e66d03f92a82e66af014d17ecfd"
 )
 
+# Maintenance-only provider quality envelope.  The frozen v3 provenance file
+# remains byte-identical to its release evidence; the currently uninstalled
+# connected worker applies these role-specific transport settings immediately
+# before the exact-bound call.  Synthetic token/cost-unit reservations remain
+# unchanged and are not USD provider budgets.
+_PROVIDER_TIMEOUT_SECONDS = {
+    "deepseek-v4-flash": 300,
+    "deepseek-v4-pro": 1800,
+    "glm-5.2-max": 1200,
+}
+
+
+def _provider_quality_binding(
+    name: str,
+    binding: Mapping[str, object],
+) -> dict[str, object]:
+    result = dict(binding)
+    options = dict(result.get("request_options") or {})
+    if name == "deepseek-v4-flash":
+        options.update({"thinking": {"type": "disabled"}, "reasoning_effort": "max"})
+    elif name == "deepseek-v4-pro":
+        options.update({"thinking": {"type": "enabled"}, "reasoning_effort": "max"})
+    elif name == "glm-5.2-max":
+        options.update({"thinking": {"type": "enabled"}, "reasoning_effort": "max"})
+    result["request_options"] = options
+    return result
+
+
+def _provider_timeout_seconds(name: str, profile: ConnectedShadowProfile) -> int:
+    return _PROVIDER_TIMEOUT_SECONDS.get(name, profile.timeout_seconds)
+
 
 class ConnectedWorkerError(RuntimeError):
     """The worker failed closed without exposing private details."""
@@ -906,7 +937,10 @@ def run_dispatch(
     dispatch = Dispatch.load(dispatch_path, policy=policy, profile=profile)
     if os.path.lexists(policy.ai_off_path):
         return {"status": "AI_OFF", "call_id": dispatch.call_id, "network_calls": 0}
-    binding = profile.binding(dispatch.model_binding)
+    binding = _provider_quality_binding(
+        dispatch.model_binding,
+        profile.binding(dispatch.model_binding),
+    )
     if credential_resolver is None:
         environment = dict(os.environ)
         for name, value in _credential_environment(policy.credential_file).items():
@@ -1022,7 +1056,7 @@ def run_dispatch(
             name,
             item,
             key,
-            timeout=bound_profile.timeout_seconds,
+            timeout=_provider_timeout_seconds(name, bound_profile),
             maximum=bound_profile.max_response_bytes,
         )
     adapter = factory(dispatch.model_binding, binding, credential, profile)
