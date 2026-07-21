@@ -1,10 +1,9 @@
 [Unit]
 Description=Dual-Contour Research OS advisor dispatch oneshot
 Documentation=https://github.com/KirPonomarev/dual-contour-research-os
-After=research-os-a1-final.service
-Requires=research-os-a1-final.service
+After=research-os-a1-bridge.service
+Wants=research-os-a1-bridge.service
 ConditionPathExists=!%h/.config/research-os/AI_OFF
-ConditionPathIsSocket=%t/research-os/researchd.sock
 
 [Service]
 Type=oneshot
@@ -12,20 +11,14 @@ ExecStart=/bin/sh %h/.local/lib/research-os/research-os-advisor-dispatch.sh
 TimeoutStartSec=1830
 TimeoutStopSec=30
 Restart=no
+RuntimeDirectory=research-os
+RuntimeDirectoryMode=0700
 
-# Hardening
+# Hardening (systemd-user compatible subset)
 NoNewPrivileges=yes
 ProtectHome=read-only
 ReadWritePaths=%h/.local/share/research-os/connected-dispatch
 PrivateTmp=yes
-ProtectSystem=strict
-ProtectKernelTunables=yes
-ProtectKernelModules=yes
-ProtectControlGroups=yes
-RestrictRealtime=yes
-LockPersonality=yes
-MemoryDenyWriteExecute=yes
-RestrictAddressFamilies=AF_UNIX
 UMask=0077
 
 [Install]

@@ -74,6 +74,7 @@ _COMMAND_PAYLOAD_KEYS = {
         }
     ),
     "lookup_model_call": frozenset({"call_id"}),
+    "list_reserved_model_calls": frozenset(),
 }
 _OPERATOR_COMMANDS = frozenset(
     {
@@ -97,7 +98,7 @@ _SCOUT_COMMANDS = frozenset(
     }
 )
 _CONNECTED_WORKER_COMMANDS = frozenset(
-    {"begin_model_call", "complete_model_call", "lookup_model_call"}
+    {"begin_model_call", "complete_model_call", "lookup_model_call", "list_reserved_model_calls"}
 )
 _ROLE_COMMANDS = {
     "operator": _OPERATOR_COMMANDS,
@@ -247,6 +248,13 @@ class _ModelControlBackend(Protocol):
         *,
         call_id: str,
         actor: str,
+    ) -> Mapping[str, object]: ...
+
+    def list_reserved_model_calls(
+        self,
+        *,
+        actor: str,
+        maximum: int,
     ) -> Mapping[str, object]: ...
 
     def reconcile_model_call(
@@ -636,6 +644,12 @@ class ControlRouter:
                 result = self._require_model_backend().lookup_model_call(
                     call_id=request.payload["call_id"],  # type: ignore[arg-type]
                     actor=actor,
+                )
+            elif request.command == "list_reserved_model_calls":
+                raw_max = request.payload.get("maximum", 1)
+                result = self._require_model_backend().list_reserved_model_calls(
+                    actor=actor,
+                    maximum=raw_max if type(raw_max) is int else 1,  # type: ignore[arg-type]
                 )
             elif request.command == "ack_proposal":
                 result = self._require_a1_backend().ack_proposal(

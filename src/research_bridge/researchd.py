@@ -1014,6 +1014,53 @@ class ResearchDaemon:
         except ModelBrokerError as exc:
             raise ResearchdError("model lookup failed closed") from exc
 
+    def list_reserved_model_calls(
+        self, *, actor: str, maximum: int = 1
+    ) -> Mapping[str, object]:
+        """List RESERVED model calls for dispatch discovery.
+
+        Read-only query bounded by WIP limit.  Only RESERVED state is
+        returned; SENT, terminal, and expired calls are excluded.
+        """
+
+        if not isinstance(actor, str) or not actor.startswith(
+            ("connected_worker:uid:", "scout:uid:")
+        ):
+            raise ResearchdError(
+                "list_reserved_model_calls requires connected_worker or scout principal"
+            )
+        if type(maximum) is not int or not 1 <= maximum <= 8:
+            raise ResearchdError("maximum must be 1..8")
+        broker, _ = self._require_model_runtime()
+        try:
+            all_states = self._ledger._model_call_states()
+            reserved = []
+            now_iso = self._clock().astimezone(timezone.utc).isoformat().replace(
+                "+00:00", "Z"
+            )
+            for record in all_states:
+                snap = record.snapshot
+                if snap.get("state") != "RESERVED":
+                    continue
+                expires = snap.get("expires_at")
+                if isinstance(expires, str) and expires <= now_iso:
+                    continue
+                reserved.append(self._sanitized_model_state(snap))
+                if len(reserved) >= maximum:
+                    break
+            return MappingProxyType(
+                {
+                    "status": "NO_RESERVED_CALLS" if not reserved else "FOUND",
+                    "reserved_calls": tuple(reserved),
+                    "count": len(reserved),
+                    "wip_limit": maximum,
+                }
+            )
+        except (ModelBrokerError, LedgerError) as exc:
+            raise ResearchdError(
+                "list_reserved_model_calls failed closed"
+            ) from exc
+
     def reconcile_model_call(
         self,
         *,
