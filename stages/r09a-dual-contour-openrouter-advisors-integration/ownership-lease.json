@@ -1,0 +1,15 @@
+{
+  "lease_id": "lease-r09a-dual-contour-openrouter-advisors-integration-agent-0",
+  "stage_id": "r09a-dual-contour-openrouter-advisors-integration",
+  "agent_id": "agent-0",
+  "branch": "codex/bridge-a0-r09a-integration",
+  "issued_at": "2026-07-21T14:13:50Z",
+  "expires_at": "2026-07-22T14:13:50Z",
+  "write_set": [
+    "stages/r09a-dual-contour-openrouter-advisors-integration/stage-envelope.json",
+    "stages/r09a-dual-contour-openrouter-advisors-integration/ownership-lease.json",
+    "docs/receipts/integration/r09a-dual-contour-openrouter-advisors.json"
+  ],
+  "exclusive": true,
+  "revoked": false
+}
