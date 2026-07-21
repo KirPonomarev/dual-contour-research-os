@@ -1,0 +1,136 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-p01-r5-docker-socket-compat-20260721",
+  "issued_at": "2026-07-21T00:48:54Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "plan_id": "DCR_OS_AUTONOMOUS_V2_3_NO_BRAKES_20260719",
+    "plan_version": "2.5.2-physical-fast-release-execution-safe",
+    "mission_id": "DCR_OS_PHYSICAL_RELEASE_20260721",
+    "project_fingerprint": "b371429cb7c01fd6c5dbd430510a264684dab906188d706b7479446c1bd8f154",
+    "stage_id": "P01_R5_DOCKER_SOCKET_COMPAT",
+    "agent_id": "agent-0",
+    "base_sha": "84174beed80ee29befc640b4de32cbfbc821d2e8",
+    "head_sha": "0a9595d3206ff097285ee87381651a5b3a9ca9a4",
+    "pr_head_sha": "54bd21854cc96872e426d2d9ec86ba2856b556bb",
+    "integration_commit_sha": "0a9595d3206ff097285ee87381651a5b3a9ca9a4",
+    "integration_tree_sha": "aa1a3e6e7a1e9b188e02388ed17bd3e822140480",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29791345684",
+    "ownership_lease_ref": "stages/p01-r5-docker-socket-compat/ownership-lease.json",
+    "delivery": {
+      "branch": "codex/bridge-a0-p01-r5-docker-socket-compat",
+      "pr_number": 112,
+      "push_head_ci_run": 29791294230,
+      "push_head_ci_conclusion": "success",
+      "pr_head_ci_run": 29791302705,
+      "pr_head_ci_conclusion": "success",
+      "merge_head_sha": "0a9595d3206ff097285ee87381651a5b3a9ca9a4",
+      "merge_tree_sha": "aa1a3e6e7a1e9b188e02388ed17bd3e822140480",
+      "merge_head_ci_run": 29791345684,
+      "merge_head_ci_conclusion": "success",
+      "squash_merge_trailers_valid": true,
+      "terminal_receipt_head_ci": "PENDING_THIS_RECEIPT_DELIVERY"
+    },
+    "repair": {
+      "cause": "After capability setup succeeded, the bound VPS persistent user unit denied its Docker client access to the rootless Docker AF_UNIX socket.",
+      "failed_deploy_receipt_sha256": "0155e85c84a5543fa66c785b0c60c7dfd9096b4d20a264cfc62d45929d762d5c",
+      "diagnostic_envelope_sha256": "c3b035fe0966bccc354a69875af5d1aed42116459463ee5a1d7bd6d6693c5312",
+      "diagnostic_receipt_sha256": "7e1375d2f795512ea3a0016365d0abca0ae35ad856a1690a86fc55a621090b00",
+      "read_only_probe": "docker-version-over-bound-local-af-unix-api",
+      "incompatible_directives": [
+        "ProtectControlGroups=yes",
+        "ProtectKernelTunables=yes"
+      ],
+      "full_final_systemd_set_probe": "pass",
+      "container_network_none_retained": true,
+      "container_read_only_retained": true,
+      "container_cap_drop_all_retained": true,
+      "container_no_new_privileges_retained": true,
+      "image_rebuilt": false,
+      "image_relabelled": false,
+      "domain_services_mutated": false
+    },
+    "release_identity": {
+      "runtime_release_sha": "0394d6c9e327eceb62f738eca90be3ece015ba79",
+      "runtime_tree_sha": "636fda24cbb2da567fb23a4d44fa865ae74ac4bc",
+      "portable_image_id": "sha256:e6db8ab087e18b13ac357a751a2e7318c3abb81a4f2af459c930a630ddc65577",
+      "engine_image_id": "sha256:d1f56e933a8e498ae9e3a1f70ba0e764785a0de44d6f702f7e1945c3621b671f",
+      "carrier_sha256": "46e12e35ef89463a9f13028732e35c30ce3aaa7b121834f68a9aeccbf727d9f7",
+      "maintenance_control_head": "0a9595d3206ff097285ee87381651a5b3a9ca9a4",
+      "runtime_inputs_changed": false,
+      "runtime_subject_advanced": false,
+      "image_rebuilt": false,
+      "bridge_service_running_during_repair": false,
+      "bridge_container_present_during_repair": false
+    },
+    "artifacts": {
+      "control_executable_sha256": "5e44e460b25a0dd98d8ed49ac7a755884388b3706195b374494290b11bcfcac6",
+      "unit_template_sha256": "2a070da4ceb6c9ca4e3a54036181c0383d34ca142bea50a4b600010ee2a34eb9",
+      "artifact_manifest_ref": "inventory/p01-r5-docker-socket-compat-control-artifact.json",
+      "artifact_manifest_sha256": "6641c44b0e49a9a3ab71db3f43412a1647323bf9fa13094faee912c773e43325",
+      "artifact_payload_sha256": "fb15a14f88461d5ceff8c2bd13a69665dece716736289373fe846c4d2b0d1b82",
+      "reuse_receipt_ref": "docs/receipts/reuse/p01-r5-docker-socket-compat.json",
+      "reuse_receipt_sha256": "4808e953070e211770493583edc178cb3215d812ffa1caf70d9c462c262c0d16",
+      "stage_envelope_sha256": "6135e43d3ef435f4879821b78cdf6e4ce716ecf9c8dd6cd07fbbf243a1dba26e",
+      "ownership_lease_sha256": "46d05fb69f0d1f743745bb7fc70f5c438cd7fbf7082434a7c799817fe0f25cbc",
+      "focused_test_sha256": "6716659b36d717f222ce7fa6524a9155dd36b0637b70149265e48a53c5be2fa5"
+    },
+    "audit_results": {
+      "contract_gate": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "runtime_or_release_relevant_mutation": false,
+      "focused_systemd_and_recovery_tests": 23,
+      "full_core_tests": 905,
+      "stage0b_tests": 25,
+      "bound_host_final_set_docker_api_probe": "green",
+      "probe_cleanup": "green",
+      "bridge_safe_tail": "inactive-disabled-container-absent",
+      "market_and_security_after_probe": "green",
+      "physical_deployment_complete": false,
+      "product_done": false,
+      "release_done": false
+    },
+    "post_receipt_requirements": {
+      "exact_terminal_receipt_head_ci": "REQUIRED_PENDING",
+      "receipt_pr_squash_merge": "REQUIRED_PENDING",
+      "exact_receipt_merge_head_ci": "REQUIRED_PENDING",
+      "regenerate_p03_profile_and_envelope_with_final_unit_identity": "REQUIRED_PENDING",
+      "resume_same_exact_r17_deploy": "REQUIRED_PENDING",
+      "stage_branch_and_worktree_cleanup": "REQUIRED_PENDING"
+    },
+    "write_set": [
+      "Makefile",
+      "docs/PHYSICAL_RELEASE_RUNBOOK.md",
+      "ops/deploy/research-os-a1-final.service",
+      "tools/physical_release_control.py",
+      "tests/test_p01_r4_systemd_host_compat.py",
+      "inventory/p01-r5-docker-socket-compat-control-artifact.json",
+      "docs/receipts/reuse/p01-r5-docker-socket-compat.json",
+      "docs/receipts/integration/p01-r5-docker-socket-compat.json",
+      "stages/p01-r5-docker-socket-compat/stage-envelope.json",
+      "stages/p01-r5-docker-socket-compat/ownership-lease.json"
+    ]
+  },
+  "integrity": {
+    "profile": "core-json-sha256-v1",
+    "payload_sha256": "f90e6a872722c21ee772c2d3838dd13fefaf88f1b3dfbee22370ba5406834a78",
+    "parent_refs": [
+      "git:84174beed80ee29befc640b4de32cbfbc821d2e8",
+      "git:54bd21854cc96872e426d2d9ec86ba2856b556bb",
+      "ci:29791302705",
+      "git:0a9595d3206ff097285ee87381651a5b3a9ca9a4",
+      "ci:29791345684",
+      "runtime:0394d6c9e327eceb62f738eca90be3ece015ba79",
+      "unit:sha256:2a070da4ceb6c9ca4e3a54036181c0383d34ca142bea50a4b600010ee2a34eb9",
+      "docker-socket-probe:sha256:7e1375d2f795512ea3a0016365d0abca0ae35ad856a1690a86fc55a621090b00"
+    ]
+  }
+}
