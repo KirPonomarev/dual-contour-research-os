@@ -1,0 +1,73 @@
+{
+  "stage_id": "p01-r4-systemd-host-compat",
+  "agent_id": "agent-0",
+  "objective": "Make the final rootless A1 user service executable on the bound VPS systemd without changing the immutable R17 runtime, image, container sandbox, or domain boundaries.",
+  "executable_blocker": "Two exact P03 deploy attempts failed closed before container creation because the host user systemd returns 218/CAPABILITIES for four capability-mutating service directives; a bounded persistent-unit matrix reproduced the failure and proved all retained directives executable.",
+  "base_sha": "3eed1bcf3a2d667f3369829fa6e70baa89df7a9a",
+  "base_tree": "c05e40b18872e1db8bdd42aa0357f13c19d46529",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a0-p01-r4-systemd-host-compat",
+  "worktree": "/private/tmp/dcr-p01-r4-3eed1bc",
+  "read_set": [
+    "ops/deploy/research-os-a1-final.service",
+    "tools/physical_release_control.py",
+    "tests/test_release_deploy_recovery.py",
+    "tests/test_p01_r3_engine_image_mapping.py",
+    "docs/PHYSICAL_RELEASE_RUNBOOK.md",
+    "owner-only:p03-capability-probe-receipt:d8ffabb15bdfca6a2db75494d38cea2ccb3d19a7c7c3b4353ad5a1db098bcbd6"
+  ],
+  "write_set": [
+    "Makefile",
+    "ops/deploy/research-os-a1-final.service",
+    "tools/physical_release_control.py",
+    "tests/test_p01_r4_systemd_host_compat.py",
+    "docs/PHYSICAL_RELEASE_RUNBOOK.md",
+    "inventory/p01-r4-systemd-host-compat-control-artifact.json",
+    "docs/receipts/reuse/p01-r4-systemd-host-compat.json",
+    "docs/receipts/integration/p01-r4-systemd-host-compat.json",
+    "stages/p01-r4-systemd-host-compat/stage-envelope.json",
+    "stages/p01-r4-systemd-host-compat/ownership-lease.json"
+  ],
+  "boundary_contract": {
+    "incompatible_host_unit_directives_removed": [
+      "PrivateDevices=yes",
+      "ProtectClock=yes",
+      "ProtectKernelLogs=yes",
+      "ProtectKernelModules=yes"
+    ],
+    "retained_host_hardening_required": true,
+    "container_cap_drop_all_required": true,
+    "container_read_only_required": true,
+    "container_no_new_privileges_required": true,
+    "container_network_none_required": true,
+    "runtime_inputs_changed": false,
+    "image_rebuild": false,
+    "additional_vps_mutation": false
+  },
+  "forbidden_scope": [
+    "runtime-image-carrier-config-policy-contract-domain-or-provider mutation",
+    "container-isolation weakening",
+    "history-rewrite-force-push-direct-main-push-or-CI-weakening",
+    "public-listener-domain-write-live-action-or-secret-in-Git"
+  ],
+  "acceptance_commands": [
+    "make contracts",
+    "make physical-release-control",
+    "python3 -m unittest tests.test_p01_r4_systemd_host_compat",
+    "python3 -m unittest tests.test_release_deploy_recovery",
+    "make test",
+    "git diff --check",
+    "exact-head PR merge and terminal receipt CI"
+  ],
+  "risk_class": "medium-host-service-hardening-compatibility-repair",
+  "stop_conditions": [
+    "container hardening must be weakened",
+    "runtime rebuild or relabel becomes necessary",
+    "retained host hardening does not execute on the bound VPS",
+    "frozen public contract break becomes necessary"
+  ],
+  "expected_receipt": "docs/receipts/integration/p01-r4-systemd-host-compat.json",
+  "rollback": "Revert only P01-R4 control files; preserve immutable failed operational receipts and keep the Bridge service disabled.",
+  "commit_authority": "agent-0-only",
+  "push_authority": "agent-0-only"
+}

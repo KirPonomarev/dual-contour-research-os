@@ -1,0 +1,26 @@
+{
+  "lease_id": "lease-p01-r4-systemd-host-compat-agent-0-20260721",
+  "fencing_token": "dcr-os-physical-release-20260721-p01r4-agent0",
+  "stage_id": "p01-r4-systemd-host-compat",
+  "agent_id": "agent-0",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-21T00:16:30Z",
+  "expires_at": "2026-07-21T12:16:30Z",
+  "base_sha": "3eed1bcf3a2d667f3369829fa6e70baa89df7a9a",
+  "branch": "codex/bridge-a0-p01-r4-systemd-host-compat",
+  "worktree": "/private/tmp/dcr-p01-r4-3eed1bc",
+  "write_set": [
+    "Makefile",
+    "ops/deploy/research-os-a1-final.service",
+    "tools/physical_release_control.py",
+    "tests/test_p01_r4_systemd_host_compat.py",
+    "docs/PHYSICAL_RELEASE_RUNBOOK.md",
+    "inventory/p01-r4-systemd-host-compat-control-artifact.json",
+    "docs/receipts/reuse/p01-r4-systemd-host-compat.json",
+    "docs/receipts/integration/p01-r4-systemd-host-compat.json",
+    "stages/p01-r4-systemd-host-compat/stage-envelope.json",
+    "stages/p01-r4-systemd-host-compat/ownership-lease.json"
+  ],
+  "delegation_allowed": false,
+  "state": "active"
+}
