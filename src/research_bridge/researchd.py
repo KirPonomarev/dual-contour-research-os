@@ -2313,7 +2313,13 @@ def _discovery_config_from_authority(
     if model_runtime is not None:
         if not isinstance(model_runtime, Mapping):
             raise ResearchdError("A1 model runtime binding is invalid")
-        context_payload["model_runtime"] = _json_copy(model_runtime)
+        # R18: model_runtime is operational config (routing, bindings, overrides),
+        # not admission authority.  Admission authority is separately bound via
+        # model_route_proof_ref in admission_runtime.  Excluding model_runtime
+        # from the admission context hash allows operational model changes
+        # (routing v1→v2, new bindings, overrides) without invalidating
+        # existing durable admission entries in the ledger.
+        pass
     context_sha256 = canonical_json_sha256(context_payload)
     try:
         executor_refs = frozen_bindings.get("executor_capability_refs")
