@@ -1,0 +1,99 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-r09a-dual-contour-openrouter-advisors-d7d0fdf548b9928622068dce0af96c29",
+  "issued_at": "2026-07-21T14:13:50Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "R09A_DUAL_CONTOUR_OPENROUTER_ADVISORS",
+    "agent_id": "agent-0",
+    "ownership_lease_ref": "stages/r09a-dual-contour-openrouter-advisors-integration/ownership-lease.json",
+    "base_sha": "28da4ab54969846818c0c38ca6f0fd45cb0d5da0",
+    "head_sha": "7670878832645afaa0b19cc58e7c2632e3db0d9f",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "stages/r09a-dual-contour-openrouter-advisors-integration/stage-envelope.json",
+      "stages/r09a-dual-contour-openrouter-advisors-integration/ownership-lease.json",
+      "docs/receipts/integration/r09a-dual-contour-openrouter-advisors.json"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "full_local_tests": "912_PLUS_25_GREEN",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "historical_v1_v2_v3_profile_tool_worker_sha_stable": true,
+      "source_and_merge_tree_equal": true,
+      "required_ci_exact": true,
+      "protected_pr_squash_merge": true,
+      "force_push": false,
+      "direct_main_push": false,
+      "live_vps_runtime_changed": false,
+      "domain_repository_mutation": false,
+      "critical_findings": 0,
+      "high_findings": 0,
+      "new_release_invalidating_medium_findings": 0
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29837953467",
+    "integration_commit_sha": "7670878832645afaa0b19cc58e7c2632e3db0d9f",
+    "plan_id": "DCR_OS_AUTONOMOUS_V2_3_NO_BRAKES_20260719",
+    "plan_version": "2.5.2-physical-release-final",
+    "mission_id": "R09A_DUAL_CONTOUR_OPENROUTER_ADVISORS",
+    "project_fingerprint": "b371429cb7c01fd6c5dbd430510a264684dab906188d706b7479446c1bd8f154",
+    "delivery": {
+      "source_branch": "codex/bridge-a0-r09a-dual-contour-advisors",
+      "source_branch_deleted": true,
+      "source_pr_number": 122,
+      "source_head_sha": "35281cf122e5e60a8ca8e6255b945ae95bc8380d",
+      "source_tree_sha": "b7bb0b545dc9fc12ba9b2e5bff5b7ca6d552274f",
+      "source_push_ci_run": 29837827966,
+      "source_push_ci_conclusion": "success",
+      "source_pr_ci_run": 29837840800,
+      "source_pr_ci_conclusion": "success",
+      "merge_head_sha": "7670878832645afaa0b19cc58e7c2632e3db0d9f",
+      "merge_tree_sha": "b7bb0b545dc9fc12ba9b2e5bff5b7ca6d552274f",
+      "merge_ci_run": 29837953467,
+      "merge_ci_conclusion": "success",
+      "delivery_mode": "protected-pr-squash-merge",
+      "receipt_branch": "codex/bridge-a0-r09a-integration",
+      "receipt_pr": "PENDING_THIS_RECEIPT_DELIVERY",
+      "receipt_head_ci": "PENDING_THIS_RECEIPT_DELIVERY"
+    },
+    "evidence_artifacts": {
+      "capability_receipt_ref": "docs/receipts/capability/r09a-dual-contour-openrouter-advisors.json",
+      "capability_receipt_sha256": "e0613a9efc12d65a311358b3188db0d7aef840cbda727becd39e56df58de13f9",
+      "capability_payload_sha256": "ec5009fd182d3b9ed1651d595217ae1e076f221409ca6ad5b9e4ef6810ee6d24",
+      "stage_envelope_sha256": "a8a73d7f57faf4d28e0a3fb79f71b7c16ba5137f8307818e00a24d519558144b",
+      "ownership_lease_sha256": "1d7405aefbbac8be25f3c38533216aa1302678a30d9c922d60fa723e5b64b2e0"
+    },
+    "credential_reconciliation": {
+      "locator": "MACOS_KEYCHAIN_OPENROUTER",
+      "wrong_wbp_secret_copy_removed": true,
+      "secret_exposed": false
+    },
+    "claim_boundary": {
+      "repository_integration_proven": true,
+      "local_D0_provider_routes_proven": true,
+      "live_vps_worker_v4_deployed": false,
+      "operationally_proven": false,
+      "cross_project_integration_claimed": false
+    }
+  },
+  "integrity": {
+    "profile": "core-json-sha256-v1",
+    "payload_sha256": "d7d0fdf548b9928622068dce0af96c298182357d5d4f7a6493f879c4feb4b44f",
+    "parent_refs": [
+      "git:28da4ab54969846818c0c38ca6f0fd45cb0d5da0",
+      "git:35281cf122e5e60a8ca8e6255b945ae95bc8380d",
+      "ci:29837827966",
+      "ci:29837840800",
+      "git:7670878832645afaa0b19cc58e7c2632e3db0d9f",
+      "ci:29837953467",
+      "capability:sha256:e0613a9efc12d65a311358b3188db0d7aef840cbda727becd39e56df58de13f9"
+    ]
+  }
+}
