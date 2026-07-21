@@ -1,0 +1,61 @@
+{
+  "stage_id": "r09b-public-release-status-reconciliation",
+  "agent_id": "agent-0",
+  "objective": "Reconcile the three public current-status documents with the accepted D125 V2.5.2 superseding physical-release closeout without changing runtime, contracts, receipts or historical evidence.",
+  "executable_blocker": "README.md, docs/ARCHITECTURE.md and docs/PRODUCT_COMPLETION.md still expose historical pre-closeout IN_PROGRESS and deployment-pending markers that can cause a repository-only auditor to report a false current release state.",
+  "base_sha": "d3a3e0e290881c6d5019f3b9bd8a6f342fdcf91c",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "project_fingerprint": "b371429cb7c01fd6c5dbd430510a264684dab906188d706b7479446c1bd8f154",
+  "branch": "codex/bridge-a0-docs-release-status-reconciliation",
+  "worktree": "/Volumes/Work/dual-contour-research-os",
+  "read_set": [
+    "README.md",
+    "docs/ARCHITECTURE.md",
+    "docs/PRODUCT_COMPLETION.md",
+    "docs/receipts/release/p06a-physical-release-sanitized.json",
+    "docs/receipts/integration/p06a-sanitized-evidence-integration.json",
+    "owner-only D125 superseding physical-release closeout"
+  ],
+  "write_set": [
+    "README.md",
+    "docs/ARCHITECTURE.md",
+    "docs/PRODUCT_COMPLETION.md",
+    "stages/r09b-public-release-status-reconciliation/stage-envelope.json",
+    "stages/r09b-public-release-status-reconciliation/ownership-lease.json"
+  ],
+  "forbidden_scope": [
+    "source-contract-profile-runtime-policy-test-deployment-or-receipt-mutation",
+    "historical-evidence-rewrite",
+    "credential-private-response-D2-D3-or-domain-payload-material",
+    "VPS-service-provider-market-security-or-crosslab-mutation",
+    "claim-that-post-release-assurance-windows-are-complete-or-operationally-proven"
+  ],
+  "dependency_hashes": {
+    "superseding_closeout_file_sha256": "c08c12b7066df44662ac08d5d39c82072fdcbf9b57357f3d815a90324ad98ec8",
+    "superseding_closeout_payload_sha256": "8a3c9dce0f50760c831105861b4b3bdfc278238e71164b4dc0a2a5dfbe5236d5",
+    "final_evidence_head": "4ecffe992e1654e10cac15473d45ba3103b074f2",
+    "runtime_subject": "0394d6c9e327eceb62f738eca90be3ece015ba79"
+  },
+  "acceptance_commands": [
+    "make contracts",
+    "make test",
+    "git diff --check",
+    "verify no stale current-status markers remain in the three-document write-set",
+    "exact-head remote CI"
+  ],
+  "risk_class": "low-documentation-governance-and-release-claim-accuracy",
+  "stop_conditions": [
+    "project-fingerprint-base-contract-or-closeout-hash-mismatch",
+    "runtime-or-private-data-mutation-is-required",
+    "release-done-claim-cannot-preserve-operationally-proven-false",
+    "write-outside-declared-write-set"
+  ],
+  "expected_receipt": "docs/receipts/integration/r09b-public-release-status-reconciliation.json",
+  "rollback": "Revert only the additive public status reconciliation; runtime, physical release, private closeout and historical receipts remain unchanged.",
+  "commit_authority": "one-scoped-agent-0-docs-stage",
+  "push_authority": true,
+  "expected_handoff_status": [
+    "ready_for_agent0_audit",
+    "blocked_validation_failed"
+  ]
+}

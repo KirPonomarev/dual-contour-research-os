@@ -1,0 +1,17 @@
+{
+  "lease_id": "lease-r09b-public-release-status-reconciliation-agent-0",
+  "stage_id": "r09b-public-release-status-reconciliation",
+  "agent_id": "agent-0",
+  "branch": "codex/bridge-a0-docs-release-status-reconciliation",
+  "issued_at": "2026-07-21T15:02:36Z",
+  "expires_at": "2026-07-22T15:02:36Z",
+  "write_set": [
+    "README.md",
+    "docs/ARCHITECTURE.md",
+    "docs/PRODUCT_COMPLETION.md",
+    "stages/r09b-public-release-status-reconciliation/stage-envelope.json",
+    "stages/r09b-public-release-status-reconciliation/ownership-lease.json"
+  ],
+  "exclusive": true,
+  "revoked": false
+}
