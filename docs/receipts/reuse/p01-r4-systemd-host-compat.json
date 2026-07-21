@@ -1,0 +1,60 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-p01-r4-systemd-host-compat-20260721",
+  "issued_at": "2026-07-21T00:17:00Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "reuse-freeze-authority"
+  },
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "rootless-user-systemd-host-compatibility-for-final-a1-service",
+    "candidates": [
+      {
+        "candidate": "retain-compatible-systemd-hardening-and-exact-container-sandbox",
+        "disposition": "selected"
+      },
+      {
+        "candidate": "remove-all-systemd-hardening",
+        "disposition": "rejected-overbroad"
+      },
+      {
+        "candidate": "weaken-Docker-container-sandbox",
+        "disposition": "rejected-boundary-violation"
+      },
+      {
+        "candidate": "rebuild-runtime-image",
+        "disposition": "rejected-unrelated-release-invalidation"
+      },
+      {
+        "candidate": "blind-deploy-retry",
+        "disposition": "rejected-no-new-evidence"
+      }
+    ],
+    "selected_mode": "omit only four independently proven incompatible capability-mutating host-wrapper directives while preserving all executable host restrictions and the exact Docker sandbox",
+    "source_ref": "git:3eed1bcf3a2d667f3369829fa6e70baa89df7a9a;owner-only:p03-capability-probe-receipt:d8ffabb15bdfca6a2db75494d38cea2ccb3d19a7c7c3b4353ad5a1db098bcbd6",
+    "unit_template_sha256": "dd025780806b1bf4908775a1ca8a75018f5d184d2b13b4ca5c1f92c547341f19",
+    "code_sha256": "44213706e745b71ad7a9d4f35a232a49dbd0dca82381246357a5acf18cb631d2",
+    "license_spdx": "Proprietary-Internal-Owned",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "incompatible directives absent",
+      "compatible systemd hardening retained",
+      "Docker network-none read-only cap-drop-all no-new-privileges retained",
+      "unit hash bound by control constant",
+      "bound-host persistent-unit compatibility probe before deploy"
+    ],
+    "canonical_owner": "Agent0-physical-release-control",
+    "rollback": "Revert only P01-R4 control files and keep the Bridge service disabled; do not rewrite failed receipts or mutate R17."
+  },
+  "integrity": {
+    "payload_sha256": "095a31d85996e17d506f9f61f484564d4af3424f61f3e86e9851b3dbf8b9335e",
+    "parent_refs": [
+      "git:3eed1bcf3a2d667f3369829fa6e70baa89df7a9a",
+      "runtime:0394d6c9e327eceb62f738eca90be3ece015ba79",
+      "unit-probe:sha256:d8ffabb15bdfca6a2db75494d38cea2ccb3d19a7c7c3b4353ad5a1db098bcbd6"
+    ]
+  }
+}

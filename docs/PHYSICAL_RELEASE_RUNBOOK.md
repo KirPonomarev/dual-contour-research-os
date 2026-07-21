@@ -84,6 +84,17 @@ The deploy path verifies carrier identity `46e12e35...`, portable identity
 `e6db8ab...`, and loaded Docker identity `d1f56e...`, then renders the service
 with `d1f56e...`. This mapping is frozen evidence, not an image rebuild.
 
+The final unit uses only host-level hardening that the bound rootless user
+systemd can execute. Persistent-unit probes proved that `PrivateDevices`,
+`ProtectClock`, `ProtectKernelLogs`, and `ProtectKernelModules` fail before
+`ExecStartPre` with `218/CAPABILITIES` on that user manager, so those four
+host-wrapper directives are intentionally omitted. This does not change the
+runtime image or container sandbox: the exact Docker command still requires
+`--network=none`, `--read-only`, `--cap-drop=ALL`, and
+`--security-opt=no-new-privileges:true`; all compatible systemd restrictions
+remain enabled. Any host migration must re-run a persistent-unit compatibility
+probe rather than silently adding or removing hardening.
+
 Run one ingress cycle only after the service and both current immutable export
 bindings are proven:
 
