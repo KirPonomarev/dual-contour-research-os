@@ -1,0 +1,61 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-p05-r3-monitor-identity-volume-20260721",
+  "issued_at": "2026-07-21T07:19:26Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "reuse-freeze-authority"
+  },
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "owner-only-runtime-identity-readable-by-sandboxed-monitor-uid",
+    "candidates": [
+      {
+        "candidate": "dedicated-read-only-docker-identity-volume-owned-by-uid-10001",
+        "disposition": "selected"
+      },
+      {
+        "candidate": "weaken-host-identity-mode-to-world-readable",
+        "disposition": "rejected-owner-only-regression"
+      },
+      {
+        "candidate": "run-monitor-container-as-root",
+        "disposition": "rejected-authority-expansion"
+      },
+      {
+        "candidate": "mutate-core-config-volume",
+        "disposition": "rejected-runtime-input-collision"
+      }
+    ],
+    "selected_mode": "retain the host binding at 0600, copy exact bytes into a distinct 0600 UID-10001 Docker volume, mount that volume read-only, and compare host/volume SHA-256 before every cycle",
+    "source_ref": "git:4f9f9950c5aeedaf6bd95dfc88d81fdadd5b798e;stage-envelope:sha256:1a855cedad0634019dfa1e30ad9df1d67b6563adee3d00903338d9cc5893a7aa",
+    "unit_sha256": "8f2f16d6aaad00af6bada6d19ad2dce018ff7553df453b455960c69b5fae5175",
+    "volume": {
+      "name": "research-os-a1-monitor-identity",
+      "owner": "10001:10001",
+      "file_mode": "0600",
+      "mount_mode": "read-only",
+      "attached_to_core": false
+    },
+    "external_dependencies_added": 0,
+    "license_spdx": "Proprietary-Internal-Owned",
+    "tests": [
+      "host identity remains 0600",
+      "volume identity is 0600 and owned by 10001:10001",
+      "host and volume identity SHA-256 must match before cycle",
+      "identity volume is read-only in the monitor and absent from Core",
+      "network none, read-only root/runtime mount, cap-drop all, and no-new-privileges remain"
+    ],
+    "canonical_owner": "Agent0-physical-release-control",
+    "rollback": "Restore the preceding monitor unit/control tree and leave the isolated identity volume unattached; never modify Core or its volumes."
+  },
+  "integrity": {
+    "payload_sha256": "6cbc6975c0575c220c9ff58fd4ee168c76d1cf9fb402e0ff81cd8fc4c3de3dd0",
+    "parent_refs": [
+      "git:4f9f9950c5aeedaf6bd95dfc88d81fdadd5b798e",
+      "stage-envelope:sha256:1a855cedad0634019dfa1e30ad9df1d67b6563adee3d00903338d9cc5893a7aa"
+    ]
+  }
+}
