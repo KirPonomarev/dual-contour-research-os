@@ -1,0 +1,106 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-r09b-public-release-status-reconciliation-b672ef3667aa42d99f619351105d5720",
+  "issued_at": "2026-07-21T15:06:31Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "R09B_PUBLIC_RELEASE_STATUS_RECONCILIATION",
+    "agent_id": "agent-0",
+    "ownership_lease_ref": "stages/r09b-public-release-status-reconciliation-integration/ownership-lease.json",
+    "base_sha": "d3a3e0e290881c6d5019f3b9bd8a6f342fdcf91c",
+    "head_sha": "be361dcd068ec7ce9eae99b2f073b04c7f3183fd",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "stages/r09b-public-release-status-reconciliation-integration/stage-envelope.json",
+      "stages/r09b-public-release-status-reconciliation-integration/ownership-lease.json",
+      "docs/receipts/integration/r09b-public-release-status-reconciliation.json"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "full_local_tests": "912_PLUS_25_GREEN",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "status_documents_reconciled": 3,
+      "stale_current_status_markers_remaining": 0,
+      "documentation_only": true,
+      "source_and_merge_tree_equal": true,
+      "required_ci_exact": true,
+      "protected_pr_squash_merge": true,
+      "force_push": false,
+      "direct_main_push": false,
+      "runtime_or_release_identity_changed": false,
+      "live_vps_runtime_changed": false,
+      "domain_repository_mutation": false,
+      "critical_findings": 0,
+      "high_findings": 0,
+      "new_release_invalidating_medium_findings": 0
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29842288290",
+    "integration_commit_sha": "be361dcd068ec7ce9eae99b2f073b04c7f3183fd",
+    "plan_id": "DCR_OS_AUTONOMOUS_V2_3_NO_BRAKES_20260719",
+    "plan_version": "2.5.2-physical-release-final",
+    "mission_id": "R09B_PUBLIC_RELEASE_STATUS_RECONCILIATION",
+    "project_fingerprint": "b371429cb7c01fd6c5dbd430510a264684dab906188d706b7479446c1bd8f154",
+    "delivery": {
+      "source_branch": "codex/bridge-a0-docs-release-status-reconciliation",
+      "source_branch_deleted": true,
+      "source_pr_number": 124,
+      "source_head_sha": "061bbca22f14e5b63b3b42982242151a93f3cbfa",
+      "source_tree_sha": "917eb5121334b90ad7a6a19224523cb812d30352",
+      "source_push_ci_run": 29842208924,
+      "source_push_ci_conclusion": "success",
+      "source_pr_ci_run": 29842220432,
+      "source_pr_ci_conclusion": "success",
+      "merge_head_sha": "be361dcd068ec7ce9eae99b2f073b04c7f3183fd",
+      "merge_tree_sha": "917eb5121334b90ad7a6a19224523cb812d30352",
+      "merge_ci_run": 29842288290,
+      "merge_ci_conclusion": "success",
+      "delivery_mode": "protected-pr-squash-merge",
+      "receipt_branch": "codex/bridge-a0-r09b-integration",
+      "receipt_pr": "PENDING_THIS_RECEIPT_DELIVERY",
+      "receipt_head_ci": "PENDING_THIS_RECEIPT_DELIVERY"
+    },
+    "evidence_artifacts": {
+      "readme_sha256": "ad5f50912962e7eccf2c9a9b43a8f32caf0453c941daf375f7d17b54d31be473",
+      "architecture_sha256": "82bbeadf33c1f152cd31681d051fd07b5290406130441f53cc81887911569cca",
+      "product_completion_sha256": "4f6900e2ebcc03e3889c2a081873bc2ef486bf97c53a2ba0b0c2ede3dec5d920",
+      "source_stage_envelope_sha256": "d3b1de3181e6d7654dc1f4f5458c995065f0af4bc03af37b6b19788e04935fe5",
+      "source_ownership_lease_sha256": "523e3dc85b6d0fa446704cd99ca0ade5a041c8fbc1efce68b0aacd8bb3dab6d0",
+      "p06a_sanitized_evidence_sha256": "12269c0371fbed98b8d103a4e481c8235d026e8f5a694d3d481a6e151283f8e0",
+      "p06a_integration_receipt_sha256": "2b5a05886ca86e5c855d0a5ff681905451712f1a799b822c885c4e8635331eb1",
+      "superseding_closeout_file_sha256": "c08c12b7066df44662ac08d5d39c82072fdcbf9b57357f3d815a90324ad98ec8",
+      "superseding_closeout_payload_sha256": "8a3c9dce0f50760c831105861b4b3bdfc278238e71164b4dc0a2a5dfbe5236d5"
+    },
+    "claim_boundary": {
+      "public_status_drift_closed": true,
+      "physical_product_release": "PASS",
+      "product_done": true,
+      "release_done": true,
+      "master_plan_done": true,
+      "physically_deployed": true,
+      "operationally_proven": false,
+      "post_release_assurance": "DEGRADED_MONITORING",
+      "post_release_windows_complete": false,
+      "live_vps_runtime_changed_by_this_stage": false
+    }
+  },
+  "integrity": {
+    "profile": "core-json-sha256-v1",
+    "payload_sha256": "b672ef3667aa42d99f619351105d5720bdf7ba095509966a07c16e17d8895323",
+    "parent_refs": [
+      "git:d3a3e0e290881c6d5019f3b9bd8a6f342fdcf91c",
+      "git:061bbca22f14e5b63b3b42982242151a93f3cbfa",
+      "ci:29842208924",
+      "ci:29842220432",
+      "git:be361dcd068ec7ce9eae99b2f073b04c7f3183fd",
+      "ci:29842288290",
+      "closeout:sha256:c08c12b7066df44662ac08d5d39c82072fdcbf9b57357f3d815a90324ad98ec8"
+    ]
+  }
+}
