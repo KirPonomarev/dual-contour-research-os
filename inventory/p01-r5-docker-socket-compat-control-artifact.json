@@ -1,0 +1,35 @@
+{
+  "schema_id": "PhysicalReleaseControlArtifact",
+  "schema_version": "1.0.0",
+  "object_id": "physical-release-control-artifact:p01-r5:20260721",
+  "issued_at": "2026-07-21T00:42:00Z",
+  "payload": {
+    "runtime_release_sha": "0394d6c9e327eceb62f738eca90be3ece015ba79",
+    "runtime_tree_sha": "636fda24cbb2da567fb23a4d44fa865ae74ac4bc",
+    "image_id": "sha256:e6db8ab087e18b13ac357a751a2e7318c3abb81a4f2af459c930a630ddc65577",
+    "engine_image_id": "sha256:d1f56e933a8e498ae9e3a1f70ba0e764785a0de44d6f702f7e1945c3621b671f",
+    "carrier_sha256": "46e12e35ef89463a9f13028732e35c30ce3aaa7b121834f68a9aeccbf727d9f7",
+    "carrier_bytes": 47947776,
+    "ingress_executable": "tools/physical_release_control.py",
+    "ingress_executable_sha256": "5e44e460b25a0dd98d8ed49ac7a755884388b3706195b374494290b11bcfcac6",
+    "domain_consumers": [
+      "market",
+      "security"
+    ],
+    "ingress_principal": "collector:uid:10002",
+    "ingress_principal_count": 1,
+    "transport": "AF_UNIX",
+    "public_listener_count": 0,
+    "domain_writes": false,
+    "live_authority": false,
+    "runtime_inputs_changed": false,
+    "deploy_wrapper_mode": "exact-R17-via-owned-low-level-primitives",
+    "forbidden_legacy_entrypoints": [
+      "tools/pre_soak_deploy.py:run",
+      "tools/final_deployment_rebind.py"
+    ]
+  },
+  "integrity": {
+    "payload_sha256": "fb15a14f88461d5ceff8c2bd13a69665dece716736289373fe846c4d2b0d1b82"
+  }
+}

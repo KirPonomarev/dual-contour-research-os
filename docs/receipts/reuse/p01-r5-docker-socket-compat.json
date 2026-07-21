@@ -1,0 +1,60 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-p01-r5-docker-socket-compat-20260721",
+  "issued_at": "2026-07-21T00:42:00Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "reuse-freeze-authority"
+  },
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "capability": "rootless-docker-af-unix-access-from-final-a1-user-service",
+    "candidates": [
+      {
+        "candidate": "retain-proven-final-systemd-set-and-exact-container-sandbox",
+        "disposition": "selected"
+      },
+      {
+        "candidate": "remove-all-systemd-hardening",
+        "disposition": "rejected-overbroad"
+      },
+      {
+        "candidate": "run-rootful-Docker-or-change-user",
+        "disposition": "rejected-architecture-and-authority-change"
+      },
+      {
+        "candidate": "weaken-Docker-container-sandbox",
+        "disposition": "rejected-boundary-violation"
+      },
+      {
+        "candidate": "blind-deploy-retry",
+        "disposition": "rejected-no-new-evidence"
+      }
+    ],
+    "selected_mode": "omit only two independently proven filesystem-namespace directives that deny the bound rootless Docker socket while preserving every Docker container isolation flag and all executable systemd restrictions",
+    "source_ref": "git:84174beed80ee29befc640b4de32cbfbc821d2e8;owner-only:p03-r6-failure:0155e85c84a5543fa66c785b0c60c7dfd9096b4d20a264cfc62d45929d762d5c;owner-only:docker-socket-probe:7e1375d2f795512ea3a0016365d0abca0ae35ad856a1690a86fc55a621090b00",
+    "unit_template_sha256": "2a070da4ceb6c9ca4e3a54036181c0383d34ca142bea50a4b600010ee2a34eb9",
+    "code_sha256": "5e44e460b25a0dd98d8ed49ac7a755884388b3706195b374494290b11bcfcac6",
+    "license_spdx": "Proprietary-Internal-Owned",
+    "license_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests": [
+      "all six bound-host-incompatible systemd directives absent",
+      "executable systemd hardening retained",
+      "Docker network-none read-only cap-drop-all no-new-privileges retained",
+      "unit hash bound by control constant",
+      "full final persistent-unit set reaches read-only local Docker API"
+    ],
+    "canonical_owner": "Agent0-physical-release-control",
+    "rollback": "Revert only P01-R5 control files and keep Bridge disabled; preserve immutable failure and diagnostic receipts and do not mutate R17."
+  },
+  "integrity": {
+    "payload_sha256": "c0087f50ee341f6ffc4693ee8e6983982ba2314847715746f7bef46a2a144437",
+    "parent_refs": [
+      "git:84174beed80ee29befc640b4de32cbfbc821d2e8",
+      "runtime:0394d6c9e327eceb62f738eca90be3ece015ba79",
+      "docker-socket-probe:sha256:7e1375d2f795512ea3a0016365d0abca0ae35ad856a1690a86fc55a621090b00"
+    ]
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "stage_id": "p01-r5-docker-socket-compat",
+  "agent_id": "agent-0",
+  "objective": "Preserve the final rootless A1 service sandbox while allowing its Docker client wrapper to reach only the bound local rootless Docker AF_UNIX API.",
+  "executable_blocker": "After P01-R4 removed the 218/CAPABILITIES directives, R6 reached the Docker initialization precheck but failed closed because two remaining filesystem-namespace systemd directives independently deny the rootless Docker socket; a read-only persistent-unit Docker API matrix proved the exact pair and the complete final set.",
+  "base_sha": "84174beed80ee29befc640b4de32cbfbc821d2e8",
+  "base_tree": "f8bc0d9305bad6d5992c56ab667e141108edb0bc",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a0-p01-r5-docker-socket-compat",
+  "worktree": "/private/tmp/dcr-p01-r5-84174be",
+  "read_set": [
+    "ops/deploy/research-os-a1-final.service",
+    "tools/physical_release_control.py",
+    "tests/test_p01_r4_systemd_host_compat.py",
+    "docs/PHYSICAL_RELEASE_RUNBOOK.md",
+    "owner-only:p03-deployment-r6-receipt:0155e85c84a5543fa66c785b0c60c7dfd9096b4d20a264cfc62d45929d762d5c",
+    "owner-only:p03-docker-socket-probe-receipt:7e1375d2f795512ea3a0016365d0abca0ae35ad856a1690a86fc55a621090b00"
+  ],
+  "write_set": [
+    "Makefile",
+    "ops/deploy/research-os-a1-final.service",
+    "tools/physical_release_control.py",
+    "tests/test_p01_r4_systemd_host_compat.py",
+    "docs/PHYSICAL_RELEASE_RUNBOOK.md",
+    "inventory/p01-r5-docker-socket-compat-control-artifact.json",
+    "docs/receipts/reuse/p01-r5-docker-socket-compat.json",
+    "docs/receipts/integration/p01-r5-docker-socket-compat.json",
+    "stages/p01-r5-docker-socket-compat/stage-envelope.json",
+    "stages/p01-r5-docker-socket-compat/ownership-lease.json"
+  ],
+  "boundary_contract": {
+    "additional_incompatible_host_unit_directives_removed": [
+      "ProtectControlGroups=yes",
+      "ProtectKernelTunables=yes"
+    ],
+    "final_host_hardening_set_docker_api_probe_passed": true,
+    "container_cap_drop_all_required": true,
+    "container_read_only_required": true,
+    "container_no_new_privileges_required": true,
+    "container_network_none_required": true,
+    "runtime_inputs_changed": false,
+    "image_rebuild": false,
+    "additional_vps_mutation": false
+  },
+  "forbidden_scope": [
+    "runtime-image-carrier-config-policy-contract-domain-or-provider mutation",
+    "container-isolation weakening",
+    "history-rewrite-force-push-direct-main-push-or-CI-weakening",
+    "public-listener-domain-write-live-action-or-secret-in-Git"
+  ],
+  "acceptance_commands": [
+    "make contracts",
+    "make physical-release-control",
+    "python3 -m unittest tests.test_p01_r4_systemd_host_compat tests.test_release_deploy_recovery",
+    "make test",
+    "git diff --check",
+    "exact-head PR merge and terminal receipt CI"
+  ],
+  "risk_class": "medium-rootless-docker-socket-host-compatibility-repair",
+  "stop_conditions": [
+    "container hardening must be weakened",
+    "runtime rebuild or relabel becomes necessary",
+    "final host hardening set cannot reach the bound local Docker API",
+    "frozen public contract break becomes necessary"
+  ],
+  "expected_receipt": "docs/receipts/integration/p01-r5-docker-socket-compat.json",
+  "rollback": "Revert only P01-R5 control files; preserve immutable failure and diagnostic receipts and keep Bridge disabled.",
+  "commit_authority": "agent-0-only",
+  "push_authority": "agent-0-only"
+}
