@@ -124,6 +124,16 @@ _MODEL_RUNTIME_KEYS = frozenset(
         "max_reserved_tokens",
         "max_reserved_cost_units",
         "available_bindings",
+        "role_binding_overrides",
+    }
+)
+_MODEL_BINDING_OVERRIDE_ROLES = frozenset(
+    {
+        "SCOUT_FAST",
+        "RESEARCH_WORKER",
+        "CRITIC_PRIMARY",
+        "CRITIC_DEEP",
+        "CHIEF_SCIENTIST",
     }
 )
 _CORRIDOR_EXECUTOR_PROFILE_KEYS = frozenset(
@@ -477,6 +487,7 @@ class ResearchDaemon:
         self._model_broker: ModelCallBroker | None = None
         self._model_routing: ModelProviderRouting | None = None
         self._model_available_bindings: frozenset[str] = frozenset()
+        self._model_role_binding_overrides: Mapping[str, str] = {}
         self._server: UnixControlServer | None = None
         self._started = False
 
@@ -870,9 +881,13 @@ class ResearchDaemon:
                     }
                 )
             if decision.used_fallback:
-                raise ResearchdError(
-                    "fallback route lacks an exact durable registry binding"
-                )
+                if (
+                    self._model_role_binding_overrides.get(role)
+                    != decision.binding
+                ):
+                    raise ResearchdError(
+                        "fallback route lacks an exact durable registry binding"
+                    )
             request_bytes = request_body.encode("utf-8", errors="strict")
             handle = broker.prepare(
                 ModelCallSpec(
@@ -1142,6 +1157,7 @@ class ResearchDaemon:
             "model worker IPC extension",
         )
         try:
+            overrides = runtime["role_binding_overrides"]  # type: ignore[index]
             registry = ModelRoleRegistry(
                 self._contract_root
                 / "a1"
@@ -1197,6 +1213,7 @@ class ResearchDaemon:
         self._model_broker = broker
         self._model_routing = routing
         self._model_available_bindings = available
+        self._model_role_binding_overrides = overrides  # type: ignore[assignment]
 
     def _fresh_staging_directory(self, attempt_id: str) -> Path:
         digest = hashlib.sha256(attempt_id.encode("utf-8")).hexdigest()
@@ -1261,6 +1278,7 @@ class ResearchDaemon:
         self._model_broker = None
         self._model_routing = None
         self._model_available_bindings = frozenset()
+        self._model_role_binding_overrides = {}
         self._fence_ledger = None
         self._input_store = None
         self._checkpoint_store = None
@@ -2053,6 +2071,19 @@ def _model_runtime_from_config(value: object) -> Mapping[str, object]:
     )
     if len(available) != len(set(available)):
         raise _ServiceConfigError("available model bindings are invalid")
+    raw_overrides = value.get("role_binding_overrides")
+    if not isinstance(raw_overrides, dict):
+        raise _ServiceConfigError("role_binding_overrides must be an object")
+    overrides: dict[str, str] = {}
+    for raw_role, raw_binding in raw_overrides.items():
+        role_name = _config_text(raw_role, "binding override role", maximum=128)
+        if role_name not in _MODEL_BINDING_OVERRIDE_ROLES:
+            raise _ServiceConfigError(
+                "binding override role is not an active model role"
+            )
+        overrides[role_name] = _config_text(
+            raw_binding, f"binding override for {role_name}", maximum=256
+        )
     return MappingProxyType(
         {
             **expected_digests,
@@ -2062,6 +2093,7 @@ def _model_runtime_from_config(value: object) -> Mapping[str, object]:
             "budget_scope_ref": budget_scope_ref,
             **limits,
             "available_bindings": available,
+            "role_binding_overrides": MappingProxyType(overrides),
         }
     )
 

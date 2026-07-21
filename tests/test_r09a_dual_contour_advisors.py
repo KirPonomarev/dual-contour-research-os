@@ -85,6 +85,7 @@ def _runtime_config(routing_sha256: str = ROUTING_SHA256) -> dict[str, object]:
             "claude-fable-5",
             "gpt-5.6-sol-xhigh",
         ],
+        "role_binding_overrides": {},
     }
     return config
 

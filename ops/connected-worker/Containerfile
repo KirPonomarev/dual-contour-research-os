@@ -18,13 +18,16 @@ WORKDIR /opt/research-os
 COPY --chown=10004:10001 src/ /opt/research-os/src/
 COPY --chown=10004:10001 tools/model_provider_shadow.py /opt/research-os/tools/model_provider_shadow.py
 COPY --chown=10004:10001 tools/model_provider_shadow_v3.py /opt/research-os/tools/model_provider_shadow_v3.py
+COPY --chown=10004:10001 tools/model_provider_shadow_v4.py /opt/research-os/tools/model_provider_shadow_v4.py
 COPY --chown=10004:10001 provenance/model-provider-connected-shadow-v2.json /opt/research-os/provenance/model-provider-connected-shadow-v2.json
 COPY --chown=10004:10001 provenance/model-provider-connected-shadow-v3.json /opt/research-os/provenance/model-provider-connected-shadow-v3.json
+COPY --chown=10004:10001 provenance/model-provider-connected-shadow-v4.json /opt/research-os/provenance/model-provider-connected-shadow-v4.json
 COPY --chown=10004:10001 provenance/model-provider-routing-v1.json /opt/research-os/provenance/model-provider-routing-v1.json
+COPY --chown=10004:10001 provenance/model-provider-routing-v2.json /opt/research-os/provenance/model-provider-routing-v2.json
 COPY --chown=10004:10001 provenance/model-worker-ipc-extension-v1.json /opt/research-os/provenance/model-worker-ipc-extension-v1.json
 COPY --chown=10004:10001 contracts/a1/v1/profiles/model_role_registry_v1.json /opt/research-os/contracts/a1/v1/profiles/model_role_registry_v1.json
 COPY --chown=10004:10001 ops/connected-worker/ /opt/research-os/ops/connected-worker/
 
 USER 10004:10001
-ENTRYPOINT ["python", "/opt/research-os/ops/connected-worker/model_worker_v3.py"]
-CMD ["run", "--policy", "/opt/research-os/ops/connected-worker/runtime-policy-v3.json", "--storage-encryption-attested"]
+ENTRYPOINT ["python", "/opt/research-os/ops/connected-worker/model_worker_v4.py"]
+CMD ["run", "--policy", "/opt/research-os/ops/connected-worker/runtime-policy-v4.json", "--storage-encryption-attested"]
