@@ -1,0 +1,99 @@
+{
+  "schema_id": "CapabilityProofReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "capability-proof:r09a-dual-contour-openrouter-advisors:20260721",
+  "issued_at": "2026-07-21T14:00:04Z",
+  "issuer": {
+    "id": "agent-0-r09a",
+    "authority_class": "bounded-provider-capability-auditor"
+  },
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "r09a-dual-contour-openrouter-advisors",
+    "project_fingerprint": "b371429cb7c01fd6c5dbd430510a264684dab906188d706b7479446c1bd8f154",
+    "base_sha": "28da4ab54969846818c0c38ca6f0fd45cb0d5da0",
+    "status": "PASS_LOCAL_D0_PROVIDER_ROUTE_ONLY",
+    "bindings": {
+      "routing_v2_sha256": "0539b1c2b3fd2e5b5f6e21769afe99d36a197f9399db100e5f0c5885e5da3c67",
+      "connected_profile_v4_sha256": "c8c01f75b9c659b96ef1ec11cc114584c4df69b78da5658a8ca0866c7fe414d2",
+      "model_broker_sha256": "0d1b3001b0667f45348b523447930f8aa1ef025521fe3ed9c23544bb6389c042",
+      "researchd_sha256": "e15c7033fafe54c92f2eb4647dfc655f8ef66eeb859e23be57b2b3095b695247",
+      "shadow_tool_v4_sha256": "171be0215ce1e88812a48ab53e6a460b04201e5164abfe121549c64609e7bb2f",
+      "connected_worker_v4_sha256": "e7677089fdd7c595748ce89189700bdfcdf23ee98decbcfe098d28ff47756e7b",
+      "runtime_policy_v4_sha256": "2abb2c84ecaa7bacf7a2d547003b167634081bf65aad668f3807b466bb8abb62"
+    },
+    "credential_reconciliation": {
+      "locator": "MACOS_KEYCHAIN_OPENROUTER",
+      "dual_contour_preflight": "CONFIGURED_AND_PROVEN_BY_BOUNDED_D0_CALLS",
+      "wrong_wbp_secret_copy_removed": true,
+      "secret_exposed": false
+    },
+    "provider_calls": [
+      {
+        "role": "CRITIC_PRIMARY",
+        "binding": "claude-fable-5",
+        "requested_model": "anthropic/claude-fable-5",
+        "provider_gateway": "openrouter",
+        "requested_reasoning_effort": "high",
+        "state": "SUCCEEDED",
+        "used_fallback": true,
+        "classification": "D0",
+        "call_id": "model-call:7eb629e4d7e12f6f55a0e2a277004614ac33b556dbb2ced24c949894f439a7a5",
+        "response_ref": "cas:sha256:1710afcf4c07a3af8ab888478d580990be512ad951b03a57bf8b34cf5cba679e",
+        "actual_tokens": 188,
+        "actual_cost_units": null,
+        "requires_cost_reconciliation": true,
+        "automatic_retry": false
+      },
+      {
+        "role": "CRITIC_DEEP",
+        "binding": "gpt-5.6-sol-xhigh",
+        "requested_model": "openai/gpt-5.6-sol",
+        "provider_gateway": "openrouter",
+        "requested_reasoning_effort": "xhigh",
+        "state": "SUCCEEDED",
+        "used_fallback": false,
+        "classification": "D0",
+        "call_id": "model-call:f91498ae09189011b34ca4c0e370527f1f45183452a949659f4d5576176f41f3",
+        "response_ref": "cas:sha256:523022a09af14ec0e40b8e44e7eab96ea36fc5a7976947697038d1928d29af3f",
+        "actual_tokens": 116,
+        "actual_cost_units": null,
+        "requires_cost_reconciliation": true,
+        "automatic_retry": false
+      }
+    ],
+    "failed_closed_observation": {
+      "reason": "shared-ledger-second-call-blocked-by-retained-unknown-cost-reservation",
+      "provider_network_call": false,
+      "remediation": "independent-one-call-ledger-without-budget-widening"
+    },
+    "authority": {
+      "model_outputs_are_untrusted": true,
+      "grants_authority": false,
+      "canonical_writes": 0,
+      "live_trading_actions": 0,
+      "live_security_actions": 0,
+      "publication_actions": 0,
+      "automatic_retry": false
+    },
+    "claim_boundary": {
+      "local_provider_route_proven": true,
+      "upstream_provider_attested": false,
+      "connected_worker_v4_deployed": false,
+      "live_vps_runtime_changed": false,
+      "operationally_proven": false,
+      "cross_project_integration_claimed": false
+    },
+    "secrets_printed": false,
+    "private_responses_committed_to_public_repository": false
+  },
+  "integrity": {
+    "payload_sha256": "ec5009fd182d3b9ed1651d595217ae1e076f221409ca6ad5b9e4ef6810ee6d24",
+    "parent_refs": [
+      "git:28da4ab54969846818c0c38ca6f0fd45cb0d5da0",
+      "profile:sha256:0539b1c2b3fd2e5b5f6e21769afe99d36a197f9399db100e5f0c5885e5da3c67",
+      "profile:sha256:c8c01f75b9c659b96ef1ec11cc114584c4df69b78da5658a8ca0866c7fe414d2"
+    ]
+  }
+}

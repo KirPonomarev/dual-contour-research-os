@@ -1,0 +1,24 @@
+{
+  "lease_id": "lease-r09a-dual-contour-openrouter-advisors-agent-0",
+  "stage_id": "r09a-dual-contour-openrouter-advisors",
+  "agent_id": "agent-0",
+  "branch": "codex/bridge-a0-r09a-dual-contour-advisors",
+  "issued_at": "2026-07-21T13:31:47Z",
+  "expires_at": "2026-07-22T13:31:47Z",
+  "write_set": [
+    "stages/r09a-dual-contour-openrouter-advisors/stage-envelope.json",
+    "stages/r09a-dual-contour-openrouter-advisors/ownership-lease.json",
+    "docs/receipts/reuse/r09a-dual-contour-openrouter-advisors.json",
+    "provenance/model-provider-routing-v2.json",
+    "provenance/model-provider-connected-shadow-v4.json",
+    "src/research_bridge/model_broker.py",
+    "src/research_bridge/researchd.py",
+    "tools/model_provider_shadow_v4.py",
+    "ops/connected-worker/model_worker_v4.py",
+    "ops/connected-worker/runtime-policy-v4.json",
+    "tests/test_r09a_dual_contour_advisors.py",
+    "docs/receipts/capability/r09a-dual-contour-openrouter-advisors.json"
+  ],
+  "exclusive": true,
+  "revoked": false
+}
