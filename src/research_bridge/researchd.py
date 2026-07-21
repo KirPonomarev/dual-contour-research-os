@@ -152,6 +152,12 @@ _MODEL_ROLE_REGISTRY_SHA256 = (
 _MODEL_ROUTING_PROFILE_SHA256 = (
     "37db8596a8245a6b1ea2bc5bce1495a4e7dadb314876e51397ad11dd194b3dc6"
 )
+_MODEL_ROUTING_PROFILE_SHA256_V2 = (
+    "0539b1c2b3fd2e5b5f6e21769afe99d36a197f9399db100e5f0c5885e5da3c67"
+)
+_MODEL_ROUTING_PROFILE_SHA256S = frozenset(
+    {_MODEL_ROUTING_PROFILE_SHA256, _MODEL_ROUTING_PROFILE_SHA256_V2}
+)
 _MODEL_ROLE_EVALUATION_SHA256 = (
     "111a7ac1dc954466b19d5e408debeeefcf65c76b5b025a743a2433be910c1e75"
 )
@@ -1145,8 +1151,19 @@ class ResearchDaemon:
                 expected_profile_sha256=runtime["role_registry_sha256"],  # type: ignore[arg-type]
                 binding_revision=runtime["binding_revision"],  # type: ignore[arg-type]
             )
+            routing_paths = {
+                _MODEL_ROUTING_PROFILE_SHA256: (
+                    provenance_root / "model-provider-routing-v1.json"
+                ),
+                _MODEL_ROUTING_PROFILE_SHA256_V2: (
+                    provenance_root / "model-provider-routing-v2.json"
+                ),
+            }
+            routing_path = routing_paths.get(runtime["routing_profile_sha256"])
+            if routing_path is None:
+                raise ModelBrokerError("model routing profile is unsupported")
             routing = ModelProviderRouting(
-                provenance_root / "model-provider-routing-v1.json",
+                routing_path,
                 expected_profile_sha256=runtime["routing_profile_sha256"],  # type: ignore[arg-type]
                 role_registry=registry,
             )
@@ -1999,13 +2016,15 @@ def _model_runtime_from_config(value: object) -> Mapping[str, object]:
     _expect_config_keys(value, _MODEL_RUNTIME_KEYS, "model_runtime")
     expected_digests = {
         "role_registry_sha256": _MODEL_ROLE_REGISTRY_SHA256,
-        "routing_profile_sha256": _MODEL_ROUTING_PROFILE_SHA256,
         "role_evaluation_sha256": _MODEL_ROLE_EVALUATION_SHA256,
         "worker_ipc_extension_sha256": _MODEL_WORKER_IPC_EXTENSION_SHA256,
     }
     for name, expected in expected_digests.items():
         if value.get(name) != expected:
             raise _ServiceConfigError(f"{name} binding is stale")
+    routing_profile_sha256 = value.get("routing_profile_sha256")
+    if routing_profile_sha256 not in _MODEL_ROUTING_PROFILE_SHA256S:
+        raise _ServiceConfigError("routing_profile_sha256 binding is stale")
     binding_revision = _config_text(
         value.get("binding_revision"), "binding_revision", maximum=128
     )
@@ -2037,6 +2056,7 @@ def _model_runtime_from_config(value: object) -> Mapping[str, object]:
     return MappingProxyType(
         {
             **expected_digests,
+            "routing_profile_sha256": routing_profile_sha256,
             "binding_revision": binding_revision,
             "budget_policy_ref": budget_policy_ref,
             "budget_scope_ref": budget_scope_ref,
@@ -2094,12 +2114,13 @@ def _model_runtime_binding(
         raise ResearchdError("model runtime binding is invalid")
     expected_digests = {
         "role_registry_sha256": _MODEL_ROLE_REGISTRY_SHA256,
-        "routing_profile_sha256": _MODEL_ROUTING_PROFILE_SHA256,
         "role_evaluation_sha256": _MODEL_ROLE_EVALUATION_SHA256,
         "worker_ipc_extension_sha256": _MODEL_WORKER_IPC_EXTENSION_SHA256,
     }
     if any(runtime.get(name) != expected for name, expected in expected_digests.items()):
         raise ResearchdError("model runtime digest binding is stale")
+    if runtime.get("routing_profile_sha256") not in _MODEL_ROUTING_PROFILE_SHA256S:
+        raise ResearchdError("model runtime routing binding is stale")
     if not isinstance(runtime.get("binding_revision"), str):
         raise ResearchdError("model runtime binding revision is invalid")
     available = runtime.get("available_bindings")

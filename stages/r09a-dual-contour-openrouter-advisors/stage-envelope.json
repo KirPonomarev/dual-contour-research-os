@@ -1,0 +1,81 @@
+{
+  "stage_id": "r09a-dual-contour-openrouter-advisors",
+  "agent_id": "agent-0",
+  "objective": "Add Claude Fable 5 as a bounded OpenRouter fallback for the existing CRITIC_PRIMARY role and make the existing GPT-5.6 Sol plus Fable routes usable through Dual-Contour's native broker, connected shadow tool, and one-shot connected worker without introducing another runtime or granting model authority.",
+  "executable_blocker": "Dual-Contour already owns the provider-neutral broker and OpenRouter credential path, but its frozen routing/profile set contains GPT-5.6 Sol only; Claude Fable 5 cannot be selected, dispatched, or proven through the project runtime.",
+  "base_sha": "28da4ab54969846818c0c38ca6f0fd45cb0d5da0",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "a1_contract_sha256": "eab6401e6fc1460433a7b45b052c0218f3d26a90e6489a234bf2d51d2269dbe1",
+  "project_fingerprint": "b371429cb7c01fd6c5dbd430510a264684dab906188d706b7479446c1bd8f154",
+  "branch": "codex/bridge-a0-r09a-dual-contour-advisors",
+  "worktree": "/private/tmp/dcr-r09a-dual-contour-advisors",
+  "read_set": [
+    "contracts/a1/v1/profiles/model_role_registry_v1.json",
+    "provenance/model-provider-routing-v1.json",
+    "provenance/model-provider-connected-shadow-v3.json",
+    "src/research_bridge/model_broker.py",
+    "src/research_bridge/researchd.py",
+    "tools/model_provider_shadow_v3.py",
+    "ops/connected-worker/model_worker_v3.py",
+    "tests/test_s16_provider_routing.py",
+    "tests/test_s17_provider_shadow_tool.py",
+    "tests/test_r04c_connected_worker_runtime.py"
+  ],
+  "write_set": [
+    "stages/r09a-dual-contour-openrouter-advisors/stage-envelope.json",
+    "stages/r09a-dual-contour-openrouter-advisors/ownership-lease.json",
+    "docs/receipts/reuse/r09a-dual-contour-openrouter-advisors.json",
+    "provenance/model-provider-routing-v2.json",
+    "provenance/model-provider-connected-shadow-v4.json",
+    "src/research_bridge/model_broker.py",
+    "src/research_bridge/researchd.py",
+    "tools/model_provider_shadow_v4.py",
+    "ops/connected-worker/model_worker_v4.py",
+    "ops/connected-worker/runtime-policy-v4.json",
+    "tests/test_r09a_dual_contour_advisors.py",
+    "docs/receipts/capability/r09a-dual-contour-openrouter-advisors.json"
+  ],
+  "forbidden_scope": [
+    "wild-boar-proxy-market-security-repository-or-crosslab-protocol-mutation",
+    "frozen-v1-contract-profile-or-historical-v1-v2-v3-provenance-tool-worker-mutation",
+    "credential-value-token-account-billing-raw-response-or-private-CAS-material-in-git",
+    "D2-D3-sealed-holdout-live-trading-live-security-publication-or-authority-escalation",
+    "new-provider-SDK-service-database-queue-scheduler-or-automatic-retry"
+  ],
+  "dependency_hashes": {
+    "role_registry_v1_sha256": "4faf6765f48a952e4d35540d92797330517938b34b8d2f12cde791e761a32eac",
+    "routing_v1_sha256": "37db8596a8245a6b1ea2bc5bce1495a4e7dadb314876e51397ad11dd194b3dc6",
+    "connected_profile_v3_sha256": "707b5b2da2e6ae2d735dc51def3cde79683e5467ec3f72e029612dea02564779",
+    "model_broker_sha256": "0ec53e1a5e677d198987057b2c07d2ea58748a6d5e9507b0cfae0c886e655ebe",
+    "researchd_sha256": "e6d34f2b81f44b6154426ecbcd160b6afcbe8ef9ba30107da6053efb780a7f9f",
+    "shadow_tool_v3_sha256": "a02f33670f6aa13046e6a32bc64defd4b8920c34beb1bad345f1d17344a11692",
+    "connected_worker_v3_sha256": "20ed9aa34cde6b5a5ad3a9050cc45f4818bcdf61d1a169f82946746f5c859f73",
+    "external_code_dependencies": "none"
+  },
+  "acceptance_commands": [
+    "python3 -m unittest -v tests.test_r09a_dual_contour_advisors tests.test_s16_provider_routing tests.test_s17_provider_shadow_tool tests.test_r04c_connected_worker_runtime tests.test_r04b_broker_scout_ipc",
+    "python3 tools/model_provider_shadow_v4.py --profile v4 preflight",
+    "bounded D0 live provider proof for CRITIC_DEEP and CRITIC_PRIMARY with zero retry",
+    "make contracts",
+    "make test",
+    "git diff --check",
+    "exact-head remote CI"
+  ],
+  "risk_class": "high-provider-identity-routing-privacy-cost-and-release-boundary",
+  "stop_conditions": [
+    "project-fingerprint-base-contract-or-worktree-mismatch",
+    "secret-private-response-or-D2-D3-material-enters-public-worktree",
+    "historical-frozen-profile-or-contract-mutation-is-required",
+    "Fable-route-requires-caller-selected-provider-authority-or-automatic-retry",
+    "live-proof-cannot-remain-D0-bounded-one-call-per-route-and-owner-authorized",
+    "write-outside-declared-write-set"
+  ],
+  "expected_receipt": "docs/receipts/capability/r09a-dual-contour-openrouter-advisors.json",
+  "rollback": "Remove the additive v2/v4 profiles, versioned v4 tool and worker, bounded broker/researchd compatibility, tests and receipts; the accepted v1 routing, v2/v3 provider profiles, v3 tool/worker, runtime and all historical receipts remain byte-identical.",
+  "commit_authority": "one-scoped-agent-0-maintenance-stage",
+  "push_authority": true,
+  "expected_handoff_status": [
+    "ready_for_agent0_audit",
+    "blocked_validation_failed"
+  ]
+}

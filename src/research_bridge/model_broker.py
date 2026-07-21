@@ -696,9 +696,13 @@ class ModelProviderRouting:
         except (UnicodeDecodeError, json.JSONDecodeError, ModelBrokerError) as exc:
             raise ModelBrokerError("provider routing profile is not strict JSON") from exc
         value = _exact(profile, _ROUTING_PROFILE_KEYS, "provider routing profile")
+        profile_identity = (value["profile_id"], value["schema_version"])
         if (
-            value["profile_id"] != "model-provider-routing-v1"
-            or value["schema_version"] != "1.0.0"
+            profile_identity
+            not in {
+                ("model-provider-routing-v1", "1.0.0"),
+                ("model-provider-routing-v2", "2.0.0"),
+            }
             or value["status"] != "fixture-evaluated"
             or value["routing_mode"]
             != "deterministic-role-to-evaluated-binding"

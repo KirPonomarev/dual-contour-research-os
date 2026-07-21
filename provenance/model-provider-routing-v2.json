@@ -1,0 +1,199 @@
+{
+  "profile_id": "model-provider-routing-v2",
+  "schema_version": "2.0.0",
+  "status": "fixture-evaluated",
+  "routing_mode": "deterministic-role-to-evaluated-binding",
+  "api_identifiers": "UNVERIFIED_UNTIL_REAL_PROVIDER_SHADOW",
+  "privacy": {
+    "allowed_input_classes": [
+      "D0",
+      "D1"
+    ],
+    "forbidden_input_classes": [
+      "D2",
+      "D3",
+      "sealed-holdout"
+    ]
+  },
+  "council": {
+    "max_calls": 4,
+    "tiers": {
+      "STANDARD": [
+        "RESEARCH_WORKER",
+        "CRITIC_PRIMARY"
+      ],
+      "MATERIAL": [
+        "RESEARCH_WORKER",
+        "CRITIC_PRIMARY",
+        "CRITIC_DEEP"
+      ],
+      "CRITICAL": [
+        "RESEARCH_WORKER",
+        "CRITIC_PRIMARY",
+        "CRITIC_DEEP",
+        "CHIEF_SCIENTIST"
+      ]
+    }
+  },
+  "bindings": {
+    "deepseek-v4-flash": {
+      "provider_slot": "DEEPSEEK_API",
+      "family": "deepseek-v4",
+      "provenance_group": "deepseek:deepseek-v4",
+      "candidate_api_identifier": "deepseek-v4-flash",
+      "api_identifier_status": "UNVERIFIED",
+      "effort_class": "fast",
+      "fixture_eval_status": "PASS",
+      "fixture_eval_ref": "source-freeze:s16-model-provider-routing-fixtures-20260718",
+      "allowed_input_classes": [
+        "D0",
+        "D1"
+      ],
+      "availability": "FIXTURE_ONLY"
+    },
+    "deepseek-v4-pro": {
+      "provider_slot": "DEEPSEEK_API",
+      "family": "deepseek-v4",
+      "provenance_group": "deepseek:deepseek-v4",
+      "candidate_api_identifier": "deepseek-v4-pro",
+      "api_identifier_status": "UNVERIFIED",
+      "effort_class": "standard",
+      "fixture_eval_status": "PASS",
+      "fixture_eval_ref": "source-freeze:s16-model-provider-routing-fixtures-20260718",
+      "allowed_input_classes": [
+        "D0",
+        "D1"
+      ],
+      "availability": "FIXTURE_ONLY"
+    },
+    "glm-5.2-max": {
+      "provider_slot": "GLM_API",
+      "family": "glm-5.2",
+      "provenance_group": "zhipu:glm-5.2",
+      "candidate_api_identifier": "glm-5.2-max",
+      "api_identifier_status": "UNVERIFIED",
+      "effort_class": "critic",
+      "fixture_eval_status": "PASS",
+      "fixture_eval_ref": "source-freeze:s16-model-provider-routing-fixtures-20260718",
+      "allowed_input_classes": [
+        "D0",
+        "D1"
+      ],
+      "availability": "FIXTURE_ONLY"
+    },
+    "claude-fable-5": {
+      "provider_slot": "OPENROUTER_API",
+      "family": "claude-fable-5",
+      "provenance_group": "anthropic:claude-fable-5",
+      "candidate_api_identifier": "anthropic/claude-fable-5",
+      "api_identifier_status": "UNVERIFIED",
+      "effort_class": "critic",
+      "fixture_eval_status": "PASS",
+      "fixture_eval_ref": "source-freeze:r09a-dual-contour-openrouter-advisors-synthetic-eval-20260721",
+      "allowed_input_classes": [
+        "D0",
+        "D1"
+      ],
+      "availability": "FIXTURE_ONLY"
+    },
+    "gpt-5.6-sol-xhigh": {
+      "provider_slot": "OPENAI_API",
+      "family": "gpt-5.6-sol",
+      "provenance_group": "openai:gpt-5.6-sol",
+      "candidate_api_identifier": "gpt-5.6-sol-xhigh",
+      "api_identifier_status": "UNVERIFIED",
+      "effort_class": "xhigh",
+      "fixture_eval_status": "PASS",
+      "fixture_eval_ref": "source-freeze:s16-model-provider-routing-fixtures-20260718",
+      "allowed_input_classes": [
+        "D0",
+        "D1"
+      ],
+      "availability": "FIXTURE_ONLY"
+    },
+    "gpt-5.6-sol-max": {
+      "provider_slot": "OPENAI_API",
+      "family": "gpt-5.6-sol",
+      "provenance_group": "openai:gpt-5.6-sol",
+      "candidate_api_identifier": "gpt-5.6-sol-max",
+      "api_identifier_status": "UNVERIFIED",
+      "effort_class": "max",
+      "fixture_eval_status": "PASS",
+      "fixture_eval_ref": "source-freeze:s16-model-provider-routing-fixtures-20260718",
+      "allowed_input_classes": [
+        "D0",
+        "D1"
+      ],
+      "availability": "FIXTURE_ONLY"
+    },
+    "qwen-reserve-slot": {
+      "provider_slot": "QWEN_API",
+      "family": "qwen-unselected",
+      "provenance_group": "qwen:unselected",
+      "candidate_api_identifier": null,
+      "api_identifier_status": "UNSELECTED",
+      "effort_class": "reserve",
+      "fixture_eval_status": "NOT_RUN",
+      "fixture_eval_ref": null,
+      "allowed_input_classes": [
+        "D0",
+        "D1"
+      ],
+      "availability": "DISABLED_UNEVALUATED"
+    }
+  },
+  "roles": {
+    "SCOUT_FAST": {
+      "primary": "deepseek-v4-flash",
+      "fallbacks": [
+        "deepseek-v4-pro"
+      ],
+      "unavailable_action": "PARKED"
+    },
+    "RESEARCH_WORKER": {
+      "primary": "deepseek-v4-pro",
+      "fallbacks": [
+        "deepseek-v4-flash"
+      ],
+      "unavailable_action": "PARKED"
+    },
+    "CRITIC_PRIMARY": {
+      "primary": "glm-5.2-max",
+      "fallbacks": [
+        "claude-fable-5"
+      ],
+      "unavailable_action": "WAIT_PROVIDER"
+    },
+    "CRITIC_DEEP": {
+      "primary": "gpt-5.6-sol-xhigh",
+      "fallbacks": [
+        "gpt-5.6-sol-max"
+      ],
+      "unavailable_action": "WAIT_PROVIDER"
+    },
+    "CHIEF_SCIENTIST": {
+      "primary": "gpt-5.6-sol-max",
+      "fallbacks": [
+        "gpt-5.6-sol-xhigh"
+      ],
+      "unavailable_action": "WAIT_PROVIDER"
+    },
+    "ARBITER_RESERVE": {
+      "primary": null,
+      "fallbacks": [],
+      "unavailable_action": "WAIT_PROVIDER"
+    }
+  },
+  "invariants": {
+    "model_outputs_are_untrusted": true,
+    "routing_is_deterministic": true,
+    "caller_cannot_select_binding": true,
+    "fallback_cannot_widen_privacy_or_authority": true,
+    "every_routed_binding_has_fixture_eval": true,
+    "same_family_efforts_share_provenance_group": true,
+    "consensus_is_not_evidence": true,
+    "cross_family_independence_is_not_claimed": true,
+    "real_provider_calls": false,
+    "credentials_or_endpoints_present": false
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "schema_id": "ConnectedWorkerRuntimePolicy",
+  "schema_version": "1.0.0",
+  "policy_id": "r09a-dual-contour-openrouter-advisors-v1",
+  "worker_uid": 10004,
+  "worker_gid": 10001,
+  "control_socket": "/var/lib/research-os/researchd.sock",
+  "private_store_root": "/var/lib/research-os-connected/private-cas",
+  "ai_off_path": "/run/research-os-connected/AI_OFF",
+  "credential_file": "/run/research-os-connected/provider.env",
+  "max_dispatch_bytes": 65536,
+  "max_completion_bytes": 16384,
+  "max_extracted_output_bytes": 65536,
+  "max_provider_output_tokens": 512,
+  "provider_input_token_margin": 256,
+  "minimum_output_bytes": 16,
+  "retention_seconds": 604800,
+  "root_mode": "0700",
+  "file_mode": "0600",
+  "storage_encryption": "EXTERNAL_VOLUME_REQUIRED",
+  "credential_locators": [
+    "ENVIRONMENT",
+    "MACOS_KEYCHAIN_OPENROUTER",
+    "OWNER_ONLY_ENV_FILE_VPS"
+  ],
+  "allowed_classifications": [
+    "D0",
+    "D1"
+  ],
+  "automatic_retry": false,
+  "replay_completion_only": true,
+  "worker_ipc_extension_sha256": "03d91f027bb6975c55d84acaef188546bcd24af9944a72f4ff9314296399d07a",
+  "shadow_profile_sha256": "c8c01f75b9c659b96ef1ec11cc114584c4df69b78da5658a8ca0866c7fe414d2",
+  "shadow_tool_sha256": "171be0215ce1e88812a48ab53e6a460b04201e5164abfe121549c64609e7bb2f"
+}
