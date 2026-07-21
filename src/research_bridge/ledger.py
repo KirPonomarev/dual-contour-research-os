@@ -1610,7 +1610,7 @@ class JobLedger:
             previous = record.snapshot
         return records
 
-    def _model_call_states(self) -> tuple[ModelCallTransitionRecord, ...]:
+    def model_call_states(self) -> tuple[ModelCallTransitionRecord, ...]:
         """Return every latest replay-validated model-call state without writes."""
 
         with self._lock:
@@ -1635,6 +1635,11 @@ class JobLedger:
             )
             latest[call_id] = record
         return tuple(latest[call_id] for call_id in sorted(latest))
+
+    def _model_call_states(self) -> tuple[ModelCallTransitionRecord, ...]:
+        """Compatibility alias; production consumers use model_call_states()."""
+
+        return self.model_call_states()
 
     def _latest_model_call_states_locked(self) -> dict[str, Mapping[str, object]]:
         rows = self._connection.execute(

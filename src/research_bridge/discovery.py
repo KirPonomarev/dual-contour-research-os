@@ -321,6 +321,10 @@ class DurableDiscoveryConfig:
     head_sha: str
     base_sha: str
     release_manifest_sha256: str
+    context_schema_version: str = "a1-context-v1"
+    admission_authority_sha256: str | None = None
+    operational_model_runtime_sha256: str | None = None
+    migration_from_context_sha256s: tuple[str, ...] = ()
     claim_ttl_seconds: int = 300
     maximum_reason_feedback: int = 1
     maximum_source_triggers_per_window: int = 12
@@ -335,6 +339,39 @@ class DurableDiscoveryConfig:
             ("release_manifest_sha256", self.release_manifest_sha256),
         ):
             _sha256(name, value)
+        if self.context_schema_version not in {"a1-context-v1", "a1-context-v2"}:
+            raise DiscoveryError("context schema version is invalid")
+        if self.context_schema_version == "a1-context-v2":
+            if self.admission_authority_sha256 is None:
+                raise DiscoveryError("admission authority digest is required")
+            if self.operational_model_runtime_sha256 is None:
+                raise DiscoveryError("operational model runtime digest is required")
+            _sha256("admission_authority_sha256", self.admission_authority_sha256)
+            _sha256(
+                "operational_model_runtime_sha256",
+                self.operational_model_runtime_sha256,
+            )
+        elif (
+            self.admission_authority_sha256 is not None
+            or self.operational_model_runtime_sha256 is not None
+            or self.migration_from_context_sha256s
+        ):
+            raise DiscoveryError("v1 context cannot carry v2 migration bindings")
+        legacy_contexts = _string_sequence(
+            "migration_from_context_sha256s",
+            self.migration_from_context_sha256s,
+            allow_empty=True,
+            maximum=64,
+        )
+        if len(legacy_contexts) > 8:
+            raise DiscoveryError("too many migration legacy contexts")
+        for value in legacy_contexts:
+            _sha256("migration legacy context", value)
+        if len(legacy_contexts) != len(set(legacy_contexts)):
+            raise DiscoveryError("migration legacy contexts are duplicated")
+        if self.context_sha256 in legacy_contexts:
+            raise DiscoveryError("migration cannot target its current context")
+        object.__setattr__(self, "migration_from_context_sha256s", legacy_contexts)
         for name, value in (("head_sha", self.head_sha), ("base_sha", self.base_sha)):
             if not isinstance(value, str) or _GIT_SHA_RE.fullmatch(value) is None:
                 raise DiscoveryError(f"{name} must be a 40-hex Git commit")
@@ -2023,6 +2060,11 @@ class DurableDiscoveryService:
             vcs = frozen_snapshot.get("vcs_identity")
             if (
                 frozen_snapshot.get("policy_sha256") != self._config.policy_sha256
+                or frozen_snapshot.get("context_sha256")
+                not in {
+                    self._config.context_sha256,
+                    *self._config.migration_from_context_sha256s,
+                }
                 or frozen_snapshot.get("executor_capability_refs")
                 != list(admission_config.executor_capability_refs)
                 or frozen_snapshot.get("evaluator_capability_refs")

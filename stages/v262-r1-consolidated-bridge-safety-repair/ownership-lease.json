@@ -1,0 +1,26 @@
+{
+  "lease_id": "lease-v262-r1-consolidated-bridge-safety-repair-agent-0-20260721",
+  "fencing_token": "dcr-os-v262-r1-safety-repair-agent0",
+  "stage_id": "v262-r1-consolidated-bridge-safety-repair",
+  "agent_id": "agent-0",
+  "issuer": "agent-0",
+  "issued_at": "2026-07-21T19:42:47Z",
+  "expires_at": "2026-07-22T19:42:47Z",
+  "base_sha": "d13bdaf98307540c17bc320f23e2f2c142f72e6b",
+  "branch": "codex/bridge-a0-v262-r1-safety-repair",
+  "worktree": "/private/tmp/dcr-v262-r1-safety",
+  "write_set": [
+    "src/research_bridge/discovery.py",
+    "src/research_bridge/researchd.py",
+    "src/research_bridge/ledger.py",
+    "ops/deploy/research-os-advisor-dispatch.sh",
+    "ops/connected-worker/model_worker_v4.py",
+    "tests/test_v262_r1_bridge_safety_repair.py",
+    "docs/receipts/reuse/v262-r1-bridge-safety-repair.json",
+    "docs/receipts/integration/v262-r1-bridge-safety-repair.json",
+    "stages/v262-r1-consolidated-bridge-safety-repair/stage-envelope.json",
+    "stages/v262-r1-consolidated-bridge-safety-repair/ownership-lease.json"
+  ],
+  "delegation_allowed": false,
+  "state": "active"
+}

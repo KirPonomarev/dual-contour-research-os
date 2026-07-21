@@ -1,0 +1,78 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-v262-r1-bridge-safety-repair-20260721",
+  "issued_at": "2026-07-21T19:55:00Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "plan_id": "DCR_OS_V2_6_2_R18_RECOVERY_AND_FINAL_RELEASE",
+    "plan_version": "2.6.2-R1",
+    "amendment_id": "V262-R1-FAST-CORRECTIVE",
+    "project_fingerprint": "b371429cb7c01fd6c5dbd430510a264684dab906188d706b7479446c1bd8f154",
+    "sprint_id": "R01_CONSOLIDATED_BRIDGE_SAFETY_REPAIR",
+    "stage_id": "F03-F04-REPAIR",
+    "agent_id": "agent-0",
+    "base_sha": "d13bdaf98307540c17bc320f23e2f2c142f72e6b",
+    "head_sha": "PENDING_EXACT_PR_HEAD",
+    "integration_commit_sha": "PENDING_SQUASH_MERGE",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "delivery_status": "LOCAL_ACCEPTED_PENDING_EXACT_HEAD_PR_CI",
+    "ownership_lease_ref": "stages/v262-r1-consolidated-bridge-safety-repair/ownership-lease.json",
+    "repair": {
+      "legacy_admission_entries_preserved": 2,
+      "legacy_context_sha256": "a980841382635e8acde469df6080ea1efab69b0284da5c1acaf81d8dc45e45bd",
+      "context_schema_version": "a1-context-v2",
+      "aggregate_context_comparison": true,
+      "public_model_call_state_api": true,
+      "production_wip_limit": 1,
+      "dispatch_requires_systemd_and_core_terminal_truth": true,
+      "maximum_provider_attempts": 2,
+      "ambiguous_retry": false,
+      "attempt_identity_and_network_count": true,
+      "ledger_rows_mutated_by_migration": 0
+    },
+    "artifacts": {
+      "stage_envelope_sha256": "34c29aeae8d329eb667d0b026d6e538c58a90ae7d85fea9195ab9b807518babe",
+      "ownership_lease_sha256": "a138ea30099b6d3ada8a9a0f54e037f5afbcf2a80ad487e335cef37c83c902d5",
+      "discovery_sha256": "9a2d5ebbbe75edb40bb876d37cc653859bfa8f0ef309794dc4379f28f5e12bb9",
+      "researchd_sha256": "89461a056fca088e37834457a0f16b0a271dd260f34cc1a6c38afaeb2bc29e1d",
+      "ledger_sha256": "02d16e7982c1e00416372fcc66d7d59345b21c791e7a123e19383011014cea64",
+      "dispatch_sha256": "dc63bdbc7a600eb654cec1ad74763f03316be2cfa0f5de5112ed9591f8c96d7f",
+      "worker_sha256": "2f6801dd6f963e744067f63a4cf40cb8bdb36ddc4dbcfb13ef19925d899aeaa5",
+      "focused_test_sha256": "09662573f16836a241e1e9298edd7338f08f512845065cb3d4cfe3bd9ede55e4"
+    },
+    "acceptance": {
+      "focused_r01_tests": 5,
+      "related_runtime_tests": 41,
+      "admission_runtime_and_hostile_tests": 14,
+      "make_contracts": "GREEN",
+      "exact_head_remote_ci": "PENDING_PR",
+      "secret_material_in_receipt": false
+    },
+    "write_set": [
+      "src/research_bridge/discovery.py",
+      "src/research_bridge/researchd.py",
+      "src/research_bridge/ledger.py",
+      "ops/deploy/research-os-advisor-dispatch.sh",
+      "ops/connected-worker/model_worker_v4.py",
+      "tests/test_v262_r1_bridge_safety_repair.py",
+      "docs/receipts/reuse/v262-r1-bridge-safety-repair.json",
+      "docs/receipts/integration/v262-r1-bridge-safety-repair.json",
+      "stages/v262-r1-consolidated-bridge-safety-repair/stage-envelope.json",
+      "stages/v262-r1-consolidated-bridge-safety-repair/ownership-lease.json"
+    ]
+  },
+  "integrity": {
+    "profile": "core-json-sha256-v1",
+    "payload_sha256": "31ef2eb99abc72c94232fb80945c983df0438a771ad01e9c7ff197199f1ce79b",
+    "parent_refs": [
+      "git:d13bdaf98307540c17bc320f23e2f2c142f72e6b",
+      "owner-only:admission-preflight:sha256:39ae30320ff7935a83a1cecf82d6fed6496c010f6d8d186a8e56ef6d0e4ad226"
+    ]
+  }
+}
