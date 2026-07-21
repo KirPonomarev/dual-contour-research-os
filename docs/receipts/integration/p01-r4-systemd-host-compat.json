@@ -1,0 +1,140 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-p01-r4-systemd-host-compat-20260721",
+  "issued_at": "2026-07-21T00:26:19Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "plan_id": "DCR_OS_AUTONOMOUS_V2_3_NO_BRAKES_20260719",
+    "plan_version": "2.5.2-physical-fast-release-execution-safe",
+    "mission_id": "DCR_OS_PHYSICAL_RELEASE_20260721",
+    "project_fingerprint": "b371429cb7c01fd6c5dbd430510a264684dab906188d706b7479446c1bd8f154",
+    "stage_id": "P01_R4_SYSTEMD_HOST_COMPAT",
+    "agent_id": "agent-0",
+    "base_sha": "3eed1bcf3a2d667f3369829fa6e70baa89df7a9a",
+    "head_sha": "6c217acffd85bcec866007673fae33753921d5e4",
+    "pr_head_sha": "ccbed270167b8ea54f1e6ee2c86fa210b95bdf38",
+    "integration_commit_sha": "6c217acffd85bcec866007673fae33753921d5e4",
+    "integration_tree_sha": "748a77955b9a734b28e3d49d31ce36a7ecae4503",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29790232574",
+    "ownership_lease_ref": "stages/p01-r4-systemd-host-compat/ownership-lease.json",
+    "delivery": {
+      "branch": "codex/bridge-a0-p01-r4-systemd-host-compat",
+      "pr_number": 110,
+      "push_head_ci_run": 29790186504,
+      "push_head_ci_conclusion": "success",
+      "pr_head_ci_run": 29790196410,
+      "pr_head_ci_conclusion": "success",
+      "merge_head_sha": "6c217acffd85bcec866007673fae33753921d5e4",
+      "merge_tree_sha": "748a77955b9a734b28e3d49d31ce36a7ecae4503",
+      "merge_head_ci_run": 29790232574,
+      "merge_head_ci_conclusion": "success",
+      "squash_merge_trailers_valid": true,
+      "terminal_receipt_head_ci": "PENDING_THIS_RECEIPT_DELIVERY"
+    },
+    "repair": {
+      "cause": "The bound VPS persistent user systemd fails before ExecStartPre with 218/CAPABILITIES when four capability-mutating host-wrapper directives are present.",
+      "failure_attempts_preserved": 2,
+      "diagnostic_action_envelope_sha256": "185af49d38f645d62c2677d0408028dc3ec3f7bd2bab12ef46e2f737f3c4cd9e",
+      "diagnostic_receipt_sha256": "d8ffabb15bdfca6a2db75494d38cea2ccb3d19a7c7c3b4353ad5a1db098bcbd6",
+      "persistent_unit_baseline": "pass",
+      "full_compatible_set": "pass",
+      "incompatible_directives": [
+        "PrivateDevices=yes",
+        "ProtectClock=yes",
+        "ProtectKernelLogs=yes",
+        "ProtectKernelModules=yes"
+      ],
+      "compatible_systemd_hardening_retained": true,
+      "container_network_none_retained": true,
+      "container_read_only_retained": true,
+      "container_cap_drop_all_retained": true,
+      "container_no_new_privileges_retained": true,
+      "image_rebuilt": false,
+      "image_relabelled": false,
+      "domain_services_mutated": false
+    },
+    "release_identity": {
+      "runtime_release_sha": "0394d6c9e327eceb62f738eca90be3ece015ba79",
+      "runtime_tree_sha": "636fda24cbb2da567fb23a4d44fa865ae74ac4bc",
+      "portable_image_id": "sha256:e6db8ab087e18b13ac357a751a2e7318c3abb81a4f2af459c930a630ddc65577",
+      "engine_image_id": "sha256:d1f56e933a8e498ae9e3a1f70ba0e764785a0de44d6f702f7e1945c3621b671f",
+      "carrier_sha256": "46e12e35ef89463a9f13028732e35c30ce3aaa7b121834f68a9aeccbf727d9f7",
+      "maintenance_control_head": "6c217acffd85bcec866007673fae33753921d5e4",
+      "runtime_inputs_changed": false,
+      "runtime_subject_advanced": false,
+      "image_rebuilt": false,
+      "bridge_service_running_during_repair": false,
+      "bridge_container_present_during_repair": false
+    },
+    "artifacts": {
+      "control_executable_sha256": "44213706e745b71ad7a9d4f35a232a49dbd0dca82381246357a5acf18cb631d2",
+      "unit_template_sha256": "dd025780806b1bf4908775a1ca8a75018f5d184d2b13b4ca5c1f92c547341f19",
+      "artifact_manifest_ref": "inventory/p01-r4-systemd-host-compat-control-artifact.json",
+      "artifact_manifest_sha256": "f23c3924a421d79cba63d545f0f6a4480564fefe43709bcd43286ea61157facc",
+      "artifact_payload_sha256": "ea86e51e0518bf9b7f1ca8fa55a3fcd1e5507ef939620696d00acdc8cc2a987a",
+      "reuse_receipt_ref": "docs/receipts/reuse/p01-r4-systemd-host-compat.json",
+      "reuse_receipt_sha256": "da78145fffb893dd3d5e1b40be38983c4ff2c7c2292855115520967a0e6aa1e8",
+      "stage_envelope_sha256": "30917cd6a94a530c06408e47d637104f042b48eb56ca318eaeabe9f6868736f3",
+      "ownership_lease_sha256": "0873466cba5796b7ba5a65a8cb543df45696b538acb408ffbfd0a723ca616187",
+      "focused_test_sha256": "a0d3b8283ebe3e45b98fc287d9e9f6651e7ba7e07b80700721511a6f64698538"
+    },
+    "audit_results": {
+      "contract_gate": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "runtime_or_release_relevant_mutation": false,
+      "focused_systemd_and_recovery_tests": 23,
+      "full_core_tests": 905,
+      "stage0b_tests": 25,
+      "sandbox_only_af_unix_failures_replayed_outside_socket_restriction": true,
+      "bound_host_probe_cleanup": "green",
+      "bridge_safe_tail": "inactive-disabled-container-absent",
+      "market_timers_after_probe": "green",
+      "security_timer_after_probe": "green",
+      "physical_deployment_complete": false,
+      "product_done": false,
+      "release_done": false
+    },
+    "post_receipt_requirements": {
+      "exact_terminal_receipt_head_ci": "REQUIRED_PENDING",
+      "receipt_pr_squash_merge": "REQUIRED_PENDING",
+      "exact_receipt_merge_head_ci": "REQUIRED_PENDING",
+      "regenerate_p03_profile_and_envelope_with_unit_identity": "REQUIRED_PENDING",
+      "resume_same_exact_r17_deploy": "REQUIRED_PENDING",
+      "stage_branch_and_worktree_cleanup": "REQUIRED_PENDING"
+    },
+    "write_set": [
+      "Makefile",
+      "docs/PHYSICAL_RELEASE_RUNBOOK.md",
+      "ops/deploy/research-os-a1-final.service",
+      "tools/physical_release_control.py",
+      "tests/test_p01_r4_systemd_host_compat.py",
+      "inventory/p01-r4-systemd-host-compat-control-artifact.json",
+      "docs/receipts/reuse/p01-r4-systemd-host-compat.json",
+      "docs/receipts/integration/p01-r4-systemd-host-compat.json",
+      "stages/p01-r4-systemd-host-compat/stage-envelope.json",
+      "stages/p01-r4-systemd-host-compat/ownership-lease.json"
+    ]
+  },
+  "integrity": {
+    "profile": "core-json-sha256-v1",
+    "payload_sha256": "22e959e681ad02960f49650c1fcd5a6e677518e25b8451070a1dba77d381959f",
+    "parent_refs": [
+      "git:3eed1bcf3a2d667f3369829fa6e70baa89df7a9a",
+      "git:ccbed270167b8ea54f1e6ee2c86fa210b95bdf38",
+      "ci:29790196410",
+      "git:6c217acffd85bcec866007673fae33753921d5e4",
+      "ci:29790232574",
+      "runtime:0394d6c9e327eceb62f738eca90be3ece015ba79",
+      "unit:sha256:dd025780806b1bf4908775a1ca8a75018f5d184d2b13b4ca5c1f92c547341f19",
+      "probe-receipt:sha256:d8ffabb15bdfca6a2db75494d38cea2ccb3d19a7c7c3b4353ad5a1db098bcbd6"
+    ]
+  }
+}
