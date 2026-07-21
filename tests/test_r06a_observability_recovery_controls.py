@@ -400,6 +400,8 @@ class ObservabilityRecoveryControlTests(unittest.TestCase):
         self.assertIn("runtime_monitor_cycle.py", monitor_service)
         self.assertIn("target=/var/lib/research-os,readonly", monitor_service)
         self.assertIn("--network=none", monitor_service)
+        self.assertIn("PrivateTmp=yes", monitor_service)
+        self.assertNotIn("PrivateDevices=yes", monitor_service)
         self.assertNotIn("researchd.sock", monitor_service)
         self.assertNotIn("bridge_job_ledger", monitor_service)
         self.assertIn("/release_backup_restore.py backup ", backup_service)
