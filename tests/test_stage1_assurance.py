@@ -771,6 +771,7 @@ class Stage1StaticBoundaryTests(unittest.TestCase):
                 "is_globally_paused",
                 "model_call_history",
                 "model_call_state",
+                "model_call_states",
                 "pause_snapshot",
             },
         )

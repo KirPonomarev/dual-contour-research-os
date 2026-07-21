@@ -1,0 +1,15 @@
+{
+  "lease_id": "lease-v262-r1-consolidated-bridge-safety-repair-agent-0-amendment-1",
+  "stage_id": "v262-r1-consolidated-bridge-safety-repair",
+  "agent_id": "agent-0",
+  "branch": "codex/bridge-a0-v262-r1-safety-repair",
+  "issued_at": "2026-07-21T20:04:00Z",
+  "expires_at": "2026-07-22T19:42:47Z",
+  "add_write_set": [
+    "tests/test_stage1_assurance.py",
+    "stages/v262-r1-consolidated-bridge-safety-repair/stage-envelope-amendment-1.json",
+    "stages/v262-r1-consolidated-bridge-safety-repair/ownership-lease-amendment-1.json"
+  ],
+  "exclusive": true,
+  "revoked": false
+}

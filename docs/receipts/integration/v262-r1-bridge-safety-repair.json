@@ -18,8 +18,9 @@
     "stage_id": "F03-F04-REPAIR",
     "agent_id": "agent-0",
     "base_sha": "d13bdaf98307540c17bc320f23e2f2c142f72e6b",
-    "head_sha": "PENDING_EXACT_PR_HEAD",
-    "integration_commit_sha": "PENDING_SQUASH_MERGE",
+    "head_sha": "697f9fe186521c267f427c8859b7c102c8e4860f",
+    "integration_commit_sha": "697f9fe186521c267f427c8859b7c102c8e4860f",
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29864048709",
     "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
     "delivery_status": "LOCAL_ACCEPTED_PENDING_EXACT_HEAD_PR_CI",
     "ownership_lease_ref": "stages/v262-r1-consolidated-bridge-safety-repair/ownership-lease.json",
@@ -54,6 +55,13 @@
       "exact_head_remote_ci": "PENDING_PR",
       "secret_material_in_receipt": false
     },
+    "audit_results": {
+      "contract_gate": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "exact_head_remote_ci": "REPAIRING_TWO_MECHANICAL_VALIDATOR_FINDINGS",
+      "runtime_logic_finding": false
+    },
     "write_set": [
       "src/research_bridge/discovery.py",
       "src/research_bridge/researchd.py",
@@ -69,10 +77,11 @@
   },
   "integrity": {
     "profile": "core-json-sha256-v1",
-    "payload_sha256": "31ef2eb99abc72c94232fb80945c983df0438a771ad01e9c7ff197199f1ce79b",
+    "payload_sha256": "505cfe691ee1d1e65b712b305aebee884853fe93b1e675eed32bf34ea26950e6",
     "parent_refs": [
       "git:d13bdaf98307540c17bc320f23e2f2c142f72e6b",
-      "owner-only:admission-preflight:sha256:39ae30320ff7935a83a1cecf82d6fed6496c010f6d8d186a8e56ef6d0e4ad226"
+      "owner-only:admission-preflight:sha256:39ae30320ff7935a83a1cecf82d6fed6496c010f6d8d186a8e56ef6d0e4ad226",
+      "git:697f9fe186521c267f427c8859b7c102c8e4860f"
     ]
   }
 }
