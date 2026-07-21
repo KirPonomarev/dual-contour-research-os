@@ -1,0 +1,126 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-p06a-sanitized-evidence-80ed28a731c79e843289d97f4d58bd88",
+  "issued_at": "2026-07-21T07:52:31Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "P06A_SANITIZED_EVIDENCE_INTEGRATION",
+    "agent_id": "agent-0",
+    "ownership_lease_ref": "stages/p06a-sanitized-evidence-integration/ownership-lease.json",
+    "base_sha": "37d028c6a9c1e5493655c54bc668ff73c673241b",
+    "head_sha": "e194dffc3e30f3d7df7222809268bd6db591b6ae",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "docs/receipts/release/p06a-physical-release-sanitized.json",
+      "docs/receipts/integration/p06a-sanitized-evidence-integration.json",
+      "stages/p06a-sanitized-evidence-integration/stage-envelope.json",
+      "stages/p06a-sanitized-evidence-integration/ownership-lease.json"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "runtime_mutation": false,
+      "physical_mutation": false,
+      "domain_repository_mutation": false,
+      "private_or_D2_D3_evidence_public": false,
+      "raw_host_locator_public": false,
+      "required_ci_exact": true,
+      "ruleset_id": 19274076,
+      "ruleset_enforcement": "active",
+      "force_push": false,
+      "direct_main_push": false,
+      "critical_findings": 0,
+      "high_findings": 0,
+      "new_release_invalidating_medium_findings": 0
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29812026621",
+    "integration_commit_sha": "e194dffc3e30f3d7df7222809268bd6db591b6ae",
+    "plan_id": "DCR_OS_AUTONOMOUS_V2_3_NO_BRAKES_20260719",
+    "plan_version": "2.5.2-physical-release-final",
+    "mission_id": "DCR_OS_PHYSICAL_RELEASE_20260721",
+    "project_fingerprint": "b371429cb7c01fd6c5dbd430510a264684dab906188d706b7479446c1bd8f154",
+    "delivery": {
+      "evidence_branch": "codex/bridge-a0-p06a-physical-evidence",
+      "evidence_pr_number": 119,
+      "evidence_pr_head_sha": "fec6efabe0f614ca52f5471111d299b08bbfc879",
+      "evidence_push_ci_run": 29811958034,
+      "evidence_push_ci_conclusion": "success",
+      "evidence_pr_ci_run": 29811972647,
+      "evidence_pr_ci_conclusion": "success",
+      "evidence_merge_head_sha": "e194dffc3e30f3d7df7222809268bd6db591b6ae",
+      "evidence_merge_tree_sha": "c7f92deb86ceda2a24675914b17cc39e04318a8e",
+      "evidence_merge_ci_run": 29812026621,
+      "evidence_merge_ci_conclusion": "success",
+      "delivery_mode": "protected-pr-squash-merge",
+      "terminal_receipt_branch": "codex/bridge-a0-p06a-terminal-receipt",
+      "terminal_receipt_pr": "PENDING_THIS_RECEIPT_DELIVERY",
+      "terminal_receipt_head_ci": "PENDING_THIS_RECEIPT_DELIVERY",
+      "final_evidence_head": "PENDING_RECEIPT_MERGE_EXTERNAL_BINDING"
+    },
+    "evidence_artifacts": {
+      "sanitized_release_receipt_ref": "docs/receipts/release/p06a-physical-release-sanitized.json",
+      "sanitized_release_receipt_sha256": "12269c0371fbed98b8d103a4e481c8235d026e8f5a694d3d481a6e151283f8e0",
+      "sanitized_release_payload_sha256": "8c69d2259e7504ee9b32485c6d31942f0906687038df197d5225a65e77dd893f",
+      "stage_envelope_ref": "stages/p06a-sanitized-evidence-integration/stage-envelope.json",
+      "stage_envelope_sha256": "f6641005ac85cac37901c417fb263d4a0b0a38d4c7f8cb4a403d386c5a030519",
+      "ownership_lease_sha256": "bc9bb1da76bb6299bbd1a8c89783385d039b35b0c9c8916259eb3c1d3391828c"
+    },
+    "release_identity": {
+      "runtime_release_sha": "0394d6c9e327eceb62f738eca90be3ece015ba79",
+      "engine_image_id": "sha256:d1f56e933a8e498ae9e3a1f70ba0e764785a0de44d6f702f7e1945c3621b671f",
+      "portable_image_id": "sha256:e6db8ab087e18b13ac357a751a2e7318c3abb81a4f2af459c930a630ddc65577",
+      "carrier_sha256": "46e12e35ef89463a9f13028732e35c30ce3aaa7b121834f68a9aeccbf727d9f7",
+      "maintenance_control_head": "37d028c6a9c1e5493655c54bc668ff73c673241b",
+      "runtime_inputs_changed": false,
+      "runtime_subject_advanced": false,
+      "image_rebuilt": false,
+      "carrier_rebuilt": false
+    },
+    "physical_receipt_ancestry": {
+      "p03_terminal_receipt_sha256": "b5cef3c7ee4b9f33230d8aa8caa48f78e252ec9b428a1fb363b78c709b604eca",
+      "p04_terminal_receipt_sha256": "4675b458c2a8815c2a850782ae251278aee03657a06fec89c6e4b25b88ad2e95",
+      "p05_terminal_receipt_sha256": "0abae15835959d707631bd4966a5081be6c0aca088f5ec0975a477285cbc676c",
+      "physical_deployment": "PASS",
+      "two_domain_e2e": "PASS",
+      "restart_reboot_backup_restore_rollback": "PASS",
+      "monitoring": "PASS_NON_RED"
+    },
+    "known_debt": {
+      "d109_trailer_governance": "MEDIUM_NON_RUNTIME_NON_RELEASE_INVALIDATING",
+      "market_long_window_currentness_incident": "POST_RELEASE_NON_BLOCKING_FAIL_CLOSED",
+      "release_invalidating": false
+    },
+    "post_receipt_requirements": {
+      "exact_terminal_receipt_pr_head_ci": "REQUIRED_PENDING",
+      "receipt_pr_squash_merge": "REQUIRED_PENDING",
+      "exact_final_merge_head_ci": "REQUIRED_PENDING",
+      "external_tracker_final_evidence_head_binding": "REQUIRED_PENDING",
+      "independent_physical_audit": "REQUIRED_P06B1",
+      "agent0_closeout_and_done": "REQUIRED_P06B2"
+    }
+  },
+  "integrity": {
+    "profile": "core-json-sha256-v1",
+    "payload_sha256": "80ed28a731c79e843289d97f4d58bd884b429b57b08705e19ffa8cf95b4f3d9a",
+    "parent_refs": [
+      "git:37d028c6a9c1e5493655c54bc668ff73c673241b",
+      "git:fec6efabe0f614ca52f5471111d299b08bbfc879",
+      "ci:29811958034",
+      "ci:29811972647",
+      "git:e194dffc3e30f3d7df7222809268bd6db591b6ae",
+      "ci:29812026621",
+      "runtime:0394d6c9e327eceb62f738eca90be3ece015ba79",
+      "private-p03-terminal:sha256:b5cef3c7ee4b9f33230d8aa8caa48f78e252ec9b428a1fb363b78c709b604eca",
+      "private-p04-terminal:sha256:4675b458c2a8815c2a850782ae251278aee03657a06fec89c6e4b25b88ad2e95",
+      "private-p05-terminal:sha256:0abae15835959d707631bd4966a5081be6c0aca088f5ec0975a477285cbc676c",
+      "sanitized-summary:sha256:12269c0371fbed98b8d103a4e481c8235d026e8f5a694d3d481a6e151283f8e0"
+    ]
+  }
+}
