@@ -161,7 +161,7 @@ _EXPECTED_BINDING_SHAPES_V4["claude-fable-5"] = {
     "endpoint": "https://openrouter.ai/api/v1/chat/completions",
     "protocol": "OPENAI_CHAT_COMPLETIONS", "api_model": "anthropic/claude-fable-5",
     "context_window": None,
-    "request_options": {"reasoning": {"effort": "high"}},
+    "request_options": {"reasoning": {"effort": "max"}},
     "source": "https://openrouter.ai/anthropic/claude-fable-5",
 }
 
@@ -372,8 +372,8 @@ def build_request_bytes(binding: Mapping[str, object], prompt: bytes, max_tokens
         text = prompt.decode("utf-8")
     except UnicodeDecodeError as exc:
         raise ShadowProviderError("shadow prompt must be UTF-8") from exc
-    if type(max_tokens) is not int or not 1 <= max_tokens <= 4096:
-        raise ShadowProviderError("shadow max_tokens must be 1..4096")
+    if type(max_tokens) is not int or not 1 <= max_tokens <= 16_384:
+        raise ShadowProviderError("shadow max_tokens must be 1..16384")
     options = copy.deepcopy(binding["request_options"])
     if not isinstance(options, dict):
         raise ShadowProviderError("provider request options are invalid")

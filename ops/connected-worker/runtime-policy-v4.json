@@ -10,8 +10,8 @@
   "credential_file": "/run/research-os-connected/provider.env",
   "max_dispatch_bytes": 65536,
   "max_completion_bytes": 16384,
-  "max_extracted_output_bytes": 65536,
-  "max_provider_output_tokens": 4096,
+  "max_extracted_output_bytes": 262144,
+  "max_provider_output_tokens": 16384,
   "provider_input_token_margin": 256,
   "minimum_output_bytes": 16,
   "retention_seconds": 604800,
@@ -30,6 +30,6 @@
   "automatic_retry": true,
   "replay_completion_only": true,
   "worker_ipc_extension_sha256": "03d91f027bb6975c55d84acaef188546bcd24af9944a72f4ff9314296399d07a",
-  "shadow_profile_sha256": "c8c01f75b9c659b96ef1ec11cc114584c4df69b78da5658a8ca0866c7fe414d2",
-  "shadow_tool_sha256": "171be0215ce1e88812a48ab53e6a460b04201e5164abfe121549c64609e7bb2f"
+  "shadow_profile_sha256": "d5de96af0d7e98c44fa85f18593a99b7771d318d888b33b6ebd991555a17a2d2",
+  "shadow_tool_sha256": "3de363f6496e5eda2419dc74905fdad37f156f04d15703544651a9506aecfab2"
 }

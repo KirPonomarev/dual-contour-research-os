@@ -140,7 +140,7 @@ _PROVIDER_MAX_OUTPUT_TOKENS = {
     "deepseek-v4-flash": 4096,
     "deepseek-v4-pro": 4096,
     "glm-5.2-max": 4096,
-    "claude-fable-5": 4096,
+    "claude-fable-5": 16384,
     "gpt-5.6-sol-xhigh": 4096,
     "gpt-5.6-sol-max": 4096,
 }
@@ -348,7 +348,7 @@ class RuntimePolicy:
             ("max_dispatch_bytes", 1_048_576),
             ("max_completion_bytes", 1_048_576),
             ("max_extracted_output_bytes", 1_048_576),
-            ("max_provider_output_tokens", 4096),
+            ("max_provider_output_tokens", 16_384),
             ("provider_input_token_margin", 4096),
             ("minimum_output_bytes", 65_536),
             ("retention_seconds", 31_536_000),
@@ -477,7 +477,7 @@ class Dispatch:
             raise ConnectedWorkerError("worker model binding is invalid")
         if classification not in policy.allowed_classifications:
             raise ConnectedWorkerError("worker classification is invalid")
-        if type(max_tokens) is not int or not 1 <= max_tokens <= 4096:
+        if type(max_tokens) is not int or not 1 <= max_tokens <= 16_384:
             raise ConnectedWorkerError("worker token bound is invalid")
         expires_at = _timestamp(value["expires_at"], label="dispatch expiry")
         return cls(
@@ -989,41 +989,26 @@ AdapterFactory = Callable[[str, Mapping[str, object], str, ConnectedShadowProfil
 
 
 def _bounded_provider_request(
+    binding_name: str,
     binding: Mapping[str, object],
     prompt: bytes,
     *,
     total_token_budget: int,
     policy: RuntimePolicy,
 ) -> tuple[bytes, int]:
-    """Derive a provider output limit below the total durable reservation.
+    """Bind provider output to reservation, policy, and exact binding ceiling."""
 
-    Canonical request bytes are a conservative upper bound for visible input
-    tokens.  The policy margin covers protocol/provider framing that is not
-    represented in that request.  The calculation is repeated after encoding
-    the chosen output limit so the final request itself is the bound subject.
-    """
-
-    output_limit = 1
-    for _ in range(2):
-        request = build_request_bytes(binding, prompt, output_limit)
-        available = (
-            total_token_budget
-            - len(request)
-            - policy.provider_input_token_margin
-        )
-        output_limit = min(policy.max_provider_output_tokens, available)
-        if output_limit < 1:
-            raise ConnectedWorkerError(
-                "total token reservation cannot cover the provider request"
-            )
+    binding_limit = _PROVIDER_MAX_OUTPUT_TOKENS.get(binding_name)
+    if type(binding_limit) is not int or binding_limit < 1:
+        raise ConnectedWorkerError("provider output binding is unrecognized")
+    output_limit = min(
+        total_token_budget,
+        policy.max_provider_output_tokens,
+        binding_limit,
+    )
+    if output_limit < 1:
+        raise ConnectedWorkerError("provider output allowance is invalid")
     request = build_request_bytes(binding, prompt, output_limit)
-    if (
-        len(request)
-        + policy.provider_input_token_margin
-        + output_limit
-        > total_token_budget
-    ):
-        raise ConnectedWorkerError("provider token allowance exceeds reservation")
     return request, output_limit
 
 
@@ -1069,6 +1054,7 @@ def run_dispatch(
             "network_calls": 0,
         }
     provider_request, provider_output_tokens = _bounded_provider_request(
+        dispatch.model_binding,
         binding,
         dispatch.request_body.encode("utf-8"),
         total_token_budget=dispatch.max_tokens,

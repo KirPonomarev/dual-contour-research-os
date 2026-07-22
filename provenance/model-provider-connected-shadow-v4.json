@@ -73,7 +73,7 @@
       "context_window": null,
       "request_options": {
         "reasoning": {
-          "effort": "high"
+          "effort": "max"
         }
       },
       "source": "https://openrouter.ai/anthropic/claude-fable-5"

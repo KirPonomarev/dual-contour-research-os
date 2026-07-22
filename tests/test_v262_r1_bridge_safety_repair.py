@@ -23,10 +23,17 @@ spec.loader.exec_module(worker)
 
 from research_bridge.admission import canonical_json_sha256  # noqa: E402
 from research_bridge.ledger import JobLedger  # noqa: E402
+from research_bridge.model_broker import ModelBrokerError, ModelCallBroker  # noqa: E402
 from research_bridge.researchd import (  # noqa: E402
     _ServiceConfigError,
     _context_binding_from_config,
     _derive_context_identities,
+)
+from tests.test_s15_model_registry_broker import (  # noqa: E402
+    policy as broker_policy,
+    registry as broker_registry,
+    seeded_ledger,
+    spec as broker_spec,
 )
 
 
@@ -306,6 +313,31 @@ class BridgeSafetyRepairTests(unittest.TestCase):
         )
         self.assertEqual(completed.returncode, 0, completed.stderr)
         self.assertFalse(worker_marker.exists())
+
+    def test_fmax_preserves_core_20000_reservation_and_old_profile_fails_closed(self) -> None:
+        with seeded_ledger(self.base / "fmax-budget.sqlite3") as ledger:
+            broker = ModelCallBroker(
+                registry=broker_registry(),
+                ledger=ledger,
+                budget_policy=broker_policy(tokens=20_000),
+            )
+            with self.assertRaises(ModelBrokerError):
+                broker.prepare(
+                    broker_spec(
+                        key="fmax-over-20000",
+                        max_tokens=20_001,
+                    ),
+                    event_at="2026-07-18T12:00:00Z",
+                )
+
+        stale = json.loads(POLICY_PATH.read_text())
+        stale["shadow_profile_sha256"] = (
+            "c8c01f75b9c659b96ef1ec11cc114584c4df69b78da5658a8ca0866c7fe414d2"
+        )
+        stale_path = self.base / "stale-fmax-policy.json"
+        stale_path.write_text(json.dumps(stale))
+        with self.assertRaises(worker.ConnectedWorkerError):
+            worker.RuntimePolicy.load(stale_path)
 
 
 if __name__ == "__main__":
