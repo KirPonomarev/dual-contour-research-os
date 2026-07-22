@@ -1,0 +1,123 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-kmax-01-kimi-k3-max-routing-20260722",
+  "issued_at": "2026-07-22T09:39:39Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "KMAX-01",
+    "agent_id": "agent-0",
+    "ownership_lease_ref": "owner-only-stage-envelope:sha256:6e1954d172220aa4f408e38fd4ac63fb313b380c64b9c9c855ab20949ecca5a8",
+    "base_sha": "0b6740ccef8fc1d9e539b6b0c8a7a336e3b2cd2a",
+    "head_sha": "edd813ffeee98b57d296ed892917c1dece5c1ddf",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "ops/connected-worker/model_worker_v4.py",
+      "ops/connected-worker/runbook-inputs-v2.json",
+      "ops/connected-worker/runtime-policy-v4.json",
+      "provenance/model-provider-connected-shadow-v4.json",
+      "provenance/model-provider-routing-v2.json",
+      "provenance/model-role-evaluation-v3.json",
+      "src/research_bridge/researchd.py",
+      "tests/test_r09a_dual_contour_advisors.py",
+      "tests/test_r18_runtime_binding.py",
+      "tools/model_provider_shadow_v4.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "evidence_correction_envelope_sha256": "65008fa1b9f5652fb5dbb722cb73d7eb6549153a3b68a846e2d6c3ab0220e590",
+      "correction_class": "ADDITIVE_STAGE_IDENTITY_SPLIT",
+      "supersedes_stage_identity_binding_only": "docs/receipts/integration/kmax-kimi-k3-max-gpt-xhigh-routing.json",
+      "superseded_receipt_file_sha256": "a120b60569ed9b315183ae37fde1cbee27473606fb1d862a6e21dbc925b40df6",
+      "superseded_receipt_disposition": "PRESERVED_IMMUTABLE; RUNTIME FACTS REMAIN ACCURATE; COMBINED STAGE/LEASE BINDING NOT USED FOR ACCEPTANCE",
+      "routing_pr": 139,
+      "routing_source_commit": "edd813ffeee98b57d296ed892917c1dece5c1ddf",
+      "routing_integration_commit": "171995f86e8ac3e0681642e6ba21a73970eb8bab",
+      "source_and_integration_trees_equal": true,
+      "stage_envelope_amendment_01_sha256": "212a26f81b8b83f5ba3ac095aa203fcea9c3362ad9e44cc3495c5d4082a14b6f",
+      "stage_envelope_amendment_02_sha256": "260002455279d7732846b60cfaf9c0fb2cf120a97143f7618c015227a53a09a1",
+      "full_core_tests": 942,
+      "stage0b_tests": 25,
+      "active_material_order": [
+        "RESEARCH_WORKER",
+        "kimi-k3-max",
+        "gpt-5.6-sol-xhigh"
+      ],
+      "fable_active": false,
+      "direct_openai_max_active": false,
+      "kimi_binding": "kimi-k3-max",
+      "kimi_api_model": "kimi-k3",
+      "kimi_role": "CRITIC_PRIMARY",
+      "kimi_reasoning_effort": "max",
+      "kimi_context_tokens": 1048576,
+      "kimi_provider_output_ceiling_tokens": 16384,
+      "kimi_monetary_budget_cap": null,
+      "cost_unit_semantics": "synthetic full-reservation fixed-charge accounting; not money and not a provider spending cap",
+      "gpt_xhigh_roles": [
+        "CRITIC_DEEP",
+        "CHIEF_SCIENTIST"
+      ],
+      "credential_locator": "MOONSHOT_API_KEY",
+      "credential_file_mode": "0600",
+      "credential_value_public_or_in_git": false,
+      "core_image_sha256": "b3ae2b9f15ee9b733a8a396f5cbc7403169ba79c3646c9b26d393cfab8444d59",
+      "core_release_sha": "171995f86e8ac3e0681642e6ba21a73970eb8bab",
+      "core_config_sha256": "5ccfd54828f7d10b10f5e64ff772e657769d73e3759a6ee2859b80d54fc94b04",
+      "core_restart_count": 0,
+      "core_network_mode": "none",
+      "core_read_only": true,
+      "core_public_ports": 0,
+      "successful_provider_call": {
+        "call_id": "model-call:c47ccbae5d4939b44d5e8ba972baa577d5a5deb210c71b0f58e970eb2082e5eb",
+        "terminal_state_after_reconciliation": "RECONCILED",
+        "network_calls": 1,
+        "attempts": 1,
+        "actual_tokens": 552,
+        "reasoning_effort": "max",
+        "response_ref_present": true,
+        "raw_response_public_or_in_git": false,
+        "budget_released": true
+      },
+      "superseded_failed_proof": {
+        "call_id": "model-call:c08c88b4a7cf83d554bf1cf37fc8621c3637bf13a926cee2f2091f49a85645f0",
+        "terminal_state_after_reconciliation": "RECONCILED",
+        "failure_code": "TOTAL_TOKEN_LIMIT_EXCEEDED",
+        "network_calls": 1,
+        "actual_tokens": 628,
+        "immutable_and_additively_superseded": true,
+        "budget_released": true
+      },
+      "reserved_calls_after_reconciliation": 0,
+      "advisor_timer": "enabled-active-waiting",
+      "runtime_monitor_timer": "enabled-active-waiting",
+      "runtime_monitor_status": "YELLOW_NONBLOCKING",
+      "runtime_monitor_red_samples": 0,
+      "systemd_failed_units": 0,
+      "provider_calls_during_evidence_correction": 0,
+      "runtime_mutations_during_evidence_correction": 0,
+      "secrets_printed": false
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29903793343",
+    "integration_commit_sha": "171995f86e8ac3e0681642e6ba21a73970eb8bab"
+  },
+  "integrity": {
+    "payload_sha256": "956af80ddbcda122b3c910787fb4af9b25932b528b3b99c52a12a2281c19e110",
+    "parent_refs": [
+      "git:edd813ffeee98b57d296ed892917c1dece5c1ddf",
+      "git:171995f86e8ac3e0681642e6ba21a73970eb8bab",
+      "ci:29903793343",
+      "stage-envelope:sha256:6e1954d172220aa4f408e38fd4ac63fb313b380c64b9c9c855ab20949ecca5a8",
+      "stage-envelope-amendment:sha256:212a26f81b8b83f5ba3ac095aa203fcea9c3362ad9e44cc3495c5d4082a14b6f",
+      "stage-envelope-amendment:sha256:260002455279d7732846b60cfaf9c0fb2cf120a97143f7618c015227a53a09a1",
+      "evidence-correction-envelope:sha256:65008fa1b9f5652fb5dbb722cb73d7eb6549153a3b68a846e2d6c3ab0220e590",
+      "superseded-receipt:sha256:a120b60569ed9b315183ae37fde1cbee27473606fb1d862a6e21dbc925b40df6"
+    ]
+  }
+}
