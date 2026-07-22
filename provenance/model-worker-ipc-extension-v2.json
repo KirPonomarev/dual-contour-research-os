@@ -1,0 +1,56 @@
+{
+  "profile_id": "model-worker-ipc-extension-v2",
+  "schema_version": "1.0.0",
+  "status": "frozen",
+  "supersedes_for_new_mission_dispatch_only": "provenance/model-worker-ipc-extension-v1.json#sha256:03d91f027bb6975c55d84acaef188546bcd24af9944a72f4ff9314296399d07a",
+  "base_profile_ref": "contracts/a1/v1/profiles/ipc_compatibility_v1.json#sha256:c9cdd8c51616ac843a6729166b6f21c9a44de24fac7559b86f842c7e1930ba04",
+  "protocol_version": "1.3",
+  "dispatch_schema": "ModelWorkerDispatch/1.1.0",
+  "roles": {
+    "collector": {
+      "additive_commands": ["queue_research_mission"],
+      "purpose": "bind one validated paired ingress to an immutable research mission"
+    },
+    "scout": {
+      "additive_commands": ["advance_research_missions", "research_mission_status", "reserve_model_call", "lookup_model_call"],
+      "purpose": "advance exactly routed bounded mission work and read sanitized durable state"
+    },
+    "connected_worker": {
+      "commands": ["begin_model_call", "complete_model_call", "complete_research_model_call", "lookup_model_call"],
+      "purpose": "receive one hash-bound dispatch and return an extracted D0/D1 mission result plus untrusted completion metadata",
+      "forbidden_commands": ["submit_source_trigger", "claim_next_proposal", "claim_proposal", "submit_proposal", "ack_proposal", "submit", "pause_global", "resume_global", "queue_research_mission", "advance_research_missions"]
+    }
+  },
+  "commands": {
+    "queue_research_mission": {"request_fields": ["mission_envelope", "action_envelope", "material_events", "mission_artifact"], "durable_transition": "PAIRED_MATERIAL_EVENTS_TO_IMMUTABLE_MISSION_MANIFEST"},
+    "advance_research_missions": {"request_fields": [], "durable_transition": "NEXT_EXACT_ROLE_TO_PROPOSED_THEN_RESERVED_OR_TERMINAL"},
+    "research_mission_status": {"request_fields": ["research_mission_sha256"], "durable_transition": "NONE_READ_ONLY"},
+    "reserve_model_call": {"request_fields": ["role", "role_assignment_ref", "classification", "request_body", "max_tokens", "max_cost_units", "expires_at"], "durable_transition": "PROPOSED_THEN_RESERVED_WITH_REQUEST_CAS"},
+    "begin_model_call": {"request_fields": ["call_id", "dispatch_token", "request_body"], "durable_transition": "RESERVED_TO_SENT_BEFORE_ACK"},
+    "complete_model_call": {"request_fields": ["call_id", "dispatch_token", "outcome", "response_ref", "actual_tokens", "actual_cost_units", "provider_receipt_ref", "failure_code"], "durable_transition": "SENT_TO_TERMINAL"},
+    "complete_research_model_call": {"request_fields": ["call_id", "dispatch_token", "outcome", "response_ref", "response_body", "actual_tokens", "actual_cost_units", "provider_receipt_ref", "failure_code"], "durable_transition": "EXTRACTED_OUTPUT_TO_INPUT_CAS_THEN_SENT_TO_TERMINAL"},
+    "lookup_model_call": {"request_fields": ["call_id"], "durable_transition": "NONE_READ_ONLY"}
+  },
+  "limits": {
+    "maximum_request_body_bytes": 49152,
+    "maximum_response_body_bytes": 262144,
+    "maximum_response_frame_bytes": 524288,
+    "automatic_provider_retry": false,
+    "mission_wip": 1,
+    "maximum_calls_per_mission": 5,
+    "one_writer": "researchd"
+  },
+  "invariants": {
+    "base_v1_profile_is_unchanged": true,
+    "extension_v1_is_accepted_for_legacy_runtime_only": true,
+    "existing_clients_and_commands_are_preserved": true,
+    "worker_identity_is_OS_verified": true,
+    "worker_cannot_select_binding": true,
+    "worker_cannot_write_ledger_or_Core_directly": true,
+    "SENT_precedes_egress_ack": true,
+    "ambiguous_restart_becomes_UNKNOWN": true,
+    "mission_result_is_hash_bound_before_terminal_completion": true,
+    "provider_network_or_credentials_are_absent_from_Core": true,
+    "grants_scientific_or_deployment_authority": false
+  }
+}

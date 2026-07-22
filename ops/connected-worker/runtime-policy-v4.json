@@ -29,7 +29,7 @@
   ],
   "automatic_retry": true,
   "replay_completion_only": true,
-  "worker_ipc_extension_sha256": "03d91f027bb6975c55d84acaef188546bcd24af9944a72f4ff9314296399d07a",
+  "worker_ipc_extension_sha256": "467b2e5dd8583939d13e216a9f29e3578b0cc720a27081ca4f8723ad5726bac3",
   "shadow_profile_sha256": "9e58feb69d30de0aa69e16bcff5465a72d5ed6b40236fb12a12287f66067a189",
   "shadow_tool_sha256": "6761f802c3bccfc2db04e47e315a5f5ef28881073a3e970c67901be5ec0da6e5"
 }

@@ -1,0 +1,46 @@
+{
+  "projection_id": "model-provider-capability-projection-v2",
+  "schema_version": "2.0.0",
+  "status": "ACCEPTED_EXACT_BOUND_INTEGRATION_RECEIPT",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "issued_at": "2026-07-22T12:35:56Z",
+  "correction_class": "PUBLIC_PROVIDER_CAPABILITY_PROJECTION_DRIFT",
+  "source": {
+    "receipt_ref": "docs/receipts/integration/kmax-01-kimi-k3-max-routing.json",
+    "receipt_file_sha256": "a5f4161f74c1c7bfc53fb2c14480cb1da85008f94d0cb9c3eb440f5b41c56d23",
+    "receipt_payload_sha256": "956af80ddbcda122b3c910787fb4af9b25932b528b3b99c52a12a2281c19e110",
+    "source_precedence": "ACCEPTED_EXACT_BOUND_INTEGRATION_RECEIPT_OVER_STALE_STATIC_PROJECTION_METADATA"
+  },
+  "capability": {
+    "binding": "kimi-k3-max",
+    "api_model": "kimi-k3",
+    "reasoning_effort": "max",
+    "successful_call_id": "model-call:c47ccbae5d4939b44d5e8ba972baa577d5a5deb210c71b0f58e970eb2082e5eb",
+    "network_calls": 1,
+    "attempts": 1,
+    "actual_tokens": 552,
+    "nonempty_response_reference_present": true,
+    "terminal_state": "RECONCILED",
+    "budget_released": true,
+    "credential_value_public_or_in_git": false,
+    "independent_runtime_audit": "PASS"
+  },
+  "projection_reconciliation": {
+    "stale_fields": [
+      "PROVIDER_PROOF_PENDING",
+      "FIXTURE_ONLY",
+      "real_provider_calls=false"
+    ],
+    "stale_fields_disposition": "PRESERVED_IN_IMMUTABLE_HISTORICAL_ARTIFACTS_AND_NOT_USED_AS_CURRENT_COUNTER_EVIDENCE",
+    "private_available_bindings_projected": false,
+    "provider_call_repeated_for_projection": false,
+    "receipt_rewritten": false
+  },
+  "authority": {
+    "capability_evidence_only": true,
+    "grants_provider_call_authority": false,
+    "grants_scientific_authority": false,
+    "grants_domain_or_canonical_write": false,
+    "grants_live_authority": false
+  }
+}

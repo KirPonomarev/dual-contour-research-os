@@ -1,7 +1,7 @@
 {
   "schema_version": "1.1.0",
   "frozen": true,
-  "amendment_ref": "docs/ADR/0008-generated-execution-path-activation.md",
+  "amendment_ref": "docs/ADR/0010-mission-bound-paired-research-ingress.md",
   "canonical_owners": {
     "adapters/market/**": "agent-3",
     "LICENSES/**": "agent-0",
@@ -24,6 +24,7 @@
     "src/research_bridge/evolution.py": "agent-1",
     "src/research_bridge/researchctl.py": "agent-1",
     "src/research_bridge/researchd.py": "agent-1",
+    "src/research_bridge/research_ingress.py": "agent-1",
     "src/research_bridge/cas.py": "agent-2",
     "src/research_bridge/execution.py": "agent-2",
     "src/research_bridge/generated_execution.py": "agent-2",

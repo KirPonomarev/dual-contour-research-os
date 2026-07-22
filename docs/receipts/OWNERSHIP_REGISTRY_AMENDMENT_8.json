@@ -1,0 +1,34 @@
+{
+  "receipt_type": "OWNERSHIP_REGISTRY_AMENDMENT",
+  "receipt_version": "1.0.0",
+  "status": "OWNERSHIP_REGISTRY_AMENDED",
+  "issued_at": "2026-07-22T12:35:56Z",
+  "issuer": "agent-0",
+  "stage_id": "p04-research-ingress-additive-repair-v1",
+  "base_sha": "18866d98bfa64a13a4c43eff97e7315576d46adf",
+  "contract_catalog_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "previous_ownership_registry_sha256": "e7a6a5158e43cb76c1df0fa28caec36ec9585a0dd05a732eabb94a92e427c9da",
+  "current_ownership_registry_sha256": "1a63672ee3311076b637497de2292724f7e8e6dcf6db0e4b93cd47c820fc25c2",
+  "stage_envelope_ref": "stages/p04-research-ingress-additive-repair-v1/stage-envelope.json",
+  "adr_ref": "docs/ADR/0010-mission-bound-paired-research-ingress.md",
+  "scope": {
+    "allows": [
+      "assign-agent-1-ownership-of-additive-research-ingress-validation-module",
+      "mission-bound-paired-D0-D1-research-ingress-with-existing-single-writer-runtime"
+    ],
+    "does_not_allow": [
+      "other-ownership-change",
+      "frozen-P04-v1-change",
+      "domain-schema-change",
+      "second-writer-broker-daemon-or-ingress-lane",
+      "D2-or-D3",
+      "credential-or-private-evidence-disclosure",
+      "domain-or-canonical-write",
+      "live-trading",
+      "live-security-execution",
+      "publication",
+      "promotion",
+      "authority-grant"
+    ]
+  }
+}

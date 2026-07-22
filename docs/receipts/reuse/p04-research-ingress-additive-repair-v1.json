@@ -1,0 +1,49 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-p04-research-ingress-additive-repair-v1-20260722",
+  "issued_at": "2026-07-22T12:35:56Z",
+  "issuer": {"id": "agent-0", "authority_class": "reuse-review-authority"},
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "p04-research-ingress-additive-repair-v1",
+    "capability": "mission-bound-paired-domain-research-ingress-and-bounded-five-role-evolution-chain",
+    "candidates": [
+      {"candidate": "frozen-P04-validators-and-AF_UNIX-transport", "disposition": "selected-via-additive-one-shot-adapter-with-frozen-tool-byte-identical"},
+      {"candidate": "existing-SourceTrigger-MaterialEvent-and-input-CAS", "disposition": "selected-preserve-existing-domain-evidence-and-content-addressed-lineage"},
+      {"candidate": "existing-researchd-JobLedger-ModelCallBroker-and-advisor-worker-boundary", "disposition": "selected-preserve-one-writer-durable-reservation-SENT-terminal-and-reconciliation"},
+      {"candidate": "new-ingress-broker-daemon-writer-or-ledger", "disposition": "rejected-duplicate-authority-and-state"},
+      {"candidate": "mission-field-in-DomainExportBinding-or-use_count-in-OperationalActionEnvelope-v1", "disposition": "rejected-would-mutate-frozen-v1-contracts"},
+      {"candidate": "direct-or-manual-provider-reservation", "disposition": "rejected-bypasses-organism-lineage-and-authority-gates"},
+      {"candidate": "single-cross-domain-SourceTrigger", "disposition": "rejected-breaks-domain-provenance-and-frozen-trigger-semantics"}
+    ],
+    "selected_candidate": "minimal-versioned-mission-wrapper-plus-target-scoped-action-over-existing-paired-P04-and-single-writer-runtime",
+    "source_ref": "git:18866d98bfa64a13a4c43eff97e7315576d46adf;internal:P04+AF_UNIX+CAS+SourceTrigger+MaterialEvent+researchd+JobLedger+ModelCallBroker+advisor-dispatch+connected-worker",
+    "selected_source_sha": "5e44e460b25a0dd98d8ed49ac7a755884388b3706195b374494290b11bcfcac6",
+    "license": "repository-native-code-only",
+    "tests": [
+      "unchanged-P04-v1-byte-and-behavior-compatibility",
+      "valid-wrapper-paired-ingress-and-exact-two-domain-triggers",
+      "plan-mission-expiry-fingerprint-binding-and-artifact-hash-denials",
+      "exact-prepared-Kimi-request-ref-hash-and-command-line-pin",
+      "D2-D3-secret-extra-field-and-one-domain-missing-denials",
+      "replay-and-second-execution-denial",
+      "reserved-request-crash-recovery-without-duplicate",
+      "exact-five-role-route-no-fallback-and-terminal-budget-reconciliation",
+      "mission-lineage-through-MaterialEvent-decisions-reservation-request-result-and-terminal"
+    ],
+    "security_review": "local-AF_UNIX-only-no-public-listener-ingress-provider-calls-zero-domain-and-canonical-writes-zero-no-live-authority-D0-D1-only",
+    "dependency_review": "stdlib-and-existing-repository-components-only-no-new-dependency-lockfile-license-notice-or-SBOM-change",
+    "rollback": "Revert only the additive mission contracts, adapter, runtime methods, IPC v2 projection and tests; preserve frozen P04, immutable mission/model receipts and the existing ledger."
+  },
+  "integrity": {
+    "payload_sha256": "4ca8e241ba270b9f7a8b1994cf85a5697545bd6f11a010b4997660b9486a7a5e",
+    "parent_refs": [
+      "git:18866d98bfa64a13a4c43eff97e7315576d46adf",
+      "reuse:reuse-p01-minimal-maintenance-and-ingress-patch-20260720",
+      "reuse:reuse-r04b-broker-scout-ipc-handshake-20260719",
+      "integration:integration-kmax-01-kimi-k3-max-routing-20260722"
+    ]
+  }
+}

@@ -74,7 +74,7 @@ _POLICY_KEYS = frozenset(
         "shadow_tool_sha256",
     }
 )
-_DISPATCH_KEYS = frozenset(
+_DISPATCH_KEYS_V1 = frozenset(
     {
         "schema_id",
         "schema_version",
@@ -88,6 +88,7 @@ _DISPATCH_KEYS = frozenset(
         "worker_ipc_extension_sha256",
     }
 )
+_DISPATCH_KEYS = _DISPATCH_KEYS_V1 | frozenset({"completion_command"})
 _RECORD_KEYS_V1 = frozenset(
     {
         "schema_id",
@@ -384,14 +385,14 @@ class RuntimePolicy:
             if not isinstance(raw, str) or not _SHA256_RE.fullmatch(raw):
                 raise ConnectedWorkerError("runtime policy digest is invalid")
             digests[name] = raw
-        if (
-            _sha256_file(
-                REPOSITORY_ROOT
-                / "provenance"
-                / "model-worker-ipc-extension-v1.json"
-            )
-            != digests["worker_ipc_extension_sha256"]
-        ):
+        extension_paths = (
+            REPOSITORY_ROOT / "provenance" / "model-worker-ipc-extension-v1.json",
+            REPOSITORY_ROOT / "provenance" / "model-worker-ipc-extension-v2.json",
+        )
+        extension_digests = {
+            _sha256_file(path) for path in extension_paths if path.is_file()
+        }
+        if digests["worker_ipc_extension_sha256"] not in extension_digests:
             raise ConnectedWorkerError("runtime policy dependency binding is stale")
         profile_paths = {_sha256_file(ADVISOR_PROFILE_PATH): ADVISOR_PROFILE_PATH}
         profile_path = profile_paths.get(digests["shadow_profile_sha256"])
@@ -433,6 +434,7 @@ class Dispatch:
     classification: str
     max_tokens: int
     expires_at: str
+    completion_command: str
 
     @classmethod
     def load(
@@ -446,11 +448,12 @@ class Dispatch:
             _regular_owner_file(path, maximum=policy.max_dispatch_bytes),
             label="worker dispatch",
         )
-        if set(value) != _DISPATCH_KEYS:
+        if set(value) not in {_DISPATCH_KEYS_V1, _DISPATCH_KEYS}:
             raise ConnectedWorkerError("worker dispatch shape drifted")
+        legacy = set(value) == _DISPATCH_KEYS_V1
         if (
             value["schema_id"] != "ModelWorkerDispatch"
-            or value["schema_version"] != "1.0.0"
+            or value["schema_version"] != ("1.0.0" if legacy else "1.1.0")
             or value["worker_ipc_extension_sha256"]
             != policy.worker_ipc_extension_sha256
         ):
@@ -468,7 +471,7 @@ class Dispatch:
         if (
             not isinstance(request_body, str)
             or not request_body
-            or len(request_body.encode("utf-8")) > 32_768
+            or len(request_body.encode("utf-8")) > 49_152
             or "\x00" in request_body
         ):
             raise ConnectedWorkerError("worker request body is invalid")
@@ -479,6 +482,14 @@ class Dispatch:
         if type(max_tokens) is not int or not 1 <= max_tokens <= 16_384:
             raise ConnectedWorkerError("worker token bound is invalid")
         expires_at = _timestamp(value["expires_at"], label="dispatch expiry")
+        completion_command = (
+            "complete_model_call" if legacy else value["completion_command"]
+        )
+        if completion_command not in {
+            "complete_model_call",
+            "complete_research_model_call",
+        }:
+            raise ConnectedWorkerError("worker completion command is invalid")
         return cls(
             call_id=call_id,
             dispatch_token=token,
@@ -487,6 +498,7 @@ class Dispatch:
             classification=str(classification),
             max_tokens=max_tokens,
             expires_at=expires_at,
+            completion_command=str(completion_command),
         )
 
 
@@ -507,9 +519,12 @@ class UnixIPCClient:
         request_id = "worker:" + hashlib.sha256(
             (command + ":" + idempotency_key).encode("utf-8")
         ).hexdigest()
+        protocol_version = (
+            "1.3" if command == "complete_research_model_call" else "1.2"
+        )
         frame = encode_message(
             {
-                "version": "1.2",
+                "version": protocol_version,
                 "request_id": request_id,
                 "idempotency_key": idempotency_key,
                 "command": command,
@@ -540,7 +555,7 @@ class UnixIPCClient:
         if set(response) != {"version", "request_id", "ok", "command", "result"}:
             raise ConnectedWorkerError("control response shape drifted")
         if (
-            response["version"] != "1.2"
+            response["version"] != protocol_version
             or response["request_id"] != request_id
             or response["ok"] is not True
             or response["command"] != command
@@ -678,6 +693,23 @@ class PrivateResponseStore:
         ):
             raise ConnectedWorkerError("completion record identity drifted")
         return value
+
+    def read_output_text(self, reference: str) -> str:
+        if not isinstance(reference, str) or not reference.startswith("cas:sha256:"):
+            raise ConnectedWorkerError("research output reference is invalid")
+        digest = reference.removeprefix("cas:sha256:")
+        if not _SHA256_RE.fullmatch(digest):
+            raise ConnectedWorkerError("research output digest is invalid")
+        raw = _regular_owner_file(
+            self.output_root / digest,
+            maximum=196_608,
+        )
+        if hashlib.sha256(raw).hexdigest() != digest:
+            raise ConnectedWorkerError("research output hash is invalid")
+        try:
+            return raw.decode("utf-8", errors="strict")
+        except UnicodeError as exc:
+            raise ConnectedWorkerError("research output is not UTF-8") from exc
 
     def delete_ref(self, reference: str) -> bool:
         if not isinstance(reference, str):
@@ -977,6 +1009,23 @@ def _completion_payload(record: Mapping[str, object]) -> dict[str, object]:
     }
 
 
+def _bound_completion(
+    dispatch: Dispatch,
+    record: Mapping[str, object],
+    store: PrivateResponseStore,
+) -> tuple[str, dict[str, object]]:
+    payload = _completion_payload(record)
+    command = dispatch.completion_command
+    if command == "complete_research_model_call":
+        response_ref = record["response_ref"]
+        payload["response_body"] = (
+            store.read_output_text(str(response_ref))
+            if record["outcome"] == "SUCCEEDED"
+            else None
+        )
+    return command, payload
+
+
 def _validate_lookup(dispatch: Dispatch, state: Mapping[str, object]) -> None:
     expected = {
         "call_id": dispatch.call_id,
@@ -1111,9 +1160,12 @@ def run_dispatch(
                 "state": current_state,
                 "network_calls": 0,
             }
+        completion_command, completion_payload = _bound_completion(
+            dispatch, existing, store
+        )
         completed = client.request(  # type: ignore[attr-defined]
-            "complete_model_call",
-            _completion_payload(existing),
+            completion_command,
+            completion_payload,
             idempotency_key="worker:complete:" + key_base,
         )
         return {
@@ -1135,9 +1187,12 @@ def run_dispatch(
             created_at=now_value,
         )
         store.write_record(uncertain)
+        completion_command, completion_payload = _bound_completion(
+            dispatch, uncertain, store
+        )
         completed = client.request(  # type: ignore[attr-defined]
-            "complete_model_call",
-            _completion_payload(uncertain),
+            completion_command,
+            completion_payload,
             idempotency_key="worker:complete:" + key_base,
         )
         return {
@@ -1336,9 +1391,12 @@ def run_dispatch(
             )
             break
     store.write_record(completion)
+    completion_command, completion_payload = _bound_completion(
+        dispatch, completion, store
+    )
     completed = client.request(  # type: ignore[attr-defined]
-        "complete_model_call",
-        _completion_payload(completion),
+        completion_command,
+        completion_payload,
         idempotency_key="worker:complete:" + key_base,
     )
     return {

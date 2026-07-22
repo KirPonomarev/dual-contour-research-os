@@ -21,7 +21,7 @@ from .authority import (
 
 
 _LEGACY_PROTOCOL_VERSION = "1.1"
-_SUPPORTED_PROTOCOL_VERSIONS = frozenset({"1.1", "1.2"})
+_SUPPORTED_PROTOCOL_VERSIONS = frozenset({"1.1", "1.2", "1.3"})
 _REQUEST_KEYS = frozenset(
     {"version", "request_id", "idempotency_key", "command", "payload"}
 )
@@ -35,6 +35,17 @@ _COMMAND_PAYLOAD_KEYS = {
     "submit": frozenset({"job_spec", "permit", "lease"}),
     "lookup": frozenset({"job_spec_ref"}),
     "submit_source_trigger": frozenset({"source_trigger"}),
+    "queue_research_mission": frozenset(
+        {
+            "mission_envelope",
+            "action_envelope",
+            "material_event_refs",
+            "artifact_body",
+            "expected_host_fingerprint",
+        }
+    ),
+    "advance_research_missions": frozenset(),
+    "research_mission_status": frozenset({"mission_sha256"}),
     "claim_next_proposal": frozenset(),
     "claim_proposal": frozenset({"material_event_ref"}),
     "submit_proposal": frozenset({"proposal_envelope"}),
@@ -65,6 +76,19 @@ _COMMAND_PAYLOAD_KEYS = {
             "failure_code",
         }
     ),
+    "complete_research_model_call": frozenset(
+        {
+            "call_id",
+            "dispatch_token",
+            "outcome",
+            "response_ref",
+            "response_body",
+            "actual_tokens",
+            "actual_cost_units",
+            "provider_receipt_ref",
+            "failure_code",
+        }
+    ),
     "reconcile_model_call": frozenset(
         {
             "call_id",
@@ -74,8 +98,16 @@ _COMMAND_PAYLOAD_KEYS = {
         }
     ),
     "lookup_model_call": frozenset({"call_id"}),
-    "list_reserved_model_calls": frozenset(),
+    "list_reserved_model_calls": frozenset({"maximum"}),
 }
+_RESEARCH_PROTOCOL_COMMANDS = frozenset(
+    {
+        "queue_research_mission",
+        "advance_research_missions",
+        "research_mission_status",
+        "complete_research_model_call",
+    }
+)
 _OPERATOR_COMMANDS = frozenset(
     {
         "status",
@@ -86,7 +118,7 @@ _OPERATOR_COMMANDS = frozenset(
         "reconcile_model_call",
     }
 )
-_COLLECTOR_COMMANDS = frozenset({"submit_source_trigger"})
+_COLLECTOR_COMMANDS = frozenset({"submit_source_trigger", "queue_research_mission"})
 _SCOUT_COMMANDS = frozenset(
     {
         "claim_next_proposal",
@@ -95,10 +127,18 @@ _SCOUT_COMMANDS = frozenset(
         "ack_proposal",
         "reserve_model_call",
         "lookup_model_call",
+        "advance_research_missions",
+        "research_mission_status",
     }
 )
 _CONNECTED_WORKER_COMMANDS = frozenset(
-    {"begin_model_call", "complete_model_call", "lookup_model_call", "list_reserved_model_calls"}
+    {
+        "begin_model_call",
+        "complete_model_call",
+        "complete_research_model_call",
+        "lookup_model_call",
+        "list_reserved_model_calls",
+    }
 )
 _ROLE_COMMANDS = {
     "operator": _OPERATOR_COMMANDS,
@@ -107,10 +147,10 @@ _ROLE_COMMANDS = {
     "connected_worker": _CONNECTED_WORKER_COMMANDS,
 }
 _ROLE_VERSIONS = {
-    "operator": frozenset({"1.1", "1.2"}),
-    "collector": frozenset({"1.2"}),
-    "scout": frozenset({"1.2"}),
-    "connected_worker": frozenset({"1.2"}),
+    "operator": frozenset({"1.1", "1.2", "1.3"}),
+    "collector": frozenset({"1.2", "1.3"}),
+    "scout": frozenset({"1.2", "1.3"}),
+    "connected_worker": frozenset({"1.2", "1.3"}),
 }
 
 
@@ -201,6 +241,34 @@ class _A1ControlBackend(Protocol):
 
 
 class _ModelControlBackend(Protocol):
+    def queue_research_mission(
+        self,
+        *,
+        mission_envelope: Mapping[str, object],
+        action_envelope: Mapping[str, object],
+        material_event_refs: object,
+        artifact_body: str,
+        expected_host_fingerprint: str,
+        actor: str,
+        idempotency_key: str,
+        now: str,
+    ) -> Mapping[str, object]: ...
+
+    def advance_research_missions(
+        self,
+        *,
+        actor: str,
+        idempotency_key: str,
+        now: str,
+    ) -> Mapping[str, object]: ...
+
+    def research_mission_status(
+        self,
+        *,
+        mission_sha256: str,
+        actor: str,
+    ) -> Mapping[str, object]: ...
+
     def reserve_model_call(
         self,
         *,
@@ -234,6 +302,23 @@ class _ModelControlBackend(Protocol):
         dispatch_token: str,
         outcome: str,
         response_ref: str | None,
+        actual_tokens: int | None,
+        actual_cost_units: int | None,
+        provider_receipt_ref: str | None,
+        failure_code: str | None,
+        actor: str,
+        idempotency_key: str,
+        now: str,
+    ) -> Mapping[str, object]: ...
+
+    def complete_research_model_call(
+        self,
+        *,
+        call_id: str,
+        dispatch_token: str,
+        outcome: str,
+        response_ref: str | None,
+        response_body: str | None,
         actual_tokens: int | None,
         actual_cost_units: int | None,
         provider_receipt_ref: str | None,
@@ -298,6 +383,8 @@ class ControlRequest:
             and self.command == "reconcile_model_call"
         ):
             raise ControlError("model reconciliation requires protocol 1.2")
+        if self.command in _RESEARCH_PROTOCOL_COMMANDS and self.version != "1.3":
+            raise ControlError("research mission commands require protocol 1.3")
         if not isinstance(self.payload, Mapping):
             raise ControlError("payload must be an object")
 
@@ -328,6 +415,32 @@ class ControlRequest:
             if not isinstance(value, Mapping):
                 raise ControlError("source_trigger must be an object")
             copied_payload["source_trigger"] = _json_copy(value)
+        elif self.command == "queue_research_mission":
+            for name in ("mission_envelope", "action_envelope"):
+                value = copied_payload[name]
+                if not isinstance(value, Mapping):
+                    raise ControlError(f"{name} must be an object")
+                copied_payload[name] = _json_copy(value)
+            refs = copied_payload["material_event_refs"]
+            if (
+                not isinstance(refs, (list, tuple))
+                or len(refs) != 2
+                or len(set(refs)) != 2
+            ):
+                raise ControlError("material_event_refs must contain exactly two unique refs")
+            copied_payload["material_event_refs"] = [
+                _normalized_text("material_event_ref", item, maximum=256)
+                for item in refs
+            ]
+            _model_request_body(copied_payload["artifact_body"])
+            _sha256_text(
+                "expected_host_fingerprint",
+                copied_payload["expected_host_fingerprint"],
+            )
+        elif self.command == "advance_research_missions":
+            pass
+        elif self.command == "research_mission_status":
+            _sha256_text("mission_sha256", copied_payload["mission_sha256"])
         elif self.command == "claim_next_proposal":
             pass
         elif self.command == "claim_proposal":
@@ -369,7 +482,7 @@ class ControlRequest:
             _normalized_text("call_id", copied_payload["call_id"], maximum=128)
             _sha256_text("dispatch_token", copied_payload["dispatch_token"])
             _model_request_body(copied_payload["request_body"])
-        elif self.command == "complete_model_call":
+        elif self.command in {"complete_model_call", "complete_research_model_call"}:
             _normalized_text("call_id", copied_payload["call_id"], maximum=128)
             _sha256_text("dispatch_token", copied_payload["dispatch_token"])
             if copied_payload["outcome"] not in {
@@ -384,6 +497,16 @@ class ControlRequest:
                     _normalized_text(name, value, maximum=512)
             for name in ("actual_tokens", "actual_cost_units"):
                 _optional_nonnegative_integer(name, copied_payload[name])
+            if self.command == "complete_research_model_call":
+                response_body = copied_payload["response_body"]
+                if response_body is not None:
+                    _model_request_body(response_body)
+                if (copied_payload["outcome"] == "SUCCEEDED") != (
+                    response_body is not None
+                ):
+                    raise ControlError(
+                        "research response_body is required only for SUCCEEDED"
+                    )
         elif self.command == "reconcile_model_call":
             _normalized_text("call_id", copied_payload["call_id"], maximum=128)
             _nonnegative_integer(
@@ -399,6 +522,9 @@ class ControlRequest:
             )
         elif self.command == "lookup_model_call":
             _normalized_text("call_id", copied_payload["call_id"], maximum=128)
+        elif self.command == "list_reserved_model_calls":
+            if copied_payload["maximum"] != 1:
+                raise ControlError("production reserved-call maximum must be 1")
         object.__setattr__(self, "payload", MappingProxyType(copied_payload))
 
     @classmethod
@@ -569,6 +695,28 @@ class ControlRouter:
                     idempotency_key=request.idempotency_key,
                     now=self._event_at(),
                 )
+            elif request.command == "queue_research_mission":
+                result = self._require_model_backend().queue_research_mission(
+                    mission_envelope=request.payload["mission_envelope"],  # type: ignore[arg-type]
+                    action_envelope=request.payload["action_envelope"],  # type: ignore[arg-type]
+                    material_event_refs=request.payload["material_event_refs"],
+                    artifact_body=request.payload["artifact_body"],  # type: ignore[arg-type]
+                    expected_host_fingerprint=request.payload["expected_host_fingerprint"],  # type: ignore[arg-type]
+                    actor=actor,
+                    idempotency_key=request.idempotency_key,
+                    now=self._event_at(),
+                )
+            elif request.command == "advance_research_missions":
+                result = self._require_model_backend().advance_research_missions(
+                    actor=actor,
+                    idempotency_key=request.idempotency_key,
+                    now=self._event_at(),
+                )
+            elif request.command == "research_mission_status":
+                result = self._require_model_backend().research_mission_status(
+                    mission_sha256=request.payload["mission_sha256"],  # type: ignore[arg-type]
+                    actor=actor,
+                )
             elif request.command == "claim_proposal":
                 result = self._require_a1_backend().claim_proposal(
                     material_event_ref=request.payload["material_event_ref"],  # type: ignore[arg-type]
@@ -622,6 +770,21 @@ class ControlRouter:
                     dispatch_token=request.payload["dispatch_token"],  # type: ignore[arg-type]
                     outcome=request.payload["outcome"],  # type: ignore[arg-type]
                     response_ref=request.payload["response_ref"],  # type: ignore[arg-type]
+                    actual_tokens=request.payload["actual_tokens"],  # type: ignore[arg-type]
+                    actual_cost_units=request.payload["actual_cost_units"],  # type: ignore[arg-type]
+                    provider_receipt_ref=request.payload["provider_receipt_ref"],  # type: ignore[arg-type]
+                    failure_code=request.payload["failure_code"],  # type: ignore[arg-type]
+                    actor=actor,
+                    idempotency_key=request.idempotency_key,
+                    now=self._event_at(),
+                )
+            elif request.command == "complete_research_model_call":
+                result = self._require_model_backend().complete_research_model_call(
+                    call_id=request.payload["call_id"],  # type: ignore[arg-type]
+                    dispatch_token=request.payload["dispatch_token"],  # type: ignore[arg-type]
+                    outcome=request.payload["outcome"],  # type: ignore[arg-type]
+                    response_ref=request.payload["response_ref"],  # type: ignore[arg-type]
+                    response_body=request.payload["response_body"],  # type: ignore[arg-type]
                     actual_tokens=request.payload["actual_tokens"],  # type: ignore[arg-type]
                     actual_cost_units=request.payload["actual_cost_units"],  # type: ignore[arg-type]
                     provider_receipt_ref=request.payload["provider_receipt_ref"],  # type: ignore[arg-type]
