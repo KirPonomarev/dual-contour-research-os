@@ -1,0 +1,15 @@
+{
+  "schema_id": "ControlArtifactInventory",
+  "schema_version": "1.0.0",
+  "stage_id": "p04-runtime-closure-vacuous-v1",
+  "artifacts": [
+    {"path": "provenance/model-vacuous-output-reconciliation-v1.json", "purpose": "sanitized exact physical evidence"},
+    {"path": "ops/connected-worker/model_worker_v4.py", "purpose": "future empty-output classification"},
+    {"path": "src/research_bridge/model_broker.py", "purpose": "exact UNKNOWN reconciliation"},
+    {"path": "src/research_bridge/researchd.py", "purpose": "mission-bound automatic application"}
+  ],
+  "provider_calls_during_validation": 0,
+  "domain_writes": 0,
+  "canonical_writes": 0,
+  "live_authority": false
+}

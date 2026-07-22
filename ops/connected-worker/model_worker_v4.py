@@ -208,6 +208,10 @@ class ConnectedWorkerError(RuntimeError):
     """The worker failed closed without exposing private details."""
 
 
+class VacuousProviderOutput(ConnectedWorkerError):
+    """A valid provider response consumed tokens but produced no usable text."""
+
+
 def _canonical_bytes(value: object) -> bytes:
     try:
         return json.dumps(
@@ -874,8 +878,10 @@ def _extract_output(raw_response: bytes, *, protocol: str) -> bytes:
         output = "".join(texts)
     else:
         raise ConnectedWorkerError("provider output protocol is invalid")
-    if not isinstance(output, str) or not output or "\x00" in output:
+    if not isinstance(output, str) or "\x00" in output:
         raise ConnectedWorkerError("provider output text is invalid")
+    if not output:
+        raise VacuousProviderOutput("provider output is empty")
     return output.encode("utf-8")
 
 
@@ -1270,7 +1276,15 @@ def run_dispatch(
                     actual_cost_units=accounting.actual_cost_units,
                     provider_receipt_ref=accounting.provider_receipt_ref,
                 )
-            output = _extract_output(raw, protocol=str(binding["protocol"]))
+            try:
+                output = _extract_output(raw, protocol=str(binding["protocol"]))
+            except VacuousProviderOutput as exc:
+                raise KnownProviderFailure(
+                    "VACUOUS_OUTPUT",
+                    actual_tokens=accounting.actual_tokens,
+                    actual_cost_units=accounting.actual_cost_units,
+                    provider_receipt_ref=accounting.provider_receipt_ref,
+                ) from exc
             if len(output.strip()) < policy.minimum_output_bytes:
                 raise KnownProviderFailure(
                     "VACUOUS_OUTPUT",

@@ -216,6 +216,14 @@ _MISSION_ACCOUNTING_PROFILE_PATH = (
     / "provenance"
     / "model-accounting-mode-v1.json"
 )
+_MISSION_VACUOUS_PROFILE_SHA256 = (
+    "3cb8ae607f1aa4b6988d69075d639b2a7ace3d00bf02a63b6c6c5e9eabe2d7ab"
+)
+_MISSION_VACUOUS_PROFILE_PATH = (
+    Path(__file__).resolve().parents[2]
+    / "provenance"
+    / "model-vacuous-output-reconciliation-v1.json"
+)
 _CORRIDOR_EXECUTOR_PROFILE_KEYS = frozenset(
     {
         "capability_ref",
@@ -548,6 +556,74 @@ def _mission_observed_accounting_evidence_ref(binding: str) -> str:
     ):
         raise ResearchdError("mission accounting profile policy drifted")
     return "accounting-policy:sha256:" + _MISSION_ACCOUNTING_PROFILE_SHA256
+
+
+def _mission_vacuous_reconciliation_profile() -> Mapping[str, object]:
+    """Load the one exact sanitized provider-response adjudication profile."""
+
+    try:
+        raw = _MISSION_VACUOUS_PROFILE_PATH.read_bytes()
+    except OSError as exc:
+        raise ResearchdError("mission vacuous-output profile is unavailable") from exc
+    if (
+        not raw
+        or len(raw) > 65_536
+        or hashlib.sha256(raw).hexdigest() != _MISSION_VACUOUS_PROFILE_SHA256
+    ):
+        raise ResearchdError("mission vacuous-output profile identity drifted")
+    try:
+        profile = json.loads(raw)
+    except (UnicodeError, json.JSONDecodeError) as exc:
+        raise ResearchdError("mission vacuous-output profile is not JSON") from exc
+    expected = {
+        "schema_id": "ModelVacuousOutputReconciliationEvidence",
+        "schema_version": "1.0.0",
+        "mission_sha256": "d7bc485d07e1bc94a35cbb3367c8978fa9173e9a85984d0306233faccfde4272",
+        "call_id": "model-call:ab10a4ee29f64c0f6b099f92f97df72f9755abee8d270811785fa0961559df3f",
+        "request_sha256": "2646a5851f90a274af2f4511cd83b53e6aaca3df0d1958e5c338df55b0336c2a",
+        "model_binding": "deepseek-v4-pro",
+        "raw_response_ref": "private-cas:sha256:a4c9eaae70446c60c995f1c07994b70710551accc1166c189a1160e2d82e9f69",
+        "provider_body_sha256": "5c10b8434b2fb83e958115af9a6780a7ad4ffb54daf9fe0838a23dcd51357cdc",
+        "provider_receipt_ref": "provider-response:sha256:5c10b8434b2fb83e958115af9a6780a7ad4ffb54daf9fe0838a23dcd51357cdc",
+        "http_status": 200,
+        "protocol": "OPENAI_CHAT_COMPLETIONS",
+        "actual_tokens": 5551,
+        "actual_cost_units": None,
+        "completion_tokens": 4096,
+        "prompt_tokens": 1455,
+        "content_bytes": 0,
+        "finish_reason": "length",
+        "network_calls": 1,
+        "request_bytes_sent": True,
+        "failure_code": "VACUOUS_OUTPUT",
+        "monetary_enforcement": "DISABLED_OBSERVATIONAL",
+        "raw_or_credential_bytes_present": False,
+        "grants_retry": False,
+        "grants_authority": False,
+    }
+    if profile != expected:
+        raise ResearchdError("mission vacuous-output profile policy drifted")
+    return MappingProxyType(profile)
+
+
+def _matches_mission_vacuous_reconciliation(
+    *,
+    mission_sha256: str,
+    call_id: object,
+    request_sha256: object,
+    model_binding: str,
+    failure_code: object,
+) -> bool:
+    """Return true only for the one frozen UNKNOWN adjudication tuple."""
+
+    profile = _mission_vacuous_reconciliation_profile()
+    return (
+        mission_sha256 == profile["mission_sha256"]
+        and call_id == profile["call_id"]
+        and request_sha256 == profile["request_sha256"]
+        and model_binding == profile["model_binding"]
+        and failure_code == "AMBIGUOUS_PROVIDER_OUTCOME"
+    )
 
 
 class ResearchDaemon:
@@ -1219,16 +1295,42 @@ class ResearchDaemon:
                             }
                         )
                     if state == "UNKNOWN":
-                        return MappingProxyType(
-                            {
-                                "status": "WAIT_PROVIDER",
-                                "mission_sha256": mission_sha,
-                                "role": role,
-                                "call_id": step["call_id"],
-                                "state": state,
-                                "reason": "AMBIGUOUS_PROVIDER_OUTCOME",
-                            }
+                        profile = _mission_vacuous_reconciliation_profile()
+                        exact_vacuous = _matches_mission_vacuous_reconciliation(
+                            mission_sha256=mission_sha,
+                            call_id=step["call_id"],
+                            request_sha256=snapshot["request_sha256"],
+                            model_binding=expected_binding,
+                            failure_code=snapshot["failure_code"],
                         )
+                        if not exact_vacuous:
+                            return MappingProxyType(
+                                {
+                                    "status": "WAIT_PROVIDER",
+                                    "mission_sha256": mission_sha,
+                                    "role": role,
+                                    "call_id": step["call_id"],
+                                    "state": state,
+                                    "reason": "AMBIGUOUS_PROVIDER_OUTCOME",
+                                }
+                            )
+                        broker, _ = self._require_model_runtime()
+                        broker.reconcile_vacuous_unknown(
+                            str(step["call_id"]),
+                            actual_tokens=int(profile["actual_tokens"]),
+                            provider_receipt_ref=str(profile["provider_receipt_ref"]),
+                            accounting_evidence_ref=(
+                                "accounting-policy:sha256:"
+                                + _MISSION_VACUOUS_PROFILE_SHA256
+                            ),
+                            event_at=now,
+                            idempotency_key=(
+                                f"mission:{mission_sha}:{index}:"
+                                "vacuous-output-reconcile"
+                            ),
+                        )
+                        snapshot = broker.snapshot(str(step["call_id"]))
+                        state = snapshot["state"]
                     if state in {"SUCCEEDED", "FAILED_KNOWN"}:
                         if (
                             snapshot["actual_tokens"] is None

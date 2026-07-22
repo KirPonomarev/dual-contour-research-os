@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import base64
 import json
 import os
 from pathlib import Path
@@ -21,7 +22,10 @@ from research_bridge.model_broker import (  # noqa: E402
 import research_bridge.researchd as researchd_module  # noqa: E402
 from research_bridge.researchd import (  # noqa: E402
     _MISSION_TOTAL_TOKEN_RESERVATION,
+    _MISSION_VACUOUS_PROFILE_SHA256,
+    _matches_mission_vacuous_reconciliation,
     _mission_observed_accounting_evidence_ref,
+    _mission_vacuous_reconciliation_profile,
     ResearchdError,
 )
 from tests.test_s15_model_registry_broker import (  # noqa: E402
@@ -43,6 +47,13 @@ TERMINAL_AT = "2026-07-22T14:40:02Z"
 RECONCILED_AT = "2026-07-22T14:40:03Z"
 RECEIPT = "provider-response:sha256:" + hashlib.sha256(b"response").hexdigest()
 EVIDENCE = _mission_observed_accounting_evidence_ref("deepseek-v4-flash")
+VACUOUS_EVIDENCE = (
+    "accounting-policy:sha256:" + _MISSION_VACUOUS_PROFILE_SHA256
+)
+VACUOUS_RECEIPT = (
+    "provider-response:sha256:"
+    "5c10b8434b2fb83e958115af9a6780a7ad4ffb54daf9fe0838a23dcd51357cdc"
+)
 
 
 class ObservedAccountingTests(unittest.TestCase):
@@ -302,6 +313,239 @@ class ObservedAccountingTests(unittest.TestCase):
             self.assertRaises(ResearchdError),
         ):
             _mission_observed_accounting_evidence_ref("deepseek-v4-flash")
+
+    def test_exact_unknown_vacuous_output_reconciles_once_without_retry(self) -> None:
+        broker, ledger, call_id = self._terminal(
+            outcome="UNKNOWN", tokens=None, receipt=None
+        )
+        before = ledger.event_count()
+        result = broker.reconcile_vacuous_unknown(
+            call_id,
+            actual_tokens=5_551,
+            provider_receipt_ref=VACUOUS_RECEIPT,
+            accounting_evidence_ref=VACUOUS_EVIDENCE,
+            event_at=RECONCILED_AT,
+            idempotency_key="mission:exact-vacuous:reconcile",
+        )
+        self.assertEqual(result.state, "RECONCILED")
+        snapshot = broker.snapshot(call_id)
+        self.assertEqual(snapshot["previous_state"], "UNKNOWN")
+        self.assertEqual(snapshot["failure_code"], "VACUOUS_OUTPUT")
+        self.assertEqual(snapshot["actual_tokens"], 5_551)
+        self.assertIsNone(snapshot["actual_cost_units"])
+        self.assertEqual(snapshot["provider_receipt_ref"], VACUOUS_RECEIPT)
+        self.assertEqual(snapshot["accounting_mode"], "OBSERVED_NO_NUMERIC_COST")
+        self.assertEqual(snapshot["accounting_evidence_ref"], VACUOUS_EVIDENCE)
+        self.assertTrue(snapshot["budget_released"])
+        self.assertEqual(ledger.event_count(), before + 1)
+
+        replay = broker.reconcile_vacuous_unknown(
+            call_id,
+            actual_tokens=5_551,
+            provider_receipt_ref=VACUOUS_RECEIPT,
+            accounting_evidence_ref=VACUOUS_EVIDENCE,
+            event_at=RECONCILED_AT,
+            idempotency_key="mission:exact-vacuous:reconcile",
+        )
+        self.assertEqual(replay.state, "RECONCILED")
+        self.assertEqual(ledger.event_count(), before + 1)
+        for drift in (
+            {"actual_tokens": 5_552},
+            {"provider_receipt_ref": "provider-response:sha256:" + "0" * 64},
+            {"accounting_evidence_ref": "accounting-policy:sha256:" + "0" * 64},
+        ):
+            arguments = {
+                "actual_tokens": 5_551,
+                "provider_receipt_ref": VACUOUS_RECEIPT,
+                "accounting_evidence_ref": VACUOUS_EVIDENCE,
+                "event_at": RECONCILED_AT,
+                "idempotency_key": "mission:exact-vacuous:reconcile",
+                **drift,
+            }
+            with self.assertRaises(ModelBrokerError):
+                broker.reconcile_vacuous_unknown(call_id, **arguments)
+        ledger.close()
+
+    def test_vacuous_profile_and_exact_gate_fail_closed_on_any_drift(self) -> None:
+        profile = _mission_vacuous_reconciliation_profile()
+        exact = {
+            "mission_sha256": profile["mission_sha256"],
+            "call_id": profile["call_id"],
+            "request_sha256": profile["request_sha256"],
+            "model_binding": profile["model_binding"],
+            "failure_code": "AMBIGUOUS_PROVIDER_OUTCOME",
+        }
+        self.assertTrue(_matches_mission_vacuous_reconciliation(**exact))
+        drifts = {
+            "mission_sha256": "0" * 64,
+            "call_id": "model-call:" + "0" * 64,
+            "request_sha256": "0" * 64,
+            "model_binding": "deepseek-v4-flash",
+            "failure_code": "MALFORMED_RESPONSE",
+        }
+        for field, value in drifts.items():
+            with self.subTest(field=field):
+                changed = {**exact, field: value}
+                self.assertFalse(_matches_mission_vacuous_reconciliation(**changed))
+
+        raw = (ROOT / "provenance/model-vacuous-output-reconciliation-v1.json").read_bytes()
+        drifted = json.loads(raw)
+        drifted["actual_tokens"] = 5_552
+        path = self.root / "drifted-vacuous-profile.json"
+        path.write_text(json.dumps(drifted, indent=2) + "\n")
+        with (
+            mock.patch.object(
+                researchd_module, "_MISSION_VACUOUS_PROFILE_PATH", path
+            ),
+            self.assertRaisesRegex(ResearchdError, "identity drifted"),
+        ):
+            _mission_vacuous_reconciliation_profile()
+
+    def test_non_unknown_cannot_use_vacuous_reconciliation(self) -> None:
+        broker, ledger, call_id = self._terminal()
+        with self.assertRaisesRegex(ModelBrokerError, "unresolved UNKNOWN"):
+            broker.reconcile_vacuous_unknown(
+                call_id,
+                actual_tokens=5_551,
+                provider_receipt_ref=VACUOUS_RECEIPT,
+                accounting_evidence_ref=VACUOUS_EVIDENCE,
+                event_at=RECONCILED_AT,
+                idempotency_key="not-unknown",
+            )
+        ledger.close()
+
+
+class VacuousWorkerOutputTests(unittest.TestCase):
+    def test_valid_accounting_empty_output_is_failed_known_without_retry(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            policy_data = json.loads(CONNECTED_WORKER_POLICY_PATH.read_text())
+            policy_data["control_socket"] = str(root / "missing-researchd.sock")
+            policy_data["private_store_root"] = str(root / "private-store")
+            policy_data["ai_off_path"] = str(root / "AI_OFF")
+            policy_data["credential_file"] = str(root / "provider.env")
+            policy_path = root / "runtime-policy.json"
+            policy_path.write_text(json.dumps(policy_data))
+            dispatch = {
+                "schema_id": "ModelWorkerDispatch",
+                "schema_version": "1.1.0",
+                "call_id": "model-call:" + "d" * 64,
+                "dispatch_token": "e" * 64,
+                "request_body": "bounded synthetic research request",
+                "model_binding": "deepseek-v4-pro",
+                "classification": "D1",
+                "max_tokens": 20_000,
+                "expires_at": "2026-07-22T18:00:00Z",
+                "completion_command": "complete_research_model_call",
+                "worker_ipc_extension_sha256": policy_data[
+                    "worker_ipc_extension_sha256"
+                ],
+            }
+            dispatch_path = root / "dispatch.json"
+            dispatch_path.write_text(
+                json.dumps(dispatch, sort_keys=True, separators=(",", ":"))
+            )
+            os.chmod(dispatch_path, 0o600)
+
+            body = json.dumps(
+                {
+                    "id": "synthetic-empty-output",
+                    "usage": {
+                        "prompt_tokens": 1455,
+                        "completion_tokens": 4096,
+                        "total_tokens": 5551,
+                    },
+                    "choices": [
+                        {
+                            "finish_reason": "length",
+                            "message": {"content": "", "reasoning_content": "bounded"},
+                        }
+                    ],
+                },
+                sort_keys=True,
+                separators=(",", ":"),
+            ).encode()
+            raw = json.dumps(
+                {
+                    "binding": "deepseek-v4-pro",
+                    "protocol": "OPENAI_CHAT_COMPLETIONS",
+                    "http_status": 200,
+                    "headers": {"x-request-id": "synthetic-empty"},
+                    "body_base64": base64.b64encode(body).decode("ascii"),
+                },
+                sort_keys=True,
+                separators=(",", ":"),
+            ).encode()
+
+            class Adapter:
+                calls = 0
+
+                def invoke_raw(self, **_keywords: object) -> bytes:
+                    self.calls += 1
+                    return raw
+
+            class Resolver:
+                def resolve(self, _name: str) -> str:
+                    return "synthetic-private-value"
+
+            class IPC:
+                state = "RESERVED"
+                completion: dict[str, object] | None = None
+
+                def request(
+                    self,
+                    command: str,
+                    payload: dict[str, object],
+                    *,
+                    idempotency_key: str,
+                ) -> dict[str, object]:
+                    self_outer.assertTrue(idempotency_key.startswith("worker:"))
+                    if command == "lookup_model_call":
+                        return {
+                            "call_id": dispatch["call_id"],
+                            "state": self.state,
+                            "request_sha256": hashlib.sha256(
+                                str(dispatch["request_body"]).encode()
+                            ).hexdigest(),
+                            "model_binding": dispatch["model_binding"],
+                            "classification": dispatch["classification"],
+                            "max_tokens": dispatch["max_tokens"],
+                            "expires_at": dispatch["expires_at"],
+                            "auto_retry": False,
+                        }
+                    if command == "begin_model_call":
+                        self.state = "SENT"
+                        return {"state": "SENT", "egress_authorized": True}
+                    if command == "complete_research_model_call":
+                        self.completion = dict(payload)
+                        self.state = str(payload["outcome"])
+                        return {"state": self.state}
+                    raise AssertionError(command)
+
+            self_outer = self
+            adapter = Adapter()
+            ipc = IPC()
+            result = connected_worker_v4.run_dispatch(
+                policy_path=policy_path,
+                dispatch_path=dispatch_path,
+                encryption_attested=True,
+                ipc_client=ipc,
+                credential_resolver=Resolver(),
+                adapter_factory=lambda *_args: adapter,
+                event_at=AT,
+            )
+            self.assertEqual(result["state"], "FAILED_KNOWN")
+            self.assertEqual(result["network_calls"], 1)
+            self.assertEqual(adapter.calls, 1)
+            self.assertIsNotNone(ipc.completion)
+            assert ipc.completion is not None
+            self.assertEqual(ipc.completion["failure_code"], "VACUOUS_OUTPUT")
+            self.assertEqual(ipc.completion["actual_tokens"], 5_551)
+            self.assertEqual(
+                ipc.completion["provider_receipt_ref"],
+                "provider-response:sha256:" + hashlib.sha256(body).hexdigest(),
+            )
+            self.assertIsNone(ipc.completion["response_ref"])
 
 
 class DispatcherStartBarrierTests(unittest.TestCase):

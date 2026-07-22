@@ -3584,7 +3584,13 @@ def _validate_model_call_transition(
         elif (
             snapshot["actual_cost_units"] is not None
             or snapshot["accounting_evidence_ref"] is None
-            or snapshot["previous_state"] not in {"SUCCEEDED", "FAILED_KNOWN"}
+            or snapshot["previous_state"] not in {
+                "SUCCEEDED", "FAILED_KNOWN", "UNKNOWN"
+            }
+            or (
+                snapshot["previous_state"] == "UNKNOWN"
+                and snapshot["failure_code"] != "VACUOUS_OUTPUT"
+            )
         ):
             raise LedgerError(
                 "observational reconciliation requires bound non-numeric evidence"
