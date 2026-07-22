@@ -196,7 +196,11 @@ class BridgeSafetyRepairTests(unittest.TestCase):
                 result, ipc = self._run(adapter)
                 self.assertEqual((result["state"], result["network_calls"]), ("UNKNOWN", 1))
                 self.assertEqual(adapter.calls, 1)
-                self.assertEqual(ipc.completion["failure_code"], code)
+                self.assertEqual(ipc.completion["failure_code"], None)
+                self.assertEqual(ipc.completion["actual_tokens"], None)
+                self.assertEqual(ipc.completion["actual_cost_units"], None)
+                self.assertEqual(ipc.completion["provider_receipt_ref"], None)
+                self.assertEqual(self._stored_record()["failure_code"], code)
 
     def test_http_429_retries_only_once_and_restart_sent_never_calls_provider(self) -> None:
         adapter = SequenceAdapter([_raw(429), _raw(429), _raw()])

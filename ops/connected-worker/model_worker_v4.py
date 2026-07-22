@@ -960,6 +960,12 @@ def _provider_request_id(raw: bytes) -> str | None:
 
 
 def _completion_payload(record: Mapping[str, object]) -> dict[str, object]:
+    # UNKNOWN keeps its diagnostic failure code in the owner-only private
+    # record, while the Core contract intentionally accepts no asserted
+    # failure or accounting for an ambiguous provider outcome.
+    failure_code = (
+        None if record["outcome"] == "UNKNOWN" else record["failure_code"]
+    )
     return {
         "call_id": record["call_id"],
         "dispatch_token": record["dispatch_token"],
@@ -968,7 +974,7 @@ def _completion_payload(record: Mapping[str, object]) -> dict[str, object]:
         "actual_tokens": record["actual_tokens"],
         "actual_cost_units": record["actual_cost_units"],
         "provider_receipt_ref": record["provider_receipt_ref"],
-        "failure_code": record["failure_code"],
+        "failure_code": failure_code,
     }
 
 
