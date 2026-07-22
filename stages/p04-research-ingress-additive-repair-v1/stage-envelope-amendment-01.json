@@ -1,0 +1,36 @@
+{
+  "schema_id": "StageEnvelopeAmendment",
+  "schema_version": "1.0.0",
+  "amendment_id": "p04-research-ingress-additive-repair-v1-release-fix-01",
+  "stage_id": "p04-research-ingress-additive-repair-v1",
+  "agent_id": "agent-0",
+  "reason": "Physical preflight proved that both existing image build contexts copy IPC extension v1 only; a runtime bound to additive v2 would fail closed because the bound provenance file is absent from the image.",
+  "previous_integration_sha": "3d39d8dc6032bfac58103576ed3ff058f777bf7e",
+  "previous_integration_tree": "2d787fc6b12951d3b34127899c5ca411f1cd707d",
+  "branch": "codex/bridge-a0-p04-research-ingress-release-fix-v1",
+  "worktree": "/private/tmp/dcros-p04-research-ingress-additive-repair-v1",
+  "additive_write_set": [
+    "ops/release/Containerfile",
+    "ops/connected-worker/Containerfile",
+    "inventory/p04-research-ingress-additive-repair-v1-control-artifact.json",
+    "tests/test_p04_research_ingress_additive_repair.py",
+    "tests/test_r08a_production_image_e2e_harness.py",
+    "stages/p04-research-ingress-additive-repair-v1/stage-envelope-amendment-01.json",
+    "stages/p04-research-ingress-additive-repair-v1/ownership-lease-amendment-01.json"
+  ],
+  "acceptance": [
+    "both build contexts copy exact provenance/model-worker-ipc-extension-v2.json",
+    "legacy IPC v1 copy remains unchanged",
+    "focused tests and make contracts pass",
+    "full repository suite passes",
+    "exact PR-head and merge-head CI pass"
+  ],
+  "stop_conditions": [
+    "dependency or base image change becomes necessary",
+    "frozen IPC v1 must be edited or removed",
+    "runtime policy or authority boundary must be weakened",
+    "Market or Security mutation becomes necessary"
+  ],
+  "rollback": "Revert only the two additive COPY lines and their hash/test evidence; no runtime mutation has occurred under the failed preflight.",
+  "authority_source": "owner-delegation:P04_RESEARCH_INGRESS_ADDITIVE_REPAIR_V1:bounded-release-surface"
+}

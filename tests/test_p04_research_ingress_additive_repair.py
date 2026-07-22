@@ -167,6 +167,23 @@ def _proof(domain: str) -> dict[str, object]:
 
 
 class ResearchIngressContractTests(unittest.TestCase):
+    def test_both_runtime_images_include_exact_ipc_v2_provenance(self) -> None:
+        expected = (
+            "provenance/model-worker-ipc-extension-v2.json "
+            "/opt/research-os/provenance/model-worker-ipc-extension-v2.json"
+        )
+        for relative in (
+            "ops/release/Containerfile",
+            "ops/connected-worker/Containerfile",
+        ):
+            text = (ROOT / relative).read_text(encoding="utf-8")
+            self.assertEqual(text.count(expected), 1, relative)
+            self.assertEqual(
+                text.count("provenance/model-worker-ipc-extension-v1.json"),
+                2,
+                relative,
+            )
+
     def test_schemas_wrappers_and_frozen_p04_trigger_are_additive(self) -> None:
         for name in (
             "ResearchMissionEnvelope.schema.json",

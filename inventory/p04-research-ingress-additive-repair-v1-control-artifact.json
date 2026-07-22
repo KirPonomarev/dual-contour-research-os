@@ -20,6 +20,8 @@
       "ops/connected-worker/model_worker_v4.py": "6fac6e13a2f3c44331cbd945cc2fa1ec91cfc8838f69cc00ea772f2f3cd977a3",
       "ops/connected-worker/runbook-inputs-v2.json": "66207c2ac70960d5551499c61b55d0b5cf2b36ed583afe6911126b7d45a52939",
       "ops/connected-worker/runtime-policy-v4.json": "dd574e725a86e7d49a1ef25f28ec34cb4d6c88a9bd880a05ea12aadcc64082a2",
+      "ops/release/Containerfile": "c06b44f992021edd1ac503e67bf20cf3e292b40ce22dd10238461c17fa1551c6",
+      "ops/connected-worker/Containerfile": "62a8f9982077f3859f5194b6fabfc6d70107b48562b31ac4589186c7915a4f0a",
       "provenance/model-worker-ipc-extension-v2.json": "467b2e5dd8583939d13e216a9f29e3578b0cc720a27081ca4f8723ad5726bac3"
     },
     "mission_contracts": [
@@ -44,6 +46,6 @@
     "live_authority": false
   },
   "integrity": {
-    "payload_sha256": "25da9921a0fedf45324d4c5b7411a4a7e2dbab0f545761961da282dc11c9c27d"
+    "payload_sha256": "923d058352398de0feceebe90ff5d2b4ea084f5f60a94c93488b38b0f419b655"
   }
 }
