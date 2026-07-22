@@ -1,0 +1,11 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "stage_id": "p04-expired-mission-vacuous-prepass-v1",
+  "decision": "REUSE_EXISTING_EXACT_PROFILE_BROKER_RECONCILIATION_AND_MISSION_ADVANCER",
+  "reused": ["immutable model-vacuous-output-reconciliation-v1 profile", "_matches_mission_vacuous_reconciliation exact tuple gate", "ModelBroker.reconcile_vacuous_unknown", "append-only model ledger", "existing advance_research_missions Scout command", "existing advisor dispatcher"],
+  "rejected": ["provider retry", "replacement call", "direct database mutation", "fake cost zero", "generic UNKNOWN release", "new admin command", "new broker/writer/dispatcher", "backdated mission clock"],
+  "minimal_glue": ["one exact-profile-only expired-mission cleanup prepass before active mission reservation"],
+  "external_code_added": false,
+  "new_dependency": false
+}

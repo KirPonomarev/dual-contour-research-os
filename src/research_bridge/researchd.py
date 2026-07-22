@@ -1243,7 +1243,15 @@ class ResearchDaemon:
             raise ResearchdError("research mission advance requires the Scout principal")
         _text("idempotency_key", idempotency_key, maximum=256)
         current = _research_timestamp(now)
+        retired_expired_mission = (
+            self._reconcile_expired_exact_vacuous_reservation(
+                current=current,
+                now=now,
+            )
+        )
         for path in self._mission_manifest_paths():
+            if path.stem == retired_expired_mission:
+                continue
             manifest = _read_private_json(
                 path, _MISSION_MANIFEST_KEYS, "mission manifest"
             )
@@ -1503,6 +1511,143 @@ class ResearchDaemon:
                 "live_authority": False,
             }
         )
+
+    def _reconcile_expired_exact_vacuous_reservation(
+        self,
+        *,
+        current: datetime,
+        now: str,
+    ) -> str | None:
+        """Release only the frozen vacuous call after its mission expired.
+
+        This is resource cleanup, not renewed mission authority.  An exact
+        cleanup match is skipped by the caller so the expired mission cannot
+        reserve another role.  Every other expired mission still reaches the
+        normal fail-closed envelope validator.
+        """
+
+        profile = _mission_vacuous_reconciliation_profile()
+        mission_sha = str(profile["mission_sha256"])
+        manifest_path = self._mission_manifest_path(mission_sha)
+        if not manifest_path.exists():
+            return None
+        manifest = _read_private_json(
+            manifest_path,
+            _MISSION_MANIFEST_KEYS,
+            "mission manifest",
+        )
+        if manifest["mission_sha256"] != mission_sha:
+            raise ResearchdError("exact expired mission manifest identity drifted")
+        mission_document = _mapping_member(
+            manifest,
+            "mission_envelope",
+            "mission manifest",
+        )
+        if set(mission_document) != {
+            "schema_id",
+            "schema_version",
+            "object_id",
+            "issued_at",
+            "payload",
+            "integrity",
+        }:
+            raise ResearchdError("exact expired mission envelope shape drifted")
+        payload = _mapping_member(
+            mission_document,
+            "payload",
+            "exact expired mission envelope",
+        )
+        integrity = _mapping_member(
+            mission_document,
+            "integrity",
+            "exact expired mission envelope",
+        )
+        if (
+            mission_document["schema_id"] != "ResearchMissionEnvelope"
+            or mission_document["schema_version"] != "1.0.0"
+            or mission_document["object_id"] != f"research-mission:{mission_sha}"
+            or payload.get("mission_sha256") != mission_sha
+            or set(integrity) != {"payload_sha256"}
+            or not hmac.compare_digest(
+                str(integrity.get("payload_sha256")),
+                research_canonical_sha256(payload),
+            )
+        ):
+            raise ResearchdError("exact expired mission envelope identity drifted")
+        expires_at = payload.get("expires_at")
+        if not isinstance(expires_at, str):
+            raise ResearchdError("exact expired mission expiry is invalid")
+        if current <= _research_timestamp(expires_at):
+            return None
+
+        role_index = 1
+        expected_role, expected_binding, expected_effort = ROLE_SEQUENCE[role_index]
+        if expected_binding != profile["model_binding"]:
+            raise ResearchdError("exact vacuous profile role binding drifted")
+        step_path = self._mission_step_path(mission_sha, role_index)
+        if not step_path.exists():
+            return None
+        step = _read_private_json(
+            step_path,
+            _MISSION_STEP_KEYS,
+            "mission role step",
+        )
+        expected_step = {
+            "mission_sha256": mission_sha,
+            "role_index": role_index,
+            "role": expected_role,
+            "model_binding": expected_binding,
+            "reasoning_effort": expected_effort,
+            "call_id": profile["call_id"],
+            "request_sha256": profile["request_sha256"],
+            "fallback_used": False,
+        }
+        if any(step[name] != value for name, value in expected_step.items()):
+            return None
+
+        broker, _ = self._require_model_runtime()
+        snapshot = broker.snapshot(str(profile["call_id"]))
+        if snapshot["state"] == "UNKNOWN":
+            if not _matches_mission_vacuous_reconciliation(
+                mission_sha256=mission_sha,
+                call_id=step["call_id"],
+                request_sha256=snapshot["request_sha256"],
+                model_binding=expected_binding,
+                failure_code=snapshot["failure_code"],
+            ):
+                return None
+            broker.reconcile_vacuous_unknown(
+                str(profile["call_id"]),
+                actual_tokens=int(profile["actual_tokens"]),
+                provider_receipt_ref=str(profile["provider_receipt_ref"]),
+                accounting_evidence_ref=(
+                    "accounting-policy:sha256:"
+                    + _MISSION_VACUOUS_PROFILE_SHA256
+                ),
+                event_at=now,
+                idempotency_key=(
+                    f"mission:{mission_sha}:expired-vacuous-output-reconcile:v1"
+                ),
+            )
+            snapshot = broker.snapshot(str(profile["call_id"]))
+
+        expected_terminal = {
+            "state": "RECONCILED",
+            "previous_state": "UNKNOWN",
+            "failure_code": "VACUOUS_OUTPUT",
+            "actual_tokens": profile["actual_tokens"],
+            "actual_cost_units": None,
+            "provider_receipt_ref": profile["provider_receipt_ref"],
+            "response_ref": None,
+            "accounting_mode": "OBSERVED_NO_NUMERIC_COST",
+            "accounting_evidence_ref": (
+                "accounting-policy:sha256:" + _MISSION_VACUOUS_PROFILE_SHA256
+            ),
+            "budget_released": True,
+        }
+        if any(snapshot[name] != value for name, value in expected_terminal.items()):
+            return None
+        return mission_sha
 
     def research_mission_status(
         self,

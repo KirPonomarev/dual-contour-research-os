@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import base64
+from datetime import datetime, timezone
 import json
 import os
 from pathlib import Path
@@ -26,7 +27,11 @@ from research_bridge.researchd import (  # noqa: E402
     _matches_mission_vacuous_reconciliation,
     _mission_observed_accounting_evidence_ref,
     _mission_vacuous_reconciliation_profile,
+    ResearchDaemon,
     ResearchdError,
+)
+from research_bridge.research_ingress import (  # noqa: E402
+    canonical_sha256 as research_canonical_sha256,
 )
 from tests.test_s15_model_registry_broker import (  # noqa: E402
     policy,
@@ -74,6 +79,92 @@ class ObservedAccountingTests(unittest.TestCase):
             budget_policy=policy(active=1, tokens=20_000, cost=1),
         )
         return broker, ledger
+
+    def _expired_prepass_daemon(
+        self,
+        *,
+        step_overrides: dict[str, object] | None = None,
+        snapshot: dict[str, object] | None = None,
+    ) -> tuple[ResearchDaemon, mock.Mock, dict[str, object]]:
+        profile = dict(_mission_vacuous_reconciliation_profile())
+        runtime = self.root / f"prepass-{self.ledger_index}"
+        self.ledger_index += 1
+        runtime.mkdir(mode=0o700)
+        mission_sha = str(profile["mission_sha256"])
+        payload = {
+            "mission_sha256": mission_sha,
+            "expires_at": "2026-07-22T16:19:22Z",
+        }
+        mission_document = {
+            "schema_id": "ResearchMissionEnvelope",
+            "schema_version": "1.0.0",
+            "object_id": "research-mission:" + mission_sha,
+            "issued_at": "2026-07-22T14:19:12Z",
+            "payload": payload,
+            "integrity": {"payload_sha256": research_canonical_sha256(payload)},
+        }
+        manifest = {
+            "schema_id": "ResearchMissionRuntimeManifest",
+            "schema_version": "1.0.0",
+            "mission_sha256": mission_sha,
+            "mission_envelope": mission_document,
+            "action_envelope": {},
+            "material_event_refs": [],
+            "artifact_ref": "cas:sha256:" + "a" * 64,
+            "queued_at": "2026-07-22T14:19:22Z",
+            "decision_lineage": {},
+            "provider_calls_maximum": 5,
+            "ingress_provider_calls": 0,
+            "domain_writes": 0,
+            "canonical_writes": 0,
+            "live_authority": False,
+        }
+        researchd_module._write_immutable_private_json(
+            runtime / "research-mission-manifests" / f"{mission_sha}.json",
+            manifest,
+        )
+        step = {
+            "schema_id": "ResearchMissionRoleReservationReceipt",
+            "schema_version": "1.0.0",
+            "mission_sha256": mission_sha,
+            "role_index": 1,
+            "role": "RESEARCH_WORKER",
+            "model_binding": profile["model_binding"],
+            "reasoning_effort": "max",
+            "call_id": profile["call_id"],
+            "request_ref": "cas:sha256:" + str(profile["request_sha256"]),
+            "request_sha256": profile["request_sha256"],
+            "role_assignment_ref": "role-assignment:exact-vacuous",
+            "reserved_at": "2026-07-22T15:31:03Z",
+            "fallback_used": False,
+            **(step_overrides or {}),
+        }
+        (runtime / "research-mission-steps").mkdir(mode=0o700)
+        researchd_module._write_immutable_private_json(
+            runtime / "research-mission-steps" / mission_sha / "1.json",
+            step,
+        )
+        unknown = {
+            "state": "UNKNOWN",
+            "previous_state": "SENT",
+            "failure_code": "AMBIGUOUS_PROVIDER_OUTCOME",
+            "request_sha256": profile["request_sha256"],
+            "actual_tokens": None,
+            "actual_cost_units": None,
+            "provider_receipt_ref": None,
+            "response_ref": None,
+            "accounting_mode": None,
+            "accounting_evidence_ref": None,
+            "budget_released": False,
+        }
+        broker = mock.Mock()
+        broker.snapshot.return_value = snapshot or unknown
+        daemon = object.__new__(ResearchDaemon)
+        daemon._root = runtime
+        daemon._started = True
+        daemon._model_broker = broker
+        daemon._model_routing = mock.Mock()
+        return daemon, broker, profile
 
     def _terminal(
         self,
@@ -365,6 +456,69 @@ class ObservedAccountingTests(unittest.TestCase):
             with self.assertRaises(ModelBrokerError):
                 broker.reconcile_vacuous_unknown(call_id, **arguments)
         ledger.close()
+
+    def test_expired_exact_vacuous_prepass_releases_only_frozen_call(self) -> None:
+        daemon, broker, profile = self._expired_prepass_daemon()
+        terminal = {
+            "state": "RECONCILED",
+            "previous_state": "UNKNOWN",
+            "failure_code": "VACUOUS_OUTPUT",
+            "request_sha256": profile["request_sha256"],
+            "actual_tokens": profile["actual_tokens"],
+            "actual_cost_units": None,
+            "provider_receipt_ref": profile["provider_receipt_ref"],
+            "response_ref": None,
+            "accounting_mode": "OBSERVED_NO_NUMERIC_COST",
+            "accounting_evidence_ref": VACUOUS_EVIDENCE,
+            "budget_released": True,
+        }
+        broker.snapshot.side_effect = [broker.snapshot.return_value, terminal]
+        result = daemon._reconcile_expired_exact_vacuous_reservation(
+            current=datetime(2026, 7, 22, 21, 31, tzinfo=timezone.utc),
+            now="2026-07-22T21:31:00Z",
+        )
+        self.assertEqual(result, profile["mission_sha256"])
+        broker.reconcile_vacuous_unknown.assert_called_once_with(
+            profile["call_id"],
+            actual_tokens=5_551,
+            provider_receipt_ref=VACUOUS_RECEIPT,
+            accounting_evidence_ref=VACUOUS_EVIDENCE,
+            event_at="2026-07-22T21:31:00Z",
+            idempotency_key=(
+                "mission:d7bc485d07e1bc94a35cbb3367c8978fa9173e9a85984d0306233faccfde4272:"
+                "expired-vacuous-output-reconcile:v1"
+            ),
+        )
+
+        broker.snapshot.side_effect = None
+        broker.snapshot.return_value = terminal
+        replay = daemon._reconcile_expired_exact_vacuous_reservation(
+            current=datetime(2026, 7, 22, 21, 32, tzinfo=timezone.utc),
+            now="2026-07-22T21:32:00Z",
+        )
+        self.assertEqual(replay, profile["mission_sha256"])
+        self.assertEqual(broker.reconcile_vacuous_unknown.call_count, 1)
+
+    def test_expired_vacuous_prepass_rejects_live_or_drifted_tuple(self) -> None:
+        daemon, broker, _profile = self._expired_prepass_daemon()
+        live = daemon._reconcile_expired_exact_vacuous_reservation(
+            current=datetime(2026, 7, 22, 15, 0, tzinfo=timezone.utc),
+            now="2026-07-22T15:00:00Z",
+        )
+        self.assertIsNone(live)
+        broker.snapshot.assert_not_called()
+        broker.reconcile_vacuous_unknown.assert_not_called()
+
+        drifted, drifted_broker, _ = self._expired_prepass_daemon(
+            step_overrides={"request_sha256": "0" * 64},
+        )
+        rejected = drifted._reconcile_expired_exact_vacuous_reservation(
+            current=datetime(2026, 7, 22, 21, 31, tzinfo=timezone.utc),
+            now="2026-07-22T21:31:00Z",
+        )
+        self.assertIsNone(rejected)
+        drifted_broker.snapshot.assert_not_called()
+        drifted_broker.reconcile_vacuous_unknown.assert_not_called()
 
     def test_vacuous_profile_and_exact_gate_fail_closed_on_any_drift(self) -> None:
         profile = _mission_vacuous_reconciliation_profile()

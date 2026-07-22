@@ -1,0 +1,11 @@
+{
+  "schema_id": "OwnershipLease",
+  "schema_version": "1.0.0",
+  "stage_id": "p04-expired-mission-vacuous-prepass-v1",
+  "agent_id": 0,
+  "base_sha": "a48ea21b557ca37bbf1d414113e312a71d5081b0",
+  "branch": "codex/bridge-a0-p04-expired-vacuous-prepass-v1",
+  "write_set": ["src/research_bridge/researchd.py", "tests/test_p04_runtime_closure.py", "stages/p04-expired-mission-vacuous-prepass-v1/", "docs/receipts/reuse/p04-expired-mission-vacuous-prepass-v1.json", "inventory/p04-expired-mission-vacuous-prepass-v1-control-artifact.json"],
+  "owner": "Agent 0",
+  "status": "ACTIVE"
+}
