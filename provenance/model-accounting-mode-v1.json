@@ -1,0 +1,38 @@
+{
+  "profile_id": "research-mission-accounting-mode-v1",
+  "schema_version": "1.0.0",
+  "status": "frozen",
+  "accounting_mode": "OBSERVED_NO_NUMERIC_COST",
+  "scope": {
+    "mission_only": true,
+    "eligible_bindings": [
+      "deepseek-v4-flash",
+      "deepseek-v4-pro",
+      "kimi-k3-max",
+      "gpt-5.6-sol-xhigh"
+    ],
+    "monetary_enforcement": "DISABLED_OBSERVATIONAL",
+    "synthetic_reservation_release": "EXPLICIT_RECEIPT_BOUND_RECONCILIATION_ONLY"
+  },
+  "required_evidence": [
+    "terminal_state_succeeded_or_failed_known",
+    "exact_actual_tokens",
+    "provider_response_receipt_identity",
+    "mission_role_step_binding",
+    "immutable_accounting_profile_identity"
+  ],
+  "fail_closed": [
+    "unknown_or_ambiguous_transmission",
+    "missing_actual_tokens",
+    "missing_provider_receipt",
+    "provider_receipt_identity_mismatch",
+    "numeric_cost_mode_with_null_cost",
+    "accounting_profile_or_binding_mismatch"
+  ],
+  "forbidden_claims": [
+    "zero_cost",
+    "no_payment_due",
+    "numeric_provider_cost",
+    "scientific_or_live_authority"
+  ]
+}

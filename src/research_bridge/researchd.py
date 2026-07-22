@@ -207,6 +207,15 @@ _MISSION_STEP_KEYS = frozenset(
     }
 )
 _MAX_MISSION_RESULT_BYTES = 262_144
+_MISSION_TOTAL_TOKEN_RESERVATION = 20_000
+_MISSION_ACCOUNTING_PROFILE_SHA256 = (
+    "1588317c907a6d91c5cfced2b3032e05af54991cc593faaf14e55ef5630f17e6"
+)
+_MISSION_ACCOUNTING_PROFILE_PATH = (
+    Path(__file__).resolve().parents[2]
+    / "provenance"
+    / "model-accounting-mode-v1.json"
+)
 _CORRIDOR_EXECUTOR_PROFILE_KEYS = frozenset(
     {
         "capability_ref",
@@ -452,6 +461,93 @@ class _CheckpointFenceLedger:
         with self._lock:
             self._claimed = None
             self._verified = None
+
+
+def _mission_observed_accounting_evidence_ref(binding: str) -> str:
+    """Validate the frozen mission-only non-numeric accounting profile."""
+
+    normalized_binding = _text("model_binding", binding, maximum=256)
+    try:
+        raw = _MISSION_ACCOUNTING_PROFILE_PATH.read_bytes()
+    except OSError as exc:
+        raise ResearchdError("mission accounting profile is unavailable") from exc
+    if (
+        not raw
+        or len(raw) > 65_536
+        or hashlib.sha256(raw).hexdigest()
+        != _MISSION_ACCOUNTING_PROFILE_SHA256
+    ):
+        raise ResearchdError("mission accounting profile identity drifted")
+
+    def pairs(items: list[tuple[str, object]]) -> dict[str, object]:
+        value: dict[str, object] = {}
+        for key, item in items:
+            if key in value:
+                raise ResearchdError("mission accounting profile has duplicate keys")
+            value[key] = item
+        return value
+
+    try:
+        profile = json.loads(raw, object_pairs_hook=pairs)
+    except (UnicodeError, json.JSONDecodeError) as exc:
+        raise ResearchdError("mission accounting profile is not strict JSON") from exc
+    if not isinstance(profile, dict) or set(profile) != {
+        "profile_id",
+        "schema_version",
+        "status",
+        "accounting_mode",
+        "scope",
+        "required_evidence",
+        "fail_closed",
+        "forbidden_claims",
+    }:
+        raise ResearchdError("mission accounting profile shape drifted")
+    scope = profile["scope"]
+    if not isinstance(scope, dict) or set(scope) != {
+        "mission_only",
+        "eligible_bindings",
+        "monetary_enforcement",
+        "synthetic_reservation_release",
+    }:
+        raise ResearchdError("mission accounting scope shape drifted")
+    if (
+        profile["profile_id"] != "research-mission-accounting-mode-v1"
+        or profile["schema_version"] != "1.0.0"
+        or profile["status"] != "frozen"
+        or profile["accounting_mode"] != "OBSERVED_NO_NUMERIC_COST"
+        or scope["mission_only"] is not True
+        or scope["monetary_enforcement"] != "DISABLED_OBSERVATIONAL"
+        or scope["synthetic_reservation_release"]
+        != "EXPLICIT_RECEIPT_BOUND_RECONCILIATION_ONLY"
+        or not isinstance(scope["eligible_bindings"], list)
+        or normalized_binding not in scope["eligible_bindings"]
+        or profile["required_evidence"]
+        != [
+            "terminal_state_succeeded_or_failed_known",
+            "exact_actual_tokens",
+            "provider_response_receipt_identity",
+            "mission_role_step_binding",
+            "immutable_accounting_profile_identity",
+        ]
+        or profile["fail_closed"]
+        != [
+            "unknown_or_ambiguous_transmission",
+            "missing_actual_tokens",
+            "missing_provider_receipt",
+            "provider_receipt_identity_mismatch",
+            "numeric_cost_mode_with_null_cost",
+            "accounting_profile_or_binding_mismatch",
+        ]
+        or profile["forbidden_claims"]
+        != [
+            "zero_cost",
+            "no_payment_due",
+            "numeric_provider_cost",
+            "scientific_or_live_authority",
+        ]
+    ):
+        raise ResearchdError("mission accounting profile policy drifted")
+    return "accounting-policy:sha256:" + _MISSION_ACCOUNTING_PROFILE_SHA256
 
 
 class ResearchDaemon:
@@ -1136,7 +1232,6 @@ class ResearchDaemon:
                     if state in {"SUCCEEDED", "FAILED_KNOWN"}:
                         if (
                             snapshot["actual_tokens"] is None
-                            or snapshot["actual_cost_units"] is None
                             or snapshot["provider_receipt_ref"] is None
                         ):
                             return MappingProxyType(
@@ -1146,20 +1241,44 @@ class ResearchDaemon:
                                     "role": role,
                                     "call_id": step["call_id"],
                                     "state": state,
-                                    "reason": "EXACT_ACCOUNTING_NOT_PROVEN",
+                                    "reason": "PROVIDER_ACCOUNTING_IDENTITY_NOT_PROVEN",
                                 }
                             )
                         broker, _ = self._require_model_runtime()
-                        broker.reconcile(
-                            str(step["call_id"]),
-                            actual_tokens=int(snapshot["actual_tokens"]),
-                            actual_cost_units=int(snapshot["actual_cost_units"]),
-                            provider_receipt_ref=str(snapshot["provider_receipt_ref"]),
-                            event_at=now,
-                            idempotency_key=(
-                                f"mission:{mission_sha}:{index}:auto-reconcile"
-                            ),
-                        )
+                        if snapshot["actual_cost_units"] is None:
+                            accounting_evidence_ref = (
+                                _mission_observed_accounting_evidence_ref(
+                                    expected_binding
+                                )
+                            )
+                            broker.reconcile_observed_no_numeric_cost(
+                                str(step["call_id"]),
+                                actual_tokens=int(snapshot["actual_tokens"]),
+                                provider_receipt_ref=str(
+                                    snapshot["provider_receipt_ref"]
+                                ),
+                                accounting_evidence_ref=accounting_evidence_ref,
+                                event_at=now,
+                                idempotency_key=(
+                                    f"mission:{mission_sha}:{index}:"
+                                    "observed-no-numeric-cost-reconcile"
+                                ),
+                            )
+                        else:
+                            broker.reconcile(
+                                str(step["call_id"]),
+                                actual_tokens=int(snapshot["actual_tokens"]),
+                                actual_cost_units=int(
+                                    snapshot["actual_cost_units"]
+                                ),
+                                provider_receipt_ref=str(
+                                    snapshot["provider_receipt_ref"]
+                                ),
+                                event_at=now,
+                                idempotency_key=(
+                                    f"mission:{mission_sha}:{index}:auto-reconcile"
+                                ),
+                            )
                         snapshot = broker.snapshot(str(step["call_id"]))
                         state = snapshot["state"]
                     if state != "RECONCILED" or snapshot["budget_released"] is not True:
@@ -1168,7 +1287,17 @@ class ResearchDaemon:
                     response_bytes: bytes | None = None
                     if response_ref is not None:
                         response_bytes = self._read_input(str(response_ref))
-                    prior_results.append((role, str(response_ref or state), response_bytes))
+                    prior_evidence = str(response_ref or state)
+                    if response_ref is None and snapshot["failure_code"] is not None:
+                        prior_evidence = (
+                            "failed-role:"
+                            + str(snapshot["previous_state"])
+                            + ":"
+                            + str(snapshot["failure_code"])
+                            + ":"
+                            + str(snapshot["provider_receipt_ref"])
+                        )
+                    prior_results.append((role, prior_evidence, response_bytes))
                     continue
 
                 request_body = build_role_request(
@@ -1187,7 +1316,7 @@ class ResearchDaemon:
                         "D0" if mission["data_class"] == "D0_PUBLIC" else "D1"
                     ),
                     request_body=request_body,
-                    max_tokens=4_096,
+                    max_tokens=_MISSION_TOTAL_TOKEN_RESERVATION,
                     max_cost_units=1,
                     expires_at=str(mission["expires_at"]),
                     actor=actor,
@@ -1320,6 +1449,15 @@ class ResearchDaemon:
                     "actual_cost_units": snapshot["actual_cost_units"],
                     "provider_receipt_ref": snapshot["provider_receipt_ref"],
                     "failure_code": snapshot["failure_code"],
+                    "terminal_origin_state": (
+                        snapshot["previous_state"]
+                        if snapshot["state"] == "RECONCILED"
+                        else snapshot["state"]
+                    ),
+                    "accounting_mode": snapshot["accounting_mode"],
+                    "accounting_evidence_ref": snapshot[
+                        "accounting_evidence_ref"
+                    ],
                     "budget_released": snapshot["budget_released"],
                 }
             )

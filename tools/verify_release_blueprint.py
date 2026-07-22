@@ -66,6 +66,8 @@ _EXPECTED_BUILD_CONTEXT = (
     "!provenance/model-provider-routing-v2.json",
     "!provenance/model-role-evaluation-v2.json",
     "!provenance/model-worker-ipc-extension-v1.json",
+    "!provenance/model-worker-ipc-extension-v2.json",
+    "!provenance/model-accounting-mode-v1.json",
     "!contracts/",
     "!contracts/catalog.json",
     "!contracts/a1/",

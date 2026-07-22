@@ -269,7 +269,7 @@ _MODEL_CALL_TERMINAL_STATES = frozenset({"SUCCEEDED", "FAILED_KNOWN", "UNKNOWN"}
 _MODEL_CALL_ACTIVE_RESERVATION_STATES = frozenset(
     {"RESERVED", "SENT", "SUCCEEDED", "FAILED_KNOWN", "UNKNOWN"}
 )
-_MODEL_CALL_FIELDS = frozenset(
+_MODEL_CALL_FIELDS_V1 = frozenset(
     {
         "call_id", "previous_state", "state", "request_sha256", "registry_sha256",
         "binding_revision", "role", "model_binding", "classification",
@@ -279,6 +279,12 @@ _MODEL_CALL_FIELDS = frozenset(
         "response_ref", "actual_tokens", "actual_cost_units", "provider_receipt_ref",
         "failure_code", "ambiguous_usage", "budget_released", "auto_retry",
     }
+)
+_MODEL_CALL_FIELDS = _MODEL_CALL_FIELDS_V1 | frozenset(
+    {"accounting_mode", "accounting_evidence_ref"}
+)
+_MODEL_ACCOUNTING_MODES = frozenset(
+    {"NUMERIC_EXACT", "OBSERVED_NO_NUMERIC_COST"}
 )
 _MODEL_CALL_ID_RE = re.compile(r"^model-call:[a-f0-9]{64}$")
 _MODEL_RESPONSE_REF_RE = re.compile(r"^cas:sha256:[a-f0-9]{64}$")
@@ -3360,7 +3366,12 @@ class JobLedger:
 
 
 def _model_call_snapshot(value: Mapping[str, object]) -> dict[str, object]:
-    snapshot = _exact_mapping(value, _MODEL_CALL_FIELDS, "model call snapshot")
+    if set(value) == _MODEL_CALL_FIELDS_V1:
+        snapshot = dict(value)
+        snapshot["accounting_mode"] = "NUMERIC_EXACT"
+        snapshot["accounting_evidence_ref"] = None
+    else:
+        snapshot = _exact_mapping(value, _MODEL_CALL_FIELDS, "model call snapshot")
     _pattern_text("model call_id", snapshot["call_id"], _MODEL_CALL_ID_RE)
     previous_state = snapshot["previous_state"]
     if previous_state is not None and previous_state not in _MODEL_CALL_STATES:
@@ -3414,6 +3425,14 @@ def _model_call_snapshot(value: Mapping[str, object]) -> dict[str, object]:
     for name in ("provider_receipt_ref", "failure_code"):
         if snapshot[name] is not None:
             _text(snapshot[name], f"model call {name}", maximum=512)
+    if snapshot["accounting_mode"] not in _MODEL_ACCOUNTING_MODES:
+        raise LedgerError("model call accounting_mode is invalid")
+    if snapshot["accounting_evidence_ref"] is not None:
+        _text(
+            snapshot["accounting_evidence_ref"],
+            "model call accounting_evidence_ref",
+            maximum=512,
+        )
     for name in ("ambiguous_usage", "budget_released", "auto_retry"):
         if type(snapshot[name]) is not bool:
             raise LedgerError(f"model call {name} must be boolean")
@@ -3499,6 +3518,11 @@ def _validate_model_call_transition(
             )
         ) or snapshot["ambiguous_usage"] or snapshot["budget_released"]:
             raise LedgerError("nonterminal model call contains terminal material")
+        if (
+            snapshot["accounting_mode"] != "NUMERIC_EXACT"
+            or snapshot["accounting_evidence_ref"] is not None
+        ):
+            raise LedgerError("nonterminal model call contains accounting disposition")
     elif state == "SUCCEEDED":
         if snapshot["response_ref"] is None or snapshot["failure_code"] is not None:
             raise LedgerError("successful model call requires a response and no failure")
@@ -3510,6 +3534,11 @@ def _validate_model_call_transition(
             raise LedgerError("successful model call ambiguity flag is invalid")
         if snapshot["budget_released"]:
             raise LedgerError("success cannot release budget before reconciliation")
+        if (
+            snapshot["accounting_mode"] != "NUMERIC_EXACT"
+            or snapshot["accounting_evidence_ref"] is not None
+        ):
+            raise LedgerError("success cannot predeclare observational accounting")
     elif state == "FAILED_KNOWN":
         if snapshot["failure_code"] is None or snapshot["response_ref"] is not None:
             raise LedgerError("known failure shape is invalid")
@@ -3521,6 +3550,11 @@ def _validate_model_call_transition(
             raise LedgerError("known failure ambiguity flag is invalid")
         if snapshot["budget_released"]:
             raise LedgerError("known failure cannot release before reconciliation")
+        if (
+            snapshot["accounting_mode"] != "NUMERIC_EXACT"
+            or snapshot["accounting_evidence_ref"] is not None
+        ):
+            raise LedgerError("known failure cannot predeclare observational accounting")
     elif state == "UNKNOWN":
         if (
             snapshot["failure_code"] != "AMBIGUOUS_PROVIDER_OUTCOME"
@@ -3528,15 +3562,33 @@ def _validate_model_call_transition(
             or snapshot["budget_released"] is not False
         ):
             raise LedgerError("UNKNOWN must retain ambiguous usage and reservation")
+        if (
+            snapshot["accounting_mode"] != "NUMERIC_EXACT"
+            or snapshot["accounting_evidence_ref"] is not None
+        ):
+            raise LedgerError("UNKNOWN cannot use observational accounting")
     elif state == "RECONCILED":
         if (
             snapshot["actual_tokens"] is None
-            or snapshot["actual_cost_units"] is None
             or snapshot["provider_receipt_ref"] is None
             or snapshot["ambiguous_usage"] is not False
             or snapshot["budget_released"] is not True
         ):
-            raise LedgerError("RECONCILED requires exact usage and budget release evidence")
+            raise LedgerError("RECONCILED requires observed usage and budget release evidence")
+        if snapshot["accounting_mode"] == "NUMERIC_EXACT":
+            if (
+                snapshot["actual_cost_units"] is None
+                or snapshot["accounting_evidence_ref"] is not None
+            ):
+                raise LedgerError("numeric reconciliation requires exact numeric cost")
+        elif (
+            snapshot["actual_cost_units"] is not None
+            or snapshot["accounting_evidence_ref"] is None
+            or snapshot["previous_state"] not in {"SUCCEEDED", "FAILED_KNOWN"}
+        ):
+            raise LedgerError(
+                "observational reconciliation requires bound non-numeric evidence"
+            )
 
 
 def _validate_model_call_budget(

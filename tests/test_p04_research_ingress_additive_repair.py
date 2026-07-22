@@ -512,6 +512,7 @@ class ResearchMissionRuntimeTests(unittest.TestCase):
             self.assertEqual(item["research_mission_sha256"], MISSION_SHA)
             self.assertEqual(item["research_role_index"], index)
             self.assertEqual(item["completion_command"], "complete_research_model_call")
+            self.assertEqual(item["max_tokens"], 20_000)
             begun = self._request(
                 daemon,
                 WORKER_UID,
@@ -570,6 +571,90 @@ class ResearchMissionRuntimeTests(unittest.TestCase):
         self.assertEqual(status.result["domain_writes"], 0)
         self.assertEqual(status.result["canonical_writes"], 0)
         self.assertFalse(status.result["live_authority"])
+
+    def test_failed_scout_observed_cost_reconciles_and_enters_next_request(self) -> None:
+        daemon = self._daemon()
+        refs = self._materialize_pair(daemon)
+        self._queue(daemon, refs)
+        reserved = self._advance(daemon, "failed-scout:reserve")
+        self.assertEqual(reserved.result["role"], "SCOUT_FAST")
+        listed = self._request(
+            daemon,
+            WORKER_UID,
+            "list_reserved_model_calls",
+            "failed-scout:list",
+            {"maximum": 1},
+        )
+        item = listed.result["reserved_calls"][0]
+        self._request(
+            daemon,
+            WORKER_UID,
+            "begin_model_call",
+            "failed-scout:begin",
+            {
+                "call_id": item["call_id"],
+                "dispatch_token": item["dispatch_token"],
+                "request_body": item["request_body"],
+            },
+        )
+        provider_receipt = "provider-response:sha256:" + hashlib.sha256(
+            b"failed-scout-provider-body"
+        ).hexdigest()
+        completed = self._request(
+            daemon,
+            WORKER_UID,
+            "complete_research_model_call",
+            "failed-scout:complete",
+            {
+                "call_id": item["call_id"],
+                "dispatch_token": item["dispatch_token"],
+                "outcome": "FAILED_KNOWN",
+                "response_ref": None,
+                "response_body": None,
+                "actual_tokens": 4_950,
+                "actual_cost_units": None,
+                "provider_receipt_ref": provider_receipt,
+                "failure_code": "TOTAL_TOKEN_LIMIT_EXCEEDED",
+            },
+            version="1.3",
+        )
+        self.assertEqual(completed.result["state"], "FAILED_KNOWN")
+
+        next_role = self._advance(daemon, "failed-scout:advance")
+        self.assertEqual(next_role.result["status"], "RESERVED")
+        self.assertEqual(next_role.result["role"], "RESEARCH_WORKER")
+        self.assertNotEqual(next_role.result["call_id"], item["call_id"])
+        status = self._request(
+            daemon,
+            SCOUT_UID,
+            "research_mission_status",
+            "failed-scout:status",
+            {"mission_sha256": MISSION_SHA},
+            version="1.3",
+        )
+        scout = status.result["calls"][0]
+        self.assertEqual(scout["state"], "RECONCILED")
+        self.assertEqual(scout["terminal_origin_state"], "FAILED_KNOWN")
+        self.assertEqual(scout["failure_code"], "TOTAL_TOKEN_LIMIT_EXCEEDED")
+        self.assertEqual(scout["accounting_mode"], "OBSERVED_NO_NUMERIC_COST")
+        self.assertIsNone(scout["actual_cost_units"])
+        self.assertTrue(scout["budget_released"])
+
+        listed_next = self._request(
+            daemon,
+            WORKER_UID,
+            "list_reserved_model_calls",
+            "failed-scout:list-next",
+            {"maximum": 1},
+        )
+        next_item = listed_next.result["reserved_calls"][0]
+        self.assertEqual(next_item["call_id"], next_role.result["call_id"])
+        self.assertEqual(next_item["max_tokens"], 20_000)
+        self.assertIn(
+            "failed-role:FAILED_KNOWN:TOTAL_TOKEN_LIMIT_EXCEEDED:"
+            + provider_receipt,
+            next_item["request_body"],
+        )
 
 
 if __name__ == "__main__":
