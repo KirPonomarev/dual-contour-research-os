@@ -1,0 +1,71 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-kmax-02-provider-input-token-margin-repair-20260722",
+  "issued_at": "2026-07-22T09:39:39Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "KMAX-02-TOKEN-MARGIN-REPAIR",
+    "agent_id": "agent-0",
+    "ownership_lease_ref": "owner-only-stage-envelope:sha256:571315c7bcd54879a389c9b34628912d51141cc8db493e96192b7804f2f1b1dc",
+    "base_sha": "171995f86e8ac3e0681642e6ba21a73970eb8bab",
+    "head_sha": "e85a50c9db0316731260679ca430b253f8b865db",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "ops/connected-worker/model_worker_v4.py",
+      "tests/test_r09a_dual_contour_advisors.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "evidence_correction_envelope_sha256": "65008fa1b9f5652fb5dbb722cb73d7eb6549153a3b68a846e2d6c3ab0220e590",
+      "correction_class": "ADDITIVE_STAGE_IDENTITY_SPLIT",
+      "supersedes_stage_identity_binding_only": "docs/receipts/integration/kmax-kimi-k3-max-gpt-xhigh-routing.json",
+      "superseded_receipt_file_sha256": "a120b60569ed9b315183ae37fde1cbee27473606fb1d862a6e21dbc925b40df6",
+      "superseded_receipt_disposition": "PRESERVED_IMMUTABLE; RUNTIME FACTS REMAIN ACCURATE; COMBINED STAGE/LEASE BINDING NOT USED FOR ACCEPTANCE",
+      "repair_pr": 140,
+      "repair_source_commit": "e85a50c9db0316731260679ca430b253f8b865db",
+      "repair_integration_commit": "46558b8206a26c805746f5677c07b95e7f690ec7",
+      "source_and_integration_trees_equal": true,
+      "provider_input_token_margin_applied_before_output_limit": true,
+      "kimi_total_reservation_ceiling": 20000,
+      "kimi_provider_output_ceiling_tokens": 16384,
+      "non_kimi_provider_output_ceiling_tokens": 4096,
+      "small_reservation_example": {
+        "reservation": 768,
+        "input_margin": 256,
+        "provider_output_limit": 512
+      },
+      "reservation_not_exceeding_margin_fails_before_network": true,
+      "focused_tests": "green",
+      "full_core_tests": 942,
+      "stage0b_tests": 25,
+      "worker_image_sha256": "a64cf5e9158b568381e4493b6863c414d2f9a79d98685c08d354462162fa86ce",
+      "worker_release_sha": "46558b8206a26c805746f5677c07b95e7f690ec7",
+      "core_restarts_during_worker_repair": 0,
+      "vps_reboots": 0,
+      "provider_calls_during_evidence_correction": 0,
+      "runtime_mutations_during_evidence_correction": 0,
+      "secrets_printed": false
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29907003957",
+    "integration_commit_sha": "46558b8206a26c805746f5677c07b95e7f690ec7"
+  },
+  "integrity": {
+    "payload_sha256": "f5026ad2211b20e0216b4c96f791921971c58239fefbb7c77b80c49d9d82eb76",
+    "parent_refs": [
+      "git:e85a50c9db0316731260679ca430b253f8b865db",
+      "git:46558b8206a26c805746f5677c07b95e7f690ec7",
+      "ci:29907003957",
+      "stage-envelope:sha256:571315c7bcd54879a389c9b34628912d51141cc8db493e96192b7804f2f1b1dc",
+      "evidence-correction-envelope:sha256:65008fa1b9f5652fb5dbb722cb73d7eb6549153a3b68a846e2d6c3ab0220e590",
+      "superseded-receipt:sha256:a120b60569ed9b315183ae37fde1cbee27473606fb1d862a6e21dbc925b40df6"
+    ]
+  }
+}
