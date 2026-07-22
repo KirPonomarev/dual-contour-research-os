@@ -186,8 +186,15 @@ _MODEL_ROUTING_PROFILE_SHA256 = (
 _MODEL_ROUTING_PROFILE_SHA256_V2 = (
     "0539b1c2b3fd2e5b5f6e21769afe99d36a197f9399db100e5f0c5885e5da3c67"
 )
+_MODEL_ROUTING_PROFILE_SHA256_V3 = (
+    "16b143ea3b095c6eaa34c5663c0e8f2424c7a16fc77f5f4ffd52f6298b773c43"
+)
 _MODEL_ROUTING_PROFILE_SHA256S = frozenset(
-    {_MODEL_ROUTING_PROFILE_SHA256, _MODEL_ROUTING_PROFILE_SHA256_V2}
+    {
+        _MODEL_ROUTING_PROFILE_SHA256,
+        _MODEL_ROUTING_PROFILE_SHA256_V2,
+        _MODEL_ROUTING_PROFILE_SHA256_V3,
+    }
 )
 _MODEL_ROLE_EVALUATION_SHA256 = (
     "111a7ac1dc954466b19d5e408debeeefcf65c76b5b025a743a2433be910c1e75"
@@ -1241,6 +1248,9 @@ class ResearchDaemon:
                     provenance_root / "model-provider-routing-v1.json"
                 ),
                 _MODEL_ROUTING_PROFILE_SHA256_V2: (
+                    provenance_root / "model-provider-routing-v2.json"
+                ),
+                _MODEL_ROUTING_PROFILE_SHA256_V3: (
                     provenance_root / "model-provider-routing-v2.json"
                 ),
             }

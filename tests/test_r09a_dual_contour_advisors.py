@@ -51,7 +51,12 @@ def _registry() -> ModelRoleRegistry:
     return ModelRoleRegistry(
         ROLE_PATH,
         expected_profile_sha256=ROLE_SHA256,
-        binding_revision="r09a-dual-contour-advisors-v1",
+        binding_revision="kmax-kimi-k3-max-gpt-xhigh-v1",
+        binding_overrides={
+            "CRITIC_PRIMARY": "kimi-k3-max",
+            "CRITIC_DEEP": "gpt-5.6-sol-xhigh",
+            "CHIEF_SCIENTIST": "gpt-5.6-sol-xhigh",
+        },
     )
 
 
@@ -74,7 +79,7 @@ def _runtime_config(routing_sha256: str = ROUTING_SHA256) -> dict[str, object]:
         "routing_profile_sha256": routing_sha256,
         "role_evaluation_sha256": ROLE_EVALUATION_SHA256,
         "worker_ipc_extension_sha256": WORKER_EXTENSION_SHA256,
-        "binding_revision": "r09a-dual-contour-advisors-v1",
+        "binding_revision": "kmax-kimi-k3-max-gpt-xhigh-v1",
         "budget_policy_ref": "budget-policy:sha256:" + "a" * 64,
         "budget_scope_ref": "budget-scope:sha256:" + "b" * 64,
         "max_active_calls": 4,
@@ -82,10 +87,14 @@ def _runtime_config(routing_sha256: str = ROUTING_SHA256) -> dict[str, object]:
         "max_reserved_cost_units": 40,
         "available_bindings": [
             "deepseek-v4-pro",
-            "claude-fable-5",
+            "kimi-k3-max",
             "gpt-5.6-sol-xhigh",
         ],
-        "role_binding_overrides": {},
+        "role_binding_overrides": {
+            "CRITIC_PRIMARY": "kimi-k3-max",
+            "CRITIC_DEEP": "gpt-5.6-sol-xhigh",
+            "CHIEF_SCIENTIST": "gpt-5.6-sol-xhigh",
+        },
     }
     return config
 
@@ -100,41 +109,40 @@ class DualContourAdvisorTests(unittest.TestCase):
             policy.shadow_tool_sha256,
             hashlib.sha256((ROOT / "tools/model_provider_shadow_v4.py").read_bytes()).hexdigest(),
         )
-        binding = profile.binding("claude-fable-5")
-        self.assertEqual(binding["provider"], "openrouter")
-        self.assertEqual(binding["provider_slot"], "OPENROUTER_API")
-        self.assertEqual(binding["credential_env"], "OPENROUTER_API_KEY")
-        self.assertEqual(binding["api_model"], "anthropic/claude-fable-5")
+        binding = profile.binding("kimi-k3-max")
+        self.assertEqual(binding["provider"], "moonshot")
+        self.assertEqual(binding["provider_slot"], "MOONSHOT_API")
+        self.assertEqual(binding["credential_env"], "MOONSHOT_API_KEY")
+        self.assertEqual(binding["api_model"], "kimi-k3")
         request = json.loads(
             shadow.build_request_bytes(binding, b"public synthetic critique", 32)
         )
-        self.assertEqual(request["model"], "anthropic/claude-fable-5")
-        self.assertEqual(request["reasoning"], {"effort": "max"})
-        self.assertNotIn("OPENROUTER_API_KEY", json.dumps(request))
-        self.assertEqual(worker._provider_timeout_seconds("claude-fable-5", profile), 1200)
+        self.assertEqual(request["model"], "kimi-k3")
+        self.assertEqual(request["reasoning_effort"], "max")
+        self.assertNotIn("MOONSHOT_API_KEY", json.dumps(request))
+        self.assertEqual(worker._provider_timeout_seconds("kimi-k3-max", profile), 1200)
         sol = profile.binding("gpt-5.6-sol-xhigh")
         self.assertEqual(sol["request_options"], {"reasoning": {"effort": "xhigh"}})
 
-    def test_fable_alone_receives_the_16384_provider_output_ceiling(self) -> None:
+    def test_kimi_alone_receives_the_16384_provider_output_ceiling(self) -> None:
         profile = shadow.ConnectedShadowProfile(shadow.ADVISOR_PROFILE_PATH)
         policy = worker.RuntimePolicy.load(POLICY_PATH)
-        fable = profile.binding("claude-fable-5")
+        kimi = profile.binding("kimi-k3-max")
         request, limit = worker._bounded_provider_request(
-            "claude-fable-5",
-            fable,
+            "kimi-k3-max",
+            kimi,
             b"public synthetic critique",
             total_token_budget=16_384,
             policy=policy,
         )
         self.assertEqual(limit, 16_384)
         self.assertEqual(json.loads(request)["max_tokens"], 16_384)
-        self.assertEqual(json.loads(request)["reasoning"], {"effort": "max"})
+        self.assertEqual(json.loads(request)["reasoning_effort"], "max")
         for name in (
             "deepseek-v4-flash",
             "deepseek-v4-pro",
             "glm-5.2-max",
             "gpt-5.6-sol-xhigh",
-            "gpt-5.6-sol-max",
         ):
             _request, other_limit = worker._bounded_provider_request(
                 name,
@@ -145,57 +153,58 @@ class DualContourAdvisorTests(unittest.TestCase):
             )
             self.assertLessEqual(other_limit, 4096, name)
         with self.assertRaises(shadow.ShadowProviderError):
-            shadow.build_request_bytes(fable, b"public synthetic", 16_385)
+            shadow.build_request_bytes(kimi, b"public synthetic", 16_385)
 
-    def test_fable_is_deterministic_critic_fallback_only(self) -> None:
+    def test_kimi_is_deterministic_critic_and_precedes_xhigh(self) -> None:
         router = _routing()
         primary = router.route(
             "CRITIC_PRIMARY",
             "D0",
-            available_bindings=frozenset({"glm-5.2-max", "claude-fable-5"}),
+            available_bindings=frozenset({"glm-5.2-max", "kimi-k3-max"}),
         )
-        self.assertEqual(primary.binding, "glm-5.2-max")
+        self.assertEqual(primary.binding, "kimi-k3-max")
         self.assertFalse(primary.used_fallback)
-        fallback = router.route(
-            "CRITIC_PRIMARY",
+        deep = router.route(
+            "CRITIC_DEEP",
             "D1",
-            available_bindings=frozenset({"claude-fable-5"}),
+            available_bindings=frozenset({"gpt-5.6-sol-xhigh"}),
         )
-        self.assertEqual(fallback.binding, "claude-fable-5")
-        self.assertTrue(fallback.used_fallback)
+        self.assertEqual(deep.binding, "gpt-5.6-sol-xhigh")
+        self.assertFalse(deep.used_fallback)
         with self.assertRaises(ModelBrokerError):
             router.route(
                 "CRITIC_PRIMARY",
                 "D2",
-                available_bindings=frozenset({"claude-fable-5"}),
+                available_bindings=frozenset({"kimi-k3-max"}),
             )
         council = router.plan_council(
             "STANDARD",
             "D0",
             available_bindings=frozenset(
-                {"deepseek-v4-pro", "claude-fable-5"}
+                {"deepseek-v4-pro", "kimi-k3-max"}
             ),
         )
         self.assertEqual(council.status, "ROUTED")
         self.assertEqual(council.call_count, 2)
-        self.assertEqual(council.decisions[1].binding, "claude-fable-5")
+        self.assertEqual(council.decisions[1].binding, "kimi-k3-max")
         self.assertFalse(council.consensus_is_evidence)
 
     def test_researchd_accepts_only_exact_additive_routing_digest(self) -> None:
         service = _service_config_from_mapping(_runtime_config())
         runtime = service.frozen_bindings["model_runtime"]
         self.assertEqual(runtime["routing_profile_sha256"], ROUTING_SHA256)
-        self.assertIn("claude-fable-5", runtime["available_bindings"])
+        self.assertIn("kimi-k3-max", runtime["available_bindings"])
+        self.assertNotIn("claude-fable-5", runtime["available_bindings"])
         with self.assertRaises(_ServiceConfigError):
             _service_config_from_mapping(_runtime_config("f" * 64))
 
     def test_profile_model_credential_and_authority_drift_fail_closed(self) -> None:
         original = json.loads(shadow.ADVISOR_PROFILE_PATH.read_text())
         mutations = (
-            lambda value: value["bindings"]["claude-fable-5"].__setitem__(
+            lambda value: value["bindings"]["kimi-k3-max"].__setitem__(
                 "api_model", "attacker/model"
             ),
-            lambda value: value["bindings"]["claude-fable-5"].__setitem__(
+            lambda value: value["bindings"]["kimi-k3-max"].__setitem__(
                 "credential_env", "ATTACKER_KEY"
             ),
             lambda value: value["invariants"].__setitem__(

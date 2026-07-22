@@ -64,6 +64,7 @@ _ALLOWED_ENDPOINTS = {
     "https://open.bigmodel.cn/api/paas/v4/chat/completions",
     "https://api.openai.com/v1/responses",
     "https://openrouter.ai/api/v1/chat/completions",
+    "https://api.moonshot.ai/v1/chat/completions",
 }
 _ALLOWED_PROTOCOLS = {"OPENAI_CHAT_COMPLETIONS", "OPENAI_RESPONSES"}
 _EXPECTED_LEGACY_BINDING_SHAPES = {
@@ -155,14 +156,15 @@ _EXPECTED_BINDING_SHAPES_V2["deepseek-v4-pro"]["request_options"]["thinking"]["t
 _EXPECTED_BINDING_SHAPES_V2["gpt-5.6-sol-xhigh"]["request_options"]["reasoning"]["effort"] = "xhigh"
 _EXPECTED_BINDING_SHAPES_V4 = copy.deepcopy(_EXPECTED_BINDING_SHAPES)
 _EXPECTED_BINDING_SHAPES_V4["gpt-5.6-sol-xhigh"]["request_options"]["reasoning"]["effort"] = "xhigh"
-_EXPECTED_BINDING_SHAPES_V4["claude-fable-5"] = {
-    "provider": "openrouter", "provider_slot": "OPENROUTER_API",
-    "credential_env": "OPENROUTER_API_KEY",
-    "endpoint": "https://openrouter.ai/api/v1/chat/completions",
-    "protocol": "OPENAI_CHAT_COMPLETIONS", "api_model": "anthropic/claude-fable-5",
-    "context_window": None,
-    "request_options": {"reasoning": {"effort": "max"}},
-    "source": "https://openrouter.ai/anthropic/claude-fable-5",
+_EXPECTED_BINDING_SHAPES_V4.pop("gpt-5.6-sol-max")
+_EXPECTED_BINDING_SHAPES_V4["kimi-k3-max"] = {
+    "provider": "moonshot", "provider_slot": "MOONSHOT_API",
+    "credential_env": "MOONSHOT_API_KEY",
+    "endpoint": "https://api.moonshot.ai/v1/chat/completions",
+    "protocol": "OPENAI_CHAT_COMPLETIONS", "api_model": "kimi-k3",
+    "context_window": 1_048_576,
+    "request_options": {"reasoning_effort": "max"},
+    "source": "https://api.moonshot.ai/v1/models/kimi-k3",
 }
 
 _OPENROUTER_CREDENTIAL_ENV = "OPENROUTER_API_KEY"
@@ -301,7 +303,8 @@ class ConnectedShadowProfile:
             "gpt-5.6-sol-xhigh", "gpt-5.6-sol-max",
         }
         if profile_id == "model-provider-connected-shadow-v4":
-            expected_binding_names.add("claude-fable-5")
+            expected_binding_names.remove("gpt-5.6-sol-max")
+            expected_binding_names.add("kimi-k3-max")
         if not isinstance(bindings, dict) or set(bindings) != expected_binding_names:
             raise ShadowProviderError("provider shadow binding set drifted")
         normalized: dict[str, dict[str, object]] = {}
@@ -548,7 +551,7 @@ def _stage_tag(profile: ConnectedShadowProfile) -> str:
     if profile.profile_id == "model-provider-connected-shadow-v1":
         return "s17"
     if profile.profile_id == "model-provider-connected-shadow-v4":
-        return "r09a-dual-contour-advisors"
+        return "kmax-kimi-k3-max-routing"
     return "s24-r2-openrouter"
 
 

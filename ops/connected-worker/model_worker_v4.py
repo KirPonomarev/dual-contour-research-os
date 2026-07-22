@@ -124,7 +124,7 @@ _ATTEMPT_KEYS = frozenset(
 _TERMINAL_STATES = frozenset(
     {"SUCCEEDED", "FAILED_KNOWN", "UNKNOWN", "RECONCILED"}
 )
-# Versioned provider quality envelope for the exact-bound v4 profile. The
+# Versioned provider quality envelope for the exact-bound Kimi/GPT profile. The
 # connected worker applies these role-specific transport settings immediately
 # before a call. Synthetic token/cost-unit reservations remain unchanged and
 # are not USD provider budgets.
@@ -132,7 +132,7 @@ _PROVIDER_TIMEOUT_SECONDS = {
     "deepseek-v4-flash": 300,
     "deepseek-v4-pro": 1800,
     "glm-5.2-max": 1200,
-    "claude-fable-5": 1200,
+    "kimi-k3-max": 1200,
 }
 
 # Per-binding maximum output tokens (provider capability, not historical ceiling)
@@ -140,9 +140,8 @@ _PROVIDER_MAX_OUTPUT_TOKENS = {
     "deepseek-v4-flash": 4096,
     "deepseek-v4-pro": 4096,
     "glm-5.2-max": 4096,
-    "claude-fable-5": 16384,
+    "kimi-k3-max": 16384,
     "gpt-5.6-sol-xhigh": 4096,
-    "gpt-5.6-sol-max": 4096,
 }
 
 # Safe retry: at most one additional attempt for UNKNOWN/FAILED_KNOWN with
@@ -853,7 +852,7 @@ def _credential_environment(path: Path) -> dict[str, str]:
     allowed = {
         "DEEPSEEK_API_KEY",
         "ZHIPU_API_KEY",
-        "OPENAI_API_KEY",
+        "MOONSHOT_API_KEY",
         "OPENROUTER_API_KEY",
     }
     result: dict[str, str] = {}

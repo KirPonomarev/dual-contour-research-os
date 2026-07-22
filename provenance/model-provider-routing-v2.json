@@ -81,15 +81,15 @@
       ],
       "availability": "FIXTURE_ONLY"
     },
-    "claude-fable-5": {
-      "provider_slot": "OPENROUTER_API",
-      "family": "claude-fable-5",
-      "provenance_group": "anthropic:claude-fable-5",
-      "candidate_api_identifier": "anthropic/claude-fable-5",
+    "kimi-k3-max": {
+      "provider_slot": "MOONSHOT_API",
+      "family": "kimi-k3",
+      "provenance_group": "moonshot:kimi-k3",
+      "candidate_api_identifier": "kimi-k3",
       "api_identifier_status": "UNVERIFIED",
       "effort_class": "critic",
       "fixture_eval_status": "PASS",
-      "fixture_eval_ref": "source-freeze:r09a-dual-contour-openrouter-advisors-synthetic-eval-20260721",
+      "fixture_eval_ref": "test:test_r09a_dual_contour_advisors#kimi-k3-max-request-shape",
       "allowed_input_classes": [
         "D0",
         "D1"
@@ -158,23 +158,21 @@
       "unavailable_action": "PARKED"
     },
     "CRITIC_PRIMARY": {
-      "primary": "glm-5.2-max",
+      "primary": "kimi-k3-max",
       "fallbacks": [
-        "claude-fable-5"
+        "glm-5.2-max"
       ],
       "unavailable_action": "WAIT_PROVIDER"
     },
     "CRITIC_DEEP": {
       "primary": "gpt-5.6-sol-xhigh",
-      "fallbacks": [
-        "gpt-5.6-sol-max"
-      ],
+      "fallbacks": [],
       "unavailable_action": "WAIT_PROVIDER"
     },
     "CHIEF_SCIENTIST": {
-      "primary": "gpt-5.6-sol-max",
+      "primary": "gpt-5.6-sol-xhigh",
       "fallbacks": [
-        "gpt-5.6-sol-xhigh"
+        "gpt-5.6-sol-max"
       ],
       "unavailable_action": "WAIT_PROVIDER"
     },

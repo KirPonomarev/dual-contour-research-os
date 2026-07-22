@@ -30,6 +30,6 @@
   "automatic_retry": true,
   "replay_completion_only": true,
   "worker_ipc_extension_sha256": "03d91f027bb6975c55d84acaef188546bcd24af9944a72f4ff9314296399d07a",
-  "shadow_profile_sha256": "d5de96af0d7e98c44fa85f18593a99b7771d318d888b33b6ebd991555a17a2d2",
-  "shadow_tool_sha256": "3de363f6496e5eda2419dc74905fdad37f156f04d15703544651a9506aecfab2"
+  "shadow_profile_sha256": "9e58feb69d30de0aa69e16bcff5465a72d5ed6b40236fb12a12287f66067a189",
+  "shadow_tool_sha256": "6761f802c3bccfc2db04e47e315a5f5ef28881073a3e970c67901be5ec0da6e5"
 }
