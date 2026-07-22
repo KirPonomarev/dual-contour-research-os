@@ -109,11 +109,43 @@ class DualContourAdvisorTests(unittest.TestCase):
             shadow.build_request_bytes(binding, b"public synthetic critique", 32)
         )
         self.assertEqual(request["model"], "anthropic/claude-fable-5")
-        self.assertEqual(request["reasoning"], {"effort": "high"})
+        self.assertEqual(request["reasoning"], {"effort": "max"})
         self.assertNotIn("OPENROUTER_API_KEY", json.dumps(request))
         self.assertEqual(worker._provider_timeout_seconds("claude-fable-5", profile), 1200)
         sol = profile.binding("gpt-5.6-sol-xhigh")
         self.assertEqual(sol["request_options"], {"reasoning": {"effort": "xhigh"}})
+
+    def test_fable_alone_receives_the_16384_provider_output_ceiling(self) -> None:
+        profile = shadow.ConnectedShadowProfile(shadow.ADVISOR_PROFILE_PATH)
+        policy = worker.RuntimePolicy.load(POLICY_PATH)
+        fable = profile.binding("claude-fable-5")
+        request, limit = worker._bounded_provider_request(
+            "claude-fable-5",
+            fable,
+            b"public synthetic critique",
+            total_token_budget=16_384,
+            policy=policy,
+        )
+        self.assertEqual(limit, 16_384)
+        self.assertEqual(json.loads(request)["max_tokens"], 16_384)
+        self.assertEqual(json.loads(request)["reasoning"], {"effort": "max"})
+        for name in (
+            "deepseek-v4-flash",
+            "deepseek-v4-pro",
+            "glm-5.2-max",
+            "gpt-5.6-sol-xhigh",
+            "gpt-5.6-sol-max",
+        ):
+            _request, other_limit = worker._bounded_provider_request(
+                name,
+                profile.binding(name),
+                b"public synthetic control",
+                total_token_budget=16_384,
+                policy=policy,
+            )
+            self.assertLessEqual(other_limit, 4096, name)
+        with self.assertRaises(shadow.ShadowProviderError):
+            shadow.build_request_bytes(fable, b"public synthetic", 16_385)
 
     def test_fable_is_deterministic_critic_fallback_only(self) -> None:
         router = _routing()
