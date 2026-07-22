@@ -70,6 +70,7 @@ _EXPECTED_BUILD_CONTEXT = (
     "!provenance/model-accounting-mode-v1.json",
     "!provenance/model-vacuous-output-reconciliation-v1.json",
     "!provenance/model-null-content-vacuous-reconciliation-v1.json",
+    "!provenance/model-chief-null-content-vacuous-reconciliation-v1.json",
     "!contracts/",
     "!contracts/catalog.json",
     "!contracts/a1/",
