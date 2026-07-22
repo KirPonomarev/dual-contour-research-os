@@ -3470,7 +3470,11 @@ def _validate_model_call_transition(
     }
     if snapshot[timestamp_fields[state]] != event_at:
         raise LedgerError("model call transition timestamp is not event-bound")
-    if _timestamp_datetime(event_at) > _timestamp_datetime(snapshot["expires_at"]):
+    if (
+        state != "RECONCILED"
+        and _timestamp_datetime(event_at)
+        > _timestamp_datetime(snapshot["expires_at"])
+    ):
         raise LedgerError("model call reservation expired")
 
     ordered = ("proposed_at", "reserved_at", "sent_at", "terminal_at", "reconciled_at")
