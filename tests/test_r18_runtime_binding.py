@@ -36,7 +36,7 @@ ROLE_REGISTRY_SHA256 = (
     "4faf6765f48a952e4d35540d92797330517938b34b8d2f12cde791e761a32eac"
 )
 ROUTING_V2_SHA256 = (
-    "0539b1c2b3fd2e5b5f6e21769afe99d36a197f9399db100e5f0c5885e5da3c67"
+    "16b143ea3b095c6eaa34c5663c0e8f2424c7a16fc77f5f4ffd52f6298b773c43"
 )
 ROLE_EVALUATION_SHA256 = (
     "111a7ac1dc954466b19d5e408debeeefcf65c76b5b025a743a2433be910c1e75"
@@ -56,7 +56,7 @@ def _base_model_runtime(
         "routing_profile_sha256": ROUTING_V2_SHA256,
         "role_evaluation_sha256": ROLE_EVALUATION_SHA256,
         "worker_ipc_extension_sha256": WORKER_EXTENSION_SHA256,
-        "binding_revision": "r18-connected-advisor-v1",
+        "binding_revision": "kmax-kimi-k3-max-gpt-xhigh-v1",
         "budget_policy_ref": "budget-policy:sha256:" + "a" * 64,
         "budget_scope_ref": "budget-scope:sha256:" + "b" * 64,
         "max_active_calls": 4,
@@ -68,9 +68,8 @@ def _base_model_runtime(
             "deepseek-v4-flash",
             "deepseek-v4-pro",
             "glm-5.2-max",
-            "claude-fable-5",
+            "kimi-k3-max",
             "gpt-5.6-sol-xhigh",
-            "gpt-5.6-sol-max",
         ],
         "role_binding_overrides": role_binding_overrides
         if role_binding_overrides is not None
@@ -104,28 +103,30 @@ class RoleBindingOverrideConfigTests(unittest.TestCase):
     def test_valid_override_accepted(self) -> None:
         runtime = _model_runtime_from_config(
             _base_model_runtime(
-                role_binding_overrides={"CRITIC_PRIMARY": "claude-fable-5"}
+                role_binding_overrides={"CRITIC_PRIMARY": "kimi-k3-max"}
             )
         )
         self.assertEqual(
             runtime["role_binding_overrides"],
-            {"CRITIC_PRIMARY": "claude-fable-5"},
+            {"CRITIC_PRIMARY": "kimi-k3-max"},
         )
 
     def test_multiple_overrides_accepted(self) -> None:
         runtime = _model_runtime_from_config(
             _base_model_runtime(
                 role_binding_overrides={
-                    "CRITIC_PRIMARY": "claude-fable-5",
+                    "CRITIC_PRIMARY": "kimi-k3-max",
                     "CRITIC_DEEP": "gpt-5.6-sol-xhigh",
+                    "CHIEF_SCIENTIST": "gpt-5.6-sol-xhigh",
                 }
             )
         )
         self.assertEqual(
             runtime["role_binding_overrides"],
             {
-                "CRITIC_PRIMARY": "claude-fable-5",
+                "CRITIC_PRIMARY": "kimi-k3-max",
                 "CRITIC_DEEP": "gpt-5.6-sol-xhigh",
+                "CHIEF_SCIENTIST": "gpt-5.6-sol-xhigh",
             },
         )
 
@@ -181,7 +182,12 @@ class FallbackRoutingTests(unittest.TestCase):
         registry = ModelRoleRegistry(
             CONTRACTS_ROOT / "a1" / "v1" / "profiles" / "model_role_registry_v1.json",
             expected_profile_sha256=ROLE_REGISTRY_SHA256,
-            binding_revision="r18-test-v1",
+            binding_revision="kmax-kimi-k3-max-gpt-xhigh-v1",
+            binding_overrides={
+                "CRITIC_PRIMARY": "kimi-k3-max",
+                "CRITIC_DEEP": "gpt-5.6-sol-xhigh",
+                "CHIEF_SCIENTIST": "gpt-5.6-sol-xhigh",
+            },
         )
         return ModelProviderRouting(
             PROVENANCE_ROOT / "model-provider-routing-v2.json",
@@ -189,28 +195,28 @@ class FallbackRoutingTests(unittest.TestCase):
             role_registry=registry,
         )
 
-    def test_critic_primary_fallback_to_fable_when_glm_unavailable(self) -> None:
-        """Routing v2 routes CRITIC_PRIMARY to claude-fable-5 as fallback."""
+    def test_critic_primary_fallback_to_glm_when_kimi_unavailable(self) -> None:
+        """Routing v2 preserves GLM only as Kimi's bounded fallback."""
         routing = self._routing()
         decision = routing.route(
             "CRITIC_PRIMARY",
             "D0",
-            available_bindings=frozenset({"claude-fable-5"}),
-        )
-        self.assertEqual(decision.status, "ROUTED")
-        self.assertEqual(decision.binding, "claude-fable-5")
-        self.assertTrue(decision.used_fallback)
-
-    def test_critic_primary_primary_when_glm_available(self) -> None:
-        """Routing v2 routes CRITIC_PRIMARY to glm-5.2-max as primary."""
-        routing = self._routing()
-        decision = routing.route(
-            "CRITIC_PRIMARY",
-            "D0",
-            available_bindings=frozenset({"glm-5.2-max", "claude-fable-5"}),
+            available_bindings=frozenset({"glm-5.2-max"}),
         )
         self.assertEqual(decision.status, "ROUTED")
         self.assertEqual(decision.binding, "glm-5.2-max")
+        self.assertTrue(decision.used_fallback)
+
+    def test_critic_primary_is_kimi_even_when_glm_is_available(self) -> None:
+        """The active exact binding routes CRITIC_PRIMARY to Kimi K3 max."""
+        routing = self._routing()
+        decision = routing.route(
+            "CRITIC_PRIMARY",
+            "D0",
+            available_bindings=frozenset({"glm-5.2-max", "kimi-k3-max"}),
+        )
+        self.assertEqual(decision.status, "ROUTED")
+        self.assertEqual(decision.binding, "kimi-k3-max")
         self.assertFalse(decision.used_fallback)
 
     def test_critic_primary_wait_provider_when_nothing_available(self) -> None:
@@ -233,15 +239,15 @@ class FallbackRoutingTests(unittest.TestCase):
             routing.route(
                 "CRITIC_PRIMARY",
                 "D2",
-                available_bindings=frozenset({"claude-fable-5"}),
+                available_bindings=frozenset({"kimi-k3-max"}),
             )
 
     def test_override_gate_logic_exact_match(self) -> None:
         """The override gate allows fallback only on exact match."""
-        overrides: dict[str, str] = {"CRITIC_PRIMARY": "claude-fable-5"}
+        overrides: dict[str, str] = {"CRITIC_PRIMARY": "kimi-k3-max"}
         # Simulates the gate check in reserve_model_call
         role = "CRITIC_PRIMARY"
-        binding = "claude-fable-5"
+        binding = "kimi-k3-max"
         used_fallback = True
         # Gate passes: override matches the fallback binding
         if used_fallback:
@@ -251,7 +257,7 @@ class FallbackRoutingTests(unittest.TestCase):
         """The override gate rejects fallback when override doesn't match."""
         overrides: dict[str, str] = {"CRITIC_PRIMARY": "glm-5.2-max"}
         role = "CRITIC_PRIMARY"
-        binding = "claude-fable-5"
+        binding = "kimi-k3-max"
         used_fallback = True
         # Gate fails: override does NOT match the fallback binding
         if used_fallback:
@@ -261,7 +267,7 @@ class FallbackRoutingTests(unittest.TestCase):
         """The override gate rejects fallback when no override exists."""
         overrides: dict[str, str] = {}
         role = "CRITIC_PRIMARY"
-        binding = "claude-fable-5"
+        binding = "kimi-k3-max"
         used_fallback = True
         # Gate fails: no override for this role
         if used_fallback:
@@ -279,11 +285,15 @@ class FallbackRoutingTests(unittest.TestCase):
         self.assertEqual(decision.binding, "deepseek-v4-pro")
         self.assertFalse(decision.used_fallback)
 
-    def test_researchd_broker_uses_exact_fable_override(self) -> None:
+    def test_researchd_broker_uses_exact_kimi_override(self) -> None:
         """The durable broker and availability router must select the same binding."""
         runtime = _base_model_runtime(
-            available_bindings=["glm-5.2-max", "claude-fable-5"],
-            role_binding_overrides={"CRITIC_PRIMARY": "claude-fable-5"},
+            available_bindings=["glm-5.2-max", "kimi-k3-max"],
+            role_binding_overrides={
+                "CRITIC_PRIMARY": "kimi-k3-max",
+                "CRITIC_DEEP": "gpt-5.6-sol-xhigh",
+                "CHIEF_SCIENTIST": "gpt-5.6-sol-xhigh",
+            },
         )
         service = _service_config_from_mapping(_full_config(runtime))
         with tempfile.TemporaryDirectory() as directory:
@@ -367,14 +377,14 @@ class FallbackRoutingTests(unittest.TestCase):
                     max_cost_units=5,
                     expires_at="2026-07-21T19:00:00Z",
                     actor="scout:uid:10003",
-                    idempotency_key="r18-test-fable-fallback",
+                    idempotency_key="kmax-test-kimi-primary",
                     now="2026-07-21T18:00:00Z",
                 )
             finally:
                 daemon.close()
         self.assertEqual(result["state"], "RESERVED")
-        self.assertEqual(result["model_binding"], "claude-fable-5")
-        self.assertTrue(result["used_fallback"])
+        self.assertEqual(result["model_binding"], "kimi-k3-max")
+        self.assertFalse(result["used_fallback"])
 
     def test_runbook_available_bindings_fail_closed_and_render_by_name(self) -> None:
         """The durable source advertises no binding before name-only capability render."""
@@ -403,17 +413,25 @@ class FallbackRoutingTests(unittest.TestCase):
 
         self.assertEqual(
             available({"OPENROUTER_API_KEY"}),
-            ["claude-fable-5", "gpt-5.6-sol-xhigh"],
+            ["gpt-5.6-sol-xhigh"],
         )
         self.assertEqual(
-            available({"DEEPSEEK_API_KEY", "OPENROUTER_API_KEY"}),
+            available({"MOONSHOT_API_KEY"}),
+            ["kimi-k3-max"],
+        )
+        self.assertEqual(
+            available(
+                {"DEEPSEEK_API_KEY", "MOONSHOT_API_KEY", "OPENROUTER_API_KEY"}
+            ),
             [
-                "claude-fable-5",
                 "deepseek-v4-flash",
                 "deepseek-v4-pro",
                 "gpt-5.6-sol-xhigh",
+                "kimi-k3-max",
             ],
         )
+        self.assertNotIn("claude-fable-5", required)
+        self.assertNotIn("gpt-5.6-sol-max", required)
 
     def test_council_cap_remains_four(self) -> None:
         """Council max_calls remains 4 in routing v2."""
@@ -426,9 +444,8 @@ class FallbackRoutingTests(unittest.TestCase):
                     "deepseek-v4-pro",
                     "deepseek-v4-flash",
                     "glm-5.2-max",
-                    "claude-fable-5",
+                    "kimi-k3-max",
                     "gpt-5.6-sol-xhigh",
-                    "gpt-5.6-sol-max",
                 }
             ),
         )

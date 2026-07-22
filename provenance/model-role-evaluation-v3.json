@@ -1,0 +1,90 @@
+{
+  "profile_id": "model-role-evaluation-v3",
+  "schema_version": "3.0.0",
+  "observed_at": "2026-07-22T08:07:52Z",
+  "status": "KIMI_K3_METADATA_VERIFIED_LIVE_PROOF_PENDING",
+  "basis": {
+    "role_registry_v1_sha256": "4faf6765f48a952e4d35540d92797330517938b34b8d2f12cde791e761a32eac",
+    "source": "https://api.moonshot.ai/v1/models/kimi-k3",
+    "credential_value_recorded": false,
+    "credential_probe": "OWNER_ONLY_READ_ONLY_MODEL_METADATA",
+    "available_model_ids_observed": [
+      "kimi-k2.6",
+      "kimi-k2.7-code",
+      "kimi-k2.7-code-highspeed",
+      "kimi-k3"
+    ]
+  },
+  "privacy": {
+    "allowed_connected_input_classes": [
+      "D0",
+      "D1"
+    ],
+    "forbidden_input_classes": [
+      "D2",
+      "D3",
+      "sealed-holdout"
+    ],
+    "raw_response_public_storage": false
+  },
+  "bindings": {
+    "kimi-k3-max": {
+      "provider": "moonshot",
+      "family": "kimi-k3",
+      "provenance_group": "moonshot:kimi-k3",
+      "api_identifier": "kimi-k3",
+      "api_identifier_status": "OFFICIAL_CREDENTIAL_BOUND_METADATA_VERIFIED",
+      "context_length": 1048576,
+      "supports_reasoning": true,
+      "reasoning_effort": "max",
+      "valid_reasoning_efforts": [
+        "low",
+        "high",
+        "max"
+      ],
+      "provider_default_reasoning_effort": "max",
+      "connected_evaluation": "LIVE_D0_PROOF_PENDING",
+      "allowed_input_classes": [
+        "D0",
+        "D1"
+      ],
+      "pricing": {
+        "status": "NOT_ASSERTED_FROM_MODEL_METADATA"
+      }
+    },
+    "gpt-5.6-sol-xhigh": {
+      "provider": "openrouter",
+      "family": "gpt-5.6-sol",
+      "provenance_group": "openai:gpt-5.6-sol",
+      "api_identifier": "openai/gpt-5.6-sol",
+      "reasoning_effort": "xhigh",
+      "connected_evaluation": "PASS_HISTORICAL",
+      "allowed_input_classes": [
+        "D0",
+        "D1"
+      ]
+    }
+  },
+  "active_roles": {
+    "CRITIC_PRIMARY": "kimi-k3-max",
+    "CRITIC_DEEP": "gpt-5.6-sol-xhigh",
+    "CHIEF_SCIENTIST": "gpt-5.6-sol-xhigh"
+  },
+  "active_material_order": [
+    "RESEARCH_WORKER",
+    "kimi-k3-max",
+    "gpt-5.6-sol-xhigh"
+  ],
+  "disabled_active_bindings": {
+    "claude-fable-5": "REMOVED_BY_USER_COST_QUALITY_DECISION",
+    "gpt-5.6-sol-max": "REMOVED_BY_USER_XHIGH_IS_TOP_DECISION"
+  },
+  "invariants": {
+    "model_outputs_are_untrusted": true,
+    "caller_cannot_select_binding": true,
+    "fallback_cannot_widen_privacy_or_authority": true,
+    "fable_history_is_not_rewritten": true,
+    "gpt_xhigh_is_the_highest_active_binding": true,
+    "grants_authority": false
+  }
+}
