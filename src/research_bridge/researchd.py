@@ -19,6 +19,7 @@ from pathlib import Path
 import signal
 import stat
 import sys
+import tempfile
 import threading
 from types import MappingProxyType
 from typing import Any, TextIO
@@ -30,7 +31,7 @@ except ImportError:  # pragma: no cover - the runtime is explicitly Unix-only
 
 from .admission import A1AdmissionKernel, canonical_json_sha256
 from .authority import CorridorExecutorProfile, PinnedOfflineAuthority, TrustedIssuer
-from .cas import ContentAddressedStore
+from .cas import CASError, ContentAddressedStore
 from .control import ControlRouter
 from .discovery import (
     DurableAdmissionConfig,
@@ -59,6 +60,19 @@ from .model_broker import (
     ModelCallSpec,
     ModelProviderRouting,
     ModelRoleRegistry,
+)
+from .research_ingress import (
+    MAX_ARTIFACT_BYTES,
+    MAX_CHAIN_REQUEST_BYTES,
+    ROLE_SEQUENCE,
+    ResearchIngressError,
+    build_role_request,
+    canonical_sha256 as research_canonical_sha256,
+    mission_evidence_ref,
+    role_assignment_ref,
+    validate_mission_artifact,
+    validate_research_ingress_action_envelope,
+    validate_research_mission_envelope,
 )
 from .validation import DeterministicL0Validator
 
@@ -157,6 +171,42 @@ _MODEL_BINDING_OVERRIDE_ROLES = frozenset(
         "CHIEF_SCIENTIST",
     }
 )
+_MISSION_MANIFEST_KEYS = frozenset(
+    {
+        "schema_id",
+        "schema_version",
+        "mission_sha256",
+        "mission_envelope",
+        "action_envelope",
+        "material_event_refs",
+        "artifact_ref",
+        "queued_at",
+        "decision_lineage",
+        "provider_calls_maximum",
+        "ingress_provider_calls",
+        "domain_writes",
+        "canonical_writes",
+        "live_authority",
+    }
+)
+_MISSION_STEP_KEYS = frozenset(
+    {
+        "schema_id",
+        "schema_version",
+        "mission_sha256",
+        "role_index",
+        "role",
+        "model_binding",
+        "reasoning_effort",
+        "call_id",
+        "request_ref",
+        "request_sha256",
+        "role_assignment_ref",
+        "reserved_at",
+        "fallback_used",
+    }
+)
+_MAX_MISSION_RESULT_BYTES = 262_144
 _CORRIDOR_EXECUTOR_PROFILE_KEYS = frozenset(
     {
         "capability_ref",
@@ -199,9 +249,22 @@ _MODEL_ROUTING_PROFILE_SHA256S = frozenset(
 _MODEL_ROLE_EVALUATION_SHA256 = (
     "111a7ac1dc954466b19d5e408debeeefcf65c76b5b025a743a2433be910c1e75"
 )
-_MODEL_WORKER_IPC_EXTENSION_SHA256 = (
+_MODEL_WORKER_IPC_EXTENSION_SHA256_V1 = (
     "03d91f027bb6975c55d84acaef188546bcd24af9944a72f4ff9314296399d07a"
 )
+_MODEL_WORKER_IPC_EXTENSION_SHA256_V2 = (
+    "467b2e5dd8583939d13e216a9f29e3578b0cc720a27081ca4f8723ad5726bac3"
+)
+_MODEL_WORKER_IPC_EXTENSION_SHA256S = frozenset(
+    {
+        _MODEL_WORKER_IPC_EXTENSION_SHA256_V1,
+        _MODEL_WORKER_IPC_EXTENSION_SHA256_V2,
+    }
+)
+_MODEL_WORKER_IPC_EXTENSION_PATHS = {
+    _MODEL_WORKER_IPC_EXTENSION_SHA256_V1: "model-worker-ipc-extension-v1.json",
+    _MODEL_WORKER_IPC_EXTENSION_SHA256_V2: "model-worker-ipc-extension-v2.json",
+}
 _MAX_CONFIG_UIDS = 16
 _MAX_CONFIG_UID = 2_147_483_647
 _MAX_CAPABILITY_REFS = 32
@@ -551,6 +614,10 @@ class ResearchDaemon:
                     quota_bytes=self._artifact_quota_bytes,
                 )
                 _private_directory(self._root / "staging-by-attempt-digest")
+                _private_directory(self._root / "research-mission-manifests")
+                _private_directory(self._root / "research-mission-steps")
+                _private_directory(self._root / "research-mission-terminal")
+                _private_directory(self._root / "mission-publication-tmp")
 
                 fence_ledger = _CheckpointFenceLedger(ledger)
                 self._fence_ledger = fence_ledger
@@ -872,6 +939,547 @@ class ResearchDaemon:
                 # this narrow validation boundary and remain fatal.
                 continue
 
+    def queue_research_mission(
+        self,
+        *,
+        mission_envelope: Mapping[str, object],
+        action_envelope: Mapping[str, object],
+        material_event_refs: object,
+        artifact_body: str,
+        expected_host_fingerprint: str,
+        actor: str,
+        idempotency_key: str,
+        now: str,
+    ) -> Mapping[str, object]:
+        """Queue one preauthorized mission after both P04 MaterialEvents exist.
+
+        Queueing performs no model reservation and no provider call.  The
+        existing Scout/dispatcher tick is the only path that may advance the
+        stored mission into the model broker.
+        """
+
+        if not isinstance(actor, str) or not actor.startswith("collector:uid:"):
+            raise ResearchdError("research mission queue requires the collector principal")
+        _text("idempotency_key", idempotency_key, maximum=256)
+        current = _research_timestamp(now)
+        try:
+            mission = validate_research_mission_envelope(
+                mission_envelope,
+                now=current,
+            )
+            action = validate_research_ingress_action_envelope(
+                action_envelope,
+                mission_envelope,
+                expected_host_fingerprint=expected_host_fingerprint,
+                expected_uid=int(actor.rsplit(":", 1)[1]),
+                now=current,
+            )
+            if not isinstance(material_event_refs, (list, tuple)):
+                raise ResearchIngressError("material_event_refs must be a pair")
+            refs = tuple(
+                _text("material_event_ref", item, maximum=256)
+                for item in material_event_refs
+            )
+            if len(refs) != 2 or len(set(refs)) != 2:
+                raise ResearchIngressError("material_event_refs must be a unique pair")
+            raw = artifact_body.encode("utf-8", errors="strict")
+            validate_mission_artifact(raw, mission)
+            self._validate_mission_material_events(mission, refs)
+            artifact_ref = self._store_input_bytes(
+                raw,
+                expected_sha256=str(mission["artifact_sha256"]),
+                maximum=MAX_ARTIFACT_BYTES,
+            )
+            if artifact_ref != mission["artifact_ref"]:
+                raise ResearchIngressError("runtime CAS ref differs from mission artifact ref")
+            mission_sha = str(mission["mission_sha256"])
+            decision_lineage = {
+                "agenda": {
+                    "status": "PROPOSED",
+                    "decision_ref": "agenda:" + mission_sha,
+                    "evidence_refs": list(refs),
+                },
+                "portfolio": {
+                    "status": "SELECTED",
+                    "decision_ref": "portfolio:" + mission_sha,
+                    "maximum_calls": len(ROLE_SEQUENCE),
+                },
+                "scout": {
+                    "status": "PENDING_AUTONOMOUS_TICK",
+                    "decision_ref": "scout-decision:" + mission_sha,
+                },
+            }
+            manifest = {
+                "schema_id": "ResearchMissionRuntimeManifest",
+                "schema_version": "1.0.0",
+                "mission_sha256": mission_sha,
+                "mission_envelope": _json_copy(mission_envelope),
+                "action_envelope": _json_copy(action_envelope),
+                "material_event_refs": list(refs),
+                "artifact_ref": artifact_ref,
+                "queued_at": now,
+                "decision_lineage": decision_lineage,
+                "provider_calls_maximum": action["provider_calls_maximum"],
+                "ingress_provider_calls": action["ingress_provider_calls"],
+                "domain_writes": action["domain_writes"],
+                "canonical_writes": action["canonical_writes"],
+                "live_authority": action["live_authority"],
+            }
+            _private_directory(
+                self._root / "research-mission-steps" / mission_sha
+            )
+            path = self._mission_manifest_path(mission_sha)
+            if path.exists():
+                existing = _read_private_json(
+                    path, _MISSION_MANIFEST_KEYS, "mission manifest"
+                )
+                manifest["queued_at"] = existing["queued_at"]
+            created = _write_immutable_private_json(path, manifest)
+            stored = _read_private_json(path, _MISSION_MANIFEST_KEYS, "mission manifest")
+            stable_fields = set(_MISSION_MANIFEST_KEYS) - {"queued_at"}
+            if any(stored[name] != manifest[name] for name in stable_fields):
+                raise ResearchdError("research mission replay differs from immutable manifest")
+            return MappingProxyType(
+                {
+                    "status": "QUEUED" if created else "ALREADY_QUEUED",
+                    "mission_sha256": mission_sha,
+                    "mission_manifest_sha256": research_canonical_sha256(stored),
+                    "artifact_ref": artifact_ref,
+                    "material_event_refs": refs,
+                    "decision_lineage": MappingProxyType(decision_lineage),
+                    "source_trigger_count": 2,
+                    "expected_trigger_domains": ("market", "security"),
+                    "provider_calls_consumed": 0,
+                    "domain_writes": 0,
+                    "canonical_writes": 0,
+                    "live_authority": False,
+                }
+            )
+        except (ResearchIngressError, UnicodeError, ValueError) as exc:
+            raise ResearchdError("research mission queue failed closed") from exc
+
+    def advance_research_missions(
+        self,
+        *,
+        actor: str,
+        idempotency_key: str,
+        now: str,
+    ) -> Mapping[str, object]:
+        """Advance at most one role through the existing WIP=1 model broker."""
+
+        if not isinstance(actor, str) or not actor.startswith("scout:uid:"):
+            raise ResearchdError("research mission advance requires the Scout principal")
+        _text("idempotency_key", idempotency_key, maximum=256)
+        current = _research_timestamp(now)
+        for path in self._mission_manifest_paths():
+            manifest = _read_private_json(
+                path, _MISSION_MANIFEST_KEYS, "mission manifest"
+            )
+            mission_document = _mapping_member(
+                manifest, "mission_envelope", "mission manifest"
+            )
+            mission = validate_research_mission_envelope(
+                mission_document,
+                now=current,
+            )
+            mission_sha = str(mission["mission_sha256"])
+            if self._mission_terminal_path(mission_sha).exists():
+                continue
+            refs_raw = manifest["material_event_refs"]
+            if not isinstance(refs_raw, list):
+                raise ResearchdError("mission material event refs are invalid")
+            self._validate_mission_material_events(mission, tuple(refs_raw))
+            artifact = self._read_input(str(manifest["artifact_ref"]))
+            validate_mission_artifact(artifact, mission)
+            prior_results: list[tuple[str, str, bytes | None]] = []
+            for index, (role, expected_binding, effort) in enumerate(ROLE_SEQUENCE):
+                step_path = self._mission_step_path(mission_sha, index)
+                if step_path.exists():
+                    step = _read_private_json(
+                        step_path, _MISSION_STEP_KEYS, "mission role step"
+                    )
+                    if (
+                        step["mission_sha256"] != mission_sha
+                        or step["role_index"] != index
+                        or step["role"] != role
+                        or step["model_binding"] != expected_binding
+                        or step["reasoning_effort"] != effort
+                        or step["fallback_used"] is not False
+                    ):
+                        raise ResearchdError("mission role step binding drifted")
+                    snapshot = self._require_model_runtime()[0].snapshot(
+                        str(step["call_id"])
+                    )
+                    state = snapshot["state"]
+                    if state in {"RESERVED", "SENT", "PROPOSED"}:
+                        return MappingProxyType(
+                            {
+                                "status": "WAIT_CURRENT_CALL",
+                                "mission_sha256": mission_sha,
+                                "role": role,
+                                "call_id": step["call_id"],
+                                "state": state,
+                                "provider_calls_reserved": index + 1,
+                            }
+                        )
+                    if state == "UNKNOWN":
+                        return MappingProxyType(
+                            {
+                                "status": "WAIT_PROVIDER",
+                                "mission_sha256": mission_sha,
+                                "role": role,
+                                "call_id": step["call_id"],
+                                "state": state,
+                                "reason": "AMBIGUOUS_PROVIDER_OUTCOME",
+                            }
+                        )
+                    if state in {"SUCCEEDED", "FAILED_KNOWN"}:
+                        if (
+                            snapshot["actual_tokens"] is None
+                            or snapshot["actual_cost_units"] is None
+                            or snapshot["provider_receipt_ref"] is None
+                        ):
+                            return MappingProxyType(
+                                {
+                                    "status": "WAIT_PROVIDER",
+                                    "mission_sha256": mission_sha,
+                                    "role": role,
+                                    "call_id": step["call_id"],
+                                    "state": state,
+                                    "reason": "EXACT_ACCOUNTING_NOT_PROVEN",
+                                }
+                            )
+                        broker, _ = self._require_model_runtime()
+                        broker.reconcile(
+                            str(step["call_id"]),
+                            actual_tokens=int(snapshot["actual_tokens"]),
+                            actual_cost_units=int(snapshot["actual_cost_units"]),
+                            provider_receipt_ref=str(snapshot["provider_receipt_ref"]),
+                            event_at=now,
+                            idempotency_key=(
+                                f"mission:{mission_sha}:{index}:auto-reconcile"
+                            ),
+                        )
+                        snapshot = broker.snapshot(str(step["call_id"]))
+                        state = snapshot["state"]
+                    if state != "RECONCILED" or snapshot["budget_released"] is not True:
+                        raise ResearchdError("mission call lacks a reconciled terminal state")
+                    response_ref = snapshot["response_ref"]
+                    response_bytes: bytes | None = None
+                    if response_ref is not None:
+                        response_bytes = self._read_input(str(response_ref))
+                    prior_results.append((role, str(response_ref or state), response_bytes))
+                    continue
+
+                request_body = build_role_request(
+                    artifact,
+                    mission_sha256=mission_sha,
+                    prepared_kimi_request_sha256=str(
+                        mission["prepared_kimi_request_sha256"]
+                    ),
+                    index=index,
+                    prior_results=prior_results,
+                )
+                result = self.reserve_model_call(
+                    role=role,
+                    role_assignment_ref=role_assignment_ref(mission_sha, index, role),
+                    classification=(
+                        "D0" if mission["data_class"] == "D0_PUBLIC" else "D1"
+                    ),
+                    request_body=request_body,
+                    max_tokens=4_096,
+                    max_cost_units=1,
+                    expires_at=str(mission["expires_at"]),
+                    actor=actor,
+                    idempotency_key=f"mission:{mission_sha}:{index}:{role}",
+                    now=now,
+                )
+                if result["status"] != "RESERVED":
+                    return MappingProxyType(
+                        {
+                            "status": result["status"],
+                            "mission_sha256": mission_sha,
+                            "role": role,
+                            "model_binding": None,
+                            "used_fallback": False,
+                            "reason": "EXACT_ROLE_UNAVAILABLE",
+                        }
+                    )
+                if result["model_binding"] != expected_binding or result["used_fallback"] is not False:
+                    raise ResearchdError("mission route attempted fallback or substitution")
+                step = {
+                    "schema_id": "ResearchMissionRoleReservationReceipt",
+                    "schema_version": "1.0.0",
+                    "mission_sha256": mission_sha,
+                    "role_index": index,
+                    "role": role,
+                    "model_binding": expected_binding,
+                    "reasoning_effort": effort,
+                    "call_id": result["call_id"],
+                    "request_ref": result["request_ref"],
+                    "request_sha256": result["request_sha256"],
+                    "role_assignment_ref": role_assignment_ref(mission_sha, index, role),
+                    "reserved_at": now,
+                    "fallback_used": False,
+                }
+                _write_immutable_private_json(step_path, step)
+                return MappingProxyType(
+                    {
+                        "status": "RESERVED",
+                        "mission_sha256": mission_sha,
+                        "role": role,
+                        "role_index": index,
+                        "model_binding": expected_binding,
+                        "reasoning_effort": effort,
+                        "call_id": result["call_id"],
+                        "request_ref": result["request_ref"],
+                        "used_fallback": False,
+                        "provider_calls_reserved": index + 1,
+                    }
+                )
+
+            terminal = {
+                "schema_id": "ResearchMissionModelChainReceipt",
+                "schema_version": "1.0.0",
+                "mission_sha256": mission_sha,
+                "status": "MODEL_CHAIN_COMPLETE",
+                "completed_at": now,
+                "role_count": len(ROLE_SEQUENCE),
+                "call_ids": [
+                    _read_private_json(
+                        self._mission_step_path(mission_sha, index),
+                        _MISSION_STEP_KEYS,
+                        "mission role step",
+                    )["call_id"]
+                    for index in range(len(ROLE_SEQUENCE))
+                ],
+                "provider_calls_maximum": len(ROLE_SEQUENCE),
+                "fallback_used": False,
+                "domain_writes": 0,
+                "canonical_writes": 0,
+                "live_authority": False,
+            }
+            _write_immutable_private_json(
+                self._mission_terminal_path(mission_sha), terminal
+            )
+            return MappingProxyType(_json_copy(terminal))
+        return MappingProxyType(
+            {
+                "status": "NO_MISSION_WORK",
+                "provider_calls_reserved": 0,
+                "domain_writes": 0,
+                "canonical_writes": 0,
+                "live_authority": False,
+            }
+        )
+
+    def research_mission_status(
+        self,
+        *,
+        mission_sha256: str,
+        actor: str,
+    ) -> Mapping[str, object]:
+        """Return ref-only mission lineage without changing durable state."""
+
+        if not isinstance(actor, str) or not actor.startswith("scout:uid:"):
+            raise ResearchdError("research mission status requires the Scout principal")
+        if not _is_sha256(mission_sha256):
+            raise ResearchdError("research mission SHA is invalid")
+        manifest = _read_private_json(
+            self._mission_manifest_path(mission_sha256),
+            _MISSION_MANIFEST_KEYS,
+            "mission manifest",
+        )
+        calls = []
+        for index, (role, binding, effort) in enumerate(ROLE_SEQUENCE):
+            path = self._mission_step_path(mission_sha256, index)
+            if not path.exists():
+                calls.append(
+                    {
+                        "role_index": index,
+                        "role": role,
+                        "model_binding": binding,
+                        "reasoning_effort": effort,
+                        "state": "NOT_RESERVED",
+                    }
+                )
+                continue
+            step = _read_private_json(path, _MISSION_STEP_KEYS, "mission role step")
+            snapshot = self._require_model_runtime()[0].snapshot(str(step["call_id"]))
+            calls.append(
+                {
+                    "role_index": index,
+                    "role": role,
+                    "model_binding": binding,
+                    "reasoning_effort": effort,
+                    "call_id": step["call_id"],
+                    "request_sha256": step["request_sha256"],
+                    "state": snapshot["state"],
+                    "response_ref": snapshot["response_ref"],
+                    "actual_tokens": snapshot["actual_tokens"],
+                    "actual_cost_units": snapshot["actual_cost_units"],
+                    "provider_receipt_ref": snapshot["provider_receipt_ref"],
+                    "failure_code": snapshot["failure_code"],
+                    "budget_released": snapshot["budget_released"],
+                }
+            )
+        terminal_path = self._mission_terminal_path(mission_sha256)
+        return MappingProxyType(
+            {
+                "status": "MODEL_CHAIN_COMPLETE" if terminal_path.exists() else "IN_PROGRESS",
+                "mission_sha256": mission_sha256,
+                "mission_manifest_sha256": research_canonical_sha256(manifest),
+                "material_event_refs": tuple(manifest["material_event_refs"]),
+                "artifact_ref": manifest["artifact_ref"],
+                "calls": tuple(MappingProxyType(item) for item in calls),
+                "provider_calls_reserved": sum(
+                    1 for item in calls if item["state"] != "NOT_RESERVED"
+                ),
+                "provider_calls_maximum": len(ROLE_SEQUENCE),
+                "fallback_used": False,
+                "domain_writes": 0,
+                "canonical_writes": 0,
+                "live_authority": False,
+            }
+        )
+
+    def _store_input_bytes(
+        self,
+        raw: bytes,
+        *,
+        expected_sha256: str,
+        maximum: int = MAX_CHAIN_REQUEST_BYTES,
+    ) -> str:
+        store = self._input_store
+        if store is None:
+            raise ResearchdError("input CAS is unavailable")
+        if (
+            not isinstance(raw, bytes)
+            or type(maximum) is not int
+            or maximum < 1
+            or not raw
+            or len(raw) > maximum
+        ):
+            raise ResearchdError("input publication bytes are invalid")
+        if hashlib.sha256(raw).hexdigest() != expected_sha256:
+            raise ResearchdError("input publication hash is invalid")
+        temporary: Path | None = None
+        descriptor: int | None = None
+        try:
+            descriptor, name = tempfile.mkstemp(
+                prefix=".mission-", dir=self._root / "mission-publication-tmp"
+            )
+            temporary = Path(name)
+            os.fchmod(descriptor, 0o600)
+            written = 0
+            while written < len(raw):
+                written += os.write(descriptor, raw[written:])
+            os.fsync(descriptor)
+            os.close(descriptor)
+            descriptor = None
+            store_blob = getattr(store, "publish")
+            stored = store_blob(
+                temporary,
+                expected_sha256=expected_sha256,
+                expected_size_bytes=len(raw),
+            )
+            return stored.ref
+        except (OSError, CASError) as exc:
+            raise ResearchdError("input CAS publication failed closed") from exc
+        finally:
+            if descriptor is not None:
+                os.close(descriptor)
+            if temporary is not None:
+                try:
+                    temporary.unlink(missing_ok=True)
+                except OSError:
+                    pass
+
+    def _validate_mission_material_events(
+        self,
+        mission: Mapping[str, object],
+        refs: Sequence[object],
+    ) -> None:
+        if len(refs) != 2:
+            raise ResearchIngressError("mission requires exactly two MaterialEvents")
+        ledger = self._require_ledger()
+        expected_mission_ref = mission_evidence_ref(str(mission["mission_sha256"]))
+        bindings = mission["domain_binding_sha256s"]
+        if not isinstance(bindings, Mapping):
+            raise ResearchIngressError("mission binding map is invalid")
+        observed_domains: list[str] = []
+        for raw_ref in refs:
+            ref = _text("material_event_ref", raw_ref, maximum=256)
+            event = ledger.read_a1_object(ref)
+            if event.get("schema_id") != "MaterialEvent":
+                raise ResearchIngressError("mission ref is not a MaterialEvent")
+            payload = _mapping_member(event, "payload", "MaterialEvent")
+            evidence = payload.get("evidence_refs")
+            materiality = _mapping_member(
+                payload, "materiality_inputs", "MaterialEvent.payload"
+            )
+            source_ref = materiality.get("source_ref")
+            if not isinstance(evidence, (list, tuple)) or expected_mission_ref not in evidence:
+                raise ResearchIngressError("MaterialEvent omits mission evidence")
+            matches = [
+                domain
+                for domain in ("market", "security")
+                if isinstance(source_ref, str)
+                and source_ref.startswith(f"registered:domain-export/{domain}/")
+            ]
+            if len(matches) != 1:
+                raise ResearchIngressError("MaterialEvent domain provenance is invalid")
+            domain = matches[0]
+            binding_ref = "registered:domain-export-binding/" + str(bindings[domain])
+            if binding_ref not in evidence:
+                raise ResearchIngressError("MaterialEvent omits exact domain binding evidence")
+            observed_domains.append(domain)
+        if tuple(observed_domains) != ("market", "security"):
+            raise ResearchIngressError("MaterialEvents are swapped or cross-domain")
+
+    def _mission_manifest_path(self, mission_sha256: str) -> Path:
+        if not _is_sha256(mission_sha256):
+            raise ResearchdError("mission SHA is invalid")
+        return self._root / "research-mission-manifests" / f"{mission_sha256}.json"
+
+    def _mission_manifest_paths(self) -> tuple[Path, ...]:
+        root = self._root / "research-mission-manifests"
+        _validate_private_directory(root, "research mission manifest directory")
+        paths = tuple(sorted(root.glob("*.json")))
+        for path in paths:
+            if not _is_sha256(path.stem):
+                raise ResearchdError("mission manifest filename is invalid")
+        return paths
+
+    def _mission_step_path(self, mission_sha256: str, index: int) -> Path:
+        if not _is_sha256(mission_sha256) or type(index) is not int or not 0 <= index < len(ROLE_SEQUENCE):
+            raise ResearchdError("mission step identity is invalid")
+        directory = self._root / "research-mission-steps" / mission_sha256
+        _validate_private_directory(directory, "research mission step directory")
+        return directory / f"{index}.json"
+
+    def _mission_terminal_path(self, mission_sha256: str) -> Path:
+        if not _is_sha256(mission_sha256):
+            raise ResearchdError("mission terminal identity is invalid")
+        return self._root / "research-mission-terminal" / f"{mission_sha256}.json"
+
+    def _mission_context_for_call(
+        self, call_id: str
+    ) -> tuple[str, Mapping[str, object]] | None:
+        normalized = _text("call_id", call_id, maximum=128)
+        for manifest_path in self._mission_manifest_paths():
+            mission_sha = manifest_path.stem
+            for index in range(len(ROLE_SEQUENCE)):
+                step_path = self._mission_step_path(mission_sha, index)
+                if not step_path.exists():
+                    continue
+                step = _read_private_json(
+                    step_path, _MISSION_STEP_KEYS, "mission role step"
+                )
+                if step["call_id"] == normalized:
+                    return mission_sha, step
+        return None
+
     def reserve_model_call(
         self,
         *,
@@ -917,6 +1525,11 @@ class ResearchDaemon:
                         "fallback route lacks an exact durable registry binding"
                     )
             request_bytes = request_body.encode("utf-8", errors="strict")
+            request_sha256 = hashlib.sha256(request_bytes).hexdigest()
+            request_ref = self._store_input_bytes(
+                request_bytes,
+                expected_sha256=request_sha256,
+            )
             handle = broker.prepare(
                 ModelCallSpec(
                     role=role,
@@ -939,8 +1552,11 @@ class ResearchDaemon:
             result.update(
                 {
                     "status": "RESERVED",
-                    "dispatch_token": _model_dispatch_token(snapshot),
+                    "dispatch_token": _model_dispatch_token(
+                        snapshot, self._model_worker_ipc_extension_sha256()
+                    ),
                     "request_body": request_body,
+                    "request_ref": request_ref,
                     "routing_profile_sha256": decision.profile_sha256,
                     "used_fallback": decision.used_fallback,
                     "durable_transition": "PROPOSED_THEN_RESERVED",
@@ -967,7 +1583,9 @@ class ResearchDaemon:
         broker, routing = self._require_model_runtime()
         try:
             before = broker.snapshot(call_id)
-            _verify_model_dispatch_token(before, dispatch_token)
+            _verify_model_dispatch_token(
+                before, dispatch_token, self._model_worker_ipc_extension_sha256()
+            )
             handle = broker.begin_external(
                 call_id,
                 request_bytes=request_body.encode("utf-8", errors="strict"),
@@ -1012,7 +1630,9 @@ class ResearchDaemon:
         broker, _ = self._require_model_runtime()
         try:
             before = broker.snapshot(call_id)
-            _verify_model_dispatch_token(before, dispatch_token)
+            _verify_model_dispatch_token(
+                before, dispatch_token, self._model_worker_ipc_extension_sha256()
+            )
             handle = broker.complete_external(
                 call_id,
                 outcome=outcome,
@@ -1026,6 +1646,58 @@ class ResearchDaemon:
             return self._sanitized_model_state(broker.snapshot(handle.call_id))
         except ModelBrokerError as exc:
             raise ResearchdError("model completion failed closed") from exc
+
+    def complete_research_model_call(
+        self,
+        *,
+        call_id: str,
+        dispatch_token: str,
+        outcome: str,
+        response_ref: str | None,
+        response_body: str | None,
+        actual_tokens: int | None,
+        actual_cost_units: int | None,
+        provider_receipt_ref: str | None,
+        failure_code: str | None,
+        actor: str,
+        idempotency_key: str,
+        now: str,
+    ) -> Mapping[str, object]:
+        """Commit one extracted D0/D1 mission result before terminal metadata."""
+
+        if self._mission_context_for_call(call_id) is None:
+            raise ResearchdError("research completion call is not mission-bound")
+        if outcome == "SUCCEEDED":
+            if not isinstance(response_body, str) or not isinstance(response_ref, str):
+                raise ResearchdError("successful research completion lacks extracted output")
+            raw = response_body.encode("utf-8", errors="strict")
+            if not raw or len(raw) > _MAX_MISSION_RESULT_BYTES:
+                raise ResearchdError("research completion output exceeds its bound")
+            expected_ref = "cas:sha256:" + hashlib.sha256(raw).hexdigest()
+            if not hmac.compare_digest(expected_ref, response_ref):
+                raise ResearchdError("research completion output/ref binding is invalid")
+            stored_ref = self._store_input_bytes(
+                raw,
+                expected_sha256=expected_ref.removeprefix("cas:sha256:"),
+                maximum=_MAX_MISSION_RESULT_BYTES,
+            )
+            if stored_ref != response_ref:
+                raise ResearchdError("research completion CAS ref drifted")
+        elif response_body is not None:
+            raise ResearchdError("non-successful research completion carries output")
+        return self.complete_model_call(
+            call_id=call_id,
+            dispatch_token=dispatch_token,
+            outcome=outcome,
+            response_ref=response_ref,
+            actual_tokens=actual_tokens,
+            actual_cost_units=actual_cost_units,
+            provider_receipt_ref=provider_receipt_ref,
+            failure_code=failure_code,
+            actor=actor,
+            idempotency_key=idempotency_key,
+            now=now,
+        )
 
     def lookup_model_call(
         self, *, call_id: str, actor: str
@@ -1073,7 +1745,37 @@ class ResearchDaemon:
                 expires = snap.get("expires_at")
                 if isinstance(expires, str) and expires <= now_iso:
                     continue
-                reserved.append(self._sanitized_model_state(snap))
+                request_ref = "cas:sha256:" + str(snap["request_sha256"])
+                request_raw = self._read_input(request_ref)
+                try:
+                    request_body = request_raw.decode("utf-8", errors="strict")
+                except UnicodeError as exc:
+                    raise ResearchdError("reserved model request is not UTF-8") from exc
+                item = dict(self._sanitized_model_state(snap))
+                item.update(
+                    {
+                        "dispatch_token": _model_dispatch_token(
+                            snap, self._model_worker_ipc_extension_sha256()
+                        ),
+                        "request_ref": request_ref,
+                        "request_body": request_body,
+                        "completion_command": "complete_model_call",
+                    }
+                )
+                mission_context = self._mission_context_for_call(
+                    str(snap["call_id"])
+                )
+                if mission_context is not None:
+                    mission_sha, step = mission_context
+                    item.update(
+                        {
+                            "research_mission_sha256": mission_sha,
+                            "research_role_index": step["role_index"],
+                            "reasoning_effort": step["reasoning_effort"],
+                            "completion_command": "complete_research_model_call",
+                        }
+                    )
+                reserved.append(MappingProxyType(item))
                 if len(reserved) >= maximum:
                     break
             return MappingProxyType(
@@ -1189,6 +1891,15 @@ class ResearchDaemon:
             raise ResearchdError("model runtime is unavailable")
         return broker, routing
 
+    def _model_worker_ipc_extension_sha256(self) -> str:
+        runtime = _model_runtime_binding(self._frozen_bindings)
+        if runtime is None:
+            raise ResearchdError("model runtime is unavailable")
+        value = runtime.get("worker_ipc_extension_sha256")
+        if value not in _MODEL_WORKER_IPC_EXTENSION_SHA256S:
+            raise ResearchdError("model worker IPC extension binding is stale")
+        return str(value)
+
     @staticmethod
     def _sanitized_model_state(
         snapshot: Mapping[str, object],
@@ -1226,9 +1937,13 @@ class ResearchDaemon:
             runtime["role_evaluation_sha256"],
             "model role evaluation",
         )
+        extension_sha256 = str(runtime["worker_ipc_extension_sha256"])
+        extension_path = _MODEL_WORKER_IPC_EXTENSION_PATHS.get(extension_sha256)
+        if extension_path is None:
+            raise ResearchdError("model worker IPC extension binding is stale")
         _verify_bound_file(
-            provenance_root / "model-worker-ipc-extension-v1.json",
-            runtime["worker_ipc_extension_sha256"],
+            provenance_root / extension_path,
+            extension_sha256,
             "model worker IPC extension",
         )
         try:
@@ -1397,7 +2112,9 @@ def _verify_bound_file(path: Path, expected_sha256: object, label: str) -> None:
         raise ResearchdError(f"{label} digest is stale")
 
 
-def _model_dispatch_token(snapshot: Mapping[str, object]) -> str:
+def _model_dispatch_token(
+    snapshot: Mapping[str, object], worker_ipc_extension_sha256: str
+) -> str:
     fields = (
         "call_id",
         "request_sha256",
@@ -1411,15 +2128,17 @@ def _model_dispatch_token(snapshot: Mapping[str, object]) -> str:
         "expires_at",
     )
     material = {field: snapshot[field] for field in fields}
-    material["worker_ipc_extension_sha256"] = _MODEL_WORKER_IPC_EXTENSION_SHA256
+    if worker_ipc_extension_sha256 not in _MODEL_WORKER_IPC_EXTENSION_SHA256S:
+        raise ResearchdError("model worker IPC extension binding is stale")
+    material["worker_ipc_extension_sha256"] = worker_ipc_extension_sha256
     return hashlib.sha256(_canonical_json_bytes(material)).hexdigest()
 
 
 def _verify_model_dispatch_token(
-    snapshot: Mapping[str, object], supplied: str
+    snapshot: Mapping[str, object], supplied: str, worker_ipc_extension_sha256: str
 ) -> None:
     if not isinstance(supplied, str) or not hmac.compare_digest(
-        _model_dispatch_token(snapshot), supplied
+        _model_dispatch_token(snapshot, worker_ipc_extension_sha256), supplied
     ):
         raise ResearchdError("model dispatch token is invalid")
 
@@ -1595,6 +2314,129 @@ def _private_directory(path: Path) -> None:
     except OSError as exc:
         raise ResearchdError("private runtime directory cannot be initialized") from exc
     _validate_private_directory(path, "private runtime directory")
+
+
+def _research_timestamp(value: str) -> datetime:
+    if not isinstance(value, str) or not value.endswith("Z"):
+        raise ResearchdError("research mission clock is invalid")
+    try:
+        parsed = datetime.fromisoformat(value[:-1] + "+00:00")
+    except ValueError as exc:
+        raise ResearchdError("research mission clock is invalid") from exc
+    if parsed.tzinfo is None or parsed.utcoffset() != timezone.utc.utcoffset(parsed):
+        raise ResearchdError("research mission clock is not UTC")
+    return parsed
+
+
+def _write_immutable_private_json(path: Path, value: Mapping[str, object]) -> bool:
+    """Create one owner-only immutable receipt or prove an exact replay."""
+
+    _private_directory(path.parent)
+    raw = _canonical_json_bytes(value) + b"\n"
+    if len(raw) > 2 * 1024 * 1024:
+        raise ResearchdError("immutable mission receipt exceeds its bound")
+    flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_CLOEXEC", 0)
+    flags |= getattr(os, "O_NOFOLLOW", 0)
+    descriptor: int | None = None
+    try:
+        descriptor = os.open(path, flags, 0o600)
+    except FileExistsError:
+        existing = _read_private_bytes(path, maximum=2 * 1024 * 1024)
+        if not hmac.compare_digest(existing, raw):
+            raise ResearchdError("immutable mission receipt replay differs")
+        return False
+    except OSError as exc:
+        raise ResearchdError("immutable mission receipt cannot be reserved") from exc
+    try:
+        written = 0
+        while written < len(raw):
+            written += os.write(descriptor, raw[written:])
+        os.fsync(descriptor)
+        os.fchmod(descriptor, 0o600)
+        directory = os.open(
+            path.parent,
+            os.O_RDONLY | getattr(os, "O_DIRECTORY", 0),
+        )
+        try:
+            os.fsync(directory)
+        finally:
+            os.close(directory)
+        return True
+    except OSError as exc:
+        try:
+            path.unlink(missing_ok=True)
+        except OSError:
+            pass
+        raise ResearchdError("immutable mission receipt write failed") from exc
+    finally:
+        if descriptor is not None:
+            os.close(descriptor)
+
+
+def _read_private_bytes(path: Path, *, maximum: int) -> bytes:
+    flags = os.O_RDONLY | getattr(os, "O_CLOEXEC", 0) | getattr(os, "O_NOFOLLOW", 0)
+    descriptor: int | None = None
+    try:
+        before = os.lstat(path)
+        if (
+            stat.S_ISLNK(before.st_mode)
+            or not stat.S_ISREG(before.st_mode)
+            or stat.S_IMODE(before.st_mode) != 0o600
+            or before.st_uid != os.geteuid()
+            or not 0 < before.st_size <= maximum
+        ):
+            raise ResearchdError("private mission receipt identity is invalid")
+        descriptor = os.open(path, flags)
+        opened = os.fstat(descriptor)
+        if (before.st_dev, before.st_ino) != (opened.st_dev, opened.st_ino):
+            raise ResearchdError("private mission receipt changed before open")
+        chunks: list[bytes] = []
+        remaining = opened.st_size
+        while remaining:
+            chunk = os.read(descriptor, min(65_536, remaining))
+            if not chunk:
+                raise ResearchdError("private mission receipt is truncated")
+            chunks.append(chunk)
+            remaining -= len(chunk)
+        after = os.fstat(descriptor)
+        current = os.lstat(path)
+        if (
+            (opened.st_dev, opened.st_ino, opened.st_size, opened.st_mtime_ns)
+            != (after.st_dev, after.st_ino, after.st_size, after.st_mtime_ns)
+            or (opened.st_dev, opened.st_ino, opened.st_size, opened.st_mtime_ns)
+            != (current.st_dev, current.st_ino, current.st_size, current.st_mtime_ns)
+        ):
+            raise ResearchdError("private mission receipt changed while read")
+        return b"".join(chunks)
+    except OSError as exc:
+        raise ResearchdError("private mission receipt is unavailable") from exc
+    finally:
+        if descriptor is not None:
+            os.close(descriptor)
+
+
+def _read_private_json(
+    path: Path,
+    keys: frozenset[str],
+    label: str,
+) -> dict[str, object]:
+    raw = _read_private_bytes(path, maximum=2 * 1024 * 1024)
+
+    def pairs(items: list[tuple[str, object]]) -> dict[str, object]:
+        result: dict[str, object] = {}
+        for key, item in items:
+            if key in result:
+                raise ResearchdError(f"{label} contains duplicate keys")
+            result[key] = item
+        return result
+
+    try:
+        value = json.loads(raw, object_pairs_hook=pairs)
+    except (UnicodeError, json.JSONDecodeError) as exc:
+        raise ResearchdError(f"{label} is not strict JSON") from exc
+    if not isinstance(value, dict) or set(value) != keys:
+        raise ResearchdError(f"{label} shape is invalid")
+    return value
 
 
 def _validate_runtime_root_directory(path: Path) -> None:
@@ -2193,11 +3035,13 @@ def _model_runtime_from_config(value: object) -> Mapping[str, object]:
     expected_digests = {
         "role_registry_sha256": _MODEL_ROLE_REGISTRY_SHA256,
         "role_evaluation_sha256": _MODEL_ROLE_EVALUATION_SHA256,
-        "worker_ipc_extension_sha256": _MODEL_WORKER_IPC_EXTENSION_SHA256,
     }
     for name, expected in expected_digests.items():
         if value.get(name) != expected:
             raise _ServiceConfigError(f"{name} binding is stale")
+    worker_ipc_extension_sha256 = value.get("worker_ipc_extension_sha256")
+    if worker_ipc_extension_sha256 not in _MODEL_WORKER_IPC_EXTENSION_SHA256S:
+        raise _ServiceConfigError("worker_ipc_extension_sha256 binding is stale")
     routing_profile_sha256 = value.get("routing_profile_sha256")
     if routing_profile_sha256 not in _MODEL_ROUTING_PROFILE_SHA256S:
         raise _ServiceConfigError("routing_profile_sha256 binding is stale")
@@ -2245,6 +3089,7 @@ def _model_runtime_from_config(value: object) -> Mapping[str, object]:
     return MappingProxyType(
         {
             **expected_digests,
+            "worker_ipc_extension_sha256": worker_ipc_extension_sha256,
             "routing_profile_sha256": routing_profile_sha256,
             "binding_revision": binding_revision,
             "budget_policy_ref": budget_policy_ref,
@@ -2305,9 +3150,10 @@ def _model_runtime_binding(
     expected_digests = {
         "role_registry_sha256": _MODEL_ROLE_REGISTRY_SHA256,
         "role_evaluation_sha256": _MODEL_ROLE_EVALUATION_SHA256,
-        "worker_ipc_extension_sha256": _MODEL_WORKER_IPC_EXTENSION_SHA256,
     }
     if any(runtime.get(name) != expected for name, expected in expected_digests.items()):
+        raise ResearchdError("model runtime digest binding is stale")
+    if runtime.get("worker_ipc_extension_sha256") not in _MODEL_WORKER_IPC_EXTENSION_SHA256S:
         raise ResearchdError("model runtime digest binding is stale")
     if runtime.get("routing_profile_sha256") not in _MODEL_ROUTING_PROFILE_SHA256S:
         raise ResearchdError("model runtime routing binding is stale")

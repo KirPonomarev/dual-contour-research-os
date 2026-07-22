@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dual-contour-research-os.invalid/contracts/research/v1/ResearchIngressActionEnvelope.schema.json",
+  "title": "ResearchIngressActionEnvelope",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_id", "schema_version", "object_id", "issued_at", "payload", "integrity"],
+  "properties": {
+    "schema_id": {"const": "ResearchIngressActionEnvelope"},
+    "schema_version": {"const": "1.0.0"},
+    "object_id": {"type": "string", "pattern": "^research-ingress-action:[a-f0-9]{64}$"},
+    "issued_at": {"type": "string", "format": "date-time"},
+    "payload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "action_id", "mission_sha256", "plan_sha256", "mission_envelope_sha256",
+        "exact_host_fingerprint", "exact_service", "exact_uid", "paired_execution_id",
+        "domain_binding_sha256s", "expected_trigger_domains", "provider_calls_maximum",
+        "ingress_provider_calls", "domain_writes", "canonical_writes", "live_authority",
+        "expires_at", "stop_conditions", "rollback", "forbidden_boundaries", "authority_source_hash"
+      ],
+      "properties": {
+        "action_id": {"type": "string", "pattern": "^research-ingress-action:[a-f0-9]{64}$"},
+        "mission_sha256": {"$ref": "#/$defs/sha256"},
+        "plan_sha256": {"$ref": "#/$defs/sha256"},
+        "mission_envelope_sha256": {"$ref": "#/$defs/sha256"},
+        "exact_host_fingerprint": {"$ref": "#/$defs/sha256"},
+        "exact_service": {"const": "research-os-a1-ingress.service"},
+        "exact_uid": {"const": 10002},
+        "paired_execution_id": {"type": "string", "pattern": "^paired-research-ingress:[a-f0-9]{64}$"},
+        "domain_binding_sha256s": {"$ref": "#/$defs/twoShaMap"},
+        "expected_trigger_domains": {"const": ["market", "security"]},
+        "provider_calls_maximum": {"const": 5},
+        "ingress_provider_calls": {"const": 0},
+        "domain_writes": {"const": 0},
+        "canonical_writes": {"const": 0},
+        "live_authority": {"const": false},
+        "expires_at": {"type": "string", "format": "date-time"},
+        "stop_conditions": {"$ref": "#/$defs/nonemptyStrings"},
+        "rollback": {"type": "string", "minLength": 1, "maxLength": 2048},
+        "forbidden_boundaries": {"$ref": "#/$defs/nonemptyStrings"},
+        "authority_source_hash": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "integrity": {"type": "object", "additionalProperties": false, "required": ["payload_sha256"], "properties": {"payload_sha256": {"$ref": "#/$defs/sha256"}}}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "twoShaMap": {"type": "object", "additionalProperties": false, "required": ["market", "security"], "properties": {"market": {"$ref": "#/$defs/sha256"}, "security": {"$ref": "#/$defs/sha256"}}},
+    "nonemptyStrings": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1, "maxLength": 512}}
+  }
+}

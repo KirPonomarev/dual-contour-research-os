@@ -73,6 +73,41 @@ fi
 
 # --- Query researchd for RESERVED calls via docker exec ----------------------
 
+advance_research_missions() {
+    # The existing Scout principal advances at most one mission role through
+    # researchd's single writer.  This is not a provider call and cannot bypass
+    # the model broker, WIP=1, exact routing or budget state machine.
+    docker exec --user 10003:10001 "${CORE_CONTAINER}" python3 -c '
+import datetime, hashlib, json, socket, sys
+tick = datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
+key = "advisor-dispatch:advance:" + tick
+s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+s.settimeout(10)
+s.connect("/var/lib/research-os/researchd.sock")
+request = {
+    "version": "1.3",
+    "request_id": hashlib.sha256(key.encode()).hexdigest(),
+    "idempotency_key": key,
+    "command": "advance_research_missions",
+    "payload": {},
+}
+s.sendall(json.dumps(request, separators=(",", ":")).encode() + b"\n")
+s.shutdown(socket.SHUT_WR)
+chunks = []
+while True:
+    chunk = s.recv(65536)
+    if not chunk:
+        break
+    chunks.append(chunk)
+s.close()
+response = json.loads(b"".join(chunks))
+if response.get("ok") is not True or not isinstance(response.get("result"), dict):
+    print(json.dumps({"status": "ADVANCE_FAILED", "error": response.get("error", "unknown")}))
+    raise SystemExit(1)
+print(json.dumps(response["result"], separators=(",", ":")))
+' 2>/dev/null
+}
+
 query_reserved_calls() {
     # Use docker exec to query Core's AF_UNIX socket from inside the container.
     # The connected_worker UID (10004) is an allowed actor for this command.
@@ -159,6 +194,14 @@ print(state)
 ' "${1}" 2>/dev/null
 }
 
+ADVANCE_RESULT=$(advance_research_missions) || {
+    die "MISSION_ADVANCE_FAILED: researchd rejected the bounded Scout tick"
+}
+ADVANCE_STATUS=$(printf '%s' "${ADVANCE_RESULT}" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("status","UNKNOWN"))' 2>/dev/null) || {
+    die "MALFORMED_RESPONSE: cannot parse mission advance result"
+}
+log "Mission advance status ${ADVANCE_STATUS}"
+
 QUERY_RESULT=$(query_reserved_calls) || {
     # docker exec itself failed
     die "CORE_UNAVAILABLE: docker exec into ${CORE_CONTAINER} failed"
@@ -244,7 +287,7 @@ import json, sys
 call = json.loads(sys.argv[1])
 dispatch = {
     "schema_id": "ModelWorkerDispatch",
-    "schema_version": "1.0.0",
+    "schema_version": "1.1.0",
     "call_id": call["call_id"],
     "dispatch_token": call["dispatch_token"],
     "request_body": call.get("request_body", ""),
@@ -252,7 +295,8 @@ dispatch = {
     "classification": call.get("classification", "D0"),
     "max_tokens": call.get("max_tokens", 512),
     "expires_at": call.get("expires_at", ""),
-    "worker_ipc_extension_sha256": "03d91f027bb6975c55d84acaef188546bcd24af9944a72f4ff9314296399d07a"
+    "completion_command": call.get("completion_command", "complete_model_call"),
+    "worker_ipc_extension_sha256": "467b2e5dd8583939d13e216a9f29e3578b0cc720a27081ca4f8723ad5726bac3"
 }
 print(json.dumps(dispatch, indent=2))
 ' "${CALL_JSON}" > "${DISPATCH_FILE}.tmp"

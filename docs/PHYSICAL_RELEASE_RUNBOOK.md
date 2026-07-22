@@ -122,6 +122,46 @@ submits deterministic, retry-safe SourceTrigger requests for both domains and
 records only provenance and response digests; no raw export content enters the
 receipt.
 
+## Additive mission-bound research ingress
+
+The P04 v1 command above and its hash-bound executable remain unchanged. A
+research mission uses the additive adapter only after the same v1 registry,
+two bindings, two payloads, and unexpired P04 ingress envelope are valid:
+
+```sh
+python3 tools/research_ingress_control.py research-ingress-once \
+  --registry "$REGISTRY" \
+  --market-binding "$MARKET_BINDING" --market-payload "$MARKET_PAYLOAD" \
+  --security-binding "$SECURITY_BINDING" --security-payload "$SECURITY_PAYLOAD" \
+  --socket /var/lib/research-os/researchd.sock \
+  --envelope "$PRIVATE_P04_INGRESS_ENVELOPE" \
+  --mission-envelope "$PRIVATE_RESEARCH_MISSION_ENVELOPE" \
+  --research-action-envelope "$PRIVATE_RESEARCH_INGRESS_ACTION_ENVELOPE" \
+  --mission-artifact "$PRIVATE_SANITIZED_MISSION_ARTIFACT" \
+  --expected-host-fingerprint "$BOUND_HOST_FINGERPRINT" \
+  --expected-bridge-head "$CURRENT_BRIDGE_RUNTIME_HEAD" \
+  --expected-bridge-project-fingerprint "$BRIDGE_PROJECT_FINGERPRINT" \
+  --expected-plan-sha256 "$PLAN_SHA256" \
+  --expected-mission-sha256 "$MISSION_SHA256" \
+  --expected-prepared-kimi-request-sha256 "$PREPARED_KIMI_REQUEST_SHA256" \
+  --receipt "$PRIVATE_RESEARCH_INGRESS_RECEIPT"
+```
+
+The mission artifact is the exact content-addressed prepared Kimi request; its
+SHA is independently pinned on the command line and carried in every role
+request. The command is one paired operation: exactly one Market SourceTrigger and one
+Security SourceTrigger share the mission ref but retain distinct domain
+binding refs and deterministic idempotency keys. It then queues the mission;
+it does not reserve or call a provider. The existing advisor timer performs a
+Scout advance through researchd before querying the existing WIP=1 broker.
+Exact request bytes are recovered from Bridge input CAS after a crash. No
+manual `reserve_model_call`, direct provider invocation, fallback, second
+writer, public listener, domain write, or canonical write is permitted.
+
+Run `python3 tools/research_ingress_control.py self-test` to prove that the
+frozen P04 executable hash is unchanged and the additive adapter has two
+domains, zero provider calls, zero writes, and no public listener.
+
 ## Stop and rollback rules
 
 Stop before mutation if any project, host, carrier, image, profile, envelope,

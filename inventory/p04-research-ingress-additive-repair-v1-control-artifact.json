@@ -1,0 +1,49 @@
+{
+  "schema_id": "ResearchIngressControlArtifact",
+  "schema_version": "1.0.0",
+  "object_id": "research-ingress-control-artifact:p04-research-ingress-additive-repair-v1:20260722",
+  "issued_at": "2026-07-22T12:35:56Z",
+  "payload": {
+    "base_sha": "18866d98bfa64a13a4c43eff97e7315576d46adf",
+    "contract_catalog_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "frozen_p04_ingress_executable": "tools/physical_release_control.py",
+    "frozen_p04_ingress_executable_sha256": "5e44e460b25a0dd98d8ed49ac7a755884388b3706195b374494290b11bcfcac6",
+    "additive_ingress_executable": "tools/research_ingress_control.py",
+    "additive_ingress_executable_sha256": "cd8a6a91c1474e3f6fdcc0da9dc1edabfc9bbb3edcaf097cce6f581a4f0335da",
+    "files": {
+      "contracts/research/v1/ResearchMissionEnvelope.schema.json": "75ff4988f6da5c5e2c832d2d930654726566d7b8a4a1befcbd6156d0e9e6a4e1",
+      "contracts/research/v1/ResearchIngressActionEnvelope.schema.json": "306962574db1677bdb74dad2957cfc29fe9422424b913cbd6d06d6394ce1902a",
+      "src/research_bridge/research_ingress.py": "f80b199063e6f493a882a945ce1d940e3a0e29188bfc90e8dfafa5b3e05efc8a",
+      "src/research_bridge/control.py": "a01cd884d942e247b3994d935c9a428b6daeff61eede16e65f1a5e9ffe68ab2b",
+      "src/research_bridge/researchd.py": "a6dd69823a4844462073ecc3fee32e1aa2c37a6248b16f20af1e1fa50b46a7fe",
+      "ops/deploy/research-os-advisor-dispatch.sh": "57dbd007bbd476063dc375336db7220cad94d78e6668fe18b63730d5ca9c92ed",
+      "ops/connected-worker/model_worker_v4.py": "6fac6e13a2f3c44331cbd945cc2fa1ec91cfc8838f69cc00ea772f2f3cd977a3",
+      "ops/connected-worker/runbook-inputs-v2.json": "66207c2ac70960d5551499c61b55d0b5cf2b36ed583afe6911126b7d45a52939",
+      "ops/connected-worker/runtime-policy-v4.json": "dd574e725a86e7d49a1ef25f28ec34cb4d6c88a9bd880a05ea12aadcc64082a2",
+      "provenance/model-worker-ipc-extension-v2.json": "467b2e5dd8583939d13e216a9f29e3578b0cc720a27081ca4f8723ad5726bac3"
+    },
+    "mission_contracts": [
+      "ResearchMissionEnvelope/1.0.0",
+      "ResearchIngressActionEnvelope/1.0.0"
+    ],
+    "paired_source_trigger_domains": ["market", "security"],
+    "model_role_sequence": [
+      "SCOUT_FAST:deepseek-v4-flash:max",
+      "RESEARCH_WORKER:deepseek-v4-pro:max",
+      "CRITIC_PRIMARY:kimi-k3-max:max",
+      "CRITIC_DEEP:gpt-5.6-sol-xhigh:xhigh",
+      "CHIEF_SCIENTIST:gpt-5.6-sol-xhigh:xhigh"
+    ],
+    "maximum_provider_calls": 5,
+    "transport": "AF_UNIX",
+    "public_listener_count": 0,
+    "new_writer_broker_daemon_count": 0,
+    "ingress_provider_calls": 0,
+    "domain_writes": 0,
+    "canonical_writes": 0,
+    "live_authority": false
+  },
+  "integrity": {
+    "payload_sha256": "25da9921a0fedf45324d4c5b7411a4a7e2dbab0f545761961da282dc11c9c27d"
+  }
+}
