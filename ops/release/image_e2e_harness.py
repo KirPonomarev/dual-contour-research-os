@@ -152,6 +152,7 @@ def verify_frozen_inputs(root: Path = ROOT) -> dict[str, str]:
     connected_inputs_path = root / "ops/connected-worker/runbook-inputs.json"
     dockerignore_path = root / ".dockerignore"
     accounting_profile_path = root / "provenance/model-accounting-mode-v1.json"
+    vacuous_profile_path = root / "provenance/model-vacuous-output-reconciliation-v1.json"
     paths = (
         config_path,
         policy_path,
@@ -162,6 +163,7 @@ def verify_frozen_inputs(root: Path = ROOT) -> dict[str, str]:
         connected_inputs_path,
         dockerignore_path,
         accounting_profile_path,
+        vacuous_profile_path,
     )
     if any(path.is_symlink() or not path.is_file() for path in paths):
         raise HarnessError("production image input set is incomplete")

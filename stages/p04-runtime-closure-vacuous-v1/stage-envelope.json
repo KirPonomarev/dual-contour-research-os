@@ -1,0 +1,20 @@
+{
+  "schema_id": "StageEnvelope",
+  "schema_version": "1.0.0",
+  "stage_id": "p04-runtime-closure-vacuous-v1",
+  "agent_id": 0,
+  "objective": "Classify valid-accounting empty provider output as FAILED_KNOWN VACUOUS_OUTPUT and reconcile only the exact existing UNKNOWN call from immutable physical response evidence.",
+  "executable_blocker": "The active mission is parked at UNKNOWN even though an immutable HTTP 200 response proves 5551 tokens, a provider receipt identity, zero content bytes and finish_reason=length.",
+  "base_sha": "60b3b335de78e8a01c7a899263372c0f486dbf09",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a0-p04-runtime-closure-vacuous-v1",
+  "worktree": "/private/tmp/dcros-p04-runtime-closure-vacuous-v1",
+  "read_set": ["ops/connected-worker/model_worker_v4.py", "src/research_bridge/model_broker.py", "src/research_bridge/ledger.py", "src/research_bridge/researchd.py", "ops/release/Containerfile", "tests/test_p04_runtime_closure.py"],
+  "write_set": ["ops/connected-worker/model_worker_v4.py", "src/research_bridge/model_broker.py", "src/research_bridge/ledger.py", "src/research_bridge/researchd.py", "ops/release/Containerfile", ".dockerignore", "tools/verify_release_blueprint.py", "ops/release/image_e2e_harness.py", "provenance/model-vacuous-output-reconciliation-v1.json", "tests/test_p04_runtime_closure.py", "tests/test_r08a_production_image_e2e_harness.py", "stages/p04-runtime-closure-vacuous-v1/", "docs/receipts/reuse/p04-runtime-closure-vacuous-v1.json", "inventory/p04-runtime-closure-vacuous-v1-control-artifact.json"],
+  "forbidden_scope": ["arbitrary UNKNOWN reconciliation", "provider retry", "new call identity", "routing/fallback", "budgets other than exact release of proven usage", "Market/Security", "domain/canonical writes", "live actions"],
+  "risk_class": "EXACT_PROVIDER_RESPONSE_ADJUDICATION",
+  "acceptance_commands": ["python3 -m unittest tests.test_p04_runtime_closure", "python3 -m unittest tests.test_r09a_dual_contour_advisors", "make contracts", "python3 tools/verify_release_blueprint.py", "python3 -m unittest discover -s tests"],
+  "stop_condition": "Any path accepts UNKNOWN without the exact call/request/raw/body/token/receipt evidence tuple, changes transmission history, or sends a provider call during validation.",
+  "expected_receipt": "IntegrationReceipt, Core+Worker deploy receipts, exact UNKNOWN-to-RECONCILED receipt, and resumed mission lineage",
+  "rollback": "Revert the additive commit; preserve UNKNOWN and reservation at WAIT_PROVIDER without retry."
+}

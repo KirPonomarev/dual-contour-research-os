@@ -1,0 +1,11 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "stage_id": "p04-runtime-closure-vacuous-v1",
+  "decision": "REUSE_EXISTING_RAW_CAS_PARSER_LEDGER_AND_MISSION_ADVANCER",
+  "reused": ["PrivateResponseStore immutable raw CAS", "HTTPResponseParser", "provider-response receipt", "model ledger RECONCILED state", "observational accounting mode", "mission advance loop"],
+  "rejected": ["provider retry", "replacement call", "direct database mutation", "invented cost zero", "generic UNKNOWN release", "new broker/writer/dispatcher"],
+  "minimal_glue": ["dedicated VacuousProviderOutput classification", "exact evidence profile", "one exact UNKNOWN reconciliation method"],
+  "external_code_added": false,
+  "new_dependency": false
+}

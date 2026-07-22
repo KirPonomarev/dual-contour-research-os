@@ -1995,6 +1995,90 @@ class ModelCallBroker:
             )
         )
 
+    def reconcile_vacuous_unknown(
+        self,
+        call_id: str,
+        *,
+        actual_tokens: int,
+        provider_receipt_ref: str,
+        accounting_evidence_ref: str,
+        event_at: str,
+        idempotency_key: str,
+    ) -> ModelCallHandle:
+        """Resolve one UNKNOWN only when immutable evidence proves empty output.
+
+        This does not retry the provider or generalize UNKNOWN reconciliation.
+        The caller must independently bind the exact call, request, raw response,
+        parsed usage and provider receipt to a frozen evidence profile.
+        """
+
+        timestamp = _timestamp("event_at", event_at)
+        tokens = _nonnegative("actual_tokens", actual_tokens)
+        receipt = _pattern(
+            "provider_receipt_ref", provider_receipt_ref, _PROVIDER_RESPONSE_REF_RE
+        )
+        evidence = _pattern(
+            "accounting_evidence_ref", accounting_evidence_ref, _ACCOUNTING_EVIDENCE_RE
+        )
+        current = self._state(call_id)
+        if current["state"] == "RECONCILED":
+            if (
+                current.get("previous_state") != "UNKNOWN"
+                or current.get("failure_code") != "VACUOUS_OUTPUT"
+                or current.get("actual_tokens") != tokens
+                or current.get("actual_cost_units") is not None
+                or current.get("provider_receipt_ref") != receipt
+                or current.get("accounting_mode") != "OBSERVED_NO_NUMERIC_COST"
+                or current.get("accounting_evidence_ref") != evidence
+                or current.get("reconciled_at") != timestamp
+            ):
+                raise ModelBrokerError(
+                    "vacuous UNKNOWN reconciliation replay differs from durable state"
+                )
+            return _handle(
+                self._append(
+                    current,
+                    idempotency_key=_text(
+                        "idempotency_key", idempotency_key, maximum=256
+                    ),
+                    event_at=timestamp,
+                )
+            )
+        if (
+            current["state"] != "UNKNOWN"
+            or current.get("failure_code") != "AMBIGUOUS_PROVIDER_OUTCOME"
+            or current.get("actual_tokens") is not None
+            or current.get("actual_cost_units") is not None
+            or current.get("provider_receipt_ref") is not None
+            or current.get("budget_released") is not False
+        ):
+            raise ModelBrokerError(
+                "vacuous reconciliation requires an unresolved UNKNOWN"
+            )
+        reconciled = {
+            **current,
+            "previous_state": "UNKNOWN",
+            "state": "RECONCILED",
+            "actual_tokens": tokens,
+            "actual_cost_units": None,
+            "provider_receipt_ref": receipt,
+            "failure_code": "VACUOUS_OUTPUT",
+            "accounting_mode": "OBSERVED_NO_NUMERIC_COST",
+            "accounting_evidence_ref": evidence,
+            "ambiguous_usage": False,
+            "budget_released": True,
+            "reconciled_at": timestamp,
+        }
+        return _handle(
+            self._append(
+                reconciled,
+                idempotency_key=_text(
+                    "idempotency_key", idempotency_key, maximum=256
+                ),
+                event_at=timestamp,
+            )
+        )
+
     def state(self, call_id: str) -> ModelCallHandle:
         return _handle(self._ledger.model_call_state(call_id))
 
