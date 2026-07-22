@@ -232,6 +232,14 @@ _MISSION_NULL_CONTENT_VACUOUS_PROFILE_PATH = (
     / "provenance"
     / "model-null-content-vacuous-reconciliation-v1.json"
 )
+_MISSION_CHIEF_NULL_CONTENT_VACUOUS_PROFILE_SHA256 = (
+    "2aa7431a2157dfc2c523f96bc69ccf81bd8ee45d1a46a972124e4a753a71e79a"
+)
+_MISSION_CHIEF_NULL_CONTENT_VACUOUS_PROFILE_PATH = (
+    Path(__file__).resolve().parents[2]
+    / "provenance"
+    / "model-chief-null-content-vacuous-reconciliation-v1.json"
+)
 _CORRIDOR_EXECUTOR_PROFILE_KEYS = frozenset(
     {
         "capability_ref",
@@ -717,6 +725,105 @@ def _matches_mission_null_content_vacuous_reconciliation(
     """Return true only for the authorized GPT null-content UNKNOWN tuple."""
 
     profile = _mission_null_content_vacuous_reconciliation_profile()
+    return (
+        mission_sha256 == profile["mission_sha256"]
+        and role_index == profile["role_index"]
+        and role == profile["role"]
+        and call_id == profile["call_id"]
+        and request_sha256 == profile["request_sha256"]
+        and model_binding == profile["model_binding"]
+        and reasoning_effort == profile["reasoning_effort"]
+        and failure_code == profile["core_failure_code"]
+    )
+
+
+def _mission_chief_null_content_vacuous_reconciliation_profile(
+) -> Mapping[str, object]:
+    """Load the one exact sanitized final-role provider adjudication."""
+
+    try:
+        raw = _MISSION_CHIEF_NULL_CONTENT_VACUOUS_PROFILE_PATH.read_bytes()
+    except OSError as exc:
+        raise ResearchdError(
+            "mission Chief null-content vacuous profile is unavailable"
+        ) from exc
+    if (
+        not raw
+        or len(raw) > 65_536
+        or hashlib.sha256(raw).hexdigest()
+        != _MISSION_CHIEF_NULL_CONTENT_VACUOUS_PROFILE_SHA256
+    ):
+        raise ResearchdError(
+            "mission Chief null-content vacuous profile identity drifted"
+        )
+    try:
+        profile = json.loads(raw)
+    except (UnicodeError, json.JSONDecodeError) as exc:
+        raise ResearchdError(
+            "mission Chief null-content vacuous profile is not JSON"
+        ) from exc
+    expected = {
+        "schema_id": "ModelChiefNullContentVacuousReconciliationEvidence",
+        "schema_version": "1.0.0",
+        "mission_sha256": "7d7dcbce44eaa5b1df58d07cdd49d5d094a7d69a717382b984b2183e0b6fa7ab",
+        "role_index": 4,
+        "role": "CHIEF_SCIENTIST",
+        "call_id": "model-call:a0ea4cd88530adc49114dbdb76d3cb72b510a875cbf62264d53a04558871863d",
+        "request_sha256": "a239c40fa7eb96b47e8a542127d0d1dca1dda346c6bbd0c5b7926e85dfcad9a9",
+        "provider_request_sha256": "c8ac9c4b935d088eef24f10a26a18bcc03daeeb41b5ea7c8c2f5efe4a0e84936",
+        "model_binding": "gpt-5.6-sol-xhigh",
+        "reasoning_effort": "xhigh",
+        "raw_response_ref": "private-cas:sha256:9a41b212b14b18e1934ab52377274f4ff0b6051191a06ca1830ffbb019086dcc",
+        "raw_response_bytes": 51852,
+        "provider_body_sha256": "2e7d74f4eaea22c081b5909052772d402bb714d42a1d2d8fb50df73c921718d0",
+        "provider_body_bytes": 38800,
+        "provider_response_id_sha256": "21489395dec444da337637c1be32b1f4ac69cd4254b0db1519e43ddd16cde6e2",
+        "provider_receipt_ref": "provider-response:sha256:2e7d74f4eaea22c081b5909052772d402bb714d42a1d2d8fb50df73c921718d0",
+        "http_status": 200,
+        "protocol": "OPENAI_CHAT_COMPLETIONS",
+        "api_model": "openai/gpt-5.6-sol",
+        "actual_tokens": 10382,
+        "actual_cost_units": None,
+        "observed_provider_monetary_cost": 0.16216375,
+        "completion_tokens": 4096,
+        "prompt_tokens": 6286,
+        "reasoning_tokens": 4096,
+        "content_is_null": True,
+        "content_bytes": 0,
+        "reasoning_is_null": True,
+        "finish_reason": "length",
+        "network_calls": 1,
+        "request_bytes_sent": True,
+        "worker_failure_code": "MALFORMED_RESPONSE",
+        "core_failure_code": "AMBIGUOUS_PROVIDER_OUTCOME",
+        "failure_code": "VACUOUS_OUTPUT",
+        "monetary_enforcement": "DISABLED_OBSERVATIONAL",
+        "zero_cost_claim": False,
+        "raw_or_credential_bytes_present": False,
+        "grants_retry": False,
+        "grants_authority": False,
+    }
+    if profile != expected:
+        raise ResearchdError(
+            "mission Chief null-content vacuous profile policy drifted"
+        )
+    return MappingProxyType(profile)
+
+
+def _matches_mission_chief_null_content_vacuous_reconciliation(
+    *,
+    mission_sha256: str,
+    role_index: int,
+    role: str,
+    call_id: object,
+    request_sha256: object,
+    model_binding: str,
+    reasoning_effort: str,
+    failure_code: object,
+) -> bool:
+    """Return true only for the authorized final-role UNKNOWN tuple."""
+
+    profile = _mission_chief_null_content_vacuous_reconciliation_profile()
     return (
         mission_sha256 == profile["mission_sha256"]
         and role_index == profile["role_index"]
@@ -1432,6 +1539,23 @@ class ResearchDaemon:
                                 state = snapshot["state"]
                                 exact_vacuous = True
                         if not exact_vacuous:
+                            exact_chief_null_content = (
+                                self._reconcile_exact_chief_null_content_vacuous_reservation(
+                                    mission_sha256=mission_sha,
+                                    role_index=index,
+                                    role=role,
+                                    model_binding=expected_binding,
+                                    reasoning_effort=effort,
+                                    step=step,
+                                    snapshot=snapshot,
+                                    now=now,
+                                )
+                            )
+                            if exact_chief_null_content is not None:
+                                snapshot = exact_chief_null_content
+                                state = snapshot["state"]
+                                exact_vacuous = True
+                        if not exact_vacuous:
                             return MappingProxyType(
                                 {
                                     "status": "WAIT_PROVIDER",
@@ -1709,6 +1833,83 @@ class ResearchDaemon:
         ):
             raise ResearchdError(
                 "exact null-content vacuous reconciliation terminal drifted"
+            )
+        return reconciled
+
+    def _reconcile_exact_chief_null_content_vacuous_reservation(
+        self,
+        *,
+        mission_sha256: str,
+        role_index: int,
+        role: str,
+        model_binding: str,
+        reasoning_effort: str,
+        step: Mapping[str, object],
+        snapshot: Mapping[str, object],
+        now: str,
+    ) -> Mapping[str, object] | None:
+        """Release only the authorized final-role vacuous call."""
+
+        profile = _mission_chief_null_content_vacuous_reconciliation_profile()
+        if not _matches_mission_chief_null_content_vacuous_reconciliation(
+            mission_sha256=mission_sha256,
+            role_index=role_index,
+            role=role,
+            call_id=step["call_id"],
+            request_sha256=snapshot["request_sha256"],
+            model_binding=model_binding,
+            reasoning_effort=reasoning_effort,
+            failure_code=snapshot["failure_code"],
+        ):
+            return None
+        expected_step = {
+            "mission_sha256": profile["mission_sha256"],
+            "role_index": profile["role_index"],
+            "role": profile["role"],
+            "model_binding": profile["model_binding"],
+            "reasoning_effort": profile["reasoning_effort"],
+            "call_id": profile["call_id"],
+            "request_sha256": profile["request_sha256"],
+            "fallback_used": False,
+        }
+        if any(step[name] != value for name, value in expected_step.items()):
+            return None
+
+        broker, _ = self._require_model_runtime()
+        evidence_ref = (
+            "accounting-policy:sha256:"
+            + _MISSION_CHIEF_NULL_CONTENT_VACUOUS_PROFILE_SHA256
+        )
+        broker.reconcile_vacuous_unknown(
+            str(profile["call_id"]),
+            actual_tokens=int(profile["actual_tokens"]),
+            provider_receipt_ref=str(profile["provider_receipt_ref"]),
+            accounting_evidence_ref=evidence_ref,
+            event_at=now,
+            idempotency_key=(
+                f"mission:{mission_sha256}:{role_index}:"
+                "chief-null-content-vacuous-output-reconcile:v1"
+            ),
+        )
+        reconciled = broker.snapshot(str(profile["call_id"]))
+        expected_terminal = {
+            "state": "RECONCILED",
+            "previous_state": "UNKNOWN",
+            "failure_code": "VACUOUS_OUTPUT",
+            "actual_tokens": profile["actual_tokens"],
+            "actual_cost_units": None,
+            "provider_receipt_ref": profile["provider_receipt_ref"],
+            "response_ref": None,
+            "accounting_mode": "OBSERVED_NO_NUMERIC_COST",
+            "accounting_evidence_ref": evidence_ref,
+            "budget_released": True,
+        }
+        if any(
+            reconciled[name] != value
+            for name, value in expected_terminal.items()
+        ):
+            raise ResearchdError(
+                "exact Chief null-content vacuous reconciliation terminal drifted"
             )
         return reconciled
 

@@ -131,6 +131,7 @@ class ProductionImageE2EHarnessTests(unittest.TestCase):
             "model-provider-routing-v2.json",
             "model-accounting-mode-v1.json",
             "model-null-content-vacuous-reconciliation-v1.json",
+            "model-chief-null-content-vacuous-reconciliation-v1.json",
         }
         for name in required_provenance:
             self.assertIn(
@@ -139,7 +140,7 @@ class ProductionImageE2EHarnessTests(unittest.TestCase):
                 container,
             )
         self.assertEqual(
-            container.count("COPY --chown=10001:10001 provenance/"), 8
+            container.count("COPY --chown=10001:10001 provenance/"), 9
         )
         self.assertIn(
             "provenance/model-worker-ipc-extension-v1.json",

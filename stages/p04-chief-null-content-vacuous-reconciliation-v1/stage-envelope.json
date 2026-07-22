@@ -1,0 +1,65 @@
+{
+  "schema_id": "StageEnvelope",
+  "schema_version": "1.0.0",
+  "stage_id": "p04-chief-null-content-vacuous-reconciliation-v1",
+  "agent_id": 0,
+  "objective": "Reconcile only exact Chief Scientist call a0ea4cd8... whose immutable HTTP 200 response is physically vacuous with null content, release its reservation with zero provider calls, and emit the existing mission terminal model-chain receipt through the canonical advisor.",
+  "executable_blocker": "Exact final-role call a0ea4cd8... holds WIP=1 after an immutable HTTP 200 length-capped response with 10382 tokens and null content was conservatively recorded UNKNOWN.",
+  "base_sha": "3f90b6fbfd365edb8716e455717f3835741eee29",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "authority_source_sha256": "c7688b6327f39bec8f48546241c4dfcaf521478721703e4452115d0866e970ed",
+  "authority_binding": "USER_STANDING_AUTHORITY: current dual-contour-research-os mission 7d7dcbce exact receipt-bound reconciliation, dependency-neutral repair, commit/PR/CI/merge, reversible Core deploy, zero provider retry/replacement/direct DB mutation",
+  "branch": "codex/bridge-a0-p04-chief-null-vacuous-v1",
+  "worktree": "/private/tmp/dcros-p04-chief-null-vacuous-v1",
+  "read_set": [
+    "src/research_bridge/researchd.py",
+    "src/research_bridge/model_broker.py",
+    "tests/test_p04_runtime_closure.py",
+    "tests/test_r08a_production_image_e2e_harness.py",
+    "tools/verify_release_blueprint.py",
+    "ops/release/Containerfile",
+    ".dockerignore",
+    "provenance/model-null-content-vacuous-reconciliation-v1.json"
+  ],
+  "write_set": [
+    "src/research_bridge/researchd.py",
+    "tests/test_p04_runtime_closure.py",
+    "tests/test_r08a_production_image_e2e_harness.py",
+    "tools/verify_release_blueprint.py",
+    "ops/release/Containerfile",
+    ".dockerignore",
+    "provenance/model-chief-null-content-vacuous-reconciliation-v1.json",
+    "stages/p04-chief-null-content-vacuous-reconciliation-v1/",
+    "docs/receipts/reuse/p04-chief-null-content-vacuous-reconciliation-v1.json",
+    "inventory/p04-chief-null-content-vacuous-reconciliation-v1-control-artifact.json"
+  ],
+  "dependencies": {
+    "authorized_call_id": "model-call:a0ea4cd88530adc49114dbdb76d3cb72b510a875cbf62264d53a04558871863d",
+    "authorized_raw_response_sha256": "9a41b212b14b18e1934ab52377274f4ff0b6051191a06ca1830ffbb019086dcc",
+    "provider_body_sha256": "2e7d74f4eaea22c081b5909052772d402bb714d42a1d2d8fb50df73c921718d0",
+    "development_agent_contract_sha256": "b4ca3f735cbbc0359ca20e47681f38d47527969f4b4f3fa2eb49bf694fc856aa",
+    "current_researchd_sha256": "64b8d1a99487e7c488c32d5f42457d1278d67472fc63ea2cf79e911ca2b6d632",
+    "existing_null_content_profile_sha256": "b4534d7138b9039c879f83ac289e09e95a253874c30973e301ec20260003f385"
+  },
+  "forbidden_scope": [
+    "provider retry or replacement identity",
+    "direct database mutation",
+    "fake zero cost",
+    "generic UNKNOWN reconciliation",
+    "Worker/provider routing changes",
+    "Market or Security mutation",
+    "canonical scientific writes",
+    "new broker/writer/dispatcher/framework"
+  ],
+  "risk_class": "EXACT_FINAL_ROLE_RESOURCE_CLEANUP",
+  "acceptance_commands": [
+    "python3 -m unittest tests.test_p04_runtime_closure",
+    "python3 -m unittest tests.test_p04_research_ingress_additive_repair tests.test_r09a_dual_contour_advisors tests.test_r08a_production_image_e2e_harness",
+    "make contracts",
+    "python3 tools/verify_release_blueprint.py",
+    "python3 -m unittest discover -s tests -p 'test_*.py'"
+  ],
+  "stop_condition": "Any call/mission/role/request/raw/body/token/content identity differs, any generic UNKNOWN reconciles, any provider call occurs, or tests/contracts fail.",
+  "expected_receipt": "IntegrationReceipt, exact Core-only deploy receipt, exact a0ea UNKNOWN-to-RECONCILED VACUOUS_OUTPUT receipt, released reservation, and same-mission MODEL_CHAIN_COMPLETE receipt",
+  "rollback": "Revert the additive exact-call commit and redeploy prior Core image; preserve ledger and UNKNOWN state until accepted deploy."
+}

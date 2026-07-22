@@ -22,11 +22,14 @@ from research_bridge.model_broker import (  # noqa: E402
 )
 import research_bridge.researchd as researchd_module  # noqa: E402
 from research_bridge.researchd import (  # noqa: E402
+    _MISSION_CHIEF_NULL_CONTENT_VACUOUS_PROFILE_SHA256,
     _MISSION_NULL_CONTENT_VACUOUS_PROFILE_SHA256,
     _MISSION_TOTAL_TOKEN_RESERVATION,
     _MISSION_VACUOUS_PROFILE_SHA256,
+    _matches_mission_chief_null_content_vacuous_reconciliation,
     _matches_mission_null_content_vacuous_reconciliation,
     _matches_mission_vacuous_reconciliation,
+    _mission_chief_null_content_vacuous_reconciliation_profile,
     _mission_null_content_vacuous_reconciliation_profile,
     _mission_observed_accounting_evidence_ref,
     _mission_vacuous_reconciliation_profile,
@@ -69,6 +72,14 @@ NULL_CONTENT_EVIDENCE = (
 NULL_CONTENT_RECEIPT = (
     "provider-response:sha256:"
     "88d0cb2c01ff014b83f14264a255f80e1fd30fb1c2faa831a4d5b9fdb572c3bb"
+)
+CHIEF_NULL_CONTENT_EVIDENCE = (
+    "accounting-policy:sha256:"
+    + _MISSION_CHIEF_NULL_CONTENT_VACUOUS_PROFILE_SHA256
+)
+CHIEF_NULL_CONTENT_RECEIPT = (
+    "provider-response:sha256:"
+    "2e7d74f4eaea22c081b5909052772d402bb714d42a1d2d8fb50df73c921718d0"
 )
 
 
@@ -660,6 +671,142 @@ class ObservedAccountingTests(unittest.TestCase):
             step=step,
             snapshot=snapshot,
             now="2026-07-22T22:32:52Z",
+        )
+        self.assertIsNone(rejected)
+        broker.reconcile_vacuous_unknown.assert_not_called()
+
+    def test_exact_chief_null_content_reconciles_without_provider_call(self) -> None:
+        profile = dict(
+            _mission_chief_null_content_vacuous_reconciliation_profile()
+        )
+        step = {
+            "mission_sha256": profile["mission_sha256"],
+            "role_index": profile["role_index"],
+            "role": profile["role"],
+            "model_binding": profile["model_binding"],
+            "reasoning_effort": profile["reasoning_effort"],
+            "call_id": profile["call_id"],
+            "request_sha256": profile["request_sha256"],
+            "fallback_used": False,
+        }
+        unknown = {
+            "state": "UNKNOWN",
+            "failure_code": "AMBIGUOUS_PROVIDER_OUTCOME",
+            "request_sha256": profile["request_sha256"],
+            "actual_tokens": None,
+            "actual_cost_units": None,
+            "provider_receipt_ref": None,
+            "response_ref": None,
+            "budget_released": False,
+        }
+        terminal = {
+            **unknown,
+            "state": "RECONCILED",
+            "previous_state": "UNKNOWN",
+            "failure_code": "VACUOUS_OUTPUT",
+            "actual_tokens": 10_382,
+            "provider_receipt_ref": CHIEF_NULL_CONTENT_RECEIPT,
+            "accounting_mode": "OBSERVED_NO_NUMERIC_COST",
+            "accounting_evidence_ref": CHIEF_NULL_CONTENT_EVIDENCE,
+            "budget_released": True,
+        }
+        broker = mock.Mock()
+        broker.snapshot.return_value = terminal
+        daemon = object.__new__(ResearchDaemon)
+        daemon._started = True
+        daemon._model_broker = broker
+        daemon._model_routing = mock.Mock()
+
+        result = daemon._reconcile_exact_chief_null_content_vacuous_reservation(
+            mission_sha256=str(profile["mission_sha256"]),
+            role_index=4,
+            role="CHIEF_SCIENTIST",
+            model_binding="gpt-5.6-sol-xhigh",
+            reasoning_effort="xhigh",
+            step=step,
+            snapshot=unknown,
+            now="2026-07-22T23:12:00Z",
+        )
+        self.assertEqual(result, terminal)
+        broker.reconcile_vacuous_unknown.assert_called_once_with(
+            profile["call_id"],
+            actual_tokens=10_382,
+            provider_receipt_ref=CHIEF_NULL_CONTENT_RECEIPT,
+            accounting_evidence_ref=CHIEF_NULL_CONTENT_EVIDENCE,
+            event_at="2026-07-22T23:12:00Z",
+            idempotency_key=(
+                "mission:7d7dcbce44eaa5b1df58d07cdd49d5d094a7d69a717382b984b2183e0b6fa7ab:"
+                "4:chief-null-content-vacuous-output-reconcile:v1"
+            ),
+        )
+        self.assertIsNone(result["actual_cost_units"])
+        self.assertFalse(profile["zero_cost_claim"])
+        self.assertEqual(profile["network_calls"], 1)
+        self.assertEqual(profile["observed_provider_monetary_cost"], 0.16216375)
+
+    def test_chief_null_content_gate_rejects_every_tuple_drift(self) -> None:
+        profile = dict(
+            _mission_chief_null_content_vacuous_reconciliation_profile()
+        )
+        exact = {
+            "mission_sha256": profile["mission_sha256"],
+            "role_index": profile["role_index"],
+            "role": profile["role"],
+            "call_id": profile["call_id"],
+            "request_sha256": profile["request_sha256"],
+            "model_binding": profile["model_binding"],
+            "reasoning_effort": profile["reasoning_effort"],
+            "failure_code": "AMBIGUOUS_PROVIDER_OUTCOME",
+        }
+        self.assertTrue(
+            _matches_mission_chief_null_content_vacuous_reconciliation(**exact)
+        )
+        drifts = {
+            "mission_sha256": "0" * 64,
+            "role_index": 3,
+            "role": "CRITIC_DEEP",
+            "call_id": "model-call:" + "0" * 64,
+            "request_sha256": "0" * 64,
+            "model_binding": "kimi-k3-max",
+            "reasoning_effort": "max",
+            "failure_code": "MALFORMED_RESPONSE",
+        }
+        for field, value in drifts.items():
+            with self.subTest(field=field):
+                self.assertFalse(
+                    _matches_mission_chief_null_content_vacuous_reconciliation(
+                        **{**exact, field: value}
+                    )
+                )
+
+        broker = mock.Mock()
+        daemon = object.__new__(ResearchDaemon)
+        daemon._started = True
+        daemon._model_broker = broker
+        daemon._model_routing = mock.Mock()
+        step = {
+            "mission_sha256": profile["mission_sha256"],
+            "role_index": profile["role_index"],
+            "role": profile["role"],
+            "model_binding": profile["model_binding"],
+            "reasoning_effort": profile["reasoning_effort"],
+            "call_id": profile["call_id"],
+            "request_sha256": "0" * 64,
+            "fallback_used": False,
+        }
+        rejected = daemon._reconcile_exact_chief_null_content_vacuous_reservation(
+            mission_sha256=str(profile["mission_sha256"]),
+            role_index=4,
+            role="CHIEF_SCIENTIST",
+            model_binding="gpt-5.6-sol-xhigh",
+            reasoning_effort="xhigh",
+            step=step,
+            snapshot={
+                "state": "UNKNOWN",
+                "failure_code": "AMBIGUOUS_PROVIDER_OUTCOME",
+                "request_sha256": profile["request_sha256"],
+            },
+            now="2026-07-22T23:12:00Z",
         )
         self.assertIsNone(rejected)
         broker.reconcile_vacuous_unknown.assert_not_called()

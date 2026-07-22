@@ -1,0 +1,46 @@
+{
+  "schema": "StageControlArtifact/1.0.0",
+  "stage_id": "p04-chief-null-content-vacuous-reconciliation-v1",
+  "base_sha": "3f90b6fbfd365edb8716e455717f3835741eee29",
+  "authority_source_sha256": "c7688b6327f39bec8f48546241c4dfcaf521478721703e4452115d0866e970ed",
+  "exact_subject": {
+    "mission_sha256": "7d7dcbce44eaa5b1df58d07cdd49d5d094a7d69a717382b984b2183e0b6fa7ab",
+    "role_index": 4,
+    "role": "CHIEF_SCIENTIST",
+    "call_id": "model-call:a0ea4cd88530adc49114dbdb76d3cb72b510a875cbf62264d53a04558871863d",
+    "request_sha256": "a239c40fa7eb96b47e8a542127d0d1dca1dda346c6bbd0c5b7926e85dfcad9a9",
+    "raw_response_sha256": "9a41b212b14b18e1934ab52377274f4ff0b6051191a06ca1830ffbb019086dcc",
+    "provider_body_sha256": "2e7d74f4eaea22c081b5909052772d402bb714d42a1d2d8fb50df73c921718d0",
+    "actual_tokens": 10382,
+    "content_is_null": true,
+    "finish_reason": "length"
+  },
+  "file_sha256": {
+    ".dockerignore": "824ab63e0d8550e6a9d667265f12b470bb300116423d784a87f2d48d7cee1043",
+    "ops/release/Containerfile": "c9743ad3d05bd08469ad9a0d7320614fdf8b2038f90863d1d0cee55ac661e0be",
+    "provenance/model-chief-null-content-vacuous-reconciliation-v1.json": "2aa7431a2157dfc2c523f96bc69ccf81bd8ee45d1a46a972124e4a753a71e79a",
+    "src/research_bridge/researchd.py": "d8b342e404bcdc8a6193303232f787b94cec23cd0746fa3de5ed519071ae4966",
+    "tests/test_p04_runtime_closure.py": "090b7e52e929eb1d9889892ba2cdbd95f1ad9dad6a9b9b6f89acb5f8acbd0c1d",
+    "tests/test_r08a_production_image_e2e_harness.py": "479f886ad8fa6601baf9507e5d9c39158305c0c28143be68d937fba2db46c8f3",
+    "tools/verify_release_blueprint.py": "f2735ef16bbe2f008aa288e73809defe2e4fc75260844d1dae37c7940317756c"
+  },
+  "acceptance": {
+    "focused_runtime_closure": "16/16 PASS",
+    "ingress_advisor_and_image": "19/19 PASS",
+    "full_suite": "965/965 PASS",
+    "contracts": "GREEN",
+    "release_blueprint": "PASS",
+    "diff_check": "PASS",
+    "secret_scan": "PASS"
+  },
+  "effects": {
+    "provider_calls_during_repair": 0,
+    "retries": 0,
+    "replacement_identities": 0,
+    "domain_writes": 0,
+    "canonical_writes": 0,
+    "live_authority": false,
+    "direct_database_mutation": false,
+    "fake_zero_cost": false
+  }
+}
