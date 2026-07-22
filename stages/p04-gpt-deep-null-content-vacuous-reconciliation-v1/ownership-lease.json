@@ -1,0 +1,11 @@
+{
+  "schema_id": "OwnershipLease",
+  "schema_version": "1.0.0",
+  "stage_id": "p04-gpt-deep-null-content-vacuous-reconciliation-v1",
+  "agent_id": 0,
+  "base_sha": "7eba4013062711f0bfae4ed4633a2e9750085297",
+  "branch": "codex/bridge-a0-p04-gpt-null-vacuous-v1",
+  "write_set": ["src/research_bridge/researchd.py", "tests/test_p04_runtime_closure.py", "tests/test_r08a_production_image_e2e_harness.py", "tools/verify_release_blueprint.py", "ops/release/Containerfile", ".dockerignore", "provenance/model-null-content-vacuous-reconciliation-v1.json", "stages/p04-gpt-deep-null-content-vacuous-reconciliation-v1/", "docs/receipts/reuse/p04-gpt-deep-null-content-vacuous-reconciliation-v1.json", "inventory/p04-gpt-deep-null-content-vacuous-reconciliation-v1-control-artifact.json"],
+  "owner": "Agent 0",
+  "status": "ACTIVE"
+}
