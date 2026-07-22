@@ -1,0 +1,22 @@
+{
+  "schema_id": "StageEnvelope",
+  "schema_version": "1.0.0",
+  "stage_id": "p04-gpt-deep-null-content-vacuous-reconciliation-v1",
+  "agent_id": 0,
+  "objective": "Reconcile only exact GPT deep call 22aa1263... whose immutable HTTP 200 response is physically vacuous with null content, release its reservation with zero provider calls, then allow the existing mission to reach Chief Scientist through the canonical advisor.",
+  "executable_blocker": "Exact GPT deep call 22aa1263... holds WIP=1 after an immutable HTTP 200 length-capped response with 10304 tokens and null content was conservatively recorded UNKNOWN.",
+  "base_sha": "7eba4013062711f0bfae4ed4633a2e9750085297",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "authority_source_sha256": "37ca12ff129fcb8cb8ac78b3103abfaca8235d0b7aa168980e460c66658e724b",
+  "branch": "codex/bridge-a0-p04-gpt-null-vacuous-v1",
+  "worktree": "/private/tmp/dcros-p04-gpt-null-vacuous-v1",
+  "read_set": ["src/research_bridge/researchd.py", "src/research_bridge/model_broker.py", "tests/test_p04_runtime_closure.py", "tests/test_r08a_production_image_e2e_harness.py", "tools/verify_release_blueprint.py", "ops/release/Containerfile", ".dockerignore", "provenance/model-vacuous-output-reconciliation-v1.json"],
+  "write_set": ["src/research_bridge/researchd.py", "tests/test_p04_runtime_closure.py", "tests/test_r08a_production_image_e2e_harness.py", "tools/verify_release_blueprint.py", "ops/release/Containerfile", ".dockerignore", "provenance/model-null-content-vacuous-reconciliation-v1.json", "stages/p04-gpt-deep-null-content-vacuous-reconciliation-v1/", "docs/receipts/reuse/p04-gpt-deep-null-content-vacuous-reconciliation-v1.json", "inventory/p04-gpt-deep-null-content-vacuous-reconciliation-v1-control-artifact.json"],
+  "dependencies": {"authorized_call_id": "model-call:22aa12635f149a06c0bf577cb50b45fbc15af4029b1d98ee68b4b467b56caf68", "authorized_raw_response_sha256": "c535ee80764ececc8ed76f8fc46306af19f2a3bb1bb7f4ec4170f5ee26ccef09", "current_researchd_sha256": "e6c66689f6808a3f7ce045f42ee13052812c5c5dcfcfc725c6a29d01fc3df4ea", "existing_vacuous_profile_sha256": "3cb8ae607f1aa4b6988d69075d639b2a7ace3d00bf02a63b6c6c5e9eabe2d7ab"},
+  "forbidden_scope": ["provider retry or replacement identity", "direct database mutation", "fake zero cost", "generic UNKNOWN reconciliation", "Worker/provider routing changes", "Market or Security mutation", "canonical scientific writes", "new broker/writer/dispatcher/framework"],
+  "risk_class": "EXACT_ACTIVE_MISSION_RESOURCE_CLEANUP",
+  "acceptance_commands": ["python3 -m unittest tests.test_p04_runtime_closure", "python3 -m unittest tests.test_p04_research_ingress_additive_repair tests.test_r09a_dual_contour_advisors tests.test_r08a_production_image_e2e_harness", "make contracts", "python3 tools/verify_release_blueprint.py", "python3 -m unittest discover -s tests -p 'test_*.py'"],
+  "stop_condition": "Any call/mission/request/raw/body/token/content identity differs, any generic UNKNOWN reconciles, any provider call occurs before Chief reservation, or tests/contracts fail.",
+  "expected_receipt": "IntegrationReceipt, exact Core-only deploy receipt, exact 22aa UNKNOWN-to-RECONCILED VACUOUS_OUTPUT receipt, and resumed same-mission Chief Scientist lineage",
+  "rollback": "Revert the additive exact-call commit and redeploy prior Core image; preserve ledger and UNKNOWN state until accepted deploy."
+}

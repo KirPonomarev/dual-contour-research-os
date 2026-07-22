@@ -1,0 +1,44 @@
+{
+  "schema": "StageControlArtifact/1.0.0",
+  "stage_id": "p04-gpt-deep-null-content-vacuous-reconciliation-v1",
+  "base_sha": "7eba4013062711f0bfae4ed4633a2e9750085297",
+  "authority_source_sha256": "37ca12ff129fcb8cb8ac78b3103abfaca8235d0b7aa168980e460c66658e724b",
+  "exact_subject": {
+    "mission_sha256": "7d7dcbce44eaa5b1df58d07cdd49d5d094a7d69a717382b984b2183e0b6fa7ab",
+    "call_id": "model-call:22aa12635f149a06c0bf577cb50b45fbc15af4029b1d98ee68b4b467b56caf68",
+    "raw_response_sha256": "c535ee80764ececc8ed76f8fc46306af19f2a3bb1bb7f4ec4170f5ee26ccef09",
+    "provider_body_sha256": "88d0cb2c01ff014b83f14264a255f80e1fd30fb1c2faa831a4d5b9fdb572c3bb",
+    "actual_tokens": 10304,
+    "content_is_null": true,
+    "finish_reason": "length"
+  },
+  "file_sha256": {
+    ".dockerignore": "eeb2b0e8f6d4d2902705f9b04642a5d96e71efe55df3a22fbb4102a498217584",
+    "ops/release/Containerfile": "2b3026c776db1dea7ac08e3a792718ffe48ac5e3e085cfd0bc39984781e7171f",
+    "provenance/model-null-content-vacuous-reconciliation-v1.json": "b4534d7138b9039c879f83ac289e09e95a253874c30973e301ec20260003f385",
+    "src/research_bridge/researchd.py": "64b8d1a99487e7c488c32d5f42457d1278d67472fc63ea2cf79e911ca2b6d632",
+    "tests/test_p04_runtime_closure.py": "ad93fe8c40050d4d70c7e8e35082756b43514a41cb354b473a1bab59f2580647",
+    "tests/test_r08a_production_image_e2e_harness.py": "bb63669c50cab0a643319637881b52787ea926cb3ffe07fc308f5c534586d618",
+    "tools/verify_release_blueprint.py": "058c0e0998346261a8b0c3220b1f7a77f440350d9559e3837820db972814e1cd"
+  },
+  "acceptance": {
+    "focused_runtime_closure": "14/14 PASS",
+    "ingress_and_advisor": "14/14 PASS",
+    "production_image_harness": "5/5 PASS",
+    "full_suite": "963/963 PASS",
+    "contracts": "GREEN",
+    "release_blueprint": "PASS",
+    "diff_check": "PASS",
+    "secret_scan": "PASS"
+  },
+  "effects": {
+    "provider_calls": 0,
+    "retries": 0,
+    "replacement_identities": 0,
+    "domain_writes": 0,
+    "canonical_writes": 0,
+    "live_authority": false,
+    "direct_database_mutation": false,
+    "fake_zero_cost": false
+  }
+}
