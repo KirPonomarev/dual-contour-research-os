@@ -1,0 +1,13 @@
+{
+  "schema_id": "ControlArtifactInventory",
+  "schema_version": "1.0.0",
+  "stage_id": "p04-runtime-closure-worker-bound-v1",
+  "artifacts": [
+    {"path": "ops/connected-worker/model_worker_v4.py", "owner": "Agent 0", "purpose": "total reservation validation at Worker ingress"},
+    {"path": "tests/test_p04_runtime_closure.py", "owner": "Agent 0", "purpose": "regression and hostile separation tests"}
+  ],
+  "provider_calls_during_validation": 0,
+  "domain_writes": 0,
+  "canonical_writes": 0,
+  "live_authority": false
+}

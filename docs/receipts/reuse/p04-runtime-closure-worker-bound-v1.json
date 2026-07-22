@@ -1,0 +1,11 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "stage_id": "p04-runtime-closure-worker-bound-v1",
+  "decision": "REUSE_AND_AMEND_MINIMAL_GLUE",
+  "reused": ["existing Dispatch parser", "existing RuntimePolicy provider_input_token_margin", "existing binding-specific _PROVIDER_MAX_OUTPUT_TOKENS", "existing _bounded_provider_request", "existing model call identity and worker unit"],
+  "rejected": ["new worker", "new dispatcher", "reservation rewrite", "manual provider call", "lowering the durable 20000 reservation", "widening provider output limits"],
+  "missing_glue": "The Dispatch parser must accept the already frozen 20000 total reservation ceiling instead of reusing the 16384 provider-output ceiling.",
+  "external_code_added": false,
+  "new_dependency": false
+}

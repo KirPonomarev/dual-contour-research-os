@@ -1,0 +1,11 @@
+{
+  "schema_id": "OwnershipLease",
+  "schema_version": "1.0.0",
+  "stage_id": "p04-runtime-closure-worker-bound-v1",
+  "agent_id": 0,
+  "base_sha": "030042a6819cf6cff894b56259deb948823dfad4",
+  "branch": "codex/bridge-a0-p04-runtime-closure-worker-bound-v1",
+  "write_set": ["ops/connected-worker/model_worker_v4.py", "tests/test_p04_runtime_closure.py", "stages/p04-runtime-closure-worker-bound-v1/", "docs/receipts/reuse/p04-runtime-closure-worker-bound-v1.json", "inventory/p04-runtime-closure-worker-bound-v1-control-artifact.json"],
+  "owner": "Agent 0",
+  "status": "ACTIVE"
+}

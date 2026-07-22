@@ -1,0 +1,21 @@
+{
+  "schema_id": "StageEnvelope",
+  "schema_version": "1.0.0",
+  "stage_id": "p04-runtime-closure-worker-bound-v1",
+  "agent_id": 0,
+  "objective": "Accept the frozen 20000-token total mission reservation at the connected Worker dispatch boundary while retaining binding-specific provider output ceilings.",
+  "executable_blocker": "The exact Research Worker call remains RESERVED with zero transmission because Dispatch.load rejects max_tokens=20000 under a stale <=16384 total-bound validator.",
+  "base_sha": "030042a6819cf6cff894b56259deb948823dfad4",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "branch": "codex/bridge-a0-p04-runtime-closure-worker-bound-v1",
+  "worktree": "/private/tmp/dcros-p04-runtime-closure-worker-bound-v1",
+  "read_set": ["ops/connected-worker/model_worker_v4.py", "ops/connected-worker/runtime-policy-v4.json", "tests/test_p04_runtime_closure.py"],
+  "write_set": ["ops/connected-worker/model_worker_v4.py", "tests/test_p04_runtime_closure.py", "stages/p04-runtime-closure-worker-bound-v1/", "docs/receipts/reuse/p04-runtime-closure-worker-bound-v1.json", "inventory/p04-runtime-closure-worker-bound-v1-control-artifact.json"],
+  "forbidden_scope": ["contracts", "schemas", "Core accounting semantics", "dispatcher", "provider adapters", "retry policy", "Market/Security", "credentials", "domain/canonical writes", "live actions"],
+  "dependency_hashes": {"model_worker_v4_sha256": "6fac6e13a2f3c44331cbd945cc2fa1ec91cfc8838f69cc00ea772f2f3cd977a3", "runtime_policy_v4_sha256": "dd574e725a86e7d49a1ef25f28ec34cb4d6c88a9bd880a05ea12aadcc64082a2"},
+  "risk_class": "RUNTIME_PROVIDER_PRE_SEND_VALIDATION",
+  "acceptance_commands": ["python3 -m unittest tests.test_p04_runtime_closure", "python3 -m unittest tests.test_r09a_connected_worker_v4", "make contracts", "python3 -m unittest discover -s tests"],
+  "stop_condition": "Any change beyond the one total-reservation validator and its regression evidence, any output-ceiling widening, or any provider transmission during validation.",
+  "expected_receipt": "IntegrationReceipt plus exact Worker image/deploy and same-call recovery evidence",
+  "rollback": "Revert the additive commit and retain the exact RESERVED call without dispatch."
+}
