@@ -132,7 +132,7 @@ class DualContourAdvisorTests(unittest.TestCase):
             "kimi-k3-max",
             kimi,
             b"public synthetic critique",
-            total_token_budget=16_384,
+            total_token_budget=20_000,
             policy=policy,
         )
         self.assertEqual(limit, 16_384)
@@ -154,6 +154,32 @@ class DualContourAdvisorTests(unittest.TestCase):
             self.assertLessEqual(other_limit, 4096, name)
         with self.assertRaises(shadow.ShadowProviderError):
             shadow.build_request_bytes(kimi, b"public synthetic", 16_385)
+
+    def test_provider_input_margin_is_removed_from_the_output_allowance(self) -> None:
+        profile = shadow.ConnectedShadowProfile(shadow.ADVISOR_PROFILE_PATH)
+        policy = worker.RuntimePolicy.load(POLICY_PATH)
+        kimi = profile.binding("kimi-k3-max")
+        request, limit = worker._bounded_provider_request(
+            "kimi-k3-max",
+            kimi,
+            b"public synthetic bounded proof",
+            total_token_budget=768,
+            policy=policy,
+        )
+        self.assertEqual(policy.provider_input_token_margin, 256)
+        self.assertEqual(limit, 512)
+        self.assertEqual(json.loads(request)["max_tokens"], 512)
+        with self.assertRaisesRegex(
+            worker.ConnectedWorkerError,
+            "total token reservation cannot cover the provider input margin",
+        ):
+            worker._bounded_provider_request(
+                "kimi-k3-max",
+                kimi,
+                b"public synthetic bounded proof",
+                total_token_budget=256,
+                policy=policy,
+            )
 
     def test_kimi_is_deterministic_critic_and_precedes_xhigh(self) -> None:
         router = _routing()
