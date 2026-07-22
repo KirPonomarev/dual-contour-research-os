@@ -30,6 +30,11 @@ from tests.test_s15_model_registry_broker import (  # noqa: E402
     seeded_ledger,
     spec,
 )
+from tests.test_r09a_dual_contour_advisors import (  # noqa: E402
+    POLICY_PATH as CONNECTED_WORKER_POLICY_PATH,
+    shadow as connected_shadow,
+    worker as connected_worker_v4,
+)
 
 
 AT = "2026-07-22T14:40:00Z"
@@ -215,6 +220,65 @@ class ObservedAccountingTests(unittest.TestCase):
         self.assertIn('"kimi-k3-max": 16384', source)
         self.assertIn("total_token_budget - policy.provider_input_token_margin", source)
         self.assertIn("min(\n        output_budget,", source)
+
+    def test_worker_accepts_20000_total_but_keeps_provider_output_ceilings(self) -> None:
+        policy = connected_worker_v4.RuntimePolicy.load(CONNECTED_WORKER_POLICY_PATH)
+        profile = connected_shadow.ConnectedShadowProfile(
+            connected_shadow.ADVISOR_PROFILE_PATH
+        )
+        dispatch = {
+            "schema_id": "ModelWorkerDispatch",
+            "schema_version": "1.1.0",
+            "call_id": "model-call:" + "a" * 64,
+            "dispatch_token": "b" * 64,
+            "request_body": "bounded synthetic recovery mission",
+            "model_binding": "deepseek-v4-pro",
+            "classification": "D1",
+            "max_tokens": 20_000,
+            "expires_at": "2026-07-22T18:00:00Z",
+            "completion_command": "complete_research_model_call",
+            "worker_ipc_extension_sha256": policy.worker_ipc_extension_sha256,
+        }
+        path = self.root / "worker-dispatch.json"
+        path.write_text(json.dumps(dispatch, sort_keys=True, separators=(",", ":")))
+        os.chmod(path, 0o600)
+        loaded = connected_worker_v4.Dispatch.load(
+            path,
+            policy=policy,
+            profile=profile,
+        )
+        self.assertEqual(loaded.max_tokens, 20_000)
+
+        request, deepseek_limit = connected_worker_v4._bounded_provider_request(
+            "deepseek-v4-pro",
+            profile.binding("deepseek-v4-pro"),
+            loaded.request_body.encode(),
+            total_token_budget=loaded.max_tokens,
+            policy=policy,
+        )
+        self.assertEqual(deepseek_limit, 4096)
+        self.assertEqual(json.loads(request)["max_tokens"], 4096)
+        _request, kimi_limit = connected_worker_v4._bounded_provider_request(
+            "kimi-k3-max",
+            profile.binding("kimi-k3-max"),
+            loaded.request_body.encode(),
+            total_token_budget=loaded.max_tokens,
+            policy=policy,
+        )
+        self.assertEqual(kimi_limit, 16_384)
+
+        dispatch["max_tokens"] = 20_001
+        path.write_text(json.dumps(dispatch, sort_keys=True, separators=(",", ":")))
+        os.chmod(path, 0o600)
+        with self.assertRaisesRegex(
+            connected_worker_v4.ConnectedWorkerError,
+            "worker token bound is invalid",
+        ):
+            connected_worker_v4.Dispatch.load(
+                path,
+                policy=policy,
+                profile=profile,
+            )
 
     def test_fake_observed_accounting_profile_fails_closed(self) -> None:
         fake = json.loads(

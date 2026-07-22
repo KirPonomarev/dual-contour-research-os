@@ -144,6 +144,7 @@ _PROVIDER_MAX_OUTPUT_TOKENS = {
     "kimi-k3-max": 16384,
     "gpt-5.6-sol-xhigh": 4096,
 }
+_TOTAL_RESERVATION_MAX_TOKENS = 20_000
 
 # Safe retry: at most one additional attempt for UNKNOWN/FAILED_KNOWN with
 # transient failure codes.  The worker is oneshot; retry is achieved by a
@@ -479,7 +480,10 @@ class Dispatch:
             raise ConnectedWorkerError("worker model binding is invalid")
         if classification not in policy.allowed_classifications:
             raise ConnectedWorkerError("worker classification is invalid")
-        if type(max_tokens) is not int or not 1 <= max_tokens <= 16_384:
+        if (
+            type(max_tokens) is not int
+            or not 1 <= max_tokens <= _TOTAL_RESERVATION_MAX_TOKENS
+        ):
             raise ConnectedWorkerError("worker token bound is invalid")
         expires_at = _timestamp(value["expires_at"], label="dispatch expiry")
         completion_command = (
