@@ -137,7 +137,15 @@ class ProductionImageE2EHarnessTests(unittest.TestCase):
                 container,
             )
         self.assertEqual(
-            container.count("COPY --chown=10001:10001 provenance/"), 4
+            container.count("COPY --chown=10001:10001 provenance/"), 5
+        )
+        self.assertIn(
+            "provenance/model-worker-ipc-extension-v1.json",
+            container,
+        )
+        self.assertIn(
+            "provenance/model-worker-ipc-extension-v2.json",
+            container,
         )
         dockerignore = (ROOT / ".dockerignore").read_text()
         for name in required_provenance:
