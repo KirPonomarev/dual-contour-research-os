@@ -1,0 +1,52 @@
+{
+  "schema_id": "P04RuntimeClosureControlArtifact",
+  "schema_version": "1.0.0",
+  "stage_id": "p04-runtime-closure-v1",
+  "base_sha": "c46538afc43b93107d92edd578bf65ed2b433984",
+  "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+  "mission_sha256": "d7bc485d07e1bc94a35cbb3367c8978fa9173e9a85984d0306233faccfde4272",
+  "scout_call_id": "model-call:85da22821c8167ca864d5a82c301e1ab48d980e8f6777f1e595b1c391274d1f4",
+  "repair": {
+    "dispatcher_start_barrier": true,
+    "single_at_template_instance": true,
+    "accounting_mode": "OBSERVED_NO_NUMERIC_COST",
+    "numeric_null_coercion": false,
+    "mission_total_token_reservation": 20000,
+    "binding_output_ceilings_unchanged": true,
+    "new_broker_writer_or_dispatcher": false
+  },
+  "file_sha256": {
+    ".dockerignore": "13e8335b20656780f64940d6ae57431bed983105cde93cb25460f4effdb642cd",
+    "ops/deploy/research-os-advisor-dispatch.sh": "608886c04cc244351521a8e99164cdac61b825236f577ccdb2a7d58ee39c4462",
+    "ops/release/Containerfile": "c048aa1137fb97cf297bac97a177bd3c86825018c7e61cecc0c97d367b922294",
+    "ops/release/image_e2e_harness.py": "0fe55bd0a252e719624d6ee73dc31a649029111c88890e3932823352d18b0171",
+    "provenance/model-accounting-mode-v1.json": "1588317c907a6d91c5cfced2b3032e05af54991cc593faaf14e55ef5630f17e6",
+    "src/research_bridge/ledger.py": "b1d586c2c43b7049fceab29c486911ad689d9afd848b3679d26fb4d4553bb605",
+    "src/research_bridge/model_broker.py": "d4690a2538053c2558ac6b3349537a1219fbb981cc2eddc40bddd3e82cafedf1",
+    "src/research_bridge/researchd.py": "a99f9329cbe75b4d007877fa499129e6136406abc214d016905416dea1001e7d",
+    "tests/test_p04_runtime_closure.py": "066100d8182a9236e57a78382d90a3d7a5fa19b8ebe1033efdc1b0519930fc16",
+    "tests/test_p04_research_ingress_additive_repair.py": "77f2d4c43597d9e25f17eee35827850aeb5cd495db1b3acdf8e98160f346e28f",
+    "tests/test_r08a_production_image_e2e_harness.py": "9b2e2fef21efb9a3a09d1394d4c54f2c7a1e4e444a72adaef174d02c8d3dced1",
+    "tools/verify_release_blueprint.py": "16a4ef98d55cba1c102360b774fc3c726feba7d7614fee18ca7eab08b1cf6607"
+  },
+  "acceptance": {
+    "focused_tests": "12/12 PASS",
+    "proportional_tests": "39/39 PASS",
+    "full_tests": "954/954 PASS",
+    "contracts": "GREEN",
+    "release_blueprint": "PASS",
+    "diff_check": "PASS"
+  },
+  "privacy": {
+    "d2_d3_present": false,
+    "credentials_present": false,
+    "provider_response_content_present": false,
+    "private_available_bindings_present": false
+  },
+  "authority": {
+    "domain_writes": 0,
+    "canonical_writes": 0,
+    "live_authority": false,
+    "provider_calls_during_implementation": 0
+  }
+}

@@ -54,6 +54,8 @@ __all__ = [
 _SHA256_RE = re.compile(r"^[a-f0-9]{64}$")
 _BUDGET_POLICY_RE = re.compile(r"^budget-policy:sha256:[a-f0-9]{64}$")
 _BUDGET_SCOPE_RE = re.compile(r"^budget-scope:sha256:[a-f0-9]{64}$")
+_ACCOUNTING_EVIDENCE_RE = re.compile(r"^accounting-policy:sha256:[a-f0-9]{64}$")
+_PROVIDER_RESPONSE_REF_RE = re.compile(r"^provider-response:sha256:[a-f0-9]{64}$")
 _PORTABLE_REF_RE = re.compile(r"^[A-Za-z][A-Za-z0-9+.-]*:[^\s\\]{1,511}$")
 _CALL_STATES = (
     "PROPOSED", "RESERVED", "SENT", "SUCCEEDED", "FAILED_KNOWN", "UNKNOWN", "RECONCILED"
@@ -1893,6 +1895,92 @@ class ModelCallBroker:
             "provider_receipt_ref": _portable_ref(
                 "provider_receipt_ref", provider_receipt_ref
             ),
+            "accounting_mode": "NUMERIC_EXACT",
+            "accounting_evidence_ref": None,
+            "ambiguous_usage": False,
+            "budget_released": True,
+            "reconciled_at": timestamp,
+        }
+        return _handle(
+            self._append(
+                reconciled,
+                idempotency_key=_text(
+                    "idempotency_key", idempotency_key, maximum=256
+                ),
+                event_at=timestamp,
+            )
+        )
+
+    def reconcile_observed_no_numeric_cost(
+        self,
+        call_id: str,
+        *,
+        actual_tokens: int,
+        provider_receipt_ref: str,
+        accounting_evidence_ref: str,
+        event_at: str,
+        idempotency_key: str,
+    ) -> ModelCallHandle:
+        """Release one exact terminal reservation without asserting numeric cost.
+
+        This mission-only path preserves a provider's honest lack of numeric
+        cost data.  It never accepts UNKNOWN, never changes a terminal token or
+        provider-response identity, and records an immutable versioned policy
+        reference before releasing the synthetic reservation.
+        """
+
+        timestamp = _timestamp("event_at", event_at)
+        tokens = _nonnegative("actual_tokens", actual_tokens)
+        receipt = _pattern(
+            "provider_receipt_ref",
+            provider_receipt_ref,
+            _PROVIDER_RESPONSE_REF_RE,
+        )
+        evidence = _pattern(
+            "accounting_evidence_ref",
+            accounting_evidence_ref,
+            _ACCOUNTING_EVIDENCE_RE,
+        )
+        current = self._state(call_id)
+        if current["state"] == "RECONCILED":
+            if (
+                current["actual_tokens"] != tokens
+                or current["actual_cost_units"] is not None
+                or current["provider_receipt_ref"] != receipt
+                or current.get("accounting_mode") != "OBSERVED_NO_NUMERIC_COST"
+                or current.get("accounting_evidence_ref") != evidence
+                or current["reconciled_at"] != timestamp
+            ):
+                raise ModelBrokerError(
+                    "observational reconciliation replay differs from durable state"
+                )
+            return _handle(
+                self._append(
+                    current,
+                    idempotency_key=_text(
+                        "idempotency_key", idempotency_key, maximum=256
+                    ),
+                    event_at=timestamp,
+                )
+            )
+        if current["state"] not in {"SUCCEEDED", "FAILED_KNOWN"}:
+            raise ModelBrokerError(
+                "observational reconciliation requires a non-ambiguous terminal state"
+            )
+        if (
+            current["actual_tokens"] != tokens
+            or current["actual_cost_units"] is not None
+            or current["provider_receipt_ref"] != receipt
+        ):
+            raise ModelBrokerError(
+                "observational reconciliation evidence differs from terminal state"
+            )
+        reconciled = {
+            **current,
+            "previous_state": current["state"],
+            "state": "RECONCILED",
+            "accounting_mode": "OBSERVED_NO_NUMERIC_COST",
+            "accounting_evidence_ref": evidence,
             "ambiguous_usage": False,
             "budget_released": True,
             "reconciled_at": timestamp,
@@ -1952,6 +2040,8 @@ class ModelCallBroker:
             "actual_cost_units": None,
             "provider_receipt_ref": None,
             "failure_code": None,
+            "accounting_mode": "NUMERIC_EXACT",
+            "accounting_evidence_ref": None,
             "ambiguous_usage": False,
             "budget_released": False,
             "auto_retry": False,

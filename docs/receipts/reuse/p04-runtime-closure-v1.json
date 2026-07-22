@@ -1,0 +1,34 @@
+{
+  "schema_version": "1.0.0",
+  "receipt_id": "reuse-p04-runtime-closure-v1",
+  "stage_id": "p04-runtime-closure-v1",
+  "agent_id": "agent-0",
+  "decision": "REUSE_WITH_MINIMAL_GLUE",
+  "evaluated_in_order": [
+    {
+      "candidate": "existing ModelCallBroker and append-only model-call ledger",
+      "decision": "REUSE",
+      "reason": "Add one evidence-bound reconciliation mode without a second accounting store or broker."
+    },
+    {
+      "candidate": "existing researchd mission WIP=1 advance path",
+      "decision": "REUSE",
+      "reason": "The same mission and role reservation sequence remain canonical; only deterministic predicates and the total token value change."
+    },
+    {
+      "candidate": "existing systemd advisor dispatcher and connected-worker template",
+      "decision": "REUSE",
+      "reason": "Add an invocation barrier and correct template instance construction; no second dispatcher or manual future-role start."
+    },
+    {
+      "candidate": "new external dependency, framework, broker or daemon",
+      "decision": "REJECT",
+      "reason": "Unnecessary and outside the authorized bounded repair."
+    }
+  ],
+  "license_or_dependency_change": false,
+  "new_writer": false,
+  "new_daemon": false,
+  "new_provider_route": false,
+  "rollback": "Revert only the bounded hotfix commit and restore the exact prior Bridge release; preserve immutable runtime evidence."
+}

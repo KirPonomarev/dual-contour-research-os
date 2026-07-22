@@ -307,7 +307,8 @@ print(json.dumps(dispatch, indent=2))
     log "Dispatching identity ${DISPATCH_IDENTITY_SHA}"
 
     # Start the worker template unit (user-level only, no system fallback)
-    UNIT="${WORKER_UNIT_TEMPLATE%.service}@${INSTANCE_NAME}.service"
+    UNIT="${WORKER_UNIT_TEMPLATE%@.service}@${INSTANCE_NAME}.service"
+    INVOCATION_BEFORE=$(systemctl --user show "${UNIT}" --property=InvocationID --value 2>/dev/null) || INVOCATION_BEFORE=""
     if systemctl --user start --no-block "${UNIT}" 2>/dev/null; then
         log "Worker started for identity ${DISPATCH_IDENTITY_SHA}"
     else
@@ -318,11 +319,21 @@ print(json.dumps(dispatch, indent=2))
 
     # Wait for worker to complete (oneshot — systemd tracks completion)
     WAITED=0
+    START_OBSERVED=0
     while [ "${WAITED}" -lt "${MAX_WAIT_SECONDS}" ]; do
         STATE=$(systemctl --user show "${UNIT}" --property=ActiveState --value 2>/dev/null) || STATE="unknown"
+        INVOCATION=$(systemctl --user show "${UNIT}" --property=InvocationID --value 2>/dev/null) || INVOCATION=""
+        if [ -n "${INVOCATION}" ] && [ "${INVOCATION}" != "${INVOCATION_BEFORE}" ]; then
+            START_OBSERVED=1
+        fi
         case "${STATE}" in
+            activating|active|reloading)
+                START_OBSERVED=1
+                ;;
             inactive|failed)
-                break
+                if [ "${START_OBSERVED}" -eq 1 ]; then
+                    break
+                fi
                 ;;
         esac
         sleep 5
@@ -330,8 +341,12 @@ print(json.dumps(dispatch, indent=2))
     done
 
     if [ "${WAITED}" -ge "${MAX_WAIT_SECONDS}" ]; then
-        log "WARNING: worker identity ${DISPATCH_IDENTITY_SHA} timed out after ${MAX_WAIT_SECONDS}s"
-        write_failure_diagnostic "WORKER_TIMEOUT" "${STATE}" "unknown" "unknown"
+        log "WARNING: worker identity ${DISPATCH_IDENTITY_SHA} start/completion barrier timed out after ${MAX_WAIT_SECONDS}s"
+        if [ "${START_OBSERVED}" -eq 0 ]; then
+            write_failure_diagnostic "START_BARRIER_TIMEOUT" "${STATE}" "unknown" "unknown"
+        else
+            write_failure_diagnostic "WORKER_TIMEOUT" "${STATE}" "unknown" "unknown"
+        fi
         return 1
     fi
 

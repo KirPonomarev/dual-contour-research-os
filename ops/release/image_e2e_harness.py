@@ -151,6 +151,7 @@ def verify_frozen_inputs(root: Path = ROOT) -> dict[str, str]:
     connected_container_path = root / "ops/connected-worker/Containerfile"
     connected_inputs_path = root / "ops/connected-worker/runbook-inputs.json"
     dockerignore_path = root / ".dockerignore"
+    accounting_profile_path = root / "provenance/model-accounting-mode-v1.json"
     paths = (
         config_path,
         policy_path,
@@ -160,6 +161,7 @@ def verify_frozen_inputs(root: Path = ROOT) -> dict[str, str]:
         connected_container_path,
         connected_inputs_path,
         dockerignore_path,
+        accounting_profile_path,
     )
     if any(path.is_symlink() or not path.is_file() for path in paths):
         raise HarnessError("production image input set is incomplete")
@@ -167,6 +169,18 @@ def verify_frozen_inputs(root: Path = ROOT) -> dict[str, str]:
     config = _load(config_path)
     policy = _load(policy_path)
     connected = _load(connected_inputs_path)
+    accounting_profile = _load(accounting_profile_path)
+    if (
+        accounting_profile.get("profile_id")
+        != "research-mission-accounting-mode-v1"
+        or accounting_profile.get("schema_version") != "1.0.0"
+        or accounting_profile.get("status") != "frozen"
+        or accounting_profile.get("accounting_mode")
+        != "OBSERVED_NO_NUMERIC_COST"
+        or _sha(accounting_profile_path)
+        != "1588317c907a6d91c5cfced2b3032e05af54991cc593faaf14e55ef5630f17e6"
+    ):
+        raise HarnessError("mission accounting profile drifted")
     if (
         config.get("schema_id") != "ResearchdServiceConfig"
         or config.get("schema_version") != "1.1.0"

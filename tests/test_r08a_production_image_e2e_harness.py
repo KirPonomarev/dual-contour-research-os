@@ -119,7 +119,7 @@ class ProductionImageE2EHarnessTests(unittest.TestCase):
 
     def test_frozen_input_graph_is_minimal_rootless_and_non_authoritative(self) -> None:
         hashes = harness.verify_frozen_inputs(ROOT)
-        self.assertEqual(len(hashes), 8)
+        self.assertEqual(len(hashes), 9)
         self.assertIn("ops/release/Containerfile", hashes)
         container = (ROOT / "ops/release/Containerfile").read_text()
         self.assertNotIn("image_e2e_harness", container)
@@ -129,6 +129,7 @@ class ProductionImageE2EHarnessTests(unittest.TestCase):
             "model-worker-ipc-extension-v1.json",
             "model-provider-routing-v1.json",
             "model-provider-routing-v2.json",
+            "model-accounting-mode-v1.json",
         }
         for name in required_provenance:
             self.assertIn(
@@ -137,7 +138,7 @@ class ProductionImageE2EHarnessTests(unittest.TestCase):
                 container,
             )
         self.assertEqual(
-            container.count("COPY --chown=10001:10001 provenance/"), 5
+            container.count("COPY --chown=10001:10001 provenance/"), 6
         )
         self.assertIn(
             "provenance/model-worker-ipc-extension-v1.json",
