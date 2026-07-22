@@ -31,6 +31,8 @@ AT = "2026-07-18T12:00:00Z"
 AT_SENT = "2026-07-18T12:00:01Z"
 AT_RECONCILED = "2026-07-18T12:00:02Z"
 EXPIRES = "2026-07-18T13:00:00Z"
+AT_AFTER_EXPIRY = "2026-07-18T14:00:00Z"
+EXPIRES_AFTER_RECONCILIATION = "2026-07-18T15:00:00Z"
 POLICY_REF = "budget-policy:sha256:" + "a" * 64
 SCOPE_REF = "budget-scope:sha256:" + "b" * 64
 
@@ -66,6 +68,7 @@ def spec(
     key: str = "model-call-synthetic-001",
     max_tokens: int = 100,
     max_cost: int = 5,
+    expires_at: str = EXPIRES,
 ) -> ModelCallSpec:
     return ModelCallSpec(
         role=role,
@@ -74,7 +77,7 @@ def spec(
         request_bytes=request,
         max_tokens=max_tokens,
         max_cost_units=max_cost,
-        expires_at=EXPIRES,
+        expires_at=expires_at,
         idempotency_key=key,
     )
 
@@ -368,6 +371,163 @@ class ModelRegistryBrokerTests(unittest.TestCase):
                             event_at=AT_RECONCILED,
                             idempotency_key=f"settlement-{label}",
                         )
+
+    def test_expired_terminal_calls_reconcile_exactly_and_release_budget(self) -> None:
+        terminal_cases = (
+            (
+                "succeeded",
+                ProviderResult(
+                    b"late-success",
+                    12,
+                    2,
+                    "provider:late-success",
+                ),
+                "SUCCEEDED",
+            ),
+            (
+                "failed-known",
+                KnownProviderFailure(
+                    "RATE_LIMITED",
+                    actual_tokens=3,
+                    actual_cost_units=1,
+                    provider_receipt_ref="provider:late-failed-known",
+                ),
+                "FAILED_KNOWN",
+            ),
+            (
+                "unknown",
+                RuntimeError("synthetic ambiguous provider result"),
+                "UNKNOWN",
+            ),
+        )
+        for label, adapter_result, terminal_state in terminal_cases:
+            with self.subTest(label=label):
+                database = Path(self.temporary.name) / f"late-{label}.sqlite3"
+                with seeded_ledger(database) as ledger:
+                    broker = self.broker(
+                        ledger,
+                        budget=policy(active=1, tokens=100, cost=5),
+                    )
+                    call = spec(key=f"late-{label}")
+                    handle = broker.prepare(call, event_at=AT)
+                    terminal = broker.execute(
+                        handle.call_id,
+                        request_bytes=call.request_bytes,
+                        adapter=RecordingAdapter(ledger, result=adapter_result),
+                        response_committer=RecordingCommitter(ledger, handle.call_id),
+                        event_at=AT_SENT,
+                    )
+                    self.assertEqual(terminal.state, terminal_state)
+                    before = ledger.event_count()
+
+                    with self.assertRaises(ModelBrokerError):
+                        broker.reconcile(
+                            handle.call_id,
+                            actual_tokens=7,
+                            actual_cost_units=1,
+                            provider_receipt_ref="",
+                            event_at=AT_AFTER_EXPIRY,
+                            idempotency_key=f"late-empty-receipt-{label}",
+                        )
+                    self.assertEqual(ledger.event_count(), before)
+
+                    reconciled = broker.reconcile(
+                        handle.call_id,
+                        actual_tokens=7,
+                        actual_cost_units=1,
+                        provider_receipt_ref=f"provider:late-reconciled-{label}",
+                        event_at=AT_AFTER_EXPIRY,
+                        idempotency_key=f"late-reconcile-{label}",
+                    )
+                    self.assertEqual(reconciled.state, "RECONCILED")
+                    snapshot = ledger.model_call_state(handle.call_id).snapshot
+                    self.assertEqual(snapshot["previous_state"], terminal_state)
+                    self.assertFalse(snapshot["ambiguous_usage"])
+                    self.assertTrue(snapshot["budget_released"])
+                    self.assertEqual(snapshot["actual_tokens"], 7)
+                    self.assertEqual(snapshot["actual_cost_units"], 1)
+                    self.assertEqual(
+                        snapshot["provider_receipt_ref"],
+                        f"provider:late-reconciled-{label}",
+                    )
+
+                    replay_before = ledger.event_count()
+                    replay = broker.reconcile(
+                        handle.call_id,
+                        actual_tokens=7,
+                        actual_cost_units=1,
+                        provider_receipt_ref=f"provider:late-reconciled-{label}",
+                        event_at=AT_AFTER_EXPIRY,
+                        idempotency_key=f"late-reconcile-{label}",
+                    )
+                    self.assertEqual(replay, reconciled)
+                    self.assertEqual(ledger.event_count(), replay_before)
+                    with self.assertRaises(ModelBrokerError):
+                        broker.reconcile(
+                            handle.call_id,
+                            actual_tokens=8,
+                            actual_cost_units=1,
+                            provider_receipt_ref=f"provider:late-reconciled-{label}",
+                            event_at=AT_AFTER_EXPIRY,
+                            idempotency_key=f"late-reconcile-{label}",
+                        )
+                    self.assertEqual(ledger.event_count(), replay_before)
+
+                    next_call = spec(
+                        key=f"after-late-reconcile-{label}",
+                        request=f"next-{label}".encode(),
+                        expires_at=EXPIRES_AFTER_RECONCILIATION,
+                    )
+                    self.assertEqual(
+                        broker.prepare(next_call, event_at=AT_AFTER_EXPIRY).state,
+                        "RESERVED",
+                    )
+
+    def test_expiry_still_rejects_every_non_reconciliation_transition(self) -> None:
+        with seeded_ledger(self.database) as ledger:
+            broker = self.broker(ledger)
+            before = ledger.event_count()
+            with self.assertRaises(ModelBrokerError):
+                broker.prepare(spec(key="late-proposed"), event_at=AT_AFTER_EXPIRY)
+            self.assertEqual(ledger.event_count(), before)
+
+            reserved_spec = spec(key="late-sent")
+            reserved = broker.prepare(reserved_spec, event_at=AT)
+            adapter = RecordingAdapter(ledger)
+            with self.assertRaises(ModelBrokerError):
+                broker.execute(
+                    reserved.call_id,
+                    request_bytes=reserved_spec.request_bytes,
+                    adapter=adapter,
+                    response_committer=RecordingCommitter(ledger, reserved.call_id),
+                    event_at=AT_AFTER_EXPIRY,
+                )
+            self.assertEqual(adapter.calls, 0)
+            self.assertEqual(broker.state(reserved.call_id).state, "RESERVED")
+
+        sent_database = Path(self.temporary.name) / "late-terminal.sqlite3"
+        with seeded_ledger(sent_database) as ledger:
+            broker = self.broker(ledger)
+            sent_spec = spec(key="late-terminal")
+            sent = broker.prepare(sent_spec, event_at=AT)
+            crashing = RecordingAdapter(
+                ledger,
+                result=SystemExit("synthetic crash after durable SENT"),
+            )
+            with self.assertRaises(SystemExit):
+                broker.execute(
+                    sent.call_id,
+                    request_bytes=sent_spec.request_bytes,
+                    adapter=crashing,
+                    response_committer=RecordingCommitter(ledger, sent.call_id),
+                    event_at=AT_SENT,
+                )
+            self.assertEqual(broker.state(sent.call_id).state, "SENT")
+            before = ledger.event_count()
+            with self.assertRaises(ModelBrokerError):
+                broker.recover_sent(sent.call_id, event_at=AT_AFTER_EXPIRY)
+            self.assertEqual(ledger.event_count(), before)
+            self.assertEqual(broker.state(sent.call_id).state, "SENT")
 
     def test_budget_oversubscription_parks_at_proposed_until_capacity_releases(self) -> None:
         with seeded_ledger(self.database) as ledger:

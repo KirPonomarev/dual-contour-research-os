@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+from datetime import timedelta
 from pathlib import Path
 import sys
 import unittest
@@ -102,17 +103,56 @@ class ModelReconciliationIPCAssuranceTests(unittest.TestCase):
         self.assertEqual(replayed.result, reconciled.result)
         self.assertEqual(reopened._ledger.event_count(), replay_before)
 
+    def test_operator_may_reconcile_exact_terminal_accounting_after_expiry(self) -> None:
+        _, daemon, reservation = self._terminal_call("late-expiry")
+        daemon._clock = lambda: r04b.NOW + timedelta(hours=2)
+        payload = {
+            "call_id": reservation["call_id"],
+            "actual_tokens": 17,
+            "actual_cost_units": 1,
+            "provider_receipt_ref": self._receipt_ref("late-expiry"),
+        }
+        before = daemon._ledger.event_count()
+        reconciled = self.runtime._request(
+            daemon,
+            OPERATOR_UID,
+            "reconcile_model_call",
+            "reconcile:late-expiry",
+            payload,
+        )
+        self.assertEqual(reconciled.result["state"], "RECONCILED")
+        self.assertEqual(
+            daemon._ledger.model_call_state(reservation["call_id"]).snapshot[
+                "previous_state"
+            ],
+            "SUCCEEDED",
+        )
+        self.assertFalse(reconciled.result["ambiguous_usage"])
+        self.assertTrue(reconciled.result["budget_released"])
+        self.assertEqual(daemon._ledger.event_count(), before + 1)
+
+        replay_before = daemon._ledger.event_count()
+        replayed = self.runtime._request(
+            daemon,
+            OPERATOR_UID,
+            "reconcile_model_call",
+            "reconcile:late-expiry-replay",
+            payload,
+        )
+        self.assertEqual(replayed.result, reconciled.result)
+        self.assertEqual(daemon._ledger.event_count(), replay_before)
+
         conflict = dict(payload)
         conflict["actual_cost_units"] = 2
         with self.assertRaises(ControlError):
             self.runtime._request(
-                reopened,
+                daemon,
                 OPERATOR_UID,
                 "reconcile_model_call",
-                "reconcile:conflict",
+                "reconcile:late-expiry-conflict",
                 conflict,
             )
-        self.assertEqual(reopened._ledger.event_count(), replay_before)
+        self.assertEqual(daemon._ledger.event_count(), replay_before)
 
     def test_role_version_shape_and_nonterminal_guards_fail_closed(self) -> None:
         _, daemon, reservation = self._terminal_call("guards")
