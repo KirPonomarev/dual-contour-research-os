@@ -1,0 +1,47 @@
+{
+  "schema_id": "IntegrationReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "integration-fmax-worker-unknown-shape-repair-20260722",
+  "issued_at": "2026-07-22T05:44:00Z",
+  "issuer": {
+    "id": "agent-0",
+    "authority_class": "integration-authority"
+  },
+  "contour": "governance",
+  "classification": "D1_INTERNAL_SANITIZED",
+  "payload": {
+    "stage_id": "FMAX-U01",
+    "agent_id": "agent-0",
+    "ownership_lease_ref": "owner-only-stage-envelope:sha256:b747a7b64a61718c20053658d4e02af3e5b4c498eba440e857d3ad43e9bdfba1",
+    "base_sha": "7953120551cbef6988fd67fdd98de1dfcd22ed88",
+    "head_sha": "0837fd2149ed366ada6020ff63f3986f82e606a4",
+    "contract_sha256": "13bdac3a60227826550771635d7367854a8a5477240ed06b2c31198dbd6f5c50",
+    "write_set": [
+      "ops/connected-worker/model_worker_v4.py",
+      "tests/test_v262_r1_bridge_safety_repair.py"
+    ],
+    "audit_results": {
+      "contract_gate": "green",
+      "privacy_secret_scan": "green",
+      "source_mutation": false,
+      "focused_tests": 24,
+      "exact_head_ci": "success",
+      "worker_only_physical_deploy": "pass",
+      "provider_calls": 0,
+      "core_restarts": 0,
+      "historical_merge_trailer_defect": "acknowledged_additively_no_history_rewrite",
+      "historical_parsed_trailers": [
+        "AMENDMENT-ID"
+      ]
+    },
+    "remote_ci_ref": "https://github.com/KirPonomarev/dual-contour-research-os/actions/runs/29892930675",
+    "integration_commit_sha": "0837fd2149ed366ada6020ff63f3986f82e606a4"
+  },
+  "integrity": {
+    "payload_sha256": "859d373521de20ee6318750581fff3ccd450a7919804f1357160f8d656b7bc0a",
+    "parent_refs": [
+      "git:0837fd2149ed366ada6020ff63f3986f82e606a4",
+      "owner-only-physical-receipt:sha256:ab4a43b1ffcf25b5525722109f2b1600801fe32c49bdb2135d96ba7f39415ffb"
+    ]
+  }
+}
