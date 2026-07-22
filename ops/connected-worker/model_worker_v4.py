@@ -1006,8 +1006,13 @@ def _bounded_provider_request(
     binding_limit = _PROVIDER_MAX_OUTPUT_TOKENS.get(binding_name)
     if type(binding_limit) is not int or binding_limit < 1:
         raise ConnectedWorkerError("provider output binding is unrecognized")
+    output_budget = total_token_budget - policy.provider_input_token_margin
+    if output_budget < 1:
+        raise ConnectedWorkerError(
+            "total token reservation cannot cover the provider input margin"
+        )
     output_limit = min(
-        total_token_budget,
+        output_budget,
         policy.max_provider_output_tokens,
         binding_limit,
     )
