@@ -1,0 +1,25 @@
+{
+  "schema_id": "ReuseDecisionReceipt",
+  "schema_version": "1.0.0",
+  "object_id": "reuse-p05-bridge-observation-readiness-v1-20260723",
+  "issued_at": "2026-07-23T21:41:28Z",
+  "issuer": {"id": "agent-0", "authority_class": "integration-authority"},
+  "decision": "REUSE_EXISTING_BRIDGE_OBSERVATION_PRIMITIVES",
+  "objective": "Derive a strict, current, read-only Bridge observation-readiness projection without changing historical flags, runtime state, domain truth or authority.",
+  "evaluation_order": [
+    "internal-adapter",
+    "owned-versioned-package",
+    "pinned-permissive-dependency",
+    "small-audited-vendor-import",
+    "minimal-missing-glue"
+  ],
+  "selected": [
+    "tools/observation_window_gate.py:strict canonical JSON, SHA and time validation patterns",
+    "ops/organism/runtime_monitor.py:Bridge-owned release/runtime/policy identity vocabulary",
+    "ops/organism/runtime-monitor-policy.json:current monitor policy identity",
+    "provenance/observation-window-policy-v1.json:long-window policy identity without claiming completion"
+  ],
+  "new_dependency": false,
+  "external_code": false,
+  "rationale": "The existing primitives cover strict identities, TTLs, tri-state failure closure and authority boundaries; only one small pure projection and focused assurance are missing."
+}
