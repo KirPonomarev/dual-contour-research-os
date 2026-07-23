@@ -1,0 +1,18 @@
+{
+  "lease_id": "lease-p05-bridge-observation-readiness-v1-agent-0",
+  "stage_id": "p05-bridge-observation-readiness-v1",
+  "agent_id": "agent-0",
+  "branch": "codex/bridge-a0-observation-readiness-v1",
+  "issued_at": "2026-07-23T21:41:28Z",
+  "expires_at": "2026-07-25T21:41:28Z",
+  "write_set": [
+    "tools/bridge_observation_readiness.py",
+    "tests/test_bridge_observation_readiness.py",
+    "docs/receipts/reuse/p05-bridge-observation-readiness-v1.json",
+    "stages/p05-bridge-observation-readiness-v1/stage-envelope.json",
+    "stages/p05-bridge-observation-readiness-v1/ownership-lease.json",
+    "docs/receipts/integration/p05-bridge-observation-readiness-v1.json"
+  ],
+  "exclusive": true,
+  "revoked": false
+}
